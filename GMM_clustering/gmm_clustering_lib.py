@@ -26,7 +26,8 @@ import common_modeling_lib as model_lib
 import functional_sensitivity_lib as fun_sens_lib
 
 # Should we put this somewhere? We only need get_hess_inv_sqrt
-sys.path.insert(0, './../../genomic_time_series_bnp/src/vb_modeling/')
+#sys.path.insert(0, './../../genomic_time_series_bnp/src/vb_modeling/')
+sys.path.insert(0, '/home/rgiordan/Documents/git_repos/genomic_time_series_bnp/src/vb_modeling/')
 import sparse_hessians_lib as sp_hess_lib
 
 
