@@ -87,8 +87,8 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\baseprior}[1][\theta]{p\left(#1\right)}
-{p\left(#1\right)}
+\newcommand{\baseprior}[1][\theta]{p_{0}\left(#1\right)}
+{p_{0}\left(#1\right)}
 \end_inset
 
 
@@ -96,7 +96,25 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\post}[2][\theta][\alpha]{p\left(#1\vert X,#2\right)}
+\newcommand{\contamprior}[2][\theta][\epsilon]{p_{c}\left(#1\vert#2\right)}
+{p_{c}\left(#1\vert#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\priorpert}[1][\theta]{\phi\left(#1\right)}
+{\phi\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\post}[2][\theta][\epsilon]{p\left(#1\vert X,#2\right)}
 {p\left(#1\vert X,#2\right)}
 \end_inset
 
@@ -123,6 +141,33 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\targetfun}{g\left(\theta\right)}
+{g\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etaopt}{\eta^{*}}
+{\eta^{*}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\mbe}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\thetadom}{\Omega_{\theta}}
 {\Omega_{\theta}}
 \end_inset
@@ -132,8 +177,17 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\renewcommand{\thetadom}{\Omega_{\theta}}
-{\Omega_{\theta}}
+\newcommand{\etadom}{\Omega_{\eta}}
+{\Omega_{\eta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qdom}{\mathcal{Q}}
+{\mathcal{Q}}
 \end_inset
 
 
@@ -238,7 +292,11 @@ We begin by deriving a general result for the sensitivity of VB optima to
 \end_layout
 
 \begin_layout Section
-Parametric Sensitivity for Variational Bayes
+Functional sensitivity
+\end_layout
+
+\begin_layout Subsection
+Variational Bayes
 \end_layout
 
 \begin_layout Standard
@@ -286,13 +344,19 @@ Suppose we observe data,
 
 :
 \begin_inset Formula 
-\begin{align*}
-\basepost & :=\frac{p\left(X\vert\theta\right)\baseprior}{\int p\left(X\vert\theta'\right)\baseprior[\theta']\lambda\left(d\theta'\right)}.
-\end{align*}
+\begin{align}
+\basepost & :=\frac{p\left(X\vert\theta\right)\baseprior}{\int p\left(X\vert\theta'\right)\baseprior[\theta']\lambda\left(d\theta'\right)}=\frac{p\left(X\vert\theta\right)\baseprior}{p\left(X\right)}.\label{eq:posterior_defn}
+\end{align}
 
 \end_inset
 
-In many cases (such as BNP problems), 
+Suppose we are interested in calculating a posterior expectation of some
+ function of interest, say 
+\begin_inset Formula $\mbe_{\basepost}\left[\targetfun\right]$
+\end_inset
+
+.
+ In many cases (such as most clustering problems), 
 \begin_inset Formula $\basepost$
 \end_inset
 
@@ -302,8 +366,242 @@ tes
 \begin_inset Formula $\basepost$
 \end_inset
 
- in KL divergence within some class of tractable distributions.
- Define the 
+ in KL divergence with a distribution in some convenient sub-class of all
+ possible distributions.
+ Let 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ be a set of distributions parameterized by the real-valued parameter 
+\begin_inset Formula $\eta\in\etadom\subseteq\mathbb{R}^{K_{q}}$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\qdom & :=\left\{ q:q=\qpost[][\eta]\textrm{ for }\eta\in\etadom\right\} .
+\end{align*}
+
+\end_inset
+
+For example, 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ might be a convenient exponential family such as a factorizing normal distribut
+ion, in which case 
+\begin_inset Formula $\eta$
+\end_inset
+
+ would parameterize the mean and covariance of 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+.
+ The optimal parameter, 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+, is the parameter that minimizes the KL divergence between 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+ and 
+\begin_inset Formula $\basepost$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align}
+KL\left(\qpost[][\eta]||\basepost\right) & :=\mbe_{\qpost[][\eta]}\left[\log\qpost[][\eta]-\log\basepost\right]\nonumber \\
+\etaopt & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\qpost[][\eta]||\basepost\right).\label{eq:kl_opt}
+\end{align}
+
+\end_inset
+
+The distribution 
+\begin_inset Formula $\qpost$
+\end_inset
+
+ is then the closest distribution in 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ to 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ as measured by KL divergence, and is called the 
+\begin_inset Quotes eld
+\end_inset
+
+variational approximation
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Formula $\basepost$
+\end_inset
+
+.
+ Noting that
+\begin_inset Formula 
+\begin{align*}
+\mbe_{\qpost[][\eta]}\left[\log\basepost\right] & =\mbe_{\qpost[][\eta]}\left[\log p\left(X\vert\theta\right)+\log\baseprior\right]-\log p\left(X\right),
+\end{align*}
+
+\end_inset
+
+we see that the intractable normalizing constant of 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ can be neglected when optimizing to find 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+.
+ We then hope that 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ is sufficiently expressive that
+\begin_inset Formula 
+\begin{align*}
+\mbe_{\qpost}\left[\targetfun\right] & \approx\mbe_{\basepost}\left[\targetfun\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Prior sensitivity
+\end_layout
+
+\begin_layout Standard
+The posterior expectation 
+\begin_inset Formula $\mbe_{\basepost}\left[\targetfun\right]$
+\end_inset
+
+ depends on the choice of prior, 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+, through the definition of the posterior in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:posterior_defn"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Similarly, the VB approximate posterior expectation 
+\begin_inset Formula $\mbe_{\qpost}\left[\targetfun\right]$
+\end_inset
+
+ depends on the choice of 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ through its occurrence in the objective of the optimization problem 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:kl_opt"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In order to quantify this dependence, consider a bounded 
+\begin_inset Formula $\lambda$
+\end_inset
+
+-integrable perturbation 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ (which may be positive or negative), take some 
+\begin_inset Formula $\epsilon\ge0$
+\end_inset
+
+, and define the 
+\begin_inset Quotes eld
+\end_inset
+
+contamination prior
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\contamprior & :=\frac{\baseprior+\epsilon\priorpert}{\int\left(\baseprior[\theta']+\epsilon\priorpert[\theta']\right)\lambda\left(d\theta'\right)}.
+\end{align*}
+
+\end_inset
+
+As long as 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ is chosen so that 
+\begin_inset Formula $\baseprior+\epsilon\priorpert\ge0$
+\end_inset
+
+, the distribution 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ is a well-defined distribution.
+ Because 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ is bounded, there always exists an open interval for 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ such that 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ is well-defined.
+ By using 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ as our prior, for any 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ we can define the 
+\begin_inset Quotes eld
+\end_inset
+
+contamination posterior
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\post & :=\frac{p\left(X\vert\theta\right)\contamprior}{\int p\left(X\vert\theta'\right)\contamprior[\theta']\lambda\left(d\theta\right)}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+GUSTAFSON showed some damn shit
 \end_layout
 
 \end_body
