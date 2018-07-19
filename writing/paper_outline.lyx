@@ -96,7 +96,7 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\contamprior}[2][\theta][\epsilon]{p_{c}\left(#1\vert#2\right)}
+\newcommand{\contamprior}[2][\theta][\epsilon,\phi]{p_{c}\left(#1\vert#2\right)}
 {p_{c}\left(#1\vert#2\right)}
 \end_inset
 
@@ -114,7 +114,7 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\post}[2][\theta][\epsilon]{p\left(#1\vert X,#2\right)}
+\newcommand{\post}[2][\theta][\epsilon,\phi]{p\left(#1\vert X,#2\right)}
 {p\left(#1\vert X,#2\right)}
 \end_inset
 
@@ -581,6 +581,10 @@ As long as
 \begin_inset Formula $\epsilon$
 \end_inset
 
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
  we can define the 
 \begin_inset Quotes eld
 \end_inset
@@ -597,11 +601,91 @@ contamination posterior
 
 \end_inset
 
+For a given 
+\begin_inset Formula $\phi$
+\end_inset
 
+, the posterior expectation 
+\begin_inset Formula $\mbe_{\post}\left[\targetfun\right]$
+\end_inset
+
+ depends on 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+, and this dependence measures the effect of perturbing the original prior
+ 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ by 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
-GUSTAFSON showed some damn shit
+For example, suppose we were interested in the effect of replacing the prior
+ 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ with an alternative distribution, 
+\begin_inset Formula $p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ If we take
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =p_{1}\left(\theta\right)-\baseprior\Rightarrow\\
+\contamprior & =\left(1-\epsilon\right)\baseprior+\epsilon p_{1}\left(\theta\right),
+\end{align*}
+
+\end_inset
+
+we can see that 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ is an 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+-additive mixture of 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ and 
+\begin_inset Formula $p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ Denote with 
+\begin_inset Formula $p_{1}\left(\theta\vert X\right)$
+\end_inset
+
+ the posterior as calculated using the prior 
+\begin_inset Formula $p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ Then the difference in the expectation of 
+\begin_inset Formula $\targetfun$
+\end_inset
+
+ between the two priors is given by
+\begin_inset Formula 
+\begin{align*}
+\mbe_{p_{1}\left(\theta\vert X\right)}\left[\targetfun\right]-\mbe_{\basepost}\left[\targetfun\right] & =\mbe_{\contamprior[][1,\phi]}\left[\targetfun\right]-\mbe_{\contamprior[][0,\phi]}\left[\targetfun\right]\\
+ & =\int_{0}^{1}\frac{d}{d\epsilon}\mbe_{\contamprior[][\epsilon,\phi]}\left[\targetfun\right]d\epsilon.
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \end_body
