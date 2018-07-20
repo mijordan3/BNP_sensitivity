@@ -191,8 +191,35 @@ theorems-ams-extended-chap-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+{\left\Vert #1\right\Vert }
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\at}[2]{\left.#1\right|_{#2}}
+{\left.#1\right|_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\cov}{\mathrm{Cov}}
 {\mathrm{Cov}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\meas}[1][d\theta]{\lambda\left(#1\right)}
+{\lambda\left(#1\right)}
 \end_inset
 
 
@@ -555,6 +582,10 @@ we see that the intractable normalizing constant of
 
 \begin_layout Subsection
 Prior sensitivity
+\end_layout
+
+\begin_layout Standard
+TODO: follow Gustafson and make the perturbations postive.
 \end_layout
 
 \begin_layout Standard
@@ -1063,19 +1094,36 @@ noprefix "false"
 
 \end_inset
 
+Define the inner product using the base prior, 
+\begin_inset Formula $\baseprior$
+\end_inset
 
-\end_layout
-
-\begin_layout Standard
-and define the inner product
+,
 \begin_inset Formula 
 \begin{align*}
-\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & :=\int a\left(\theta\right)b\left(\theta\right)\lambda\left(d\theta\right),
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & :=\int a\left(\theta\right)b\left(\theta\right)\lambda\left(d\theta\right).
 \end{align*}
 
 \end_inset
 
-then
+
+\end_layout
+
+\begin_layout Standard
+See notes below: it is not totally obviously to me whether it is not better
+ to define the inner product
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\frac{1}{\baseprior}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then
 \end_layout
 
 \begin_layout Proposition
@@ -1098,10 +1146,6 @@ The Gateaux derivatives are given by
 \begin_inset Separator plain
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
@@ -1176,6 +1220,279 @@ Extra notes
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+What is the correct inner product space to reproduce Gustafson's results?
+ Note that his notion of 
+\begin_inset Quotes eld
+\end_inset
+
+size
+\begin_inset Quotes erd
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \priorpert\right\Vert _{G} & =\int\frac{\priorpert^{2}}{\baseprior}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+Also, each of the influence function integrals have 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ in the denominator.
+ So it is tempting to define
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\frac{1}{\baseprior}\lambda\left(d\theta\right)
+\end{align*}
+
+\end_inset
+
+ so that
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \priorpert\right\Vert _{G} & =\sqrt{\left\langle \priorpert,\priorpert\right\rangle },
+\end{align*}
+
+\end_inset
+
+ and
+\begin_inset Formula 
+\begin{align*}
+\pinfluencefun & :=\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\basepost\\
+\pinfluenceop & =\left\langle \pinfluencefun,\priorpert\right\rangle .
+\end{align*}
+
+\end_inset
+
+What goes wrong? For one thing, it doesn't seem like the measure 
+\begin_inset Formula $\lambda\left(\cdot\right)/\baseprior$
+\end_inset
+
+ is dominated by 
+\begin_inset Formula $\lambda\left(\cdot\right)$
+\end_inset
+
+.
+ I don't know whether that matters, but you should at least be careful that
+ the measure is well-defined and stuff.
+\end_layout
+
+\begin_layout Standard
+Also,
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \pinfluencefun\right\Vert _{2} & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\basepost^{2}\frac{\lambda\left(d\theta\right)}{\baseprior}
+\end{align*}
+
+\end_inset
+
+which may not be finite.
+ In contrast, if you define the inner produce without the prior, then
+\begin_inset Formula 
+\begin{align*}
+\pinfluencefun & :=\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\basepost}{\baseprior}\\
+\left\Vert \pinfluencefun\right\Vert _{2} & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\basepost^{2}\frac{\lambda\left(d\theta\right)}{\baseprior^{2}}\\
+ & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\frac{p\left(X\vert\theta\right)^{2}}{p\left(X\right)^{2}}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+In fact, this also may not be finite.
+ And may be worse when 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ is small, which is where the problems arise.
+\end_layout
+
+\begin_layout Standard
+Note that in the proof of the worst case you actually use Holder's inequality
+ with respect to yet a third option.
+ For 
+\begin_inset Formula $\pinfluencefun$
+\end_inset
+
+ and 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ positive,
+\begin_inset Formula 
+\begin{align*}
+\int\pinfluencefun\priorpert\lambda\left(d\theta\right) & =\int\pinfluencefun\frac{\priorpert}{\baseprior}\baseprior\lambda\left(d\theta\right)\\
+ & \le\left(\int\pinfluencefun^{2}\baseprior\lambda\left(d\theta\right)\cdot\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\lambda\left(d\theta\right)\right)^{1/2}\\
+ & =\left(\int\pinfluencefun^{2}\baseprior\lambda\left(d\theta\right)\right)^{1/2}\left\Vert \priorpert\right\Vert _{G}.
+\end{align*}
+
+\end_inset
+
+This is Holder's inequality applied with 
+\begin_inset Formula $p=2$
+\end_inset
+
+ and 
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\baseprior\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\newpriorpert}{\gamma\left(\theta\right)}
+{\gamma\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this view, you might consider replacing the perturbation 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ in Gustafson by
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =\newpriorpert\baseprior
+\end{align*}
+
+\end_inset
+
+ or
+\begin_inset Formula 
+\begin{align*}
+\contamprior & :=\frac{\baseprior+\epsilon\priorpert}{\int\left(\baseprior+\epsilon\priorpert\right)\lambda\left(d\theta\right)}\\
+ & =\frac{\baseprior+\epsilon\baseprior\newpriorpert}{\int\left(\baseprior+\epsilon\baseprior\newpriorpert\right)\lambda\left(d\theta\right)}\\
+ & =\frac{\baseprior\left(1+\epsilon\newpriorpert\right)}{\int\left(\baseprior\left(1+\epsilon\newpriorpert\right)\right)\lambda\left(d\theta\right)}.
+\end{align*}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\epsilon}\log\left(\baseprior\left(1+\epsilon\newpriorpert\right)\right) & =\frac{\partial}{\partial\epsilon}\log\baseprior+\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\newpriorpert\right)\\
+ & =\frac{\newpriorpert}{1+\epsilon\newpriorpert}\\
+ & =\newpriorpert.
+\end{align*}
+
+\end_inset
+
+The magnitude of the perturbation is
+\begin_inset Formula 
+\begin{align*}
+\norm{{\priorpert}}_{G}^{2} & =\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\lambda\left(d\theta\right)\\
+ & =\int\newpriorpert^{2}\baseprior\lambda\left(d\theta\right)\\
+ & =\left\langle \newpriorpert,\newpriorpert\right\rangle \\
+ & =\norm{\newpriorpert}_{2}^{2}.
+\end{align*}
+
+\end_inset
+
+The Gateaux derivative is
+\begin_inset Formula 
+\begin{align*}
+\cov_{\basepost}\left(\targetfun,\newpriorpert\right) & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\newpriorpert\meas\\
+ & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\newpriorpert\frac{\baseprior}{\baseprior}\meas\\
+ & =\left\langle \left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\basepost}{\baseprior},\newpriorpert\right\rangle _{\baseprior\meas}\\
+ & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\priorpert}{\baseprior}\meas\\
+ & =\left\langle \basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right),\frac{\priorpert}{\baseprior}\right\rangle _{\meas}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We know that (up to sign fiddliness)
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\worstnewpriorpert}{\gamma^{*}\left(\theta\right)}
+{\gamma^{*}\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\worstpriorpert}{\phi^{*}\left(\theta\right)}
+{\phi^{*}\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\gbar}{\overline{\targetfun}}
+{\overline{\targetfun}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\worstnewpriorpert & \propto\left(\gbar\right)\frac{\basepost}{\baseprior}\\
+\norm{\worstnewpriorpert}_{G} & =1\Rightarrow\\
+\worstnewpriorpert & =\frac{\left(\gbar\right)\frac{\basepost}{\baseprior}}{\int\left(\gbar\right)^{2}\left(\frac{\basepost}{\baseprior}\right)^{2}\baseprior\meas}.
+\end{align*}
+
+\end_inset
+
+This simply follows from Cauchy-Schwartz with the inner product 
+\begin_inset Formula $\left\langle \cdot,\cdot\right\rangle _{\baseprior\meas}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\left(\int\basepost\gbar\frac{\priorpert}{\baseprior}\frac{\baseprior}{\baseprior}\meas\right)^{2} & \le\\
+\left(\int\left(\basepost\frac{\gbar}{\baseprior}\right)^{2}\baseprior\meas\right)\left(\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\meas\right) & =\textrm{ (note, using }\left\langle \cdot\right\rangle _{\baseprior\meas}\textrm{)}\\
+\left(\int\left(\basepost\frac{\gbar}{\baseprior}\right)^{2}\baseprior\meas\right)\cdot1
+\end{align*}
+
+\end_inset
+
+The same integral occurs.
+ Because
+\begin_inset Formula 
+\begin{align*}
+\frac{\priorpert}{\baseprior} & =C_{\phi}^{-1}\frac{\basepost\gbar}{\baseprior}
+\end{align*}
+
+\end_inset
+
+this is the same worst-case up to proportionality (of course) and
+\begin_inset Formula 
+\begin{align*}
+1 & =\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\meas\\
+ & =\int C_{\phi}^{-2}\left(\frac{\basepost\gbar}{\baseprior}\right)^{2}\baseprior\meas\Rightarrow\\
+C_{\phi}^{2} & =\int\left(\frac{\basepost\gbar}{\baseprior}\right)^{2}\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+So you need to compute the same integral either way.
 \end_layout
 
 \end_body
