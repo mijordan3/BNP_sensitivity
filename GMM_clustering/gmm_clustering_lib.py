@@ -828,7 +828,7 @@ class LinearSensitivity(object):
             # but it gives autograd arrayboxes. So we only use it
             # for integration: i.e. when we need to compute for many samples
 
-            # in this case, theta should be a vector
+            # in this case, theta needs to be a vector
             # in the other case, theta could be a matrix
             assert len(np.shape(theta)) < 2
             log_q_pi_jac = self.get_log_q_pi_jac_manual(\
@@ -920,7 +920,7 @@ class LinearSensitivity(object):
 
         return total_influence
 
-    def get_worst_case_perturbation(self, g_eta, theta, sign, diffble = True):
+    def get_worst_case_perturbation_unscaled(self, g_eta, theta, sign, diffble = True):
         alpha = self.model.prior_params['alpha'].get()
 
         prior_density = np.expand_dims(sp.stats.beta.pdf(theta, 1, alpha), \
@@ -931,11 +931,33 @@ class LinearSensitivity(object):
 
         return np.maximum(sign * influence, 0)**2 * prior_density
 
-    # def get_worse_case_norm(self, g_eta):
-    #     # returns the worst case functional perturbation
-    #
-    #     integral1, integral2 = self.worse_case_integration(g_eta, k)
-    #     return np.maximum(np.sqrt(integral1), np.sqrt(integral2))
+    def get_worst_case_fun_sens(self, g_eta):
+        worst_case_neg = lambda x : \
+                self.get_worst_case_perturbation_unscaled(
+                                        g_eta = g_eta, \
+                                        theta = x, \
+                                        sign = -1,
+                                        diffble = False)
+
+        worst_case_pos = lambda x : \
+                self.get_worst_case_perturbation_unscaled(
+                                        g_eta = g_eta, \
+                                        theta = x, \
+                                        sign = 1,
+                                        diffble = False)
+
+        worst_case_fun_sens_mat_pos = np.zeros((len(self.optimal_global_free_params), self.model.k_approx - 1))
+        worst_case_fun_sens_mat_neg = np.zeros((len(self.optimal_global_free_params), self.model.k_approx - 1))
+
+        for k in range(self.model.k_approx - 1):
+            worst_case_fun_sens_mat_pos[:, k] = \
+                self.get_functional_sensitivity(lambda x : worst_case_pos(x), k)
+
+            worst_case_fun_sens_mat_neg[:, k] = \
+                self.get_functional_sensitivity(lambda x : worst_case_neg(x), k)
+
+
+        return worst_case_fun_sens_mat_pos, worst_case_fun_sens_mat_neg
 
 #################################
 # Functions to reload the model
