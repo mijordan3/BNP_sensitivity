@@ -56,22 +56,6 @@ def get_dp_prior(vb_params, prior_params):
     return (alpha - 1) * np.sum(e_log_1mv)
 
 
-def get_e_beta_prior(vb_params, prior_params):
-    beta = vb_params['global']['beta'].get()
-
-    # normalizing beta in the prior too
-    beta = beta / np.expand_dims(np.linalg.norm(beta, axis=0), axis=0)
-
-    beta_base_prior = ef.uvn_prior(
-        prior_mean = prior_params['prior_beta'].get(),
-        prior_info = prior_params['prior_beta_info'].get(),
-        e_obs = beta.flatten(),
-        var_obs = np.array([0.]))
-
-    return np.sum(beta_base_prior)
-
-
-
 ##############
 # likelihoods
 
