@@ -769,7 +769,7 @@ class LinearSensitivity(object):
         # with respect to perturbing the prior of the k stick by a function u
 
         # we compute the expectation with importance sampling. imp_propn
-        # gives the factor of the variance that we multiply/divide by
+        # gives the factor of the variance that we multiply by;
         # n_samples is the number of samples we draw to compute the expectation
 
         assert self.model.vb_params.use_logitnormal_sticks , \
@@ -824,8 +824,16 @@ class LinearSensitivity(object):
                                 self.kl_hessian_inv, log_q_pi_jacT)
 
         else:
-            log_q_pi_jac = self.get_log_q_pi_jac(\
+            # diffbl = False is a lot faster
+            # but it gives autograd arrayboxes. So we only use it
+            # for integration: i.e. when we need to compute for many samples
+
+            # in this case, theta should be a vector
+            # in the other case, theta could be a matrix
+            assert len(np.shape(theta)) < 2
+            log_q_pi_jac = self.get_log_q_pi_jac_manual(\
                                 self.optimal_global_free_params, theta, k)
+
             return osp.linalg.cho_solve(self.kl_hessian_chol, log_q_pi_jac.T)
 
     def get_q_prior_log_ratio(self, theta, k):
@@ -861,7 +869,7 @@ class LinearSensitivity(object):
         self.model.global_vb_params.set_free(global_free_params)
         return self.model.vb_params['global']['v_sticks']['info'].get()[k]
 
-    def get_log_q_pi_jac(self, global_free_params, theta, k):
+    def get_log_q_pi_jac_manual(self, global_free_params, theta, k):
         mean = self._get_logit_k_mean(global_free_params, k)
         info = self._get_logit_k_info(global_free_params, k)
 
@@ -912,7 +920,7 @@ class LinearSensitivity(object):
 
         return total_influence
 
-    def _eval_worst_case_integrand(self, g_eta, theta, sign, diffble = True):
+    def get_worst_case_perturbation(self, g_eta, theta, sign, diffble = True):
         alpha = self.model.prior_params['alpha'].get()
 
         prior_density = np.expand_dims(sp.stats.beta.pdf(theta, 1, alpha), \
@@ -923,11 +931,11 @@ class LinearSensitivity(object):
 
         return np.maximum(sign * influence, 0)**2 * prior_density
 
-    def get_worse_case_norm(self, g_eta):
-        # returns the worst case functional perturbation
-
-        integral1, integral2 = self.worse_case_integration(g_eta, k)
-        return np.maximum(np.sqrt(integral1), np.sqrt(integral2))
+    # def get_worse_case_norm(self, g_eta):
+    #     # returns the worst case functional perturbation
+    #
+    #     integral1, integral2 = self.worse_case_integration(g_eta, k)
+    #     return np.maximum(np.sqrt(integral1), np.sqrt(integral2))
 
 #################################
 # Functions to reload the model
