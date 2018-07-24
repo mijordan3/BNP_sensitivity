@@ -27,8 +27,8 @@ import functional_sensitivity_lib as fun_sens_lib
 
 # Should we put this somewhere? We only need get_hess_inv_sqrt
 #sys.path.insert(0, './../../genomic_time_series_bnp/src/vb_modeling/')
-sys.path.insert(0, '/home/rgiordan/Documents/git_repos/genomic_time_series_bnp/src/vb_modeling/')
-import sparse_hessians_lib as sp_hess_lib
+#sys.path.insert(0, '/home/rgiordan/Documents/git_repos/genomic_time_series_bnp/src/vb_modeling/')
+#import sparse_hessians_lib as sp_hess_lib
 
 
 import checkpoints
@@ -686,7 +686,8 @@ class DPGaussianMixture(object):
     def get_preconditioner(self, free_par):
         obj_hessian = self.objective.fun_free_hessian(free_par)
         inv_hess_sqrt, hessian_corrected = \
-            sp_hess_lib.get_hess_inv_sqrt(obj_hessian)
+            obj_lib.get_sym_matrix_inv_sqrt(obj_hessian)
+            #sp_hess_lib.get_hess_inv_sqrt(obj_hessian)
 
         return inv_hess_sqrt, obj_hessian, hessian_corrected
 
