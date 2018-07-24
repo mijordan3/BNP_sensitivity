@@ -1,0 +1,1976 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\begin_modules
+theorems-ams-chap-bytype
+theorems-ams-extended-chap-bytype
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\basepost}[1][\theta]{p\left(#1\vert X\right)}
+{p\left(#1\vert X\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\baseprior}[1][\theta]{p_{0}\left(#1\right)}
+{p_{0}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\contamprior}[2][\theta][\epsilon,\phi]{p_{c}\left(#1\vert#2\right)}
+{p_{c}\left(#1\vert#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\priorpert}[1][\theta]{\phi\left(#1\right)}
+{\phi\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\post}[2][\theta][\epsilon,\phi]{p\left(#1\vert X,#2\right)}
+{p\left(#1\vert X,#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qpost}[2][\theta][\eta^{*}]{q\left(#1;#2\right)}
+{q\left(#1;#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\logpert}[2][\theta][\alpha]{\rho\left(#1,#2\right)}
+{\rho\left(#1;#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\targetfun}{g\left(\theta\right)}
+{g\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etaopt}{\eta^{*}}
+{\eta^{*}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\klhess}{H}
+{H}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\eggrad}{G}
+{G}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\mbe}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+{\left\Vert #1\right\Vert }
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\at}[2]{\left.#1\right|_{#2}}
+{\left.#1\right|_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\cov}{\mathrm{Cov}}
+{\mathrm{Cov}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\meas}[1][d\theta]{\lambda\left(#1\right)}
+{\lambda\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pinfluenceop}[1][\phi]{\mathbb{I}_{p}^{}\left[#1\right]}
+{\mathbb{I}_{p}\left[#1\right]}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qinfluenceop}[1][\phi]{\mathbb{I}_{q}\left[#1\right]}
+{\mathbb{I}_{q}\left[#1\right]}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pinfluencefun}[2][\theta][\,]{\mathcal{I}_{p}^{#2}\left(#1\right)}
+{\mathcal{I}_{p}^{#2}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qinfluencefun}[2][\theta][\,]{\mathcal{I}_{q}^{#2}\left(#1\right)}
+{\mathcal{I}_{q}^{#2}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\thetadom}{\Omega_{\theta}}
+{\Omega_{\theta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etadom}{\Omega_{\eta}}
+{\Omega_{\eta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qdom}{\mathcal{Q}}
+{\mathcal{Q}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\unusedpertbound}{C_{\phi}}
+{C_{\phi}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\ball}{B_{\delta}}
+{B_{\delta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+A central question in many probabilistic clustering problems is how many
+ distinct clusters are present in a particular dataset.
+ In all but the simplest problems, any attempt to answer this question may
+ be strongly determined by the criterion used.
+ One common approach, based in the Bayesian tradition, addresses the problem
+ with a generative model: out of a population of unobserved latent clusters,
+ some finite number are randomly chosen to be present in the actual data
+ at hand.
+ The identity and number of these clusters can then be estimated – with
+ attendant uncertainty estimates – using the tools of Bayesian posterior
+ inference.
+ For example, one might estimate the 
+\begin_inset Quotes eld
+\end_inset
+
+number of distinct clusters present
+\begin_inset Quotes erd
+\end_inset
+
+ by its posterior expectation.
+ Such a generative model is called a 
+\begin_inset Quotes eld
+\end_inset
+
+Bayesian non-parametric
+\begin_inset Quotes erd
+\end_inset
+
+ (BNP) model when the number of latent clusters is infinite, though, naturally,
+ even in non-parametric models only a finite number of clusters can actually
+ be observed in any particular dataset.
+ 
+\end_layout
+
+\begin_layout Standard
+As with any Bayesian model, this approach requires the specification of
+ a prior and a likelihood.
+ In this case, the likelihood describes the dispersion of data within a
+ particular cluster, and the prior determines both the distribution of cluster
+ shapes and sizes as well as the process that determines how many clusters
+ are present.
+ In general, different choices of the prior and likelihood would give different
+ answers to the question 
+\begin_inset Quotes eld
+\end_inset
+
+how many distinct clusters are present?
+\begin_inset Quotes erd
+\end_inset
+
+ For example, if the prior does not somehow prefer fewer, larger clusters,
+ then there is nothing that inherently prevents such an approach from inferring
+ that each datapoint is in its own cluster.
+ However, one still hopes that a broad range of reasonable choices of prior
+ and likelihood will come to similar conclusions.
+ Consequently, it is important, in practice, to measure the sensitivity
+ of the inferred number of clusters present to the prior and likelihood
+ specification.
+ Furthermore, these sensitivity measures should work with the kinds of inference
+ tools that are used in practice, operate relatively automatically without
+ re-fitting the model many times, and measure sensitivity not only to alternativ
+e hyperparameters but also to alternative functional forms of the prior
+ and likelihood.
+ 
+\end_layout
+
+\begin_layout Standard
+To address these needs, we develop fast, automatic measures of the sensitivity
+ of variational Bayes (VB) approximations to perturbations of functional
+ forms in a putative model.
+ As a motivating application, we apply our techniques to estimate the sensitivit
+y of BNP posteriors to the functional form of a particular BNP prior known
+ as the stick-breaking prior.
+ As we will see below, stick-breaking priors provide a strong motivation
+ to quantify functional perturbations.
+ A typical choice of a stick breaking prior is specified with only a single
+ real-valued hyperparameter and also a potentially informative distributional
+ assumption, the form of a stick breaking prior can substantially inform
+ the number of clusters inferred to be present in a particular dataset,
+ and it is arguably difficult for ordinary practitioners to form meaningful
+ subjective beliefs about the abstract form of the stick breaking prior.
+\end_layout
+
+\begin_layout Standard
+We begin by deriving a general result for the sensitivity of VB optima to
+ function-valued perturbations, as well as several useful specializations.
+ We then describe a VB approximation to a BNP model with a stick-breaking
+ prior and derive the sensitivity of the approximate number of inferred
+ clusters to the choice of the stick breaking prior.
+ We then apply our methods to a real dataset, comparing our results to the
+ much more expensive process of re-fitting the model.
+\end_layout
+
+\begin_layout Section
+Functional sensitivity
+\end_layout
+
+\begin_layout Subsection
+Variational Bayes
+\end_layout
+
+\begin_layout Standard
+Suppose we observe data, 
+\begin_inset Formula $X$
+\end_inset
+
+, and a parameter 
+\begin_inset Formula $\theta\in\thetadom\subseteq\mathbb{R}^{K}$
+\end_inset
+
+, which parameterizes a generative model for 
+\begin_inset Formula $X$
+\end_inset
+
+, denoted 
+\begin_inset Formula $p\left(X\vert\theta\right)$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $K$
+\end_inset
+
+ may be finite or, as in the case of BNP, countably infinite.
+ Defining a base prior, 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+, with respect to a dominating measure 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ on 
+\begin_inset Formula $\thetadom$
+\end_inset
+
+, we can calculate the posterior distribution on 
+\begin_inset Formula $\theta$
+\end_inset
+
+ given 
+\begin_inset Formula $X$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align}
+\basepost & :=\frac{p\left(X\vert\theta\right)\baseprior}{\int p\left(X\vert\theta'\right)\baseprior[\theta']\lambda\left(d\theta'\right)}=\frac{p\left(X\vert\theta\right)\baseprior}{p\left(X\right)}.\label{eq:posterior_defn}
+\end{align}
+
+\end_inset
+
+Suppose we are interested in calculating a posterior expectation of some
+ function of interest, say 
+\begin_inset Formula $\mbe_{\basepost}\left[\targetfun\right]$
+\end_inset
+
+.
+ In many cases (such as most clustering problems), 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ is intractable and must be approximated.
+ One popular approximation technique, known as variational Bayes (VB), approxima
+tes 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ in KL divergence with a distribution in some convenient sub-class of all
+ possible distributions.
+ Let 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ be a set of distributions parameterized by the real-valued parameter 
+\begin_inset Formula $\eta\in\etadom\subseteq\mathbb{R}^{K_{q}}$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\qdom & :=\left\{ q:q=\qpost[][\eta]\textrm{ for }\eta\in\etadom\right\} .
+\end{align*}
+
+\end_inset
+
+For example, 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ might be a convenient exponential family such as a factorizing normal distribut
+ion, in which case 
+\begin_inset Formula $\eta$
+\end_inset
+
+ would parameterize the mean and covariance of 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+.
+ The optimal parameter, 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+, is the parameter that minimizes the KL divergence between 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+ and 
+\begin_inset Formula $\basepost$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align}
+KL\left(\qpost[][\eta]||\basepost\right) & :=\mbe_{\qpost[][\eta]}\left[\log\qpost[][\eta]-\log\basepost\right]\nonumber \\
+\etaopt & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\qpost[][\eta]||\basepost\right).\label{eq:kl_opt}
+\end{align}
+
+\end_inset
+
+The distribution 
+\begin_inset Formula $\qpost$
+\end_inset
+
+ is then the closest distribution in 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ to 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ as measured by KL divergence, and is called the 
+\begin_inset Quotes eld
+\end_inset
+
+variational approximation
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Formula $\basepost$
+\end_inset
+
+.
+ Noting that
+\begin_inset Formula 
+\begin{align*}
+\mbe_{\qpost[][\eta]}\left[\log\basepost\right] & =\mbe_{\qpost[][\eta]}\left[\log p\left(X\vert\theta\right)+\log\baseprior\right]-\log p\left(X\right),
+\end{align*}
+
+\end_inset
+
+we see that the intractable normalizing constant of 
+\begin_inset Formula $\basepost$
+\end_inset
+
+ can be neglected when optimizing to find 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+.
+ We then hope that 
+\begin_inset Formula $\qdom$
+\end_inset
+
+ is sufficiently expressive that
+\begin_inset Formula 
+\begin{align*}
+\mbe_{\qpost}\left[\targetfun\right] & \approx\mbe_{\basepost}\left[\targetfun\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hyperparameter sensitivity
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:hyperparam_sensitivity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As discussed in GIORDANO, for a log-perturbed posterior
+\begin_inset Formula 
+\begin{align*}
+\post[][\epsilon] & :=\frac{\basepost\exp\left(\rho\left(\theta,\epsilon\right)\right)}{\int\basepost[\theta']\exp\left(\rho\left(\theta',\epsilon\right)\right)\lambda\left(d\theta'\right)},
+\end{align*}
+
+\end_inset
+
+with variational approximation 
+\begin_inset Formula $\qpost[][\etaopt\left(\epsilon,\phi\right)]$
+\end_inset
+
+ given by
+\begin_inset Formula 
+\begin{align*}
+\etaopt\left(\epsilon,\phi\right) & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\qpost[][\eta]||\post\right),
+\end{align*}
+
+\end_inset
+
+then
+\begin_inset Formula 
+\begin{align*}
+\left.\frac{d}{d\epsilon}\mbe_{\post[][\epsilon]}\left[\targetfun\right]\right|_{\epsilon=0} & =\cov_{\basepost}\left(\targetfun,\left.\frac{\partial}{\partial\epsilon}\rho\left(\theta,\epsilon\right)\right|_{\epsilon=0}\right)
+\end{align*}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{align*}
+\klhess & :=\left.\frac{\partial KL\left(\eta\right)}{\partial\eta\partial\eta^{T}}\right|_{\eta=\etaopt\left(0,\phi\right)}\\
+\eggrad & :=\left.\frac{\partial\mbe_{\qpost[][\eta]}\left[\targetfun\right]}{\partial\eta^{T}}\right|_{\eta=\etaopt\left(0,\phi\right)}\\
+\left.\frac{d}{d\epsilon}\mbe_{\qpost[][\etaopt\left(\epsilon,\phi\right)]}\left[\targetfun\right]\right|_{\epsilon=0} & =-\eggrad\klhess^{-1}\left.\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\left.\frac{\partial}{\partial\epsilon}\rho\left(\theta,\epsilon\right)\right|_{\epsilon=0}\right]\right|_{\eta=\etaopt\left(0,\phi\right)}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Prior sensitivity
+\end_layout
+
+\begin_layout Standard
+The posterior expectation 
+\begin_inset Formula $\mbe_{\basepost}\left[\targetfun\right]$
+\end_inset
+
+ depends on the choice of prior, 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+, through the definition of the posterior in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:posterior_defn"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Similarly, the VB approximate posterior expectation 
+\begin_inset Formula $\mbe_{\qpost}\left[\targetfun\right]$
+\end_inset
+
+ depends on the choice of 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ through its occurrence in the objective of the optimization problem 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:kl_opt"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In order to quantify this dependence, we will follow GUSTAFSON, defining
+ a class of perturbations to 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ and quantifying the sensitivity of 
+\begin_inset Formula $\mbe\left[\targetfun\right]$
+\end_inset
+
+ to these perturbations.
+\end_layout
+
+\begin_layout Standard
+Consider a positive, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+-integrable perturbation 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+, take some 
+\begin_inset Formula $\epsilon\ge0$
+\end_inset
+
+, and define the following 
+\begin_inset Quotes eld
+\end_inset
+
+contaminated prior
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Definition
+Let 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ be a point-wise positive, 
+\begin_inset Formula $\lambda$
+\end_inset
+
+-measurable function such that
+\begin_inset Formula 
+\begin{align*}
+\priorpert & \ge0\textrm{ and }\\
+\int\priorpert\baseprior\meas & <\infty.
+\end{align*}
+
+\end_inset
+
+Then, for any 
+\begin_inset Formula $\epsilon\ge0$
+\end_inset
+
+, define the 
+\begin_inset Quotes eld
+\end_inset
+
+contaminated prior
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+, as
+\begin_inset Formula 
+\begin{align*}
+\contamprior & :=\frac{\baseprior\left(1+\epsilon\priorpert\right)}{\int\baseprior[\theta']\left(1+\epsilon\priorpert[\theta']\right)\meas[d\theta']}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because 
+\begin_inset Formula $\int\priorpert\baseprior\meas<\infty$
+\end_inset
+
+, 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ is well-defined for all 
+\begin_inset Formula $\epsilon\ge0$
+\end_inset
+
+.
+ Also note that 
+\begin_inset Formula $\contamprior[][0,\phi]=\baseprior$
+\end_inset
+
+ for all 
+\begin_inset Formula $\phi$
+\end_inset
+
+, so that we recover the original prior at 
+\begin_inset Formula $\epsilon=0$
+\end_inset
+
+ and deviate from it in the 
+\begin_inset Quotes eld
+\end_inset
+
+direction
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ as 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ increases.
+ For example, suppose we were interested in the effect of replacing the
+ prior 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ with an alternative distribution, 
+\begin_inset Formula $p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ If we take 
+\begin_inset Formula $\priorpert=\frac{p_{1}\left(\theta\right)}{\baseprior}$
+\end_inset
+
+, then
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\frac{\baseprior+\epsilon p_{1}\left(\theta\right)}{1+\epsilon}
+\end{align*}
+
+\end_inset
+
+Consequently, 
+\begin_inset Formula $\contamprior[][0,\phi]=\baseprior$
+\end_inset
+
+, and 
+\begin_inset Formula $\lim_{\epsilon\rightarrow\infty}\contamprior=\contamprior[][\infty,\phi]=p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+By using 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ as our prior, for any 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
+ we get a new posterior:
+\begin_inset Formula 
+\begin{align*}
+\post & :=\frac{p\left(X\vert\theta\right)\contamprior}{\int p\left(X\vert\theta'\right)\contamprior[\theta']\meas[d\theta']}.
+\end{align*}
+
+\end_inset
+
+As in , local sensitivity analysis approximates the dependence of expectations
+ on 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ (a given 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+) using the derivative.
+ 
+\begin_inset Formula 
+\begin{align}
+\mbe_{\contamprior}\left[\targetfun\right]-\mbe_{\basepost}\left[\targetfun\right] & \approx\left.\frac{d}{d\epsilon}\mbe_{\post}\left[\targetfun\right]\right|_{\epsilon=0}\epsilon.\label{eq:difference_approx}
+\end{align}
+
+\end_inset
+
+The derivative in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:difference_approx"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is known as 
+\begin_inset Quotes eld
+\end_inset
+
+local sensitivity
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+, and the derivative depends on 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+ For a given 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+, we can use the results of 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "subsec:hyperparam_sensitivity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to calculate the derivative.
+ Using 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ is equivalent to taking 
+\begin_inset Formula 
+\begin{align*}
+\rho\left(\theta,\epsilon\right) & =\log\contamprior-\log\baseprior\Rightarrow\\
+\frac{\partial}{\partial\epsilon}\rho\left(\theta,\epsilon\right) & =\frac{\partial}{\partial\epsilon}\log\left(\baseprior\left(1+\epsilon\priorpert\right)\right)-\frac{\partial}{\partial\epsilon}\log\int\baseprior[\theta']\left(1+\epsilon\priorpert[\theta']\right)\lambda\left(d\theta'\right)\\
+ & =\frac{\priorpert}{1+\epsilon\priorpert}-\frac{\int\baseprior[\theta']\priorpert[\theta']\lambda\left(d\theta'\right)}{\int\left(\baseprior[\theta']+\epsilon\priorpert[\theta']\right)\lambda\left(d\theta'\right)}\Rightarrow\\
+\left.\frac{\partial}{\partial\epsilon}\rho\left(\theta,\epsilon\right)\right|_{\epsilon=0} & =\priorpert-\int\baseprior[\theta']\priorpert[\theta']\lambda\left(d\theta'\right).
+\end{align*}
+
+\end_inset
+
+Noting that the term 
+\begin_inset Formula $\int\baseprior[\theta']\priorpert[\theta']\lambda\left(d\theta'\right)$
+\end_inset
+
+ is not a function of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ , we have that
+\end_layout
+
+\begin_layout Proposition
+\begin_inset CommandInset label
+LatexCommand label
+name "prop:sensitivity_formulas"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\left.\frac{d}{d\epsilon}\mbe_{\post}\left[\targetfun\right]\right|_{\epsilon=0} & =\cov_{\basepost}\left(\targetfun,\priorpert\right)\label{eq:posterior_sensitivity_formula}\\
+\left.\frac{d}{d\epsilon}\mbe_{\qpost[][\etaopt\left(\epsilon,\phi\right)]}\left[\targetfun\right]\right|_{\epsilon=0} & =-\eggrad\klhess^{-1}\left.\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\priorpert\right]\right|_{\eta=\etaopt}.\label{eq:vb_sensitivity_formula}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:posterior_sensitivity_formula"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is equivalent to that given in GUSTAFSON up to a re-parameterization.
+ Our contribution is the corresponding 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:vb_sensitivity_formula"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for variational approximations.
+ 
+\end_layout
+
+\begin_layout Subsection
+Worst-case perturbations
+\end_layout
+
+\begin_layout Standard
+The sensitivities in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:sensitivity_formulas"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are defined for a particular 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+.
+ There are many functions 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ to try, and it can be useful to consider the worst-case perturbation amongst
+ perturbations of a particular 
+\begin_inset Quotes eld
+\end_inset
+
+size
+\begin_inset Quotes erd
+\end_inset
+
+.
+ A number of notions of perturbation size have been considered, and we follow
+ one of the central recommendations in GUSTAFASON with minor notational
+ differences.
+ (See 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "sec:gustafson_comparison"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details connecting GUSTAFSON to the present work.)
+\end_layout
+
+\begin_layout Standard
+To define a notion of perturbation size, we define an inner product for
+ 
+\begin_inset Formula $\lambda$
+\end_inset
+
+-measurable functions:
+\end_layout
+
+\begin_layout Definition
+\begin_inset CommandInset label
+LatexCommand label
+name "def:hilbert_def"
+
+\end_inset
+
+Define a Hilbert space of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+-measurable functions 
+\begin_inset Formula $a\left(\theta\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $b\left(\theta\right)$
+\end_inset
+
+ using the inner product
+\begin_inset Formula 
+\begin{align*}
+\left\langle a,b\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+Correspondingly, define the norm
+\begin_inset Formula 
+\begin{align*}
+\norm a_{2}^{2} & :=\left\langle a,a\right\rangle 
+\end{align*}
+
+\end_inset
+
+and the positive 
+\begin_inset Formula $\delta$
+\end_inset
+
+-ball
+\begin_inset Formula 
+\begin{align*}
+B_{\delta} & :=\left\{ a\left(\theta\right):\norm a_{2}\le\delta,a\left(\theta\right)\ge0\right\} .
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+TODO: refer to Dudley to prove this is a Hilbert space.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Under 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "def:hilbert_def"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we will consider functions 
+\begin_inset Formula $\priorpert\in\ball$
+\end_inset
+
+ for some fixed 
+\begin_inset Formula $\delta$
+\end_inset
+
+.
+ Up to careful treatment of re-parameterizations, this is equivalent to
+ equation (2) in GUSTAFSON; see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "sec:gustafson_comparison"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details.
+\end_layout
+
+\begin_layout Standard
+One benefit of working in a Hilbert space is that the the sensitivities
+ in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:sensitivity_formulas"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ can be expressed as inner products with 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+.
+ Define 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\pinfluenceop & :=\left.\frac{d}{d\epsilon}\mbe_{\post}\left[\targetfun\right]\right|_{\epsilon=0}\\
+\qinfluenceop & :=\left.\frac{d}{d\epsilon}\mbe_{\qpost[][\etaopt\left(\epsilon,\phi\right)]}\left[\targetfun\right]\right|_{\epsilon=0}.
+\end{align*}
+
+\end_inset
+
+By plugging in the expressions from 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:sensitivity_formulas"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we can define
+\begin_inset Formula 
+\begin{align*}
+\pinfluencefun & :=\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\basepost}{\baseprior}\\
+\qinfluencefun & :=-\eggrad\klhess^{-1}\left.\frac{\partial}{\partial\eta}\log\qpost[][\eta]\right|_{\eta=\etaopt\left(0,\phi\right)}\frac{\qpost}{\baseprior}.
+\end{align*}
+
+\end_inset
+
+Then,
+\end_layout
+
+\begin_layout Proposition
+The sensitivities in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:sensitivity_formulas"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are given by
+\end_layout
+
+\begin_layout Proposition
+\begin_inset Formula 
+\begin{align*}
+\pinfluenceop & =\left\langle \pinfluencefun,\priorpert\right\rangle \\
+\qinfluenceop & =\left\langle \qinfluencefun,\priorpert\right\rangle .
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We are interested in how large 
+\begin_inset Formula $\pinfluenceop$
+\end_inset
+
+ and 
+\begin_inset Formula $\qinfluenceop$
+\end_inset
+
+ can be for 
+\begin_inset Formula $\priorpert\in\ball$
+\end_inset
+
+.
+ Recalling that 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ must be positive point-wise, an application of Cauchy-Schwartz gives the
+ following result.
+\end_layout
+
+\begin_layout Proposition
+Define the positive part of 
+\begin_inset Formula $\pinfluencefun$
+\end_inset
+
+ as 
+\begin_inset Formula $\pinfluencefun[][+]:=\pinfluencefun\wedge0$
+\end_inset
+
+ and the negative part as 
+\begin_inset Formula $\pinfluencefun[][-]:=\left(-\pinfluencefun\right)\wedge0$
+\end_inset
+
+.
+ Similarly, define 
+\begin_inset Formula $\qinfluencefun[][+]:=\qinfluencefun\wedge0$
+\end_inset
+
+ and 
+\begin_inset Formula $\qinfluencefun[][-]:=\left(-\qinfluencefun\right)\wedge0$
+\end_inset
+
+.
+ Then worst-case perturbations in a 
+\begin_inset Formula $\delta$
+\end_inset
+
+-ball are given by
+\end_layout
+
+\begin_layout Proposition
+\begin_inset Formula 
+\begin{align*}
+\sup_{\priorpert\in\ball}\left\langle \pinfluencefun,\priorpert\right\rangle  & =\delta\norm{{\pinfluencefun[][+]}}_{2}\quad\textrm{and}\quad\inf_{\priorpert\in\ball}\left\langle \pinfluencefun,\priorpert\right\rangle =\delta\norm{{\pinfluencefun[][-]}}_{2}.
+\end{align*}
+
+\end_inset
+
+Correspondingly, 
+\begin_inset Formula 
+\begin{align*}
+\underset{\priorpert\in\ball}{\mathrm{argsup}}\left\langle \pinfluencefun,\priorpert\right\rangle  & =\delta\frac{\pinfluencefun[][+]}{\norm{{\pinfluencefun[][+]}}_{2}}\quad\textrm{and}\quad\underset{\priorpert\in\ball}{\mathrm{arginf}}\left\langle \pinfluencefun,\priorpert\right\rangle =\delta\frac{\pinfluencefun[][-]}{\norm{{\pinfluencefun[][-]}}_{2}}.
+\end{align*}
+
+\end_inset
+
+The corresponding results for a variational approximation are
+\begin_inset Formula 
+\begin{align*}
+\sup_{\priorpert\in\ball}\left\langle \qinfluencefun,\priorpert\right\rangle  & =\delta\norm{{\qinfluencefun[][+]}}_{2}\quad\textrm{and}\quad\inf_{\priorpert\in\ball}\left\langle \qinfluencefun,\priorpert\right\rangle =\delta\norm{{\qinfluencefun[][-]}}_{2}.
+\end{align*}
+
+\end_inset
+
+Correspondingly, 
+\begin_inset Formula 
+\begin{align*}
+\underset{\priorpert\in\ball}{\mathrm{argsup}}\left\langle \qinfluencefun,\priorpert\right\rangle  & =\delta\frac{\qinfluencefun[][+]}{\norm{{\qinfluencefun[][+]}}_{2}}\quad\textrm{and}\quad\underset{\priorpert\in\ball}{\mathrm{arginf}}\left\langle \qinfluencefun,\priorpert\right\rangle =\delta\frac{\qinfluencefun[][-]}{\norm{{\qinfluencefun[][-]}}_{2}}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the worst-case sensitivity depends crucially on the choice of
+ 
+\begin_inset Formula $\delta$
+\end_inset
+
+, and it may not be obvious what a reasonable 
+\begin_inset Formula $\delta$
+\end_inset
+
+ would be.
+ We discuss this more in the experiments section.
+ Note also that it is generally easy to compute 
+\begin_inset Formula $\pinfluencefun$
+\end_inset
+
+ and 
+\begin_inset Formula $\qinfluencefun$
+\end_inset
+
+, but it may be more computationally involved to calculate the norms 
+\begin_inset Formula $\norm{{\pinfluencefun[][+]}}_{2}$
+\end_inset
+
+, 
+\begin_inset Formula $\norm{{\qinfluencefun[][+]}}_{2}$
+\end_inset
+
+, and so on.
+ We discuss this more in the sections below.
+\end_layout
+
+\begin_layout Section
+Frechet differentiability
+\end_layout
+
+\begin_layout Standard
+Under conditions similar to the IJ paper you can show that the VB objective
+ is Frechet differentiable.
+ The key conditions are something like
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\grave{\sup_{\eta\in\etadom}\norm{\frac{{{\qpost[][\eta]}}}{{{\baseprior}}}\left(\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}\frac{\partial}{\partial\eta^{T}}\log{{\qpost[][\eta]}}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{{\qpost[][\eta]}}\right)}_{2}} & \le C_{H}.\\
+\sup_{\eta\in\etadom}\norm{\frac{{\qpost}}{{\baseprior}}\frac{\partial}{\partial\eta}\log{\qpost}}_{2} & \le C_{G}.
+\end{align*}
+
+\end_inset
+
+These could be violated if 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ has lighter tails than 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Is this worth doing carefully? Probably – otherwise you may not be justified
+ in using the linear approximation.
+\end_layout
+
+\begin_layout Section
+APPENDICES AND EXTRA NOTES
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+-\eggrad\klhess^{-1}\left.\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\frac{\priorpert}{\baseprior}\right]\right|_{\eta=\etaopt\left(0,\phi\right)} & =-\eggrad\klhess^{-1}\left.\frac{\partial}{\partial\eta}\int\qpost\frac{\priorpert}{\baseprior}\lambda\left(d\theta\right)\right|_{\eta=\etaopt\left(0,\phi\right)}\\
+ & =-\eggrad\klhess^{-1}\int\qpost\left.\frac{\partial}{\partial\eta}\log\qpost[][\eta]\right|_{\eta=\etaopt\left(0,\phi\right)}\frac{\priorpert}{\baseprior}\lambda\left(d\theta\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+What is the correct inner product space to reproduce Gustafson's results?
+ Note that his notion of 
+\begin_inset Quotes eld
+\end_inset
+
+size
+\begin_inset Quotes erd
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \priorpert\right\Vert _{G} & =\int\frac{\priorpert^{2}}{\baseprior}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+Also, each of the influence function integrals have 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ in the denominator.
+ So it is tempting to define
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\frac{1}{\baseprior}\lambda\left(d\theta\right)
+\end{align*}
+
+\end_inset
+
+ so that
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \priorpert\right\Vert _{G} & =\sqrt{\left\langle \priorpert,\priorpert\right\rangle },
+\end{align*}
+
+\end_inset
+
+ and
+\begin_inset Formula 
+\begin{align*}
+\pinfluencefun & :=\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\basepost\\
+\pinfluenceop & =\left\langle \pinfluencefun,\priorpert\right\rangle .
+\end{align*}
+
+\end_inset
+
+What goes wrong? For one thing, it doesn't seem like the measure 
+\begin_inset Formula $\lambda\left(\cdot\right)/\baseprior$
+\end_inset
+
+ is dominated by 
+\begin_inset Formula $\lambda\left(\cdot\right)$
+\end_inset
+
+.
+ I don't know whether that matters, but you should at least be careful that
+ the measure is well-defined and stuff.
+\end_layout
+
+\begin_layout Standard
+Also,
+\begin_inset Formula 
+\begin{align*}
+\left\Vert \pinfluencefun\right\Vert _{2} & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\basepost^{2}\frac{\lambda\left(d\theta\right)}{\baseprior}
+\end{align*}
+
+\end_inset
+
+which may not be finite.
+ In contrast, if you define the inner produce without the prior, then
+\begin_inset Formula 
+\begin{align*}
+\pinfluencefun & :=\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\basepost}{\baseprior}\\
+\left\Vert \pinfluencefun\right\Vert _{2} & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\basepost^{2}\frac{\lambda\left(d\theta\right)}{\baseprior^{2}}\\
+ & =\int\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)^{2}\frac{p\left(X\vert\theta\right)^{2}}{p\left(X\right)^{2}}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+In fact, this also may not be finite.
+ And may be worse when 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ is small, which is where the problems arise.
+\end_layout
+
+\begin_layout Standard
+Note that in the proof of the worst case you actually use Holder's inequality
+ with respect to yet a third option.
+ For 
+\begin_inset Formula $\pinfluencefun$
+\end_inset
+
+ and 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ positive,
+\begin_inset Formula 
+\begin{align*}
+\int\pinfluencefun\priorpert\lambda\left(d\theta\right) & =\int\pinfluencefun\frac{\priorpert}{\baseprior}\baseprior\lambda\left(d\theta\right)\\
+ & \le\left(\int\pinfluencefun^{2}\baseprior\lambda\left(d\theta\right)\cdot\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\lambda\left(d\theta\right)\right)^{1/2}\\
+ & =\left(\int\pinfluencefun^{2}\baseprior\lambda\left(d\theta\right)\right)^{1/2}\left\Vert \priorpert\right\Vert _{G}.
+\end{align*}
+
+\end_inset
+
+This is Holder's inequality applied with 
+\begin_inset Formula $p=2$
+\end_inset
+
+ and 
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\baseprior\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\newpriorpert}{\gamma\left(\theta\right)}
+{\gamma\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this view, you might consider replacing the perturbation 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+ in Gustafson by
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =\newpriorpert\baseprior
+\end{align*}
+
+\end_inset
+
+ or
+\begin_inset Formula 
+\begin{align*}
+\contamprior & :=\frac{\baseprior+\epsilon\priorpert}{\int\left(\baseprior+\epsilon\priorpert\right)\lambda\left(d\theta\right)}\\
+ & =\frac{\baseprior+\epsilon\baseprior\newpriorpert}{\int\left(\baseprior+\epsilon\baseprior\newpriorpert\right)\lambda\left(d\theta\right)}\\
+ & =\frac{\baseprior\left(1+\epsilon\newpriorpert\right)}{\int\left(\baseprior\left(1+\epsilon\newpriorpert\right)\right)\lambda\left(d\theta\right)}.
+\end{align*}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\epsilon}\log\left(\baseprior\left(1+\epsilon\newpriorpert\right)\right) & =\frac{\partial}{\partial\epsilon}\log\baseprior+\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\newpriorpert\right)\\
+ & =\frac{\newpriorpert}{1+\epsilon\newpriorpert}\\
+ & =\newpriorpert.
+\end{align*}
+
+\end_inset
+
+The magnitude of the perturbation is
+\begin_inset Formula 
+\begin{align*}
+\norm{{\priorpert}}_{G}^{2} & =\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\lambda\left(d\theta\right)\\
+ & =\int\newpriorpert^{2}\baseprior\lambda\left(d\theta\right)\\
+ & =\left\langle \newpriorpert,\newpriorpert\right\rangle \\
+ & =\norm{\newpriorpert}_{2}^{2}.
+\end{align*}
+
+\end_inset
+
+The Gateaux derivative is
+\begin_inset Formula 
+\begin{align*}
+\cov_{\basepost}\left(\targetfun,\newpriorpert\right) & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\newpriorpert\meas\\
+ & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\newpriorpert\frac{\baseprior}{\baseprior}\meas\\
+ & =\left\langle \left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\basepost}{\baseprior},\newpriorpert\right\rangle _{\baseprior\meas}\\
+ & =\int\basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right)\frac{\priorpert}{\baseprior}\meas\\
+ & =\left\langle \basepost\left(\targetfun-\mbe_{\basepost}\left[\targetfun\right]\right),\frac{\priorpert}{\baseprior}\right\rangle _{\meas}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We know that (up to sign fiddliness)
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\worstnewpriorpert}{\gamma^{*}\left(\theta\right)}
+{\gamma^{*}\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\worstpriorpert}{\phi^{*}\left(\theta\right)}
+{\phi^{*}\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\gbar}{\overline{\targetfun}}
+{\overline{\targetfun}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\worstnewpriorpert & \propto\left(\gbar\right)\frac{\basepost}{\baseprior}\\
+\norm{\worstnewpriorpert}_{G} & =1\Rightarrow\\
+\worstnewpriorpert & =\frac{\left(\gbar\right)\frac{\basepost}{\baseprior}}{\int\left(\gbar\right)^{2}\left(\frac{\basepost}{\baseprior}\right)^{2}\baseprior\meas}.
+\end{align*}
+
+\end_inset
+
+This simply follows from Cauchy-Schwartz with the inner product 
+\begin_inset Formula $\left\langle \cdot,\cdot\right\rangle _{\baseprior\meas}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\left(\int\basepost\gbar\frac{\priorpert}{\baseprior}\frac{\baseprior}{\baseprior}\meas\right)^{2} & \le\\
+\left(\int\left(\basepost\frac{\gbar}{\baseprior}\right)^{2}\baseprior\meas\right)\left(\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\meas\right) & =\textrm{ (note, using }\left\langle \cdot\right\rangle _{\baseprior\meas}\textrm{)}\\
+\left(\int\left(\basepost\frac{\gbar}{\baseprior}\right)^{2}\baseprior\meas\right)\cdot1
+\end{align*}
+
+\end_inset
+
+The same integral occurs.
+ Because
+\begin_inset Formula 
+\begin{align*}
+\frac{\priorpert}{\baseprior} & =C_{\phi}^{-1}\frac{\basepost\gbar}{\baseprior}
+\end{align*}
+
+\end_inset
+
+this is the same worst-case up to proportionality (of course) and
+\begin_inset Formula 
+\begin{align*}
+1 & =\int\left(\frac{\priorpert}{\baseprior}\right)^{2}\baseprior\meas\\
+ & =\int C_{\phi}^{-2}\left(\frac{\basepost\gbar}{\baseprior}\right)^{2}\baseprior\meas\Rightarrow\\
+C_{\phi}^{2} & =\int\left(\frac{\basepost\gbar}{\baseprior}\right)^{2}\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+So you need to compute the same integral either way.
+ Nothing practical is gained – it's only a little easier to understand using
+ 
+\begin_inset Formula $\newpriorpert$
+\end_inset
+
+ because you can define a single inner product for the entire calculation.
+\end_layout
+
+\begin_layout Standard
+What about the other 
+\begin_inset Formula $L_{p}$
+\end_inset
+
+ norms? The key condition is
+\begin_inset Formula 
+\begin{align*}
+\int\left(\frac{\priorpert}{\baseprior}\right)^{p}\baseprior\meas & =\delta^{p}\\
+\int I\left(\theta\right)\priorpert\meas & =\int I\left(\theta\right)\frac{\priorpert}{\baseprior}\baseprior\meas\\
+ & \le\left(\int I\left(\theta\right)^{q}\baseprior\meas\right)^{1/q}\left(\int\left(\frac{\priorpert}{\baseprior}\right)^{p}\baseprior\meas\right)^{1/p}\\
+ & =\left(\int I\left(\theta\right)^{q}\baseprior\meas\right)^{1/q}\delta.
+\end{align*}
+
+\end_inset
+
+Noting that 
+\begin_inset Formula $\newpriorpert=\priorpert/\baseprior$
+\end_inset
+
+, and noting that you have to change the influence function to have 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ to use the inner product 
+\begin_inset Formula $\left\langle \cdot\right\rangle _{\baseprior\meas}$
+\end_inset
+
+, the analysis is the same.
+ So it's pretty clarifying to use the proportional parameterization and
+ the inner product.
+\end_layout
+
+\begin_layout Standard
+Is the positivity necessary? It seems like it must be.
+ But what if you did
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =C^{-1}\baseprior\exp\left(\epsilon\newpriorpert\right)\\
+\at{\frac{d}{d\epsilon}\log{\contamprior}}{\epsilon=0} & =\newpriorpert.
+\end{align*}
+
+\end_inset
+
+Take
+\begin_inset Formula 
+\begin{align*}
+\newpriorpert & =\log p_{1}\left(\theta\right)-\log\baseprior
+\end{align*}
+
+\end_inset
+
+and you get
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =C^{-1}\baseprior^{1-\epsilon}p_{1}\left(\theta\right)^{\epsilon}.
+\end{align*}
+
+\end_inset
+
+That is, you get a multiplicative mixture.
+ This is Gustafon's nonlinear perturbation with 
+\begin_inset Formula $p=\infty$
+\end_inset
+
+ since
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\exp\left(\log\baseprior+\epsilon\newpriorpert\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+He restricts 
+\begin_inset Formula $\newpriorpert$
+\end_inset
+
+ to be non-negative in order to achieve generality, though that is not necessary
+ taking 
+\begin_inset Formula $t\left(\cdot\right)=\log\left(\cdot\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Comparison with Gustafson
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:gustafson_comparison"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO: this is straightforward; write this out before you forget it.
+\end_layout
+
+\begin_layout Section
+Frechet differentiability of the variational objective.
+\end_layout
+
+\begin_layout Standard
+The key will be a condition like Condition 1 from the IJ paper.
+ Let 
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+ denote the zero function, i.e.
+ 
+\begin_inset Formula $\phi_{0}\left(\theta\right)=0,\forall\theta\in\thetadom$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\sup_{\eta\in\etadom}\sup_{\priorpert\in\ball}\norm{\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi_{0}\right)}{\eta}}_{1} & \le C_{G}\delta\\
+\sup_{\eta\in\etadom}\sup_{\priorpert\in\ball}\norm{\at{\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}KL\left(\eta,\phi_{0}\right)}{\eta}}_{1} & \le C_{H}\delta.
+\end{align*}
+
+\end_inset
+
+What do these terms look like? Well,
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right) & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log p\left(X\vert\theta\right)+\log\qpost[][\eta]-\log\contamprior\right]+C\\
+ & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log p\left(X\vert\theta\right)+\log\qpost[][\eta]-\log\baseprior+\log\left(1+\epsilon\priorpert\right)\right]+C
+\end{align*}
+
+\end_inset
+
+Only one term depends on 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+, so
+\begin_inset Formula 
+\begin{align*}
+\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi_{0}\right)}{\eta} & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log\left(1+\epsilon\priorpert\right)+\log\left(1\right)\right]\\
+ & =-\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right].
+\end{align*}
+
+\end_inset
+
+Expanding and changing the order of integration and differentiation,
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =\int\qpost\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas.
+\end{align*}
+
+\end_inset
+
+Taking 
+\begin_inset Formula $\targetfun=\theta$
+\end_inset
+
+ and taking the inverse (or pseudo-inverse) of 
+\begin_inset Formula $G$
+\end_inset
+
+, then the last term is
+\begin_inset Formula 
+\begin{align*}
+-\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =-HG^{-1}GH^{-1}\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =HG^{-1}\int\baseprior\qinfluencefun\log\left(1+\epsilon\priorpert\right)\meas.
+\end{align*}
+
+\end_inset
+
+Next, applying Cauchy-Schwartz term-wise, and using the fact that 
+\begin_inset Formula $\priorpert\ge0$
+\end_inset
+
+ and so 
+\begin_inset Formula $\log\left(1+\epsilon\priorpert\right)^{2}\le\left(\epsilon\priorpert\right)^{2}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\left|\int\baseprior\qinfluencefun_{k}\log\left(1+\epsilon\priorpert\right)\meas.\right| & \le\sqrt{\int\qinfluencefun_{k}^{2}\baseprior\meas}\sqrt{\int\log\left(1+\epsilon\priorpert\right)^{2}\baseprior\meas}\\
+ & \le\norm{{\qinfluencefun}_{k}}_{2}\sqrt{\int\left(\epsilon\priorpert\right)^{2}\baseprior\meas}\\
+ & \le\norm{{\qinfluencefun}_{k}}_{2}\norm{\epsilon{\priorpert}}_{2}.
+\end{align*}
+
+\end_inset
+
+The condition will follow from the size of 
+\begin_inset Formula $\norm{\epsilon{\priorpert}}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This seems too slick – there must be a deeper connection.
+ It is probably enough to observe that, for any 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\left|\left\langle \qinfluencefun,\priorpert\right\rangle \right| & \le\norm{{\qinfluencefun}}_{2}\norm{{\priorpert}}_{2}.
+\end{align*}
+
+\end_inset
+
+So a sufficient condition for Frechet differentiability is something like
+ 
+\begin_inset Formula 
+\begin{align*}
+\sup_{\eta\in\etadom}\norm{{\qinfluencefun}}_{2} & <\infty.
+\end{align*}
+
+\end_inset
+
+Though you'll also need something like
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =\frac{\partial}{\partial\eta^{T}}\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =\frac{\partial}{\partial\eta^{T}}\int\baseprior\frac{\qpost}{\baseprior}\left(\frac{\partial}{\partial\eta}\log\qpost\frac{\partial}{\partial\eta^{T}}\log\qpost+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log\qpost\right)\log\left(1+\epsilon\priorpert\right)\meas
+\end{align*}
+
+\end_inset
+
+and so
+\begin_inset Formula 
+\begin{align*}
+\grave{\sup_{\eta\in\etadom}\norm{\frac{{\qpost[][\eta]}}{{\baseprior}}\left(\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}\frac{\partial}{\partial\eta^{T}}\log{\qpost[][\eta]}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{\qpost[][\eta]}\right)}_{2}} & \le C_{H}.
+\end{align*}
+
+\end_inset
+
+Note that this is all of the form
+\begin_inset Formula 
+\begin{align*}
+\int\frac{\qpost}{\baseprior}f\left(\theta\right)\qpost\meas
+\end{align*}
+
+\end_inset
+
+for some 
+\begin_inset Formula $f\left(\theta\right)$
+\end_inset
+
+.
+ The danger would occur if, for some 
+\begin_inset Formula $\theta$
+\end_inset
+
+ range, 
+\begin_inset Formula $\baseprior\ll\qpost$
+\end_inset
+
+.
+\end_layout
+
+\end_body
+\end_document
