@@ -1377,7 +1377,43 @@ Note that the worst-case sensitivity depends crucially on the choice of
 \end_layout
 
 \begin_layout Section
-Extra notes
+Frechet differentiability
+\end_layout
+
+\begin_layout Standard
+Under conditions similar to the IJ paper you can show that the VB objective
+ is Frechet differentiable.
+ The key conditions are something like
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\grave{\sup_{\eta\in\etadom}\norm{\frac{{{\qpost[][\eta]}}}{{{\baseprior}}}\left(\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}\frac{\partial}{\partial\eta^{T}}\log{{\qpost[][\eta]}}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{{\qpost[][\eta]}}\right)}_{2}} & \le C_{H}.\\
+\sup_{\eta\in\etadom}\norm{\frac{{\qpost}}{{\baseprior}}\frac{\partial}{\partial\eta}\log{\qpost}}_{2} & \le C_{G}.
+\end{align*}
+
+\end_inset
+
+These could be violated if 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ has lighter tails than 
+\begin_inset Formula $\qpost[][\eta]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Is this worth doing carefully? Probably – otherwise you may not be justified
+ in using the linear approximation.
+\end_layout
+
+\begin_layout Section
+APPENDICES AND EXTRA NOTES
 \end_layout
 
 \begin_layout Standard
@@ -1772,7 +1808,168 @@ name "sec:gustafson_comparison"
 \end_layout
 
 \begin_layout Standard
-TODO: write this out.
+TODO: this is straightforward; write this out before you forget it.
+\end_layout
+
+\begin_layout Section
+Frechet differentiability of the variational objective.
+\end_layout
+
+\begin_layout Standard
+The key will be a condition like Condition 1 from the IJ paper.
+ Let 
+\begin_inset Formula $\phi_{0}$
+\end_inset
+
+ denote the zero function, i.e.
+ 
+\begin_inset Formula $\phi_{0}\left(\theta\right)=0,\forall\theta\in\thetadom$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\sup_{\eta\in\etadom}\sup_{\priorpert\in\ball}\norm{\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi_{0}\right)}{\eta}}_{1} & \le C_{G}\delta\\
+\sup_{\eta\in\etadom}\sup_{\priorpert\in\ball}\norm{\at{\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}KL\left(\eta,\phi_{0}\right)}{\eta}}_{1} & \le C_{H}\delta.
+\end{align*}
+
+\end_inset
+
+What do these terms look like? Well,
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right) & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log p\left(X\vert\theta\right)+\log\qpost[][\eta]-\log\contamprior\right]+C\\
+ & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log p\left(X\vert\theta\right)+\log\qpost[][\eta]-\log\baseprior+\log\left(1+\epsilon\priorpert\right)\right]+C
+\end{align*}
+
+\end_inset
+
+Only one term depends on 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+, so
+\begin_inset Formula 
+\begin{align*}
+\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi\right)}{\eta}-\at{\frac{\partial}{\partial\eta}KL\left(\eta,\phi_{0}\right)}{\eta} & =\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[-\log\left(1+\epsilon\priorpert\right)+\log\left(1\right)\right]\\
+ & =-\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right].
+\end{align*}
+
+\end_inset
+
+Expanding and changing the order of integration and differentiation,
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =\int\qpost\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas.
+\end{align*}
+
+\end_inset
+
+Taking 
+\begin_inset Formula $\targetfun=\theta$
+\end_inset
+
+ and taking the inverse (or pseudo-inverse) of 
+\begin_inset Formula $G$
+\end_inset
+
+, then the last term is
+\begin_inset Formula 
+\begin{align*}
+-\frac{\partial}{\partial\eta}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =-HG^{-1}GH^{-1}\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =HG^{-1}\int\baseprior\qinfluencefun\log\left(1+\epsilon\priorpert\right)\meas.
+\end{align*}
+
+\end_inset
+
+Next, applying Cauchy-Schwartz term-wise, and using the fact that 
+\begin_inset Formula $\priorpert\ge0$
+\end_inset
+
+ and so 
+\begin_inset Formula $\log\left(1+\epsilon\priorpert\right)^{2}\le\left(\epsilon\priorpert\right)^{2}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\left|\int\baseprior\qinfluencefun_{k}\log\left(1+\epsilon\priorpert\right)\meas.\right| & \le\sqrt{\int\qinfluencefun_{k}^{2}\baseprior\meas}\sqrt{\int\log\left(1+\epsilon\priorpert\right)^{2}\baseprior\meas}\\
+ & \le\norm{{\qinfluencefun}_{k}}_{2}\sqrt{\int\left(\epsilon\priorpert\right)^{2}\baseprior\meas}\\
+ & \le\norm{{\qinfluencefun}_{k}}_{2}\norm{\epsilon{\priorpert}}_{2}.
+\end{align*}
+
+\end_inset
+
+The condition will follow from the size of 
+\begin_inset Formula $\norm{\epsilon{\priorpert}}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This seems too slick – there must be a deeper connection.
+ It is probably enough to observe that, for any 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\left|\left\langle \qinfluencefun,\priorpert\right\rangle \right| & \le\norm{{\qinfluencefun}}_{2}\norm{{\priorpert}}_{2}.
+\end{align*}
+
+\end_inset
+
+So a sufficient condition for Frechet differentiability is something like
+ 
+\begin_inset Formula 
+\begin{align*}
+\sup_{\eta\in\etadom}\norm{{\qinfluencefun}}_{2} & <\infty.
+\end{align*}
+
+\end_inset
+
+Though you'll also need something like
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\mbe_{\qpost[][\eta]}\left[\log\left(1+\epsilon\priorpert\right)\right] & =\frac{\partial}{\partial\eta^{T}}\int\baseprior\frac{\qpost}{\baseprior}\frac{\partial}{\partial\eta}\log\qpost\log\left(1+\epsilon\priorpert\right)\meas\\
+ & =\frac{\partial}{\partial\eta^{T}}\int\baseprior\frac{\qpost}{\baseprior}\left(\frac{\partial}{\partial\eta}\log\qpost\frac{\partial}{\partial\eta^{T}}\log\qpost+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log\qpost\right)\log\left(1+\epsilon\priorpert\right)\meas
+\end{align*}
+
+\end_inset
+
+and so
+\begin_inset Formula 
+\begin{align*}
+\grave{\sup_{\eta\in\etadom}\norm{\frac{{\qpost[][\eta]}}{{\baseprior}}\left(\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}\frac{\partial}{\partial\eta^{T}}\log{\qpost[][\eta]}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{\qpost[][\eta]}\right)}_{2}} & \le C_{H}.
+\end{align*}
+
+\end_inset
+
+Note that this is all of the form
+\begin_inset Formula 
+\begin{align*}
+\int\frac{\qpost}{\baseprior}f\left(\theta\right)\qpost\meas
+\end{align*}
+
+\end_inset
+
+for some 
+\begin_inset Formula $f\left(\theta\right)$
+\end_inset
+
+.
+ The danger would occur if, for some 
+\begin_inset Formula $\theta$
+\end_inset
+
+ range, 
+\begin_inset Formula $\baseprior\ll\qpost$
+\end_inset
+
+.
 \end_layout
 
 \end_body
