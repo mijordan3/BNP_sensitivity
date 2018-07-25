@@ -234,6 +234,7 @@ class DPGaussianMixture(object):
         self.dim = y.shape[1]
         self.k_approx = k_approx
         self.n_obs = y.shape[0]
+        self.gh_deg = gh_deg
 
         self.use_weights = False
         self.weights = np.ones((self.n_obs, 1))
@@ -439,7 +440,7 @@ class DPGaussianMixture(object):
             json_tricks.dumps(self.global_vb_params.get_vector())
         fit_dict['prior_params_vec' + np_string] = \
             json_tricks.dumps(self.prior_params.get_vector())
-        fit_dict['gh_deg'] = len(self.vb_params.gh_loc)
+        fit_dict['gh_deg'] = self.gh_deg
         fit_dict['y' + np_string] = json_tricks.dumps(self.y)
         fit_dict['use_weights'] = self.use_weights
         fit_dict['sample_weights' + np_string] = json_tricks.dumps(self.weights)
@@ -643,6 +644,8 @@ class DPGaussianMixture(object):
                       gtol=1e-8, ftol=1e-8, xtol=1e-8, max_condition_iter=10,
                       disp=True):
 
+        if disp:
+            print('BGFS')
         init_opt, init_opt_time = self.minimize_kl_bfgs(
             precondition=False, init_x=init_free_par,
             maxiter = init_max_iter, disp = disp,
@@ -659,7 +662,11 @@ class DPGaussianMixture(object):
         i = 0
 
         # Converge if either the x or the f converge.
+        if disp:
+            print('Conditioned Newton:')
         while i < max_condition_iter and (not x_conv) and (not f_conv):
+            if disp:
+                print('i = ', i)
             i += 1
             new_init_x, vb_opt, opt_time, kl_hessian, kl_hessian_corrected = \
                 self.precondition_and_optimize(
@@ -686,7 +693,7 @@ class DPGaussianMixture(object):
     def get_preconditioner(self, free_par):
         obj_hessian = self.objective.fun_free_hessian(free_par)
         inv_hess_sqrt, hessian_corrected = \
-            obj_lib.get_sym_matrix_inv_sqrt(obj_hessian)
+            obj_lib.get_sym_matrix_inv_sqrt(obj_hessian, ev_min=1, ev_max=1e5)
             #sp_hess_lib.get_hess_inv_sqrt(obj_hessian)
 
         return inv_hess_sqrt, obj_hessian, hessian_corrected
@@ -948,8 +955,10 @@ class LinearSensitivity(object):
                                         sign = 1,
                                         diffble = False)
 
-        worst_case_fun_sens_mat_pos = np.zeros((len(self.optimal_global_free_params), self.model.k_approx - 1))
-        worst_case_fun_sens_mat_neg = np.zeros((len(self.optimal_global_free_params), self.model.k_approx - 1))
+        worst_case_fun_sens_mat_pos = np.zeros(
+        (len(self.optimal_global_free_params), self.model.k_approx - 1))
+        worst_case_fun_sens_mat_neg = np.zeros(
+            (len(self.optimal_global_free_params), self.model.k_approx - 1))
 
         for k in range(self.model.k_approx - 1):
             worst_case_fun_sens_mat_pos[:, k] = \
