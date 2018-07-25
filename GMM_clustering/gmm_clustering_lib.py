@@ -269,13 +269,19 @@ class DPGaussianMixture(object):
 
         # To priors:
         self.prior_indices = obj_lib.make_index_param(self.prior_params)
-        self.__get_kl_prior_free_grad = autograd.grad(
-            self.get_kl_from_prior_and_free_par, argnum=1)
-        self.get_kl_prior_cross_hess = autograd.jacobian(
-            self.__get_kl_prior_free_grad, argnum=0)
+        self.kl_param_and_prior_obj = obj_lib.TwoParameterObjective(
+            self.prior_params, self.global_vb_params, self.set_z_get_kl)
+        # self.__get_kl_prior_free_grad = autograd.grad(
+        #     self.get_kl_from_prior_and_free_par, argnum=1)
+        # self.get_kl_prior_cross_hess = autograd.jacobian(
+        #     self.__get_kl_prior_free_grad, argnum=0)
+        self.get_kl_prior_cross_hess = kl_param_and_prior_obj.fun_free_hessian12
 
         # To data:
-        self.get_data_cross_hess = autograd.jacobian(self.get_per_gene_kl)
+        self.per_gene_kl_obj = obj_lib.Objective(
+            self.global_vb_params, self.get_per_gene_kl)
+        #self.get_data_cross_hess = autograd.jacobian(self.get_per_gene_kl)
+        self.get_data_cross_hess = self.per_gene_kl_obj.fun_free_jacobian
 
     def __str__(self):
         b = self.vb_params['global']['b'].e()
@@ -462,15 +468,20 @@ class DPGaussianMixture(object):
     ########################
     # Sensitivity functions.
 
-    def get_kl_from_prior_and_free_par(self, prior_free, free_par):
-        self.prior_params.set_free(prior_free)
-        self.global_vb_params.set_free(free_par)
-        return self.set_z_get_kl()
+    # def get_kl_from_prior_and_free_par(self, prior_free, free_par):
+    #     self.prior_params.set_free(prior_free)
+    #     self.global_vb_params.set_free(free_par)
+    #     return self.set_z_get_kl()
 
     # Get the likelihood for each gene.  This is equivalent to the derivative
     # of the KL divergence with respect to the weight vector.
-    def get_per_gene_kl(self, free_par):
-        self.global_vb_params.set_free(free_par)
+    # def get_per_gene_kl(self, free_par):
+    #     self.global_vb_params.set_free(free_par)
+    #     loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
+    #     e_z = self.vb_params['e_z'].get()
+    #     return -1 * np.sum(e_z * loglik_obs_by_nk, axis=1)
+
+    def get_per_gene_kl(self):
         loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
         e_z = self.vb_params['e_z'].get()
         return -1 * np.sum(e_z * loglik_obs_by_nk, axis=1)
@@ -740,6 +751,7 @@ class LinearSensitivity(object):
         self.set_sensitivities(self.optimal_global_free_params)
 
         # d/d_eta q_eta(\theta)
+        self.get_log_q_pi_obj = obj_lib.Objective(self.get_log_q_pi)
         self.get_log_q_pi_jac_autodiff = autograd.jacobian(self.get_log_q_pi, 0)
 
 
@@ -859,13 +871,19 @@ class LinearSensitivity(object):
                         - log_prior_density(theta)
         return log_ratio
 
-    def get_log_q_pi(self, global_free_params, theta, k):
-        self.model.global_vb_params.set_free(global_free_params)
-        # self.model.set_optimal_z()
+    # def get_log_q_pi(self, global_free_params, theta, k):
+    #     self.model.global_vb_params.set_free(global_free_params)
+    #     # self.model.set_optimal_z()
+    #
+    #     mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
+    #     info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
+    #
+    #     return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
 
+    def get_log_q_pi(self, theta, k):
+        # TODO: you need to deal with passing these extra arguments somehow.
         mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
         info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
-
         return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
 
     # functions to get the jacobian of log_q_pi faster
