@@ -42,14 +42,18 @@ parameters {
   vector <lower=0,upper=1>[n_clusters - 1] sticks; // BNP sticks
   cov_matrix[dim] sigma[n_clusters]; 
 }
-model {
-  vector[n_clusters] contributions;
+transformed parameters {
   vector[n_clusters] weights; 
-  
+  weights = get_weights_from_sticks(sticks); 
+}
+model {
+  vector[n_clusters] contributions[n_obs];
+
   // priors
   for(k in 1:n_clusters) {
     // draw centroids
-    mu[k] ~ multi_normal(rep_vector(0.0, dim), diag_matrix(rep_vector(mu_prior_var, dim)));
+    mu[k] ~ multi_normal(rep_vector(0.0, dim), 
+              diag_matrix(rep_vector(mu_prior_var, dim)));
     // draw covariances 
     sigma[k] ~ inv_wishart(wishart_df, inv_wishart_scale); 
     
@@ -57,20 +61,31 @@ model {
       sticks[k] ~ beta(1, alpha); 
     }
   }
-  weights = get_weights_from_sticks(sticks); 
-  
   
   // likelihood
   for(i in 1:n_obs) {
     for(k in 1:n_clusters) {
-      contributions[k] = log(weights[k]) + 
+      contributions[i][k] = log(weights[k]) + 
                 multi_normal_lpdf(y[i] | mu[k], sigma[k]);
     }
-    target += log_sum_exp(contributions);
+    target += log_sum_exp(contributions[i]);
   }
 }
 
 generated quantities {
+  // We get the cluster belongings
+  vector[n_clusters] e_z[n_obs];
   
+  // is there a way to pull the contributions 
+  // from the model block above? we're computing them twice ... 
+  vector[n_clusters] contributions[n_obs];
+
+  for(i in 1:n_obs) {
+    for(k in 1:n_clusters) {
+      contributions[i][k] = log(weights[k]) + 
+                multi_normal_lpdf(y[i] | mu[k], sigma[k]);
+    }
+    e_z[i] = exp(contributions[i] - log_sum_exp(contributions[i]));
+  }
 }
 

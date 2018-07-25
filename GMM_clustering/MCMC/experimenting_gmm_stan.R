@@ -72,8 +72,7 @@ get_default_data_model <- function(y, n_clusters){
   return(data)
 }
 
-# y <- gmm_model$y
-y <- 
+y <- gmm_data$y
 model_data <- get_default_data_model(y, n_clusters)
 
 ##########################
@@ -90,14 +89,52 @@ fit <- sampling(gmm_mixture_model,
 ##########################
 print(fit)
 
+save_fit <- TRUE
+if(save_fit){
+  save('fit', file = './gmm_model_fit.RData')
+}
+
 samples <- rstan::extract(fit)
 
 divergent <- get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'divergent__']
 cat('propn divergent: ', mean(divergent))
 
-mu_samples <- matrix(samples$mu, ncol = 2)
-ggplot() + geom_point(aes(x = mu_samples[, 1], y = mu_samples[, 2]), 
-                      color = 'red', alpha = 0.5) + 
-  geom_point(aes(x = gmm_data$mu[, 1], y = gmm_data$mu[, 2]), 
-             shape = 'x', color = 'blue', size = 5)
+mu_samples <- matrix(samples$mu, ncol = d)
+sigma_samples <- array(samples$sigma, dim = c(dim(mu_samples)[1], d, d))
 
+e_z <- apply(samples$e_z, c(2, 3), mean)
+z_ind <- apply(e_z, 1, which.max)
+
+p <- ggplot() + geom_point(aes(x = mu_samples[, 1], y = mu_samples[, 2]), 
+                          color = 'black', alpha = 0.5) +
+      geom_point(aes(x = gmm_data$mu[, 1], y = gmm_data$mu[, 2]),
+                 shape = 'x', color = 'blue', size = 5) +
+      geom_point(aes(y[, 1], y[, 2], color = as.factor(z_ind)), alpha = 0.1)
+
+
+get_ellipse <- function(Sigma, center, s=3, npoints = 100){
+  t <- seq(0, 2*pi, len=npoints)
+
+  a <- s * sqrt(eigen(Sigma)$values[2])
+  b <- s * sqrt(eigen(Sigma)$values[1])
+  x_ <- a*cos(t)
+  y_ <- b*sin(t)
+  X <- cbind(x_, y_)
+  R <- eigen(Sigma)$vectors
+  ellipse <- (X%*%R)
+  return(data.frame(x = ellipse[, 1] + center[1], 
+                    y = ellipse[, 2] + center[2]))
+}
+
+for(i in 1:dim(mu_samples)[1]){
+  Sigma <- sigma_samples[i, , ]
+  center <- mu_samples[i, ]
+  ellipse <- get_ellipse(Sigma, center)
+  
+  ggplot() + geom_path(data=ellipse, aes(x=x, y=y), colour='blue', 
+            linetype = 'dashed', alpha = 1)
+  
+  p <- p + geom_path(data=ellipse, aes(x=x, y=y), colour='blue', 
+                     linetype = 'dashed', alpha = 0.1)
+}
+p
