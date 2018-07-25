@@ -814,9 +814,11 @@ class LinearSensitivity(object):
         # the dimensions of which are n_free_params x len(theta)
 
         if diffble:
-            log_q_pi_jac = \
-                self.get_log_q_pi_jac_autodiff(\
-                    self.optimal_global_free_params, theta, k)
+            obj = VariationalStickJacobian(self.model, theta, k)
+            log_q_pi_jac = obj.stick_jacobian(self.optimal_global_free_params)
+            # log_q_pi_jac = \
+            #     self.get_log_q_pi_jac_autodiff(\
+            #         self.optimal_global_free_params, theta, k)
             log_q_pi_jacT = np.rollaxis(log_q_pi_jac, \
                                         len(np.shape(log_q_pi_jac)) - 1)
 
@@ -958,6 +960,26 @@ class LinearSensitivity(object):
 
 
         return worst_case_fun_sens_mat_pos, worst_case_fun_sens_mat_neg
+
+class VariationalStickJacobian(object):
+    def __init__(self, model, theta, k):
+        self.model = model
+        self.theta = theta
+        self.k = k
+
+        self.obj = obj_lib.Objective(self.model.global_vb_params, self.get_log_q_pi)
+        self.stick_jacobian = self.obj.ag_fun_free_jacobian
+
+    def get_log_q_pi(self):
+        # self.model.global_vb_params.set_free(global_free_params)
+        # self.model.set_optimal_z()
+
+        mean = self.model.vb_params['global']['v_sticks']['mean'].get()[self.k]
+        info = self.model.vb_params['global']['v_sticks']['info'].get()[self.k]
+
+        return fun_sens_lib.get_log_logitnormal_density(self.theta, mean, info)
+
+
 
 #################################
 # Functions to reload the model
