@@ -153,12 +153,13 @@ def get_e_log_wishart_prior(vb_params, prior_params):
     gamma = vb_params['global']['gamma'].get()
     dim = np.shape(gamma)[1]
 
-    V_inv_gamma = np.einsum('ij, kjl -> kil', V_inv, gamma)
-    # apparently autograd doesn't like this
-    # tr_V_inv_gamma = np.einsum('kii -> k', V_inv_gamma)
+    # New way:
+    tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    eye = np.eye(dim)
-    tr_V_inv_gamma = np.einsum('kij, ji -> k', V_inv_gamma, eye)
+    # Old way for the record:
+    # V_inv_gamma = np.einsum('ij, kjl -> kil', V_inv, gamma)
+    # eye = np.eye(dim)
+    # tr_V_inv_gamma = np.einsum('kij, ji -> k', V_inv_gamma, eye)
 
     return np.sum((df - dim - 1) / 2 * np.linalg.slogdet(gamma)[1] -
                     0.5 * tr_V_inv_gamma)
@@ -880,6 +881,7 @@ class LinearSensitivity(object):
     #
     #     return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
 
+    # ## Needs autograd version
     def get_log_q_pi(self, theta, k):
         # TODO: you need to deal with passing these extra arguments somehow.
         mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
@@ -888,11 +890,13 @@ class LinearSensitivity(object):
 
     # functions to get the jacobian of log_q_pi faster
     # This should be tested ..
+    # ## Needs autograd version
     def _get_logit_k_mean(self, global_free_params, k):
         self.model.global_vb_params.set_free(global_free_params)
         return self.model.vb_params['global']['v_sticks']['mean'].get()[k]
 
     def _get_logit_k_info(self, global_free_params, k):
+    # ## Needs autograd version
         self.model.global_vb_params.set_free(global_free_params)
         return self.model.vb_params['global']['v_sticks']['info'].get()[k]
 

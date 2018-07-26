@@ -1,0 +1,469 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\basepost}[1][\theta]{p\left(#1\vert X\right)}
+{p\left(#1\vert X\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\baseprior}[1][\theta]{p_{0}\left(#1\right)}
+{p_{0}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\contamprior}[2][\theta][\epsilon,\phi]{p_{c}\left(#1\vert#2\right)}
+{p_{c}\left(#1\vert#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\priorpert}[1][\theta]{\phi\left(#1\right)}
+{\phi\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\post}[2][\theta][\epsilon,\phi]{p\left(#1\vert X,#2\right)}
+{p\left(#1\vert X,#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qpost}[2][\theta][\eta^{*}]{q\left(#1;#2\right)}
+{q\left(#1;#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\logpert}[2][\theta][\alpha]{\rho\left(#1,#2\right)}
+{\rho\left(#1;#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\targetfun}{g\left(\theta\right)}
+{g\left(\theta\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etaopt}{\eta^{*}}
+{\eta^{*}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\klhess}{H}
+{H}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\eggrad}{G}
+{G}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\mbe}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+{\left\Vert #1\right\Vert }
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\at}[2]{\left.#1\right|_{#2}}
+{\left.#1\right|_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\cov}{\mathrm{Cov}}
+{\mathrm{Cov}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\meas}[1][d\theta]{\lambda\left(#1\right)}
+{\lambda\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pinfluenceop}[1][\phi]{\mathbb{I}_{p}^{}\left[#1\right]}
+{\mathbb{I}_{p}\left[#1\right]}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qinfluenceop}[1][\phi]{\mathbb{I}_{q}\left[#1\right]}
+{\mathbb{I}_{q}\left[#1\right]}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pinfluencefun}[2][\theta][\,]{\mathcal{I}_{p}^{#2}\left(#1\right)}
+{\mathcal{I}_{p}^{#2}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qinfluencefun}[2][\theta][\,]{\mathcal{I}_{q}^{#2}\left(#1\right)}
+{\mathcal{I}_{q}^{#2}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\thetadom}{\Omega_{\theta}}
+{\Omega_{\theta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etadom}{\Omega_{\eta}}
+{\Omega_{\eta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\qdom}{\mathcal{Q}}
+{\mathcal{Q}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\unusedpertbound}{C_{\phi}}
+{C_{\phi}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\ball}{B_{\delta}}
+{B_{\delta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+BNP derivation
+\end_layout
+
+\begin_layout Standard
+We are interested in perturbing a BNP prior.
+ So we take
+\begin_inset Formula 
+\begin{align*}
+\theta_{k} & =\textrm{Stick length }k,\textrm{ for }k=1,...,K\\
+\baseprior[\theta_{k}] & =Beta\left(1,\alpha\right)\\
+\log\baseprior[\theta_{k}] & =\left(\alpha-1\right)\log\left(1-\theta_{k}\right).
+\end{align*}
+
+\end_inset
+
+In order to flexibly calculate variational integrals, we approximate in
+ the unconstrained space:
+\begin_inset Formula 
+\begin{align*}
+\tau_{k}\left(\theta_{k}\right) & =\log\frac{\theta_{k}}{1-\theta_{k}}\\
+\theta_{k}\left(\tau_{k}\right) & =\frac{e^{\tau_{k}}}{1+e^{\tau_{k}}}\\
+\frac{d\tau_{k}}{d\theta_{k}} & =\frac{1}{\theta_{k}}+\frac{1}{1-\theta_{k}}=\frac{\theta_{k}+1-\theta_{k}}{\theta_{k}\left(1-\theta_{k}\right)}=\frac{1}{\theta_{k}\left(1-\theta_{k}\right)}\\
+\log\frac{d\tau_{k}}{d\theta_{k}} & =-\log\theta_{k}-\log\left(1-\theta_{k}\right)\\
+\log q\left(\tau_{k}\right) & =-\frac{1}{2\sigma^{2}}\left(\tau_{k}-\mu\right)^{2}-\frac{1}{2}\log\sigma^{2}\\
+q\left(\theta_{k}\right) & =q\left(\tau_{k}\right)\left|\frac{d\tau_{k}}{d\theta_{k}}\right|\Rightarrow\\
+\log q\left(\theta_{k}\right) & =\log q\left(\tau_{k}\left(\theta_{k}\right)\right)-\log\theta_{k}-\log\left(1-\theta_{k}\right)\\
+ & =\log q\left(\tau_{k}\right)-\log\frac{e^{\tau_{k}}}{1+e^{\tau_{k}}}-\log\left(\frac{1}{1+e^{\tau_{k}}}\right)\\
+ & =\log q\left(\tau_{k}\right)-\tau_{k}+\log\left(1+e^{\tau_{k}}\right)+2\log\left(1+e^{\tau_{k}}\right)\\
+ & =\log q\left(\tau_{k}\right)-\tau_{k}+2\log\left(1+e^{\tau_{k}}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Um.
+ In 
+\begin_inset Formula $\tau$
+\end_inset
+
+ space,
+\begin_inset Formula 
+\begin{align*}
+\baseprior[\tau_{k}] & =\baseprior[\theta_{k}\left(\tau_{k}\right)]\left|\frac{d\theta_{k}}{d\tau_{k}}\right|\\
+\log\baseprior[\tau_{k}] & =\left(\alpha-1\right)\log\left(1-\theta_{k}\right)+\log\theta_{k}+\log\left(1-\theta_{k}\right)\\
+ & =\alpha\log\left(1-\theta_{k}\right)+\log\theta_{k}\\
+ & =-\alpha\log\left(1+e^{\tau_{k}}\right)+\tau_{k}-\log\left(1+e^{\tau_{k}}\right)\\
+ & =\tau_{k}-\left(\alpha+1\right)\log\left(1+e^{\tau_{k}}\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Suppose we have a 
+\begin_inset Formula $\targetfun$
+\end_inset
+
+, 
+\begin_inset Formula $\qpost$
+\end_inset
+
+, and corresponding 
+\begin_inset Formula $GH^{-1}$
+\end_inset
+
+.
+ Then, for a particular 
+\begin_inset Formula $k$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\contamprior[\theta_{k}] & =\baseprior[\theta_{k}]\left(1+\priorpert[\theta_{k}]\right)\\
+\qinfluencefun[\theta_{k}] & =GH^{-1}\frac{q\left(\theta_{k};\etaopt\right)}{\baseprior}\at{\frac{\partial}{\partial\eta}\log q\left(\theta_{k};\eta\right)}{\etaopt}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The ratio 
+\begin_inset Formula $\frac{q\left(\theta_{k};\etaopt\right)}{\baseprior}$
+\end_inset
+
+ is invariant to transformations.
+ And
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\eta}\log q\left(\theta_{k};\eta\right) & =\frac{\partial}{\partial\eta}\left(\log q\left(\tau_{k}\left(\theta_{k}\right);\eta\right)-\log\left|\frac{d\tau_{k}}{d\theta_{k}}\right|\right)\\
+ & =\frac{\partial}{\partial\eta}\log q\left(\tau_{k}\left(\theta_{k}\right);\eta\right).
+\end{align*}
+
+\end_inset
+
+Note that this is not really crazy – 
+\begin_inset Formula 
+\begin{align*}
+\log q_{\tau}\left(\tau\right) & =\eta^{T}\tau-A\left(\eta\right)\\
+\log q_{\theta}\left(\theta\right) & =\log q_{\tau}\left(\tau\left(\theta\right)\right)+\log J\\
+ & =\eta^{T}\tau\left(\theta\right)-A\left(\eta\right)+\log J\\
+\at{\frac{\partial}{\partial\eta}\log q_{\theta}\left(\theta\right)}{\theta} & =\tau\left(\theta\right)-\frac{\partial A}{\partial\eta}\\
+\at{\frac{\partial}{\partial\eta}\log q_{\tau}\left(\tau\right)}{\tau=\tau\left(\theta\right)} & =\tau\left(\theta\right)-\frac{\partial A}{\partial\eta}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Suppose
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\baseprior\left(1+\priorpert\right)\\
+\contamprior[\tau] & =\contamprior[\theta\left(\tau\right)]\left|\frac{d\theta}{d\tau}\right|\\
+ & =\baseprior[\theta\left(\tau\right)]\left(1+\priorpert[\theta\left(\tau\right)]\right)\left|\frac{d\theta}{d\tau}\right|\Rightarrow\\
+\log\contamprior[\tau] & =\log\baseprior[\theta\left(\tau\right)]+\log\left|\frac{d\theta}{d\tau}\right|+\log\left(\left(1+\priorpert[\theta\left(\tau\right)]\right)\right)\\
+ & =\log\baseprior[\tau]+\log\left(\left(1+\priorpert[\theta\left(\tau\right)]\right)\right).
+\end{align*}
+
+\end_inset
+
+Note also that
+\begin_inset Formula 
+\begin{align*}
+\norm{{\priorpert}}_{2}^{2} & =\int\priorpert[\theta]\baseprior d\theta\\
+ & =\int\priorpert[\theta\left(\tau\right)]\baseprior[\theta\left(\tau\right)]\left|\frac{d\theta}{d\tau}\right|d\tau\textrm{ (change of variables)}\\
+ & =\int\priorpert[\theta\left(\tau\right)]\baseprior[\tau]d\tau
+\end{align*}
+
+\end_inset
+
+so that the norm is unchanged.
+ Indeed,
+\begin_inset Formula 
+\begin{align*}
+\left\langle a\left(\theta\right),b\left(\theta\right)\right\rangle  & =\int a\left(\theta\right)b\left(\theta\right)\baseprior d\theta\\
+ & =\int a\left(\theta\left(\tau\right)\right)b\left(\theta\left(\tau\right)\right)\baseprior[\tau]d\tau
+\end{align*}
+
+\end_inset
+
+ so the inner product is unchanged.
+ In other words, it doesn't matter what space we do things in.
+\begin_inset Formula 
+\begin{align*}
+\log\qinfluencefun[\tau] & =\log\qpost[\theta\left(\tau\right)]-\log\baseprior[\theta\left(\tau\right)]+\log GH^{-1}\at{\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}}{\etaopt}\\
+\qinfluencefun[\tau] & =GH^{-1}\at{\frac{\partial{\qpost[][\eta]}}{\partial\eta}}{\etaopt}\frac{1}{\baseprior}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
