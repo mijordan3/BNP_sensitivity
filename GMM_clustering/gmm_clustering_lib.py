@@ -269,14 +269,14 @@ class DPGaussianMixture(object):
         # Sensitivity terms.
 
         # To priors:
-        self.prior_indices = obj_lib.make_index_param(self.prior_params)
-        self.kl_param_and_prior_obj = obj_lib.TwoParameterObjective(
-            self.prior_params, self.global_vb_params, self.set_z_get_kl)
-        # self.__get_kl_prior_free_grad = autograd.grad(
-        #     self.get_kl_from_prior_and_free_par, argnum=1)
-        # self.get_kl_prior_cross_hess = autograd.jacobian(
-        #     self.__get_kl_prior_free_grad, argnum=0)
-        self.get_kl_prior_cross_hess = kl_param_and_prior_obj.fun_free_hessian12
+        # self.prior_indices = obj_lib.make_index_param(self.prior_params)
+        # self.kl_param_and_prior_obj = obj_lib.TwoParameterObjective(
+        #     self.prior_params, self.global_vb_params, self.set_z_get_kl)
+        ## self.__get_kl_prior_free_grad = autograd.grad(
+        ##     self.get_kl_from_prior_and_free_par, argnum=1)
+        ## self.get_kl_prior_cross_hess = autograd.jacobian(
+        ##     self.__get_kl_prior_free_grad, argnum=0)
+        #self.get_kl_prior_cross_hess = kl_param_and_prior_obj.fun_free_hessian12
 
         # To data:
         self.per_gene_kl_obj = obj_lib.Objective(
