@@ -743,254 +743,254 @@ class InterestingMoments(object):
             self.moment_params['v_sticks'].set(
                 self.model.vb_params['global']['v_sticks'].e())
 
-class LinearSensitivity(object):
-    def __init__(self, model, moment_model):
-        self.model = deepcopy(model)
-        self.moment_model = moment_model
-
-        self.optimal_global_free_params = self.model.global_vb_params.get_free()
-        self.set_sensitivities(self.optimal_global_free_params)
-
-        # d/d_eta q_eta(\theta)
-        self.get_log_q_pi_obj = obj_lib.Objective(self.get_log_q_pi)
-        self.get_log_q_pi_jac_autodiff = autograd.jacobian(self.get_log_q_pi, 0)
-
-
-    def set_sensitivities(self, free_par):
-        # Save the parameter
-        self.free_par = deepcopy(free_par)
-
-        print('KL Hessian:')
-        self.kl_hessian = self.model.objective.fun_free_hessian(free_par)
-
-        print('Prior Hessian...')
-        self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
-             self.model.prior_params.get_free(), free_par)
-
-        print('Data Hessian...')
-        self.data_cross_hess = self.model.get_data_cross_hess(free_par)
-
-        print('Linear systems...')
-        self.kl_hessian_chol = osp.linalg.cho_factor(self.kl_hessian)
-        self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
-
-        self.prior_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.prior_cross_hess)
-        self.data_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.data_cross_hess.T)
-
-        print('Done.')
-
-    def get_functional_sensitivity(self, u, k,
-                                        imp_propn = 4,
-                                        n_samples = 10000):
-        # returns the KL hessian inverse * d/d\eta E_q[u(\theta) / p_0(\theta)]
-
-        # returns a vector of length len(global free params)
-        # giving the sensitivity of the global free parameters
-        # with respect to perturbing the prior of the k stick by a function u
-
-        # we compute the expectation with importance sampling. imp_propn
-        # gives the factor of the variance that we multiply by;
-        # n_samples is the number of samples we draw to compute the expectation
-
-        assert self.model.vb_params.use_logitnormal_sticks , \
-            'functional sensitivty only computed with logitnormal sticks. '
-
-        # importance sample
-        self.model.global_vb_params.set_free(self.optimal_global_free_params)
-        mean_sample = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
-        info_sample = (1 / imp_propn) * \
-                self.model.vb_params['global']['v_sticks']['info'].get()[k]
-
-        imp_sample_integrand = lambda x : np.exp(\
-            self.get_q_prior_log_ratio(x, k) + \
-            np.log(u(x) + 1e-16) -
-            fun_sens_lib.get_log_logitnormal_density(x, mean_sample, info_sample)) * \
-            self.get_influence_operator(x, k, diffble = False)
-
-        samples = sp.special.expit(np.random.randn(n_samples) * 1 / np.sqrt(info_sample) + \
-                        mean_sample)
-
-        return np.mean(imp_sample_integrand(samples), axis = 1)
-
-    def influence_function(self, theta, k, diffble = True):
-        # returns the influence function on the global free parameters
-        # with respect to the the kth stick
-
-        assert self.model.vb_params.use_logitnormal_sticks == True, \
-            'influence function is computed for logitnormal sticks only'
-
-        influence_operator = self.get_influence_operator(theta, k, \
-                                    diffble = diffble)
-        ratio = np.exp(self.get_q_prior_log_ratio(theta, k))
-
-        if not isinstance(theta, np.ndarray):
-            ratio = np.array([ratio])
-
-        return influence_operator * ratio[None, :]
-
-    def get_influence_operator(self, theta, k, diffble = True):
-        # this is H^(-1) * grad(log q_k), the influence on the global free params
-        # from the kth stick
-        # the dimensions of which are n_free_params x len(theta)
-
-        if diffble:
-            log_q_pi_jac = \
-                self.get_log_q_pi_jac_autodiff(\
-                    self.optimal_global_free_params, theta, k)
-            log_q_pi_jacT = np.rollaxis(log_q_pi_jac, \
-                                        len(np.shape(log_q_pi_jac)) - 1)
-
-            return np.einsum('ij, j...->i...', \
-                                self.kl_hessian_inv, log_q_pi_jacT)
-
-        else:
-            # diffbl = False is a lot faster
-            # but it gives autograd arrayboxes. So we only use it
-            # for integration: i.e. when we need to compute for many samples
-
-            # in this case, theta needs to be a vector
-            # in the other case, theta could be a matrix
-            assert len(np.shape(theta)) < 2
-            log_q_pi_jac = self.get_log_q_pi_jac_manual(\
-                                self.optimal_global_free_params, theta, k)
-
-            return osp.linalg.cho_solve(self.kl_hessian_chol, log_q_pi_jac.T)
-
-    def get_q_prior_log_ratio(self, theta, k):
-        # this is q(theta) / p_0(theta)
-        # returns a vector of length(theta)
-
-        alpha = self.model.prior_params['alpha'].get()
-
-        log_prior_density = lambda x : \
-                fun_sens_lib.get_log_beta_prior(x, alpha) - \
-                (sp.special.gammaln(alpha) - sp.special.gammaln(alpha + 1))
-
-        log_ratio = self.get_log_q_pi(self.optimal_global_free_params, theta, k) \
-                        - log_prior_density(theta)
-        return log_ratio
-
-    # def get_log_q_pi(self, global_free_params, theta, k):
-    #     self.model.global_vb_params.set_free(global_free_params)
-    #     # self.model.set_optimal_z()
-    #
-    #     mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
-    #     info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
-    #
-    #     return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
-
-    # ## Needs autograd version
-    def get_log_q_pi(self, theta, k):
-        # TODO: you need to deal with passing these extra arguments somehow.
-        mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
-        info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
-        return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
-
-    # functions to get the jacobian of log_q_pi faster
-    # This should be tested ..
-    # ## Needs autograd version
-    def _get_logit_k_mean(self, global_free_params, k):
-        self.model.global_vb_params.set_free(global_free_params)
-        return self.model.vb_params['global']['v_sticks']['mean'].get()[k]
-
-    def _get_logit_k_info(self, global_free_params, k):
-    # ## Needs autograd version
-        self.model.global_vb_params.set_free(global_free_params)
-        return self.model.vb_params['global']['v_sticks']['info'].get()[k]
-
-    def get_log_q_pi_jac_manual(self, global_free_params, theta, k):
-        mean = self._get_logit_k_mean(global_free_params, k)
-        info = self._get_logit_k_info(global_free_params, k)
-
-        d_log_q_pi_mean = info * (sp.special.logit(theta) - mean)
-        d_log_q_pi_info = -0.5 * (sp.special.logit(theta) - mean)**2 + \
-                0.5 / info
-
-        get_d_mean_global_params = \
-            autograd.grad(self._get_logit_k_mean, argnum = 0)
-        get_d_info_global_params = \
-            autograd.grad(self._get_logit_k_info, argnum = 0)
-
-        d_mean_global_params = \
-            get_d_mean_global_params(global_free_params, k)
-        d_info_global_params = \
-            get_d_info_global_params(global_free_params, k)
-
-        if len(np.shape(theta)) > 0:
-            jac = np.zeros((len(theta), len(d_info_global_params)))
-        else:
-            jac = np.zeros((1, len(d_info_global_params)))
-
-        mean_indx = np.argwhere(d_mean_global_params > 0).squeeze()
-        info_indx = np.argwhere(d_info_global_params > 0).squeeze()
-
-        jac[:, mean_indx] = \
-            (d_log_q_pi_mean * d_mean_global_params[mean_indx]).squeeze()
-        jac[:, info_indx] = \
-            (d_log_q_pi_info * d_info_global_params[info_indx]).squeeze()
-        return jac
-
-    #########################
-    # Functions to get worst case influence
-    def total_influence_function(self, x, diffble = True):
-        global_free_size = len(self.optimal_global_free_params)
-        x_shape = np.shape(x)
-
-        if not len(x_shape) == 0:
-            jac_size = np.concatenate((np.array([global_free_size]), x_shape))
-        else:
-            # if theta is just a scalar
-            jac_size = [global_free_size, 1]
-
-        total_influence = np.zeros(jac_size)
-        k_approx = self.model.k_approx
-        for k in range(k_approx - 1):
-            total_influence += self.influence_function(x, k, diffble = diffble)
-
-        return total_influence
-
-    def get_worst_case_perturbation_unscaled(self, g_eta, theta, sign, diffble = True):
-        alpha = self.model.prior_params['alpha'].get()
-
-        prior_density = np.expand_dims(sp.stats.beta.pdf(theta, 1, alpha), \
-                                        axis = 0)
-
-        influence = np.einsum('i, i...->...', g_eta, \
-                        self.total_influence_function(theta, diffble = diffble))
-
-        return np.maximum(sign * influence, 0)**2 * prior_density
-
-    def get_worst_case_fun_sens(self, g_eta):
-        worst_case_neg = lambda x : \
-                self.get_worst_case_perturbation_unscaled(
-                                        g_eta = g_eta, \
-                                        theta = x, \
-                                        sign = -1,
-                                        diffble = False)
-
-        worst_case_pos = lambda x : \
-                self.get_worst_case_perturbation_unscaled(
-                                        g_eta = g_eta, \
-                                        theta = x, \
-                                        sign = 1,
-                                        diffble = False)
-
-        worst_case_fun_sens_mat_pos = np.zeros(
-        (len(self.optimal_global_free_params), self.model.k_approx - 1))
-        worst_case_fun_sens_mat_neg = np.zeros(
-            (len(self.optimal_global_free_params), self.model.k_approx - 1))
-
-        for k in range(self.model.k_approx - 1):
-            worst_case_fun_sens_mat_pos[:, k] = \
-                self.get_functional_sensitivity(lambda x : worst_case_pos(x), k)
-
-            worst_case_fun_sens_mat_neg[:, k] = \
-                self.get_functional_sensitivity(lambda x : worst_case_neg(x), k)
-
-
-        return worst_case_fun_sens_mat_pos, worst_case_fun_sens_mat_neg
+# class LinearSensitivity(object):
+#     def __init__(self, model, moment_model):
+#         self.model = deepcopy(model)
+#         self.moment_model = moment_model
+#
+#         self.optimal_global_free_params = self.model.global_vb_params.get_free()
+#         self.set_sensitivities(self.optimal_global_free_params)
+#
+#         # d/d_eta q_eta(\theta)
+#         self.get_log_q_pi_obj = obj_lib.Objective(self.get_log_q_pi)
+#         self.get_log_q_pi_jac_autodiff = autograd.jacobian(self.get_log_q_pi, 0)
+#
+#
+#     def set_sensitivities(self, free_par):
+#         # Save the parameter
+#         self.free_par = deepcopy(free_par)
+#
+#         print('KL Hessian:')
+#         self.kl_hessian = self.model.objective.fun_free_hessian(free_par)
+#
+#         print('Prior Hessian...')
+#         self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
+#              self.model.prior_params.get_free(), free_par)
+#
+#         print('Data Hessian...')
+#         self.data_cross_hess = self.model.get_data_cross_hess(free_par)
+#
+#         print('Linear systems...')
+#         self.kl_hessian_chol = osp.linalg.cho_factor(self.kl_hessian)
+#         self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
+#
+#         self.prior_sens_mat = -1 * osp.linalg.cho_solve(
+#             self.kl_hessian_chol, self.prior_cross_hess)
+#         self.data_sens_mat = -1 * osp.linalg.cho_solve(
+#             self.kl_hessian_chol, self.data_cross_hess.T)
+#
+#         print('Done.')
+#
+#     def get_functional_sensitivity(self, u, k,
+#                                         imp_propn = 4,
+#                                         n_samples = 10000):
+#         # returns the KL hessian inverse * d/d\eta E_q[u(\theta) / p_0(\theta)]
+#
+#         # returns a vector of length len(global free params)
+#         # giving the sensitivity of the global free parameters
+#         # with respect to perturbing the prior of the k stick by a function u
+#
+#         # we compute the expectation with importance sampling. imp_propn
+#         # gives the factor of the variance that we multiply by;
+#         # n_samples is the number of samples we draw to compute the expectation
+#
+#         assert self.model.vb_params.use_logitnormal_sticks , \
+#             'functional sensitivty only computed with logitnormal sticks. '
+#
+#         # importance sample
+#         self.model.global_vb_params.set_free(self.optimal_global_free_params)
+#         mean_sample = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
+#         info_sample = (1 / imp_propn) * \
+#                 self.model.vb_params['global']['v_sticks']['info'].get()[k]
+#
+#         imp_sample_integrand = lambda x : np.exp(\
+#             self.get_q_prior_log_ratio(x, k) + \
+#             np.log(u(x) + 1e-16) -
+#             fun_sens_lib.get_log_logitnormal_density(x, mean_sample, info_sample)) * \
+#             self.get_influence_operator(x, k, diffble = False)
+#
+#         samples = sp.special.expit(np.random.randn(n_samples) * 1 / np.sqrt(info_sample) + \
+#                         mean_sample)
+#
+#         return np.mean(imp_sample_integrand(samples), axis = 1)
+#
+#     def influence_function(self, theta, k, diffble = True):
+#         # returns the influence function on the global free parameters
+#         # with respect to the the kth stick
+#
+#         assert self.model.vb_params.use_logitnormal_sticks == True, \
+#             'influence function is computed for logitnormal sticks only'
+#
+#         influence_operator = self.get_influence_operator(theta, k, \
+#                                     diffble = diffble)
+#         ratio = np.exp(self.get_q_prior_log_ratio(theta, k))
+#
+#         if not isinstance(theta, np.ndarray):
+#             ratio = np.array([ratio])
+#
+#         return influence_operator * ratio[None, :]
+#
+#     def get_influence_operator(self, theta, k, diffble = True):
+#         # this is H^(-1) * grad(log q_k), the influence on the global free params
+#         # from the kth stick
+#         # the dimensions of which are n_free_params x len(theta)
+#
+#         if diffble:
+#             log_q_pi_jac = \
+#                 self.get_log_q_pi_jac_autodiff(\
+#                     self.optimal_global_free_params, theta, k)
+#             log_q_pi_jacT = np.rollaxis(log_q_pi_jac, \
+#                                         len(np.shape(log_q_pi_jac)) - 1)
+#
+#             return np.einsum('ij, j...->i...', \
+#                                 self.kl_hessian_inv, log_q_pi_jacT)
+#
+#         else:
+#             # diffbl = False is a lot faster
+#             # but it gives autograd arrayboxes. So we only use it
+#             # for integration: i.e. when we need to compute for many samples
+#
+#             # in this case, theta needs to be a vector
+#             # in the other case, theta could be a matrix
+#             assert len(np.shape(theta)) < 2
+#             log_q_pi_jac = self.get_log_q_pi_jac_manual(\
+#                                 self.optimal_global_free_params, theta, k)
+#
+#             return osp.linalg.cho_solve(self.kl_hessian_chol, log_q_pi_jac.T)
+#
+#     def get_q_prior_log_ratio(self, theta, k):
+#         # this is q(theta) / p_0(theta)
+#         # returns a vector of length(theta)
+#
+#         alpha = self.model.prior_params['alpha'].get()
+#
+#         log_prior_density = lambda x : \
+#                 fun_sens_lib.get_log_beta_prior(x, alpha) - \
+#                 (sp.special.gammaln(alpha) - sp.special.gammaln(alpha + 1))
+#
+#         log_ratio = self.get_log_q_pi(self.optimal_global_free_params, theta, k) \
+#                         - log_prior_density(theta)
+#         return log_ratio
+#
+#     # def get_log_q_pi(self, global_free_params, theta, k):
+#     #     self.model.global_vb_params.set_free(global_free_params)
+#     #     # self.model.set_optimal_z()
+#     #
+#     #     mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
+#     #     info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
+#     #
+#     #     return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
+#
+#     # ## Needs autograd version
+#     def get_log_q_pi(self, theta, k):
+#         # TODO: you need to deal with passing these extra arguments somehow.
+#         mean = self.model.vb_params['global']['v_sticks']['mean'].get()[k]
+#         info = self.model.vb_params['global']['v_sticks']['info'].get()[k]
+#         return fun_sens_lib.get_log_logitnormal_density(theta, mean, info)
+#
+#     # functions to get the jacobian of log_q_pi faster
+#     # This should be tested ..
+#     # ## Needs autograd version
+#     def _get_logit_k_mean(self, global_free_params, k):
+#         self.model.global_vb_params.set_free(global_free_params)
+#         return self.model.vb_params['global']['v_sticks']['mean'].get()[k]
+#
+#     def _get_logit_k_info(self, global_free_params, k):
+#     # ## Needs autograd version
+#         self.model.global_vb_params.set_free(global_free_params)
+#         return self.model.vb_params['global']['v_sticks']['info'].get()[k]
+#
+#     def get_log_q_pi_jac_manual(self, global_free_params, theta, k):
+#         mean = self._get_logit_k_mean(global_free_params, k)
+#         info = self._get_logit_k_info(global_free_params, k)
+#
+#         d_log_q_pi_mean = info * (sp.special.logit(theta) - mean)
+#         d_log_q_pi_info = -0.5 * (sp.special.logit(theta) - mean)**2 + \
+#                 0.5 / info
+#
+#         get_d_mean_global_params = \
+#             autograd.grad(self._get_logit_k_mean, argnum = 0)
+#         get_d_info_global_params = \
+#             autograd.grad(self._get_logit_k_info, argnum = 0)
+#
+#         d_mean_global_params = \
+#             get_d_mean_global_params(global_free_params, k)
+#         d_info_global_params = \
+#             get_d_info_global_params(global_free_params, k)
+#
+#         if len(np.shape(theta)) > 0:
+#             jac = np.zeros((len(theta), len(d_info_global_params)))
+#         else:
+#             jac = np.zeros((1, len(d_info_global_params)))
+#
+#         mean_indx = np.argwhere(d_mean_global_params > 0).squeeze()
+#         info_indx = np.argwhere(d_info_global_params > 0).squeeze()
+#
+#         jac[:, mean_indx] = \
+#             (d_log_q_pi_mean * d_mean_global_params[mean_indx]).squeeze()
+#         jac[:, info_indx] = \
+#             (d_log_q_pi_info * d_info_global_params[info_indx]).squeeze()
+#         return jac
+#
+#     #########################
+#     # Functions to get worst case influence
+#     def total_influence_function(self, x, diffble = True):
+#         global_free_size = len(self.optimal_global_free_params)
+#         x_shape = np.shape(x)
+#
+#         if not len(x_shape) == 0:
+#             jac_size = np.concatenate((np.array([global_free_size]), x_shape))
+#         else:
+#             # if theta is just a scalar
+#             jac_size = [global_free_size, 1]
+#
+#         total_influence = np.zeros(jac_size)
+#         k_approx = self.model.k_approx
+#         for k in range(k_approx - 1):
+#             total_influence += self.influence_function(x, k, diffble = diffble)
+#
+#         return total_influence
+#
+#     def get_worst_case_perturbation_unscaled(self, g_eta, theta, sign, diffble = True):
+#         alpha = self.model.prior_params['alpha'].get()
+#
+#         prior_density = np.expand_dims(sp.stats.beta.pdf(theta, 1, alpha), \
+#                                         axis = 0)
+#
+#         influence = np.einsum('i, i...->...', g_eta, \
+#                         self.total_influence_function(theta, diffble = diffble))
+#
+#         return np.maximum(sign * influence, 0)**2 * prior_density
+#
+#     def get_worst_case_fun_sens(self, g_eta):
+#         worst_case_neg = lambda x : \
+#                 self.get_worst_case_perturbation_unscaled(
+#                                         g_eta = g_eta, \
+#                                         theta = x, \
+#                                         sign = -1,
+#                                         diffble = False)
+#
+#         worst_case_pos = lambda x : \
+#                 self.get_worst_case_perturbation_unscaled(
+#                                         g_eta = g_eta, \
+#                                         theta = x, \
+#                                         sign = 1,
+#                                         diffble = False)
+#
+#         worst_case_fun_sens_mat_pos = np.zeros(
+#         (len(self.optimal_global_free_params), self.model.k_approx - 1))
+#         worst_case_fun_sens_mat_neg = np.zeros(
+#             (len(self.optimal_global_free_params), self.model.k_approx - 1))
+#
+#         for k in range(self.model.k_approx - 1):
+#             worst_case_fun_sens_mat_pos[:, k] = \
+#                 self.get_functional_sensitivity(lambda x : worst_case_pos(x), k)
+#
+#             worst_case_fun_sens_mat_neg[:, k] = \
+#                 self.get_functional_sensitivity(lambda x : worst_case_neg(x), k)
+#
+#
+#         return worst_case_fun_sens_mat_pos, worst_case_fun_sens_mat_neg
 
 #################################
 # Functions to reload the model
