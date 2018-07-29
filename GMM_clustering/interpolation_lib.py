@@ -68,10 +68,11 @@ class BsplineRegression():
         # to evalute the b-spline approximation call eval_interp_fun(x)
 
         self.bsplines = Bspline(knot_vector)
-
+        self.order = order
+        
         # regressors defined by bsplines
         self.bspline_basis_at_x_reg = \
-            self.bsplines.get_pth_order_basis(x_reg, order)
+            self.bsplines.get_pth_order_basis(x_reg, self.order)
 
         # function values at x_reg
         self.fun_at_x_reg = fun(x_reg)
@@ -98,4 +99,4 @@ class BsplineRegression():
 
     def eval_interp_fun(self, x):
         return np.dot(self.bspline_coeffs, \
-                        self.bsplines.get_pth_order_basis(x, 3))
+                        self.bsplines.get_pth_order_basis(x, self.order))
