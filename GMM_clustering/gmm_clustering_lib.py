@@ -168,8 +168,8 @@ def get_e_log_prior(vb_params, prior_params, u = None):
         # no perturbation
         dp_prior = model_lib.get_dp_prior(vb_params, prior_params)
     else:
-        dp_prior = fun_sens_lib.dp_perturbed_prior(vb_params, prior_params, \
-                        u = u)
+        dp_prior = np.sum(fun_sens_lib.dp_perturbed_prior(vb_params, prior_params, \
+                        u = u))
     e_gamma_prior = get_e_log_wishart_prior(vb_params, prior_params)
 
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)

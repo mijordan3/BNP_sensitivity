@@ -44,11 +44,17 @@ parameters {
 }
 transformed parameters {
   vector[n_clusters] weights; 
-  weights = get_weights_from_sticks(sticks); 
-}
-model {
   vector[n_clusters] contributions[n_obs];
 
+  weights = get_weights_from_sticks(sticks); 
+  for(i in 1:n_obs) {
+    for(k in 1:n_clusters) {
+      contributions[i][k] = log(weights[k]) + 
+                multi_normal_lpdf(y[i] | mu[k], sigma[k]);
+    }
+  }
+}
+model {
   // priors
   for(k in 1:n_clusters) {
     // draw centroids
@@ -64,10 +70,6 @@ model {
   
   // likelihood
   for(i in 1:n_obs) {
-    for(k in 1:n_clusters) {
-      contributions[i][k] = log(weights[k]) + 
-                multi_normal_lpdf(y[i] | mu[k], sigma[k]);
-    }
     target += log_sum_exp(contributions[i]);
   }
 }
@@ -75,16 +77,8 @@ model {
 generated quantities {
   // We get the cluster belongings
   vector[n_clusters] e_z[n_obs];
-  
-  // is there a way to pull the contributions 
-  // from the model block above? we're computing them twice ... 
-  vector[n_clusters] contributions[n_obs];
 
   for(i in 1:n_obs) {
-    for(k in 1:n_clusters) {
-      contributions[i][k] = log(weights[k]) + 
-                multi_normal_lpdf(y[i] | mu[k], sigma[k]);
-    }
     e_z[i] = exp(contributions[i] - log_sum_exp(contributions[i]));
   }
 }
