@@ -9,6 +9,7 @@ import LinearResponseVariationalBayes.ExponentialFamilies as ef
 def dp_perturbed_prior(vb_params, prior_params, u = lambda x : 0):
     # expectation of perturbed dp prior
 
+    # u(x) has to be able to take in a vector of inputs and return a vector
     alpha = prior_params['alpha'].get()
     dp_prior_density = lambda x : 1 / sp.special.beta(1, alpha) \
                             * (1 - x)**(alpha - 1)
@@ -21,8 +22,15 @@ def dp_perturbed_prior(vb_params, prior_params, u = lambda x : 0):
     gh_loc = vb_params.gh_loc
     gh_weights = vb_params.gh_weights
 
-    return ef.get_e_fun_normal(lognorm_means, lognorm_infos, \
-                            gh_loc, gh_weights, integrand)
+    dp_prior = 0.0
+    for k in range(len(lognorm_means)):
+        dp_prior += ef.get_e_fun_normal(lognorm_means[k], lognorm_infos[k], \
+                                gh_loc, gh_weights, integrand)
+
+    return dp_prior
+
+    # return ef.get_e_fun_normal(lognorm_means, lognorm_infos, \
+    #                         gh_loc, gh_weights, integrand)
 
 # get explicit densities (not expectations) for computing the influence function
 def get_log_logitnormal_density(theta, mean, info):
