@@ -695,7 +695,7 @@ class DPGaussianMixture(object):
 #######################
 class InterestingMoments(object):
     def __init__(self, model):
-        self.model = deepcopy(model)
+        self.model = model
         self.moment_params = vb.ModelParamsDict('Moment parameters')
         self.moment_params.push_param(
             vb.ArrayParam('centroids', shape=(model.dim, model.k_approx)))
@@ -705,6 +705,15 @@ class InterestingMoments(object):
             vb.VectorParam('cluster_weights', size=model.k_approx))
         self.moment_params.push_param(
             vb.VectorParam('v_sticks', size=model.k_approx - 1))
+
+        self.moment_converter = obj_lib.ParameterConverter(
+            par_in=self.model.global_vb_params,
+            par_out=self.moment_params,
+            converter=self.set_moments)
+        self.get_moment_jacobian = self.moment_converter.free_to_vec_jacobian
+
+    def set_moments(self):
+        self.set_moments_from_free_par(self.model.global_vb_params.get_free())
 
     def set_moments_from_free_par(self, free_par):
         self.model.set_from_global_free_par(free_par)
