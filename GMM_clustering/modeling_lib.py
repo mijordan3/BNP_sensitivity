@@ -59,11 +59,16 @@ def get_dp_prior(vb_params, prior_params):
 ##############
 # likelihoods
 
+# Autograd doesn't work with the original cumprod.
+def cumprod_through_log(x):
+    return np.exp(np.cumsum(np.log(x)))
+
+
 def get_mixture_weights(stick_lengths):
     # computes mixture weights from stick lengths
     stick_lengths_1m = 1 - stick_lengths
     stick_remain = np.concatenate((np.array([1]),
-                                   np.cumprod(stick_lengths_1m)))
+                                   cumprod_through_log(stick_lengths_1m)))
     stick_add = np.concatenate((stick_lengths, np.array([1])))
 
     return stick_remain * stick_add
@@ -108,7 +113,7 @@ def get_mixture_weights_array(stick_lengths):
 
     stick_lengths_1m = 1 - stick_lengths
     stick_remain = np.hstack((np.ones((n_sticks, 1)),
-                                np.cumprod(stick_lengths_1m, axis = 1)))
+                              cumprod_through_log(stick_lengths_1m, axis = 1)))
     stick_add = np.hstack((stick_lengths,
                                 np.ones((n_sticks, 1))))
 

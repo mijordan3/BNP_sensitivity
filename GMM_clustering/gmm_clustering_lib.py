@@ -699,8 +699,8 @@ class InterestingMoments(object):
         self.moment_params = vb.ModelParamsDict('Moment parameters')
         self.moment_params.push_param(
             vb.ArrayParam('centroids', shape=(model.dim, model.k_approx)))
-        self.moment_params.push_param(
-            vb.ArrayParam('e_z', shape=(model.n_obs, model.k_approx)))
+        # self.moment_params.push_param(
+        #     vb.ArrayParam('e_z', shape=(model.n_obs, model.k_approx)))
         self.moment_params.push_param(
             vb.VectorParam('cluster_weights', size=model.k_approx))
         self.moment_params.push_param(
@@ -720,10 +720,10 @@ class InterestingMoments(object):
         self.moment_params['centroids'].set(
             self.model.vb_params['global']['centroids'].get())
 
-        e_z = self.model.vb_params['e_z'].get()
-        self.moment_params['e_z'].set(e_z)
-        self.moment_params['cluster_weights'].set(\
-            self.model.get_e_cluster_probabilities())
+        # e_z = self.model.vb_params['e_z'].get()
+        # self.moment_params['e_z'].set(e_z)
+        # self.moment_params['cluster_weights'].set(\
+        #     self.model.get_e_cluster_probabilities())
 
         if self.model.vb_params.use_logitnormal_sticks:
             self.moment_params['v_sticks'].set(
