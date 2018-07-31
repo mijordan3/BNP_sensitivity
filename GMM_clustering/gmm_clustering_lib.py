@@ -254,7 +254,8 @@ class DPGaussianMixture(object):
         self.gh_deg = gh_deg
 
         self.use_weights = False
-        self.weights = np.ones((self.n_obs, 1))
+        self.weights = vb.VectorParam('w', size=self.n_obs)
+        self.weights.set(np.ones((self.n_obs, 1)))
 
         self.vb_params = get_vb_params(
             self.dim, k_approx, self.n_obs, gh_deg,
@@ -280,15 +281,33 @@ class DPGaussianMixture(object):
         self.global_vb_params.push_param(self.vb_params['global']['gamma'])
         self.global_vb_params.push_param(self.vb_params['global']['v_sticks'])
 
+        # The KL divergence:
         self.objective = \
             obj_lib.Objective(self.global_vb_params, self.set_z_get_kl)
         self.objective.preconditioning = False
         self.objective.logger.callback = self.display_optimization_status
 
+        # The prior:
+        self.prior_objective = \
+            obj_lib.TwoParameterObjective(
+                self.prior_params, self.global_vb_params, self.set_z_get_kl)
+        self.get_kl_prior_cross_hess = self.prior_objective.fun_free_hessian12
+
         # To data:
-        self.per_gene_kl_obj = obj_lib.Objective(
-            self.global_vb_params, self.get_per_gene_kl)
-        self.get_data_cross_hess = self.per_gene_kl_obj.fun_free_jacobian
+        # self.per_gene_kl_obj = obj_lib.Objective(
+        #     self.global_vb_params, self.get_per_gene_kl)
+        # self.get_data_cross_hess = self.per_gene_kl_obj.fun_free_jacobian
+        self.data_objective = \
+            obj_lib.TwoParameterObjective(
+                self.global_vb_params, self.weights, self.set_z_get_kl)
+
+    def get_data_cross_hess(self, free_par):
+        use_weights_cache = self.use_weights
+        self.use_weights = True
+        data_cross_hess = self.data_objective.fun_free_hessian12(
+            free_par, self.weights.get_free())
+        self.use_weights = use_weights_cache
+        return data_cross_hess
 
     def __str__(self):
         b = self.vb_params['global']['b'].e()
@@ -318,7 +337,6 @@ class DPGaussianMixture(object):
         else:
             e_log_cluster_probs = 0
 
-
         z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
         if return_loglik_obs_by_nk:
@@ -347,8 +365,9 @@ class DPGaussianMixture(object):
             self.y, self.vb_params)
 
         if self.use_weights:
-            assert np.shape(self.weights) == (self.n_obs, 1)
-            e_loglik_obs = np.sum(self.weights * e_z * loglik_obs_by_nk)
+            #assert np.shape(weights) == (self.n_obs, 1)
+            weights = np.expand_dims(self.weights.get(), 1)
+            e_loglik_obs = np.sum( * e_z * loglik_obs_by_nk)
         else:
             e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
@@ -377,8 +396,9 @@ class DPGaussianMixture(object):
         e_z = self.vb_params['e_z'].get()
 
         if self.use_weights:
-            assert np.shape(self.weights) == (self.n_obs, 1)
-            e_loglik_obs = np.sum(self.weights * e_z * loglik_obs_by_nk)
+            #assert np.shape(self.weights) == (self.n_obs, 1)
+            weights = np.expand_dims(self.weights.get(), 1)
+            e_loglik_obs = np.sum(weights * e_z * loglik_obs_by_nk)
         else:
             e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
@@ -425,54 +445,6 @@ class DPGaussianMixture(object):
             e_1mv = e_sticks[1, :]
 
         return model_lib.get_mixture_weights(e_v)
-
-
-    ########################
-    # Saving and loading.
-
-    def get_checkpoint_dictionary(self, seed=None, compact=False):
-        # Set the optimal z to remove arrayboxes if necessary.
-        self.set_optimal_z()
-        e_z = self.vb_params['e_z'].get()
-        labels = np.squeeze(np.argmax(e_z, axis=1))
-        centroids = self.vb_params['global']['centroids'].get()
-        fit_dict = checkpoints.get_fit_dict(
-            method = 'gmm',
-            initialization_method = 'kmeans',
-            seed = seed,
-            centroids = centroids,
-            labels = labels,
-            cluster_assignments = osp.sparse.csr_matrix(e_z),
-            preprocessing_dict = None,
-            basis_mat = None,
-            cluster_weights = self.get_e_cluster_probabilities())
-        np_string = checkpoints.np_string
-        fit_dict['k_approx'] = self.k_approx
-        fit_dict['use_bnp_prior'] = self.vb_params.use_bnp_prior
-        fit_dict['vb_global_free_par' + np_string] = \
-            json_tricks.dumps(self.global_vb_params.get_free())
-        fit_dict['vb_global_vec_par' + np_string] = \
-            json_tricks.dumps(self.global_vb_params.get_vector())
-        fit_dict['prior_params_vec' + np_string] = \
-            json_tricks.dumps(self.prior_params.get_vector())
-        fit_dict['gh_deg'] = self.gh_deg
-        fit_dict['y' + np_string] = json_tricks.dumps(self.y)
-        fit_dict['use_weights'] = self.use_weights
-        fit_dict['sample_weights' + np_string] = json_tricks.dumps(self.weights)
-        fit_dict['use_logitnormal_sticks'] = \
-            self.vb_params.use_logitnormal_sticks
-
-        # Optionally do not save the large objects.  Zero them out here
-        # rather than before calling get_fit_dict() because get_fit_dict()
-        # does validation on e_z.
-        if compact:
-            empty_array = json_tricks.dumps(np.array([]))
-            fit_dict['y'] = empty_array
-            fit_dict['e_z'] = empty_array
-            fit_dict['labels'] = empty_array
-
-        return fit_dict
-
 
     ########################
     # Sensitivity functions.
@@ -753,19 +725,22 @@ class InterestingMoments(object):
 
 
 class LinearSensitivity(object):
-    def __init__(self, model, moment_model):
+    def __init__(self, model, moment_model, kl_hessian=None):
         self.model = deepcopy(model)
         self.moment_model = moment_model
 
         self.optimal_global_free_params = self.model.global_vb_params.get_free()
-        self.set_sensitivities(self.optimal_global_free_params)
+        self.set_sensitivities(self.optimal_global_free_params, kl_hessian)
 
-    def set_sensitivities(self, free_par):
+    def set_sensitivities(self, free_par, kl_hessian):
         # Save the parameter
         self.free_par = deepcopy(free_par)
 
-        print('KL Hessian:')
-        self.kl_hessian = self.model.objective.fun_free_hessian(free_par)
+        if kl_hessian is None:
+            print('KL Hessian:')
+            self.kl_hessian = self.model.objective.fun_free_hessian(free_par)
+        else:
+            self.kl_hessian = kl_hessian
 
         print('Prior Hessian...')
         self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
@@ -779,9 +754,9 @@ class LinearSensitivity(object):
         self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
 
         self.prior_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.prior_cross_hess)
+            self.kl_hessian_chol, self.prior_cross_hess.T)
         self.data_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.data_cross_hess.T)
+            self.kl_hessian_chol, self.data_cross_hess)
 
         print('Done.')
 
@@ -789,6 +764,54 @@ class LinearSensitivity(object):
 #################################
 # Functions to reload the model
 #################################
+
+def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
+    # Set the optimal z to remove arrayboxes if necessary.
+    model.set_optimal_z()
+    e_z = model.vb_params['e_z'].get()
+    labels = np.squeeze(np.argmax(e_z, axis=1))
+    centroids = model.vb_params['global']['centroids'].get()
+    fit_dict = checkpoints.get_fit_dict(
+        method = 'gmm',
+        initialization_method = 'kmeans',
+        seed = seed,
+        centroids = centroids,
+        labels = labels,
+        cluster_assignments = osp.sparse.csr_matrix(e_z),
+        preprocessing_dict = None,
+        basis_mat = None,
+        cluster_weights = model.get_e_cluster_probabilities())
+    np_string = checkpoints.np_string
+    fit_dict['k_approx'] = model.k_approx
+    fit_dict['use_bnp_prior'] = model.vb_params.use_bnp_prior
+    fit_dict['vb_global_free_par' + np_string] = \
+        json_tricks.dumps(model.global_vb_params.get_free())
+    fit_dict['vb_global_vec_par' + np_string] = \
+        json_tricks.dumps(model.global_vb_params.get_vector())
+    fit_dict['prior_params_vec' + np_string] = \
+        json_tricks.dumps(model.prior_params.get_vector())
+    fit_dict['gh_deg'] = model.gh_deg
+    fit_dict['y' + np_string] = json_tricks.dumps(model.y)
+    fit_dict['use_weights'] = model.use_weights
+    fit_dict['sample_weights' + np_string] = json_tricks.dumps(model.weights.get())
+    fit_dict['use_logitnormal_sticks'] = \
+        model.vb_params.use_logitnormal_sticks
+
+    if not kl_hessian is None:
+        fit_dict['kl_hessian' + np_string] = json_tricks.dumps(kl_hessian)
+
+    # Optionally do not save the large objects.  Zero them out here
+    # rather than before calling get_fit_dict() because get_fit_dict()
+    # does validation on e_z.
+    if compact:
+        empty_array = json_tricks.dumps(np.array([]))
+        fit_dict['y'] = empty_array
+        fit_dict['e_z'] = empty_array
+        fit_dict['labels'] = empty_array
+
+    return fit_dict
+
+
 def get_model_from_checkpoint(fit_dict):
     # load model from fit dictionary
     np_string = checkpoints.np_string
@@ -824,8 +847,13 @@ def get_model_from_checkpoint(fit_dict):
 
     # set weights if necessary
     model.use_weights = fit_dict['use_weights']
-    model.weights = json_tricks.loads(fit_dict['sample_weights' + np_string])
+    weights = json_tricks.loads(fit_dict['sample_weights' + np_string])
+    model.weights.set(np.reshape(weights, (model.n_obs, 1)))
 
     model.set_optimal_z()
 
     return model
+
+
+def get_kl_hessian_from_checkpoint(fit_dict):
+    return json_tricks.loads(fit_dict['kl_hessian' + checkpoints.np_string])
