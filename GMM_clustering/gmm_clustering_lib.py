@@ -726,7 +726,7 @@ class InterestingMoments(object):
 
 class LinearSensitivity(object):
     def __init__(self, model, moment_model, kl_hessian=None):
-        self.model = deepcopy(model)
+        self.model = model
         self.moment_model = moment_model
 
         self.optimal_global_free_params = self.model.global_vb_params.get_free()

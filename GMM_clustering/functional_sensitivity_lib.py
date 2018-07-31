@@ -5,6 +5,7 @@ sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
 import autograd.numpy as np
 import autograd.scipy as sp
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import LinearResponseVariationalBayes.SparseObjectives as obj_lib
 
 # A class to calculate sensitivity to the stick-breaking distribution.
 #
