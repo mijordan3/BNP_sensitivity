@@ -5,7 +5,7 @@ library(MASS)
 set.seed(54)
 
 ##########################
-# DRAW DATA
+# DRAW / LOAD DATA
 ##########################
 draw_gmm_data <- function(n_obs, n_clusters, d, sigma){
   # draw centroids
@@ -29,21 +29,56 @@ draw_gmm_data <- function(n_obs, n_clusters, d, sigma){
               z_ind = z_ind))
 }
 
-n_obs <- 1000
-n_clusters <- 3
-d <- 2
-sigma <- 0.02
-gmm_data <- draw_gmm_data(n_obs, n_clusters, d, sigma)
 
-data.frame(y1 = gmm_data$y[, 1], 
-           y2 = gmm_data$y[, 2], 
-           labels = gmm_data$z_ind) %>% 
-  ggplot() + geom_point(aes(y1, y2, color = as.factor(labels)))
+load_iris_data <- function(){
+  iris_features <- as.matrix(iris[, 1:4]) 
+  iris_species <- as.matrix(iris[, 5])
+  
+  # run PCA
+  ir.pca <- prcomp(iris_features,
+                   center = TRUE,
+                   scale. = TRUE) 
+  
+  # transform features
+  iris_pc_features <- predict(ir.pca, newdata=iris_features)
+  
+  return(list(iris_features = iris_features, 
+              iris_species = iris_species, 
+              iris_pc_features = iris_pc_features))
+}
+
+simulate_data <- FALSE
+if(simulate_data){
+  n_obs <- 1000
+  n_clusters <- 3
+  d <- 2
+  sigma <- 0.02
+  gmm_data <- draw_gmm_data(n_obs, n_clusters, d, sigma)
+  
+  data.frame(y1 = gmm_data$y[, 1], 
+             y2 = gmm_data$y[, 2], 
+             labels = gmm_data$z_ind) %>% 
+    ggplot() + geom_point(aes(y1, y2, color = as.factor(labels)))
+  
+  y <- gmm_data$y
+}else{
+  iris_data <- load_iris_data()
+  y <- iris_data$iris_pc_features
+  d <- dim(y)[2]
+  
+  data.frame(y1 = y[, 1], 
+             y2 = y[, 2], 
+             labels = iris_data$iris_species) %>% 
+    ggplot() + geom_point(aes(y1, y2, color = as.factor(labels)))
+  
+}
 
 ##########################
 # DEFINE MODEL
 ##########################
-load_model <- FALSE
+
+# Define stan object
+load_model <- TRUE
 if(load_model){
   model_file <- './gmm_model_compiled.RData'
   load(model_file)
@@ -52,6 +87,7 @@ if(load_model){
   save('gmm_mixture_model', file = './gmm_model_compiled.RData')
 }
 
+# Get data for stan model
 get_default_data_model <- function(y, n_clusters){
   n_obs <- dim(y)[1]
   d <- dim(y)[2]
@@ -72,7 +108,7 @@ get_default_data_model <- function(y, n_clusters){
   return(data)
 }
 
-y <- gmm_data$y
+n_clusters <- 3
 model_data <- get_default_data_model(y, n_clusters)
 
 ##########################
@@ -91,7 +127,7 @@ print(fit)
 
 save_fit <- TRUE
 if(save_fit){
-  save('fit', file = './gmm_model_fit.RData')
+  save('fit', file = './gmm_model_fit_iris.RData')
 }
 
 samples <- rstan::extract(fit)
@@ -107,10 +143,9 @@ z_ind <- apply(e_z, 1, which.max)
 
 p <- ggplot() + geom_point(aes(x = mu_samples[, 1], y = mu_samples[, 2]), 
                           color = 'black', alpha = 0.5) +
-      geom_point(aes(x = gmm_data$mu[, 1], y = gmm_data$mu[, 2]),
-                 shape = 'x', color = 'blue', size = 5) +
-      geom_point(aes(y[, 1], y[, 2], color = as.factor(z_ind)), alpha = 0.1)
-
+      geom_point(aes(y[, 1], y[, 2], color = as.factor(z_ind)), alpha = 0.5) 
+  
+p
 
 get_ellipse <- function(Sigma, center, s=3, npoints = 100){
   t <- seq(0, 2*pi, len=npoints)
@@ -127,8 +162,8 @@ get_ellipse <- function(Sigma, center, s=3, npoints = 100){
 }
 
 for(i in 1:dim(mu_samples)[1]){
-  Sigma <- sigma_samples[i, , ]
-  center <- mu_samples[i, ]
+  Sigma <- sigma_samples[i, c(1, 2), c(1, 2)]
+  center <- mu_samples[i, c(1,2)]
   ellipse <- get_ellipse(Sigma, center)
   
   ggplot() + geom_path(data=ellipse, aes(x=x, y=y), colour='blue', 
@@ -138,3 +173,4 @@ for(i in 1:dim(mu_samples)[1]){
                      linetype = 'dashed', alpha = 0.1)
 }
 p
+
