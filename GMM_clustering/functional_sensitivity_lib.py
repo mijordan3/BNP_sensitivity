@@ -6,67 +6,66 @@ import autograd.numpy as np
 import autograd.scipy as sp
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
-def dp_perturbed_prior(vb_params, prior_params, u = lambda x : 0):
-    # expectation of perturbed dp prior
-
-    # u(x) has to be able to take in a vector of inputs and return a vector
-    alpha = prior_params['alpha'].get()
-    dp_prior_density = lambda x : 1 / sp.special.beta(1, alpha) \
-                            * (1 - x)**(alpha - 1)
-    perturbed_log_density = lambda x : np.log(u(x) + dp_prior_density(x))
-
-    integrand = lambda x : perturbed_log_density(sp.special.expit(x))
-
-    lognorm_means = vb_params['global']['v_sticks']['mean'].get()
-    lognorm_infos = vb_params['global']['v_sticks']['info'].get()
-    gh_loc = vb_params.gh_loc
-    gh_weights = vb_params.gh_weights
-
-    dp_prior = 0.0
-    for k in range(len(lognorm_means)):
-        dp_prior += ef.get_e_fun_normal(lognorm_means[k], lognorm_infos[k], \
-                                gh_loc, gh_weights, integrand)
-
-    return dp_prior
-
-    # return ef.get_e_fun_normal(lognorm_means, lognorm_infos, \
-    #                         gh_loc, gh_weights, integrand)
-
-# get explicit densities (not expectations) for computing the influence function
-def get_log_logitnormal_density(theta, mean, info):
-    return - 0.5 * (np.log(2 * np.pi) - np.log(info)) + \
-            -0.5 * info * (sp.special.logit(theta) - mean) ** 2 + \
-            -np.log(theta) - np.log(1 - theta)
-
-
-def get_log_beta_prior(pi, alpha):
-    # pi are the stick lengths
-    # alpha is the DP parameter
-
-    return (alpha - 1.0) * np.log(1.0 - pi)
-
-
-# def evaluate_stick_integral_imp_sampling(u, mean, info, imp_propn = 4.0, \
-#                                         n_samples = 10000):
-#     # Given function u(x), we evaluate E[u(x)], where
-#     # x ~ logitnormal with mean and info
+# A class to calculate sensitivity to the stick-breaking distribution.
 #
-#     # mean and info should be scalars
-#
-#     mean_sample = mean
-#     info_sample = (1 / imp_propn) * info
-#
-#     samples = sp.special.expit(np.random.randn(n_samples) * 1 / np.sqrt(info_sample) + \
-#                     mean_sample)
-#
-#     u_samples = u(samples) * np.exp(fun_sens_lib.get_log_logitnormal_density(x, mean_sample, info_sample)
-#
-#     if np.shape(u_samples) > 1:
-#         # u(x) might return a vector, like in the case when we evaluate
-#         # functional sensitivity
-#
-#         assert np.shape(u_samples)[1] == n_samples
-#         return np.mean(u_samples, axis = 1)
-#
-#     else:
-#         return np.mean(u_samples)
+# Parameters:
+#   model: A DPGaussianMixture object.
+#   best_param: A free parameter at a local minimum of the KL divergence.
+#   kl_hessian: The Hessian of the KL divergence evaluated at best_param.
+#   dgdeta: The derivative of the moments of interest with respect to the
+#           variational free parameters.
+class StickSensitivity(object):
+    def __init__(self, model, best_param, kl_hessian, dgdeta):
+        self.model = model
+        self.best_param = best_param
+        self.log_q_logit_stick_obj = obj_lib.Objective(
+            self.model.global_vb_params, self.get_log_q_logit_stick)
+        self.set_lr_matrix(kl_hessian, dgdeta)
+
+    def set_lr_matrix(self, kl_hessian, dgdeta):
+        self.lr_mat = -1 * np.linalg.solve(kl_hessian, dgdeta)
+
+    # The log variational density of stick k at logit_v
+    # in the logit_stick space.
+    def get_log_q_logit_stick(self, logit_v, k):
+        mean = self.model.global_vb_params['v_sticks']['mean'].get()[k]
+        info = self.model.global_vb_params['v_sticks']['info'].get()[k]
+        return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
+
+    # Return a vectof of log variational densities for all sticks at logit_v
+    # in the logit stick space.
+    def get_log_q_logit_all_sticks(self, logit_v):
+        mean = self.model.global_vb_params['v_sticks']['mean'].get()
+        info = self.model.global_vb_params['v_sticks']['info'].get()
+        return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
+
+    # The base prior (of any stick -- they are all the same) at logit_v in
+    # the logit stick space.
+    def get_log_p0_logit_stick(self, logit_v):
+        alpha = self.model.prior_params['alpha'].get()
+        return logit_v - (alpha + 1) * np.log1p(np.exp(logit_v))
+
+    # Get the influence function for a perturbation to the prior on stick k.
+    def get_single_stick_influence(self, logit_v, k):
+        log_q = self.get_log_q_logit_stick(logit_v, k)
+        log_p0 = self.get_log_p0_logit_stick(logit_v)
+
+        log_q_grad = self.log_q_logit_stick_obj.fun_free_grad(
+            self.best_param, logit_v=logit_v, k=k)
+        return(self.lr_mat.T @ log_q_grad * np.exp(log_q - log_p0))
+
+    # Get the influence function for a perturbation to all stick priors
+    # simultaneously.
+    def get_all_stick_influence(self, logit_v):
+        log_q_vec = self.get_log_q_logit_all_sticks(logit_v)
+
+        # The prior is the same for every stick.
+        log_p0 = self.get_log_p0_logit_stick(logit_v)
+
+        log_q_grad_vec = np.array([
+            self.log_q_logit_stick_obj.fun_free_grad(
+                self.best_param, logit_v=logit_v, k=k)
+            for k in range(self.model.k_approx - 1) ])
+
+        dens_ratios = np.exp(log_q_vec - log_p0)
+        return(self.lr_mat.T @ np.einsum('kd,k->d', log_q_grad_vec, dens_ratios))
