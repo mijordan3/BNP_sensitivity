@@ -69,7 +69,7 @@ class BsplineRegression():
 
         self.bsplines = Bspline(knot_vector)
         self.order = order
-        
+
         # regressors defined by bsplines
         self.bspline_basis_at_x_reg = \
             self.bsplines.get_pth_order_basis(x_reg, self.order)
