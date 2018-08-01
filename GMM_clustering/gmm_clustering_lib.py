@@ -728,8 +728,8 @@ class InterestingMoments(object):
 
         # e_z = self.model.vb_params['e_z'].get()
         # self.moment_params['e_z'].set(e_z)
-        # self.moment_params['cluster_weights'].set(\
-        #     self.model.get_e_cluster_probabilities())
+        self.moment_params['cluster_weights'].set(\
+            self.model.get_e_cluster_probabilities())
 
         if self.model.vb_params.use_logitnormal_sticks:
             self.moment_params['v_sticks'].set(
