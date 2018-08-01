@@ -111,8 +111,14 @@ def get_default_prior_params(dim):
     prior_params = vb.ModelParamsDict('prior_params')
 
     # DP prior parameter
+    # prior_params.push_param(
+    #     vb.ScalarParam(name = 'alpha', lb = 0.0, val = 4.0))
+
+    # Do not constrain the prior parameters so that the free param is the
+    # vector param -- for now we haven't implemented mixed free / vector
+    # Hessians in TwoParameterObjective.
     prior_params.push_param(
-        vb.ScalarParam(name = 'alpha', lb = 0.0, val = 4.0))
+        vb.ScalarParam(name = 'alpha', val = 4.0))
 
     # prior on the centroids
     prior_params.push_param(
