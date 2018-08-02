@@ -52,7 +52,8 @@ def push_global_params(global_params, dim, k_approx, use_logitnormal_sticks):
 
     # the kth column is the centroid for the kth cluster
     # variational distribution for the centroids are a point mass
-    global_params.push_param(vb.ArrayParam('centroids', shape=(dim, k_approx)))
+    global_params.push_param(vb.ArrayParam(
+        'centroids', shape=(dim, k_approx)))
 
     # note the shape k_approx - 1 ...
     # the last stick is always 1 in our approximation
