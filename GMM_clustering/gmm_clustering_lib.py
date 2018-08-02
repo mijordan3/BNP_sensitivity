@@ -71,8 +71,8 @@ def push_global_params(global_params, dim, k_approx, use_logitnormal_sticks):
     global_params.push_param(vb.PosDefMatrixParamVector('gamma', \
                                 length = k_approx, matrix_size = dim))
 
-def push_local_params(vb_params, n_obs, k_approx):
-    vb_params.push_param(vb.SimplexParam(name='e_z', shape=(n_obs, k_approx)))
+# def push_local_params(vb_params, n_obs, k_approx):
+#     vb_params.push_param(vb.SimplexParam(name='e_z', shape=(n_obs, k_approx)))
 
 
 # Set the gh_log and gh_weights attributes of the vb_params object.
@@ -97,9 +97,9 @@ def get_vb_params(dim, k_approx, n_obs, gh_deg, \
                         vb_params.use_logitnormal_sticks)
     vb_params.push_param(global_params)
 
-    # local parameters:
-    # the cluster belongings
-    push_local_params(vb_params, n_obs, k_approx)
+    # # local parameters:
+    # # the cluster belongings
+    # #push_local_params(vb_params, n_obs, k_approx)
 
     # not really vb parameters: set the weights and locations for
     # integrating the logitnormal
@@ -212,8 +212,8 @@ def get_e_log_prior(vb_params, prior_params, phi=None):
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params):
-    e_z = vb_params['e_z'].get()
+def get_entropy(vb_params, e_z):
+    #e_z = vb_params['e_z'].get()
     return model_lib.multinom_entropy(e_z) + \
         model_lib.get_stick_entropy(vb_params)
 
@@ -269,6 +269,8 @@ class DPGaussianMixture(object):
         self.n_obs = y.shape[0]
         self.gh_deg = gh_deg
 
+        self.e_z = np.full((self.n_obs, self.k_approx), float('nan'))
+
         self.use_weights = False
         self.weights = vb.VectorParam('w', size=self.n_obs)
         self.weights.set(np.ones((self.n_obs, 1)))
@@ -292,6 +294,9 @@ class DPGaussianMixture(object):
         # Make a set of parameters for optimization.  Note that the
         # parameters are passed by reference, so updating global_vb_params
         # updates vb_params.
+
+        # TODO: There is no need to keep track of "global" VB params.
+        # e_z should not be a part of the same data structure.
         self.global_vb_params = vb.ModelParamsDict()
         self.global_vb_params.push_param(self.vb_params['global']['centroids'])
         self.global_vb_params.push_param(self.vb_params['global']['gamma'])
@@ -332,7 +337,7 @@ class DPGaussianMixture(object):
                 self.vb_params['global']['gamma'].get())),
             str(self.vb_params['global']['beta']),
             'b mean = {} sd = {} '.format(np.mean(b), np.std(b)),
-            'Z totals: {}'.format(np.sum(self.vb_params['e_z'].get(), axis=0)) ])
+            'Z totals: {}'.format(np.sum(self.e_z, axis=0)) ])
 
     def set_random(self):
         self.vb_params['global'].set_free(np.random.random(
@@ -369,26 +374,27 @@ class DPGaussianMixture(object):
                     self.get_z_nat_params(return_loglik_obs_by_nk)
 
         log_const = sp.misc.logsumexp(z_nat_param, axis=1)
-        self.vb_params['e_z'].set(np.exp(z_nat_param - log_const[:, None]))
+        #self.vb_params['e_z'].set(np.exp(z_nat_param - log_const[:, None]))
+        self.e_z = np.exp(z_nat_param - log_const[:, None])
 
         if return_loglik_obs_by_nk:
             return loglik_obs_by_nk
 
     def get_kl(self):
         # ...with the current value of z.
-        e_z = self.vb_params['e_z'].get()
+        #e_z = self.vb_params['e_z'].get()
         loglik_obs_by_nk = get_loglik_obs_by_nk(
             self.y, self.vb_params)
 
         if self.use_weights:
             #assert np.shape(weights) == (self.n_obs, 1)
             weights = np.expand_dims(self.weights.get(), 1)
-            e_loglik_obs = np.sum( * e_z * loglik_obs_by_nk)
+            e_loglik_obs = np.sum( * self.e_z * loglik_obs_by_nk)
         else:
-            e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+            e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
 
         if self.vb_params.use_bnp_prior:
-            e_loglik_ind = model_lib.loglik_ind(self.vb_params)
+            e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
         else:
             e_loglik_ind = 0.
 
@@ -396,7 +402,7 @@ class DPGaussianMixture(object):
 
         assert(np.isfinite(e_loglik))
 
-        entropy = np.squeeze(get_entropy(self.vb_params))
+        entropy = np.squeeze(get_entropy(self.vb_params, self.e_z))
         assert(np.isfinite(entropy))
 
         e_log_prior = np.squeeze(
@@ -409,17 +415,17 @@ class DPGaussianMixture(object):
     def set_z_get_kl(self):
         # Update z and evaluate likelihood.
         loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
-        e_z = self.vb_params['e_z'].get()
+        #e_z = self.vb_params['e_z'].get()
 
         if self.use_weights:
             #assert np.shape(self.weights) == (self.n_obs, 1)
             weights = np.expand_dims(self.weights.get(), 1)
-            e_loglik_obs = np.sum(weights * e_z * loglik_obs_by_nk)
+            e_loglik_obs = np.sum(weights * self.e_z * loglik_obs_by_nk)
         else:
-            e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+            e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
 
         if self.vb_params.use_bnp_prior:
-            e_loglik_ind = model_lib.loglik_ind(self.vb_params)
+            e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
         else:
             e_loglik_ind = 0.
 
@@ -428,15 +434,11 @@ class DPGaussianMixture(object):
         if not np.isfinite(e_loglik):
             print('gamma', self.vb_params['global']['gamma'].get())
             print('det gamma', np.linalg.slogdet(self.vb_params['global']['gamma'].get())[1])
-            print('cluster weights', np.sum(e_z, axis = 0))
-
-            # print('loglik_obs_by_nk', np.all(np.isfinite(loglik_obs_by_nk)))
-            # print('e_z', np.all(np.isfinite(e_z)))
-            # print('e_loglik_ind', e_loglik_ind)
+            print('cluster weights', np.sum(self.e_z, axis = 0))
 
         assert(np.isfinite(e_loglik))
 
-        entropy = np.squeeze(get_entropy(self.vb_params))
+        entropy = np.squeeze(get_entropy(self.vb_params, self.e_z))
         assert(np.isfinite(entropy))
 
         e_log_prior = np.squeeze(
@@ -465,23 +467,10 @@ class DPGaussianMixture(object):
     ########################
     # Sensitivity functions.
 
-    # def get_kl_from_prior_and_free_par(self, prior_free, free_par):
-    #     self.prior_params.set_free(prior_free)
-    #     self.global_vb_params.set_free(free_par)
-    #     return self.set_z_get_kl()
-
-    # Get the likelihood for each gene.  This is equivalent to the derivative
-    # of the KL divergence with respect to the weight vector.
-    # def get_per_gene_kl(self, free_par):
-    #     self.global_vb_params.set_free(free_par)
-    #     loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
-    #     e_z = self.vb_params['e_z'].get()
-    #     return -1 * np.sum(e_z * loglik_obs_by_nk, axis=1)
-
     def get_per_gene_kl(self):
         loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
-        e_z = self.vb_params['e_z'].get()
-        return -1 * np.sum(e_z * loglik_obs_by_nk, axis=1)
+        #e_z = self.vb_params['e_z'].get()
+        return -1 * np.sum(self.e_z * loglik_obs_by_nk, axis=1)
 
     ########################
     # Optimization functions follow.
@@ -489,17 +478,18 @@ class DPGaussianMixture(object):
     def get_rmse(self):
         # This can be a callback in optimization as a sanity check.
 
-        e_z = self.vb_params['e_z'].get()
+        #e_z = self.vb_params['e_z'].get()
         centroids = self.global_vb_params['centroids'].get()
 
-        post_means = np.dot(e_z, centroids.T)
+        post_means = np.dot(self.e_z, centroids.T)
 
         resid = self.y - post_means
         return np.sqrt(np.sum(resid ** 2))
 
     def get_z_allocation(self):
         self.set_optimal_z()
-        return np.sum(self.vb_params['e_z'].get(), axis=0)
+        #return np.sum(self.vb_params['e_z'].get(), axis=0)
+        return np.sum(self.e_z, axis=0)
 
     # A callback for use with SparseObjectives:Objective.
     def display_optimization_status(self, logger):
@@ -509,23 +499,6 @@ class DPGaussianMixture(object):
         self.set_from_global_free_par(free_param)
         print('Iter: {}\t RMSE: {}\t Objective: {}'.format(
                 logger.iter,  self.get_rmse(), logger.value))
-
-    # def get_per_observation_fits(self):
-    #     # Initialize all the data points.
-    #     beta_obs = np.full((self.n_obs, self.beta_dim), float('nan'))
-    #     shift_obs = np.full(self.n_obs, float('nan'))
-    #
-    #     individual_fits = individ_lib.IndividiualFits(self)
-    #
-    #     xtx = np.matmul(self.x.T, self.x)
-    #     xtxinv_x = np.linalg.solve(xtx, self.x.T)
-    #
-    #     for obs in range(self.n_obs):
-    #         shift_obs[obs] = np.mean(self.y[obs, :])
-    #         beta_obs[obs] = model_lib.get_scale_shift_regression(
-    #             xtxinv_x, self.y[obs, :], 1.0, shift_obs[obs])
-    #
-    #     return beta_obs, shift_obs
 
     # Cluster the individual fits and initialize.  The z matrix will be at
     # least z_init_eps.
@@ -542,12 +515,14 @@ class DPGaussianMixture(object):
                 enertia_best = enertia
                 km_best = deepcopy(km)
 
-        e_z_init = np.full(self.vb_params['e_z'].shape(), z_init_eps)
+        #e_z_init = np.full(self.vb_params['e_z'].shape(), z_init_eps)
+        e_z_init = np.full(self.e_z.shape, z_init_eps)
         for n in range(len(km_best.labels_)):
             e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
         e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-        self.vb_params['e_z'].set(e_z_init)
+        self.e_z = e_z_init
+        #self.vb_params['e_z'].set(e_z_init)
 
         centroids_init = km_best.cluster_centers_.T
         # beta_init / np.linalg.norm(beta_init, axis=0, keepdims=True)
@@ -804,8 +779,8 @@ class LinearSensitivity(object):
 def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
     # Set the optimal z to remove arrayboxes if necessary.
     model.set_optimal_z()
-    e_z = model.vb_params['e_z'].get()
-    labels = np.squeeze(np.argmax(e_z, axis=1))
+    #e_z = model.vb_params['e_z'].get()
+    labels = np.squeeze(np.argmax(model.e_z, axis=1))
     centroids = model.vb_params['global']['centroids'].get()
     fit_dict = checkpoints.get_fit_dict(
         method = 'gmm',
@@ -813,7 +788,7 @@ def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
         seed = seed,
         centroids = centroids,
         labels = labels,
-        cluster_assignments = osp.sparse.csr_matrix(e_z),
+        cluster_assignments = osp.sparse.csr_matrix(model.e_z),
         preprocessing_dict = None,
         basis_mat = None,
         cluster_weights = model.get_e_cluster_probabilities())

@@ -93,10 +93,11 @@ def get_e_log_cluster_probabilities(vb_params):
     return e_log_stick_remain + e_log_new_stick
 
 
-def loglik_ind(vb_params):
+def loglik_ind(vb_params, e_z):
     # expected log likelihood of all indicators for all n observations
     e_log_cluster_probs = get_e_log_cluster_probabilities(vb_params)
-    return np.sum(vb_params['e_z'].get() * e_log_cluster_probs)
+    #return np.sum(vb_params['e_z'].get() * e_log_cluster_probs)
+    return np.sum(e_z * e_log_cluster_probs)
 
 
 ##########################
@@ -137,23 +138,23 @@ def get_kth_weight_from_sticks(stick_lengths, k):
 
     return (stick_remaining * stick_length)
 
-def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):
-    # get logitnormal params
-    mu = vb_params['global']['v_sticks']['mean'].get()
-    sigma = vb_params['global']['v_sticks']['info'].get()
-    n_sticks = len(mu)
-    n_obs = vb_params['e_z'].shape()[0]
-
-    # sample from univariate normal
-    unv_norm_samples = np.random.normal(0, 1, size = (samples, n_sticks))
-
-    # sample sticks from variational distribution
-    stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
-
-    e_num_clusters = 0
-    for k in range(n_sticks):
-        weight_samples_k = get_kth_weight_from_sticks(stick_samples, k)
-
-        e_num_clusters = e_num_clusters + np.mean(1 - (1 - weight_samples_k)**n_obs)
-
-    return e_num_clusters
+# def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):
+#     # get logitnormal params
+#     mu = vb_params['global']['v_sticks']['mean'].get()
+#     sigma = vb_params['global']['v_sticks']['info'].get()
+#     n_sticks = len(mu)
+#     #n_obs = vb_params['e_z'].shape()[0]
+#
+#     # sample from univariate normal
+#     unv_norm_samples = np.random.normal(0, 1, size = (samples, n_sticks))
+#
+#     # sample sticks from variational distribution
+#     stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
+#
+#     e_num_clusters = 0
+#     for k in range(n_sticks):
+#         weight_samples_k = get_kth_weight_from_sticks(stick_samples, k)
+#
+#         e_num_clusters = e_num_clusters + np.mean(1 - (1 - weight_samples_k)**n_obs)
+#
+#     return e_num_clusters
