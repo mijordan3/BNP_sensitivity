@@ -74,6 +74,14 @@ def push_global_params(global_params, dim, k_approx, use_logitnormal_sticks):
 def push_local_params(vb_params, n_obs, k_approx):
     vb_params.push_param(vb.SimplexParam(name='e_z', shape=(n_obs, k_approx)))
 
+
+# Set the gh_log and gh_weights attributes of the vb_params object.
+def set_gauss_hermite_points(vb_params, gh_deg):
+    gh_loc, gh_weights = hermgauss(gh_deg)
+    vb_params.gh_loc = gh_loc
+    vb_params.gh_weights = gh_weights
+
+
 def get_vb_params(dim, k_approx, n_obs, gh_deg, \
                     use_bnp_prior = True,
                     use_logitnormal_sticks = True):
@@ -95,9 +103,7 @@ def get_vb_params(dim, k_approx, n_obs, gh_deg, \
 
     # not really vb parameters: set the weights and locations for
     # integrating the logitnormal
-    gh_loc, gh_weights = hermgauss(gh_deg)
-    vb_params.gh_loc = gh_loc
-    vb_params.gh_weights = gh_weights
+    set_gauss_hermite_points(vb_params, gh_deg)
 
     # also save this flag here
     vb_params.use_bnp_prior = use_bnp_prior
@@ -171,20 +177,21 @@ def get_e_log_wishart_prior(vb_params, prior_params):
                     0.5 * tr_V_inv_gamma)
 
 
-def get_e_log_perturbation(vb_params, phi):
+def get_e_log_perturbation_vec(vb_params, phi):
     perturbed_log_density = lambda x : np.log(1.0 + phi(x))
     lognorm_means = vb_params['global']['v_sticks']['mean'].get()
     lognorm_infos = vb_params['global']['v_sticks']['info'].get()
     gh_loc = vb_params.gh_loc
     gh_weights = vb_params.gh_weights
 
-    expected_perturbation = 0.0
-    for k in range(len(lognorm_means)):
-        dp_prior += ef.get_e_fun_normal(
+    expected_perturbations = np.array([
+        ef.get_e_fun_normal(
             lognorm_means[k], lognorm_infos[k], \
             gh_loc, gh_weights, perturbed_log_density)
+        for k in range(len(lognorm_means))
+    ])
 
-    return expected_perturbation
+    return expected_perturbations
 
 
 def get_e_log_prior(vb_params, prior_params, phi=None):
@@ -193,7 +200,8 @@ def get_e_log_prior(vb_params, prior_params, phi=None):
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
     if phi is not None:
-        e_log_perturbation = get_e_log_perturbation(vb_params, phi)
+        e_log_perturbation = \
+            np.sum(get_e_log_perturbation_vec(vb_params, phi))
     else:
         e_log_perturbation = 0
 
