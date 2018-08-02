@@ -44,7 +44,7 @@ def get_stick_entropy(vb_params):
 def get_dp_prior(vb_params, prior_params):
     alpha = prior_params['alpha'].get()
     if vb_params.use_logitnormal_sticks:
-        e_log_v, e_log_1mv =\
+        e_log_v, e_log_1mv = \
             ef.get_e_log_logitnormal(
                 lognorm_means = vb_params['global']['v_sticks']['mean'].get(),
                 lognorm_infos = vb_params['global']['v_sticks']['info'].get(),

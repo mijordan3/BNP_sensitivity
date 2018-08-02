@@ -183,7 +183,7 @@ def get_e_log_perturbation_vec(vb_params, phi):
     lognorm_infos = vb_params['global']['v_sticks']['info'].get()
     gh_loc = vb_params.gh_loc
     gh_weights = vb_params.gh_weights
-
+    # print('DEBUG: 0th lognorm mean: ', lognorm_means[0])
     expected_perturbations = np.array([
         ef.get_e_fun_normal(
             lognorm_means[k], lognorm_infos[k], \
@@ -200,8 +200,10 @@ def get_e_log_prior(vb_params, prior_params, phi=None):
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
     if phi is not None:
+        print('DEBUG: phiphiphi')
         e_log_perturbation = \
             np.sum(get_e_log_perturbation_vec(vb_params, phi))
+        print(e_log_perturbation)
     else:
         e_log_perturbation = 0
 
