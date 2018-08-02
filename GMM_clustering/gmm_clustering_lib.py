@@ -201,10 +201,10 @@ def get_e_log_prior(vb_params, prior_params, phi=None):
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
     if phi is not None:
-        print('DEBUG: phiphiphi')
+        #print('DEBUG: phiphiphi')
         e_log_perturbation = \
             np.sum(get_e_log_perturbation_vec(vb_params, phi))
-        print(e_log_perturbation)
+        #print(e_log_perturbation)
     else:
         e_log_perturbation = 0
 
@@ -383,40 +383,83 @@ class DPGaussianMixture(object):
 
     def get_kl(self):
         # ...with the current value of z.
+        return self.get_kl_utility(set_z=False)
         #e_z = self.vb_params['e_z'].get()
-        loglik_obs_by_nk = get_loglik_obs_by_nk(
-            self.y, self.vb_params)
-
-        if self.use_weights:
-            #assert np.shape(weights) == (self.n_obs, 1)
-            weights = np.expand_dims(self.weights.get(), 1)
-            e_loglik_obs = np.sum( * self.e_z * loglik_obs_by_nk)
-        else:
-            e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
-
-        if self.vb_params.use_bnp_prior:
-            e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
-        else:
-            e_loglik_ind = 0.
-
-        e_loglik = e_loglik_ind + e_loglik_obs
-
-        assert(np.isfinite(e_loglik))
-
-        entropy = np.squeeze(get_entropy(self.vb_params, self.e_z))
-        assert(np.isfinite(entropy))
-
-        e_log_prior = np.squeeze(
-            get_e_log_prior(self.vb_params, self.prior_params, phi=self.phi))
-        assert(np.isfinite(e_log_prior))
-
-        elbo = e_log_prior + entropy + e_loglik
-        return -1 * elbo
+        # loglik_obs_by_nk = get_loglik_obs_by_nk(
+        #     self.y, self.vb_params)
+        #
+        # if self.use_weights:
+        #     #assert np.shape(weights) == (self.n_obs, 1)
+        #     weights = np.expand_dims(self.weights.get(), 1)
+        #     e_loglik_obs = np.sum( * self.e_z * loglik_obs_by_nk)
+        # else:
+        #     e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
+        #
+        # if self.vb_params.use_bnp_prior:
+        #     e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
+        # else:
+        #     e_loglik_ind = 0.
+        #
+        # e_loglik = e_loglik_ind + e_loglik_obs
+        #
+        # assert(np.isfinite(e_loglik))
+        #
+        # entropy = np.squeeze(get_entropy(self.vb_params, self.e_z))
+        # assert(np.isfinite(entropy))
+        #
+        # e_log_prior = np.squeeze(
+        #     get_e_log_prior(self.vb_params, self.prior_params, phi=self.phi))
+        # assert(np.isfinite(e_log_prior))
+        #
+        # elbo = e_log_prior + entropy + e_loglik
+        # return -1 * elbo
 
     def set_z_get_kl(self):
-        # Update z and evaluate likelihood.
-        loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
-        #e_z = self.vb_params['e_z'].get()
+        return self.get_kl_utility(set_z=True)
+
+        # # Update z and evaluate likelihood.
+        # loglik_obs_by_nk = self.set_optimal_z(return_loglik_obs_by_nk = True)
+        # #e_z = self.vb_params['e_z'].get()
+        #
+        # if self.use_weights:
+        #     #assert np.shape(self.weights) == (self.n_obs, 1)
+        #     weights = np.expand_dims(self.weights.get(), 1)
+        #     e_loglik_obs = np.sum(weights * self.e_z * loglik_obs_by_nk)
+        # else:
+        #     e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
+        #
+        # if self.vb_params.use_bnp_prior:
+        #     e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
+        # else:
+        #     e_loglik_ind = 0.
+        #
+        # e_loglik = e_loglik_ind + e_loglik_obs
+        #
+        # if not np.isfinite(e_loglik):
+        #     print('gamma', self.vb_params['global']['gamma'].get())
+        #     print('det gamma', np.linalg.slogdet(self.vb_params['global']['gamma'].get())[1])
+        #     print('cluster weights', np.sum(self.e_z, axis = 0))
+        #
+        # assert(np.isfinite(e_loglik))
+        #
+        # entropy = np.squeeze(get_entropy(self.vb_params, self.e_z))
+        # assert(np.isfinite(entropy))
+        #
+        # e_log_prior = np.squeeze(
+        #     get_e_log_prior(self.vb_params, self.prior_params, phi=self.phi))
+        # assert(np.isfinite(e_log_prior))
+        #
+        # # print(self.vb_params['global']['gamma'].get())
+        # elbo = e_log_prior + entropy + e_loglik
+        # return -1 * elbo
+
+    def get_kl_utility(self, set_z):
+        if set_z:
+            loglik_obs_by_nk = self.set_optimal_z(
+                return_loglik_obs_by_nk = True)
+        else:
+            loglik_obs_by_nk = get_loglik_obs_by_nk(
+                self.y, self.vb_params)
 
         if self.use_weights:
             #assert np.shape(self.weights) == (self.n_obs, 1)
@@ -449,7 +492,6 @@ class DPGaussianMixture(object):
         # print(self.vb_params['global']['gamma'].get())
         elbo = e_log_prior + entropy + e_loglik
         return -1 * elbo
-
 
     def get_e_cluster_probabilities(self):
         if self.vb_params.use_logitnormal_sticks:
