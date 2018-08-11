@@ -767,6 +767,7 @@ class InterestingMoments(object):
                 self.model.vb_params['global']['v_sticks'].e())
 
 
+# TODO: use the ParametricSensitivity class for this.
 class LinearSensitivity(object):
     def __init__(self, model, moment_model, kl_hessian=None):
         self.model = model
