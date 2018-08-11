@@ -718,6 +718,10 @@ class InterestingMoments(object):
             self.moment_params['v_sticks'].set(
                 self.model.vb_params['global']['v_sticks'].e())
 
+    def set_and_get_moments_from_free_par(self, free_par):
+        self.set_moments_from_free_par(free_par)
+        return self.moment_params.get_vector()
+
 
 # TODO: use the ParametricSensitivity class for this.
 class LinearSensitivity(object):
