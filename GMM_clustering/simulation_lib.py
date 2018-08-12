@@ -41,6 +41,9 @@ def draw_components_from_unif(probs, u):
 # Returns:
 #   features (the data) followed by true parameters.
 def simulate_data(n_obs, dim, true_k, separation=0.4):
+    true_probs = np.linspace(5, 5 + true_k, true_k)
+    true_probs /= np.sum(true_probs)
+
     true_components, true_z = draw_components(
         np.broadcast_to(true_probs, (n_obs, true_k)))
 
@@ -49,8 +52,6 @@ def simulate_data(n_obs, dim, true_k, separation=0.4):
     true_covs = np.array([
         (separation ** 2) * (k + 1) * \
         np.eye(dim) / true_k for k in range(true_k) ])
-    true_probs = np.linspace(5, 5 + true_k, true_k)
-    true_probs /= np.sum(true_probs)
 
     features = np.full((n_obs, dim), float('nan'))
     for n in range(n_obs):

@@ -724,53 +724,53 @@ class InterestingMoments(object):
 
 
 # TODO: use the ParametricSensitivity class for this.
-class LinearSensitivity(object):
-    def __init__(self, model, moment_model, kl_hessian=None):
-        self.model = model
-        self.moment_model = moment_model
-
-        self.optimal_global_free_params = \
-            deepcopy(self.model.global_vb_params.get_free())
-        self.weights_free = deepcopy(self.model.weights.get_free())
-        self.prior_params_free = deepcopy(self.model.prior_params.get_free())
-
-        self.set_sensitivities(self.optimal_global_free_params, kl_hessian)
-
-    def set_sensitivities(self, free_par, kl_hessian):
-        # Save the parameter
-        if kl_hessian is None:
-            print('KL Hessian:')
-            self.kl_hessian = self.model.objective.fun_free_hessian(
-                self.optimal_global_free_params)
-        else:
-            self.kl_hessian = kl_hessian
-
-        print('Prior Hessian...')
-        self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
-             self.prior_params_free, self.optimal_global_free_params)
-
-        print('Data Hessian...')
-        self.data_cross_hess = self.model.get_data_cross_hess(
-            self.optimal_global_free_params)
-
-        print('Linear systems...')
-        self.kl_hessian_chol = osp.linalg.cho_factor(self.kl_hessian)
-        self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
-
-        self.prior_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.prior_cross_hess.T)
-        self.data_sens_mat = -1 * osp.linalg.cho_solve(
-            self.kl_hessian_chol, self.data_cross_hess)
-
-        print('Done.')
-
-    def predict_from_prior_params(self, new_free_prior_par):
-        return self.optimal_global_free_params + \
-            self.prior_sens_mat @ (new_free_prior_par - self.prior_params_free)
-
-    def predict_from_weights(self, new_weights_free):
-        return self.optimal_global_free_params + \
-            self.data_sens_mat @ (new_weights_free - self.weights_free)
+# class LinearSensitivity(object):
+#     def __init__(self, model, moment_model, kl_hessian=None):
+#         self.model = model
+#         self.moment_model = moment_model
+#
+#         self.optimal_global_free_params = \
+#             deepcopy(self.model.global_vb_params.get_free())
+#         self.weights_free = deepcopy(self.model.weights.get_free())
+#         self.prior_params_free = deepcopy(self.model.prior_params.get_free())
+#
+#         self.set_sensitivities(self.optimal_global_free_params, kl_hessian)
+#
+#     def set_sensitivities(self, free_par, kl_hessian):
+#         # Save the parameter
+#         if kl_hessian is None:
+#             print('KL Hessian:')
+#             self.kl_hessian = self.model.objective.fun_free_hessian(
+#                 self.optimal_global_free_params)
+#         else:
+#             self.kl_hessian = kl_hessian
+#
+#         print('Prior Hessian...')
+#         self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
+#              self.prior_params_free, self.optimal_global_free_params)
+#
+#         print('Data Hessian...')
+#         self.data_cross_hess = self.model.get_data_cross_hess(
+#             self.optimal_global_free_params)
+#
+#         print('Linear systems...')
+#         self.kl_hessian_chol = osp.linalg.cho_factor(self.kl_hessian)
+#         self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
+#
+#         self.prior_sens_mat = -1 * osp.linalg.cho_solve(
+#             self.kl_hessian_chol, self.prior_cross_hess.T)
+#         self.data_sens_mat = -1 * osp.linalg.cho_solve(
+#             self.kl_hessian_chol, self.data_cross_hess)
+#
+#         print('Done.')
+#
+#     def predict_from_prior_params(self, new_free_prior_par):
+#         return self.optimal_global_free_params + \
+#             self.prior_sens_mat @ (new_free_prior_par - self.prior_params_free)
+#
+#     def predict_from_weights(self, new_weights_free):
+#         return self.optimal_global_free_params + \
+#             self.data_sens_mat @ (new_weights_free - self.weights_free)
 
 #################################
 # Functions to reload the model

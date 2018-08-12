@@ -46,6 +46,12 @@ class StickSensitivity(object):
         alpha = self.model.prior_params['alpha'].get()
         return logit_v - (alpha + 1) * np.log1p(np.exp(logit_v))
 
+    # The base prior (of any stick -- they are all the same) at v in
+    # the stick space.
+    def get_log_p0_stick(self, v):
+        alpha = self.model.prior_params['alpha'].get()
+        return (alpha - 1) * np.log1p(v)
+
     # Get the influence function for a perturbation to the prior on stick k.
     def get_single_stick_influence(self, logit_v, k):
         log_q = self.get_log_q_logit_stick(logit_v, k)
