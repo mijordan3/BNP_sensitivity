@@ -119,6 +119,24 @@ theorems-ams-extended-chap-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\basepriorpert}[1][\theta]{\phi_{0}\left(#1\right)}
+{\phi_{0}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\gustpriorpert}[1][\theta]{\phi_{g}\left(#1\right)}
+{\phi_{g}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\post}[2][\theta][\epsilon,\phi]{p\left(#1\vert X,#2\right)}
 {p\left(#1\vert X,#2\right)}
 \end_inset
@@ -726,11 +744,11 @@ Let
 \begin_inset Formula $\priorpert$
 \end_inset
 
- be a point-wise positive, 
+ be 
 \begin_inset Formula $\lambda$
 \end_inset
 
--measurable function such that
+-almost everywhere positive and measurable function such that
 \begin_inset Formula 
 \begin{align*}
 \priorpert & \ge0\textrm{ and }\\
@@ -1390,7 +1408,7 @@ Under conditions similar to the IJ paper you can show that the VB objective
 \begin_inset Formula 
 \begin{align*}
 \grave{\sup_{\eta\in\etadom}\norm{\frac{{{\qpost[][\eta]}}}{{{\baseprior}}}\left(\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}\frac{\partial}{\partial\eta^{T}}\log{{\qpost[][\eta]}}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{{\qpost[][\eta]}}\right)}_{2}} & \le C_{H}.\\
-\sup_{\eta\in\etadom}\norm{\frac{{\qpost}}{{\baseprior}}\frac{\partial}{\partial\eta}\log{\qpost}}_{2} & \le C_{G}.
+\sup_{\eta\in\etadom}\norm{\frac{{{\qpost}}}{{{\baseprior}}}\frac{\partial}{\partial\eta}\log{{\qpost}}}_{2} & \le C_{G}.
 \end{align*}
 
 \end_inset
@@ -1410,6 +1428,266 @@ These could be violated if
 \begin_layout Standard
 Is this worth doing carefully? Probably – otherwise you may not be justified
  in using the linear approximation.
+\end_layout
+
+\begin_layout Section
+A new parameterization
+\end_layout
+
+\begin_layout Standard
+One problem with the parameterization given above, and used by Gustafson,
+ is that to replace one prior with another you must extrapolate 
+\begin_inset Formula $\epsilon\rightarrow\infty$
+\end_inset
+
+.
+ For this, no linear approximation will work.
+ So let us define instead a re-parameterization that actually has the same
+ derivatives, but which allows sensible extrapolation.
+\end_layout
+
+\begin_layout Standard
+Define
+\begin_inset Formula 
+\begin{align*}
+\contamprior & :=\frac{\baseprior\left(1+\epsilon\left(\priorpert-1\right)\right)}{\int\baseprior[\theta']\left(1+\epsilon\left(\priorpert[\theta']-1\right)\right)\meas[d\theta']},
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align*}
+\epsilon & \in\left[0,1\right]\\
+\priorpert & \ge0\\
+\int\baseprior\priorpert\meas & \ge M>0.
+\end{align*}
+
+\end_inset
+
+The latter two conditions guarantee that the normalizing constant is nonzero,
+ since, assuming 
+\begin_inset Formula $\int\priorpert\baseprior\meas\le1$
+\end_inset
+
+ (it is automatically fine if 
+\begin_inset Formula $\int\priorpert\baseprior\meas\ge1$
+\end_inset
+
+),
+\begin_inset Formula 
+\begin{align*}
+\int\baseprior\left(1+\epsilon\left(\priorpert-1\right)\right)\meas & =1-\epsilon+\epsilon\int\priorpert\baseprior\meas\\
+ & \ge\int\priorpert\baseprior\meas\\
+ & \ge M.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is not a cone for 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+.
+ But what is the meaning of the scale? Obviously, for any 
+\begin_inset Formula $\epsilon\in\left[0,1\right]$
+\end_inset
+
+ we have a well-defined distribution.
+ However, defining 
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =\alpha\basepriorpert\\
+\frac{d}{d\epsilon}\log\left(1+\epsilon\left(\priorpert-1\right)\right) & =\frac{\priorpert-1}{1+\epsilon\left(\priorpert-1\right)}\\
+\at{\frac{d^{k}}{d\epsilon^{k}}\log\left(1+\epsilon\left({\priorpert}-1\right)\right)}{\epsilon=0} & =\left(-1\right)^{k+1}\left(\priorpert-1\right)^{k}\\
+ & =\left(-1\right)^{k+1}\left(\alpha\basepriorpert-1\right)^{k}.
+\end{align*}
+
+\end_inset
+
+By choosing 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ for a fixed 
+\begin_inset Formula $\basepriorpert$
+\end_inset
+
+ we can make 
+\begin_inset Formula $\int\baseprior\priorpert\meas$
+\end_inset
+
+ as large as we like, but unlike Gustafson the derivatives are not invariant
+ to re-scaling.
+ This is because the perturbation in Gustafson is 
+\begin_inset Formula $\priorpert-1$
+\end_inset
+
+, all of which gets rescaled.
+\end_layout
+
+\begin_layout Standard
+The intuition is based on 
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =\frac{p_{1}\left(\theta\right)}{\baseprior},
+\end{align*}
+
+\end_inset
+
+in which case
+\begin_inset Formula 
+\begin{align*}
+\int\priorpert\baseprior\meas & =\int p_{1}\left(\theta\right)\meas=1.
+\end{align*}
+
+\end_inset
+
+Thus you can think of 
+\begin_inset Formula $\int\priorpert\baseprior\meas\approx0$
+\end_inset
+
+ as being mixing with a density that is non-normalized and very small.
+ Thus we might expect to require
+\begin_inset Formula 
+\begin{align*}
+\int\priorpert\baseprior\meas & =\left\langle \phi,1\right\rangle =1,
+\end{align*}
+
+\end_inset
+
+which is a well-defined subspace for which the normalizing constant always
+ exists.
+ Let us suppose 
+\begin_inset Formula $\left\langle \phi_{0},1\right\rangle =1$
+\end_inset
+
+, i.e.
+ there is some density 
+\begin_inset Formula $p_{1}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\baseprior\basepriorpert=p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ Then
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\frac{\baseprior\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right)}{\int\baseprior[\theta']\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right)\meas[d\theta']}\\
+ & =\frac{\left(1-\epsilon\right)\baseprior+\epsilon\alpha p_{1}\left(\theta\right)}{\int\left(\left(1-\epsilon\right)\baseprior[\theta']+\epsilon\alpha p_{1}\left(\theta'\right)\right)\meas[d\theta']}\\
+ & =\frac{\left(1-\epsilon\right)\baseprior+\epsilon\alpha p_{1}\left(\theta\right)}{1+\epsilon\left(\alpha-1\right)}.
+\end{align*}
+
+\end_inset
+
+This just means that 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ changes the shape of the curve by which you move from 
+\begin_inset Formula $\baseprior$
+\end_inset
+
+ to 
+\begin_inset Formula $p_{1}\left(\theta\right)$
+\end_inset
+
+.
+ Of course, what we really care about is
+\begin_inset Formula 
+\begin{align*}
+v\left(\theta\right) & :=-G^{T}H^{-1}\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta\right)\\
+\xi\left(\epsilon,\alpha\right) & :=\frac{\left(1-\epsilon\right)\int v\left(\theta\right)\baseprior\meas+\epsilon\alpha\int v\left(\theta\right)p_{1}\left(\theta\right)\meas}{1+\epsilon\left(\alpha-1\right)}\\
+ & =:\frac{\left(1-\epsilon\right)v_{0}+\epsilon\alpha v_{1}}{1+\epsilon\left(\alpha-1\right)}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And
+\begin_inset Formula 
+\begin{align*}
+\frac{d\xi}{d\epsilon} & =\frac{\alpha v_{1}-v_{0}}{1+\epsilon\left(\alpha-1\right)}-\frac{\left(\left(1-\epsilon\right)v_{0}+\epsilon\alpha v_{1}\right)\left(\alpha-1\right)}{\left(1+\epsilon\left(\alpha-1\right)\right)^{2}}\\
+\at{\frac{d\xi}{d\epsilon}}{\epsilon=0} & =\alpha v_{1}-v_{0}-\left(\alpha-1\right)v_{0}=\alpha\left(v_{1}-v_{0}\right).
+\end{align*}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{d^{2}\xi}{d\epsilon^{2}} & =-\frac{\left(\alpha v_{1}-v_{0}\right)\left(\alpha-1\right)}{\left(1+\epsilon\left(\alpha-1\right)\right)^{2}}-\\
+ & \quad\frac{\left(-v_{0}+\alpha v_{1}\right)\left(\alpha-1\right)}{\left(1+\epsilon\left(\alpha-1\right)\right)^{2}}+2\frac{\left(\left(1-\epsilon\right)v_{0}+\epsilon\alpha v_{1}\right)\left(\alpha-1\right)^{2}}{\left(1+\epsilon\left(\alpha-1\right)\right)^{3}}\\
+\at{\frac{d^{2}\xi}{d\epsilon^{2}}}{\epsilon=0} & =-\left(\alpha v_{1}-v_{0}\right)\left(\alpha-1\right)-\left(\alpha v_{1}-v_{0}\right)\left(\alpha-1\right)+2\left(\alpha-1\right)^{2}v_{0}\\
+ & =-2\left(\alpha v_{1}-v_{0}\right)\left(\alpha-1\right)+2\left(\alpha-1\right)^{2}v_{0}\\
+ & =2\left(\alpha-1\right)\left(v_{0}-\alpha v_{1}+\left(\alpha-1\right)v_{0}\right)\\
+ & =2\left(\alpha-1\right)\alpha\left(v_{0}-v_{1}\right).
+\end{align*}
+
+\end_inset
+
+Note that at 
+\begin_inset Formula $\alpha=1$
+\end_inset
+
+, the magnitude of the second derivative is zero at 
+\begin_inset Formula $\epsilon=0$
+\end_inset
+
+.
+ This recommends using 
+\begin_inset Formula $\alpha=1$
+\end_inset
+
+.
+ (Unless I screwed something up.)
+\end_layout
+
+\begin_layout Standard
+Given this constraint, we need to fine
+\begin_inset Formula 
+\begin{align*}
+\phi^{*} & =\mathrm{argsup}_{\phi}\left\langle v,\phi\right\rangle \\
+\left\langle \phi^{*},1\right\rangle  & =1\\
+\phi^{*} & >0.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is a classical optimization problem under constraints.
+\end_layout
+
+\begin_layout Standard
+Note that when 
+\begin_inset Formula $\norm{\int\left({\priorpert}-1\right)^{2}{\baseprior}{\meas}}_{2}=1$
+\end_inset
+
+, we have
+\begin_inset Formula 
+\begin{align*}
+\int\left(\priorpert-1\right)^{2}\baseprior\meas & =\int\priorpert^{2}\baseprior\meas-2\int\priorpert\baseprior\meas+1=1\Rightarrow\\
+\int\priorpert\baseprior\meas & =\frac{1}{2}\int\priorpert^{2}\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1746,7 +2024,7 @@ Is the positivity necessary? It seems like it must be.
 \begin_inset Formula 
 \begin{align*}
 \contamprior & =C^{-1}\baseprior\exp\left(\epsilon\newpriorpert\right)\\
-\at{\frac{d}{d\epsilon}\log{\contamprior}}{\epsilon=0} & =\newpriorpert.
+\at{\frac{d}{d\epsilon}\log{{\contamprior}}}{\epsilon=0} & =\newpriorpert.
 \end{align*}
 
 \end_inset
@@ -1895,14 +2173,14 @@ Next, applying Cauchy-Schwartz term-wise, and using the fact that
 \begin_inset Formula 
 \begin{align*}
 \left|\int\baseprior\qinfluencefun_{k}\log\left(1+\epsilon\priorpert\right)\meas.\right| & \le\sqrt{\int\qinfluencefun_{k}^{2}\baseprior\meas}\sqrt{\int\log\left(1+\epsilon\priorpert\right)^{2}\baseprior\meas}\\
- & \le\norm{{\qinfluencefun}_{k}}_{2}\sqrt{\int\left(\epsilon\priorpert\right)^{2}\baseprior\meas}\\
- & \le\norm{{\qinfluencefun}_{k}}_{2}\norm{\epsilon{\priorpert}}_{2}.
+ & \le\norm{{{\qinfluencefun}}_{k}}_{2}\sqrt{\int\left(\epsilon\priorpert\right)^{2}\baseprior\meas}\\
+ & \le\norm{{{\qinfluencefun}}_{k}}_{2}\norm{\epsilon{{\priorpert}}}_{2}.
 \end{align*}
 
 \end_inset
 
 The condition will follow from the size of 
-\begin_inset Formula $\norm{\epsilon{\priorpert}}_{2}$
+\begin_inset Formula $\norm{\epsilon{{\priorpert}}}_{2}$
 \end_inset
 
 .
@@ -1943,7 +2221,7 @@ Though you'll also need something like
 and so
 \begin_inset Formula 
 \begin{align*}
-\grave{\sup_{\eta\in\etadom}\norm{\frac{{\qpost[][\eta]}}{{\baseprior}}\left(\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}\frac{\partial}{\partial\eta^{T}}\log{\qpost[][\eta]}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{\qpost[][\eta]}\right)}_{2}} & \le C_{H}.
+\grave{\sup_{\eta\in\etadom}\norm{\frac{{{\qpost[][\eta]}}}{{{\baseprior}}}\left(\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}\frac{\partial}{\partial\eta^{T}}\log{{\qpost[][\eta]}}+\frac{\partial^{2}}{\partial\eta\partial\eta^{T}}\log{{\qpost[][\eta]}}\right)}_{2}} & \le C_{H}.
 \end{align*}
 
 \end_inset
