@@ -1812,6 +1812,90 @@ But how could you possibly motivative such an approximation?
 \end_layout
 
 \begin_layout Section
+Exponential perturbation
+\end_layout
+
+\begin_layout Standard
+Let
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\frac{\left(\priorpert\baseprior\right)^{1-\epsilon}\baseprior^{\epsilon}}{1+\left(1-\epsilon\right)C_{\phi}}\\
+ & =\frac{\priorpert^{1-\epsilon}\baseprior^{\epsilon}}{1+\left(1-\epsilon\right)C_{\phi}}\\
+\contamprior[][1,\phi] & =\frac{\priorpert\baseprior}{C_{\phi}}\\
+C_{\phi} & =\int\priorpert\baseprior\meas
+\end{align*}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\epsilon}\log\contamprior & =-\log\priorpert\\
+\frac{\partial g}{\partial\epsilon} & =G^{T}H^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)\log\priorpert\meas.
+\end{align*}
+
+\end_inset
+
+Interestingly, this is invariant to re-scaling and has the form above.
+ Also note that if 
+\begin_inset Formula $\contamprior[][1,\phi]$
+\end_inset
+
+ is normalized,
+\begin_inset Formula 
+\begin{align*}
+KL\left(\baseprior||\contamprior[][1,\phi]\right) & =\int\left(\log\left(\priorpert\baseprior/C_{\phi}\right)-\log\baseprior\right)\baseprior\meas\\
+ & =\int\left(\log\priorpert-\log C_{\phi}\right)\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+Perhaps this can be used as a metric 
+\begin_inset Quotes eld
+\end_inset
+
+ball
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Taking 
+\begin_inset Formula 
+\begin{align*}
+\priorpert & =\basepriorpert^{\alpha},
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+KL\left(\baseprior||\contamprior[][1,\phi]\right) & =\int\left(\alpha\log\basepriorpert-\log\int\basepriorpert^{\alpha}\baseprior\meas\right)\baseprior\meas.
+\end{align*}
+
+\end_inset
+
+The normalization makes this tricky – if it weren't for the 
+\begin_inset Formula $C_{\phi}$
+\end_inset
+
+ term, the worst-case would be a simple closed-form computation.
+\end_layout
+
+\begin_layout Standard
+IIRC Gustafson argues that, with an exponential perturbation, you should
+ use the infinity norm.
+ Ultimately, by fixing a norm, you remove the scaling from the worst-case
+ analysis because you choose the scaling to match the ball.
+ However, if you're not doing worst-case analysis, then the scaling matters
+ because there are many ways to achieve a particular distribution at 
+\begin_inset Formula $\epsilon=1$
+\end_inset
+
+ that are not invariant under re-scaling.
+\end_layout
+
+\begin_layout Section
 APPENDICES AND EXTRA NOTES
 \end_layout
 
