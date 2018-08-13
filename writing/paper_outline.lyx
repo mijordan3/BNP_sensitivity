@@ -1652,7 +1652,21 @@ Note that at
 \end_inset
 
 .
- (Unless I screwed something up.)
+ (Unless I screwed something up — I think I did screw something up – you
+ need to consider the log of the perturbation.
+ When 
+\begin_inset Formula $\alpha=1$
+\end_inset
+
+ it's linear in 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+.)
+\end_layout
+
+\begin_layout Standard
+Wrong:
 \end_layout
 
 \begin_layout Standard
@@ -1688,6 +1702,113 @@ Note that when
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+What we really need is
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right) & =\frac{\left(\alpha\basepriorpert-1\right)}{1+\epsilon\left(\alpha\basepriorpert-1\right)}\\
+\frac{\partial^{k}}{\partial\epsilon^{k}}\log\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right) & =\left(-1\right)^{k+1}\frac{\left(\alpha\basepriorpert-1\right)^{k}}{1+\epsilon\left(\alpha\basepriorpert-1\right)}.
+\end{align*}
+
+\end_inset
+
+Because
+\begin_inset Formula 
+\begin{align*}
+\at{\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\left(\alpha{\basepriorpert}-1\right)\right)}{\epsilon=0} & =\alpha\int v\left(\theta\right)\basepriorpert\meas-1
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+you can get any answer you want with different 
+\begin_inset Formula $\alpha$
+\end_inset
+
+.
+ So which to choose? The one that gives you the best linear approximation\SpecialChar endofsentence
+
+\end_layout
+
+\begin_layout Standard
+By making 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ small you reduce the curvature at 
+\begin_inset Formula $\epsilon=0$
+\end_inset
+
+ but increase it at 
+\begin_inset Formula $\epsilon=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Recall the integral form of Taylor's theorem.
+\begin_inset Formula 
+\begin{align*}
+g\left(\epsilon,\alpha\right) & =g\left(0,\alpha\right)+\at{\frac{\partial g}{\partial\epsilon}}{0,\alpha}\epsilon+\frac{1}{2}\int_{0}^{1}\epsilon'^{2}\at{\frac{\partial^{2}g}{\partial\epsilon^{2}}}{\epsilon',\alpha}d\epsilon'.
+\end{align*}
+
+\end_inset
+
+The problem is we don't know the derivative except at 
+\begin_inset Formula $\epsilon=0$
+\end_inset
+
+.
+ However, we might assume that 
+\begin_inset Formula 
+\begin{align*}
+\at{\frac{\partial g}{\partial\epsilon}}{0,\alpha} & =\int G\left(\epsilon\right)^{T}H\left(\epsilon\right)^{-1}\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\left(\epsilon\right)\right)q\left(\theta;\eta\left(\epsilon\right)\right)\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right)d\theta\\
+ & \approx G{}^{T}H{}^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\left(\epsilon\right)\right)q\left(\theta;\eta\left(\epsilon\right)\right)\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right)d\theta\\
+ & \approx G^{T}H^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)\frac{\partial}{\partial\epsilon}\log\left(1+\epsilon\left(\alpha\basepriorpert-1\right)\right)d\theta\\
+ & :=\gamma\left(\epsilon,\alpha\right).
+\end{align*}
+
+\end_inset
+
+Using this final approximation would motivate
+\begin_inset Formula 
+\begin{align*}
+g\left(1,\alpha\right)-g\left(0,\alpha\right) & \approx\int_{0}^{1}\gamma\left(\epsilon,\alpha\right)d\epsilon\\
+ & =G^{T}H^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)\log\left(\basepriorpert\right)d\theta\\
+ & =G^{T}H^{-1}\frac{\partial}{\partial\eta}\int q\left(\theta;\eta\right)\log\left(\basepriorpert\right)d\theta.
+\end{align*}
+
+\end_inset
+
+because
+\begin_inset Formula 
+\begin{align*}
+\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)d\theta & =0.
+\end{align*}
+
+\end_inset
+
+Attractively, this is independent of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+.
+ It is also, attractively, a linear operator in an unconstrained representation,
+ 
+\begin_inset Formula $\log\left(\basepriorpert\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+But how could you possibly motivative such an approximation?
 \end_layout
 
 \begin_layout Section
