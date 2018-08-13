@@ -195,20 +195,21 @@ def get_e_log_perturbation_vec(vb_params, phi):
     return expected_perturbations
 
 
-def get_e_log_prior(vb_params, prior_params, phi=None):
+def get_e_log_prior(vb_params, prior_params):
     dp_prior = model_lib.get_dp_prior(vb_params, prior_params)
     e_gamma_prior = get_e_log_wishart_prior(vb_params, prior_params)
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
-    if phi is not None:
-        #print('DEBUG: phiphiphi')
-        e_log_perturbation = \
-            np.sum(get_e_log_perturbation_vec(vb_params, phi))
-        #print(e_log_perturbation)
-    else:
-        e_log_perturbation = 0
+    # if phi is not None:
+    #     #print('DEBUG: phiphiphi')
+    #     e_log_perturbation = \
+    #         np.sum(get_e_log_perturbation_vec(vb_params, phi))
+    #     #print(e_log_perturbation)
+    # else:
+    #     e_log_perturbation = 0
 
-    return e_gamma_prior + e_centroid_prior + dp_prior + e_log_perturbation
+    # return e_gamma_prior + e_centroid_prior + dp_prior + e_log_perturbation
+    return e_gamma_prior + e_centroid_prior + dp_prior
 
 ##########################
 # Entropy
@@ -252,16 +253,13 @@ def get_loglik_obs_by_nk(y, vb_params):
 ##########################
 class DPGaussianMixture(object):
     def __init__(self, y, k_approx, prior_params, gh_deg, \
-                    use_bnp_prior = True, use_logitnormal_sticks = False,
-                    u = None, phi=None):
+                    use_bnp_prior = True,
+                    use_logitnormal_sticks = False):
         # y is the observed data
         # x is the matrix of 'covariates', in our case, the spline bases
         # k_approx is the number of clusters
         # prior_params is the class in which the prior parameters are stored
         # gh_deg is the parameter used for logitnormal integration
-        # u (deprecated) is the functional perturbation
-        # phi is the functional perturbation of the prior:
-        # prior_c = prior_0 * (1 + phi)
 
         self.y = y
 
@@ -282,15 +280,6 @@ class DPGaussianMixture(object):
             use_logitnormal_sticks = use_logitnormal_sticks)
 
         self.prior_params = deepcopy(prior_params)
-
-        # functional perturbation
-        if u is not None:
-            raise NotImplementedError('u is deprecated -- use phi')
-
-        self.phi = phi
-        if phi is not None and not use_logitnormal_sticks:
-            raise NotImplementedError(
-                'functional sensitivty only computed with logitnormal sticks')
 
         # Make a set of parameters for optimization.  Note that the
         # parameters are passed by reference, so updating global_vb_params
@@ -388,7 +377,7 @@ class DPGaussianMixture(object):
     # Separate out for debugging.
     def get_e_log_prior(self):
         return np.squeeze(
-            get_e_log_prior(self.vb_params, self.prior_params, phi=self.phi))
+            get_e_log_prior(self.vb_params, self.prior_params))
 
     def get_kl(self):
         # ...with the current value of z.
