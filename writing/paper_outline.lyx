@@ -1896,6 +1896,158 @@ IIRC Gustafson argues that, with an exponential perturbation, you should
 \end_layout
 
 \begin_layout Section
+Optimality amongst a class of perturbations
+\end_layout
+
+\begin_layout Standard
+Consider
+\begin_inset Formula 
+\begin{align*}
+\contamprior[][\epsilon,\alpha,\phi] & =\left(\baseprior^{\alpha}+\epsilon\left(p_{1}\left(\theta\right)^{\alpha}\right)\right)^{1/\alpha}\\
+ & =\baseprior\left(1+\epsilon\left(\frac{p_{1}\left(\theta\right)}{\baseprior}\right)^{\alpha}\right)^{1/\alpha}\\
+ & =\baseprior\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)^{1/\alpha}.
+\end{align*}
+
+\end_inset
+
+Note that because
+\begin_inset Formula 
+\begin{align*}
+\lim_{n\rightarrow\infty}\left(1+\frac{x}{n}\right)^{n} & =\lim_{\alpha\rightarrow\infty}\left(1+\alpha x\right)^{1/\alpha}=e^{x},
+\end{align*}
+
+\end_inset
+
+we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\lim_{\alpha\rightarrow\infty}\baseprior\left(1+\phi\left(\theta\right)^{\alpha}\right)^{1/\alpha} & =\baseprior\exp\left(\phi\left(\theta\right)\right)\\
+ & =\exp\left(\log\baseprior+\priorpert\right).
+\end{align*}
+
+\end_inset
+
+However, to add in this space means
+\begin_inset Formula 
+\begin{align*}
+\exp\left(\log\baseprior+\delta\priorpert\right) & =\lim_{\alpha\rightarrow\infty}\baseprior\left(1+\delta^{\alpha}\phi\left(\theta\right)^{\alpha}\right)^{1/\alpha}\\
+\epsilon & =\delta^{\alpha}.
+\end{align*}
+
+\end_inset
+
+Because 
+\begin_inset Formula $\delta\in\left[0,1\right]$
+\end_inset
+
+, the 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ corresponding to 
+\begin_inset Formula $\delta$
+\end_inset
+
+ goes to zero as 
+\begin_inset Formula $\alpha\rightarrow\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\epsilon}\log\contamprior[][\epsilon,\alpha,\phi] & =\frac{\partial}{\partial\epsilon}\frac{1}{\alpha}\log\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)\\
+ & =\frac{1}{\alpha}\frac{\phi\left(\theta\right)^{\alpha}}{1+\epsilon\phi\left(\theta\right)^{\alpha}}\\
+\frac{\partial}{\partial\epsilon^{2}}\log\contamprior[][\epsilon,\alpha,\phi] & =-\frac{1}{\alpha}\frac{\phi\left(\theta\right)^{2\alpha}}{\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)^{2}}.
+\end{align*}
+
+\end_inset
+
+Define
+\begin_inset Formula 
+\begin{align*}
+v\left(\theta,\eta\right) & :=G^{T}H^{-1}\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)
+\end{align*}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{align*}
+\frac{dg}{d\epsilon} & =\int_{\thetadom}v\left(\theta;\eta\left(\epsilon\right)\right)\frac{1}{\alpha}\frac{\phi\left(\theta\right)^{\alpha}}{1+\epsilon\phi\left(\theta\right)^{\alpha}}\meas.
+\end{align*}
+
+\end_inset
+
+Then by the integral form of the Taylor series residual,
+\begin_inset Formula 
+\begin{align*}
+g\left(\epsilon=1\right)-g\left(\epsilon=0\right) & =\int_{0}^{1}\at{\frac{dg}{d\epsilon}}{\epsilon}d\epsilon\\
+ & =\at{\frac{dg}{d\epsilon}}{\epsilon=0}+\frac{1}{2}\int_{0}^{1}\epsilon^{2}\at{\frac{d^{2}g}{d\epsilon^{2}}}{\epsilon}d\epsilon.
+\end{align*}
+
+\end_inset
+
+Thus we want to choose 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ to minimize the magnitude of 
+\begin_inset Formula 
+\begin{align*}
+E\left(\alpha\right)=\int_{0}^{1}\epsilon^{2}\at{\frac{d^{2}g}{d\epsilon^{2}}}{\epsilon}d\epsilon & =-\frac{1}{\alpha}\int_{0}^{1}\epsilon^{2}\int_{\thetadom}v\left(\theta;\eta\left(\epsilon\right)\right)\frac{\phi\left(\theta\right)^{2\alpha}}{\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)^{2}}\meas d\epsilon.
+\end{align*}
+
+\end_inset
+
+Umm.
+ Suppose we assume that 
+\begin_inset Formula $\eta\left(\epsilon\right)\approx\eta$
+\end_inset
+
+; it is this dependence that we don't know in general.
+ Then
+\begin_inset Formula 
+\begin{align*}
+E\left(\alpha\right) & \approx-\frac{1}{\alpha}\int_{0}^{1}\epsilon^{2}\int_{\thetadom}v\left(\theta;\eta\right)\frac{\phi\left(\theta\right)^{2\alpha}}{\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)^{2}}\meas d\epsilon\\
+ & =-\frac{1}{\alpha}\int_{\thetadom}v\left(\theta;\eta\right)\phi\left(\theta\right)^{2\alpha}\left(\int_{0}^{1}\frac{\epsilon^{2}}{\left(1+\epsilon\phi\left(\theta\right)^{\alpha}\right)^{2}}d\epsilon\right)\meas.
+\end{align*}
+
+\end_inset
+
+In general,
+\begin_inset Formula 
+\begin{align*}
+\int_{0}^{1}\frac{\epsilon^{2}}{\left(1+a\epsilon\right)^{2}}d\epsilon & =\frac{1}{a}\int_{1}^{1+a}\frac{\left(\frac{z-1}{a}\right)^{2}}{z^{2}}dz\\
+(1+a\epsilon=z & \textrm{; }d\epsilon=\frac{dz}{a})\\
+ & =\frac{1}{a^{3}}\int_{1}^{1+a}\frac{z^{2}-2z+1}{z^{2}}dz\\
+ & =\frac{1}{a^{3}}\int_{1}^{1+a}\left(1-2z^{-1}+z^{-2}\right)dz\\
+ & =\frac{1}{a^{3}}\left[z-2\log z-z^{-1}\right]_{1}^{1+a}\\
+ & =\frac{1}{a^{3}}\left(a-2\log\left(1+a\right)-\frac{1}{1+a}+1\right)\\
+ & =\frac{1}{a^{3}}\left(\left(1+a\right)-2\log\left(1+a\right)-\frac{1}{1+a}\right).
+\end{align*}
+
+\end_inset
+
+So
+\begin_inset Formula 
+\begin{align*}
+E\left(\alpha\right) & \approx-\frac{1}{\alpha}\int_{\thetadom}v\left(\theta;\eta\right)\phi\left(\theta\right)^{2\alpha}\phi\left(\theta\right)^{-3\alpha}\left(1+\phi\left(\theta\right)^{\alpha}-2\log\left(1+\phi\left(\theta\right)^{\alpha}\right)-\frac{1}{1+\phi\left(\theta\right)^{\alpha}}\right)\meas\\
+ & =-\frac{1}{\alpha}\int_{\thetadom}v\left(\theta;\eta\right)\left(\phi\left(\theta\right)^{-\alpha}+1-2\phi\left(\theta\right)^{-\alpha}\log\left(1+\phi\left(\theta\right)^{\alpha}\right)-\frac{1}{\phi\left(\theta\right)^{\alpha}\left(1+\phi\left(\theta\right)^{\alpha}\right)}\right)\meas.
+\end{align*}
+
+\end_inset
+
+Unless I made a mistake.
+\end_layout
+
+\begin_layout Section
 APPENDICES AND EXTRA NOTES
 \end_layout
 

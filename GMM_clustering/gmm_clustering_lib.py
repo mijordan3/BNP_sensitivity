@@ -4,6 +4,7 @@ sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
 import LinearResponseVariationalBayes as vb
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 import LinearResponseVariationalBayes.SparseObjectives as obj_lib
+import LinearResponseVariationalBayes.OptimizationUtils as opt_lib
 
 import autograd
 import autograd.numpy as np
@@ -525,62 +526,62 @@ class DPGaussianMixture(object):
         self.vb_params['global']['gamma'].set(gamma_init)
 
         return self.global_vb_params.get_free()
-
-
-    def minimize_kl_newton(self, init_x, precondition,
-                           maxiter = 50, gtol = 1e-6, disp = True,
-                           print_every = 1, init_logger = True):
-        opt_time = time.time()
-        if init_logger:
-            self.objective.logger.initialize()
-        self.objective.logger.print_every = print_every
-        self.objective.preconditioning = precondition
-        if precondition:
-            init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
-            vb_opt = optimize.minimize(
-                lambda par: self.objective.fun_free_cond(par, verbose=disp),
-                x0=init_x_cond,
-                jac=self.objective.fun_free_grad_cond,
-                hessp=self.objective.fun_free_hvp_cond,
-                method='trust-ncg',
-                options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
-        else:
-            vb_opt = optimize.minimize(
-                lambda par: self.objective.fun_free(par, verbose=disp),
-                x0=init_x,
-                jac=self.objective.fun_free_grad,
-                hessp=self.objective.fun_free_hvp,
-                method='trust-ncg',
-                options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
-        opt_time = time.time() - opt_time
-        return vb_opt, opt_time
-
-    def minimize_kl_bfgs(self, init_x, precondition,
-                         maxiter = 500, disp = True, print_every = 50,
-                         init_logger = True):
-        opt_time = time.time()
-        if init_logger:
-            self.objective.logger.initialize()
-
-        self.objective.logger.print_every = print_every
-        self.objective.preconditioning = precondition
-        if precondition:
-            init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
-            vb_opt = optimize.minimize(
-                lambda par: self.objective.fun_free_cond(par, verbose=disp),
-                x0=init_x_cond,
-                jac=self.objective.fun_free_grad_cond,
-                method='BFGS',
-                options={'maxiter': maxiter, 'disp': disp})
-        else:
-            vb_opt = optimize.minimize(
-                lambda par: self.objective.fun_free(par, verbose=disp),
-                x0=init_x,
-                jac=self.objective.fun_free_grad,
-                method='BFGS',
-                options={'maxiter': maxiter, 'disp': disp})
-        opt_time = time.time() - opt_time
-        return vb_opt, opt_time
+    #
+    #
+    # def minimize_kl_newton(self, init_x, precondition,
+    #                        maxiter = 50, gtol = 1e-6, disp = True,
+    #                        print_every = 1, init_logger = True):
+    #     opt_time = time.time()
+    #     if init_logger:
+    #         self.objective.logger.initialize()
+    #     self.objective.logger.print_every = print_every
+    #     self.objective.preconditioning = precondition
+    #     if precondition:
+    #         init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
+    #         vb_opt = optimize.minimize(
+    #             lambda par: self.objective.fun_free_cond(par, verbose=disp),
+    #             x0=init_x_cond,
+    #             jac=self.objective.fun_free_grad_cond,
+    #             hessp=self.objective.fun_free_hvp_cond,
+    #             method='trust-ncg',
+    #             options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
+    #     else:
+    #         vb_opt = optimize.minimize(
+    #             lambda par: self.objective.fun_free(par, verbose=disp),
+    #             x0=init_x,
+    #             jac=self.objective.fun_free_grad,
+    #             hessp=self.objective.fun_free_hvp,
+    #             method='trust-ncg',
+    #             options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
+    #     opt_time = time.time() - opt_time
+    #     return vb_opt, opt_time
+    #
+    # def minimize_kl_bfgs(self, init_x, precondition,
+    #                      maxiter = 500, disp = True, print_every = 50,
+    #                      init_logger = True):
+    #     opt_time = time.time()
+    #     if init_logger:
+    #         self.objective.logger.initialize()
+    #
+    #     self.objective.logger.print_every = print_every
+    #     self.objective.preconditioning = precondition
+    #     if precondition:
+    #         init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
+    #         vb_opt = optimize.minimize(
+    #             lambda par: self.objective.fun_free_cond(par, verbose=disp),
+    #             x0=init_x_cond,
+    #             jac=self.objective.fun_free_grad_cond,
+    #             method='BFGS',
+    #             options={'maxiter': maxiter, 'disp': disp})
+    #     else:
+    #         vb_opt = optimize.minimize(
+    #             lambda par: self.objective.fun_free(par, verbose=disp),
+    #             x0=init_x,
+    #             jac=self.objective.fun_free_grad,
+    #             method='BFGS',
+    #             options={'maxiter': maxiter, 'disp': disp})
+    #     opt_time = time.time() - opt_time
+    #     return vb_opt, opt_time
 
 
     def precondition_and_optimize(
@@ -588,82 +589,46 @@ class DPGaussianMixture(object):
         gtol=1e-8, maxiter=100, disp=True, print_every_n=10,
         ev_min=1, ev_max=1e5):
 
-        if kl_hessian is None:
-            inv_hess_sqrt, kl_hessian, kl_hessian_corrected = \
-                self.get_preconditioner(init_x)
+        opt_lib.set_objective_preconditioner(
+            objective=self.objective,
+            free_par=init_x,
+            hessian=kl_hessian,
+            ev_min=ev_min, ev_max=ev_max)
+
+        opt_x, vb_opt = opt_lib.minimize_objective_trust_ncg(
+            objective=self.objective,
+            init_x=init_x,
+            precondition=True,
+            maxiter=maxiter,
+            gtol=gtol,
+            disp=disp,
+            print_every=print_every_n,
+            init_logger=False)
+
+        return opt_x, vb_opt
+
+    def optimize_full(self, init_free_par, bgfs_init=True):
+
+        def bfgs_fun(x):
+            return opt_lib.minimize_objective_bfgs(
+                self.objective,
+                init_x=x,
+                precondition=False)
+
+        if bgfs_init:
+            initial_optimization_fun = bfgs_fun
         else:
-            inv_hess_sqrt, kl_hessian_corrected = \
-                obj_lib.get_sym_matrix_inv_sqrt(
-                    kl_hessian, ev_min=ev_min, ev_max=ev_max)
+            initial_optimization_fun = None
 
-        self.objective.preconditioner = inv_hess_sqrt
-        vb_opt, opt_time = self.minimize_kl_newton(
-            precondition = True,
-            init_x = init_x,
-            maxiter = maxiter, gtol = gtol, disp = disp,
-            print_every=print_every_n, init_logger = False)
-        return self.objective.uncondition_x(vb_opt.x), vb_opt, opt_time, \
-               kl_hessian, kl_hessian_corrected
+        return opt_lib.repeatedly_optimize(
+            objective=self.objective,
+            optimization_fun=self.precondition_and_optimize,
+            init_x=init_free_par,
+            initial_optimization_fun=initial_optimization_fun,
+            max_iter=100,
+            gtol=1e-8, ftol=1e-8, xtol=1e-8, disp=False,
+            keep_intermediate_optimizations=True)
 
-
-    def optimize_full(self, init_free_par, do_second_bfgs=True,
-                      init_max_iter=300, final_max_iter=300,
-                      gtol=1e-8, ftol=1e-8, xtol=1e-8, max_condition_iter=10,
-                      disp=True):
-
-        if disp:
-            print('BGFS')
-        init_opt, init_opt_time = self.minimize_kl_bfgs(
-            precondition=False, init_x=init_free_par,
-            maxiter = init_max_iter, disp = disp,
-            print_every=10, init_logger = True)
-        init_x = init_opt.x
-
-        newton_time = 0.0
-
-        x_diff = float('inf')
-        f_diff = float('inf')
-        x_conv = False
-        f_conv = False
-        f_val = self.objective.fun_free(init_x)
-        i = 0
-
-        # Converge if either the x or the f converge.
-        if disp:
-            print('Conditioned Newton:')
-        while i < max_condition_iter and (not x_conv) and (not f_conv):
-            if disp:
-                print('i = ', i)
-            i += 1
-            new_init_x, vb_opt, opt_time, kl_hessian, kl_hessian_corrected = \
-                self.precondition_and_optimize(
-                    init_x, gtol=gtol, maxiter=final_max_iter, disp=disp)
-            new_f_val = self.objective.fun_free(new_init_x)
-
-            newton_time += opt_time
-            x_diff = np.sum(np.abs(init_x - new_init_x))
-            f_diff = np.abs(new_f_val - f_val)
-            x_conv = x_diff < xtol
-            f_conv = f_diff < ftol
-            init_x = new_init_x
-            f_val = new_f_val
-            if disp:
-                print('Iter {}: x_diff = {}, f_diff = {}'.format(i, x_diff, f_diff))
-
-        best_param = init_x
-
-        # print('done')
-
-        return best_param, kl_hessian, kl_hessian_corrected, \
-               init_opt_time, newton_time, x_conv, f_conv, vb_opt
-
-    def get_preconditioner(self, free_par):
-        obj_hessian = self.objective.fun_free_hessian(free_par)
-        inv_hess_sqrt, hessian_corrected = \
-            obj_lib.get_sym_matrix_inv_sqrt(obj_hessian, ev_min=1, ev_max=1e5)
-            #sp_hess_lib.get_hess_inv_sqrt(obj_hessian)
-
-        return inv_hess_sqrt, obj_hessian, hessian_corrected
 
 ########################
 # Sensitivity functions
