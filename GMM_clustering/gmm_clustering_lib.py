@@ -201,15 +201,6 @@ def get_e_log_prior(vb_params, prior_params):
     e_gamma_prior = get_e_log_wishart_prior(vb_params, prior_params)
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
-    # if phi is not None:
-    #     #print('DEBUG: phiphiphi')
-    #     e_log_perturbation = \
-    #         np.sum(get_e_log_perturbation_vec(vb_params, phi))
-    #     #print(e_log_perturbation)
-    # else:
-    #     e_log_perturbation = 0
-
-    # return e_gamma_prior + e_centroid_prior + dp_prior + e_log_perturbation
     return e_gamma_prior + e_centroid_prior + dp_prior
 
 ##########################
@@ -248,6 +239,24 @@ def get_loglik_obs_by_nk(y, vb_params):
     #                 np.expand_dims(centroid2_term, axis = 0))
 
     return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
+
+
+def precondition_and_optimize(
+    objective, init_x, kl_hessian=None, ev_min=1, ev_max=1e5):
+
+    opt_lib.set_objective_preconditioner(
+        objective=objective,
+        free_par=init_x,
+        hessian=kl_hessian,
+        ev_min=ev_min, ev_max=ev_max)
+
+    opt_x, vb_opt = opt_lib.minimize_objective_trust_ncg(
+        objective=objective,
+        init_x=init_x,
+        precondition=True,
+        init_logger=False)
+
+    return opt_x, vb_opt
 
 ##########################
 # the model class
@@ -526,86 +535,7 @@ class DPGaussianMixture(object):
         self.vb_params['global']['gamma'].set(gamma_init)
 
         return self.global_vb_params.get_free()
-    #
-    #
-    # def minimize_kl_newton(self, init_x, precondition,
-    #                        maxiter = 50, gtol = 1e-6, disp = True,
-    #                        print_every = 1, init_logger = True):
-    #     opt_time = time.time()
-    #     if init_logger:
-    #         self.objective.logger.initialize()
-    #     self.objective.logger.print_every = print_every
-    #     self.objective.preconditioning = precondition
-    #     if precondition:
-    #         init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
-    #         vb_opt = optimize.minimize(
-    #             lambda par: self.objective.fun_free_cond(par, verbose=disp),
-    #             x0=init_x_cond,
-    #             jac=self.objective.fun_free_grad_cond,
-    #             hessp=self.objective.fun_free_hvp_cond,
-    #             method='trust-ncg',
-    #             options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
-    #     else:
-    #         vb_opt = optimize.minimize(
-    #             lambda par: self.objective.fun_free(par, verbose=disp),
-    #             x0=init_x,
-    #             jac=self.objective.fun_free_grad,
-    #             hessp=self.objective.fun_free_hvp,
-    #             method='trust-ncg',
-    #             options={'maxiter': maxiter, 'gtol': gtol, 'disp': disp})
-    #     opt_time = time.time() - opt_time
-    #     return vb_opt, opt_time
-    #
-    # def minimize_kl_bfgs(self, init_x, precondition,
-    #                      maxiter = 500, disp = True, print_every = 50,
-    #                      init_logger = True):
-    #     opt_time = time.time()
-    #     if init_logger:
-    #         self.objective.logger.initialize()
-    #
-    #     self.objective.logger.print_every = print_every
-    #     self.objective.preconditioning = precondition
-    #     if precondition:
-    #         init_x_cond = np.linalg.solve(self.objective.preconditioner, init_x)
-    #         vb_opt = optimize.minimize(
-    #             lambda par: self.objective.fun_free_cond(par, verbose=disp),
-    #             x0=init_x_cond,
-    #             jac=self.objective.fun_free_grad_cond,
-    #             method='BFGS',
-    #             options={'maxiter': maxiter, 'disp': disp})
-    #     else:
-    #         vb_opt = optimize.minimize(
-    #             lambda par: self.objective.fun_free(par, verbose=disp),
-    #             x0=init_x,
-    #             jac=self.objective.fun_free_grad,
-    #             method='BFGS',
-    #             options={'maxiter': maxiter, 'disp': disp})
-    #     opt_time = time.time() - opt_time
-    #     return vb_opt, opt_time
 
-
-    def precondition_and_optimize(
-        self, init_x, kl_hessian=None,
-        gtol=1e-8, maxiter=100, disp=True, print_every_n=10,
-        ev_min=1, ev_max=1e5):
-
-        opt_lib.set_objective_preconditioner(
-            objective=self.objective,
-            free_par=init_x,
-            hessian=kl_hessian,
-            ev_min=ev_min, ev_max=ev_max)
-
-        opt_x, vb_opt = opt_lib.minimize_objective_trust_ncg(
-            objective=self.objective,
-            init_x=init_x,
-            precondition=True,
-            maxiter=maxiter,
-            gtol=gtol,
-            disp=disp,
-            print_every=print_every_n,
-            init_logger=False)
-
-        return opt_x, vb_opt
 
     def optimize_full(self, init_free_par, bgfs_init=True):
 
@@ -620,9 +550,12 @@ class DPGaussianMixture(object):
         else:
             initial_optimization_fun = None
 
+        def local_precondition_and_optimize(x):
+            return precondition_and_optimize(self.objective, x)
+
         return opt_lib.repeatedly_optimize(
             objective=self.objective,
-            optimization_fun=self.precondition_and_optimize,
+            optimization_fun=local_precondition_and_optimize,
             init_x=init_free_par,
             initial_optimization_fun=initial_optimization_fun,
             max_iter=100,
