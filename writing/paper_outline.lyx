@@ -101,6 +101,15 @@ theorems-ams-extended-chap-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\altprior}[1][\theta]{p_{1}\left(#1\right)}
+{p_{1}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\contamprior}[2][\theta][\epsilon,\phi]{p_{c}\left(#1\vert#2\right)}
 {p_{c}\left(#1\vert#2\right)}
 \end_inset
@@ -1446,6 +1455,10 @@ One problem with the parameterization given above, and used by Gustafson,
  derivatives, but which allows sensible extrapolation.
 \end_layout
 
+\begin_layout Subsection
+Initial try
+\end_layout
+
 \begin_layout Standard
 Define
 \begin_inset Formula 
@@ -1811,7 +1824,70 @@ Attractively, this is independent of
 But how could you possibly motivative such an approximation?
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
+General relationship between scaling and re-parameterizations
+\end_layout
+
+\begin_layout Standard
+Suppose you have a one-parameter family of densities, 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+, where 
+\begin_inset Formula $\contamprior[][0,\phi]=\baseprior$
+\end_inset
+
+ and 
+\begin_inset Formula $\contamprior[][1,\phi]=\altprior.$
+\end_inset
+
+ A statistic can be viewed as a functional of 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+, of 
+\begin_inset Formula $\altprior$
+\end_inset
+
+, of 
+\begin_inset Formula $\priorpert$
+\end_inset
+
+, or as a function of the real-valued parameter 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+.
+ What is the relationship amongst all these? It is the chain rule.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+g\left(\contamprior\right)= & T_{0}\left(\log\contamprior\right)\\
+\contamprior & =T_{1}\left(\baseprior,\priorpert,\epsilon\right)\\
+\priorpert & =T_{2}\left(\baseprior,\altprior\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Ultimately we are interested in integrating along a line in function space
+ from 
+\begin_inset Formula $g\left(\baseprior\right)$
+\end_inset
+
+ to 
+\begin_inset Formula $g\left(\altprior\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
 Exponential perturbation
 \end_layout
 
@@ -1819,8 +1895,8 @@ Exponential perturbation
 Let
 \begin_inset Formula 
 \begin{align*}
-\contamprior & =\frac{\left(\priorpert\baseprior\right)^{1-\epsilon}\baseprior^{\epsilon}}{1+\left(1-\epsilon\right)C_{\phi}}\\
- & =\frac{\priorpert^{1-\epsilon}\baseprior^{\epsilon}}{1+\left(1-\epsilon\right)C_{\phi}}\\
+\contamprior & =\frac{\left(\priorpert\baseprior\right)^{\epsilon}\baseprior^{1-\epsilon}}{1-\epsilon+\epsilon C_{\phi}}\\
+ & =\frac{\priorpert^{\epsilon}\baseprior}{1+\epsilon\left(C_{\phi}-1\right)}\\
 \contamprior[][1,\phi] & =\frac{\priorpert\baseprior}{C_{\phi}}\\
 C_{\phi} & =\int\priorpert\baseprior\meas
 \end{align*}
@@ -1830,8 +1906,8 @@ C_{\phi} & =\int\priorpert\baseprior\meas
 Then
 \begin_inset Formula 
 \begin{align*}
-\frac{\partial}{\partial\epsilon}\log\contamprior & =-\log\priorpert\\
-\frac{\partial g}{\partial\epsilon} & =G^{T}H^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)\log\priorpert\meas.
+\frac{\partial}{\partial\epsilon}\log\contamprior & =\log\priorpert\\
+\frac{\partial g}{\partial\epsilon} & =-G^{T}H^{-1}\int\frac{\partial}{\partial\eta}\log q\left(\theta;\eta\right)q\left(\theta;\eta\right)\log\priorpert\meas.
 \end{align*}
 
 \end_inset
