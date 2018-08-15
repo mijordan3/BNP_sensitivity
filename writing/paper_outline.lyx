@@ -2120,7 +2120,135 @@ E\left(\alpha\right) & \approx-\frac{1}{\alpha}\int_{\thetadom}v\left(\theta;\et
 
 \end_inset
 
-Unless I made a mistake.
+Unless I made a mistake, which I probably did.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Chain rule perspective
+\end_layout
+
+\begin_layout Standard
+One way to view this might be from a perspective of the chain rule.
+ The variational optimum is a functional of the KL divergence, which as
+ a function of 
+\begin_inset Formula $\eta$
+\end_inset
+
+ lives in a function space.
+\begin_inset Formula 
+\begin{align*}
+T_{0}: & KL\left(\eta\right)\rightarrow\etaopt.
+\end{align*}
+
+\end_inset
+
+The KL divergence is a functional of the prior.
+\begin_inset Formula 
+\begin{align*}
+T_{1}: & p_{c}\rightarrow KL\left(\eta\right).
+\end{align*}
+
+\end_inset
+
+In turn the contaminating prior is a function of a function-valued perturbation
+ of the original prior,
+\begin_inset Formula 
+\begin{align*}
+T_{2}: & \phi\rightarrow p_{c}.
+\end{align*}
+
+\end_inset
+
+Finally, we parameterize a class of perturbations by a real parameter such
+ that 
+\begin_inset Formula $p_{c}$
+\end_inset
+
+ takes desired values at endpoints.
+\begin_inset Formula 
+\begin{align*}
+T_{3}: & \epsilon\rightarrow\phi\left(\epsilon\right).
+\end{align*}
+
+\end_inset
+
+The final step is to compose these:
+\begin_inset Formula 
+\begin{align*}
+\etaopt\left(\epsilon\right) & =T_{0}\circ T_{1}\circ T_{2}\circ T_{3}\left(\epsilon\right).
+\end{align*}
+
+\end_inset
+
+We then use the chain rule to differentiate the entire expression.
+ 
+\end_layout
+
+\begin_layout Standard
+We may want to define
+\begin_inset Formula 
+\begin{align*}
+T_{4} & =T_{1}\circ T_{2}\circ T_{3}:\epsilon\rightarrow KL\left(\eta\right).
+\end{align*}
+
+\end_inset
+
+The key is that if you use the exponential mixture,
+\begin_inset Formula 
+\begin{align*}
+T_{4}\left(\epsilon\right) & =\mbe_{q}\left[-\log\basepost\right]-\epsilon\mbe_{q}\left[\log\priorpert\right]+\mbe_{q}\left[\log q\left(\theta;\eta\right)\right],
+\end{align*}
+
+\end_inset
+
+so that at least the last step is linear in 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+.
+ Contrast with other 
+\begin_inset Formula $\alpha-$
+\end_inset
+
+perturbations, where
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\frac{\left(\baseprior^{\alpha}+\epsilon\altprior^{\alpha}\right)^{1/\alpha}}{C\left(\epsilon\right)}\\
+ & =\frac{\baseprior\left(1+\epsilon\priorpert^{\alpha}\right)^{1/\alpha}}{C\left(\epsilon\right)}\\
+\log\contamprior & =\log\baseprior+\frac{1}{\alpha}\log\left(1+\epsilon\priorpert^{\alpha}\right)\\
+\frac{d^{k}}{d\epsilon^{k}}\log\contamprior & =\left(-1\right)^{k+1}\frac{1}{\alpha}\left(\frac{\priorpert^{\alpha}}{1+\epsilon\priorpert^{\alpha}}\right)^{k}.
+\end{align*}
+
+\end_inset
+
+For no finite 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is the second or higher derivatives zero for all 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+, so for these alternative perturbations 
+\begin_inset Formula $T_{4}\left(\epsilon\right)$
+\end_inset
+
+ is non-linear.
+\end_layout
+
+\begin_layout Standard
+Note that, under appropriate conditions that we should articulate, 
+\begin_inset Formula $T_{1}$
+\end_inset
+
+ is Hadamard (or Frechet) differentiable by Fernholz Theorem 3.2.4.
 \end_layout
 
 \begin_layout Section
