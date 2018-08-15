@@ -21,16 +21,8 @@ from copy import deepcopy
 
 import time
 
-# import individual_fits_lib as individ_lib
-
 import modeling_lib as model_lib
 import functional_sensitivity_lib as fun_sens_lib
-
-# Should we put this somewhere? We only need get_hess_inv_sqrt
-#sys.path.insert(0, './../../genomic_time_series_bnp/src/vb_modeling/')
-#sys.path.insert(0, '/home/rgiordan/Documents/git_repos/genomic_time_series_bnp/src/vb_modeling/')
-#import sparse_hessians_lib as sp_hess_lib
-
 
 import checkpoints
 import json
@@ -119,14 +111,11 @@ def get_default_prior_params(dim):
     prior_params = vb.ModelParamsDict('prior_params')
 
     # DP prior parameter
-    # prior_params.push_param(
-    #     vb.ScalarParam(name = 'alpha', lb = 0.0, val = 4.0))
-
-    # Do not constrain the prior parameters so that the free param is the
-    # vector param -- for now we haven't implemented mixed free / vector
-    # Hessians in TwoParameterObjective.
     prior_params.push_param(
-        vb.ScalarParam(name = 'alpha', val = 4.0))
+        vb.ScalarParam(name = 'alpha', lb = 0.0, val = 4.0))
+
+    # prior_params.push_param(
+    #     vb.ScalarParam(name = 'alpha', val = 4.0))
 
     # prior on the centroids
     prior_params.push_param(
@@ -166,20 +155,17 @@ def get_e_log_wishart_prior(vb_params, prior_params):
 
     gamma = vb_params['global']['gamma'].get()
     dim = np.shape(gamma)[1]
-
-    # New way:
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
-
-    # Old way for the record:
-    # V_inv_gamma = np.einsum('ij, kjl -> kil', V_inv, gamma)
-    # eye = np.eye(dim)
-    # tr_V_inv_gamma = np.einsum('kij, ji -> k', V_inv_gamma, eye)
 
     return np.sum((df - dim - 1) / 2 * np.linalg.slogdet(gamma)[1] -
                     0.5 * tr_V_inv_gamma)
 
 
-# The function func should take arguments in the logit stick space.
+# Get a vector of expected functions of the logit sticks.
+# You can use this to define proportional functional perturbations to the
+# logit stick distributions.
+# The function func should take arguments in the logit stick space, i.e.
+# logit_stick = log(stick / (1 - stick)).
 def get_e_func_logit_stick_vec(vb_params, func):
     lognorm_means = vb_params['global']['v_sticks']['mean'].get()
     lognorm_infos = vb_params['global']['v_sticks']['info'].get()
@@ -194,23 +180,6 @@ def get_e_func_logit_stick_vec(vb_params, func):
     ])
 
     return e_phi
-
-
-# def get_e_log_perturbation_vec(vb_params, phi):
-#     perturbed_log_density = lambda x : np.log(1.0 + phi(x))
-#     lognorm_means = vb_params['global']['v_sticks']['mean'].get()
-#     lognorm_infos = vb_params['global']['v_sticks']['info'].get()
-#     gh_loc = vb_params.gh_loc
-#     gh_weights = vb_params.gh_weights
-#     # print('DEBUG: 0th lognorm mean: ', lognorm_means[0])
-#     expected_perturbations = np.array([
-#         ef.get_e_fun_normal(
-#             lognorm_means[k], lognorm_infos[k], \
-#             gh_loc, gh_weights, perturbed_log_density)
-#         for k in range(len(lognorm_means))
-#     ])
-#
-#     return expected_perturbations
 
 
 def get_e_log_prior(vb_params, prior_params):
@@ -250,10 +219,6 @@ def get_loglik_obs_by_nk(y, vb_params):
 
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
-
-    # squared_term = (np.expand_dims(data2_term, axis = 1) -
-    #                 2 * cross_term +
-    #                 np.expand_dims(centroid2_term, axis = 0))
 
     return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
 
@@ -626,55 +591,6 @@ class InterestingMoments(object):
         self.set_moments_from_free_par(free_par)
         return self.moment_params.get_vector()
 
-
-# TODO: use the ParametricSensitivity class for this.
-# class LinearSensitivity(object):
-#     def __init__(self, model, moment_model, kl_hessian=None):
-#         self.model = model
-#         self.moment_model = moment_model
-#
-#         self.optimal_global_free_params = \
-#             deepcopy(self.model.global_vb_params.get_free())
-#         self.weights_free = deepcopy(self.model.weights.get_free())
-#         self.prior_params_free = deepcopy(self.model.prior_params.get_free())
-#
-#         self.set_sensitivities(self.optimal_global_free_params, kl_hessian)
-#
-#     def set_sensitivities(self, free_par, kl_hessian):
-#         # Save the parameter
-#         if kl_hessian is None:
-#             print('KL Hessian:')
-#             self.kl_hessian = self.model.objective.fun_free_hessian(
-#                 self.optimal_global_free_params)
-#         else:
-#             self.kl_hessian = kl_hessian
-#
-#         print('Prior Hessian...')
-#         self.prior_cross_hess = self.model.get_kl_prior_cross_hess(
-#              self.prior_params_free, self.optimal_global_free_params)
-#
-#         print('Data Hessian...')
-#         self.data_cross_hess = self.model.get_data_cross_hess(
-#             self.optimal_global_free_params)
-#
-#         print('Linear systems...')
-#         self.kl_hessian_chol = osp.linalg.cho_factor(self.kl_hessian)
-#         self.kl_hessian_inv = np.linalg.inv(self.kl_hessian)
-#
-#         self.prior_sens_mat = -1 * osp.linalg.cho_solve(
-#             self.kl_hessian_chol, self.prior_cross_hess.T)
-#         self.data_sens_mat = -1 * osp.linalg.cho_solve(
-#             self.kl_hessian_chol, self.data_cross_hess)
-#
-#         print('Done.')
-#
-#     def predict_from_prior_params(self, new_free_prior_par):
-#         return self.optimal_global_free_params + \
-#             self.prior_sens_mat @ (new_free_prior_par - self.prior_params_free)
-#
-#     def predict_from_weights(self, new_weights_free):
-#         return self.optimal_global_free_params + \
-#             self.data_sens_mat @ (new_weights_free - self.weights_free)
 
 #################################
 # Functions to reload the model
