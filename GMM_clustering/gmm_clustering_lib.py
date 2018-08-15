@@ -196,21 +196,21 @@ def get_e_func_logit_stick_vec(vb_params, func):
     return e_phi
 
 
-def get_e_log_perturbation_vec(vb_params, phi):
-    perturbed_log_density = lambda x : np.log(1.0 + phi(x))
-    lognorm_means = vb_params['global']['v_sticks']['mean'].get()
-    lognorm_infos = vb_params['global']['v_sticks']['info'].get()
-    gh_loc = vb_params.gh_loc
-    gh_weights = vb_params.gh_weights
-    # print('DEBUG: 0th lognorm mean: ', lognorm_means[0])
-    expected_perturbations = np.array([
-        ef.get_e_fun_normal(
-            lognorm_means[k], lognorm_infos[k], \
-            gh_loc, gh_weights, perturbed_log_density)
-        for k in range(len(lognorm_means))
-    ])
-
-    return expected_perturbations
+# def get_e_log_perturbation_vec(vb_params, phi):
+#     perturbed_log_density = lambda x : np.log(1.0 + phi(x))
+#     lognorm_means = vb_params['global']['v_sticks']['mean'].get()
+#     lognorm_infos = vb_params['global']['v_sticks']['info'].get()
+#     gh_loc = vb_params.gh_loc
+#     gh_weights = vb_params.gh_weights
+#     # print('DEBUG: 0th lognorm mean: ', lognorm_means[0])
+#     expected_perturbations = np.array([
+#         ef.get_e_fun_normal(
+#             lognorm_means[k], lognorm_infos[k], \
+#             gh_loc, gh_weights, perturbed_log_density)
+#         for k in range(len(lognorm_means))
+#     ])
+#
+#     return expected_perturbations
 
 
 def get_e_log_prior(vb_params, prior_params):
