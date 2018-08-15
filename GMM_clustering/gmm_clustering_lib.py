@@ -554,7 +554,7 @@ class DPGaussianMixture(object):
         return self.global_vb_params.get_free()
 
 
-    def optimize_full(self, init_free_par, bgfs_init=True):
+    def optimize_full(self, init_free_par, bfgs_init=True):
 
         def bfgs_fun(x):
             return opt_lib.minimize_objective_bfgs(
@@ -562,7 +562,7 @@ class DPGaussianMixture(object):
                 init_x=x,
                 precondition=False)
 
-        if bgfs_init:
+        if bfgs_init:
             initial_optimization_fun = bfgs_fun
         else:
             initial_optimization_fun = None
