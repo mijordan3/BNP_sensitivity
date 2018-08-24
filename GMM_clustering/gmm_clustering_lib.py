@@ -1,5 +1,7 @@
 import sys
-sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
+#sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
+# sys.path.insert(0,
+#     os.path.join(git_repo, 'BNP_sensitivity/GMM_clustering/'))
 
 import LinearResponseVariationalBayes as vb
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
@@ -24,11 +26,9 @@ import time
 import modeling_lib as model_lib
 import functional_sensitivity_lib as fun_sens_lib
 
-import checkpoints
+import checkpoints_lib as checkpoints
 import json
 import json_tricks
-
-import checkpoints
 
 from numpy.polynomial.hermite import hermgauss
 
