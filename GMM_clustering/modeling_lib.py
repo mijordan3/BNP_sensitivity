@@ -60,8 +60,8 @@ def get_dp_prior(vb_params, prior_params):
 # likelihoods
 
 # Autograd doesn't work with the original cumprod.
-def cumprod_through_log(x):
-    return np.exp(np.cumsum(np.log(x)))
+def cumprod_through_log(x, axis = None):
+    return np.exp(np.cumsum(np.log(x), axis = axis))
 
 
 def get_mixture_weights(stick_lengths):
@@ -137,6 +137,27 @@ def get_kth_weight_from_sticks(stick_lengths, k):
         stick_length = stick_lengths[:, k]
 
     return (stick_remaining * stick_length)
+
+def get_e_number_clusters_from_logit_sticks(model, threshold = 0.0,
+                                                samples = 100000):
+
+    # get logitnormal params
+    mu = model.vb_params['global']['v_sticks']['mean'].get()
+    sigma = model.vb_params['global']['v_sticks']['info'].get()
+    k_approx = len(mu)
+
+    # sample from univariate normal
+    unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
+
+    # sample sticks from variational distribution
+    stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
+
+    # get posterior weights
+    weight_samples = modeling_lib.get_mixture_weights_array(stick_samples)
+
+    n_obs = model.y.shape[0]
+    return np.mean(np.sum(1 - (1 - weight_samples)**n_obs, axis = 1))
+
 
 # def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):
 #     # get logitnormal params
