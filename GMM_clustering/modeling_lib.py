@@ -153,7 +153,7 @@ def get_e_number_clusters_from_logit_sticks(model, threshold = 0.0,
     stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
 
     # get posterior weights
-    weight_samples = modeling_lib.get_mixture_weights_array(stick_samples)
+    weight_samples = get_mixture_weights_array(stick_samples)
 
     n_obs = model.y.shape[0]
     return np.mean(np.sum(1 - (1 - weight_samples)**n_obs, axis = 1))

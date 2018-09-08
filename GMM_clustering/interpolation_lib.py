@@ -23,7 +23,8 @@ class Bspline():
 
         zeroth_basis = np.zeros((len(self.knot_vector), len(x)))
         pos_basis_indx = np.searchsorted(self.knot_vector, x)
-
+        pos_basis_indx[pos_basis_indx == len(self.knot_vector)] = \
+                            len(self.knot_vector) - 1
         zeroth_basis[pos_basis_indx, np.arange(len(x))] = 1.0
 
         return zeroth_basis[1:, ]
@@ -52,7 +53,6 @@ class Bspline():
         first_term = first_term_numerator / first_term_denominator[:, np.newaxis]
 
         second_term = second_term_numerator / second_term_denominator[:, np.newaxis]
-
 
         return  (first_term[:-1] * basis_p_minus_1[:-1] +
                  second_term * basis_p_minus_1[1:])

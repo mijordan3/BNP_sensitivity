@@ -15,15 +15,17 @@ import scipy as osp
 
 
 class PriorPerturbation(object):
-    def __init__(self, model, log_phi, epsilon=1.0):
-        self.logit_v_lb = -4
-        self.logit_v_ub = 4
+    def __init__(self, model, log_phi, epsilon=1.0,
+                        logit_v_ub = 4,
+                        logit_v_lb = -4):
+        self.logit_v_lb = logit_v_lb
+        self.logit_v_ub = logit_v_ub
 
         self.gustafson_style = False
 
         self.model = model
 
-        self.epsilon_param = vb.ScalarParam('epsilon', lb=0.0)
+        self.epsilon_param = vb.ScalarParam('epsilon') #, lb=0.0)
         self.epsilon_param.set(epsilon)
 
         self.set_log_phi(log_phi)
@@ -100,7 +102,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc
         else:
-            assert epsilon <= 1
+            # assert epsilon <= 1
             return \
                 self.get_log_p0(v) + \
                 epsilon * self.log_phi(logit_v) - \
@@ -119,7 +121,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc_logit
         else:
-            assert epsilon <= 1
+            # assert epsilon <= 1
             return \
                 self.get_log_p0_logit(logit_v) + \
                 epsilon * self.log_phi(logit_v) - \
