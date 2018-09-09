@@ -2,6 +2,8 @@
 import sys
 sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
 
+import autograd
+
 import autograd.numpy as np
 import autograd.scipy as sp
 
@@ -238,3 +240,69 @@ class PriorPerturbation(object):
 #
 #         dens_ratios = np.exp(log_q_vec - log_p0)
 #         return(self.lr_mat.T @ np.einsum('kd,k->d', log_q_grad_vec, dens_ratios))
+
+class InfluenceFunction(object):
+    def __init__(self, model, input_par, output_par,
+                         input_to_output_converter,
+                         optimal_input_par,
+                         objective_hessian):
+
+        self.null_perturbation = PriorPerturbation(model, lambda x : 0.0 * x)
+        self.null_perturbation.set_epsilon(0.0)
+
+        self.optimal_input_par = optimal_input_par
+        self.model = model
+
+        self.sensitivity_object = \
+            obj_lib.ParametricSensitivity(
+                objective_fun=model.set_z_get_kl,
+                input_par=input_par,
+                output_par=output_par,
+                hyper_par=self.null_perturbation.epsilon_param,
+                input_to_output_converter=input_to_output_converter,
+                optimal_input_par=optimal_input_par,
+                objective_hessian=objective_hessian,
+                hyper_par_objective_fun=None)
+
+        # this is grad log q
+        self.jac_q_logit_sticks = autograd.jacobian(self.get_q_logit_stick_from_free_params, argnum=0)
+
+        # this is g_eta H^{-1}
+        # should a matrix of size len(output_par) x len(global_free_par)
+        self.influence_operator = osp.linalg.cho_solve(self.sensitivity_object.hessian_chol,
+                                                       self.sensitivity_object.dout_din.T).T
+
+    def get_log_ratio(self, logit_v, k):
+        # this is log(q / p_0) in logit space
+        self.null_perturbation.model.global_vb_params.set_free(self.optimal_input_par)
+        return -self.null_perturbation.get_log_p0_logit(logit_v) + \
+                    self.null_perturbation.get_log_q_logit_stick(logit_v, k)
+
+    def get_q_logit_stick_from_free_params(self, global_free_params, logit_v, k):
+        self.null_perturbation.model.global_vb_params.set_free(global_free_params)
+
+        return self.null_perturbation.get_log_q_logit_stick(logit_v, k)
+
+    def get_jac_q_logit_sticks(self, logit_v, k):
+        # this returns grad log q
+        # returns a matrix of size len(global_free_params) x len(logit_v)
+        return self.jac_q_logit_sticks(self.optimal_input_par, logit_v, k).T
+
+    def get_influence_function_k(self, logit_v, k):
+        return np.dot(self.influence_operator, self.get_jac_q_logit_sticks(logit_v, k)) * \
+                    np.exp(self.get_log_ratio(logit_v, k))
+
+    def get_influence_function(self, logit_v):
+        influence_fun = 0.0
+
+        for k in range(self.model.k_approx - 1):
+            influence_fun = influence_fun + self.get_influence_function_k(logit_v, k)
+
+        return influence_fun.squeeze()
+
+#         log_influence_fun_array = np.zeros((self.model.k_approx - 1, len(logit_v)))
+
+#         for k in range(self.model.k_approx - 1):
+#             log_influence_fun_array[k, :] = self.get_influence_function_k(logit_v, k)
+
+#         return osp.misc.logsumexp(log_influence_fun_array, axis = 0)
