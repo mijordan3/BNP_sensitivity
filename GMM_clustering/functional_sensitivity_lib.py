@@ -82,12 +82,12 @@ class PriorPerturbation(object):
 
     def get_log_p0(self, v):
         alpha = self.model.prior_params['alpha'].get()
-        return (alpha - 1) * np.log1p(v) - self.log_norm_p0
+        return (alpha - 1) * np.log1p(-v) - self.log_norm_p0
 
     def get_log_p0_logit(self, logit_v):
         alpha = self.model.prior_params['alpha'].get()
         return \
-            logit_v - (alpha + 1) * np.log1p(np.exp(logit_v)) - \
+            - alpha * logit_v - (alpha + 1) * np.log1p(np.exp(-logit_v)) - \
             self.log_norm_p0_logit
 
     def get_log_pc(self, v):
