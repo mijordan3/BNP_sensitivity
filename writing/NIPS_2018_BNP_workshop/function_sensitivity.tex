@@ -182,8 +182,8 @@ let $p_{\alpha}(\theta | y)$ be the posterior distribution with a particular cho
 Now the optimal variational parameters also depend on $\alpha$, since $\eta^*(\alpha) =
 \argmin_\eta KL(q_\eta\left(\theta\right) \| p_{\alpha}(\theta | y))$.
 
-Now suppose we fit the model at some $\alpha_0$, and we wish to evaluate the
-variational parameters should we have chosen a different prior parameter $\alpha_1$.
+Now suppose we fit the model at some $\alpha_0$, and we wish to efficiently
+re-evaluate the variational parameters at different prior parameter $\alpha_1$.
 We can approximate the variational parameters $\eta^*$ at $\alpha_1$ as
 \begin{align}
     \eta^*(\alpha_1) \approx \eta^*_{lin}(\alpha_1)
@@ -191,7 +191,7 @@ We can approximate the variational parameters $\eta^*$ at $\alpha_1$ as
     \label{eq:our_approximation}
 \end{align}
 
-Following CITE,  we compute $\frac{d}{d\alpha}\eta^*(\alpha) $ as:
+Following CITE RYAN,  we compute $\frac{d}{d\alpha}\eta^*(\alpha) $ as:
 \begin{align}
   \frac{d}{d\alpha}\eta^*(\alpha)\Big|_{\alpha=\alpha_0} &= H^{-1} f_\eta \label{eq:vb_sensitivty}
 \end{align}
@@ -201,6 +201,8 @@ where
   KL(q_\eta\left(\theta\right) \| p_\alpha(\theta | y)) \\
   f_\eta &= \frac{\partial^2}{\partial \alpha \partial \eta}\Big\rvert_{\eta = \eta^*, \alpha = \alpha_0} E_{q_{\eta}} \big[\log p_\alpha(\theta)\big]
 \end{align}
+
+These quantities can be easily and quickly COMPUTED with auto-differentiation tools CITE AUTODIFF.
 
 If $g(\eta)$ is the variational quantity of interest,
 e.g. the expected number of posterior quantities in equation \ref{eq:expected_num_clusters},
@@ -239,7 +241,7 @@ and the derivative of $\eta^*$ with respect to this perturbation is given by
   \label{eq:sensitivity_exp_pert}
 \end{align}
 
-CITE GUSTAFSON. 
+CITE GUSTAFSON.
 
 % We have some original $p_0(\theta)$, and suppose we consider a
 % ``contaminated prior'' of the form
@@ -393,46 +395,6 @@ CITE GUSTAFSON.
 We first compute a variational approximation to the posterior when the stick breaking
 prior parameter is $\alpha = 8.0$. The fit is shown in figure \ref{fig:init_fit}.
 
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.4\textwidth}
-		\includegraphics[width = \textwidth]{./parametric_sens_results/init_fit_alpha8.png}
-		% \subcaption{}
-	\end{subfigure}
-	\caption{The data plotted in PC space along the first two principal components, and colored by
-	cluster belonging in the model fit. Black crosses are the cluster centroids of the model fit,
-  and ovals represent the
-  covariances of the model fit. }
-	\label{fig:init_fit}
-\end{figure}
-
-We seek to evaluate other possible posterior results should we have chosen a different
-$\alpha$. The orginal prior for each stick $\nu_k$ has prior
-\begin{align}
-  p_0(\nu_k) \propto (1 - \nu_k)^{\alpha - 1}
-\end{align}
-Now if we consider an exponential perturbation (equation \ref{eq:expon_perturb}) and
-take $\phi(\nu_k)$ to be $(1 - \nu_k)$,
-we have the same effect as perturbing the prior parameter $\alpha$  by $\epsilon$.
-
-% We are particularly interested in investigating the the effect of this prior
-% parameter on the expected number of posterior clusters. Our variational
-% distribution provides a distribution over the cluster weights $\pi$, induced
-% by the distribution on the sticks. We compute the expected number of
-% clusters under our variational distribution as
-% \begin{align}
-%   E_{q(\pi)}\Big[E\Big[\#\{\text{distinct clusters}\}|\pi\Big]\Big] &=
-%   E_{q(\pi)}\Big[\sum_{i=1}^K P[\text{cluster $k$ is in the dataset}|\pi_k]\Big] \\
-%     &= E_{q(\pi)} \Big[\sum_{i=1}^K (1 - (1 - \pi_k)^N)\Big]
-%     \label{eq:expected_num_clusters}
-% \end{align}
-% Note that to compute the sensitivity using equation \ref{eq:func_sensitivity},
-% we require the derivative
-% of this expectation with respect to the variational parameters in $q$. We can compute
-% the expectation by sampling the sticks $\nu_k$ from the variational distribution, and
-% the cluster weights $\pi_k$'s are functions of the sticks $\nu_k$. Derivatives
-% are computed by applying the reparameterization trick to the sticks $\nu_k$.
-
 We compare the posterior expectation predicted by our linear approximation against the
 expectation obtained from re-optimizing the objective. The results are shown in figure
 \ref{fig:parametric_sens_e_num_clusters}.
@@ -440,7 +402,15 @@ expectation obtained from re-optimizing the objective. The results are shown in 
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[t]{0.4\textwidth}
-		\includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters.png}
+		\includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha2_.png}
+		% \subcaption{}
+	\end{subfigure}
+  \begin{subfigure}[t]{0.4\textwidth}
+    \includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha3_5.png}
+    % \subcaption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha5.png}
 		% \subcaption{}
 	\end{subfigure}
 	\caption{Comparison of the expected number of clusters computed by re-optimizing
@@ -450,94 +420,8 @@ expectation obtained from re-optimizing the objective. The results are shown in 
 	\label{fig:parametric_sens_e_num_clusters}
 \end{figure}
 
-We see that the linear approximation is quite reasonable for $\epsilon \in [-4, 10]$,
-but the linear approximation breaks down for larger $\epsilon$.
 
-\subsection{Influence function and worst-case influence}
-We compute the influence function of perturbing the DP stick-breaking prior.
-Recall that the sticks $\nu_k$ were drawn iid
-from a $Beta(1, \alpha)$ distribution.
-If we perturb each stick by the same perturbation $\phi(\cdot)$ (in Gustafson style), then the sensitivity is given by
-\begin{align}
-S_u^q &=
-g_\eta H^{-1} \sum_{k = 1}^K \frac{\partial}{\partial \eta} E_{q_\eta(\nu_k)}\Big[\phi(\nu_k) \Big]
-\end{align}
-where $p_0(\nu_k)$ is the $Beta(1, \alpha)$ pdf. We can now define the {\itshape total} influence function as
-\begin{align}
-I(\cdot) = g_\eta H^{-1} \sum_{k = 1}^K \frac{q_{\nu_k; \eta}(\cdot)}{p_0(\cdot)}\frac{\partial\log q_{\nu_k; \eta}(\cdot)}{\partial \eta}
-\label{eq:total_influence}
-\end{align}
-where $q_{\nu_k; \eta}$ is the variational approximation specifically for the $k$th stick.
-
-The total influence function is shown in \ref{fig:influence_func}.
-
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.4\textwidth}
-		\includegraphics[width = \textwidth]{./func_sens_results/influence_func.png}
-		% \subcaption{}
-	\end{subfigure}
-	\caption{Total influence function of the sticks on the expected number of
-  posterior clusters}
-	\label{fig:influence_func}
-\end{figure}
-
-From the total influence function, we can compute the worst case positive and negative
-perturbations (equation \ref{eq:worst_case_perturbation}).
-We plot them in \ref{fig:worst_case_perturbations}a-b.
-
-With these worst case functions $\phi^+$ and $\phi^-$, we contaiminate our prior
-using the exponential perturbation described in (equation \ref{eq:expon_perturb}).
-The contaiminated priors are shown in figures \ref{fig:worst_case_perturbations}.
-
-\begin{figure}[h!]
-	\centering
-% 	\begin{subfigure}[t]{0.4\textwidth}
-% 		\includegraphics[width = \textwidth]{./func_sens_results/worst_case_neg_pert.png}
-% 		\subcaption{}
-% 	\end{subfigure}
-%   \begin{subfigure}[t]{0.4\textwidth}
-%     \includegraphics[width = \textwidth]{./func_sens_results/worst_case_pos_pert.png}
-%     \subcaption{}
-%   \end{subfigure}
-% \\
-\begin{subfigure}[t]{0.4\textwidth}
-  \includegraphics[width = \textwidth]{./func_sens_results/worst_case_neg_priors.png}
-  \subcaption{}
-\end{subfigure}
-\begin{subfigure}[t]{0.4\textwidth}
-  \includegraphics[width = \textwidth]{./func_sens_results/worst_case_pos_priors.png}
-  \subcaption{}
-\end{subfigure}
-	% \caption{(a) and (b), the worst case negative and positive perturbations, respectively.
-  % (c) and (d), the original prior in blue; in orange, the prior perturbed (at $\epsilon = 1$) by
-  % the worst case negative and positive perturbations, respectively. }
-  \caption{The original prior in blue; in orange, the prior perturbed (at $\epsilon = 1$) by
-  the worst case negative and positive perturbations, in (a) and (b), respectively. }
-	\label{fig:worst_case_perturbations}
-\end{figure}
-
-After contaiminating our prior by the worst-case perturbations, we again compute the
-expected number of clusters (equation \ref{eq:expected_num_clusters}). We examine the
-accuracy of our linear approximation to re-optimizing with the perturbed prior,
-in figure \ref{fig:worst_case_results}.
-
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.4\textwidth}
-		\includegraphics[width = \textwidth]{./func_sens_results/worst_case_neg_influence_results.png}
-		\subcaption{}
-	\end{subfigure}
-  \begin{subfigure}[t]{0.4\textwidth}
-    \includegraphics[width = \textwidth]{./func_sens_results/worst_case_pos_influence_results.png}
-    \subcaption{}
-  \end{subfigure}
-  \caption{Expected number of posterior clusters after perturbing by the worst-case
-  negative perturbation (a), and the worst-case positive perturbation (b). Blue is the
-  expectation obtained from re-optimizing at the contaiminated posterior, while
-  orange is the prediction from our linear approximation. }
-  \label{fig:worst_case_results}
-\end{figure}
+\subsection{Functional Perturbation}
 
 \section{Discussion}
 In this work, we fit a BNP model to cluster the Iris dataset, and
