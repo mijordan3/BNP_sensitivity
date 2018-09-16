@@ -120,7 +120,7 @@ We can write out equation~\ref{eq:GEM} more explicitly as,
   \nu_k | \alpha &\sim Beta(1, \alpha) \quad k = 1, .., \infty \label{eq:beta_sticks}\\
   \pi_k | \nu &= \nu_k \prod_{j=1}^{k-1} (1 - \nu_j) \label{eq:stick_breaking}
 \end{align}
-so posterior inference on the cluster proportions amounts to doing
+so posterior inference on the cluster weights $\pi_k$, amounts to doing
 posterior inference on the sticks $\nu_k$'s.
 
 The other parameters have priors:
@@ -150,8 +150,9 @@ With this variational approximation, we seek
 where we use $\eta$ to represent the variational parameters be the parameters of the variational distribution
 (the mean variance of the logitnormal, the locations of the point masses, etc.).
 
-The posterior quantitiy of interest for us will be the expected number of
-clusters under our variational distribution,
+We use this variational distribution to define our posterior quantitiy of
+interest: for us, it will be the expected number of
+clusters,
 \begin{align}
   E_{q(\pi)}\Big[E\Big[\#\{\text{distinct clusters}\}|\pi\Big]\Big] &=
   E_{q(\pi)}\Big[\sum_{i=1}^K P[\text{cluster $k$ is in the dataset}|\pi_k]\Big] \\
@@ -182,9 +183,12 @@ let $p_{\alpha}(\theta | y)$ be the posterior distribution with a particular cho
 Now the optimal variational parameters also depend on $\alpha$, since $\eta^*(\alpha) =
 \argmin_\eta KL(q_\eta\left(\theta\right) \| p_{\alpha}(\theta | y))$.
 
-Now suppose we fit the model at some $\alpha_0$, and we wish to efficiently
-re-evaluate the variational parameters at different prior parameter $\alpha_1$.
-We can approximate the variational parameters $\eta^*$ at $\alpha_1$ as
+Now suppose we fit the model at some $\alpha_0$, and we wish to
+re-evaluate the variational parameters at a different prior parameter $\alpha_1$.
+Re-optimizing the objective is computationally expensive, and often, we
+wish to re-evaluate the variational parameters at several different prior parameters.
+
+Thus, we propose to approximate the variational parameters $\eta^*$ at $\alpha_1$ as
 \begin{align}
     \eta^*(\alpha_1) \approx \eta^*_{lin}(\alpha_1)
     := \eta^*(\alpha_0) + \frac{d}{d\alpha}\eta^*(\alpha)\Big|_{\alpha=\alpha_0} \cdot (\alpha_1 - \alpha_0)
@@ -202,7 +206,10 @@ where
   f_\eta &= \frac{\partial^2}{\partial \alpha \partial \eta}\Big\rvert_{\eta = \eta^*, \alpha = \alpha_0} E_{q_{\eta}} \big[\log p_\alpha(\theta)\big]
 \end{align}
 
-These quantities can be easily and quickly COMPUTED with auto-differentiation tools CITE AUTODIFF.
+These quantities can be quickly computed with auto-differentiation tools CITE AUTODIFF.
+The derivative also only needs to be computed once; after computing the derivatve,
+we can then approximate many values of
+the variational parameters under different $\alpha$s.
 
 If $g(\eta)$ is the variational quantity of interest,
 e.g. the expected number of posterior quantities in equation \ref{eq:expected_num_clusters},
@@ -215,7 +222,7 @@ then we approximate
 \label{sec:func_pert}
 We also consider changing the functional form of the prior on the sticks.
 Consider some function $\phi(\nu_k)$, where $\phi(\nu_k) > 0$ for all $\nu_k \in [0, 1]$.
-Then we define our contaminated prior on the stick $k$ as
+Then we define our contaminated prior on stick $k$ as
 
 \begin{align}
 	\label{eq:expon_perturb}
@@ -234,14 +241,14 @@ Here,
 The second term does not depend on $\nu_k$, so $f_\eta = \frac{\partial}{\partial \eta} E_{q_\eta}[\log \phi(\nu_k)]$.
 
 Now if we perturb each stick $k$ by the same perturbation $\phi(\cdot)$, then
-and the derivative of $\eta^*$ with respect to this perturbation is given by
+the derivative of $\eta^*$ with respect to this perturbation is given by
 \begin{align}
    \frac{d}{d\epsilon}\eta^*(\epsilon) &=
    H^{-1}\frac{\partial}{\partial \eta} E_{q_\eta}\Big[\sum_{k = 1}^K \log \phi(\nu_k)\Big]
   \label{eq:sensitivity_exp_pert}
 \end{align}
-
-CITE GUSTAFSON.
+so derivative for pertubing all the sticks is given by the sum of the deriatives
+of perturbing each stick individually. CITE GUSTAFSON.
 
 % We have some original $p_0(\theta)$, and suppose we consider a
 % ``contaminated prior'' of the form
@@ -392,36 +399,85 @@ CITE GUSTAFSON.
 \section{Results}
 
 \subsection{Parametric Sensitivity}
-We first compute a variational approximation to the posterior when the stick breaking
-prior parameter is $\alpha = 8.0$. The fit is shown in figure \ref{fig:init_fit}.
-
-We compare the posterior expectation predicted by our linear approximation against the
+We start with some DP prior parameter $\alpha_0$. After choosing a different $\alpha$,
+we compare the posterior expected number of clusters (equation \ref{eq:expected_num_clusters})
+predicted by our linear approximation against the
 expectation obtained from re-optimizing the objective. The results are shown in figure
 \ref{fig:parametric_sens_e_num_clusters}.
 
+More specifically, we evaluated the expected number of clusters for a range of
+$\alpha$ between 0.5 and 6.5.
+Then we chose three $\alpha_0$ values, 2, 3.5, and 5, and constructed the linear approximation
+centered at each of these $\alpha_0$s. The linear approximation did quite well for choices of $\alpha$
+close to $\alpha_0$. Hence, by evaluating the objective at three $\alpha_0$s, we can use
+the linear approximation to understand the effect of the DP prior parameter $\alpha$ across the entire
+range from 0.5 - 6.5.
+
 \begin{figure}[h!]
 	\centering
-	\begin{subfigure}[t]{0.4\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha2_.png}
 		% \subcaption{}
 	\end{subfigure}
-  \begin{subfigure}[t]{0.4\textwidth}
+  \begin{subfigure}[t]{0.32\textwidth}
     \includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha3_5.png}
     % \subcaption{}
   \end{subfigure}
-  \begin{subfigure}[t]{0.4\textwidth}
+  \begin{subfigure}[t]{0.32\textwidth}
 		\includegraphics[width = \textwidth]{./parametric_sens_results/pred_num_clusters_init_alpha5.png}
 		% \subcaption{}
 	\end{subfigure}
 	\caption{Comparison of the expected number of clusters computed by re-optimizing
   the variational objective for various $\epsilon$ perturbations to the BNP prior parameter
   (blue),
-  versus the predicted value from our linear approximation (orange). }
+  versus the predicted value from our linear approximation (orange), with $\alpha_0$ the
+  red horizontal line. }.
 	\label{fig:parametric_sens_e_num_clusters}
 \end{figure}
 
 
+
 \subsection{Functional perturbations}
+We now use the functional perturbation described in equation \ref{eq:expon_perturb}
+to perturb the prior on the stick distribution.
+The results are shown in figure \ref{fig:func_sens_e_num_clusters}.
+
+We chose two different functional perturbations: for the first we let $p_1(\nu_k)$ be a
+logit normal with parameters $\mu = -2, \sigma = 1$; for the second, we let
+$p_1(\nu_k)$ be a
+logit normal with parameters $\mu = 2, \sigma = 1$. In both cases, we then chose
+$\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$.
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[t]{0.32\textwidth}
+		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
+		\subcaption{}
+	\end{subfigure}
+  \begin{subfigure}[t]{0.32\textwidth}
+    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
+    \subcaption{}
+  \end{subfigure}\\
+  \centering
+  \begin{subfigure}[t]{0.32\textwidth}
+    \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
+    \subcaption{}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.32\textwidth}
+    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
+    \subcaption{}
+  \end{subfigure}
+	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
+  re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
+  [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
+	\label{fig:func_sens_e_num_clusters}
+\end{figure}
+
+We find that the linear approximation in this case was able to capture the direction of the perturbation,
+(expected number of clusters increased under the first pertubation, decreased under the second), but
+did not provide a good approximation at $\epsilon = 1$.
+
+
 
 \section{Discussion}
 In this work, we fit a BNP model to cluster the Iris dataset, and
