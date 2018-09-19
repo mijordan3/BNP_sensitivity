@@ -1,0 +1,42 @@
+\begin{thebibliography}{1}
+
+\bibitem{iris_data_anderson}
+E.~Anderson, ``The species problem in iris,'' {\em Annals of the Missouri
+  Botanical Garden}, vol.~23, no.~3, pp.~457--509, 1936.
+
+\bibitem{iris_data_fisher}
+R.~A. Fisher, ``The use of multiple measurements in taxonomic problems,'' {\em
+  Annals of Eugenics}, vol.~7, no.~2, pp.~179--188.
+
+\bibitem{ferguson:1973:bayesian}
+T.~S. Ferguson, ``A bayesian analysis of some nonparametric problems,'' {\em
+  The annals of statistics}, pp.~209--230, 1973.
+
+\bibitem{sethuraman:1994:constructivedp}
+J.~Sethuraman, ``A constructive definition of dirichlet priors,'' {\em
+  Statistica sinica}, pp.~639--650, 1994.
+
+\bibitem{blei:2006:dirichletbnp}
+D.~M. Blei and M.~I. Jordan, ``Variational inference for {D}irichlet process
+  mixtures,'' {\em {B}ayesian Analysis}, vol.~1, no.~1, pp.~121--143, 2006.
+
+\bibitem{giordano:2017:covariances}
+R.~Giordano, T.~Broderick, and M.~I. Jordan, ``Covariances, robustness, and
+  variational bayes,'' {\em arXiv preprint arXiv:1709.02536}, 2017.
+
+\bibitem{maclaurin:2015:autograd}
+D.~Maclaurin, D.~Duvenaud, and R.~P. Adams, ``Autograd: Effortless gradients in
+  numpy,'' in {\em International Conference on Machine Learning 2015 AutoML
+  Workshop}, 2015.
+
+\bibitem{gustafson:2012:localrobustnessbook}
+P.~Gustafson, ``Local robustness in {Bayesian} analysis,'' in {\em Robust
+  {Bayesian} Analysis} (D.~R. Insua and F.~Ruggeri, eds.), vol.~152, Springer
+  Science \& Business Media, 2000.
+
+\bibitem{Basu:2000:BNP_robustness}
+S.~Basu, ``Bayesian robustness and bayesian nonparametrics,'' in {\em Robust
+  {Bayesian} Analysis} (D.~R. Insua and F.~Ruggeri, eds.), vol.~152, Springer
+  Science \& Business Media, 2000.
+
+\end{thebibliography}
