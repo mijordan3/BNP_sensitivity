@@ -1,5 +1,7 @@
 \documentclass{article}
-\usepackage{nips_2018}
+%\usepackage{nips_2018}
+% The authors do not need to be anonymized for a workshop submission.
+\usepackage[final]{nips_2018}
 
 %\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
 \usepackage[utf8]{inputenc}
@@ -18,6 +20,8 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{subcaption}
+\usepackage{authblk}
+
 
 %\usepackage[authoryear]{natbib}
 %\usepackage[nonatbib]{nips_2018}
@@ -36,12 +40,16 @@
 % \DeclareMathOperator*{\sup}{sup}
 
 \title{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}
-\author{
-    Runjing (Bryan) Liu\\
-    \And
-    Ryan Giordano
-}
-%\date{\today}
+
+\author[1*]{Runjing (Bryan) Liu}
+\author[1*]{Ryan Giordano}
+\author[2]{Tamara Broderick}
+\author[1]{Michael I.~Jordan}
+
+\affil[*]{These authors contributed equally}
+\affil[1]{UC Berkeley}
+\affil[2]{MIT}
+
 
 \begin{document}
 \maketitle
@@ -544,7 +552,6 @@ We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (expected number of clusters increased under the
 first pertubation, decreased under the second), but did not provide a good
 approximation at $\epsilon = 1$.
-
 
 
 \section{Discussion}

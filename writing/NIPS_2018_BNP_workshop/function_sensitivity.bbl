@@ -1,42 +1,64 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{9}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem{iris_data_anderson}
-E.~Anderson, ``The species problem in iris,'' {\em Annals of the Missouri
-  Botanical Garden}, vol.~23, no.~3, pp.~457--509, 1936.
+\bibitem[Anderson(1936)]{iris_data_anderson}
+Edgar Anderson.
+\newblock The species problem in iris.
+\newblock \emph{Annals of the Missouri Botanical Garden}, 23\penalty0
+  (3):\penalty0 457--509, 1936.
+\newblock ISSN 00266493.
+\newblock URL \url{http://www.jstor.org/stable/2394164}.
 
-\bibitem{iris_data_fisher}
-R.~A. Fisher, ``The use of multiple measurements in taxonomic problems,'' {\em
-  Annals of Eugenics}, vol.~7, no.~2, pp.~179--188.
+\bibitem[Basu(2000)]{Basu:2000:BNP_robustness}
+Sanjib Basu.
+\newblock Bayesian robustness and bayesian nonparametrics.
+\newblock In D.~R. Insua and F.~Ruggeri, editors, \emph{Robust {Bayesian}
+  Analysis}, volume 152. Springer Science \& Business Media, 2000.
 
-\bibitem{ferguson:1973:bayesian}
-T.~S. Ferguson, ``A bayesian analysis of some nonparametric problems,'' {\em
-  The annals of statistics}, pp.~209--230, 1973.
+\bibitem[Blei and Jordan(2006)]{blei:2006:dirichletbnp}
+D.~M. Blei and M.~I. Jordan.
+\newblock Variational inference for {D}irichlet process mixtures.
+\newblock \emph{{B}ayesian Analysis}, 1\penalty0 (1):\penalty0 121--143, 2006.
 
-\bibitem{sethuraman:1994:constructivedp}
-J.~Sethuraman, ``A constructive definition of dirichlet priors,'' {\em
-  Statistica sinica}, pp.~639--650, 1994.
+\bibitem[Ferguson(1973)]{ferguson:1973:bayesian}
+Thomas~S Ferguson.
+\newblock A bayesian analysis of some nonparametric problems.
+\newblock \emph{The annals of statistics}, pages 209--230, 1973.
 
-\bibitem{blei:2006:dirichletbnp}
-D.~M. Blei and M.~I. Jordan, ``Variational inference for {D}irichlet process
-  mixtures,'' {\em {B}ayesian Analysis}, vol.~1, no.~1, pp.~121--143, 2006.
+\bibitem[Fisher()]{iris_data_fisher}
+R.~A. Fisher.
+\newblock The use of multiple measurements in taxonomic problems.
+\newblock \emph{Annals of Eugenics}, 7\penalty0 (2):\penalty0 179--188.
+\newblock \doi{10.1111/j.1469-1809.1936.tb02137.x}.
+\newblock URL
+  \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-1809.1936.tb02137.x}.
 
-\bibitem{giordano:2017:covariances}
-R.~Giordano, T.~Broderick, and M.~I. Jordan, ``Covariances, robustness, and
-  variational bayes,'' {\em arXiv preprint arXiv:1709.02536}, 2017.
+\bibitem[Giordano et~al.(2017)Giordano, Broderick, and
+  Jordan]{giordano:2017:covariances}
+Ryan Giordano, Tamara Broderick, and Michael~I Jordan.
+\newblock Covariances, robustness, and variational bayes.
+\newblock \emph{arXiv preprint arXiv:1709.02536}, 2017.
 
-\bibitem{maclaurin:2015:autograd}
-D.~Maclaurin, D.~Duvenaud, and R.~P. Adams, ``Autograd: Effortless gradients in
-  numpy,'' in {\em International Conference on Machine Learning 2015 AutoML
+\bibitem[Gustafson(2000)]{gustafson:2012:localrobustnessbook}
+P.~Gustafson.
+\newblock Local robustness in {Bayesian} analysis.
+\newblock In D.~R. Insua and F.~Ruggeri, editors, \emph{Robust {Bayesian}
+  Analysis}, volume 152. Springer Science \& Business Media, 2000.
+
+\bibitem[Maclaurin et~al.(2015)Maclaurin, Duvenaud, and
+  Adams]{maclaurin:2015:autograd}
+D.~Maclaurin, D.~Duvenaud, and R.~P. Adams.
+\newblock Autograd: Effortless gradients in numpy.
+\newblock In \emph{International Conference on Machine Learning 2015 AutoML
   Workshop}, 2015.
 
-\bibitem{gustafson:2012:localrobustnessbook}
-P.~Gustafson, ``Local robustness in {Bayesian} analysis,'' in {\em Robust
-  {Bayesian} Analysis} (D.~R. Insua and F.~Ruggeri, eds.), vol.~152, Springer
-  Science \& Business Media, 2000.
-
-\bibitem{Basu:2000:BNP_robustness}
-S.~Basu, ``Bayesian robustness and bayesian nonparametrics,'' in {\em Robust
-  {Bayesian} Analysis} (D.~R. Insua and F.~Ruggeri, eds.), vol.~152, Springer
-  Science \& Business Media, 2000.
+\bibitem[Sethuraman(1994)]{sethuraman:1994:constructivedp}
+Jayaram Sethuraman.
+\newblock A constructive definition of dirichlet priors.
+\newblock \emph{Statistica sinica}, pages 639--650, 1994.
 
 \end{thebibliography}
