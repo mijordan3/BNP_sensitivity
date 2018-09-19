@@ -456,13 +456,54 @@ so that the norm is unchanged.
  In other words, it doesn't matter what space we do things in.
 \begin_inset Formula 
 \begin{align*}
-\log\qinfluencefun[\tau] & =\log\qpost[\theta\left(\tau\right)]-\log\baseprior[\theta\left(\tau\right)]+\log GH^{-1}\at{\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}}{\etaopt}\\
-\qinfluencefun[\tau] & =GH^{-1}\at{\frac{\partial{\qpost[][\eta]}}{\partial\eta}}{\etaopt}\frac{1}{\baseprior}.
+\log\qinfluencefun[\tau] & =\log\qpost[\theta\left(\tau\right)]-\log\baseprior[\theta\left(\tau\right)]+\log GH^{-1}\at{\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}}{\etaopt}\\
+\qinfluencefun[\tau] & =GH^{-1}\at{\frac{\partial{{\qpost[][\eta]}}}{\partial\eta}}{\etaopt}\frac{1}{\baseprior}.
 \end{align*}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Note that the density ratio is 
+\begin_inset Formula 
+\begin{align*}
+\log\frac{q\left(\tau_{k}\right)}{\baseprior[\tau_{k}]} & =-\frac{1}{2\sigma^{2}}\left(\tau_{k}-\mu\right)^{2}-\frac{1}{2}\log\sigma^{2}-\tau_{k}+\left(\alpha+1\right)\log\left(1+e^{\tau_{k}}\right).
+\end{align*}
+
+\end_inset
+
+When 
+\begin_inset Formula $\tau_{k}$
+\end_inset
+
+ is large and positive, 
+\begin_inset Formula 
+\begin{align*}
+\log\baseprior[\tau_{k}] & \approx-\alpha\tau_{k}
+\end{align*}
+
+\end_inset
+
+and when 
+\begin_inset Formula $\tau_{k}$
+\end_inset
+
+ is large and negative,
+\begin_inset Formula 
+\begin{align*}
+\log\baseprior[\tau_{k}] & \approx-\tau_{k}
+\end{align*}
+
+\end_inset
+
+so the 
+\begin_inset Formula $-\frac{1}{2\sigma^{2}}\tau_{k}^{2}$
+\end_inset
+
+ term always dominates and positive powers of the density ratio are integrable.
+ 
 \end_layout
 
 \end_body
