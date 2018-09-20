@@ -1,0 +1,57 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# source(file.path(paper_directory, "R_scripts/load_data.R"))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+% TODO: define these in knitr instead.
+\global\long\def\splinedegree{3}
+\global\long\def\ntime{14}
+\global\long\def\ngenes{1000}
+\global\long\def\nclusters{18}
+\global\long\def\fullparamdim{66199}
+\global\long\def\covregularization{0.1}
+
+\global\long\def\regmat{X_{df}}
+\global\long\def\mbe{\mathbb{E}}
+\global\long\def\cov{\mathrm{Cov}}
+\global\long\def\thetareg{\theta_{r}}
+\global\long\def\thetaclust{\theta_{c}}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{SetImageSize}\hlstd{(}\hlkwc{aspect_ratio}\hlstd{=} \hlnum{1} \hlopt{*} \hlstd{base_aspect_ratio)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in SetImageSize(aspect\_ratio = 1 * base\_aspect\_ratio): could not find function "{}SetImageSize"{}}}\begin{alltt}
+\hlstd{figcap} \hlkwb{<-} \hlkwd{paste}\hlstd{(}
+    \hlstr{"Genomics data: accuracy and timing results"}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{source}\hlstd{(}\hlstr{"Rscripts/parametric_sens_results.R"}\hlstd{,} \hlkwc{echo}\hlstd{=knitr_debug,} \hlkwc{print.eval}\hlstd{=}\hlnum{TRUE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: package or namespace load failed for 'tidyverse' in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]):\\\#\#\ \ there is no package called 'nlme'}}\end{kframe}
+\end{knitrout}
+
+foo
