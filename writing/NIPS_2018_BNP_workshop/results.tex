@@ -34,11 +34,7 @@
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{SetImageSize}\hlstd{(}\hlkwc{aspect_ratio}\hlstd{=} \hlnum{1} \hlopt{*} \hlstd{base_aspect_ratio)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in SetImageSize(aspect\_ratio = 1 * base\_aspect\_ratio): could not find function "{}SetImageSize"{}}}\begin{alltt}
+\hlcom{# SetImageSize(aspect_ratio= 1 * base_aspect_ratio)}
 \hlstd{figcap} \hlkwb{<-} \hlkwd{paste}\hlstd{(}
     \hlstr{"Genomics data: accuracy and timing results"}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{)}
 \end{alltt}
@@ -51,7 +47,20 @@
 \end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: package or namespace load failed for 'tidyverse' in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]):\\\#\#\ \ there is no package called 'nlme'}}\end{kframe}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading tidyverse: ggplot2\\\#\# Loading tidyverse: tibble\\\#\# Loading tidyverse: tidyr\\\#\# Loading tidyverse: readr\\\#\# Loading tidyverse: purrr\\\#\# Loading tidyverse: dplyr}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Conflicts with tidy packages ----------------------------------------------}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# filter(): dplyr, stats\\\#\# lag():\ \ \ \ dplyr, stats}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# Attaching package: 'gridExtra'}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# The following object is masked from 'package:dplyr':\\\#\# \\\#\#\ \ \ \  combine}}\end{kframe}\begin{figure}
+\includegraphics[width=\maxwidth]{figure/mse_and_timing_graph-1} 
+\includegraphics[width=\maxwidth]{figure/mse_and_timing_graph-2} \caption[Genomics data]{Genomics data: accuracy and timing results}\label{fig:mse_and_timing_graph}
+\end{figure}
+
+
 \end{knitrout}
 
 foo

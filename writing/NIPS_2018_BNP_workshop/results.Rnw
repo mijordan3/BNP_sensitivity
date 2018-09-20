@@ -32,7 +32,7 @@ simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 \global\long\def\thetaclust{\theta_{c}}
 
 <<graph_fig_cap3>>=
-SetImageSize(aspect_ratio= 1 * base_aspect_ratio)
+# SetImageSize(aspect_ratio= 1 * base_aspect_ratio)
 figcap <- paste(
     "Genomics data: accuracy and timing results", sep="")
 @
