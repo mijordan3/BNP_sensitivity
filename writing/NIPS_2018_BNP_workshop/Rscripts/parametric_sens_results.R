@@ -1,8 +1,4 @@
 # load data
-library(tidyverse)
-library(gridExtra)
-
-# source('./multiplot.R')
 
 # results where alpha_0 was 2.0
 results_matrix_20 <- read.csv('./data_for_figures/init_20_param_sens.csv', header = FALSE)
@@ -29,16 +25,16 @@ plot_parametric_sensitivity <- function(results_df, alpha_0){
     gather(method, e_num_clusters, -alpha) 
   
   plot <- 
-    ggplot(results_df_long) + geom_point(aes(x = alpha, y = e_num_clusters, color = method)) + 
-      geom_line(data = subset(results_df_long, method == 'linear approx'),
-                aes(x = alpha, y = e_num_clusters, color = method)) + 
-      geom_vline(xintercept = alpha_0, color = 'blue', linetype = 'dashed') + 
-      xlab('alpha') + ylab('expected number of clusters') + theme(legend.position = c(0.75, 0.2))
+    ggplot(results_df_long) + 
+    geom_point(aes(x = alpha, y = e_num_clusters, color = method)) + 
+    geom_line(data = subset(results_df_long, method == 'linear approx'),
+              aes(x = alpha, y = e_num_clusters, color = method)) + 
+    geom_vline(xintercept = alpha_0, color = 'blue', linetype = 'dashed') + 
+    xlab('alpha') + ylab('expected number of clusters') + 
+    theme(legend.position = c(0.75, 0.2))
   
   return(plot)
 }
-
-plot_parametric_sensitivity(results_df_20, alpha_0 = 2.0)
 
 w <- 1.1
 grid.arrange(
