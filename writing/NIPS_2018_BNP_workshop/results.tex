@@ -41,7 +41,7 @@ parameter $\alpha$ across the entire range from 0.5 - 6.5.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.343\linewidth]{figure/mse_and_timing_graph-1} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.343\linewidth]{figure/parametric_sens_plot-1} 
 
 }
 
@@ -49,7 +49,7 @@ parameter $\alpha$ across the entire range from 0.5 - 6.5.
   the variational objective for various epsilon perturbations to the BNP prior parameter
   (green),
   versus the predicted value from our linear approximation (orange), with alpha0 the
-  blue horizontal line.}\label{fig:mse_and_timing_graph}
+  blue horizontal line.}\label{fig:parametric_sens_plot}
 \end{figure}
 
 
@@ -67,31 +67,50 @@ $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$; for the
 second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$.
 
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.32\textwidth}
-		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
-		\subcaption{}
-	\end{subfigure}
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
-    \subcaption{}
-  \end{subfigure}\\
-  \centering
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
-    \subcaption{}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
-    \subcaption{}
-  \end{subfigure}
-	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
-  re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
-  [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
-	\label{fig:func_sens_e_num_clusters}
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.686\linewidth]{figure/functional_sens_plot-1} 
+
+}
+
+\caption{\label{fig:func_sens_e_num_clusters} 
+Left column: the original prior p0 in purple, the perturbed prior pc in red. Right: linearly approximated vs.
+re-fitted expected number of clusters after the purtubation.  }\label{fig:functional_sens_plot}
 \end{figure}
 
+
+\end{knitrout}
+
+
+
+% \begin{figure}[h!]
+% 	\centering
+% 	\begin{subfigure}[t]{0.32\textwidth}
+% 		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
+% 		\subcaption{}
+% 	\end{subfigure}
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}\\
+%   \centering
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}
+% 	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
+%   re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
+%   [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
+% 	\label{fig:func_sens_e_num_clusters}
+% \end{figure}
+% 
 We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (expected number of clusters increased under the
 first pertubation, decreased under the second), but did not provide a good

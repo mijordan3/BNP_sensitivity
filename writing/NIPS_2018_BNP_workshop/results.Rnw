@@ -11,6 +11,7 @@
 knitr_debug <- FALSE # Set to true to see error output
 simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("./Rscripts/initialize.R", echo=FALSE)
+source("./Rscripts/plot_sens_results.R")
 @
 
 % TODO: define these in knitr instead.
@@ -41,7 +42,7 @@ close to $\alpha_0$. Hence, by evaluating the objective at three $\alpha_0$s, we
 can use the linear approximation to understand the effect of the DP prior
 parameter $\alpha$ across the entire range from 0.5 - 6.5.
 
-<<graph_fig_cap3>>=
+<<fig_cap1>>=
 SetImageSize(aspect_ratio= 1 * base_aspect_ratio)
 figcap <- paste(
     "\\label{fig:parametric_sens_e_num_clusters}Comparison of the expected number of clusters computed by re-optimizing
@@ -50,7 +51,7 @@ figcap <- paste(
   versus the predicted value from our linear approximation (orange), with alpha0 the
   blue horizontal line.", sep="")
 @
-<<mse_and_timing_graph, cache=simple_cache, fig.show='hold', fig.cap=figcap>>=
+<<parametric_sens_plot, cache=simple_cache, fig.show='hold', fig.cap=figcap>>=
 source("Rscripts/parametric_sens_results.R", echo=knitr_debug, print.eval=TRUE)
 @
 
@@ -66,31 +67,45 @@ $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$; for the
 second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$.
 
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.32\textwidth}
-		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
-		\subcaption{}
-	\end{subfigure}
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
-    \subcaption{}
-  \end{subfigure}\\
-  \centering
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
-    \subcaption{}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.32\textwidth}
-    \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
-    \subcaption{}
-  \end{subfigure}
-	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
-  re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
-  [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
-	\label{fig:func_sens_e_num_clusters}
-\end{figure}
+<<fig_cap2>>=
+SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
+figcap2 <- paste(
+    "\\label{fig:func_sens_e_num_clusters} 
+Left column: the original prior p0 in purple, the perturbed prior pc in red. Right: linearly approximated vs.
+re-fitted expected number of clusters after the purtubation.  ", sep="")
+@
 
+<<functional_sens_plot, cache=simple_cache, fig.show='hold', fig.cap=figcap2>>=
+source("Rscripts/functional_sens_results.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+
+% \begin{figure}[h!]
+% 	\centering
+% 	\begin{subfigure}[t]{0.32\textwidth}
+% 		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
+% 		\subcaption{}
+% 	\end{subfigure}
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}\\
+%   \centering
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}
+%   \begin{subfigure}[t]{0.32\textwidth}
+%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
+%     \subcaption{}
+%   \end{subfigure}
+% 	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
+%   re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
+%   [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
+% 	\label{fig:func_sens_e_num_clusters}
+% \end{figure}
+% 
 We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (expected number of clusters increased under the
 first pertubation, decreased under the second), but did not provide a good

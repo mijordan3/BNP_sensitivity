@@ -1,3 +1,5 @@
+# create plots of figure 1: parametric results
+
 # load data
 
 # results where alpha_0 was 2.0
@@ -16,25 +18,6 @@ results_matrix_50 <- read.csv('./data_for_figures/init_50_param_sens.csv', heade
 rownames(results_matrix_50) <- c('alpha', 'refitted', 'linear approx')
 results_df_50 <- as.data.frame(t(results_matrix_50))
 
-
-plot_parametric_sensitivity <- function(results_df, alpha_0){
-  results_df %>% 
-    gather(method, e_num_clusters, -alpha) 
-  
-  results_df_long <-   results_df %>% 
-    gather(method, e_num_clusters, -alpha) 
-  
-  plot <- 
-    ggplot(results_df_long) + 
-    geom_point(aes(x = alpha, y = e_num_clusters, color = method)) + 
-    geom_line(data = subset(results_df_long, method == 'linear approx'),
-              aes(x = alpha, y = e_num_clusters, color = method)) + 
-    geom_vline(xintercept = alpha_0, color = 'blue', linetype = 'dashed') + 
-    xlab('alpha') + ylab('expected number of clusters') + 
-    theme(legend.position = c(0.75, 0.2))
-  
-  return(plot)
-}
 
 w <- 1.1
 grid.arrange(
