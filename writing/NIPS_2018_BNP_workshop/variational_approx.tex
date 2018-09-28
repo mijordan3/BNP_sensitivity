@@ -1,0 +1,51 @@
+%
+A true BNP representation would take $K = \infty$, but in order to make a
+computationally feasible algorithm we truncate $K$ at a value large enough so
+that many clusters are essentially unoccupied in the approximate posterior
+\citep{blei:2006:dirichletbnp}. The variational approximation is
+%
+\begin{align}
+q(\nu, \mu, \Sigma, z) & =
+\Big\{\prod_{k=1}^{K}q\left(\nu_{k}\right)\delta\left(\mu_{k}\right)
+    \delta\left(\Sigma_{k}\right)\Big\} \prod_{n=1}^{150}q\left(z_{n}\right),
+\end{align}
+%
+where $\delta\left(\cdot\right)$ denotes a point mass at a parameterized
+location, $q\left(\nu_{k}\right)$ is a logitnormal distribution, and
+$q\left(z_{n}\right)$ is a multinomial distribution.
+
+With this variational approximation, we seek
+%
+\begin{align}
+\eta^* = \argmin_{\eta} KL\left(
+    q_\eta(\nu, \mu, \Sigma, z) \big\| p(\nu, \mu, \Sigma, z | y)
+    \right) \label{eq:kl_objective}
+\end{align}
+%
+where we use $\eta$ to represent the variational parameters be the parameters of
+the variational distribution (the mean variance of the logitnormal, the
+locations of the point masses, etc.).
+
+We use this variational distribution to define our posterior quantitiy of
+interest: for us, it will be the expected number of clusters,
+%
+\begin{align}
+  E_{q(\pi)}\Big[E\Big[\#\{\text{distinct clusters}\}|\pi\Big]\Big] &=
+  E_{q(\pi)}\Big[\sum_{i=1}^K P[\text{cluster $k$ is in the dataset}|\pi_k]\Big] \\
+    &= E_{q(\pi)} \Big[\sum_{i=1}^K (1 - (1 - \pi_k)^N)\Big]
+    \label{eq:expected_num_clusters}
+\end{align}
+%
+For a given variational distribtion, this quanitity can be computed with
+Monte-Carlo draws of sticks $\nu_k$ from the $q(\nu_k)$, and the weights $\pi_k$
+are functions of the sticks $\nu_k$ (recall eq. \ref{eq:stick_breaking}).
+
+In the next section we will outline our method for quickly evaluating the
+sensitivity of this quantity with respect to various prior perturbations.
+
+% Note that to compute the sensitivity using equation \ref{eq:func_sensitivity},
+% we require the derivative
+% of this expectation with respect to the variational parameters in $q$. We can compute
+% the expectation by sampling the sticks $\nu_k$ from the variational distribution, and
+% the cluster weights $\pi_k$'s are functions of the sticks $\nu_k$. Derivatives
+% are computed by applying the reparameterization trick to the sticks $\nu_k$.
