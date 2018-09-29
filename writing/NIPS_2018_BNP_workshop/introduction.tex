@@ -6,9 +6,9 @@ the problem with a generative model: out of a population of unobserved latent
 clusters, some finite number are randomly chosen to be present in the actual
 data at hand. The identity and number of these clusters can then be estimated –
 with attendant uncertainty estimates – using the tools of Bayesian posterior
-inference. For example, one might estimate the “number of distinct clusters
-present” by its posterior expectation. Such a generative model is called a
-“Bayesian non-parametric” (BNP) model when the number of latent clusters is
+inference. For example, one might estimate the ``number of distinct clusters
+present'' by its posterior expectation. Such a generative model is called a
+``Bayesian non-parametric'' (BNP) model when the number of latent clusters is
 infinite, though, naturally, even in non-parametric models only a finite number
 of clusters can actually be observed in any particular dataset.
 
@@ -22,7 +22,7 @@ present?” For example, if the prior does not somehow prefer fewer, larger
 clusters, then there is nothing that inherently prevents such an approach from
 inferring that each datapoint is in its own cluster. However, one still hopes
 that a broad range of reasonable choices of prior and likelihood will come to
-similar conclusions. Consequently, it is important, in practice, to measure the
+similar conclusions. Consequently it is important, in practice, to measure the
 sensitivity of the inferred number of clusters present to the prior and
 likelihood specification. Furthermore, these sensitivity measures should work
 with the kinds of inference tools that are used in practice, operate relatively

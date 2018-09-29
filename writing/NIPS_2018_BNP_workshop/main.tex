@@ -12,6 +12,7 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{prettyref}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -22,8 +23,9 @@
 \usepackage{subcaption}
 \usepackage{authblk}
 
+% By including the boilerplate that begins knitr output once, we can
+% have \input{} individual knitted files below.
 \input{knitr_header.tex}
-
 
 %\usepackage[authoryear]{natbib}
 %\usepackage[nonatbib]{nips_2018}
@@ -38,6 +40,12 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argsup}{arg\,sup}
 \DeclareMathOperator*{\arginf}{arg\,inf}
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\indep}{\stackrel{indep}{\sim}}
+\newcommand{\vbfamily}{\mathcal{Q}}
+\newcommand{\etaopt}{\eta^{*}}
+\newcommand{\qopt}{q^{*}}
+
 
 % \DeclareMathOperator*{\sup}{sup}
 
@@ -45,8 +53,8 @@
 
 \author[1*]{Runjing (Bryan) Liu}
 \author[1*]{Ryan Giordano}
-\author[2]{Tamara Broderick}
 \author[1]{Michael I.~Jordan}
+\author[2]{Tamara Broderick}
 
 \affil[*]{These authors contributed equally}
 \affil[1]{UC Berkeley}
@@ -59,10 +67,10 @@
 \section{Introduction}\label{sec:introduction}
 \input{introduction.tex}
 
-\section{Model}\label{sec:model}
+\section{Model and Inference}\label{sec:model}
 \input{model.tex}
 
-\section{Variational approximation}\label{sec:variational_approx}
+%\section{Variational approximation}\label{sec:variational_approx}
 \input{variational_approx.tex}
 
 \section{Hyper-parameter sensitivity}\label{sec:hyper_param_sens}

@@ -24,10 +24,10 @@
 \global\long\def\thetaclust{\theta_{c}}
 
 We start with some DP prior parameter $\alpha_0$. After choosing a different
-$\alpha$, we compare the posterior expected number of clusters (equation
-\ref{eq:expected_num_clusters}) predicted by our linear approximation against
-the expectation obtained from re-optimizing the objective. The results are shown
-in figure \ref{fig:parametric_sens_e_num_clusters}.
+$\alpha$, we compare the posterior expected number of clusters (
+\prettyref{eq:expected_num_clusters}) predicted by our linear approximation
+against the expectation obtained from re-optimizing the objective. The results
+are shown in \prettyref{fig:parametric_sens_e_num_clusters}.
 
 More specifically, we evaluated the expected number of clusters for a range of
 $\alpha$ between 0.5 and 6.5. Then we chose three $\alpha_0$ values, 2, 3.5, and
@@ -58,9 +58,9 @@ parameter $\alpha$ across the entire range from 0.5 - 6.5.
 
 \subsection{Functional perturbations}
 %
-We now use the functional perturbation described in equation
-\ref{eq:expon_perturb} to perturb the prior on the stick distribution. The
-results are shown in figure \ref{fig:func_sens_e_num_clusters}.
+We now use the functional perturbation described in
+\prettyref{eq:expon_perturb} to perturb the prior on the stick distribution. The
+results are shown in \prettyref{fig:func_sens_e_num_clusters}.
 
 We chose two different functional perturbations: for the first we let
 $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$; for the
@@ -76,7 +76,7 @@ second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
 
 }
 
-\caption{\label{fig:func_sens_e_num_clusters} 
+\caption{\label{fig:func_sens_e_num_clusters}
 Left column: the original prior p0 in purple, the perturbed prior pc in red. Right: linearly approximated vs.
 re-fitted expected number of clusters after the purtubation.  }\label{fig:functional_sens_plot}
 \end{figure}
@@ -110,7 +110,7 @@ re-fitted expected number of clusters after the purtubation.  }\label{fig:functi
 %   [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
 % 	\label{fig:func_sens_e_num_clusters}
 % \end{figure}
-% 
+%
 We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (expected number of clusters increased under the
 first pertubation, decreased under the second), but did not provide a good
