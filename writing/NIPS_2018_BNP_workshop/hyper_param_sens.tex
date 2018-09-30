@@ -1,47 +1,38 @@
-
-We consider the effect of perturbing the prior distribution on the sticks. Let
-$p_{0k}(\nu_k; \alpha)$ be the $\text{Beta}(1, \alpha)$ prior on the $k$th
-stick, and let $p_{\alpha}(\theta | y)$ be the posterior distribution with a
-particular choice of $\alpha$. Now the optimal variational parameters also
-depend on $\alpha$, since $\eta^*(\alpha) = \argmin_\eta
-KL(q_\eta\left(\theta\right) \| p_{\alpha}(\theta | y))$.
-
-Now suppose we fit the model at some $\alpha_0$, and we wish to re-evaluate the
-variational parameters at a different prior parameter $\alpha_1$. Re-optimizing
-the objective is computationally expensive, and often, we wish to re-evaluate
-the variational parameters at several different prior parameters.
-
-Thus, we propose to approximate the variational parameters $\eta^*$ at
-$\alpha_1$ as
+We with to evaluate the sensitity of $g(\etaopt)$ to perturbations of the value
+of $\alpha$ and to the functional form of $p_{0k}$.  To do this, we will call on
+a general result for the sensitivity of VB optima to hyperparameters.  Suppose
+the exact posterior is parameterized by a real-valued hyperparameter $\epsilon$,
+i.e., the posterior is given by $p\left(\theta, z \vert y, \epsilon\right)$. In
+the present work, $\epsilon$ will parameterize perturbations to the prior, as we
+will describe in more detail shortly.  Then the optimal variational
+approximation is also a function of $\epsilon$ through
+\prettyref{eq:kl_objective}:
 %
 \begin{align}
-    \eta^*(\alpha_1) \approx \eta^*_{lin}(\alpha_1)
-    := \eta^*(\alpha_0) +
-    \frac{d}{d\alpha}\eta^*(\alpha)\Big|_{\alpha=\alpha_0} \cdot (\alpha_1 - \alpha_0)
-    \label{eq:our_approximation}
+    \etaopt\left(\epsilon\right) &=
+    \argmin_{\eta} KL\left(
+        q(\theta, z \vert \eta) \big\| p(\theta, z | y, \epsilon) \right) =:
+    \argmin_{\eta} KL\left(\eta, \epsilon\right) \label{eq:pert_kl_objective}
 \end{align}
-
-Following \citet{giordano:2017:covariances},  we compute
-$\frac{d}{d\alpha}\eta^*(\alpha) $ as:
+%
+In general, the dependence of $\etaopt\left(\epsilon\right)$ on $\epsilon$ is
+complex and non-linear, but we may approximate it with a first-order Taylor
+series. Without loss of generality, let $\epsilon=0$ represent the unperturbed
+posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta,
+z \vert y \right)$.  Then
 %
 \begin{align}
-  \frac{d}{d\alpha}\eta^*(\alpha)\Big|_{\alpha=\alpha_0} &= H^{-1} f_\eta \label{eq:vb_sensitivty}
+\etaopt(\epsilon) &\approx
+ \etaopt(0) +
+    \frac{d \etaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0}
+    \epsilon \label{eq:our_approximation}
 \end{align}
 %
-where
-%
-\begin{align}
-  H &= \frac{\partial^2}{\partial^2\eta}\Big\rvert_{\eta = \eta^*, \alpha = \alpha_0}
-  KL(q_\eta\left(\theta\right) \| p_\alpha(\theta | y)) \\
-  f_\eta &= \frac{\partial^2}{\partial \alpha \partial \eta}
-    \Big\rvert_{\eta = \eta^*, \alpha = \alpha_0} E_{q_{\eta}}
-    \big[\log p_\alpha(\theta)\big]
-\end{align}
-
-These quantities can be quickly computed with auto-differentiation tools
-\citep{maclaurin:2015:autograd}. The derivative also only needs to be computed
-once; after computing the derivatve, we can then approximate many values of the
-variational parameters under different $\alpha$s.
+Under mild regularity conditions that are satisfied in the present case,
+\citet[Theorem 2]{giordano:2017:covariances} gives a closed form
+expression for $d \etaopt(\epsilon)/ d\epsilon^T \vert_{\epsilon = 0}$
+which can be easily evaluated using automatic differentiation
+\citep{maclaurin:2015:autograd} (see \prettyref{app:sensitivity}).
 
 If $g(\eta)$ is the variational quantity of interest, e.g. the expected number
 of posterior quantities in \prettyref{eq:expected_num_clusters}, then we
