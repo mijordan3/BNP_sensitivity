@@ -1,4 +1,5 @@
 %
+\paragraph{Variational approximation.}
 It is difficult to calculate the posterior $p\left(\nu, \mu, \Sigma, z \vert
 y\right)$, both because the normalizing constant is intractable and because
 $K=\infty$ in a true BNP represetation. In order to perform approximate
@@ -42,20 +43,47 @@ The variational approximation is then given by
     \right). \label{eq:kl_objective}
 \end{align}
 %
-Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
-We are interested in the inferred number of clusters present in the observed
-data, which can be expressed as an expection with respect to $\qopt$,
-and so as a function of $\etaopt$:
+It will be important later to note that it is easy to calculate
+the optimal $\eta_z$ for a given $\eta_\theta$ because the model is
+conjugate, i.e., $p\left(z \vert \theta, y\right)$ is multinomial,
+and so is $q\left(z \vert \eta_z\right)$.  Specifically, there
+exists an easily-calculated, closed form for
 %
 \begin{align}
-g(\etaopt) :=
-\Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]  &=
-%  \Expect_{q(\pi)}\Big[\sum_{i=1}^K P[\text{cluster $k$ is in the dataset}|\pi_k]\Big] \\
-\Expect_{\qopt} \left[\sum_{i=1}^K \left(1 - \left(1 - \pi_k\right)^N\right)
+\etazopt\left(\eta_\theta\right) = \argmin_{\eta_z}
+    KL\left(
+    q(\theta \vert \eta_\theta) q( z \vert \eta_z)
+        \big\| p(\theta, z | y)
+    \right).
+\label{eq:z_update}
+\end{align}
+%
+In general, $\etazopt(\eta_\theta)$ is highly non-linear.
+%
+
+%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%
+
+
+\paragraph{Target posterior quantity.}
+Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
+We are interested in the inferred number of clusters present in the observed
+data, which can be expressed as an expection with respect to
+$q\left(\theta \vert \eta_\theta \right)$,
+and so as a function of $\etathetaopt$:
+%
+\begin{align}
+g(\etathetaopt) &:=
+%\Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]  =
+\Expect_{\qopt(\theta, z)} \left[
+    \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\} \right]
+= \Expect_{\qopt(\nu)}
+    \left[\sum_{k=1}^K \left(1 - \left(1 - \pi_k\right)^N\right)
     \right]
     \label{eq:expected_num_clusters}
 \end{align}
 %
-For a given variational distribtion, $g(\etaopt)$ can be computed with
+For a given variational distribtion, $g(\etathetaopt)$ can be computed with
 Monte-Carlo draws of sticks $\nu_k$ from the $\qopt(\nu_k)$,
 since the weights $\pi_k$ are functions of the sticks $\nu_k$.
