@@ -1,0 +1,40 @@
+\paragraph{Sensitivity to $\alpha$.}
+%
+Let $\alpha_0$ be a base value of $\alpha$ at which we optimize for
+$\etaopt$. By simply taking $\epsilon = \alpha - \alpha_0$, and
+%
+\begin{align*}
+f^\alpha_\eta := \partial^2
+    \QExpect
+        \left[ \log p\left(\nu \vert \alpha \right) \right]
+    / \partial \eta_\theta \partial \alpha^T
+    \Big\rvert_{\eta_\theta = \etathetaopt, \alpha = \alpha_0},
+\end{align*}
+%
+we can approximate
+%
+\begin{align*}
+\etathetalin(\alpha) := \etathetaopt -
+  H^{-1} f^\alpha_\eta (\alpha - \alpha_0) \approx \etathetaopt(\alpha).
+\end{align*}
+%
+We can then approximate
+$g\left(\etathetaopt(\alpha)\right) \approx g\left(\etathetalin(\alpha)\right)$.
+Note that the complete mapping
+$\alpha \mapsto \Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]$
+is, in general, composed of many highly non-linear steps:
+%
+\begin{align}
+\alpha \mapsto
+\etathetaopt(\alpha) \mapsto
+\etazopt\left(\eta_\theta\right) \mapsto
+\textrm{Draws from }z \sim q(z \vert \etazopt) \mapsto
+\Expect_z\left[\sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\}\right].
+\end{align}
+%
+However, only the first step, $\alpha \mapsto \etathetaopt(\alpha)$ is
+computationally intensive (re-solving the optimization problem
+\prettyref{eq:pert_kl_objective} with a new alpha), and it is precisely this
+first step which we approximate linearly with $\alpha \mapsto
+\etathetalin(\alpha)$.  The result is a fast and accurate approximation to
+a highly nonlinear function, as can be seen in \prettyref{sec:results}.

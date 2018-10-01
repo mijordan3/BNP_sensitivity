@@ -30,17 +30,17 @@ Without loss of generality, let $\epsilon=0$ represent the unperturbed
 posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta,
 z \vert y \right)$.
 Define
-$H := \partial^2 KL(\eta_\theta, \epsilon) / \partial \eta_\theta \partial \eta^T
-    \Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}$ and
+$H := \partial^2 KL(\eta_\theta, \epsilon) /
+    \partial \eta_\theta \partial \eta_\theta^T
+    \atzero$ and
 $f_\eta := \partial^2
-    \Expect_{q\left(\theta, z \vert \eta\right)}
-        \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]
+    \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]
     / \partial \eta_\theta \partial \epsilon^T
-    \Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}$.  Then
+    \atzero$.
+Then
 %
 \begin{align}
 \etathetaopt(\epsilon)  -  \etathetaopt(0) &\approx
- \etathetalin(\epsilon) :=
 \frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon =
 - H^{-1} f_\eta \epsilon
 \label{eq:our_approximation}
@@ -52,47 +52,3 @@ differentiation without any need to re-optimize for different $\epsilon$
 the Hessian $H$ need be factorized (e.g. with a Cholesky decomposition) or
 inverted only once and then re-used to approximate $\etathetaopt(\epsilon)$ for
 many different perturbations.
-
-
-
-
-
-\subsection{Functional perturbations}
-\label{sec:func_pert}
-%
-We also consider changing the functional form of the prior on the sticks.
-Consider some function $\phi(\nu_k)$, where $\phi(\nu_k) > 0$ for all $\nu_k \in
-[0, 1]$. Then we define our contaminated prior on stick $k$ as
-
-\begin{align}
-	\label{eq:expon_perturb}
-	p^c_{k}(\nu_k ; \epsilon, \phi) :=
-  \frac{p_{0k}(\nu_k)\phi(\nu_k)^\epsilon}{\int p_0(\nu_k')\phi(\nu_k')^\epsilon \lambda(d\nu_k')}
-\end{align}
-%
-For example, we might consider a different prior for the sticks, say
-$p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$, we are
-swapping the original prior for a a new prior $p_1$ as $\epsilon \rightarrow 1$.
-
-Here,
-%
-\begin{align}
-  \frac{\partial}{\partial \epsilon} \log p_k^k(\nu_k | \epsilon, \phi) := \log \phi(\nu_k) -
-    \frac{\int p_0(\nu_k')\log\phi(\nu_k')e^{\epsilon\phi(\nu_k')} \lambda(d\nu_k')}{\int p_0(\nu_k')\phi(\nu_k')^\epsilon \lambda(d\nu_k')}
-\end{align}
-%
-The second term does not depend on $\nu_k$, so $f_\eta =
-\frac{\partial}{\partial \eta} E_{q_\eta}[\log \phi(\nu_k)]$.
-
-Now if we perturb each stick $k$ by the same perturbation $\phi(\cdot)$, then
-the derivative of $\eta^*$ with respect to this perturbation is given by
-%
-\begin{align}
-   \frac{d}{d\epsilon}\eta^*(\epsilon) &=
-   H^{-1}\frac{\partial}{\partial \eta} E_{q_\eta}\Big[\sum_{k = 1}^K \log \phi(\nu_k)\Big]
-  \label{eq:sensitivity_exp_pert}
-\end{align}
-%
-so derivative for pertubing all the sticks is given by the sum of the deriatives
-of perturbing each stick individually
-\citep{gustafson:2012:localrobustnessbook}.

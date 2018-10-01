@@ -23,10 +23,19 @@ q\left(z_n\right) = \mathrm{Multinomial}\left(z_n\right)
 %
 The family $\vbfamily$ is parameterized by a finite-dimension vector containing
 the locations of the delta functions and the parameters for the lognormal
-distributions, which we denote by $\eta_\theta$, and the parameters for the
-multinomial distributions, which we denote by $\eta_z$.
-We write the combined parameters as $\eta=\left(\eta_\theta, \eta_z\right)$.
-That is, $\eta$ is defined such that
+distributions
+%
+\footnote{We use the lognormal distribution rather than the conjugate Beta
+distribution because the lognormal makes numerical integration easier when
+re-optimizing using non-conjugate $p_{0k}$.  Were one to simply rely on our
+sensitivity measures and not re-optimize, there would be no need for numerical
+integration, and the more convenient Beta variational approximation could be
+used.}
+%
+, which we denote by $\eta_\theta$, and the parameters for the
+multinomial distributions, which we denote by $\eta_z$. We write the combined
+parameters as $\eta=\left(\eta_\theta, \eta_z\right)$. That is, $\eta$ is
+defined such that
 %
 $\vbfamily =
     \left\{q: q\left(\theta, z\right) =
@@ -81,14 +90,16 @@ g(\etathetaopt) &:=
 \end{align}
 %
 For a given variational distribtion, $g(\etathetaopt)$ can be computed with
-Monte-Carlo draws of the cluster indicators. In general, the mapping
-that comprises $g(\etathetaopt)$,
+Monte-Carlo draws of the cluster indicators.
+
+% In general, the mapping
+% that comprises $g(\etathetaopt)$,
 %
-\begin{align}
-\eta_\theta \mapsto
-\etazopt\left(\eta_\theta\right) \mapsto
-\textrm{A draw from }z \sim q(z \vert \etazopt) \mapsto
-\sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\},
-\end{align}
+% \begin{align}
+% \eta_\theta \mapsto
+% \etazopt\left(\eta_\theta\right) \mapsto
+% \textrm{A draw from }z \sim q(z \vert \etazopt) \mapsto
+% \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\},
+% \end{align}
 %
-is highly non-linear.  However, it is also easily and quickly computed.
+% is highly non-linear.  However, it is also easily and quickly computed.

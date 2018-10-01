@@ -1,0 +1,70 @@
+
+
+\paragraph{Functional perturbations.}
+%
+In order to measure sensitivity to changing the functional form of the prior on
+the sticks, we define a parametrized class of multiplicative perturbations to
+the base density $p_{0k}$ and apply \prettyref{eq:our_approximation}.
+Specifically, fix a multiplicative perturbation $\phi(\cdot): [0, 1] \rightarrow
+(0, \infty)$  (recall that the stick lengths $\nu_k\in[0, 1]$), fix
+some $\delta\in[0, 1]$, and define
+a $\delta$-contaminated prior $p^c_{k}$ on the $k$-th stick by
+%
+\begin{align}
+\label{eq:expon_perturb}
+	p^c_{k}(\nu_k ; \delta, \phi) :=
+  \frac{p_{0k}(\nu_k)\phi(\nu_k)^\delta}
+       {\int_0^1 p_0(\nu_k')\phi(\nu_k')^\delta d\nu_k'}
+\end{align}
+%
+$p^c_{k}$ is defined so that $\delta\in[0, 1]$ interpolates multiplicatively
+between the original prior, $p_{0k}$, and a prior proportional to
+$\phi(\nu_k)p_{0k}$. For example, we might consider a different prior for the
+sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$, we
+swap the original prior for the new prior by taking $\delta \rightarrow 1$.
+
+For a fixed $\phi$, we can use \prettyref{eq:our_approximation} by taking
+$\epsilon = \delta$ and
+%
+\begin{align*}
+f^{\delta,\phi}_\eta :=
+\frac{\partial^2
+    \QExpect \left[ \log p^c_{k}(\nu_k ; \delta, \phi) \right]}
+{\partial \eta_\theta \partial \delta}
+    \Big\rvert_{\eta_\theta = \etathetaopt, \delta = 0} =
+\frac{\partial
+    \QExpect \left[ \log\phi(\nu_k) \right]}
+{\partial \eta_\theta}
+    \Big\rvert_{\eta_\theta = \etathetaopt}
+\end{align*}
+%
+Because we have used a multiplicative perturbation, $f^{\delta,\phi}_\eta$
+is linear in $\delta$
+%
+\footnote{Indeed, for the purposes of extrapolating to different priors, this
+fact appears to recommend multiplicative perturbations amongst the class of
+non-linear perturbations considered by \citet{gustafson:1996:localposterior}.}
+
+
+% Here,
+% %
+% \begin{align}
+%   \frac{\partial}{\partial \delta} \log p_k^k(\nu_k | \delta, \phi) := \log \phi(\nu_k) -
+%     \frac{\int p_0(\nu_k')\log\phi(\nu_k')e^{\delta\phi(\nu_k')} \lambda(d\nu_k')}{\int p_0(\nu_k')\phi(\nu_k')^\delta \lambda(d\nu_k')}
+% \end{align}
+% %
+% The second term does not depend on $\nu_k$, so $f_\eta =
+% \frac{\partial}{\partial \eta} E_{q_\eta}[\log \phi(\nu_k)]$.
+%
+% Now if we perturb each stick $k$ by the same perturbation $\phi(\cdot)$, then
+% the derivative of $\eta^*$ with respect to this perturbation is given by
+% %
+% \begin{align}
+%    \frac{d}{d\delta}\eta^*(\delta) &=
+%    H^{-1}\frac{\partial}{\partial \eta} E_{q_\eta}\Big[\sum_{k = 1}^K \log \phi(\nu_k)\Big]
+%   \label{eq:sensitivity_exp_pert}
+% \end{align}
+% %
+% so derivative for pertubing all the sticks is given by the sum of the deriatives
+% of perturbing each stick individually
+% \citep{gustafson:2012:localrobustnessbook}.
