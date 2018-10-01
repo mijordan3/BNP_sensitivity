@@ -9,35 +9,14 @@
 
 
 
-% TODO: define these in knitr instead.
-% \global\long\def\splinedegree{3}
-% \global\long\def\ntime{14}
-% \global\long\def\ngenes{1000}
-% \global\long\def\nclusters{18}
-% \global\long\def\fullparamdim{66199}
-% \global\long\def\covregularization{0.1}
-%
-% \global\long\def\regmat{X_{df}}
-% \global\long\def\mbe{\mathbb{E}}
-% \global\long\def\cov{\mathrm{Cov}}
-% \global\long\def\thetareg{\theta_{r}}
-% \global\long\def\thetaclust{\theta_{c}}
-
-\paragraph{Experimental Results for $\alpha$ Perturbations.}
-
-We start with some DP prior parameter $\alpha_0$. After choosing a different
-$\alpha$, we compare the posterior expected number of clusters (
-\prettyref{eq:expected_num_clusters}) predicted by our linear approximation
-against the expectation obtained from re-optimizing the objective. The results
-are shown in \prettyref{fig:parametric_sens_e_num_clusters}.
-
-More specifically, we evaluated the expected number of clusters for a range of
+On the Iris data, we evaluated the expected number of clusters for a range of
 $\alpha$ between 0.5 and 6.5. Then we chose three $\alpha_0$ values, 2, 3.5, and
 5, and constructed the linear approximation centered at each of these
 $\alpha_0$s. The linear approximation did quite well for choices of $\alpha$
-close to $\alpha_0$. Hence, by evaluating the objective at three $\alpha_0$s, we
-can use the linear approximation to understand the effect of the DP prior
-parameter $\alpha$ across the entire range from 0.5 - 6.5.
+close to $\alpha_0$, as seen in \prettyref{fig:parametric_sens_plot}.
+%  Hence, by evaluating the objective at three $\alpha_0$s, we
+% can use the linear approximation to understand the effect of the DP prior
+% parameter $\alpha$ across the entire range from 0.5 - 6.5.
 
 
 \begin{knitrout}
@@ -47,11 +26,7 @@ parameter $\alpha$ across the entire range from 0.5 - 6.5.
 
 }
 
-\caption{\label{fig:parametric_sens_e_num_clusters}Comparison of the expected number of clusters computed by re-optimizing
-  the variational objective for various epsilon perturbations to the BNP prior parameter
-  (green),
-  versus the predicted value from our linear approximation (orange), with alpha0 the
-  blue horizontal line.}\label{fig:parametric_sens_plot}
+\caption[Comparison of the expected number of clusters computed by re-optimizingversus the linear approximation]{Comparison of the expected number of clusters computed by re-optimizingversus the linear approximation.  The blue vertical line indicates the location of $\alpha_0$.}\label{fig:parametric_sens_plot}
 \end{figure}
 
 
