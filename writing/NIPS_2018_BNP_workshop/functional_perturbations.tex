@@ -1,31 +1,31 @@
 
 
-\paragraph{Functional perturbations.}
+\paragraph{Sensitivity to functional perturbations.}
 %
 In order to measure sensitivity to changing the functional form of the prior on
 the sticks, we define a parametrized class of multiplicative perturbations to
 the base density $p_{0k}$ and apply \prettyref{eq:our_approximation}.
 Specifically, fix a multiplicative perturbation $\phi(\cdot): [0, 1] \rightarrow
 (0, \infty)$ (recall that the stick lengths $\nu_k$  lie in $[0, 1]$). Fix some
-$\delta\in[0, 1]$.  We then define a $\delta$-contaminated prior $p^c_{k}$ on
+$\delta_k\in[0, 1]$.  We then define a $\delta_k$-contaminated prior $p^c_{k}$ on
 the $k$-th stick by
 %
 \begin{align}
 \label{eq:expon_perturb}
-	p^c_{k}(\nu_k ; \delta, \phi) :=
-  \frac{p_{0k}(\nu_k)\phi(\nu_k)^\delta}
-       {\int_0^1 p_0(\nu_k')\phi(\nu_k')^\delta d\nu_k'}
+	p^c_{k}(\nu_k ; \delta_k, \phi) :=
+  \frac{p_{0k}(\nu_k)\phi(\nu_k)^\delta_k}
+       {\int_0^1 p_0(\nu_k')\phi(\nu_k')^\delta_k d\nu_k'}
 \end{align}
 %
-$p^c_{k}$ is defined so that $\delta\in[0, 1]$ interpolates multiplicatively
+$p^c_{k}$ is defined so that $\delta_k\in[0, 1]$ interpolates multiplicatively
 between the original prior, $p_{0k}$, and a prior proportional to
 $\phi(\nu_k)p_{0k}$. For example, we might consider a different prior for the
 sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$, we
-recover $p_{0k}$ at $\delta = 0$ and swap the original prior for the new prior
-by taking $\delta \rightarrow 1$.
+recover $p_{0k}$ at $\delta_k = 0$ and swap the original prior for the new prior
+by taking $\delta_k \rightarrow 1$.
 
 For a fixed $\phi$, we can use \prettyref{eq:our_approximation} by taking
-$\epsilon = \delta$ and
+$\epsilon = \delta_k$ and
 %
 \begin{align*}
 f^{\delta,\phi}_\eta :=
@@ -39,33 +39,20 @@ f^{\delta,\phi}_\eta :=
     \Big\rvert_{\eta_\theta = \etathetaopt}
 \end{align*}
 %
-Because we have used a multiplicative perturbation, $f^{\delta,\phi}_\eta$
-is linear in $\delta$, which we might expect to improve the fidelity of a
-linear approximation
+Because we have used a multiplicative perturbation, $f^{\delta_k, \phi}_\eta$
+is linear in $\delta_k$, which we might expect to improve the fidelity of a
+linear approximation.
 %
-\footnote{Indeed, for the purposes of extrapolating to different priors
+%\footnote{
+Indeed, for the purposes of extrapolating to different priors
 when using VB based on KL divergence, this
 fact appears to recommend multiplicative perturbations amongst the class of
-non-linear perturbations considered by \citet{gustafson:1996:localposterior}.}.
-% Here,
-% %
-% \begin{align}
-%   \frac{\partial}{\partial \delta} \log p_k^k(\nu_k | \delta, \phi) := \log \phi(\nu_k) -
-%     \frac{\int p_0(\nu_k')\log\phi(\nu_k')e^{\delta\phi(\nu_k')} \lambda(d\nu_k')}{\int p_0(\nu_k')\phi(\nu_k')^\delta \lambda(d\nu_k')}
-% \end{align}
-% %
-% The second term does not depend on $\nu_k$, so $f_\eta =
-% \frac{\partial}{\partial \eta} E_{q_\eta}[\log \phi(\nu_k)]$.
-%
-% Now if we perturb each stick $k$ by the same perturbation $\phi(\cdot)$, then
-% the derivative of $\eta^*$ with respect to this perturbation is given by
-% %
-% \begin{align}
-%    \frac{d}{d\delta}\eta^*(\delta) &=
-%    H^{-1}\frac{\partial}{\partial \eta} E_{q_\eta}\Big[\sum_{k = 1}^K \log \phi(\nu_k)\Big]
-%   \label{eq:sensitivity_exp_pert}
-% \end{align}
-% %
-% so derivative for pertubing all the sticks is given by the sum of the deriatives
-% of perturbing each stick individually
-% \citep{gustafson:2012:localrobustnessbook}.
+non-linear perturbations considered by \citet{gustafson:1996:localposterior}.
+%}.
+
+Finally, by linearity of the derivative, the effect of changing all the stick
+priors simultaneously by the same perturbation, $\phi$, is given by taking
+$\delta_1 = ... = \delta_K = \delta$, and
+$\frac{d\etaopt}{d\delta} \Big\rvert_{\eta_\theta = \etathetaopt, \delta=0} =
+    \sum_{k=1}^{K} \frac{d\etaopt}{d\delta_k}
+    \Big\rvert_{\eta_\theta = \etathetaopt, \delta_k=0}$.

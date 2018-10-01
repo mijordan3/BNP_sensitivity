@@ -18,7 +18,7 @@ q(\theta, z) = &
     \left(\prod_{n=1}^{150}q\left(z_{n}\right) \right)\textrm{, where } \\
 q\left(\nu_{k}\right) =& \mathrm{Lognormal}\left(\nu_k\right) \textrm{ and }
 q\left(z_n\right) = \mathrm{Multinomial}\left(z_n\right)
-\Big\}
+\Big\}.
 \end{align*}
 %
 The family $\vbfamily$ is parameterized by a finite-dimension vector containing
@@ -46,11 +46,11 @@ $\vbfamily =
 %
 The variational approximation is then given by
 %
-\begin{align}
+\begin{align*}
 \etaopt = \argmin_{\eta} KL\left(
     q(\theta, z \vert \eta) \big\| p(\theta, z | y)
-    \right). \label{eq:kl_objective}
-\end{align}
+    \right). %\label{eq:kl_objective}
+\end{align*}
 %
 %Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
 It will be important later to note that it is easy to calculate
