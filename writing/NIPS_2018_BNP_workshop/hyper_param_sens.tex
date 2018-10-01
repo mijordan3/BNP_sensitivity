@@ -1,5 +1,6 @@
 
 \paragraph{General hyperparamter sensitivity.}
+%
 We with to approximate the sensitity of $g(\etaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0k}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
@@ -8,41 +9,53 @@ real-valued hyperparameter $\epsilon$, i.e., the posterior is given by
 $p\left(\theta, z \vert y, \epsilon\right)$. In the present work, $\epsilon$
 will parameterize perturbations to the prior, as we will describe in more detail
 shortly.  Then the optimal variational approximation is also a function of
-$\epsilon$ through \prettyref{eq:kl_objective}:
+$\epsilon$ through \prettyref{eq:kl_objective}.  We can define
 %
 \begin{align}
-    \etaopt\left(\epsilon\right) &=
-    \argmin_{\eta} KL\left(
-        q(\theta, z \vert \eta) \big\| p(\theta, z | y, \epsilon) \right) =:
-    \argmin_{\eta} KL\left(\eta, \epsilon\right) \label{eq:pert_kl_objective}
+KL\left(\eta_\theta, \epsilon\right) &:=
+    KL\left(q(\theta, z \vert \eta_\theta, \etazopt\left(\eta_\theta\right))
+    \big\| p(\theta, z | y, \epsilon) \right) \\
+\etathetaopt\left(\epsilon\right) &=
+    \argmin_{\eta_\theta} KL\left(\eta_\theta, \epsilon\right)
+    \label{eq:pert_kl_objective}
 \end{align}
 %
-In general, the dependence of $\etaopt\left(\epsilon\right)$ on $\epsilon$ is
+In general, the dependence of $\etathetaopt\left(\epsilon\right)$ on $\epsilon$ is
 complex and non-linear, but we may approximate it with a first-order Taylor
-series. Without loss of generality, let $\epsilon=0$ represent the unperturbed
-posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta,
-z \vert y \right)$.  Then
-%
-\begin{align}
-\etaopt(\epsilon) &\approx
- \etaopt(0) +
-    \frac{d \etaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0}
-    \epsilon \label{eq:our_approximation}
-\end{align}
-%
+series.
 Under mild regularity conditions that are satisfied in the present case,
 \citet[Theorem 2]{giordano:2017:covariances} gives a closed form
-expression for $d \etaopt(\epsilon)/ d\epsilon^T \vert_{\epsilon = 0}$
-which can be easily evaluated using automatic differentiation
-\citep{maclaurin:2015:autograd} (see \prettyref{app:sensitivity}).
-
-% If $g(\eta)$ is the variational quantity of interest, e.g. the expected number
-% of posterior quantities in \prettyref{eq:expected_num_clusters}, then we
-% approximate
+expression for this Taylor series.
+Without loss of generality, let $\epsilon=0$ represent the unperturbed
+posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta,
+z \vert y \right)$.
+Define
+$H := \partial^2 KL(\eta_\theta, \epsilon) / \partial \eta_\theta \partial \eta^T
+    \Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}$ and
+$f_\eta := \partial^2
+    \Expect_{q\left(\theta, z \vert \eta\right)}
+        \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]
+    / \partial \eta_\theta \partial \epsilon^T
+    \Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}$.  Then
 %
-% \begin{align}
-%     g(\eta^*(\alpha_1)) \approx g(\eta^*_{lin}(\alpha_1))
-% \end{align}
+\begin{align}
+\etathetaopt(\epsilon)  -  \etathetaopt(0) &\approx
+ \etathetalin(\epsilon) :=
+\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon =
+- H^{-1} f_\eta \epsilon
+\label{eq:our_approximation}
+\end{align}
+%
+Note that $H$ and $f_\eta$ can be easily evaluated using automatic
+differentiation without any need to re-optimize for different $\epsilon$
+\citep{maclaurin:2015:autograd} (see \prettyref{app:sensitivity}).  Furthermore,
+the Hessian $H$ need be factorized (e.g. with a Cholesky decomposition) or
+inverted only once and then re-used to approximate $\etathetaopt(\epsilon)$ for
+many different perturbations.
+
+
+
+
 
 \subsection{Functional perturbations}
 \label{sec:func_pert}
