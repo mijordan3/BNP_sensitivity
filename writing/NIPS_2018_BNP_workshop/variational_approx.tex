@@ -46,27 +46,32 @@ $\vbfamily =
 %
 The variational approximation is then given by
 %
-\begin{align*}
+%\begin{align*}
+$
 \etaopt = \argmin_{\eta} KL\left(
     q(\theta, z \vert \eta) \big\| p(\theta, z | y)
     \right). %\label{eq:kl_objective}
-\end{align*}
+$
+%\end{align*}
 %
 %Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
+
 It will be important later to note that it is easy to calculate
 the optimal $\eta_z$ for a given $\eta_\theta$ because the model is
 conjugate, i.e., $p\left(z \vert \theta, y\right)$ is multinomial,
 and so is $q\left(z \vert \eta_z\right)$.  Specifically, there
 exists an easily-calculated, closed form for
 %
-\begin{align}
+%\begin{align}
+$
 \etazopt\left(\eta_\theta\right) = \argmin_{\eta_z}
     KL\left(
     q(\theta \vert \eta_\theta) q( z \vert \eta_z)
         \big\| p(\theta, z | y)
     \right).
-\label{eq:z_update}
-\end{align}
+$
+%\label{eq:z_update}
+%\end{align}
 %
 
 %%%%%%%%%%%%%%%%
