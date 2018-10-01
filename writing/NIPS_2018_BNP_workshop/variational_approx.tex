@@ -1,51 +1,112 @@
 %
-A true BNP representation would take $K = \infty$, but in order to make a
-computationally feasible algorithm we truncate $K$ at a value large enough so
-that many clusters are essentially unoccupied in the approximate posterior
-\citep{blei:2006:dirichletbnp}. The variational approximation is
+\paragraph{Variational approximation.}
+It is difficult to calculate the posterior $p\left(\nu, \mu, \Sigma, z \vert
+y\right)$, both because the normalizing constant is intractable and because
+$K=\infty$ in a true BNP represetation. In order to perform approximate
+inference, we use a truncated VB approximation
+\citep{blei:2006:dirichletbnp}. For compactness of notation, let $\theta =
+\left(\nu, \mu, \Sigma\right)$ denote the collection of ``global'' parameters,
+i.e., parameters whose values affect the data generating process of every
+observation $y_n$.   Let $\delta\left(\cdot\right)$ denote a delta function. We
+define a class of approximating distributions for VB as
 %
-\begin{align}
-q(\nu, \mu, \Sigma, z) & =
-\Big\{\prod_{k=1}^{K}q\left(\nu_{k}\right)\delta\left(\mu_{k}\right)
-    \delta\left(\Sigma_{k}\right)\Big\} \prod_{n=1}^{150}q\left(z_{n}\right),
-\end{align}
+\begin{align*}
+\vbfamily := \Big\{ q:
+q(\theta, z) = &
+\left(\prod_{k=1}^{K}q\left(\nu_{k}\right)\delta\left(\mu_{k}\right)
+    \delta\left(\Sigma_{k}\right)\right)
+    \left(\prod_{n=1}^{150}q\left(z_{n}\right) \right)\textrm{, where } \\
+q\left(\nu_{k}\right) =& \mathrm{Lognormal}\left(\nu_k\right) \textrm{ and }
+q\left(z_n\right) = \mathrm{Multinomial}\left(z_n\right)
+\Big\}.
+\end{align*}
 %
-where $\delta\left(\cdot\right)$ denotes a point mass at a parameterized
-location, $q\left(\nu_{k}\right)$ is a logitnormal distribution, and
-$q\left(z_{n}\right)$ is a multinomial distribution.
+The family $\vbfamily$ is parameterized by a finite-dimension vector containing
+the locations of the delta functions and the parameters for the lognormal
+distributions
+%
+\footnote{We use the lognormal distribution rather than the conjugate Beta
+distribution because the lognormal makes numerical integration easier when
+re-optimizing using non-conjugate $p_{0k}$.  Were one to simply rely on our
+sensitivity measures and not re-optimize, there would be no need for numerical
+integration, and the more convenient Beta variational approximation could be
+used.}
+%
+, which we denote by $\eta_\theta$, and the parameters for the
+multinomial distributions, which we denote by $\eta_z$. We write the combined
+parameters as $\eta=\left(\eta_\theta, \eta_z\right)$. That is, $\eta$ is
+defined such that
+%
+$\vbfamily =
+    \left\{q: q\left(\theta, z\right) =
+            q\left(\theta, z \vert \eta \right) =
+            q\left(\theta \vert \eta_\theta \right)
+            q\left(z \vert \eta_z \right)
+    \right\}.$
+%
+The variational approximation is then given by
+%
+%\begin{align*}
+$
+\etaopt = \argmin_{\eta} KL\left(
+    q(\theta, z \vert \eta) \big\| p(\theta, z | y)
+    \right). %\label{eq:kl_objective}
+$
+%\end{align*}
+%
+%Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
 
-With this variational approximation, we seek
+It will be important later to note that it is easy to calculate
+the optimal $\eta_z$ for a given $\eta_\theta$ because the model is
+conjugate, i.e., $p\left(z \vert \theta, y\right)$ is multinomial,
+and so is $q\left(z \vert \eta_z\right)$.  Specifically, there
+exists an easily-calculated, closed form for
 %
-\begin{align}
-\eta^* = \argmin_{\eta} KL\left(
-    q_\eta(\nu, \mu, \Sigma, z) \big\| p(\nu, \mu, \Sigma, z | y)
-    \right) \label{eq:kl_objective}
-\end{align}
+%\begin{align}
+$
+\etazopt\left(\eta_\theta\right) = \argmin_{\eta_z}
+    KL\left(
+    q(\theta \vert \eta_\theta) q( z \vert \eta_z)
+        \big\| p(\theta, z | y)
+    \right).
+$
+%\label{eq:z_update}
+%\end{align}
 %
-where we use $\eta$ to represent the variational parameters be the parameters of
-the variational distribution (the mean variance of the logitnormal, the
-locations of the point masses, etc.).
 
-We use this variational distribution to define our posterior quantitiy of
-interest: for us, it will be the expected number of clusters,
+%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%
+
+
+\paragraph{Target posterior quantity.}
+
+We are interested in the inferred number of clusters present in the observed
+data, which can be expressed as an expection with respect to
+$q\left(z \vert \eta_z \right)$, and so as a function of
+$\etathetaopt$ via the relation $\etazopt(\eta_\theta)$:
 %
 \begin{align}
-  E_{q(\pi)}\Big[E\Big[\#\{\text{distinct clusters}\}|\pi\Big]\Big] &=
-  E_{q(\pi)}\Big[\sum_{i=1}^K P[\text{cluster $k$ is in the dataset}|\pi_k]\Big] \\
-    &= E_{q(\pi)} \Big[\sum_{i=1}^K (1 - (1 - \pi_k)^N)\Big]
+g(\etathetaopt) &:=
+\Expect_{q(\theta, z \vert \etaopt)} \left[ \#\{\text{distinct clusters}\} \right]  =
+\Expect_{q(z \vert \etazopt(\eta_\theta))} \left[
+    \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\} \right].
     \label{eq:expected_num_clusters}
 \end{align}
 %
-For a given variational distribtion, this quanitity can be computed with
-Monte-Carlo draws of sticks $\nu_k$ from the $q(\nu_k)$, and the weights $\pi_k$
-are functions of the sticks $\nu_k$ (recall eq. \ref{eq:stick_breaking}).
+For a given optimal set of global variational parameters,
+$g(\etathetaopt)$ can be computed with Monte-Carlo draws of the cluster
+indicators,
+$z \iid q\left(z \vert \etazopt(\etathetaopt)\right)$.
 
-In the next section we will outline our method for quickly evaluating the
-sensitivity of this quantity with respect to various prior perturbations.
-
-% Note that to compute the sensitivity using equation \ref{eq:func_sensitivity},
-% we require the derivative
-% of this expectation with respect to the variational parameters in $q$. We can compute
-% the expectation by sampling the sticks $\nu_k$ from the variational distribution, and
-% the cluster weights $\pi_k$'s are functions of the sticks $\nu_k$. Derivatives
-% are computed by applying the reparameterization trick to the sticks $\nu_k$.
+% In general, the mapping
+% that comprises $g(\etathetaopt)$,
+%
+% \begin{align}
+% \eta_\theta \mapsto
+% \etazopt\left(\eta_\theta\right) \mapsto
+% \textrm{A draw from }z \sim q(z \vert \etazopt) \mapsto
+% \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\},
+% \end{align}
+%
+% is highly non-linear.  However, it is also easily and quickly computed.

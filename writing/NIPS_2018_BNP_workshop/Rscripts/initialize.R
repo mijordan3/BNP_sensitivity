@@ -35,8 +35,7 @@ DefineMacro <- function(macro_name, value, digits=3) {
 }
 
 # These are based on one image per row.
-#base_aspect_ratio <- 2.8 / (5 * 2) # This was what we used for the NIPS submission.
-base_aspect_ratio <- 3.5 / (5 * 2) # This was what we used for the NIPS submission.
+base_aspect_ratio <- 3 / (5 * 2) 
 base_image_width <- 4.9 * 2
 
 SetImageSize <- function(aspect_ratio, image_width=base_image_width) {

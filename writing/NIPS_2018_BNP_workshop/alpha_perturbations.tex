@@ -1,0 +1,22 @@
+\paragraph{Sensitivity to $\alpha$.}
+%
+Let $\alpha_0$ be a base value of $\alpha$ at which we optimize for
+$\etaopt$. By simply taking $\epsilon = \alpha - \alpha_0$, and
+%
+\begin{align*}
+f^\alpha_\eta := \frac{\partial^2
+    \QExpect
+        \left[ \log p\left(\nu \vert \alpha \right) \right]}
+{ \partial \eta_\theta \partial \alpha^T }
+    \Big\rvert_{\eta_\theta = \etathetaopt, \alpha = \alpha_0},
+\end{align*}
+%
+we can approximate
+%
+\begin{align*}
+\etathetalin(\alpha) := \etathetaopt -
+  H^{-1} f^\alpha_\eta (\alpha - \alpha_0) \approx \etathetaopt(\alpha).
+\end{align*}
+%
+We can then approximate
+$g\left(\etathetaopt(\alpha)\right) \approx g\left(\etathetalin(\alpha)\right)$.

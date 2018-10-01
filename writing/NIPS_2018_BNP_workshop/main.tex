@@ -12,6 +12,7 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{prettyref}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -22,8 +23,9 @@
 \usepackage{subcaption}
 \usepackage{authblk}
 
+% By including the boilerplate that begins knitr output once, we can
+% have \input{} individual knitted files below.
 \input{knitr_header.tex}
-
 
 %\usepackage[authoryear]{natbib}
 %\usepackage[nonatbib]{nips_2018}
@@ -38,6 +40,23 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argsup}{arg\,sup}
 \DeclareMathOperator*{\arginf}{arg\,inf}
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\indep}{\stackrel{indep}{\sim}}
+\newcommand{\vbfamily}{\mathcal{Q}}
+\newcommand{\etaopt}{\eta^{*}}
+\newcommand{\etazopt}{\eta_z^{*}}
+\newcommand{\etathetaopt}{\eta_\theta^{*}}
+\newcommand{\qopt}{q^{*}}
+\newcommand{\targethat}{\hat{g}}
+\newcommand{\QExpect}
+{\Expect_{q\left(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta)\right)}}
+\newcommand{\atzero}{\Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}}
+\newcommand{\etathetalin}{\eta_\theta^{LIN}}
+
+\newrefformat{eq}{Equation \ref{#1}}
+\newrefformat{app}{Appendix \ref{#1}}
+\newrefformat{fig}{Figure \ref{#1}}
+
 
 % \DeclareMathOperator*{\sup}{sup}
 
@@ -45,8 +64,8 @@
 
 \author[1*]{Runjing (Bryan) Liu}
 \author[1*]{Ryan Giordano}
-\author[2]{Tamara Broderick}
 \author[1]{Michael I.~Jordan}
+\author[2]{Tamara Broderick}
 
 \affil[*]{These authors contributed equally}
 \affil[1]{UC Berkeley}
@@ -59,29 +78,38 @@
 \section{Introduction}\label{sec:introduction}
 \input{introduction.tex}
 
-\section{Model}\label{sec:model}
+\section{Model and Inference}\label{sec:model}
 \input{model.tex}
 
-\section{Variational approximation}\label{sec:variational_approx}
+%\section{Variational approximation}\label{sec:variational_approx}
 \input{variational_approx.tex}
 
 \section{Hyper-parameter sensitivity}\label{sec:hyper_param_sens}
 \input{hyper_param_sens.tex}
+\input{alpha_perturbations.tex}
+\input{results_alpha.tex}
 
-\section{Prior work}\label{sec:prior_work}
-\input{prior_work.tex}
+
+\input{functional_perturbations.tex}
+\input{results_functions.tex}
+
+% \section{Prior work}\label{sec:prior_work}
+% \input{prior_work.tex}
 
 
-\section{Results}\label{sec:results}
-\input{results.tex}
+% \section{Results}\label{sec:results}
+% No
 
-\section{Discussion}\label{sec:discussion}
-\input{discussion.tex}
+% \section{Discussion}\label{sec:discussion}
+% \input{discussion.tex}
 
 \newpage
 \bibliography{references}
 \bibliographystyle{plainnat}
 
 \newpage
+\appendix
+\section*{Appendices}
+\input{appendices.tex}
 
 \end{document}

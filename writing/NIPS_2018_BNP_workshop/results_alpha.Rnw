@@ -1,0 +1,36 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
+source("./Rscripts/initialize.R", echo=FALSE)
+source("./Rscripts/plot_sens_results.R")
+@
+
+On the Iris data, we evaluated the expected number of clusters for a range of
+$\alpha$ between 0.5 and 6.5. Then we chose three $\alpha_0$ values, 2, 3.5, and
+5, and constructed the linear approximation centered at each of these
+$\alpha_0$s. The linear approximation did quite well for choices of $\alpha$
+close to $\alpha_0$, as seen in \prettyref{fig:parametric_sens_plot}.
+%  Hence, by evaluating the objective at three $\alpha_0$s, we
+% can use the linear approximation to understand the effect of the DP prior
+% parameter $\alpha$ across the entire range from 0.5 - 6.5.
+
+<<fig_cap1, cache=cache_knitr>>=
+SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
+figcap <- paste(
+    "Comparison of the expected number of clusters computed by re-optimizing ",
+    "versus the linear approximation.  ",
+    "The blue vertical line indicates the location of $\\alpha_0$.",
+    sep="")
+@
+<<parametric_sens_plot, cache=cache_knitr, fig.show='hold', fig.cap=figcap>>=
+source("Rscripts/parametric_sens_results.R", echo=knitr_debug, print.eval=TRUE)
+@
