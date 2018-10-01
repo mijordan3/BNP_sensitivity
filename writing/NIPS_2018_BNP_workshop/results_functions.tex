@@ -8,22 +8,6 @@
 
 
 
-
-% TODO: define these in knitr instead.
-% \global\long\def\splinedegree{3}
-% \global\long\def\ntime{14}
-% \global\long\def\ngenes{1000}
-% \global\long\def\nclusters{18}
-% \global\long\def\fullparamdim{66199}
-% \global\long\def\covregularization{0.1}
-%
-% \global\long\def\regmat{X_{df}}
-% \global\long\def\mbe{\mathbb{E}}
-% \global\long\def\cov{\mathrm{Cov}}
-% \global\long\def\thetareg{\theta_{r}}
-% \global\long\def\thetaclust{\theta_{c}}
-
-\paragraph{Experimental Results for Functional Perturbations.}
 %
 We now use the functional perturbation described in
 \prettyref{eq:expon_perturb} to perturb the prior on the stick distribution. The
@@ -39,13 +23,14 @@ second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.686\linewidth]{figure/functional_sens_plot-1} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.480\linewidth]{figure/functional_sens_plot-1} 
 
 }
 
 \caption{\label{fig:func_sens_e_num_clusters}
-Left column: the original prior p0 in purple, the perturbed prior pc in red. Right: linearly approximated vs.
-re-fitted expected number of clusters after the purtubation.  }\label{fig:functional_sens_plot}
+Left column: the original prior $p_{0k}$ in purple,
+the perturbed prior $p^c_k$ in red. Right: linearly approximated vs.
+re-fitted expected number of clusters after the pertubation.  }\label{fig:functional_sens_plot}
 \end{figure}
 
 

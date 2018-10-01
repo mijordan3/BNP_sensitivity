@@ -9,26 +9,10 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
-
-% TODO: define these in knitr instead.
-% \global\long\def\splinedegree{3}
-% \global\long\def\ntime{14}
-% \global\long\def\ngenes{1000}
-% \global\long\def\nclusters{18}
-% \global\long\def\fullparamdim{66199}
-% \global\long\def\covregularization{0.1}
-%
-% \global\long\def\regmat{X_{df}}
-% \global\long\def\mbe{\mathbb{E}}
-% \global\long\def\cov{\mathrm{Cov}}
-% \global\long\def\thetareg{\theta_{r}}
-% \global\long\def\thetaclust{\theta_{c}}
-
-\paragraph{Experimental Results for Functional Perturbations.}
 %
 We now use the functional perturbation described in
 \prettyref{eq:expon_perturb} to perturb the prior on the stick distribution. The
@@ -39,12 +23,13 @@ $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$; for the
 second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$.
 
-<<fig_cap2>>=
-SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
+<<fig_cap2, cache=cache_knitr>>=
+SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
 figcap2 <- paste(
     "\\label{fig:func_sens_e_num_clusters}
-Left column: the original prior p0 in purple, the perturbed prior pc in red. Right: linearly approximated vs.
-re-fitted expected number of clusters after the purtubation.  ", sep="")
+Left column: the original prior $p_{0k}$ in purple,
+the perturbed prior $p^c_k$ in red. Right: linearly approximated vs.
+re-fitted expected number of clusters after the pertubation.  ", sep="")
 @
 
 <<functional_sens_plot, cache=cache_knitr, fig.show='hold', fig.cap=figcap2>>=

@@ -9,7 +9,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
+cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
 source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
@@ -24,7 +24,7 @@ close to $\alpha_0$, as seen in \prettyref{fig:parametric_sens_plot}.
 % parameter $\alpha$ across the entire range from 0.5 - 6.5.
 
 <<fig_cap1, cache=cache_knitr>>=
-SetImageSize(aspect_ratio= 1 * base_aspect_ratio)
+SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
 figcap <- paste(
     "Comparison of the expected number of clusters computed by re-optimizing ",
     "versus the linear approximation.  ",
