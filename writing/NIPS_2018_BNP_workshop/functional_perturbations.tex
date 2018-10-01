@@ -6,9 +6,9 @@ In order to measure sensitivity to changing the functional form of the prior on
 the sticks, we define a parametrized class of multiplicative perturbations to
 the base density $p_{0k}$ and apply \prettyref{eq:our_approximation}.
 Specifically, fix a multiplicative perturbation $\phi(\cdot): [0, 1] \rightarrow
-(0, \infty)$  (recall that the stick lengths $\nu_k\in[0, 1]$), fix
-some $\delta\in[0, 1]$, and define
-a $\delta$-contaminated prior $p^c_{k}$ on the $k$-th stick by
+(0, \infty)$ (recall that the stick lengths $\nu_k$  lie in $[0, 1]$). Fix some
+$\delta\in[0, 1]$.  We then define a $\delta$-contaminated prior $p^c_{k}$ on
+the $k$-th stick by
 %
 \begin{align}
 \label{eq:expon_perturb}
@@ -21,7 +21,8 @@ $p^c_{k}$ is defined so that $\delta\in[0, 1]$ interpolates multiplicatively
 between the original prior, $p_{0k}$, and a prior proportional to
 $\phi(\nu_k)p_{0k}$. For example, we might consider a different prior for the
 sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$, we
-swap the original prior for the new prior by taking $\delta \rightarrow 1$.
+recover $p_{0k}$ at $\delta = 0$ and swap the original prior for the new prior
+by taking $\delta \rightarrow 1$.
 
 For a fixed $\phi$, we can use \prettyref{eq:our_approximation} by taking
 $\epsilon = \delta$ and

@@ -8,12 +8,13 @@ Bayesian nonparametrics (BNP) addresses this question by placing a generative
 process on cluster assigment, making the number of distinct clusters present
 amenable to Bayesian inference.  However, like all Bayesian approaches, BNP
 requires the specification of a prior which may favor a greater or fewer number
-of distinct clusters.  In the extreme, there exist prior specifications that
-will place the preponderance of posterior mass either on a single cluster or as
-many distinct clusters as there are datapoints.  Hopefully, reasonable priors
-will lie somewhere in between, with the inferred number of clusters present
-being largely determined by the likelihood and data, not the prior.  In
-practice, however, it is important to quantitatively establish that the prior is
+of distinct clusters.
+% In the extreme, there exist prior specifications that
+% will place the preponderance of posterior mass either on a single cluster or as
+% many distinct clusters as there are datapoints.  Hopefully, reasonable priors
+% will lie somewhere in between, with the inferred number of clusters present
+% being largely determined by the likelihood and data, not the prior.
+In practice, it is important to quantitatively establish that the prior is
 not too imformative, particularly when---as is often the case in BNP---the
 particular form of the prior is chosen for mathematical convenience rather than
 because of a considered subjective belief.
@@ -23,18 +24,22 @@ to the BNP prior for trucated variational Bayes (VB) approximation.  Local
 sensitivity measures approximate the non-linear dependence of a VB optimum on
 prior parameters using a local Taylor series approximation
 \citep{gustafson:1996:localposterior, giordano:2017:covariances}. Unlike
-previous work on local Bayesian robustness for BNP
+previous work on local Bayesian sensitivity for BNP
 \citep{Basu:2000:BNP_robustness}, we pay special attention to the ability of our
 sensitivity measures to \emph{extrapolate} to different priors, rather than
-treating the sensitivity as a measure of robustness \textit{per se}.  This leads
-us to only linearize the most computationally intensive part of the inferential
-process (re-optimization of the global parameters), as well as to use a
-multiplicative perturbation to the functional form of the stick distribution
-rather than the more common additive perturbation, resulting in a considerably
-more accurate approximation far from the original prior than
-reported by \citet{Basu:2000:BNP_robustness}.
+treating the sensitivity as a measure of robustness \textit{per se}.
+Furthermore, as far as the authors are aware, ours is the first analysis of the
+local sensitivity of BNP posteriors when using a VB approximation.
 
-Using a stick-breaking represenation of a Dirichlet process, we consider
+%   This leads
+% us to only linearize the most computationally intensive part of the inferential
+% process (re-optimization of the global parameters), as well as to use a
+% multiplicative perturbation to the functional form of the stick distribution
+% rather than the more common additive perturbation, resulting in a considerably
+% more accurate approximation far from the original prior than
+% reported by \citet{Basu:2000:BNP_robustness}.
+
+Using a stick-breaking representation of a Dirichlet process, we consider
 perturbations both to the scalar concentration parameter and to the functional
 form of the stick-breaking distribution. We apply our methods to cluster the
 Iris \citep{iris_data_anderson, iris_data_fisher} dataset, evaluating the

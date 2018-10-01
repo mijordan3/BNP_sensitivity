@@ -1,5 +1,5 @@
 
-\paragraph{General hyperparamter sensitivity.}
+\paragraph{General hyperparameter sensitivity.}
 %
 We with to approximate the sensitity of $g(\etaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0k}$.  To do this, we will
@@ -14,7 +14,7 @@ $\epsilon$ through \prettyref{eq:kl_objective}.  We can define
 \begin{align}
 KL\left(\eta_\theta, \epsilon\right) &:=
     KL\left(q(\theta, z \vert \eta_\theta, \etazopt\left(\eta_\theta\right))
-    \big\| p(\theta, z | y, \epsilon) \right) \\
+    \big\| p(\theta, z | y, \epsilon) \right) \nonumber \\
 \etathetaopt\left(\epsilon\right) &=
     \argmin_{\eta_\theta} KL\left(\eta_\theta, \epsilon\right)
     \label{eq:pert_kl_objective}
@@ -52,3 +52,24 @@ differentiation without any need to re-optimize for different $\epsilon$
 the Hessian $H$ need be factorized (e.g. with a Cholesky decomposition) or
 inverted only once and then re-used to approximate $\etathetaopt(\epsilon)$ for
 many different perturbations.
+
+
+\paragraph{Allowing nonlinearity in computationally easy steps.}
+%
+Note that the complete mapping
+$\epsilon \mapsto \Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]$
+is, in general, composed of many highly non-linear steps:
+%
+\begin{align*}
+\epsilon \mapsto
+\etathetaopt(\epsilon) \mapsto
+\etazopt\left(\eta_\theta\right) \mapsto
+\textrm{Draws from }z \sim q(z \vert \etazopt) \mapsto
+\Expect_z\left[\sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\}\right].
+\end{align*}
+%
+However, only the first step, $\epsilon \mapsto \etathetaopt(\epsilon)$ is
+computationally intensive (re-solving the optimization problem
+\prettyref{eq:pert_kl_objective} with a new $\epsilon$), and it is precisely this
+first step which we approximate linearly with $\epsilon \mapsto
+\etathetalin(\epsilon)$.
