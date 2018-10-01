@@ -18,20 +18,28 @@ not too imformative, particularly when---as is often the case in BNP---the
 particular form of the prior is chosen for mathematical convenience rather than
 because of a considered subjective belief.
 
-We derive sensitivity measures of the expected number of distinct clusters
-present for trucated variational Bayes (VB) approximation to a BNP clustering
-problem.  Using a stick-breaking represenation of a Dirichlet process, we
-consider perturbations both to the scalar concentration parameter and to the
-functional form of the stick-breaking distribution.  Unlike previous work on
-local Bayesian robustness \citep{gustafson:1996:localposterior,
-Basu:2000:BNP_robustness}, we pay special attention to the ability of our
+We derive local sensitivity measures of the expected number of distinct clusters
+to the BNP prior for trucated variational Bayes (VB) approximation.  Local
+sensitivity measures approximate the non-linear dependence of a VB optimum on
+prior parameters using a local Taylor series approximation
+\citep{gustafson:1996:localposterior, giordano:2017:covariances}. Unlike
+previous work on local Bayesian robustness for BNP
+\citep{Basu:2000:BNP_robustness}, we pay special attention to the ability of our
 sensitivity measures to \emph{extrapolate} to different priors, rather than
-treating the sensitivity as a measure of robustness \textit{per se}.  This
-leads us to
+treating the sensitivity as a measure of robustness \textit{per se}.  This leads
+us to only linearize the most computationally intensive part of the inferential
+process (re-optimization of the global parameters), as well as to use a
+multiplicative perturbation to the functional form of the stick distribution
+rather than the more common additive perturbation, resulting in a considerably
+more accurate approximation far from the original prior than
+reported by \citet{Basu:2000:BNP_robustness}.
 
-We apply our methods to cluster the Iris \citep{iris_data_anderson,
-iris_data_fisher} dataset, comparing our results to the much more expensive
-process of re-fitting the model.
+Using a stick-breaking represenation of a Dirichlet process, we consider
+perturbations both to the scalar concentration parameter and to the functional
+form of the stick-breaking distribution. We apply our methods to cluster the
+Iris \citep{iris_data_anderson, iris_data_fisher} dataset, evaluating the
+accuracy of our approximations by comparing to the much more expensive process
+of re-fitting the model.
 
 % A central question in many probabilistic clustering problems is how many
 % distinct clusters are present in a particular dataset. In all but the simplest
