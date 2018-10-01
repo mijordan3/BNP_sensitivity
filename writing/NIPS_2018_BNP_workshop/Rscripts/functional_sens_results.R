@@ -10,9 +10,11 @@ prior_pert1_df <- as.data.frame(t(prior_pert1))
 colnames(prior_pert1_df) <- c('nu_k', 'p0', 'pc')
 
 prior_pert1_plot <-
-  prior_pert1_df %>% gather(which_prior, p, -nu_k) %>%
-    ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-      theme(legend.position = c(0.8, 0.8), legend.title=element_blank())
+  prior_pert1_df %>%
+  gather(which_prior, p, -nu_k) %>%
+  ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
+    theme(legend.position = c(0.8, 0.8), legend.title=element_blank()) +
+    xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$"))
 # prior_pert1_plot
 
 # the second one
@@ -23,8 +25,9 @@ colnames(prior_pert2_df) <- c('nu_k', 'p0', 'pc')
 
 prior_pert2_plot <-
   prior_pert2_df %>% gather(which_prior, p, -nu_k) %>%
-    ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-      theme(legend.position = c(0.8, 0.8), legend.title=element_blank())
+  ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
+      theme(legend.position = c(0.8, 0.8), legend.title=element_blank()) +
+      xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$"))
 # prior_pert2_plot
 
 ##########################
@@ -37,7 +40,8 @@ results_df_prior_pert1 <- as.data.frame(t(results_matrix_prior_pert1))
 colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 
 prior_pert1_results_plot <-
-  plot_parametric_sensitivity(results_df_prior_pert1, alpha_0 = -1) +
+  plot_parametric_sensitivity(
+    results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.8, 0.3))
 # prior_pert1_results_plot
 
@@ -48,7 +52,8 @@ results_df_prior_pert2 <- as.data.frame(t(results_matrix_prior_pert2))
 colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
 
 prior_pert2_results_plot <-
-  plot_parametric_sensitivity(results_df_prior_pert2, alpha_0 = -1) +
+  plot_parametric_sensitivity(
+    results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.15, 0.35))
 # prior_pert2_results_plot
 

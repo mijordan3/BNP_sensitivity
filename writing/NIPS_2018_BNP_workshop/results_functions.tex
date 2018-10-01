@@ -8,15 +8,11 @@
 
 
 
-%
-We now use the functional perturbation described in
-\prettyref{eq:expon_perturb} to perturb the prior on the stick distribution. The
-results are shown in \prettyref{fig:func_sens_e_num_clusters}.
-
-We chose two different functional perturbations: for the first we let
-$p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$; for the
-second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2, \sigma =
-1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$.
+On the Iris data, we chose two different functional perturbations: for the first
+we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$;
+for the second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2,
+\sigma = 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) /
+p_{0k}(\nu_k)$.
 
 
 
@@ -35,35 +31,8 @@ re-fitted expected number of clusters after the pertubation.  }\label{fig:functi
 
 
 \end{knitrout}
-
-
-
-% \begin{figure}[h!]
-% 	\centering
-% 	\begin{subfigure}[t]{0.32\textwidth}
-% 		\includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior1_init3_5.png}
-% 		\subcaption{}
-% 	\end{subfigure}
-%   \begin{subfigure}[t]{0.32\textwidth}
-%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters1_init3_5.png}
-%     \subcaption{}
-%   \end{subfigure}\\
-%   \centering
-%   \begin{subfigure}[t]{0.32\textwidth}
-%     \includegraphics[width = \textwidth]{./functional_sens_results/perturbed_prior2_init3_5.png}
-%     \subcaption{}
-%   \end{subfigure}
-%   \begin{subfigure}[t]{0.32\textwidth}
-%     \includegraphics[width = \textwidth]{./functional_sens_results/pred_num_clusters2_init3_5.png}
-%     \subcaption{}
-%   \end{subfigure}
-% 	\caption{Left column: the original prior in purple, the perturbed prior $p_1$ in red. Right: linearly approximated vs.
-%   re-fitted expected number of clusters after purturbing each stick by $\phi(\nu_k)^\epsilon =
-%   [p_1(\nu_k) / p_{0k}(\nu_k)]^\epsilon$.  }
-% 	\label{fig:func_sens_e_num_clusters}
-% \end{figure}
 %
 We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (expected number of clusters increased under the
-first pertubation, decreased under the second), but did not provide a good
-approximation at $\epsilon = 1$.
+first pertubation, decreased under the second), although as
+$\delta \rightarrow 1$ the quality of the approximation degraded.

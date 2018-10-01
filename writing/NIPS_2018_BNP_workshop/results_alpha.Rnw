@@ -9,7 +9,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
