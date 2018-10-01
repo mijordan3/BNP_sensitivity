@@ -1,5 +1,37 @@
 
-TODO (Ryan): rewrite and shorten intro
+A central question in many probabilistic clustering problems is how many
+distinct clusters are present in a particular dataset.
+% In all but the simplest
+% problems, any attempt to answer this question may be strongly determined by the
+% criterion used.
+Bayesian nonparametrics (BNP) addresses this question by placing a generative
+process on cluster assigment, making the number of distinct clusters present
+amenable to Bayesian inference.  However, like all Bayesian approaches, BNP
+requires the specification of a prior which may favor a greater or fewer number
+of distinct clusters.  In the extreme, there exist prior specifications that
+will place the preponderance of posterior mass either on a single cluster or as
+many distinct clusters as there are datapoints.  Hopefully, reasonable priors
+will lie somewhere in between, with the inferred number of clusters present
+being largely determined by the likelihood and data, not the prior.  In
+practice, however, it is important to quantitatively establish that the prior is
+not too imformative, particularly when---as is often the case in BNP---the
+particular form of the prior is chosen for mathematical convenience rather than
+because of a considered subjective belief.
+
+We derive sensitivity measures of the expected number of distinct clusters
+present for trucated variational Bayes (VB) approximation to a BNP clustering
+problem.  Using a stick-breaking represenation of a Dirichlet process, we
+consider perturbations both to the scalar concentration parameter and to the
+functional form of the stick-breaking distribution.  Unlike previous work on
+local Bayesian robustness \citep{gustafson:1996:localposterior,
+Basu:2000:BNP_robustness}, we pay special attention to the ability of our
+sensitivity measures to \emph{extrapolate} to different priors, rather than
+treating the sensitivity as a measure of robustness \textit{per se}.  This
+leads us to
+
+We apply our methods to cluster the Iris \citep{iris_data_anderson,
+iris_data_fisher} dataset, comparing our results to the much more expensive
+process of re-fitting the model.
 
 % A central question in many probabilistic clustering problems is how many
 % distinct clusters are present in a particular dataset. In all but the simplest
@@ -46,10 +78,10 @@ TODO (Ryan): rewrite and shorten intro
 % ordinary practitioners to form meaningful subjective beliefs about the abstract
 % form of the stick breaking prior.
 
-We begin by deriving a general result for the sensitivity of VB optima to
-function-valued perturbations, as well as several useful specializations. We
-then describe a VB approximation to a BNP model with a stick-breaking prior and
-derive the sensitivity of the approximate number of inferred clusters to the
-choice of the stick breaking prior. We then apply our methods to cluster the
-Iris \citep{iris_data_anderson, iris_data_fisher} dataset, comparing our results
-to the much more expensive process of re-fitting the model.
+% We begin by deriving a general result for the sensitivity of VB optima to
+% function-valued perturbations, as well as several useful specializations. We
+% then describe a VB approximation to a BNP model with a stick-breaking prior and
+% derive the sensitivity of the approximate number of inferred clusters to the
+% choice of the stick breaking prior. We then apply our methods to cluster the
+% Iris \citep{iris_data_anderson, iris_data_fisher} dataset, comparing our results
+% to the much more expensive process of re-fitting the model.
