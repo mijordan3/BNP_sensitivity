@@ -2,7 +2,7 @@
 import sys
 sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
 
-import autograd
+# import autograd
 
 import autograd.numpy as np
 import autograd.scipy as sp
