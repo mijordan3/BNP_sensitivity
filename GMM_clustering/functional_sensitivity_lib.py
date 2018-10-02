@@ -104,7 +104,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc
         else:
-            # assert epsilon <= 1
+            assert epsilon <= 1
             return \
                 self.get_log_p0(v) + \
                 epsilon * self.log_phi(logit_v) - \
@@ -123,7 +123,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc_logit
         else:
-            # assert epsilon <= 1
+            assert epsilon <= 1
             return \
                 self.get_log_p0_logit(logit_v) + \
                 epsilon * self.log_phi(logit_v) - \
