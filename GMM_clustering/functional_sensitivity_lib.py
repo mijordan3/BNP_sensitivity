@@ -15,6 +15,7 @@ import LinearResponseVariationalBayes.SparseObjectives as obj_lib
 
 import scipy as osp
 
+from copy import deepcopy
 
 class PriorPerturbation(object):
     def __init__(self, model, log_phi, epsilon=1.0,
@@ -250,7 +251,7 @@ class InfluenceFunction(object):
         self.null_perturbation = PriorPerturbation(model, lambda x : 0.0 * x)
         self.null_perturbation.set_epsilon(0.0)
 
-        self.optimal_input_par = optimal_input_par
+        self.optimal_input_par = deepcopy(optimal_input_par)
         self.model = model
 
         self.sensitivity_object = \
@@ -265,7 +266,10 @@ class InfluenceFunction(object):
                 hyper_par_objective_fun=None)
 
         # this is grad log q
-        self.jac_q_logit_sticks = autograd.jacobian(self.get_q_logit_stick_from_free_params, argnum=0)
+        # self.jac_q_logit_sticks = autograd.jacobian(self.get_q_logit_stick_from_free_params, argnum=0)
+        self.q_logit_sticks_obj = \
+                        obj_lib.Objective(self.null_perturbation.model.global_vb_params, \
+                                        self.get_q_logit_stick_from_free_params)
 
         # this is g_eta H^{-1}
         # should a matrix of size len(output_par) x len(global_free_par)
@@ -278,15 +282,18 @@ class InfluenceFunction(object):
         return -self.null_perturbation.get_log_p0_logit(logit_v) + \
                     self.null_perturbation.get_log_q_logit_stick(logit_v, k)
 
-    def get_q_logit_stick_from_free_params(self, global_free_params, logit_v, k):
-        self.null_perturbation.model.global_vb_params.set_free(global_free_params)
+    def get_q_logit_stick_from_free_params(self, logit_v, k):
+        # self.null_perturbation.model.global_vb_params.set_free(global_free_params)
 
         return self.null_perturbation.get_log_q_logit_stick(logit_v, k)
 
     def get_jac_q_logit_sticks(self, logit_v, k):
         # this returns grad log q
         # returns a matrix of size len(global_free_params) x len(logit_v)
-        return self.jac_q_logit_sticks(self.optimal_input_par, logit_v, k).T
+
+        # return self.jac_q_logit_sticks(self.optimal_input_par, logit_v, k).T
+        return self.q_logit_sticks_obj.fun_free_jacobian(self.optimal_input_par,
+                                                        logit_v, k).T
 
     def get_influence_function_k(self, logit_v, k):
         return np.dot(self.influence_operator, self.get_jac_q_logit_sticks(logit_v, k)) * \

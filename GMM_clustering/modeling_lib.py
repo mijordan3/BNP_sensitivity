@@ -158,6 +158,13 @@ def get_e_number_clusters_from_logit_sticks(model, threshold = 0.0,
     n_obs = model.y.shape[0]
     return np.mean(np.sum(1 - (1 - weight_samples)**n_obs, axis = 1))
 
+def get_e_number_clusters_from_ez(e_z):
+    # computes the expected number of clusters from
+    # the e_z in the variational distribution 
+    k = np.shape(e_z)[1]
+    return k - np.sum(np.prod(1 - e_z, axis = 1))
+
+
 
 # def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):
 #     # get logitnormal params
