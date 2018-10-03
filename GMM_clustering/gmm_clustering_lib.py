@@ -591,6 +591,56 @@ class InterestingMoments(object):
         self.set_moments_from_free_par(free_par)
         return self.moment_params.get_vector()
 
+class ExpectedNumClustersFromLogitSticks(object):
+    # Class that wraps the functions to calculate the posterior predictive
+    # expected number of clusters present in a new dataset
+    # drawn from the posterior distribution of indicators
+    def __init__(self, model):
+        self.model = model
+        self.e_num_clusters = vb.ScalarParam('e_num_clusters', lb = 0.0)
+
+    def set_e_num_clusters(self):
+        self.set_e_num_clusters_from_free_param(\
+            self.model.global_vb_params.get_free())
+
+    def set_e_num_clusters_from_free_param(self, free_par):
+        self.model.set_from_global_free_par(free_par)
+        self.e_num_clusters.set_vector(\
+            model_lib.get_e_number_clusters_from_logit_sticks(self.model))
+
+    def set_and_get_e_num_clusters_from_free_param(self, free_par):
+        self.set_e_num_clusters_from_free_param(free_par)
+
+        return self.e_num_clusters.get_vector()
+
+
+
+class ExpectedNumClustersFromZ(object):
+    # Class that wraps the functions to calculate the
+    # expected number of clusters present in the given dataset
+    # drawn from the posterior distribution of the cluster belongings
+
+    def __init__(self, model):
+        self.model = model
+        self.e_num_clusters = vb.ScalarParam('e_num_clusters', lb = 0.0)
+
+    def set_e_num_clusters(self):
+        self.set_e_num_clusters_from_free_param(\
+                self.model.global_vb_params.get_free())
+
+    def set_e_num_clusters_from_free_param(self, free_par):
+        self.model.set_from_global_free_par(free_par)
+        self.model.set_optimal_z()
+        self.e_num_clusters.set_vector(\
+                model_lib.get_e_number_clusters_from_ez(self.model.e_z))
+
+    def set_and_get_e_num_clusters_from_free_param(self, free_par):
+        self.set_e_num_clusters_from_free_param(free_par)
+
+        return self.e_num_clusters.get_vector()
+
+
+
 
 #################################
 # Functions to reload the model
