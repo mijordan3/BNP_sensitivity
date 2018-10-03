@@ -1,0 +1,83 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Anderson(1936)]{iris_data_anderson}
+Edgar Anderson.
+\newblock The species problem in iris.
+\newblock \emph{Annals of the Missouri Botanical Garden}, 23\penalty0
+  (3):\penalty0 457--509, 1936.
+\newblock ISSN 00266493.
+\newblock URL \url{http://www.jstor.org/stable/2394164}.
+
+\bibitem[Basu(2000)]{Basu:2000:BNP_robustness}
+Sanjib Basu.
+\newblock Bayesian robustness and bayesian nonparametrics.
+\newblock In D.~R. Insua and F.~Ruggeri, editors, \emph{Robust {Bayesian}
+  Analysis}, volume 152. Springer Science \& Business Media, 2000.
+
+\bibitem[Blei and Jordan(2006)]{blei:2006:dirichletbnp}
+D.~M. Blei and M.~I. Jordan.
+\newblock Variational inference for {D}irichlet process mixtures.
+\newblock \emph{{B}ayesian Analysis}, 1\penalty0 (1):\penalty0 121--143, 2006.
+
+\bibitem[Ferguson(1973)]{ferguson:1973:bayesian}
+Thomas~S Ferguson.
+\newblock A bayesian analysis of some nonparametric problems.
+\newblock \emph{The annals of statistics}, pages 209--230, 1973.
+
+\bibitem[Fisher(1936)]{iris_data_fisher}
+R.~Fisher.
+\newblock The use of multiple measurements in taxonomic problems.
+\newblock \emph{Annals of eugenics}, 7\penalty0 (2):\penalty0 179--188, 1936.
+\newblock \doi{10.1111/j.1469-1809.1936.tb02137.x}.
+\newblock URL
+  \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-1809.1936.tb02137.x}.
+
+\bibitem[Giordano et~al.(2017)Giordano, Broderick, and
+  Jordan]{giordano:2017:covariances}
+Ryan Giordano, Tamara Broderick, and Michael~I Jordan.
+\newblock Covariances, robustness, and variational bayes.
+\newblock \emph{arXiv preprint arXiv:1709.02536}, 2017.
+
+\bibitem[Gustafson(1996{\natexlab{a}})]{gustafson:1996:localmarginals}
+P.~Gustafson.
+\newblock Local sensitivity of inferences to prior marginals.
+\newblock \emph{Journal of the American Statistical Association}, 91\penalty0
+  (434):\penalty0 774--781, 1996{\natexlab{a}}.
+
+\bibitem[Gustafson(1996{\natexlab{b}})]{gustafson:1996:localposterior}
+P.~Gustafson.
+\newblock Local sensitivity of posterior expectations.
+\newblock \emph{The Annals of Statistics}, 24\penalty0 (1):\penalty0 174--195,
+  1996{\natexlab{b}}.
+
+\bibitem[Kucukelbir et~al.(2015)Kucukelbir, Ranganath, Gelman, and
+  Blei]{kucukelbir:2015:advi}
+Alp Kucukelbir, Rajesh Ranganath, Andrew Gelman, and David Blei.
+\newblock Automatic variational inference in {Stan}.
+\newblock In \emph{Advances in neural information processing systems}, pages
+  568--576, 2015.
+
+\bibitem[Maclaurin et~al.(2015)Maclaurin, Duvenaud, and
+  Adams]{maclaurin:2015:autograd}
+D.~Maclaurin, D.~Duvenaud, and R.~P. Adams.
+\newblock Autograd: Effortless gradients in numpy.
+\newblock In \emph{International Conference on Machine Learning 2015 AutoML
+  Workshop}, 2015.
+
+\bibitem[Sethuraman(1994)]{sethuraman:1994:constructivedp}
+Jayaram Sethuraman.
+\newblock A constructive definition of dirichlet priors.
+\newblock \emph{Statistica sinica}, pages 639--650, 1994.
+
+\bibitem[{Stan Team}(2015)]{stan-manual:2015}
+{Stan Team}.
+\newblock \emph{Stan Modeling Language Users Guide and Reference Manual,
+  Version 2.8.0}, 2015.
+\newblock URL \url{http://mc-stan.org/}.
+
+\end{thebibliography}

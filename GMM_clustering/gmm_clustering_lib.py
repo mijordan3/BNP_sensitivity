@@ -14,27 +14,23 @@ import scipy as osp
 
 from scipy import optimize
 from scipy import linalg
+from scipy import sparse
 
 from sklearn.cluster import KMeans
 
 from copy import deepcopy
 
+from datetime import datetime
 import time
 
 import modeling_lib as model_lib
 import functional_sensitivity_lib as fun_sens_lib
 
-import checkpoints
 import json
 import json_tricks
 
-import checkpoints
-
 from numpy.polynomial.hermite import hermgauss
 
-import matplotlib.pyplot as plt
-
-from copy import deepcopy
 ##########################
 # Set up vb parameters
 ##########################
@@ -645,13 +641,151 @@ class ExpectedNumClustersFromZ(object):
 # Functions to reload the model
 #################################
 
+# TODO: All this was copied over in a hurry from
+# https://github.com/NelleV/genomic_time_series_bnp/bin/checkpoints/checkpoints/checkpoints_lib.py#L71
+# It could probably be tidied up.
+
+sp_string = '_sp_packed'
+np_string = '_np_packed'
+
+def get_timestamp():
+    return datetime.today().timestamp()
+
+# Pack a sparse csr_matrix in a json-seralizable format.
+def pack_csr_matrix(sp_mat):
+    assert sparse.isspmatrix_csr(sp_mat)
+    sp_mat = sparse.csr_matrix(sp_mat)
+    return { 'data': json_tricks.dumps(sp_mat.data),
+             'indices': json_tricks.dumps(sp_mat.indices),
+             'indptr': json_tricks.dumps(sp_mat.indptr),
+             'shape': sp_mat.shape,
+             'type': 'csr_matrix' }
+
+
+# Convert the output of pack_csr_matrix back into a csr_matrix.
+def unpack_csr_matrix(sp_mat_dict):
+    assert sp_mat_dict['type'] == 'csr_matrix'
+    data = json_tricks.loads(sp_mat_dict['data'])
+    indices = json_tricks.loads(sp_mat_dict['indices'])
+    indptr = json_tricks.loads(sp_mat_dict['indptr'])
+    return sparse.csr_matrix(
+        ( data, indices, indptr), shape = sp_mat_dict['shape'])
+
+# Populate a dictionary with the minimum necessary fields to describe
+# a pre-processing step.
+def get_preprocessing_dict(method, p_values=None, log_fold_change=None):
+    """
+    Returns a pre-processing dict, population with defaults.
+    Parameters
+    ----------
+    method : string
+    p_values : ndarray, optional, default: None
+    log_fold_change : ndarray, optional, default: None
+    Returns
+    -------
+    dictionary
+    """
+
+    if p_values is None:
+        p_values = np.array([])
+
+    if log_fold_change is None:
+        log_fold_change = np.array([])
+
+    return {
+        'timestamp': get_timestamp(),
+        'method': method,
+        'p_values' + np_string: json_tricks.dumps(p_values),
+        'log_fold_change' + sp_string: json_tricks.dumps(log_fold_change)}
+
+
+def get_fit_dict(method, initialization_method, seed, centroids,
+                 labels=None,
+                 cluster_assignments=None,
+                 preprocessing_dict=None, basis_mat=None,
+                 cluster_weights=None):
+    """
+    returns a "fit" dictionary
+    Parameters
+    ----------
+    method : string
+    initialization_method : string
+    seed : int
+        random seed
+    centroids : ndarray
+    labels : ndarray (n, ), optional, default: None
+        1D-array containing the cluster labels.
+        Either labels or cluster_assignments needs to be provided.
+    cluster_assignments : {ndarray, csr_matrix}, optional, default: None
+        n by k sparse or dense matrix contraining the cluster assignments or
+        probability.
+        Either labels or cluster_assignments needs to be provided.
+    preprocessing_dict : dictionary
+        dictionary containing a `timestamp` and `method` key
+    basis_mat : ndarray, optional, default: None
+    cluster_weights : ndarray, optional, default: None
+    """
+    if labels is None and cluster_assignments is None:
+        raise ValueError(
+            "In order to save the results, either provide labels or cluster"
+            " assignment")
+
+    if labels is not None and len(labels.shape) > 1:
+        raise ValueError(
+            "Labels should be a 1D array. "
+            "Provided a %d-d array" % len(labels.shape))
+
+    if cluster_assignments is not None and not sparse.issparse(cluster_assignments):
+        cluster_assignments = sparse.csr_matrix(cluster_assignments)
+
+    if labels is not None:
+        if labels.max() >= centroids.shape[1]:
+            raise ValueError(
+                "There are %d centroids, but the labels contain up to %d "
+                "element" % (centroids.shape[1], labels.max()))
+
+        # The user provided labels and not a sparse matrix
+        if cluster_assignments is not None:
+            if np.any(labels != cluster_assignments.argmax(axis=1).A.flatten()):
+                raise ValueError(
+                    "Incoherence between the labels provided and the cluster "
+                    "assignments.")
+        else:
+            cluster_assignments = sparse.csr_matrix(
+                (np.ones(len(labels)), (np.arange(len(labels)), labels)),
+                shape=(len(labels), centroids.shape[1]))
+
+    if preprocessing_dict is None:
+        preprocessing_dict = get_preprocessing_dict("NoPreprocessing")
+
+    if basis_mat is None:
+        basis_mat = np.array([])
+
+    if cluster_weights is None:
+        cluster_weights = cluster_assignments.sum(axis=0).A.flatten()
+        cluster_weights /= cluster_weights.sum()
+
+    return {
+        'timestamp': get_timestamp(),
+        'method': method,
+        'initialization_method': initialization_method,
+        'seed': seed,
+        'preprocessing_method': preprocessing_dict['method'],
+        'preprocessing_timestamp': preprocessing_dict['timestamp'],
+        'centroids' + np_string: json_tricks.dumps(centroids),
+        'basis_mat' + np_string: json_tricks.dumps(basis_mat),
+        'cluster_weights' + np_string: json_tricks.dumps(cluster_weights),
+        'cluster_assignments' + sp_string: pack_csr_matrix(cluster_assignments)
+         }
+
+
 def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
     # Set the optimal z to remove arrayboxes if necessary.
     model.set_optimal_z()
     #e_z = model.vb_params['e_z'].get()
     labels = np.squeeze(np.argmax(model.e_z, axis=1))
     centroids = model.vb_params['global']['centroids'].get()
-    fit_dict = checkpoints.get_fit_dict(
+    fit_dict = get_fit_dict(
         method = 'gmm',
         initialization_method = 'kmeans',
         seed = seed,
@@ -661,7 +795,6 @@ def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
         preprocessing_dict = None,
         basis_mat = None,
         cluster_weights = model.get_e_cluster_probabilities())
-    np_string = checkpoints.np_string
     fit_dict['k_approx'] = model.k_approx
     fit_dict['use_bnp_prior'] = model.vb_params.use_bnp_prior
     fit_dict['vb_global_free_par' + np_string] = \
@@ -694,7 +827,6 @@ def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
 
 def get_model_from_checkpoint(fit_dict):
     # load model from fit dictionary
-    np_string = checkpoints.np_string
 
     # the data
     y = json_tricks.loads(fit_dict['y' + np_string])
@@ -736,4 +868,4 @@ def get_model_from_checkpoint(fit_dict):
 
 
 def get_kl_hessian_from_checkpoint(fit_dict):
-    return json_tricks.loads(fit_dict['kl_hessian' + checkpoints.np_string])
+    return json_tricks.loads(fit_dict['kl_hessian' + np_string])
