@@ -9,7 +9,7 @@ real-valued hyperparameter $\epsilon$, i.e., the posterior is given by
 $p\left(\theta, z \vert y, \epsilon\right)$. In the present work, $\epsilon$
 will parameterize perturbations to the prior, as we will describe in more detail
 shortly.  Then the optimal variational approximation is also a function of
-$\epsilon$ through the minization of the KL divergence.  We can define
+$\epsilon$ through the minimization of the KL divergence.  We can define
 %
 \begin{align}
 KL\left(\eta_\theta, \epsilon\right) &:=
@@ -21,7 +21,7 @@ KL\left(\eta_\theta, \epsilon\right) &:=
 \end{align}
 %
 In general, the dependence of $\etathetaopt\left(\epsilon\right)$ on $\epsilon$ is
-complex and non-linear, but we may approximate it with a first-order Taylor
+complex and nonlinear, but we may approximate it with a first-order Taylor
 series.
 Under mild regularity conditions that are satisfied in the present case,
 \citet[Theorem 2]{giordano:2017:covariances} gives a closed form
@@ -49,7 +49,7 @@ Then
 Note that $H$ and $f_\eta$ can be easily evaluated using automatic
 differentiation without any need to re-optimize for different $\epsilon$
 \citep{maclaurin:2015:autograd} (see \prettyref{app:sensitivity}).  Furthermore,
-the Hessian $H$ need be factorized (e.g. with a Cholesky decomposition) or
+the Hessian $H$ needs to be factorized (e.g. with a Cholesky decomposition) or
 inverted only once and then re-used to approximate $\etathetaopt(\epsilon)$ for
 many different perturbations.
 
@@ -57,14 +57,14 @@ many different perturbations.
 %
 Note that the complete mapping
 $\epsilon \mapsto \Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]$
-is, in general, composed of many highly non-linear steps:
+is, in general, composed of many highly nonlinear steps:
 %
 \begin{align*}
 \epsilon \mapsto
 \etathetaopt(\epsilon) \mapsto
 \etazopt\left(\etathetaopt\right) \mapsto
 \textrm{Draws from }z \sim q(z \vert \etazopt) \mapsto
-\Expect_z\left[\sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\}\right].
+\Expect_z \left[ \#\{\text{distinct clusters}\} \right]
 \end{align*}
 %
 However, only the first step, $\epsilon \mapsto \etathetaopt(\epsilon)$ is
@@ -73,8 +73,8 @@ computationally intensive (re-solving the optimization problem
 this first step which we approximate linearly using
 \prettyref{eq:our_approximation}, i.e., with $\epsilon \mapsto \etathetaopt(0) -
 H^{-1} f_\eta \epsilon$. Consequently, our approximations retain the
-nonlinearity in the mapping $\etathetaopt \mapsto \Expect_z\left[\sum_{k=1}^K
-\prod_{n=1}^N \mathbb{I}\{z_n = k\}\right]$.
+nonlinearity in the mapping $\etathetaopt \mapsto \Expect_z \left[
+\#\{\text{distinct clusters}\} \right]$.
 
 Furthermore, we attempt to improve the linearity of the dependence of
 $\etathetaopt$ on $\epsilon$ by using an unconstrained parameterization for

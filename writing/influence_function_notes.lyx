@@ -360,6 +360,26 @@ Um.
 \end_layout
 
 \begin_layout Standard
+- alpha * logit_v - (alpha + 1) * np.log1p(np.exp(-logit_v))
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+logit_v - (alpha + 1) * np.log1p(np.exp(logit_v))
+\begin_inset Formula 
+\begin{align*}
+\\
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Suppose we have a 
 \begin_inset Formula $\targetfun$
 \end_inset
@@ -456,8 +476,8 @@ so that the norm is unchanged.
  In other words, it doesn't matter what space we do things in.
 \begin_inset Formula 
 \begin{align*}
-\log\qinfluencefun[\tau] & =\log\qpost[\theta\left(\tau\right)]-\log\baseprior[\theta\left(\tau\right)]+\log GH^{-1}\at{\frac{\partial}{\partial\eta}\log{\qpost[][\eta]}}{\etaopt}\\
-\qinfluencefun[\tau] & =GH^{-1}\at{\frac{\partial{\qpost[][\eta]}}{\partial\eta}}{\etaopt}\frac{1}{\baseprior}.
+\log\qinfluencefun[\tau] & =\log\qpost[\theta\left(\tau\right)]-\log\baseprior[\theta\left(\tau\right)]+\log GH^{-1}\at{\frac{\partial}{\partial\eta}\log{{\qpost[][\eta]}}}{\etaopt}\\
+\qinfluencefun[\tau] & =GH^{-1}\at{\frac{\partial{{\qpost[][\eta]}}}{\partial\eta}}{\etaopt}\frac{1}{\baseprior}.
 \end{align*}
 
 \end_inset

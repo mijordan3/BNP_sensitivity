@@ -6,7 +6,7 @@ $K=\infty$ in a true BNP represetation. In order to perform approximate
 inference, we use a truncated VB approximation
 \citep{blei:2006:dirichletbnp}. For compactness of notation, let $\theta =
 \left(\nu, \mu, \Sigma\right)$ denote the collection of ``global'' parameters,
-i.e., parameters whose values affect the data generating process of every
+i.e., parameters whose values affect the data-generating process of every
 observation $y_n$.   Let $\delta\left(\cdot\right)$ denote a delta function. We
 define a class of approximating distributions for VB as
 %
@@ -21,7 +21,7 @@ q\left(z_n\right) = \mathrm{Multinomial}\left(z_n\right)
 \Big\}.
 \end{align*}
 %
-The family $\vbfamily$ is parameterized by a finite-dimension vector containing
+The family $\vbfamily$ is parameterized by a finite-dimensional vector containing
 the locations of the delta functions and the parameters for the lognormal
 distributions
 %
@@ -83,14 +83,14 @@ $
 
 We are interested in the inferred number of clusters present in the observed
 data, which can be expressed as an expection with respect to
-$q\left(z \vert \eta_z \right)$, and so as a function of
+$q\left(z \vert \eta_z \right)$, and therefore as a function of
 $\etathetaopt$ via the relation $\etazopt(\eta_\theta)$:
 %
 \begin{align}
 g(\etathetaopt) &:=
 \Expect_{q(\theta, z \vert \etaopt)} \left[ \#\{\text{distinct clusters}\} \right]  =
 \Expect_{q(z \vert \etazopt(\eta_\theta))} \left[
-    \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\} \right].
+    \sum_{k=1}^K \left(1 - \prod_{n=1}^N \mathbb{I}\{z_n \ne k\} \right) \right].
     \label{eq:expected_num_clusters}
 \end{align}
 %
@@ -98,15 +98,3 @@ For a given optimal set of global variational parameters,
 $g(\etathetaopt)$ can be computed with Monte-Carlo draws of the cluster
 indicators,
 $z \iid q\left(z \vert \etazopt(\etathetaopt)\right)$.
-
-% In general, the mapping
-% that comprises $g(\etathetaopt)$,
-%
-% \begin{align}
-% \eta_\theta \mapsto
-% \etazopt\left(\eta_\theta\right) \mapsto
-% \textrm{A draw from }z \sim q(z \vert \etazopt) \mapsto
-% \sum_{k=1}^K \prod_{n=1}^N \mathbb{I}\{z_n = k\},
-% \end{align}
-%
-% is highly non-linear.  However, it is also easily and quickly computed.

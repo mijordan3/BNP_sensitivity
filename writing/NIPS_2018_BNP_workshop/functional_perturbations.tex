@@ -17,12 +17,12 @@ the $k$-th stick by
        {\int_0^1 p_0(\nu_k')\phi(\nu_k')^\delta_k d\nu_k'}
 \end{align}
 %
-$p^c_{k}$ is defined so that $\delta_k\in[0, 1]$ interpolates multiplicatively
-between the original prior, $p_{0k}$, and a prior proportional to
-$\phi(\nu_k)p_{0k}$. For example, we might consider a different prior for the
-sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) / p_{0k}(\nu_k)$, we
-recover $p_{0k}$ at $\delta_k = 0$ and swap the original prior for the new prior
-by taking $\delta_k \rightarrow 1$.
+The contaminating prior $p^c_{k}$ is defined so that $\delta_k\in[0, 1]$
+interpolates multiplicatively between the original prior, $p_{0k}$, and a prior
+proportional to $\phi(\nu_k)p_{0k}$. For example, we might consider a different
+prior for the sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) /
+p_{0k}(\nu_k)$, we recover $p_{0k}$ at $\delta_k = 0$ and swap the original
+prior for the new prior by taking $\delta_k \rightarrow 1$.
 
 For a fixed $\phi$, we can use \prettyref{eq:our_approximation} by taking
 $\epsilon = \delta_k$ and
@@ -47,7 +47,7 @@ linear approximation.
 Indeed, for the purposes of extrapolating to different priors
 when using VB based on KL divergence, this
 fact appears to recommend multiplicative perturbations amongst the class of
-non-linear perturbations considered by \citet{gustafson:1996:localposterior}.
+nonlinear perturbations considered by \citet{gustafson:1996:localposterior}.
 %}.
 
 Finally, by linearity of the derivative, the effect of changing all the stick
