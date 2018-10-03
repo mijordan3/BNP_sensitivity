@@ -592,9 +592,9 @@ class InterestingMoments(object):
         return self.moment_params.get_vector()
 
 class ExpectedNumClustersFromLogitSticks(object):
-    # Class that wraps the functions to get the expected number of clusters
-    # from the variational distribution on the logit sticks
-    # This is a posterior predictive quantity
+    # Class that wraps the functions to calculate the posterior predictive
+    # expected number of clusters present in a new dataset
+    # drawn from the posterior distribution of indicators
     def __init__(self, model):
         self.model = model
         self.e_num_clusters = vb.ScalarParam('e_num_clusters', lb = 0.0)
@@ -616,8 +616,9 @@ class ExpectedNumClustersFromLogitSticks(object):
 
 
 class ExpectedNumClustersFromZ(object):
-    # Class that wraps the functions to get the expected number of clusters
-    # from the variational distribution on cluster belongings z_n in the data
+    # Class that wraps the functions to calculate the
+    # expected number of clusters present in the given dataset
+    # drawn from the posterior distribution of the cluster belongings
 
     def __init__(self, model):
         self.model = model
