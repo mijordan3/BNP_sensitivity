@@ -164,7 +164,8 @@ def get_e_number_clusters_from_ez(e_z):
     # computes the expected number of clusters from
     # the e_z in the variational distribution
     k = np.shape(e_z)[1]
-    return k - np.sum(np.prod(1 - e_z, axis = 1))
+    return k - np.sum(np.prod(1 - e_z, axis = 0))
+
 
 
 

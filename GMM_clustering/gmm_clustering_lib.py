@@ -23,7 +23,7 @@ from copy import deepcopy
 from datetime import datetime
 import time
 
-import modeling_lib as model_lib
+import modeling_lib
 import functional_sensitivity_lib as fun_sens_lib
 
 import json
@@ -179,7 +179,7 @@ def get_e_func_logit_stick_vec(vb_params, func):
 
 
 def get_e_log_prior(vb_params, prior_params):
-    dp_prior = model_lib.get_dp_prior(vb_params, prior_params)
+    dp_prior = modeling_lib.get_dp_prior(vb_params, prior_params)
     e_gamma_prior = get_e_log_wishart_prior(vb_params, prior_params)
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
@@ -190,8 +190,8 @@ def get_e_log_prior(vb_params, prior_params):
 ##########################
 def get_entropy(vb_params, e_z):
     #e_z = vb_params['e_z'].get()
-    return model_lib.multinom_entropy(e_z) + \
-        model_lib.get_stick_entropy(vb_params)
+    return modeling_lib.multinom_entropy(e_z) + \
+        modeling_lib.get_stick_entropy(vb_params)
 
 ##########################
 # Likelihood term
@@ -336,7 +336,7 @@ class DPGaussianMixture(object):
 
         if self.vb_params.use_bnp_prior:
             e_log_cluster_probs = \
-                model_lib.get_e_log_cluster_probabilities(self.vb_params)
+                modeling_lib.get_e_log_cluster_probabilities(self.vb_params)
         else:
             e_log_cluster_probs = 0
 
@@ -390,7 +390,7 @@ class DPGaussianMixture(object):
             e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
 
         if self.vb_params.use_bnp_prior:
-            e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
+            e_loglik_ind = modeling_lib.loglik_ind(self.vb_params, self.e_z)
         else:
             e_loglik_ind = 0.
 
@@ -426,7 +426,7 @@ class DPGaussianMixture(object):
             e_v = e_sticks[0, :]
             e_1mv = e_sticks[1, :]
 
-        return model_lib.get_mixture_weights(e_v)
+        return modeling_lib.get_mixture_weights(e_v)
 
     ########################
     # Sensitivity functions.
@@ -604,7 +604,7 @@ class InterestingMoments(object):
 #     def set_e_num_clusters_from_free_param(self, free_par):
 #         self.model.set_from_global_free_par(free_par)
 #         self.e_num_clusters.set_vector(\
-#             model_lib.get_e_number_clusters_from_logit_sticks(self.model))
+#             modeling_lib.get_e_number_clusters_from_logit_sticks(self.model))
 #
 #     def set_and_get_e_num_clusters_from_free_param(self, free_par):
 #         self.set_e_num_clusters_from_free_param(free_par)
@@ -629,13 +629,26 @@ class InterestingMoments(object):
 #         self.model.set_from_global_free_par(free_par)
 #         self.model.set_optimal_z()
 #         self.e_num_clusters.set_vector(\
-#                 model_lib.get_e_number_clusters_from_ez(self.model.e_z))
+#                 modeling_lib.get_e_number_clusters_from_ez(self.model.e_z))
 #
 #     def set_and_get_e_num_clusters_from_free_param(self, free_par):
 #         self.set_e_num_clusters_from_free_param(free_par)
 #
 #         return self.e_num_clusters.get_vector()
 
+# Get the expected posterior predictive number of distinct clusters.
+def get_e_num_pred_clusters_from_free_par(free_par, model):
+    model.global_vb_params.set_free(free_par)
+    mu = model.global_vb_params['v_sticks']['mean'].get()
+    sigma = 1 / np.sqrt(model.global_vb_params['v_sticks']['info'].get())
+    n_obs = model.n_obs
+    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs)
+
+# Get the expected posterior number of distinct clusters.
+def get_e_num_clusters_from_free_par(free_par, model):
+    model.global_vb_params.set_free(free_par)
+    model.set_optimal_z()
+    return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
 
 
 
