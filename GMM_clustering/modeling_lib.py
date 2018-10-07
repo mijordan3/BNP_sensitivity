@@ -149,6 +149,8 @@ def get_e_number_clusters_from_logit_sticks(
     k_approx = len(mu)
 
     # sample from univariate normal
+    # TODO: keep these draws fixed to reduce simulation noise --
+    # "Rao-Blackwellize" this statistic.
     unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
 
     # sample sticks from variational distribution
