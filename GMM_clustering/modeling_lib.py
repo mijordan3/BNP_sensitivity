@@ -140,8 +140,9 @@ def get_kth_weight_from_sticks(stick_lengths, k):
     return (stick_remaining * stick_length)
 
 
-def get_e_number_clusters_from_logit_sticks(
-    mu, sigma, n_obs, threshold = 0.0, samples = 100000):
+def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
+                                            samples = 100000,
+                                            unv_norm_samples = None):
 
     # get logitnormal params
     # mu = model.vb_params['global']['v_sticks']['mean'].get()
@@ -151,7 +152,8 @@ def get_e_number_clusters_from_logit_sticks(
     # sample from univariate normal
     # TODO: keep these draws fixed to reduce simulation noise --
     # "Rao-Blackwellize" this statistic.
-    unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
+    if unv_norm_samples is None:
+        unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
 
     # sample sticks from variational distribution
     stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
@@ -167,6 +169,48 @@ def get_e_number_clusters_from_ez(e_z):
     # the e_z in the variational distribution
     k = np.shape(e_z)[1]
     return k - np.sum(np.prod(1 - e_z, axis = 0))
+
+def sample_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_sample):
+
+    n_obs = e_z_cumsum.shape[0]
+
+    assert len(unif_sample) == n_obs
+
+    # get which cluster the sample belongs to
+    z_ind = (e_z_cumsum > unif_sample[:, None]).argmax(1)
+
+    # get one hot encoding
+    # is there a way to vectorize this?
+    z_sample = np.zeros(e_z_cumsum.shape)
+    z_sample[np.arange(n_obs), z_ind] = 1
+
+    return z_sample
+
+
+def get_e_num_large_clusters_from_ez(e_z,
+                                    threshold = 0.0,
+                                    n_samples = 100000,
+                                    unif_samples = None):
+
+    n_obs = e_z.shape[0]
+
+    # draw uniform samples
+    if unif_samples is None:
+        unif_samples = np.random.random((n_obs, n_samples))
+
+    else:
+        assert len(unif_samples.shape[0]) == n_obs
+
+    e_z_cumsum = np.cumsum(e_z, axis = 1)
+    num_heavy_clusters_vec = np.zeros(n_samples)
+    for i in range(n_samples):
+        z_sample = sample_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_samples[:, i])
+
+        num_heavy_clusters_vec[i] = np.sum(np.mean(z_sample, axis = 0) > threshold)
+
+    return np.mean(num_heavy_clusters_vec)
+
+
 
 
 
