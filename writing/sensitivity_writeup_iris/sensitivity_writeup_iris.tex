@@ -80,7 +80,7 @@ for flower $n$, and $n = 1, ..., 150$.
 Now, let $z_n$ denote the cluster (i.e. the species, which we treat as unknown)
 to which flower $n$ belongs.
 Each cluster has mean $\mu_k\in \mathbb{R}^4$  and covariance $\Sigma_k \in \mathbb{R}^{4\times 4}$.
-Our data-generating process is then
+Our data generating process is then
 \begin{align}
 	y_n | z_n \sim \mathcal{N}\Big(\sum_{k=1}^\infty \mathbb{I}\{z_n = k\} \mu_k \;,
               \; \sum_{k=1}^\infty \mathbb{I}\{z_n = k\} \Sigma_k\Big),
@@ -92,7 +92,7 @@ the Bayesian non-parametric prior that makes this possible.
 \subsection{Our prior}
 We place priors on $\mu_k$, $\Sigma_k$, and $z_n$. \par
 
-We use a Dirichlet stick-breaking process \cite{dp_prior} as our prior on the cluster components
+We use a Dirichlet stick breaking process \cite{dp_prior} as our prior on the cluster components
 weights $\pi$, and draw $z_n$ from a multinomial with said weights:
 \begin{align}
 	\pi &\sim \text{GEM}(\alpha) \label{eq:GEM} \\
@@ -242,7 +242,7 @@ figure \ref{fig:vary_alpha_fits}. When perturbing $\alpha$ between with an $\eps
 \end{figure}
 
 The fact that more clusters appear as we increase $\alpha$ is expected from the structure
-of the stick-breaking process: recall that the sticks are distributed $\text{Beta}(1, \alpha)$,
+of the stick breaking process: recall that the sticks are distributed $\text{Beta}(1, \alpha)$,
 so larger $\alpha$ puts more prior mass on smaller sticks. We wish to evaluate the
 sensitivity of the fits to changes in $\alpha$, and do so efficiently without having to
 do expensive re-optimizations. To do so, we use the linear approximation described
