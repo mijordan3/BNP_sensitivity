@@ -2,8 +2,6 @@
 import sys
 sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
 
-# import autograd
-
 import autograd.numpy as np
 import autograd.scipy as sp
 
@@ -266,7 +264,6 @@ class InfluenceFunction(object):
                 hyper_par_objective_fun=None)
 
         # this is grad log q
-        # self.jac_q_logit_sticks = autograd.jacobian(self.get_q_logit_stick_from_free_params, argnum=0)
         self.q_logit_sticks_obj = \
                         obj_lib.Objective(self.null_perturbation.model.global_vb_params, \
                                         self.get_q_logit_stick_from_free_params)
