@@ -1,0 +1,28 @@
+
+
+\section{Calculating the derivative}\label{app:sensitivity}
+
+\citet[Theorem 2]{giordano:2017:covariances} give
+the following expression for
+the derivative $d \etaopt(\epsilon)/ d\epsilon^T \vert_{\epsilon = 0}:$
+%
+\begin{align}
+H &= \frac{\partial^2 KL(\eta, \epsilon)}{\partial \eta \partial \eta^T}
+    \Big\rvert_{\eta = \etaopt, \epsilon = 0} \nonumber \\
+f_\eta &= \frac{\partial^2
+    \Expect_{q\left(\theta, z \vert \eta\right)}
+        \left[ \log p\left(y, \theta, z \vert \epsilon \right)\right]
+    } {\partial \eta \partial \epsilon^T}
+    \Big\rvert_{\eta = \etaopt, \epsilon = 0}  \nonumber  \\
+\frac{d \etaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} &=
+    H^{-1} f_\eta. \label{eq:vb_sensitivty}
+\end{align}
+%
+Both $H$ and $f_\eta$ can be evaluated using only $\etaopt(0)$, allowing us to
+use \prettyref{eq:our_approximation} to approximate $\eta$ without re-optimizing
+\prettyref{eq:pert_kl_objective} for different $\epsilon$. Furthermore, $H$ and
+$f_\eta$ can be quickly computed with auto-differentiation tools
+\citep{maclaurin:2015:autograd}. The derivatives and Cholesky factorization of
+$H$ also only need to be computed once, and these calculates can be reused to
+approximate many values of the variational parameters under different
+values of $\epsilon$.

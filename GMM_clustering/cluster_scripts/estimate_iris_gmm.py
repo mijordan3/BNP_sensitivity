@@ -23,8 +23,7 @@ import time
 
 from copy import deepcopy
 import json_tricks
-import checkpoints
-from checkpoints import np_string
+from gmm_clustering_lib import np_string
 
 from sklearn import datasets
 from sklearn.cluster import KMeans

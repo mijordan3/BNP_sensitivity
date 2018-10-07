@@ -120,6 +120,7 @@ def get_mixture_weights_array(stick_lengths):
 
     return stick_remain * stick_add
 
+
 def get_kth_weight_from_sticks(stick_lengths, k):
     assert len(np.shape(stick_lengths)) == 2
     # stick lengths is a matrix of shape (n_samples, k_approx - 1)
@@ -138,15 +139,18 @@ def get_kth_weight_from_sticks(stick_lengths, k):
 
     return (stick_remaining * stick_length)
 
-def get_e_number_clusters_from_logit_sticks(model, threshold = 0.0,
-                                                samples = 100000):
+
+def get_e_number_clusters_from_logit_sticks(
+    mu, sigma, n_obs, threshold = 0.0, samples = 100000):
 
     # get logitnormal params
-    mu = model.vb_params['global']['v_sticks']['mean'].get()
-    sigma = model.vb_params['global']['v_sticks']['info'].get()
+    # mu = model.vb_params['global']['v_sticks']['mean'].get()
+    # sigma = model.vb_params['global']['v_sticks']['info'].get()
     k_approx = len(mu)
 
     # sample from univariate normal
+    # TODO: keep these draws fixed to reduce simulation noise --
+    # "Rao-Blackwellize" this statistic.
     unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
 
     # sample sticks from variational distribution
@@ -155,14 +159,15 @@ def get_e_number_clusters_from_logit_sticks(model, threshold = 0.0,
     # get posterior weights
     weight_samples = get_mixture_weights_array(stick_samples)
 
-    n_obs = model.y.shape[0]
     return np.mean(np.sum(1 - (1 - weight_samples)**n_obs, axis = 1))
+
 
 def get_e_number_clusters_from_ez(e_z):
     # computes the expected number of clusters from
-    # the e_z in the variational distribution 
+    # the e_z in the variational distribution
     k = np.shape(e_z)[1]
-    return k - np.sum(np.prod(1 - e_z, axis = 1))
+    return k - np.sum(np.prod(1 - e_z, axis = 0))
+
 
 
 

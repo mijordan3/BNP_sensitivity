@@ -14,27 +14,23 @@ import scipy as osp
 
 from scipy import optimize
 from scipy import linalg
+from scipy import sparse
 
 from sklearn.cluster import KMeans
 
 from copy import deepcopy
 
+from datetime import datetime
 import time
 
-import modeling_lib as model_lib
+import modeling_lib
 import functional_sensitivity_lib as fun_sens_lib
 
-import checkpoints
 import json
 import json_tricks
 
-import checkpoints
-
 from numpy.polynomial.hermite import hermgauss
 
-import matplotlib.pyplot as plt
-
-from copy import deepcopy
 ##########################
 # Set up vb parameters
 ##########################
@@ -183,7 +179,7 @@ def get_e_func_logit_stick_vec(vb_params, func):
 
 
 def get_e_log_prior(vb_params, prior_params):
-    dp_prior = model_lib.get_dp_prior(vb_params, prior_params)
+    dp_prior = modeling_lib.get_dp_prior(vb_params, prior_params)
     e_gamma_prior = get_e_log_wishart_prior(vb_params, prior_params)
     e_centroid_prior = get_e_centroid_prior(vb_params, prior_params)
 
@@ -194,8 +190,8 @@ def get_e_log_prior(vb_params, prior_params):
 ##########################
 def get_entropy(vb_params, e_z):
     #e_z = vb_params['e_z'].get()
-    return model_lib.multinom_entropy(e_z) + \
-        model_lib.get_stick_entropy(vb_params)
+    return modeling_lib.multinom_entropy(e_z) + \
+        modeling_lib.get_stick_entropy(vb_params)
 
 ##########################
 # Likelihood term
@@ -340,7 +336,7 @@ class DPGaussianMixture(object):
 
         if self.vb_params.use_bnp_prior:
             e_log_cluster_probs = \
-                model_lib.get_e_log_cluster_probabilities(self.vb_params)
+                modeling_lib.get_e_log_cluster_probabilities(self.vb_params)
         else:
             e_log_cluster_probs = 0
 
@@ -394,7 +390,7 @@ class DPGaussianMixture(object):
             e_loglik_obs = np.sum(self.e_z * loglik_obs_by_nk)
 
         if self.vb_params.use_bnp_prior:
-            e_loglik_ind = model_lib.loglik_ind(self.vb_params, self.e_z)
+            e_loglik_ind = modeling_lib.loglik_ind(self.vb_params, self.e_z)
         else:
             e_loglik_ind = 0.
 
@@ -430,7 +426,7 @@ class DPGaussianMixture(object):
             e_v = e_sticks[0, :]
             e_1mv = e_sticks[1, :]
 
-        return model_lib.get_mixture_weights(e_v)
+        return modeling_lib.get_mixture_weights(e_v)
 
     ########################
     # Sensitivity functions.
@@ -591,54 +587,19 @@ class InterestingMoments(object):
         self.set_moments_from_free_par(free_par)
         return self.moment_params.get_vector()
 
-class ExpectedNumClustersFromLogitSticks(object):
-    # Class that wraps the functions to calculate the posterior predictive
-    # expected number of clusters present in a new dataset
-    # drawn from the posterior distribution of indicators
-    def __init__(self, model):
-        self.model = model
-        self.e_num_clusters = vb.ScalarParam('e_num_clusters', lb = 0.0)
+# Get the expected posterior predictive number of distinct clusters.
+def get_e_num_pred_clusters_from_free_par(free_par, model):
+    model.global_vb_params.set_free(free_par)
+    mu = model.global_vb_params['v_sticks']['mean'].get()
+    sigma = 1 / np.sqrt(model.global_vb_params['v_sticks']['info'].get())
+    n_obs = model.n_obs
+    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs)
 
-    def set_e_num_clusters(self):
-        self.set_e_num_clusters_from_free_param(\
-            self.model.global_vb_params.get_free())
-
-    def set_e_num_clusters_from_free_param(self, free_par):
-        self.model.set_from_global_free_par(free_par)
-        self.e_num_clusters.set_vector(\
-            model_lib.get_e_number_clusters_from_logit_sticks(self.model))
-
-    def set_and_get_e_num_clusters_from_free_param(self, free_par):
-        self.set_e_num_clusters_from_free_param(free_par)
-
-        return self.e_num_clusters.get_vector()
-
-
-
-class ExpectedNumClustersFromZ(object):
-    # Class that wraps the functions to calculate the
-    # expected number of clusters present in the given dataset
-    # drawn from the posterior distribution of the cluster belongings
-
-    def __init__(self, model):
-        self.model = model
-        self.e_num_clusters = vb.ScalarParam('e_num_clusters', lb = 0.0)
-
-    def set_e_num_clusters(self):
-        self.set_e_num_clusters_from_free_param(\
-                self.model.global_vb_params.get_free())
-
-    def set_e_num_clusters_from_free_param(self, free_par):
-        self.model.set_from_global_free_par(free_par)
-        self.model.set_optimal_z()
-        self.e_num_clusters.set_vector(\
-                model_lib.get_e_number_clusters_from_ez(self.model.e_z))
-
-    def set_and_get_e_num_clusters_from_free_param(self, free_par):
-        self.set_e_num_clusters_from_free_param(free_par)
-
-        return self.e_num_clusters.get_vector()
-
+# Get the expected posterior number of distinct clusters.
+def get_e_num_clusters_from_free_par(free_par, model):
+    model.global_vb_params.set_free(free_par)
+    model.set_optimal_z()
+    return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
 
 
 
@@ -646,13 +607,151 @@ class ExpectedNumClustersFromZ(object):
 # Functions to reload the model
 #################################
 
+# TODO: All this was copied over in a hurry from
+# https://github.com/NelleV/genomic_time_series_bnp/bin/checkpoints/checkpoints/checkpoints_lib.py#L71
+# It could probably be tidied up.
+
+sp_string = '_sp_packed'
+np_string = '_np_packed'
+
+def get_timestamp():
+    return datetime.today().timestamp()
+
+# Pack a sparse csr_matrix in a json-seralizable format.
+def pack_csr_matrix(sp_mat):
+    assert sparse.isspmatrix_csr(sp_mat)
+    sp_mat = sparse.csr_matrix(sp_mat)
+    return { 'data': json_tricks.dumps(sp_mat.data),
+             'indices': json_tricks.dumps(sp_mat.indices),
+             'indptr': json_tricks.dumps(sp_mat.indptr),
+             'shape': sp_mat.shape,
+             'type': 'csr_matrix' }
+
+
+# Convert the output of pack_csr_matrix back into a csr_matrix.
+def unpack_csr_matrix(sp_mat_dict):
+    assert sp_mat_dict['type'] == 'csr_matrix'
+    data = json_tricks.loads(sp_mat_dict['data'])
+    indices = json_tricks.loads(sp_mat_dict['indices'])
+    indptr = json_tricks.loads(sp_mat_dict['indptr'])
+    return sparse.csr_matrix(
+        ( data, indices, indptr), shape = sp_mat_dict['shape'])
+
+# Populate a dictionary with the minimum necessary fields to describe
+# a pre-processing step.
+def get_preprocessing_dict(method, p_values=None, log_fold_change=None):
+    """
+    Returns a pre-processing dict, population with defaults.
+    Parameters
+    ----------
+    method : string
+    p_values : ndarray, optional, default: None
+    log_fold_change : ndarray, optional, default: None
+    Returns
+    -------
+    dictionary
+    """
+
+    if p_values is None:
+        p_values = np.array([])
+
+    if log_fold_change is None:
+        log_fold_change = np.array([])
+
+    return {
+        'timestamp': get_timestamp(),
+        'method': method,
+        'p_values' + np_string: json_tricks.dumps(p_values),
+        'log_fold_change' + sp_string: json_tricks.dumps(log_fold_change)}
+
+
+def get_fit_dict(method, initialization_method, seed, centroids,
+                 labels=None,
+                 cluster_assignments=None,
+                 preprocessing_dict=None, basis_mat=None,
+                 cluster_weights=None):
+    """
+    returns a "fit" dictionary
+    Parameters
+    ----------
+    method : string
+    initialization_method : string
+    seed : int
+        random seed
+    centroids : ndarray
+    labels : ndarray (n, ), optional, default: None
+        1D-array containing the cluster labels.
+        Either labels or cluster_assignments needs to be provided.
+    cluster_assignments : {ndarray, csr_matrix}, optional, default: None
+        n by k sparse or dense matrix contraining the cluster assignments or
+        probability.
+        Either labels or cluster_assignments needs to be provided.
+    preprocessing_dict : dictionary
+        dictionary containing a `timestamp` and `method` key
+    basis_mat : ndarray, optional, default: None
+    cluster_weights : ndarray, optional, default: None
+    """
+    if labels is None and cluster_assignments is None:
+        raise ValueError(
+            "In order to save the results, either provide labels or cluster"
+            " assignment")
+
+    if labels is not None and len(labels.shape) > 1:
+        raise ValueError(
+            "Labels should be a 1D array. "
+            "Provided a %d-d array" % len(labels.shape))
+
+    if cluster_assignments is not None and not sparse.issparse(cluster_assignments):
+        cluster_assignments = sparse.csr_matrix(cluster_assignments)
+
+    if labels is not None:
+        if labels.max() >= centroids.shape[1]:
+            raise ValueError(
+                "There are %d centroids, but the labels contain up to %d "
+                "element" % (centroids.shape[1], labels.max()))
+
+        # The user provided labels and not a sparse matrix
+        if cluster_assignments is not None:
+            if np.any(labels != cluster_assignments.argmax(axis=1).A.flatten()):
+                raise ValueError(
+                    "Incoherence between the labels provided and the cluster "
+                    "assignments.")
+        else:
+            cluster_assignments = sparse.csr_matrix(
+                (np.ones(len(labels)), (np.arange(len(labels)), labels)),
+                shape=(len(labels), centroids.shape[1]))
+
+    if preprocessing_dict is None:
+        preprocessing_dict = get_preprocessing_dict("NoPreprocessing")
+
+    if basis_mat is None:
+        basis_mat = np.array([])
+
+    if cluster_weights is None:
+        cluster_weights = cluster_assignments.sum(axis=0).A.flatten()
+        cluster_weights /= cluster_weights.sum()
+
+    return {
+        'timestamp': get_timestamp(),
+        'method': method,
+        'initialization_method': initialization_method,
+        'seed': seed,
+        'preprocessing_method': preprocessing_dict['method'],
+        'preprocessing_timestamp': preprocessing_dict['timestamp'],
+        'centroids' + np_string: json_tricks.dumps(centroids),
+        'basis_mat' + np_string: json_tricks.dumps(basis_mat),
+        'cluster_weights' + np_string: json_tricks.dumps(cluster_weights),
+        'cluster_assignments' + sp_string: pack_csr_matrix(cluster_assignments)
+         }
+
+
 def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
     # Set the optimal z to remove arrayboxes if necessary.
     model.set_optimal_z()
     #e_z = model.vb_params['e_z'].get()
     labels = np.squeeze(np.argmax(model.e_z, axis=1))
     centroids = model.vb_params['global']['centroids'].get()
-    fit_dict = checkpoints.get_fit_dict(
+    fit_dict = get_fit_dict(
         method = 'gmm',
         initialization_method = 'kmeans',
         seed = seed,
@@ -662,7 +761,6 @@ def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
         preprocessing_dict = None,
         basis_mat = None,
         cluster_weights = model.get_e_cluster_probabilities())
-    np_string = checkpoints.np_string
     fit_dict['k_approx'] = model.k_approx
     fit_dict['use_bnp_prior'] = model.vb_params.use_bnp_prior
     fit_dict['vb_global_free_par' + np_string] = \
@@ -695,7 +793,6 @@ def get_checkpoint_dictionary(model, kl_hessian=None, seed=None, compact=False):
 
 def get_model_from_checkpoint(fit_dict):
     # load model from fit dictionary
-    np_string = checkpoints.np_string
 
     # the data
     y = json_tricks.loads(fit_dict['y' + np_string])
@@ -737,4 +834,4 @@ def get_model_from_checkpoint(fit_dict):
 
 
 def get_kl_hessian_from_checkpoint(fit_dict):
-    return json_tricks.loads(fit_dict['kl_hessian' + checkpoints.np_string])
+    return json_tricks.loads(fit_dict['kl_hessian' + np_string])
