@@ -1,0 +1,326 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\contamprior}[1][\theta]{p_{c}\left(#1\right)}
+{p_{c}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\origprior}[1][\theta]{p_{0}\left(#1\right)}
+{p_{0}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\altprior}[1][\theta]{p_{1}\left(#1\right)}
+{p_{1}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pertfun}[1][\theta]{u\left(#1\right)}
+{u\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\transfun}[2][\beta][\cdot]{\tau_{#1}\left(#2\right)}
+{\tau_{#1}\left(#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\invtransfun}[2][\beta][\cdot]{\tau_{#1}^{-1}\left(#2\right)}
+{\tau_{#1}^{-1}\left(#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\priorspace}{L_{1}}
+{L_{1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Gustafson basics
+\end_layout
+
+\begin_layout Standard
+We will consider the class of non-linear perturbations given by GUSTAFSON.
+ Let 
+\begin_inset Formula $\priorspace$
+\end_inset
+
+ denote the space of Lebesgue-integrable functions defined on 
+\begin_inset Formula $\left[0,1\right]$
+\end_inset
+
+.
+ By definition, 
+\begin_inset Formula $\origprior\in\priorspace$
+\end_inset
+
+ .For 
+\begin_inset Formula $\beta\ge1$
+\end_inset
+
+, define the mapping 
+\begin_inset Formula $\transfun:\priorspace\rightarrow\priorspace$
+\end_inset
+
+ by the point-wise transformation
+\begin_inset Formula 
+\begin{align*}
+\transfun[][f] & :=\beta f^{1/\beta}-\beta+1.\\
+\invtransfun[][g] & =\left(\frac{g-1}{\beta}+1\right)^{\beta}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(This is 
+\begin_inset Formula $t_{p}\left(y\right)$
+\end_inset
+
+ in Gustafson.) For 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+, we observe that
+\begin_inset Formula 
+\begin{align*}
+\left(\frac{\transfun[][f]-1}{\beta}+1\right)^{\beta} & =f\Rightarrow\\
+\lim_{\beta\rightarrow\infty}\left(\frac{\transfun[][f]-1}{\beta}+1\right)^{\beta} & =\exp\left(\lim_{\beta\rightarrow\infty}\transfun[][f]-1\right)=f\Rightarrow\\
+\transfun[\infty][f]:=\lim_{\beta\rightarrow\infty}\transfun[][f] & =\log f+1.
+\end{align*}
+
+\end_inset
+
+This defines 
+\begin_inset Formula $\transfun[\infty][f]$
+\end_inset
+
+.
+ We then define a perturbation by transforming, perturbing additively, and
+ un-perturbing.
+\begin_inset Formula 
+\begin{align*}
+\contamprior & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}].
+\end{align*}
+
+\end_inset
+
+We note that, for 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{align*}
+\contamprior & \propto\left(\frac{\transfun[][{\origprior}]+\pertfun-1}{\beta}+1\right)^{\beta}\\
+ & =\left(\frac{\beta\origprior^{1/\beta}-\beta+1+\pertfun-1}{\beta}+1\right)^{\beta}\\
+ & =\left(\origprior^{1/\beta}+\frac{\pertfun}{\beta}\right)^{\beta}\\
+ & =\origprior\left(1+\frac{\pertfun}{\beta}\right)^{\beta}.
+\end{align*}
+
+\end_inset
+
+And for 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+, 
+\begin_inset Formula 
+\begin{align*}
+\contamprior & \propto\exp\left(\log\origprior+\pertfun-1\right)\\
+ & =\origprior\exp\left(\pertfun\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Therefore, in log space,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\log\contamprior & =\log\origprior+\beta\log\left(1+\frac{\pertfun}{\beta}\right)+C\textrm{ for }\beta<\infty\\
+\log\contamprior & =\log\origprior+\pertfun.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Re-parameterizing
+\end_layout
+
+\begin_layout Standard
+We wish to re-parameterize so that we can extrapolate to completely replacing
+ one prior with another.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\contamprior[\theta\vert\delta] & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}]\\
+ & :=\invtransfun[][{\transfun[][{\origprior}]}+\delta{\altprior}].
+\end{align*}
+
+\end_inset
+
+We want to have
+\begin_inset Formula 
+\begin{align*}
+\contamprior[\theta\vert\delta=1] & \propto\altprior,
+\end{align*}
+
+\end_inset
+
+so
+\begin_inset Formula 
+\begin{align*}
+\transfun[][{\altprior}] & =\transfun[][{\origprior}]+\pertfun\Rightarrow\\
+\pertfun & :=\transfun[][{\origprior}]-\transfun[][{\altprior}].
+\end{align*}
+
+\end_inset
+
+For example, when 
+\begin_inset Formula $\beta=1$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\pertfun & =\origprior-\altprior,
+\end{align*}
+
+\end_inset
+
+giving rise to the classical mixture model.
+ When 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\pertfun & =\log\origprior-\log\altprior\\
+ & =\log\frac{\origprior}{\altprior},
+\end{align*}
+
+\end_inset
+
+which is the log of a proportional perturbation.
+\end_layout
+
+\end_body
+\end_document
