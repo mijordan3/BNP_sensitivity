@@ -139,6 +139,24 @@
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pertratio}[1][\theta]{\phi\left(#1\right)}
+{\phi\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\expect}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Gustafson basics
 \end_layout
@@ -221,7 +239,7 @@ We note that, for
 \contamprior & \propto\left(\frac{\transfun[][{\origprior}]+\pertfun-1}{\beta}+1\right)^{\beta}\\
  & =\left(\frac{\beta\origprior^{1/\beta}-\beta+1+\pertfun-1}{\beta}+1\right)^{\beta}\\
  & =\left(\origprior^{1/\beta}+\frac{\pertfun}{\beta}\right)^{\beta}\\
- & =\origprior\left(1+\frac{\pertfun}{\beta}\right)^{\beta}.
+ & =\origprior\left(1+\frac{\origprior^{-1/\beta}}{\beta}\pertfun\right)^{\beta}.
 \end{align*}
 
 \end_inset
@@ -288,11 +306,15 @@ so
 \begin_inset Formula 
 \begin{align*}
 \transfun[][{\altprior}] & =\transfun[][{\origprior}]+\pertfun\Rightarrow\\
-\pertfun & :=\transfun[][{\origprior}]-\transfun[][{\altprior}].
+\pertfun & :=\transfun[][{\altprior}]-\transfun[][{\origprior}].
 \end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 For example, when 
 \begin_inset Formula $\beta=1$
 \end_inset
@@ -300,7 +322,8 @@ For example, when
 ,
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =\origprior-\altprior,
+\pertfun & =\altprior-\origprior\\
+ & =\origprior\left(\frac{\altprior}{\origprior}-1\right).
 \end{align*}
 
 \end_inset
@@ -313,13 +336,155 @@ giving rise to the classical mixture model.
 
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =\log\origprior-\log\altprior\\
- & =\log\frac{\origprior}{\altprior},
+\pertfun & =\log\altprior-\log\origprior\\
+ & =\log\frac{\altprior}{\origprior},
 \end{align*}
 
 \end_inset
 
 which is the log of a proportional perturbation.
+ If 
+\begin_inset Formula $\beta=2$
+\end_inset
+
+, then
+\begin_inset Formula 
+\begin{align*}
+\pertfun & =2\left(\sqrt{\altprior}-\sqrt{\origprior}\right)\\
+ & =2\sqrt{\origprior}\left(\sqrt{\frac{\altprior}{\origprior}}-1\right).
+\end{align*}
+
+\end_inset
+
+Indeed, for any 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\pertfun & =\beta\altprior^{1/\beta}-\beta\origprior^{1/\beta}\\
+ & =\beta\origprior^{1/\beta}\left(\left(\frac{\altprior}{\origprior}\right)^{1/\beta}-1\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that, for a fixed 
+\begin_inset Formula $\origprior$
+\end_inset
+
+, the map 
+\begin_inset Formula $\altprior\mapsto\pertfun$
+\end_inset
+
+ is affine (if you choose any 
+\begin_inset Formula $\delta$
+\end_inset
+
+ other than 
+\begin_inset Formula $1$
+\end_inset
+
+ to represent the point at which 
+\begin_inset Formula $\contamprior=\altprior$
+\end_inset
+
+, you change the slope as well).
+ Consequently, the quantity 
+\begin_inset Formula $\frac{dg}{d\pertfun}\delta=\frac{dg}{d\altprior}\delta$
+\end_inset
+
+ is unchanged.
+ Of course, 
+\begin_inset Formula $\frac{dg}{d\pertfun}\ne\frac{dg}{d\altprior}$
+\end_inset
+
+.
+ In this sense the perspective of extrapolation is an improvement over Gustafson
+, which simply looks at the slope.
+\end_layout
+
+\begin_layout Standard
+Going forwards, we will define
+\begin_inset Formula 
+\begin{align*}
+\pertratio & :=\frac{\altprior}{\origprior},\\
+\pertfun & =\beta\origprior^{1/\beta}\left(\pertratio{}^{1/\beta}-1\right)
+\end{align*}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{align*}
+\contamprior[\theta\vert\delta] & \propto\origprior\left(1+\origprior^{-1/\beta}\frac{\delta\pertfun}{\beta}\right)^{\beta}\\
+ & =\origprior\left(\left(\delta\pertratio\right)^{1/\beta}-1\right)^{\beta}
+\end{align*}
+
+\end_inset
+
+for 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+ and
+\begin_inset Formula 
+\begin{align*}
+\pertfun & =\log\delta\pertratio\\
+\contamprior[\theta\vert\delta] & \propto\origprior\left(\pertratio^{\delta}\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned above, this is an affine re-parameterization at 
+\begin_inset Formula $\delta=0$
+\end_inset
+
+, and so will give equivalent results to all of Gustafson, with the additional
+ advantages here described.
+ This is the parameterization we will use going forwards.
+\end_layout
+
+\begin_layout Section
+Derivatives
+\end_layout
+
+\begin_layout Standard
+We note that
+\begin_inset Formula 
+\begin{align*}
+\log\contamprior[\theta\vert\delta] & =\begin{cases}
+\log\origprior+\beta\log\left(\left(\delta\pertratio\right)^{1/\beta}-1\right) & \beta<\infty\\
+\log\origprior+\delta\log\pertratio & \beta=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+The Gateaux derivatives of the KL divergence are given by
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\delta}\expect_{q}\left[\log\contamprior[\theta\vert\delta]\right] & =\begin{cases}
+\beta\frac{\partial}{\partial\delta}\expect_{q}\left[\log\left(\left(\delta\pertratio\right)^{1/\beta}-1\right)\right] & \beta<\infty\\
+\frac{\partial}{\partial\delta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\beta\expect_{q}\left[\frac{\frac{1}{\beta}\delta^{\frac{1}{\beta}-1}\pertratio^{\frac{1}{\beta}}}{\left(\delta\pertratio\right)^{\frac{1}{\beta}}-1}\right] & \beta<\infty\\
+\expect_{q}\left[\log\pertratio\right] & \beta=\infty
+\end{cases}
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \end_body
