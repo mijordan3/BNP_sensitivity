@@ -588,12 +588,13 @@ class InterestingMoments(object):
         return self.moment_params.get_vector()
 
 # Get the expected posterior predictive number of distinct clusters.
-def get_e_num_pred_clusters_from_free_par(free_par, model):
+def get_e_num_pred_clusters_from_free_par(free_par, model, n_samples = 100000):
     model.global_vb_params.set_free(free_par)
     mu = model.global_vb_params['v_sticks']['mean'].get()
     sigma = 1 / np.sqrt(model.global_vb_params['v_sticks']['info'].get())
     n_obs = model.n_obs
-    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs)
+    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs, \
+                                                        n_samples = n_samples)
 
 # Get the expected posterior number of distinct clusters.
 def get_e_num_clusters_from_free_par(free_par, model):

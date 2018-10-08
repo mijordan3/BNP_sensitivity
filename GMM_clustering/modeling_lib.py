@@ -141,7 +141,7 @@ def get_kth_weight_from_sticks(stick_lengths, k):
 
 
 def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
-                                            samples = 100000,
+                                            n_samples = None,
                                             unv_norm_samples = None):
 
     # get logitnormal params
@@ -153,7 +153,10 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
     # TODO: keep these draws fixed to reduce simulation noise --
     # "Rao-Blackwellize" this statistic.
     if unv_norm_samples is None:
-        unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
+        assert n_samples is not None
+        unv_norm_samples = np.random.normal(0, 1, size = (n_samples, k_approx))
+    if n_samples is None:
+        assert unv_norm_samples is not None
 
     # sample sticks from variational distribution
     stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
@@ -170,51 +173,49 @@ def get_e_number_clusters_from_ez(e_z):
     k = np.shape(e_z)[1]
     return k - np.sum(np.prod(1 - e_z, axis = 0))
 
-def get_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_sample):
-    # returns a n_obs x n_clusters matrix encoding whether
-    # observation n belongs to cluster k.
+def get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
+    # returns a n_obs x n_samples matrix encoding the cluster belonging
+    # of the nth observation in nth sample
 
     n_obs = e_z_cumsum.shape[0]
 
-    # unif_sample should be a vector of length n_obs
-    assert len(unif_sample) == n_obs
-    assert len(unif_sample.shape) == 1
+    # unif_sample should be a matrix of shape n_obs x n_samples
+    assert len(unif_samples.shape) == 2
+    assert unif_samples.shape[0] == n_obs
 
     # get which cluster the sample belongs to
-    z_ind = (e_z_cumsum > unif_sample[:, None]).argmax(1)
-
-    # get one hot encoding
-    z_sample = np.zeros(e_z_cumsum.shape)
-    z_sample[np.arange(n_obs), z_ind] = 1
+    z_sample = (e_z_cumsum[:, :, None] > unif_samples[:, None, :]).argmax(1)
 
     return z_sample
 
 
 def get_e_num_large_clusters_from_ez(e_z,
                                     threshold = 0.0,
-                                    n_samples = 100000,
+                                    n_samples = None,
                                     unif_samples = None):
 
     n_obs = e_z.shape[0]
+    n_clusters = e_z.shape[1]
 
     # draw uniform samples
     if unif_samples is None:
+        assert n_samples is not None
         unif_samples = np.random.random((n_obs, n_samples))
 
     else:
+        assert unif_samples is not None
         assert unif_samples.shape[0] == n_obs
 
     n_samples = unif_samples.shape[1]
     e_z_cumsum = np.cumsum(e_z, axis = 1)
-    num_heavy_clusters_vec = np.zeros(n_samples)
 
-    # think harder about how to vectorize this and the function above....
-    for i in range(n_samples):
-        # z_sample is a n_obs x n_clusters binary matrix of cluster belongings
-        z_sample = get_clusters_from_ez_and_unif_sample(e_z_cumsum, \
-                                                        unif_samples[:, i])
-        # get number of clusters with at least enough points aabove the threshold
-        num_heavy_clusters_vec[i] = np.sum(np.mean(z_sample, axis = 0) > threshold)
+    num_heavy_clusters_vec = np.zeros(n_samples)
+    for i in range(n_clusters):
+        # z_sample is a n_obs x n_samples matrix of cluster belongings
+        z_sample = get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples)
+
+        # get number of clusters with at least enough points above the threshold
+        num_heavy_clusters_vec += np.mean(z_sample == i, axis = 0) > threshold
 
     return np.mean(num_heavy_clusters_vec)
 
