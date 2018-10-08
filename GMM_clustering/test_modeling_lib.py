@@ -25,7 +25,7 @@ class TestClusteringSamples(unittest.TestCase):
             # draw uniform samples
             unif_samples = np.random.rand(n)
             # get cluster belongings
-            e_z_mean += modeling_lib.sample_clusters_from_ez_and_unif_sample(\
+            e_z_mean += modeling_lib.get_clusters_from_ez_and_unif_sample(\
                                     e_z_cumsum, unif_samples)
         e_z_mean /= n_samples
 

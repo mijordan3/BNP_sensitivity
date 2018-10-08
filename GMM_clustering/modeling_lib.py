@@ -170,7 +170,9 @@ def get_e_number_clusters_from_ez(e_z):
     k = np.shape(e_z)[1]
     return k - np.sum(np.prod(1 - e_z, axis = 0))
 
-def sample_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_sample):
+def get_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_sample):
+    # returns a n_obs x n_clusters matrix encoding whether
+    # observation n belongs to cluster k.
 
     n_obs = e_z_cumsum.shape[0]
 
@@ -199,20 +201,18 @@ def get_e_num_large_clusters_from_ez(e_z,
         unif_samples = np.random.random((n_obs, n_samples))
 
     else:
-        assert len(unif_samples.shape[0]) == n_obs
+        assert unif_samples.shape[0] == n_obs
 
+    n_samples = unif_samples.shape[1]
     e_z_cumsum = np.cumsum(e_z, axis = 1)
     num_heavy_clusters_vec = np.zeros(n_samples)
     for i in range(n_samples):
-        z_sample = sample_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_samples[:, i])
-
+        z_sample = get_clusters_from_ez_and_unif_sample(e_z_cumsum, \
+                                                        unif_samples[:, i])
+        # get number of clusters with at least enough points aabove the threshold
         num_heavy_clusters_vec[i] = np.sum(np.mean(z_sample, axis = 0) > threshold)
 
     return np.mean(num_heavy_clusters_vec)
-
-
-
-
 
 
 # def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):

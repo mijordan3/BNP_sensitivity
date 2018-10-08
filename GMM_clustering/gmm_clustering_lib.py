@@ -601,6 +601,26 @@ def get_e_num_clusters_from_free_par(free_par, model):
     model.set_optimal_z()
     return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
 
+class ExpectedNumClustersFromZ(object):
+    # Get the expected posterior number of distinct clusters above
+    # some given threshold.
+
+    def __init__(self, model):
+        self.model = model
+        self.n_obs = self.model.y.shape[0]
+
+        self.set_uniform_samples()
+
+    def set_uniform_samples(self, n_samples = 10000):
+        self.unif_samples = np.random.random((self.n_obs, n_samples))
+
+    def get_e_num_heavy_clusters_from_free_par(self, free_par, threshold = 0):
+        self.model.global_vb_params.set_free(free_par)
+        self.model.set_optimal_z()
+
+        return modeling_lib.get_e_num_large_clusters_from_ez(self.model.e_z,
+                                                threshold = threshold,
+                                                unif_samples = self.unif_samples)
 
 
 #################################
