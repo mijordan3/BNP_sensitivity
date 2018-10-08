@@ -604,6 +604,8 @@ def get_e_num_clusters_from_free_par(free_par, model):
 class ExpectedNumClustersFromZ(object):
     # Get the expected posterior number of distinct clusters above
     # some given threshold.
+    # Note that we cache the uniform samples that we use to sample
+    # cluster belongings.
 
     def __init__(self, model):
         self.model = model

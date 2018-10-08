@@ -176,13 +176,14 @@ def get_clusters_from_ez_and_unif_sample(e_z_cumsum, unif_sample):
 
     n_obs = e_z_cumsum.shape[0]
 
+    # unif_sample should be a vector of length n_obs
     assert len(unif_sample) == n_obs
+    assert len(unif_sample.shape) == 1
 
     # get which cluster the sample belongs to
     z_ind = (e_z_cumsum > unif_sample[:, None]).argmax(1)
 
     # get one hot encoding
-    # is there a way to vectorize this?
     z_sample = np.zeros(e_z_cumsum.shape)
     z_sample[np.arange(n_obs), z_ind] = 1
 
@@ -206,7 +207,10 @@ def get_e_num_large_clusters_from_ez(e_z,
     n_samples = unif_samples.shape[1]
     e_z_cumsum = np.cumsum(e_z, axis = 1)
     num_heavy_clusters_vec = np.zeros(n_samples)
+
+    # think harder about how to vectorize this and the function above....
     for i in range(n_samples):
+        # z_sample is a n_obs x n_clusters binary matrix of cluster belongings
         z_sample = get_clusters_from_ez_and_unif_sample(e_z_cumsum, \
                                                         unif_samples[:, i])
         # get number of clusters with at least enough points aabove the threshold

@@ -5,7 +5,7 @@ import autograd.scipy as sp
 
 from autograd import elementwise_grad
 
-import interpolation_lib as interp
+import modeling_lib 
 import unittest
 
 np.random.seed(24524)
