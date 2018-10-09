@@ -619,6 +619,35 @@ def get_e_num_clusters_from_free_par(free_par, model):
     model.set_optimal_z()
     return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
 
+class ExpectedPredNumClusters(object):
+    # Get the expected posterior predictive number of distinct clusters above
+    # some given threshold.
+    # Note that we cache the normal samples that we use to sample
+    # cluster belongings.
+
+    def __init__(self, model):
+        self.model = model
+        self.n_obs = self.model.y.shape[0]
+        self.k_approx = self.model.k_approx
+
+        self.set_normal_samples()
+
+    def set_normal_samples(self, n_samples = 10000):
+        self.unv_norm_samples = np.random.normal(0, 1, \
+                                    size = (n_samples, self.k_approx - 1))
+
+    def get_e_num_pred_heavy_clusters_from_free_par(self, free_par, threshold = 0):
+        self.model.global_vb_params.set_free(free_par)
+        self.model.set_optimal_z()
+
+        mu = self.model.global_vb_params['v_sticks']['mean'].get()
+        sigma = 1 / np.sqrt(self.model.global_vb_params['v_sticks']['info'].get())
+
+        return modeling_lib.get_e_number_clusters_from_logit_sticks(
+                                    mu, sigma, self.n_obs,
+                                    threshold = threshold,
+                                    unv_norm_samples = self.unv_norm_samples)
+
 class ExpectedNumClustersFromZ(object):
     # Get the expected posterior number of distinct clusters above
     # some given threshold.
