@@ -105,8 +105,17 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\pertfun}[1][\theta]{u\left(#1\right)}
-{u\left(#1\right)}
+\newcommand{\pertfun}[2][\theta][\beta]{u_{#2}\left(#1\right)}
+{u_{#2}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\affpertfun}[2][\theta][\beta]{v_{#2}\left(#1\right)}
+{v_{#2}\left(#1\right)}
 \end_inset
 
 
@@ -195,8 +204,17 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\at}[2][][]{\left.#1\right|_{#2}}
+\newcommand{\at}[2]{\left.#1\right|_{#2}}
 {\left.#1\right|_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+{\left\Vert #1\right\Vert }
 \end_inset
 
 
@@ -269,7 +287,7 @@ This defines
  un-perturbing.
 \begin_inset Formula 
 \begin{align*}
-\contamprior & \propto\invtransfun[][{{\transfun[][{\origprior}]}}+{{\pertfun}}].
+\contamprior & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}].
 \end{align*}
 
 \end_inset
@@ -298,6 +316,21 @@ And for
 \begin{align*}
 \contamprior & \propto\exp\left(\log\origprior+\pertfun-1\right)\\
  & =\origprior\exp\left(\pertfun\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Succinctly:
+\begin_inset Formula 
+\begin{align*}
+\contamprior\propto & \begin{cases}
+\origprior\left(1+\frac{\origprior^{-1/\beta}}{\beta}\pertfun\right)^{\beta} & \beta<\infty\\
+\origprior\exp\left(\pertfun\right) & \beta=\infty.
+\end{cases}
 \end{align*}
 
 \end_inset
@@ -360,7 +393,7 @@ For example, when
 ,
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =\altprior-\origprior\\
+\pertfun[][1] & =\altprior-\origprior\\
  & =\origprior\left(\frac{\altprior}{\origprior}-1\right).
 \end{align*}
 
@@ -374,7 +407,7 @@ giving rise to the classical mixture model.
 
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =\log\altprior-\log\origprior\\
+\pertfun[][\infty] & =\log\altprior-\log\origprior\\
  & =\log\frac{\altprior}{\origprior},
 \end{align*}
 
@@ -388,7 +421,7 @@ which is the log of a proportional perturbation.
 , then
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =2\left(\sqrt{\altprior}-\sqrt{\origprior}\right)\\
+\pertfun[][2] & =2\left(\sqrt{\altprior}-\sqrt{\origprior}\right)\\
  & =2\sqrt{\origprior}\left(\sqrt{\frac{\altprior}{\origprior}}-1\right).
 \end{align*}
 
@@ -403,6 +436,63 @@ Indeed, for any
 \begin{align*}
 \pertfun & =\beta\altprior^{1/\beta}-\beta\origprior^{1/\beta}\\
  & =\beta\origprior^{1/\beta}\left(\left(\frac{\altprior}{\origprior}\right)^{1/\beta}-1\right).
+\end{align*}
+
+\end_inset
+
+To this end, let us define
+\begin_inset Formula 
+\begin{align*}
+\pertratio & :=\frac{\altprior}{\origprior},
+\end{align*}
+
+\end_inset
+
+and an affine transformation of 
+\begin_inset Formula $\pertfun$
+\end_inset
+
+, which is itself a function of 
+\begin_inset Formula $\pert$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\pertfun\left(\pert,\origprior\right) & :=\begin{cases}
+\beta\origprior^{1/\beta}\left(\pertratio{}^{1/\beta}-1\right) & \beta<\infty\\
+\log\pertratio & \beta=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+Because
+\begin_inset Formula 
+\begin{align*}
+\contamprior & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then we can maybe define:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\affpertfun\left(\pertfun\right) & :=\begin{cases}
+\left(\pertratio{}^{1/\beta}-1\right) & \beta<\infty\\
+\log\pertratio
+\end{cases}\\
+ & =\begin{cases}
+\beta\origprior^{1/\beta}\left(\left(\frac{\altprior}{\origprior}\right)^{1/\beta}-1\right) & \beta<\infty\\
+\log\frac{\altprior}{\origprior} & \beta=\infty
+\end{cases}
 \end{align*}
 
 \end_inset
@@ -459,7 +549,7 @@ Going forwards, we will define
 so that
 \begin_inset Formula 
 \begin{align*}
-\contamprior[\theta\vert\delta] & \propto\origprior\left(1+\beta\origprior^{-1/\beta}\frac{\delta\pertfun}{\beta}\right)^{\beta}\\
+\contamprior[\theta\vert\delta,\pert] & \propto\origprior\left(1+\beta\origprior^{-1/\beta}\delta\frac{\pertfun}{\beta}\right)^{\beta}\\
  & =\origprior\left(1+\delta\left(\pertratio^{1/\beta}-1\right)\right)^{\beta}.
 \end{align*}
 
@@ -472,8 +562,7 @@ for
  and
 \begin_inset Formula 
 \begin{align*}
-\pertfun & =\log\delta\pertratio\\
-\contamprior[\theta\vert\delta] & \propto\origprior\exp\left(\delta\log\pertratio\right)\\
+\contamprior[\theta\vert\delta,\pert] & \propto\origprior\exp\left(\delta\log\pertratio\right)\\
  & =\origprior\left(\pertratio^{\delta}\right).
 \end{align*}
 
@@ -486,6 +575,250 @@ As mentioned above, this is an affine re-parameterization at
 , and so will give equivalent results to all of Gustafson, with the additional
  advantages here described.
  This is the parameterization we will use going forwards.
+\end_layout
+
+\begin_layout Section
+Step back
+\end_layout
+
+\begin_layout Standard
+Look, what we want is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\contamprior\propto & \begin{cases}
+\left(\origprior^{1/\beta}+\frac{1}{\beta}\pertfun\right)^{\beta} & 1\le\beta<\infty\\
+\origprior\exp\left(\pertfun\right) & \beta=\infty.
+\end{cases}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we want to choose a 
+\begin_inset Formula $\pertfun$
+\end_inset
+
+ so that a unit step of 
+\begin_inset Formula $\contamprior$
+\end_inset
+
+ in the direction of 
+\begin_inset Formula $\pertfun$
+\end_inset
+
+ is 
+\begin_inset Formula $\altprior$
+\end_inset
+
+, then we would choose
+\begin_inset Formula 
+\begin{align*}
+\altprior & =\left(\origprior^{1/\beta}+\frac{1}{\beta}\pertfun\right)^{\beta}\Rightarrow\\
+\pertfun & =\beta\left(\altprior^{1/\beta}-\origprior^{1/\beta}\right)
+\end{align*}
+
+\end_inset
+
+for 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+ or
+\begin_inset Formula 
+\begin{align*}
+\altprior & =\origprior\exp\left(\pertfun[][\infty]\right)\Rightarrow\\
+\pertfun[][\infty] & =\log\frac{\altprior}{\origprior}.
+\end{align*}
+
+\end_inset
+
+When 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+, we require 
+\begin_inset Formula $\pertfun\ge0$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+, we can accept any 
+\begin_inset Formula $\pertfun[][\infty]$
+\end_inset
+
+, though both come with the restriction that the implied 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ integrates to one.
+\end_layout
+
+\begin_layout Standard
+We might additionally define
+\begin_inset Formula 
+\begin{align*}
+\affpertfun & :=\begin{cases}
+\frac{\origprior^{-1/\beta}}{\beta}\pertfun+1 & \beta<\infty\\
+\pertfun[][\infty] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\frac{\origprior^{-1/\beta}}{\beta}\beta\left(\altprior^{1/\beta}-\origprior^{1/\beta}\right)+1 & \beta<\infty\\
+\log\frac{\altprior}{\origprior} & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\left(\frac{\altprior}{\origprior}\right)^{1/\beta} & \beta<\infty\\
+\log\frac{\altprior}{\origprior} & \beta=\infty
+\end{cases}
+\end{align*}
+
+\end_inset
+
+Then, inverting,
+\begin_inset Formula 
+\begin{align*}
+\pertfun & :=\begin{cases}
+\beta\origprior^{1/\beta}\left(\affpertfun-1\right) & \beta<\infty\\
+\affpertfun[][\infty] & \beta=\infty
+\end{cases}
+\end{align*}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{align*}
+\contamprior\propto & \begin{cases}
+\left(\origprior^{1/\beta}+\frac{1}{\beta}\beta\origprior^{1/\beta}\left(\affpertfun-1\right)\right)^{\beta} & 1\le\beta<\infty\\
+\origprior\exp\left(\affpertfun[][\infty]\right) & \beta=\infty.
+\end{cases}\\
+= & \begin{cases}
+\origprior\affpertfun^{\beta} & 1\le\beta<\infty\\
+\origprior\exp\left(\affpertfun[][\infty]\right) & \beta=\infty.
+\end{cases}
+\end{align*}
+
+\end_inset
+
+What, then is the meaning of the norm of 
+\begin_inset Formula $\affpertfun$
+\end_inset
+
+? For 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\norm{{\affpertfun}}_{\beta}^{\beta} & =\int\left|\left(\frac{\altprior}{\origprior}\right)^{1/\beta}\right|^{\beta}\lambda\left(d\theta\right)\\
+ & =\int\frac{\altprior}{\origprior}\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+If we take 
+\begin_inset Formula $\lambda\left(d\theta\right)=\origprior d\theta$
+\end_inset
+
+, then
+\begin_inset Formula 
+\begin{align*}
+\norm{{\affpertfun}}_{\beta}^{\beta} & =1.
+\end{align*}
+
+\end_inset
+
+For 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{align*}
+\norm{{\affpertfun[][\infty]}}_{\beta}^{\beta} & =\int\left(\log\altprior^{\beta}-\log\origprior^{\beta}\right)\lambda\left(d\theta\right).
+\end{align*}
+
+\end_inset
+
+For any 
+\begin_inset Formula $\beta$
+\end_inset
+
+, this may be infinite or finite irrespective of whether 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ integrates.
+ If we take
+\begin_inset Formula 
+\begin{align*}
+\norm{{\affpertfun[][\infty]}}_{\infty} & =\sup_{\theta}\left|\log\altprior-\log\origprior\right|,
+\end{align*}
+
+\end_inset
+
+then
+\begin_inset Formula 
+\begin{align*}
+\int\altprior d\theta & =\int\exp\left(\log\left(\frac{\altprior}{\origprior}\right)\right)\origprior d\theta\\
+ & \le\int\exp\left(\norm{{\affpertfun[][\infty]}}_{\infty}\right)\origprior d\theta\\
+ & =\exp\left(\norm{{\affpertfun[][\infty]}}_{\infty}\right).
+\end{align*}
+
+\end_inset
+
+So that 
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}<\infty$
+\end_inset
+
+ means that 
+\begin_inset Formula $\affpertfun[][\infty]$
+\end_inset
+
+ corresponds to a valid alternative prior distribution 
+\begin_inset Formula $\altprior$
+\end_inset
+
+.
+ However, there obviously exist valid 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ with 
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}=\infty$
+\end_inset
+
+ (for example, the domains may not overlap).
+ Or, with respect to the Lebesgue measure,
+\begin_inset Formula 
+\begin{align*}
+\altprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/4}\\
+\origprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/2}\\
+\affpertfun[][\infty] & =\mathbb{I}\left(0<\theta<1\right)\log\frac{\theta^{1/4}}{\theta^{1/2}}\\
+ & =\mathbb{I}\left(0<\theta<1\right)\left(-\frac{1}{4}\right)\log\theta,\\
+\lim_{\theta\rightarrow0}\affpertfun[][\infty] & =-\infty.
+\end{align*}
+
+\end_inset
+
+Consequently, unlike 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+, taking 
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}\le1$
+\end_inset
+
+ meaningfully restricts the set of perturbations we consider.
 \end_layout
 
 \begin_layout Section
@@ -602,7 +935,7 @@ Before doing so, we note that
 \begin_inset Formula 
 \begin{align*}
 \log\contamprior[\theta\vert\delta] & =\begin{cases}
-\log\origprior+\beta\log\left(\left(\delta\pertratio\right)^{1/\beta}-1\right) & \beta<\infty\\
+\log\origprior+\beta\log\left(\delta\left(\pertratio\right)^{1/\beta}-1\right) & \beta<\infty\\
 \log\origprior+\delta\log\pertratio & \beta=\infty
 \end{cases}.
 \end{align*}
@@ -685,13 +1018,13 @@ iation,
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\at[\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right)][\eta=\etaopt,\delta=0] & =\begin{cases}
+\at{}{} & =\begin{cases}
 \beta\frac{\partial}{\partial\eta}\expect_{q}\left[\pertratio^{\frac{1}{\beta}}\right] & \beta<\infty\\
 \frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
-\beta\int q\left(\theta\vert\etaopt\right)\at[\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}][\etaopt]\pertratio^{\frac{1}{\beta}}d\theta & \beta<\infty\\
-\int q\left(\theta\vert\etaopt\right)\at[\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}][\etaopt]\log\pertratio d\theta & \beta=\infty.
+\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\pertratio^{\frac{1}{\beta}}d\theta & \beta<\infty\\
+\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\pertratio d\theta & \beta=\infty.
 \end{cases}
 \end{align*}
 
@@ -708,11 +1041,16 @@ It is clear that the derivative is a linear operator on
 
 \end_inset
 
-(This is because of 
+(This is actually just 
 \begin_inset Formula $\pertfun$
 \end_inset
 
-; for clarity we should not introduce new notation.)
+; for clarity we should not introduce new notation.
+ In the rewrite let's subscript 
+\begin_inset Formula $u$
+\end_inset
+
+ from the start.)
 \end_layout
 
 \begin_layout Standard
@@ -723,7 +1061,7 @@ Because
  is a distribution, we are guaranteed
 \begin_inset Formula 
 \begin{align*}
-\int\altprior d\theta & =0
+\int\altprior d\theta & =1
 \end{align*}
 
 \end_inset
@@ -741,6 +1079,95 @@ but not, in general
 \end_inset
 
 .
+ When 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+, 
+\begin_inset Formula $\mathrm{sup}_{\theta}\left|\log\pertratio\right|<\infty$
+\end_inset
+
+ guarantees that 
+\begin_inset Formula $\int\altprior d\theta=1$
+\end_inset
+
+, but the converse is not true – it is possible that 
+\begin_inset Formula $\int\altprior d\theta=1$
+\end_inset
+
+ but 
+\begin_inset Formula $\mathrm{sup}_{\theta}\left|\log\pertratio\right|=\infty$
+\end_inset
+
+.
+ For any norm other than the 
+\begin_inset Formula $L_{\infty}$
+\end_inset
+
+norm, the former guarantee does not hold either.
+\end_layout
+
+\begin_layout Standard
+Um
+\end_layout
+
+\begin_layout Standard
+In fact, we don't really need to look at the Gateaux derivative.
+\begin_inset Formula 
+\begin{align*}
+G\left(\pert,\eta\right) & =\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\pert]\right]\\
+ & =\begin{cases}
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\log\left(\pertratio^{1/\beta}-1\right)\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\left(\pertratio^{1/\beta}-1\right)d\theta & \beta<\infty\\
+\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\pertratio d\theta & \beta=\infty.
+\end{cases}
+\end{align*}
+
+\end_inset
+
+For 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+, 
+\begin_inset Formula $G\left(\pert,\eta\right)$
+\end_inset
+
+ is a linear operator.
+ It suffices to show that it is bounded to show that it is Frechet differentiabl
+e.
+ Using the 
+\begin_inset Formula $L_{\infty}$
+\end_inset
+
+ norm for the reasons described above,
+\begin_inset Formula 
+\begin{align*}
+\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\pertratio d\theta & \le\sup_{\theta}\left|\log\pertratio\right|\int q\left(\theta\vert\etaopt\right)\norm{\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}}_{1}d\theta\\
+ & \le\norm{\log\pert}\expect_{q}\left[\norm{\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}}_{1}\right].
+\end{align*}
+
+\end_inset
+
+For 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+, umm
+\begin_inset Formula 
+\begin{align*}
+\contamprior & =\frac{\origprior+\pertfun}{C}\\
+\log\contamprior & =\log\left(\origprior+\pertfun\right)\\
+ & =\log\left(\origprior\left(1+\frac{\pertfun}{\origprior}\right)\right)\\
+ & =\log\left(\origprior\right)+\log\left(1+\frac{\pertfun}{\origprior}\right).
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \end_body
