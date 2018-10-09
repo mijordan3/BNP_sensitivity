@@ -31,8 +31,31 @@ class TestClusteringSamples(unittest.TestCase):
             e_z_sampled[:, i] = (z_ind_samples == i).mean(axis = 1)
 
         tol = 3 * np.sqrt(e_z * (1 - e_z) / n_samples)
-        print(np.max(np.abs(e_z_sampled - e_z)))
+        print('e_z diff', np.max(np.abs(e_z_sampled - e_z)))
         assert np.all(np.abs(e_z_sampled - e_z) < tol)
+
+    def test_get_e_num_clusters_from_ez(self):
+        n_obs = 5
+        n_clusters = 3
+        e_z = np.random.random((n_obs, n_clusters))
+        e_z = e_z / np.sum(e_z, axis = 1, keepdims = True)
+
+        e_num_clusters_sampled, var_num_clusters_sampled = \
+            modeling_lib.get_e_num_large_clusters_from_ez(e_z,
+                                                    n_samples = 10000,
+                                                    unif_samples = None,
+                                                    threshold = 0.0)
+
+        e_num_clusters_analytic = modeling_lib.get_e_number_clusters_from_ez(e_z)
+
+        print('e_num_clusters diff',
+                np.abs(e_num_clusters_analytic - e_num_clusters_sampled))
+        assert np.abs(e_num_clusters_analytic - e_num_clusters_sampled) < \
+                    np.sqrt(var_num_clusters_sampled) * 3
+
+
+
+
 
 
 if __name__ == '__main__':

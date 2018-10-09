@@ -217,7 +217,7 @@ def get_e_num_large_clusters_from_ez(e_z,
         # get number of clusters with at least enough points above the threshold
         num_heavy_clusters_vec += np.mean(z_sample == i, axis = 0) > threshold
 
-    return np.mean(num_heavy_clusters_vec)
+    return np.mean(num_heavy_clusters_vec), np.var(num_heavy_clusters_vec)
 
 
 # def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):
