@@ -141,6 +141,15 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\etaspace}{\Omega_{\eta}}
+{\Omega_{\eta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\pertratio}[1][\theta]{\phi\left(#1\right)}
 {\phi\left(#1\right)}
 \end_inset
@@ -150,8 +159,35 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\pert}{\phi}
+{\phi}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\expect}{\mathbb{E}}
 {\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etaopt}{\eta^{*}}
+{\eta^{*}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\at}[2][][]{\left.#1\right|_{#2}}
+{\left.#1\right|_{#2}}
 \end_inset
 
 
@@ -224,7 +260,7 @@ This defines
  un-perturbing.
 \begin_inset Formula 
 \begin{align*}
-\contamprior & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}].
+\contamprior & \propto\invtransfun[][{{\transfun[][{\origprior}]}}+{{\pertfun}}].
 \end{align*}
 
 \end_inset
@@ -283,18 +319,11 @@ Re-parameterizing
 \begin_layout Standard
 We wish to re-parameterize so that we can extrapolate to completely replacing
  one prior with another.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-\contamprior[\theta\vert\delta] & \propto\invtransfun[][{\transfun[][{\origprior}]}+{\pertfun}]\\
- & :=\invtransfun[][{\transfun[][{\origprior}]}+\delta{\altprior}].
-\end{align*}
-
+ That is, we want to have a perturbation 
+\begin_inset Formula $\delta\pertfun$
 \end_inset
 
-We want to have
+, where
 \begin_inset Formula 
 \begin{align*}
 \contamprior[\theta\vert\delta=1] & \propto\altprior,
@@ -421,8 +450,8 @@ Going forwards, we will define
 so that
 \begin_inset Formula 
 \begin{align*}
-\contamprior[\theta\vert\delta] & \propto\origprior\left(1+\origprior^{-1/\beta}\frac{\delta\pertfun}{\beta}\right)^{\beta}\\
- & =\origprior\left(\left(\delta\pertratio\right)^{1/\beta}-1\right)^{\beta}
+\contamprior[\theta\vert\delta] & \propto\origprior\left(1+\beta\origprior^{-1/\beta}\frac{\delta\pertfun}{\beta}\right)^{\beta}\\
+ & =\origprior\left(1+\delta\left(\pertratio^{1/\beta}-1\right)\right)^{\beta}.
 \end{align*}
 
 \end_inset
@@ -435,15 +464,12 @@ for
 \begin_inset Formula 
 \begin{align*}
 \pertfun & =\log\delta\pertratio\\
-\contamprior[\theta\vert\delta] & \propto\origprior\left(\pertratio^{\delta}\right).
+\contamprior[\theta\vert\delta] & \propto\origprior\exp\left(\delta\log\pertratio\right)\\
+ & =\origprior\left(\pertratio^{\delta}\right).
 \end{align*}
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 As mentioned above, this is an affine re-parameterization at 
 \begin_inset Formula $\delta=0$
 \end_inset
@@ -458,7 +484,112 @@ Derivatives
 \end_layout
 
 \begin_layout Standard
-We note that
+Define
+\begin_inset Formula 
+\begin{align*}
+p\left(\theta\vert X,\delta,\pert\right) & :=\frac{p\left(X\vert\theta\right)\contamprior[\theta\vert\delta,\pert]}{\int p\left(X\vert\theta'\right)\contamprior[\theta'\vert\delta,\pert]d\theta'}\\
+ & =\frac{p\left(X\vert\theta\right)\origprior\pertratio^{\delta}}{\int p\left(X\vert\theta'\right)\origprior\pertratio[\theta']^{\delta}d\theta'}.
+\end{align*}
+
+\end_inset
+
+The gradient of the KL divergence defines a map 
+\begin_inset Formula $G\left(\pert,\eta\right):\priorspace\times\etaspace\rightarrow\mathbb{R}$
+\end_inset
+
+ by
+\begin_inset Formula 
+\begin{align*}
+G\left(\pert,\eta\right) & :=\frac{\partial}{\partial\eta}KL\left(q\left(\theta\vert\eta\right)||p\left(\theta\vert X,\delta,\pert\right)\right)\\
+ & =\frac{\partial}{\partial\eta}\left(\expect_{q}\left[\log q\left(\theta\vert\eta\right)\right]-\expect_{q}\left[\log p\left(X\vert\theta\right)\right]-\expect_{q}\left[\contamprior[\theta\vert\delta,\pert]\right]\right).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For a given 
+\begin_inset Formula $\pert,$
+\end_inset
+
+the parameters of the optimal variational approximation, 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+, are defined by the estimating equation
+\begin_inset Formula 
+\begin{align*}
+G\left(\pert,\etaopt\right) & =0.
+\end{align*}
+
+\end_inset
+
+With a slight abuse of notation for 
+\begin_inset Formula $\etaopt$
+\end_inset
+
+, we wish to establish that the function
+\begin_inset Formula 
+\begin{align*}
+\etaopt\left(\pert\right) & :\priorspace\rightarrow\etaspace
+\end{align*}
+
+\end_inset
+
+exists and is Fréchet differentiable at 
+\begin_inset Formula $\pert\equiv1$
+\end_inset
+
+ (which represents no perturbation).
+ By Theorem 4B of Zeidler volume 1, it will suffice that 
+\begin_inset Formula $H$
+\end_inset
+
+ (defined above) exists and is invertible, that 
+\begin_inset Formula $G$
+\end_inset
+
+ is a continuous function of 
+\begin_inset Formula $\eta$
+\end_inset
+
+, and that 
+\begin_inset Formula $G$
+\end_inset
+
+ is a continuous function of 
+\begin_inset Formula $\pert$
+\end_inset
+
+ defined in a neighborhood of 
+\begin_inset Formula $\left(1,\etaopt\right)$
+\end_inset
+
+.
+ (Here, 
+\begin_inset Formula $1$
+\end_inset
+
+ represents the function in 
+\begin_inset Formula $\priorspace$
+\end_inset
+
+ that is identically equal to 
+\begin_inset Formula $1$
+\end_inset
+
+.) Only the last point remains to be proven, and to define it we will need
+ to choose a metric on 
+\begin_inset Formula $\priorspace$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Before doing so, we note that
 \begin_inset Formula 
 \begin{align*}
 \log\contamprior[\theta\vert\delta] & =\begin{cases}
@@ -469,17 +600,85 @@ We note that
 
 \end_inset
 
-The Gateaux derivatives of the KL divergence are given by
+Thus the Gateaux derivative in the direction 
+\begin_inset Formula $\pert$
+\end_inset
+
+ of 
+\begin_inset Formula $G$
+\end_inset
+
+ is given by
 \begin_inset Formula 
 \begin{align*}
-\frac{\partial}{\partial\delta}\expect_{q}\left[\log\contamprior[\theta\vert\delta]\right] & =\begin{cases}
-\beta\frac{\partial}{\partial\delta}\expect_{q}\left[\log\left(\left(\delta\pertratio\right)^{1/\beta}-1\right)\right] & \beta<\infty\\
-\frac{\partial}{\partial\delta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
+\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right) & =\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\delta]\right]\\
+ & =\begin{cases}
+\beta\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\left(\delta\left(\pertratio\right)^{1/\beta}-1\right)\right] & \beta<\infty\\
+\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
-\beta\expect_{q}\left[\frac{\frac{1}{\beta}\delta^{\frac{1}{\beta}-1}\pertratio^{\frac{1}{\beta}}}{\left(\delta\pertratio\right)^{\frac{1}{\beta}}-1}\right] & \beta<\infty\\
-\expect_{q}\left[\log\pertratio\right] & \beta=\infty
-\end{cases}
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\frac{\pertratio^{\frac{1}{\beta}}}{\delta\left(\pertratio\right)^{\frac{1}{\beta}}-1}\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+We will require that 
+\begin_inset Formula $\log\pertratio$
+\end_inset
+
+ is absolutely integrable with respect to 
+\begin_inset Formula $q\left(\theta,\eta\right)$
+\end_inset
+
+.
+ One can immediately see that 
+\begin_inset Formula $G$
+\end_inset
+
+ is linear in 
+\begin_inset Formula $\pert$
+\end_inset
+
+ only for 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+.
+ This is a consequence of our having used KL divergence.
+ Of course, linearity in 
+\begin_inset Formula $G$
+\end_inset
+
+ does not mean linearity of 
+\begin_inset Formula $\etaopt\left(\pert\right)$
+\end_inset
+
+.
+ However, the curvature of the variational approximation seems more difficult
+ to characerize in general, whereas we are completely free to choose 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Evaluating at 
+\begin_inset Formula $\delta=0$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\at[\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right)][\delta=0] & =\begin{cases}
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\pertratio^{\frac{1}{\beta}}\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
+\end{cases}.
 \end{align*}
 
 \end_inset
