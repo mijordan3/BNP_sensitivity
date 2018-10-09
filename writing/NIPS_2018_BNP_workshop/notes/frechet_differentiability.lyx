@@ -168,6 +168,15 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\linearpert}{v_{\beta}}
+{v_{\beta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\expect}{\mathbb{E}}
 {\mathbb{E}}
 \end_inset
@@ -657,7 +666,7 @@ We will require that
 
 .
  However, the curvature of the variational approximation seems more difficult
- to characerize in general, whereas we are completely free to choose 
+ to characterize in general, whereas we are completely free to choose 
 \begin_inset Formula $\beta$
 \end_inset
 
@@ -669,21 +678,69 @@ Evaluating at
 \begin_inset Formula $\delta=0$
 \end_inset
 
-,
+, and continuing to assume that we can freely exchange integration and different
+iation,
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\at[\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right)][\delta=0] & =\begin{cases}
+\at[\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right)][\eta=\etaopt,\delta=0] & =\begin{cases}
 \beta\frac{\partial}{\partial\eta}\expect_{q}\left[\pertratio^{\frac{1}{\beta}}\right] & \beta<\infty\\
 \frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\beta\int q\left(\theta\vert\etaopt\right)\at[\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}][\etaopt]\pertratio^{\frac{1}{\beta}}d\theta & \beta<\infty\\
+\int q\left(\theta\vert\etaopt\right)\at[\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}][\etaopt]\log\pertratio d\theta & \beta=\infty.
+\end{cases}
+\end{align*}
+
+\end_inset
+
+It is clear that the derivative is a linear operator on
+\begin_inset Formula 
+\begin{align*}
+\linearpert & :=\begin{cases}
+\pertratio^{\frac{1}{\beta}} & \beta<\infty\\
+\log\pertratio & \beta=\infty
 \end{cases}.
 \end{align*}
 
 \end_inset
 
+(This is because of 
+\begin_inset Formula $\pertfun$
+\end_inset
 
+; for clarity we should not introduce new notation.)
+\end_layout
+
+\begin_layout Standard
+Because 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ is a distribution, we are guaranteed
+\begin_inset Formula 
+\begin{align*}
+\int\altprior d\theta & =0
+\end{align*}
+
+\end_inset
+
+but not, in general
+\begin_inset Formula 
+\begin{align*}
+\int\altprior^{1/\beta}d\theta & <\infty
+\end{align*}
+
+\end_inset
+
+ for any 
+\begin_inset Formula $\beta\ne1$
+\end_inset
+
+.
 \end_layout
 
 \end_body
