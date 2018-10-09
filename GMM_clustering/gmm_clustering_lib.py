@@ -12,6 +12,8 @@ import autograd.scipy as sp
 
 import scipy as osp
 
+import warnings
+
 from scipy import optimize
 from scipy import linalg
 from scipy import sparse
@@ -506,9 +508,14 @@ class DPGaussianMixture(object):
         gamma_init = np.zeros((self.k_approx, dim, dim))
         for k in range(self.k_approx):
             indx = np.argwhere(km_best.labels_ == k).flatten()
-            resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
-            gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
-                                    np.eye(dim) * 1e-4)
+            if len(indx == 1):
+                # if there's only one datapoint in the cluster,
+                # the covariance is not defined.
+                gamma_init[k, :, :] = np.eye(dim)
+            else:
+                resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
+                gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
+                                        np.eye(dim) * 1e-4)
 
         self.vb_params['global']['gamma'].set(gamma_init)
 
@@ -531,7 +538,8 @@ class DPGaussianMixture(object):
         def local_precondition_and_optimize(x):
             return precondition_and_optimize(self.objective, x)
 
-        return opt_lib.repeatedly_optimize(
+        best_param, converged, x_conv, f_conv, grad_conv, obj_opt, opt_results = \
+         opt_lib.repeatedly_optimize(
             objective=self.objective,
             optimization_fun=local_precondition_and_optimize,
             init_x=init_free_par,
@@ -539,6 +547,15 @@ class DPGaussianMixture(object):
             max_iter=100,
             gtol=1e-8, ftol=1e-8, xtol=1e-8, disp=False,
             keep_intermediate_optimizations=True)
+
+        self.global_vb_params.set_free(best_param)
+        self.set_optimal_z()
+
+        class_weights = np.sum(self.e_z, axis=0) / self.n_obs
+        if class_weights[-1] > 1/self.k_approx:
+            warnings.warn('last cluster may not be un-occupied')
+
+        return best_param, converged, x_conv, f_conv, grad_conv, obj_opt, opt_results
 
 
 ########################
