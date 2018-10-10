@@ -123,6 +123,15 @@
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\affpert}{v_{\beta}}
+{v_{\beta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\transfun}[2][\beta][\cdot]{\tau_{#1}\left(#2\right)}
 {\tau_{#1}\left(#2\right)}
 \end_inset
@@ -668,26 +677,53 @@ We might additionally define
 \begin{align*}
 \affpertfun & :=\begin{cases}
 \frac{\origprior^{-1/\beta}}{\beta}\pertfun+1 & \beta<\infty\\
-\pertfun[][\infty] & \beta=\infty
+\pertfun[][\infty]+1 & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
 \frac{\origprior^{-1/\beta}}{\beta}\beta\left(\altprior^{1/\beta}-\origprior^{1/\beta}\right)+1 & \beta<\infty\\
-\log\frac{\altprior}{\origprior} & \beta=\infty
+\log\frac{\altprior}{\origprior}+1 & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
 \left(\frac{\altprior}{\origprior}\right)^{1/\beta} & \beta<\infty\\
-\log\frac{\altprior}{\origprior} & \beta=\infty
+\log\frac{\altprior}{\origprior}+1 & \beta=\infty
 \end{cases}
 \end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+Note that, in each case, 
+\begin_inset Quotes eld
+\end_inset
+
+no perturbation
+\begin_inset Quotes erd
+\end_inset
+
+ is the identity function, 
+\begin_inset Formula $\affpert\equiv1$
+\end_inset
+
+.
+ Maybe we should make it zero? No — because it is constrained to be positive
+ in the current formulation, and would otherwise be constrained to be greater
+ than 
+\begin_inset Formula $-1$
+\end_inset
+
+, which is weirder than evaluating the derivative at one.
+\end_layout
+
+\begin_layout Standard
 Then, inverting,
 \begin_inset Formula 
 \begin{align*}
 \pertfun & :=\begin{cases}
 \beta\origprior^{1/\beta}\left(\affpertfun-1\right) & \beta<\infty\\
-\affpertfun[][\infty] & \beta=\infty
+\affpertfun-1 & \beta=\infty
 \end{cases}
 \end{align*}
 
@@ -698,18 +734,22 @@ so that
 \begin{align*}
 \contamprior\propto & \begin{cases}
 \left(\origprior^{1/\beta}+\frac{1}{\beta}\beta\origprior^{1/\beta}\left(\affpertfun-1\right)\right)^{\beta} & 1\le\beta<\infty\\
-\origprior\exp\left(\affpertfun[][\infty]\right) & \beta=\infty.
+\origprior\exp\left(\affpertfun[][\infty]-1\right) & \beta=\infty.
 \end{cases}\\
 = & \begin{cases}
 \origprior\affpertfun^{\beta} & 1\le\beta<\infty\\
-\origprior\exp\left(\affpertfun[][\infty]\right) & \beta=\infty.
+\origprior\exp\left(\affpertfun[][\infty]-1\right) & \beta=\infty.
 \end{cases}
 \end{align*}
 
 \end_inset
 
-What, then is the meaning of the norm of 
+What, then is the meaning of the distance from 
 \begin_inset Formula $\affpertfun$
+\end_inset
+
+ to 
+\begin_inset Formula $1$
 \end_inset
 
 ? For 
@@ -719,8 +759,9 @@ What, then is the meaning of the norm of
 ,
 \begin_inset Formula 
 \begin{align*}
-\norm{{\affpertfun}}_{\beta}^{\beta} & =\int\left|\left(\frac{\altprior}{\origprior}\right)^{1/\beta}\right|^{\beta}\lambda\left(d\theta\right)\\
- & =\int\frac{\altprior}{\origprior}\lambda\left(d\theta\right).
+\norm{{\affpertfun}-1}_{\beta}^{\beta} & =\int\left|\left(\frac{\altprior}{\origprior}\right)^{1/\beta}-1\right|^{\beta}\lambda\left(d\theta\right)\\
+ & =\int\left|\origprior^{-1/\beta}\left(\altprior^{1/\beta}-\origprior^{1/\beta}\right)\right|^{\beta}\lambda\left(d\theta\right)\\
+ & =\int\frac{1}{\origprior}\left|\altprior^{1/\beta}-\origprior^{1/\beta}\right|^{\beta}\lambda\left(d\theta\right).
 \end{align*}
 
 \end_inset
@@ -732,19 +773,63 @@ If we take
 , then
 \begin_inset Formula 
 \begin{align*}
-\norm{{\affpertfun}}_{\beta}^{\beta} & =1.
+\norm{{\affpertfun}-1}_{\beta} & =\left(\int\left|\altprior^{1/\beta}-\origprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}\\
+ & \le\left(\int\left|\altprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}+\left(\int\left|\origprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}\\
+ & =\left(\int\altprior d\theta\right)^{1/\beta}+\left(\int\origprior d\theta\right)^{1/\beta}\\
+ & =2.
 \end{align*}
 
 \end_inset
 
+So as long as 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ is integrable, 
+\begin_inset Formula $\norm{{\affpertfun}-1}_{\beta}$
+\end_inset
+
+ is finite.
+ (TODO: be a little more careful about whether 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ is normalized or not.) Conversely,
+\begin_inset Formula 
+\begin{align*}
+\norm{{\affpertfun}-1}_{\beta} & =\left(\int\left|\altprior^{1/\beta}-\origprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}\\
+ & \ge\left(\int\left|\altprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}-\left(\int\left|\origprior^{1/\beta}\right|^{\beta}d\theta\right)^{1/\beta}\\
+ & =\left(\int\altprior d\theta\right)^{1/\beta}-1\Rightarrow\\
+\int\altprior d\theta & \le\left(1+\norm{{\affpertfun}-1}_{\beta}\right)^{\beta}.
+\end{align*}
+
+\end_inset
+
+so 
+\begin_inset Formula $\norm{{\affpertfun}-1}_{\beta}<M\le\infty\Rightarrow\int\altprior d\theta<\infty.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For 
 \begin_inset Formula $\beta=\infty$
 \end_inset
 
-,
+, the 
+\begin_inset Formula $L_{\beta}$
+\end_inset
+
+ norms will not do for 
+\begin_inset Formula $\beta<\infty$
+\end_inset
+
+.
+ This is because
 \begin_inset Formula 
 \begin{align*}
-\norm{{\affpertfun[][\infty]}}_{\beta}^{\beta} & =\int\left(\log\altprior^{\beta}-\log\origprior^{\beta}\right)\lambda\left(d\theta\right).
+\norm{{\affpertfun}-1}_{\beta}^{\beta} & =\int\left(\log\frac{\altprior}{\origprior}-1\right)^{\beta}\lambda\left(d\theta\right).
 \end{align*}
 
 \end_inset
@@ -761,7 +846,7 @@ For any
  If we take
 \begin_inset Formula 
 \begin{align*}
-\norm{{\affpertfun[][\infty]}}_{\infty} & =\sup_{\theta}\left|\log\altprior-\log\origprior\right|,
+\norm{{\affpertfun}-1}_{\infty} & =\sup_{\theta}\left|\log\frac{\altprior}{\origprior}-1\right|,
 \end{align*}
 
 \end_inset
@@ -769,19 +854,19 @@ For any
 then
 \begin_inset Formula 
 \begin{align*}
-\int\altprior d\theta & =\int\exp\left(\log\left(\frac{\altprior}{\origprior}\right)\right)\origprior d\theta\\
- & \le\int\exp\left(\norm{{\affpertfun[][\infty]}}_{\infty}\right)\origprior d\theta\\
- & =\exp\left(\norm{{\affpertfun[][\infty]}}_{\infty}\right).
+\int\altprior d\theta & =\int\exp\left(\log\left(\frac{\altprior}{\origprior}\right)-1+1\right)\origprior d\theta\\
+ & \le\int\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun[][\infty]}-1}_{\infty}\right)\origprior d\theta\\
+ & =\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun}}_{\infty}\right).
 \end{align*}
 
 \end_inset
 
 So that 
-\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}<\infty$
+\begin_inset Formula $\norm{{\affpertfun}-1}_{\infty}<\infty$
 \end_inset
 
  means that 
-\begin_inset Formula $\affpertfun[][\infty]$
+\begin_inset Formula $\affpertfun$
 \end_inset
 
  corresponds to a valid alternative prior distribution 
@@ -794,18 +879,18 @@ So that
 \end_inset
 
  with 
-\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}=\infty$
+\begin_inset Formula $\norm{{\affpertfun}-1}_{\infty}=\infty$
 \end_inset
 
- (for example, the domains may not overlap).
- Or, with respect to the Lebesgue measure,
+.
+ For example, with respect to the Lebesgue measure, define the densitites
 \begin_inset Formula 
 \begin{align*}
 \altprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/4}\\
 \origprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/2}\\
-\affpertfun[][\infty] & =\mathbb{I}\left(0<\theta<1\right)\log\frac{\theta^{1/4}}{\theta^{1/2}}\\
+\affpertfun & =\mathbb{I}\left(0<\theta<1\right)\log\frac{\theta^{1/4}}{\theta^{1/2}}\\
  & =\mathbb{I}\left(0<\theta<1\right)\left(-\frac{1}{4}\right)\log\theta,\\
-\lim_{\theta\rightarrow0}\affpertfun[][\infty] & =-\infty.
+\lim_{\theta\rightarrow0}\affpertfun & =-\infty.
 \end{align*}
 
 \end_inset
@@ -815,10 +900,19 @@ Consequently, unlike
 \end_inset
 
 , taking 
-\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}\le1$
+\begin_inset Formula $\norm{{\affpertfun}}_{\infty}\le1$
 \end_inset
 
  meaningfully restricts the set of perturbations we consider.
+\end_layout
+
+\begin_layout Standard
+For the actual paper, we can just start by defining the perturbations in
+ terms of 
+\begin_inset Formula $\affpertfun$
+\end_inset
+
+, and connect them to Gustafson secondarily.
 \end_layout
 
 \begin_layout Section
@@ -829,8 +923,11 @@ Derivatives
 Define
 \begin_inset Formula 
 \begin{align*}
-p\left(\theta\vert X,\delta,\pert\right) & :=\frac{p\left(X\vert\theta\right)\contamprior[\theta\vert\delta,\pert]}{\int p\left(X\vert\theta'\right)\contamprior[\theta'\vert\delta,\pert]d\theta'}\\
- & =\frac{p\left(X\vert\theta\right)\origprior\pertratio^{\delta}}{\int p\left(X\vert\theta'\right)\origprior\pertratio[\theta']^{\delta}d\theta'}.
+p\left(\theta\vert X,\delta,\affpert\right) & :=\frac{p\left(X\vert\theta\right)\contamprior[\theta\vert\delta,\pert]}{\int p\left(X\vert\theta'\right)\contamprior[\theta'\vert\delta,\pert]d\theta'}\\
+ & =\begin{cases}
+\frac{p\left(X\vert\theta\right)\origprior\left(\delta\affpertfun\right)^{\beta}}{\int p\left(X\vert\theta'\right)\origprior\left(\delta\affpertfun\right)^{\beta}d\theta'} & \beta<\infty\\
+\frac{p\left(X\vert\theta\right)\origprior\exp\left(\delta\affpertfun[][\infty]\right)}{\int p\left(X\vert\theta'\right)\origprior\exp\left(\delta\affpertfun[][\infty]\right)d\theta'} & \beta=\infty
+\end{cases}.
 \end{align*}
 
 \end_inset
@@ -935,8 +1032,8 @@ Before doing so, we note that
 \begin_inset Formula 
 \begin{align*}
 \log\contamprior[\theta\vert\delta] & =\begin{cases}
-\log\origprior+\beta\log\left(\delta\left(\pertratio\right)^{1/\beta}-1\right) & \beta<\infty\\
-\log\origprior+\delta\log\pertratio & \beta=\infty
+\log\origprior+\beta\log\left(\delta\affpertfun\right) & \beta<\infty\\
+\log\origprior+\delta\affpertfun[][\infty] & \beta=\infty
 \end{cases}.
 \end{align*}
 
@@ -955,12 +1052,12 @@ Thus the Gateaux derivative in the direction
 \begin{align*}
 \frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right) & =\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\delta]\right]\\
  & =\begin{cases}
-\beta\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\left(\delta\left(\pertratio\right)^{1/\beta}-1\right)\right] & \beta<\infty\\
-\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
+\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\beta\log\left(1+\delta\left(\affpertfun-1\right)\right)\right] & \beta<\infty\\
+\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[1+\delta\affpertfun[][\infty]\right] & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
-\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\frac{\pertratio^{\frac{1}{\beta}}}{\delta\left(\pertratio\right)^{\frac{1}{\beta}}-1}\right] & \beta<\infty\\
-\frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\frac{\affpertfun}{\delta\affpertfun}\right] & \beta<\infty????????????\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun[][\infty]\right] & \beta=\infty
 \end{cases}.
 \end{align*}
 
