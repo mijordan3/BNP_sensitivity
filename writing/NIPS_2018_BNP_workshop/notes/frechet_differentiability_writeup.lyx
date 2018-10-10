@@ -1,0 +1,199 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Frechet (non-)Differentiability of Variational Approximations
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+A Bayesian posterior expectation depends on the functional form of the prior
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The expectation depends on the likelihood as well, but for simplicity we
+ will focus on the prior in the present work.
+\end_layout
+
+\end_inset
+
+.
+ As such, calculating a Bayesian posterior expectation may be thought of
+ as a map from the space of possible priors to a real number, i.e., as a functiona
+l of the prior density.
+ The same can be said of variational Bayes (VB) approximations to posterior
+ expectations.
+ When alternative forms of the prior are subjectively plausible, it is important
+ to ask whether the posterior expectation of interest is sensitive to the
+ chosen prior.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Local Bayesian robustness
+\begin_inset Quotes erd
+\end_inset
+
+ provides an approximate answer to this question by calculating derivatives
+ of posterior expectations with respect to function-valued perturbations.
+ These derivatives are meaningful to the extent that they provide the a
+ linear approximation to the behavior of the posterior expectation in some
+ 
+\begin_inset Quotes eld
+\end_inset
+
+neighborhood
+\begin_inset Quotes erd
+\end_inset
+
+ of the original prior.
+ But the validity of such a linear approximation in the infinite-dimensional
+ space of functions is a more delicate affair than in finite-dimensional
+ spaces.
+ In particular, one must show carefully that the derivative provides a uniformly
+ good linear approximation to the functional in every direction, a condition
+ known as 
+\begin_inset Quotes eld
+\end_inset
+
+Fréchet differentiability
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Although most well-behaved functionals in finite-dimensional, real-valued
+ vectors spaces are Fréchet differentiable, many commonly-used functionals
+ in infinite-dimensional vector spaces are not.
+ 
+\end_layout
+
+\begin_layout Standard
+In the current work, we develop usable, closed-form VB versions of the classical
+ non-linear functional sensitivity measures of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "gustafson:1996:localposterior"
+literal "false"
+
+\end_inset
+
+.
+ We show that, for VB approximations based on the Kullback-Leibler (KL)
+ divergence, only the class of multiplicative perturbations are Fréchet
+ differentiable.
+ In particular, we show that local sensitivity measures do not provide a
+ uniformly good linear approximation to dependence on additive perturbations,
+ which are arguably the most commonly used prior contamination specification.
+ As part of our proof, we provide adversarial examples that reveal a lack
+ of robustness for VB approximations that is not shared by the exact posterior.
+ These results both provide guidance for quantifying in practice the sensitivity
+ of VB approximations based on KL divergence as well as a template for establish
+ing Fréchet differentiability (or non-differentiability) for other divergence
+ measures.
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "references"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
