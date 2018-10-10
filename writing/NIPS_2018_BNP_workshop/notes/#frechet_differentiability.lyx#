@@ -1493,7 +1493,7 @@ Quick note: you can show that
  is not a continuous function using 
 \begin_inset Formula 
 \begin{align*}
-h_{\epsilon,\delta} & :=\begin{cases}
+h & :=\begin{cases}
 1 & x\ge\epsilon\\
 \delta & 0\le x<\epsilon
 \end{cases}.
@@ -1526,61 +1526,10 @@ Because
 \end_layout
 
 \begin_layout Standard
-It will be easiest to just show discontinuity.
- Since 
-\begin_inset Formula $h$
-\end_inset
-
- is a direction, let
+Um
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-h_{\epsilon,\delta} & :=\begin{cases}
-0 & x\ge\epsilon\\
-\delta-1 & 0\le x<\epsilon
-\end{cases}.
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Then, since 
-\begin_inset Formula $\log\left(1\right)=0$
-\end_inset
-
-,
-\begin_inset Formula 
-\begin{align*}
-\norm{\log\left(1+h_{\epsilon,\delta}\right)-\log\left(1\right)}_{p} & =\left(\int_{0}^{1}\left|\log\left(1+h_{\epsilon,\delta}\left(\theta\right)\right)\right|^{p}d\theta\right)^{1/p}\\
- & =\left(\int_{0}^{\epsilon}\left|\log\left(\delta\right)\right|^{p}d\theta\right)^{1/p}\\
- & =\epsilon\left|\log\left(\delta\right)\right|.
-\end{align*}
-
-\end_inset
-
-and
-\begin_inset Formula 
-\begin{align*}
-\norm{h_{\epsilon,\delta}}_{p} & =\left(\int_{0}^{1}h_{\epsilon,\delta}\left(\theta\right)^{p}d\theta\right)^{1/p}\\
- & =\left(\int_{0}^{\epsilon}\left|\delta-1\right|^{p}d\theta\right)^{1/p}\\
- & =\epsilon\left|\delta-1\right|.
-\end{align*}
-
-\end_inset
-
-Then
-\begin_inset Formula 
-\begin{align*}
-\frac{\norm{\log\left(1+h_{\epsilon,\delta}\right)-\log\left(1\right)}_{p}}{\norm{h_{\epsilon,\delta}}_{p}} & =\frac{\left|\log\left(\delta\right)\right|}{\left|\delta-1\right|}\underset{\delta\rightarrow0}{\longrightarrow}\infty.
-\end{align*}
-
-\end_inset
-
 
 \end_layout
 
