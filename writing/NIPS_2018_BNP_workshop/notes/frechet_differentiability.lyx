@@ -855,18 +855,19 @@ then
 \begin_inset Formula 
 \begin{align*}
 \int\altprior d\theta & =\int\exp\left(\log\left(\frac{\altprior}{\origprior}\right)-1+1\right)\origprior d\theta\\
- & \le\int\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun[][\infty]}-1}_{\infty}\right)\origprior d\theta\\
- & =\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun}}_{\infty}\right).
+ & =\int\exp\left(\affpertfun[][\infty]-1\right)\origprior d\theta\\
+ & \le\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun[][\infty]}-1}_{\infty}\right)\int\origprior d\theta\\
+ & =\exp\left(1\right)\cdot\exp\left(\norm{{\affpertfun[][\infty]}-1}_{\infty}\right).
 \end{align*}
 
 \end_inset
 
 So that 
-\begin_inset Formula $\norm{{\affpertfun}-1}_{\infty}<\infty$
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}-1}_{\infty}<\infty$
 \end_inset
 
  means that 
-\begin_inset Formula $\affpertfun$
+\begin_inset Formula $\affpertfun[][\infty]$
 \end_inset
 
  corresponds to a valid alternative prior distribution 
@@ -879,18 +880,18 @@ So that
 \end_inset
 
  with 
-\begin_inset Formula $\norm{{\affpertfun}-1}_{\infty}=\infty$
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}-1}_{\infty}=\infty$
 \end_inset
 
 .
- For example, with respect to the Lebesgue measure, define the densitites
+ For example, with respect to the Lebesgue measure, define the densities
 \begin_inset Formula 
 \begin{align*}
 \altprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/4}\\
 \origprior & \propto\mathbb{I}\left(0<\theta<1\right)\theta^{1/2}\\
-\affpertfun & =\mathbb{I}\left(0<\theta<1\right)\log\frac{\theta^{1/4}}{\theta^{1/2}}\\
+\affpertfun[][\infty] & =\mathbb{I}\left(0<\theta<1\right)\log\frac{\theta^{1/4}}{\theta^{1/2}}\\
  & =\mathbb{I}\left(0<\theta<1\right)\left(-\frac{1}{4}\right)\log\theta,\\
-\lim_{\theta\rightarrow0}\affpertfun & =-\infty.
+\lim_{\theta\rightarrow0}\affpertfun[][\infty] & =-\infty.
 \end{align*}
 
 \end_inset
@@ -900,7 +901,7 @@ Consequently, unlike
 \end_inset
 
 , taking 
-\begin_inset Formula $\norm{{\affpertfun}}_{\infty}\le1$
+\begin_inset Formula $\norm{{\affpertfun[][\infty]}}_{\infty}\le1$
 \end_inset
 
  meaningfully restricts the set of perturbations we consider.
@@ -923,10 +924,10 @@ Derivatives
 Define
 \begin_inset Formula 
 \begin{align*}
-p\left(\theta\vert X,\delta,\affpert\right) & :=\frac{p\left(X\vert\theta\right)\contamprior[\theta\vert\delta,\pert]}{\int p\left(X\vert\theta'\right)\contamprior[\theta'\vert\delta,\pert]d\theta'}\\
+p\left(\theta\vert X,\affpert\right) & :=\frac{p\left(X\vert\theta\right)\contamprior[\theta\vert\affpert]}{\int p\left(X\vert\theta'\right)\contamprior[\theta'\vert\affpert]d\theta'}\\
  & =\begin{cases}
-\frac{p\left(X\vert\theta\right)\origprior\left(\delta\affpertfun\right)^{\beta}}{\int p\left(X\vert\theta'\right)\origprior\left(\delta\affpertfun\right)^{\beta}d\theta'} & \beta<\infty\\
-\frac{p\left(X\vert\theta\right)\origprior\exp\left(\delta\affpertfun[][\infty]\right)}{\int p\left(X\vert\theta'\right)\origprior\exp\left(\delta\affpertfun[][\infty]\right)d\theta'} & \beta=\infty
+\frac{p\left(X\vert\theta\right)\origprior\affpertfun^{\beta}}{\int p\left(X\vert\theta'\right)\origprior\affpertfun^{\beta}d\theta'} & \beta<\infty\\
+\frac{p\left(X\vert\theta\right)\origprior\exp\left(\affpertfun[][\infty]-1\right)}{\int p\left(X\vert\theta'\right)\origprior\exp\left(\affpertfun[][\infty]-1\right)d\theta'} & \beta=\infty
 \end{cases}.
 \end{align*}
 
@@ -940,7 +941,7 @@ The gradient of the KL divergence defines a map
 \begin_inset Formula 
 \begin{align*}
 G\left(\pert,\eta\right) & :=\frac{\partial}{\partial\eta}KL\left(q\left(\theta\vert\eta\right)||p\left(\theta\vert X,\delta,\pert\right)\right)\\
- & =\frac{\partial}{\partial\eta}\left(\expect_{q}\left[\log q\left(\theta\vert\eta\right)\right]-\expect_{q}\left[\log p\left(X\vert\theta\right)\right]-\expect_{q}\left[\contamprior[\theta\vert\delta,\pert]\right]\right).
+ & =\frac{\partial}{\partial\eta}\left(\expect_{q}\left[\log q\left(\theta\vert\eta\right)\right]-\expect_{q}\left[\log p\left(X\vert\theta\right)\right]-\expect_{q}\left[\contamprior[\theta\vert\affpert]\right]\right).
 \end{align*}
 
 \end_inset
@@ -950,7 +951,7 @@ G\left(\pert,\eta\right) & :=\frac{\partial}{\partial\eta}KL\left(q\left(\theta\
 
 \begin_layout Standard
 For a given 
-\begin_inset Formula $\pert,$
+\begin_inset Formula $\affpert,$
 \end_inset
 
 the parameters of the optimal variational approximation, 
@@ -960,7 +961,7 @@ the parameters of the optimal variational approximation,
 , are defined by the estimating equation
 \begin_inset Formula 
 \begin{align*}
-G\left(\pert,\etaopt\right) & =0.
+G\left(\affpert,\etaopt\right) & =0.
 \end{align*}
 
 \end_inset
@@ -972,13 +973,13 @@ With a slight abuse of notation for
 , we wish to establish that the function
 \begin_inset Formula 
 \begin{align*}
-\etaopt\left(\pert\right) & :\priorspace\rightarrow\etaspace
+\etaopt\left(\affpert\right) & :\priorspace\rightarrow\etaspace
 \end{align*}
 
 \end_inset
 
 exists and is Fréchet differentiable at 
-\begin_inset Formula $\pert\equiv1$
+\begin_inset Formula $\affpert\equiv1$
 \end_inset
 
  (which represents no perturbation).
@@ -1031,195 +1032,39 @@ exists and is Fréchet differentiable at
 Before doing so, we note that
 \begin_inset Formula 
 \begin{align*}
-\log\contamprior[\theta\vert\delta] & =\begin{cases}
-\log\origprior+\beta\log\left(\delta\affpertfun\right) & \beta<\infty\\
-\log\origprior+\delta\affpertfun[][\infty] & \beta=\infty
+\log\contamprior[\theta\vert\affpert] & =\begin{cases}
+\log\origprior+\beta\log\left(\affpert\right) & \beta<\infty\\
+\log\origprior+\affpertfun[][\infty]-1 & \beta=\infty
 \end{cases}.
 \end{align*}
 
 \end_inset
 
-Thus the Gateaux derivative in the direction 
-\begin_inset Formula $\pert$
-\end_inset
 
- of 
-\begin_inset Formula $G$
-\end_inset
-
- is given by
-\begin_inset Formula 
-\begin{align*}
-\frac{\partial}{\partial\delta}G\left(\delta\pert,\eta\right) & =\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\delta]\right]\\
- & =\begin{cases}
-\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\beta\log\left(1+\delta\left(\affpertfun-1\right)\right)\right] & \beta<\infty\\
-\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[1+\delta\affpertfun[][\infty]\right] & \beta=\infty
-\end{cases}\\
- & =\begin{cases}
-\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\frac{\affpertfun}{\delta\affpertfun}\right] & \beta<\infty????????????\\
-\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun[][\infty]\right] & \beta=\infty
-\end{cases}.
-\end{align*}
-
-\end_inset
-
-We will require that 
-\begin_inset Formula $\log\pertratio$
-\end_inset
-
- is absolutely integrable with respect to 
-\begin_inset Formula $q\left(\theta,\eta\right)$
-\end_inset
-
-.
- One can immediately see that 
-\begin_inset Formula $G$
-\end_inset
-
- is linear in 
-\begin_inset Formula $\pert$
-\end_inset
-
- only for 
-\begin_inset Formula $\beta=\infty$
-\end_inset
-
-.
- This is a consequence of our having used KL divergence.
- Of course, linearity in 
-\begin_inset Formula $G$
-\end_inset
-
- does not mean linearity of 
-\begin_inset Formula $\etaopt\left(\pert\right)$
-\end_inset
-
-.
- However, the curvature of the variational approximation seems more difficult
- to characterize in general, whereas we are completely free to choose 
-\begin_inset Formula $\beta$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Evaluating at 
-\begin_inset Formula $\delta=0$
-\end_inset
-
-, and continuing to assume that we can freely exchange integration and different
-iation,
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-\at{}{} & =\begin{cases}
-\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\pertratio^{\frac{1}{\beta}}\right] & \beta<\infty\\
-\frac{\partial}{\partial\eta}\expect_{q}\left[\log\pertratio\right] & \beta=\infty
-\end{cases}\\
- & =\begin{cases}
-\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\pertratio^{\frac{1}{\beta}}d\theta & \beta<\infty\\
-\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\pertratio d\theta & \beta=\infty.
-\end{cases}
-\end{align*}
-
-\end_inset
-
-It is clear that the derivative is a linear operator on
-\begin_inset Formula 
-\begin{align*}
-\linearpert & :=\begin{cases}
-\pertratio^{\frac{1}{\beta}} & \beta<\infty\\
-\log\pertratio & \beta=\infty
-\end{cases}.
-\end{align*}
-
-\end_inset
-
-(This is actually just 
-\begin_inset Formula $\pertfun$
-\end_inset
-
-; for clarity we should not introduce new notation.
- In the rewrite let's subscript 
-\begin_inset Formula $u$
-\end_inset
-
- from the start.)
-\end_layout
-
-\begin_layout Standard
-Because 
-\begin_inset Formula $\altprior$
-\end_inset
-
- is a distribution, we are guaranteed
-\begin_inset Formula 
-\begin{align*}
-\int\altprior d\theta & =1
-\end{align*}
-
-\end_inset
-
-but not, in general
-\begin_inset Formula 
-\begin{align*}
-\int\altprior^{1/\beta}d\theta & <\infty
-\end{align*}
-
-\end_inset
-
- for any 
-\begin_inset Formula $\beta\ne1$
-\end_inset
-
-.
- When 
-\begin_inset Formula $\beta=\infty$
-\end_inset
-
-, 
-\begin_inset Formula $\mathrm{sup}_{\theta}\left|\log\pertratio\right|<\infty$
-\end_inset
-
- guarantees that 
-\begin_inset Formula $\int\altprior d\theta=1$
-\end_inset
-
-, but the converse is not true – it is possible that 
-\begin_inset Formula $\int\altprior d\theta=1$
-\end_inset
-
- but 
-\begin_inset Formula $\mathrm{sup}_{\theta}\left|\log\pertratio\right|=\infty$
-\end_inset
-
-.
- For any norm other than the 
-\begin_inset Formula $L_{\infty}$
-\end_inset
-
-norm, the former guarantee does not hold either.
-\end_layout
-
-\begin_layout Standard
-Um
 \end_layout
 
 \begin_layout Standard
 In fact, we don't really need to look at the Gateaux derivative.
+ Let 
+\begin_inset Formula $C$
+\end_inset
+
+ denote terms that do not depend on 
+\begin_inset Formula $\affpert$
+\end_inset
+
+.
+ Then
 \begin_inset Formula 
 \begin{align*}
-G\left(\pert,\eta\right) & =\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\pert]\right]\\
+G\left(\pert,\eta\right) & =\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\affpert]\right]+C\\
  & =\begin{cases}
-\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\log\left(\pertratio^{1/\beta}-1\right)\right] & \beta<\infty\\
-\frac{\partial}{\partial\eta}\expect_{q}\left[\delta\log\pertratio\right] & \beta=\infty
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\log\affpert\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun[][\infty]-1\right] & \beta=\infty
 \end{cases}\\
  & =\begin{cases}
-\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\left(\pertratio^{1/\beta}-1\right)d\theta & \beta<\infty\\
-\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\pertratio d\theta & \beta=\infty.
+\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\affpertfun d\theta & \beta<\infty\\
+\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\affpertfun[][\infty]d\theta & \beta=\infty.
 \end{cases}
 \end{align*}
 
@@ -1253,18 +1098,134 @@ For
 \begin_inset Formula $\beta<\infty$
 \end_inset
 
-, umm
+, it seems a little trickier.
+ As we have seen, the map 
+\begin_inset Formula $T_{1}\left(f\right):\left(\priorspace,\norm{\cdot}_{\infty}\right)\rightarrow\left(\mathbb{R}^{D},\norm{\cdot}_{2}\right)$
+\end_inset
+
+ given by
 \begin_inset Formula 
 \begin{align*}
-\contamprior & =\frac{\origprior+\pertfun}{C}\\
-\log\contamprior & =\log\left(\origprior+\pertfun\right)\\
- & =\log\left(\origprior\left(1+\frac{\pertfun}{\origprior}\right)\right)\\
- & =\log\left(\origprior\right)+\log\left(1+\frac{\pertfun}{\origprior}\right).
+T_{1}\left(f\right)= & \int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}f\left(\theta\right)d\theta
+\end{align*}
+
+\end_inset
+
+ is continuous and linear and so Frechet differentiable.
+ So we must show that the map 
+\begin_inset Formula $T_{2}\left(f\right):\left(L_{1},\norm{\cdot}_{\beta}\right)\rightarrow\left(\priorspace\norm{\cdot}_{\infty}\right)$
+\end_inset
+
+ given by
+\begin_inset Formula 
+\begin{align*}
+T_{2}\left(\affpert\right) & \left(\theta\right)=\log\affpertfun
+\end{align*}
+
+\end_inset
+
+ is Frechet differentiable at 
+\begin_inset Formula $\affpert=1$
+\end_inset
+
+.
+ The derivative is given by
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{d\affpert}\log\affpert & =\frac{1}{\affpert},
+\end{align*}
+
+\end_inset
+
+so we need to assess
+\end_layout
+
+\begin_layout Subsection
+Values of derivatives
+\end_layout
+
+\begin_layout Standard
+Thus the Gateaux derivative in the direction 
+\begin_inset Formula $\pert$
+\end_inset
+
+ of 
+\begin_inset Formula $G$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial}{\partial\delta}G\left(\delta\left(\affpert-1\right)+1,\eta\right) & =\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\log\contamprior[\theta\vert\delta\left(\affpert-1\right)+1]\right]\\
+ & =\begin{cases}
+\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\beta\log\left(\delta\left(\affpertfun-1\right)+1\right)\right] & \beta<\infty\\
+\frac{\partial}{\partial\delta}\frac{\partial}{\partial\eta}\expect_{q}\left[\delta\left(\affpertfun[][\infty]-1\right)+1\right] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\frac{\affpertfun}{\delta\left(\affpertfun-1\right)+1}\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun[][\infty]-1\right] & \beta=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+Evaluating at 
+\begin_inset Formula $\delta=0$
+\end_inset
+
+, and continuing to assume that we can freely exchange integration and different
+iation,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\at{\frac{\partial}{\partial\delta}G\left(\delta\left(\affpert-1\right)+1,\eta\right)}{\delta=0} & =\begin{cases}
+\beta\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun\right] & \beta<\infty\\
+\frac{\partial}{\partial\eta}\expect_{q}\left[\affpertfun[][\infty]\right] & \beta=\infty
+\end{cases}\\
+ & =\begin{cases}
+\beta\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\left(\frac{\altprior}{\origprior}\right)^{\frac{1}{\beta}}d\theta & \beta<\infty\\
+\int q\left(\theta\vert\etaopt\right)\at{\frac{\partial\log q\left(\theta\vert\eta\right)}{\partial\eta}}{\etaopt}\log\frac{\altprior}{\origprior}d\theta & \beta=\infty.
+\end{cases}
 \end{align*}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+(We will require that we can exchange integration and differentiation.) One
+ can immediately see that 
+\begin_inset Formula $G$
+\end_inset
+
+ is linear in 
+\begin_inset Formula $\affpert$
+\end_inset
+
+ only for 
+\begin_inset Formula $\beta=\infty$
+\end_inset
+
+.
+ This is a consequence of our having used KL divergence.
+ Of course, linearity in 
+\begin_inset Formula $G$
+\end_inset
+
+ does not mean linearity of 
+\begin_inset Formula $\etaopt\left(\affpert\right)$
+\end_inset
+
+.
+ However, the curvature of the variational approximation seems more difficult
+ to characterize in general, whereas we are completely free to choose 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
 \end_layout
 
 \end_body
