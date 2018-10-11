@@ -10,8 +10,7 @@ plot_parametric_sensitivity <- function(
   plot <-
     ggplot(results_df_long) +
     geom_point(aes(x = alpha, y = e_num_clusters, color = method)) +
-    geom_line(data = subset(results_df_long, method == 'linear approx'),
-              aes(x = alpha, y = e_num_clusters, color = method)) +
+    geom_line(aes(x = alpha, y = e_num_clusters, color = method)) +
     xlab(xlabel) + ylab('expected number of clusters') +
     theme(legend.position = c(0.75, 0.2))
 
@@ -22,3 +21,5 @@ plot_parametric_sensitivity <- function(
   }
   return(plot)
 }
+
+# data = subset(results_df_long, method == 'linear approx')
