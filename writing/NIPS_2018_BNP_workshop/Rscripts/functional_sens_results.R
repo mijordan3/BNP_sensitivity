@@ -60,8 +60,8 @@ prior_pert2_results_plot <-
 # prior_pert2_results_plot
 
 grid.arrange(
-  prior_pert1_plot,
-  prior_pert1_results_plot,
+  # prior_pert1_plot,
+  # prior_pert1_results_plot,
   prior_pert2_plot,
   prior_pert2_results_plot,
   ncol  = 2)
