@@ -20,8 +20,11 @@ results_df_3 <- as.data.frame(t(results_matrix_3))
 
 w <- 1.1
 grid.arrange(
-  plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0), 
-  plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0), 
-  plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0),
+  plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) + 
+    theme(legend.position = c(0.25, 0.8)), 
+  plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) + 
+    theme(legend.position="none"), 
+  plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) + 
+    theme(legend.position="none"),
   ncol  = 3)
 

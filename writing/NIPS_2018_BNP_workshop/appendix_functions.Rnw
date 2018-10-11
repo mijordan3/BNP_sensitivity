@@ -1,0 +1,42 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
+source("./Rscripts/initialize.R", echo=FALSE)
+source("./Rscripts/plot_sens_results.R")
+@
+
+<<figcap3, cache=cache_knitr>>=
+SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
+figcap3 <- paste(
+    "\\label{fig:func_sens_e_num_clusters_thresh0}
+Left column: the original prior $p_{0k}$ in orange,
+the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
+re-fitted expected number of clusters after the pertubation.  ", sep="")
+@
+
+<<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold', fig.cap=figcap3>>=
+source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
+@
+%
+
+<<figcap4, cache=cache_knitr>>=
+SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
+figcap4 <- paste(
+    "\\label{fig:func_sens_e_num_clusters_thresh3}
+Left column: the original prior $p_{0k}$ in orange,
+the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
+re-fitted expected number of clusters after the pertubation.  ", sep="")
+@
+
+<<functional_sens_plot_thresh3, cache=cache_knitr, fig.show='hold', fig.cap=figcap4>>=
+source("Rscripts/appendix_functional_sens_results_thresh3.R", echo=knitr_debug, print.eval=TRUE)
+@
