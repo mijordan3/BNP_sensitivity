@@ -1896,7 +1896,11 @@ To show that
 \end_inset
 
  so that 
-\begin_inset Formula $\inf_{\theta\in\left(\theta_{0},\theta_{0}+\epsilon\right)}\frac{\partial\log\vbdist}{\partial\eta}\vbdist>M$
+\begin_inset Formula 
+\begin{align*}
+\inf_{\theta\in\left(\theta_{0},\theta_{0}+\epsilon\right)}\frac{\partial\log\vbdist}{\partial\eta}\vbdist & >M
+\end{align*}
+
 \end_inset
 
  for some 
