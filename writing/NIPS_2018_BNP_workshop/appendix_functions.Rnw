@@ -15,7 +15,7 @@ source("./Rscripts/plot_sens_results.R")
 @
 
 <<figcap3, cache=cache_knitr>>=
-SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
+SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap3 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh0}
 Left column: the original prior $p_{0k}$ in orange,
@@ -29,7 +29,7 @@ source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, 
 %
 
 <<figcap4, cache=cache_knitr>>=
-SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
+SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap4 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh3}
 Left column: the original prior $p_{0k}$ in orange,

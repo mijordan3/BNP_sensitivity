@@ -73,8 +73,7 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 prior_pert1_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) + 
-  ylab('E[#(predicted clusters)]') 
+  theme(legend.position = c(0.75, 0.75), legend.title=element_blank())
 # prior_pert1_pred_results_plot
 
 # plot results from second perturbation
@@ -87,18 +86,17 @@ colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
 prior_pert2_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) + 
-  ylab('E[#(predicted clusters)]')
+  theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) 
 # prior_pert2_pred_results_plot
 
 
 
 grid.arrange(
-  prior_pert1_plot, 
-  prior_pert1_results_plot,
-  prior_pert1_pred_results_plot,
-  prior_pert2_plot, 
-  prior_pert2_results_plot,
-  prior_pert2_pred_results_plot,
+  prior_pert1_plot + ggtitle('Priors'), 
+  prior_pert1_results_plot + ggtitle('In-sample quantity'),
+  prior_pert1_pred_results_plot + ggtitle('Predictive quantity'),
+  prior_pert2_plot + ggtitle(' '), 
+  prior_pert2_results_plot + ggtitle(' '),
+  prior_pert2_pred_results_plot + ggtitle(' '),
   ncol  = 3)
 
