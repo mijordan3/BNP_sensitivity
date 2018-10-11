@@ -53,8 +53,6 @@ $
     \right). %\label{eq:kl_objective}
 $
 %\end{align*}
-%
-%Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
 
 It will be important later to note that it is easy to calculate the optimal
 $\eta_z$ for a given $\eta_\theta$ because the model is conditionally conjugate,
@@ -94,7 +92,7 @@ g(\etathetaopt) &:=
     \label{eq:expected_num_clusters}
 \end{align}
 %
-For a given optimal set of global variational parameters,
-$g(\etathetaopt)$ can be computed with Monte-Carlo draws of the cluster
-indicators,
-$z \iid q\left(z \vert \etazopt(\etathetaopt)\right)$.
+For a given optimal set of global variational parameters, $g(\etathetaopt)$ can
+be computed with Monte-Carlo draws of the cluster indicators, $z \iid q\left(z
+\vert \etazopt(\etathetaopt)\right)$.  We will denote Monte-Carlo expectations
+by $\Expecthat[\cdot]$.

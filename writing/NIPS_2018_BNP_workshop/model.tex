@@ -27,19 +27,24 @@ For the prior on the cluster memberships $z_n$, we use a stick breaking
 process representation of a BNP Dirichlet process prior
 \citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}. Specifically, we
 define latent stick lengths $\nu=\left(\nu_1, \nu_2, ...\right)$, a
-concentration parameter $\alpha>0$, and base stick-breaking distributions
-$p_{0k}\left(\nu_k \vert \alpha \right) = \mathrm{Beta}\left(\nu_k \Big\vert 1,
-\alpha \right)$.  The prior on the cluster assignments $z_n$ is then given by
+concentration parameter $\alpha>0$, and base stick-breaking distribution
+$p_{0}\left(\nu_k \vert \alpha \right) = \mathrm{Beta}\left(\nu_k \Big\vert 1,
+\alpha \right)$.  The prior on the cluster assignments $z_n$ for
+$n=1,...,150$ is then given by
 %
 \begin{align}
-\nu_k \vert \alpha &\iid
-    p_{0k}\left(\nu_k \Big\vert \alpha\right)\textrm{, for }k=1,...,K
-    \quad\textrm{, with }\quad \nonumber
-\pi_k | \nu := \nu_k \prod_{j=1}^{k-1} (1 - \nu_j) \label{eq:stick_breaking} \\
-z_n \vert \pi &\iid \mathrm{Categorical}(\pi)\textrm{, for }n = 1...,150.
+\nu \vert \alpha \sim \prod_{k=1}^K p_{0}\left(\nu_k \vert \alpha \right)
+\textrm{,}
+% \nu_k \vert \alpha &\iid
+%     p_{0k}\left(\nu_k \Big\vert \alpha\right)\textrm{, for }k=1,...,K,
+    \quad\textrm{ with }\quad
+\pi_k | \nu := \nu_k \prod_{j=1}^{k-1} (1 - \nu_j)
+\quad\textrm{ and }\quad
+z_n \vert \pi \iid \mathrm{Categorical}(\pi). \label{eq:stick_breaking}
+%\textrm{, for }n = 1...,150.
 \end{align}
 %
-The concentration parameter $\alpha$ and stick-breaking priors $p_{0k}$
+The concentration parameter $\alpha$ and stick-breaking prior $p_{0}$
 thus determine our prior belief about the number of clusters present.
 We will be examining the sensitivity of our posterior beliefs about the
-number of clusters present to our choice for $\alpha$ and $p_{0k}$.
+number of clusters present to our choice for $\alpha$ and $p_{0}$.

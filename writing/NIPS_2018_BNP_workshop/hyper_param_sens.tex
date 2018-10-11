@@ -2,7 +2,7 @@
 \paragraph{General hyperparameter sensitivity.}
 %
 We wish to approximate the sensitity of $g(\etaopt)$ to perturbations of the
-value of $\alpha$ and to the functional form of $p_{0k}$.  To do this, we will
+value of $\alpha$ and to the functional form of $p_{0}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
 real-valued hyperparameters.  Suppose the exact posterior is parameterized by a
 real-valued hyperparameter $\epsilon$, i.e., the posterior is given by
@@ -14,22 +14,22 @@ $\epsilon$ through the minimization of the KL divergence.  We can define
 \begin{align}
 KL\left(\eta_\theta, \epsilon\right) &:=
     KL\left(q(\theta, z \vert \eta_\theta, \etazopt\left(\eta_\theta\right))
-    \big\| p(\theta, z | y, \epsilon) \right) \nonumber \\
+    \big\| p(\theta, z | y, \epsilon) \right) %\nonumber \\
+\quad\textrm{ and }\quad
 \etathetaopt\left(\epsilon\right) &=
     \argmin_{\eta_\theta} KL\left(\eta_\theta, \epsilon\right).
     \label{eq:pert_kl_objective}
 \end{align}
 %
-In general, the dependence of $\etathetaopt\left(\epsilon\right)$ on $\epsilon$ is
-complex and nonlinear, but we may approximate it with a first-order Taylor
-series.
-Under mild regularity conditions that are satisfied in the present case,
-\citet[Theorem 2]{giordano:2017:covariances} gives a closed form
-expression for this Taylor series.
-Without loss of generality, let $\epsilon=0$ represent the unperturbed
-posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta,
-z \vert y \right)$.
-Define
+In general, the dependence of $\etathetaopt\left(\epsilon\right)$ on $\epsilon$
+is complex and nonlinear, but we may approximate it with a first-order Taylor
+series. Under mild regularity conditions that are satisfied in the present case,
+\citet[Theorem 2]{giordano:2017:covariances} gives a closed form expression for
+this Taylor series. Without loss of generality, let $\epsilon=0$ represent the
+unperturbed posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) =
+p\left(\theta, z \vert y \right)$.
+%
+Define the Hessian
 $H := \partial^2 KL(\eta_\theta, \epsilon) /
     \partial \eta_\theta \partial \eta_\theta^T
     \atzero$ and
@@ -56,7 +56,8 @@ many different perturbations.
 \paragraph{Allowing nonlinearity in computationally easy steps.}
 %
 Note that the complete mapping
-$\epsilon \mapsto \Expect_{\qopt} \left[ \#\{\text{distinct clusters}\} \right]$
+$\epsilon \mapsto \Expecthat_{{q(z \vert \etazopt)}}
+\left[ \#\{\text{distinct clusters}\} \right]$
 is, in general, composed of many highly nonlinear steps:
 %
 \begin{align*}
@@ -64,7 +65,7 @@ is, in general, composed of many highly nonlinear steps:
 \etathetaopt(\epsilon) \mapsto
 \etazopt\left(\etathetaopt\right) \mapsto
 \textrm{Draws from }z \sim q(z \vert \etazopt) \mapsto
-\Expect_z \left[ \#\{\text{distinct clusters}\} \right].
+\Expecthat_z \left[ \#\{\text{distinct clusters}\} \right].
 \end{align*}
 %
 However, only the first step, $\epsilon \mapsto \etathetaopt(\epsilon)$, is
@@ -73,7 +74,7 @@ computationally intensive (re-solving the optimization problem in
 this first step which we approximate linearly using
 \prettyref{eq:our_approximation}, i.e., with $\epsilon \mapsto \etathetaopt(0) -
 H^{-1} f_\eta \epsilon$. Consequently, our approximations retain the
-nonlinearity in the mapping $\etathetaopt \mapsto \Expect_z \left[
+nonlinearity in the mapping $\etathetaopt \mapsto \Expecthat_z \left[
 \#\{\text{distinct clusters}\} \right]$.
 
 Furthermore, we attempt to improve the linearity of the dependence of
