@@ -6,6 +6,11 @@
 \origin unavailable
 \textclass article
 \use_default_options true
+\begin_modules
+theorems-ams-chap-bytype
+theorems-ams-bytype
+theorems-sec-bytype
+\end_modules
 \maintain_unincluded_children false
 \language english
 \language_package default
@@ -76,6 +81,150 @@
 \end_header
 
 \begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pert}{u}
+{u}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\onefun}{\mathit{1}}
+{\mathit{1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\origprior}[1][\theta]{p_{0}\left(#1\right)}
+{p_{0}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\altprior}[1][\theta]{p_{1}\left(#1\right)}
+{p_{1}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\contamprior}[1][\theta]{p_{p}\left(#1\right)}
+{p_{p}\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\altpriornorm}{Z_{1}}
+{Z_{1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\targetfun}[1][\theta]{g\left(#1\right)}
+{g\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\vbdist}[1][\theta\vert\eta]{q\left(#1\right)}
+{q\left(#1\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\vbclass}{\mathcal{Q}}
+{\mathcal{Q}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etadom}{\Omega_{\eta}}
+{\Omega_{\eta}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\expect}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\at}[2]{\left.#1\right|_{#2}}
+{\left.#1\right|_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+{\left\Vert #1\right\Vert }
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\funspace}[1][p]{L_{#1}\left[0,1\right]}
+{L_{#1}\left[0,1\right]}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\opspace}[2]{L\left(#1,#2\right)}
+{L\left(#1,#2\right)}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\fullmap}{T}
+{T}
+\end_inset
+
+
+\end_layout
 
 \begin_layout Title
 Frechet (non-)Differentiability of Variational Approximations
@@ -172,8 +321,275 @@ ing Fréchet differentiability (or non-differentiability) for other divergence
  measures.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Section
+Setup and definitions
+\end_layout
 
+\begin_layout Standard
+Given data 
+\begin_inset Formula $X$
+\end_inset
+
+, a prior 
+\begin_inset Formula $p\left(\theta\right)$
+\end_inset
+
+, a likelihood 
+\begin_inset Formula $p\left(X\vert\theta\right)$
+\end_inset
+
+, and a target quantity of interest and 
+\begin_inset Formula $\targetfun\in\mathbb{R}$
+\end_inset
+
+.
+ For the simplicity, we assume that 
+\begin_inset Formula $\theta\in\left[0,1\right]$
+\end_inset
+
+ and that 
+\begin_inset Formula $p\left(\theta\right)$
+\end_inset
+
+ is a density with respect to the Lebesgue measure on on 
+\begin_inset Formula $\left[0,1\right]$
+\end_inset
+
+; generalizations to other intervals or higher dimensions are straightforward.
+ We will consider approximating the real-valued posterior expectation 
+\begin_inset Formula $\expect_{p\left(\theta\vert X\right)}\left[\targetfun\right]$
+\end_inset
+
+, where 
+\begin_inset Formula $p\left(\theta\vert X\right)=p\left(X\vert\theta\right)\contamprior/\int p\left(X\vert\theta'\right)\contamprior[\theta']d\theta'$
+\end_inset
+
+.
+ We will approximate 
+\begin_inset Formula $\expect_{p\left(\theta\vert X\right)}\left[\targetfun\right]$
+\end_inset
+
+ using a VB approximating distribution
+\begin_inset CommandInset citation
+LatexCommand citep
+key "blei:2016:variational"
+literal "false"
+
+\end_inset
+
+.
+ Specifically, we consider a finitely-parameterized set of tractable densities,
+ 
+\begin_inset Formula $\vbclass:=\left\{ q:\vbdist\textrm{ for }\eta\in\etadom\subseteq\mathbb{R}^{D}\right\} $
+\end_inset
+
+, and define the KL divergence 
+\begin_inset Formula $KL\left(\vbdist||p\left(\theta\vert X\right)\right):=\expect_{\vbdist}\left[\log\vbdist-\log p\left(\theta\vert X\right)\right]$
+\end_inset
+
+.
+ We choose 
+\begin_inset Formula $q\in\vbclass$
+\end_inset
+
+ to minimize the KL divergence from 
+\begin_inset Formula $p\left(\theta\vert X\right)$
+\end_inset
+
+, setting
+\begin_inset Formula 
+\begin{align}
+\eta^{*} & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\vbdist||\frac{p\left(X\vert\theta\right)p\left(\theta\right)}{\int_{0}^{1}p\left(X\vert\theta'\right)p\left(\theta'\right)d\theta'}\right).\label{eq:kl_divergence}
+\end{align}
+
+\end_inset
+
+Then our approximating distribution is 
+\begin_inset Formula $\vbdist[\theta\vert\eta^{*}]$
+\end_inset
+
+, and we are interested in the value 
+\begin_inset Formula $\expect_{\vbdist[\theta\vert\eta^{*}]}\left[\targetfun\right]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $\expect_{\vbdist[\theta\vert\eta^{*}]}\left[\targetfun\right]$
+\end_inset
+
+ depends on 
+\begin_inset Formula $p\left(\theta\right)$
+\end_inset
+
+ through the optimization problem 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:kl_divergence"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ As such, 
+\begin_inset Formula $\expect_{\vbdist[\theta\vert\eta^{*}]}\left[\targetfun\right]$
+\end_inset
+
+ is a map from some notion of the 
+\begin_inset Quotes eld
+\end_inset
+
+space of possible priors
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+.
+ We are interested in evaluating the sensitivity of this map to its input,
+ the prior density 
+\begin_inset Formula $p\left(\theta\right)$
+\end_inset
+
+.
+ In particular, we wish to estimate this sensitivity some form of a functional
+ derivative in the hopes that this derivative provides a tractable linear
+ approximation to the otherwise computationally intensive task of re-estimating
+ 
+\begin_inset Formula $\eta^{*}$
+\end_inset
+
+ exactly for a large number of different 
+\begin_inset Formula $p\left(\theta\right)$
+\end_inset
+
+.
+ In order to do so, we must specify what we mean by 
+\begin_inset Quotes eld
+\end_inset
+
+a space of possible priors
+\begin_inset Quotes erd
+\end_inset
+
+, as well as a norm and what it means to add and subtract priors in this
+ space – that is, we must embed our priors in a Banach space
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+We recommend 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "zeidler:2013:nonlinearv1"
+literal "false"
+
+\end_inset
+
+ as an accessible introduction to the mathematics used in the present work.
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+There are a number of ways to embed prior distributions in a Banach space,
+ and in the present work we consider the class of non-linear perturbations
+ given in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "gustafson:1996:localposterior"
+literal "false"
+
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Our definitions differ formally from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "gustafson:1996:localposterior"
+literal "false"
+
+\end_inset
+
+ but are equivalent
+\end_layout
+
+\end_inset
+
+.
+ In particular, for a given 
+\begin_inset Formula $1\le p\le\infty$
+\end_inset
+
+, a base prior 
+\begin_inset Formula $\origprior[\theta]$
+\end_inset
+
+, and a perturbation function 
+\begin_inset Formula $\pert\left(\theta\right)$
+\end_inset
+
+, we define the 
+\begin_inset Quotes eld
+\end_inset
+
+contamination prior
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\contamprior[\theta\vert\pert] & :=\begin{cases}
+\frac{\origprior[\theta]\pert\left(\theta\right)^{p}}{\altpriornorm\left(\pert\right)}\textrm{ where }\altpriornorm\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\pert\left(\theta\right)^{p}d\theta & \textrm{for }1\le p<\infty\\
+\frac{\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right)}{\altpriornorm\left(\pert\right)}\textrm{ where }\altpriornorm\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right)d\theta & \textrm{for }p=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+Defining 
+\begin_inset Formula $\onefun\left(\theta\right)\equiv1$
+\end_inset
+
+ to be the function that is identically one, we can see that we recover
+ the base prior at 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $\contamprior[\theta\vert\onefun]=\origprior$
+\end_inset
+
+.
+ Because of the normalization constant 
+\begin_inset Formula $\altpriornorm\left(\pert\right)$
+\end_inset
+
+, 
+\begin_inset Formula $\contamprior[\theta\vert\pert]$
+\end_inset
+
+ is a well-defined density as long as 
+\begin_inset Formula $\altpriornorm\left(\pert\right)$
+\end_inset
+
+ is finite.
+ This guides us in the choice of norms 
 \end_layout
 
 \begin_layout Standard
@@ -193,6 +609,22 @@ options "plain"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Choice of norms
+\begin_inset CommandInset label
+LatexCommand label
+name "app:normchoice"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+ok
 \end_layout
 
 \end_body
