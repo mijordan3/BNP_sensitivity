@@ -2,7 +2,7 @@
 \paragraph{Variational approximation.}
 It is difficult to calculate the posterior $p\left(\nu, \mu, \Sigma, z \vert
 y\right)$, both because the normalizing constant is intractable and because
-$K=\infty$ in a true BNP represetation. In order to perform approximate
+$K=\infty$ in a true BNP representation. In order to perform approximate
 inference, we use a truncated VB approximation
 \citep{blei:2006:dirichletbnp}. For compactness of notation, let $\theta =
 \left(\nu, \mu, \Sigma\right)$ denote the collection of ``global'' parameters,
@@ -12,18 +12,18 @@ define a class of approximating distributions for VB as
 %
 \begin{align*}
 \vbfamily := \Big\{ q:
-q(\theta, z) = &
+q(\theta, z) &=
 \left(\prod_{k=1}^{K}q\left(\nu_{k}\right)\delta\left(\mu_{k}\right)
     \delta\left(\Sigma_{k}\right)\right)
     \left(\prod_{n=1}^{150}q\left(z_{n}\right) \right)\textrm{, where } \\
-q\left(\nu_{k}\right) =& \mathrm{Lognormal}\left(\nu_k\right) \textrm{ and }
-q\left(z_n\right) = \mathrm{Multinomial}\left(z_n\right)
+q\left(\nu_{k}\right) &= \mathrm{Lognormal}\left(\nu_k\right) \textrm{ and }
+q\left(z_n\right) = \mathrm{Categorical}\left(z_n\right)
 \Big\}.
 \end{align*}
 %
 The family $\vbfamily$ is parameterized by a finite-dimensional vector containing
 the locations of the delta functions and the parameters for the lognormal
-distributions
+distributions,
 %
 \footnote{We use the lognormal distribution rather than the conjugate Beta
 distribution because the lognormal makes numerical integration easier when
@@ -32,7 +32,7 @@ sensitivity measures and not re-optimize, there would be no need for numerical
 integration, and the more convenient Beta variational approximation could be
 used.}
 %
-, which we denote by $\eta_\theta$, and the parameters for the
+which we denote by $\eta_\theta$, and the parameters for the
 multinomial distributions, which we denote by $\eta_z$. We write the combined
 parameters as $\eta=\left(\eta_\theta, \eta_z\right)$. That is, $\eta$ is
 defined such that
@@ -56,11 +56,11 @@ $
 %
 %Let $\qopt\left(\theta, z\right) = q\left(\theta, z \vert \etaopt\right)$.
 
-It will be important later to note that it is easy to calculate
-the optimal $\eta_z$ for a given $\eta_\theta$ because the model is
-conjugate, i.e., $p\left(z \vert \theta, y\right)$ is multinomial,
-and so is $q\left(z \vert \eta_z\right)$.  Specifically, there
-exists an easily-calculated, closed form for
+It will be important later to note that it is easy to calculate the optimal
+$\eta_z$ for a given $\eta_\theta$ because the model is conditionally conjugate,
+i.e., $p\left(z \vert \theta, y\right)$ is categorical, and so is $q\left(z
+\vert \eta_z\right)$.  Specifically, there exists an easily-calculated, closed
+form for
 %
 %\begin{align}
 $

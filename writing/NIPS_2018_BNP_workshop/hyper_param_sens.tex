@@ -1,7 +1,7 @@
 
 \paragraph{General hyperparameter sensitivity.}
 %
-We with to approximate the sensitity of $g(\etaopt)$ to perturbations of the
+We wish to approximate the sensitity of $g(\etaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0k}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
 real-valued hyperparameters.  Suppose the exact posterior is parameterized by a
@@ -16,7 +16,7 @@ KL\left(\eta_\theta, \epsilon\right) &:=
     KL\left(q(\theta, z \vert \eta_\theta, \etazopt\left(\eta_\theta\right))
     \big\| p(\theta, z | y, \epsilon) \right) \nonumber \\
 \etathetaopt\left(\epsilon\right) &=
-    \argmin_{\eta_\theta} KL\left(\eta_\theta, \epsilon\right)
+    \argmin_{\eta_\theta} KL\left(\eta_\theta, \epsilon\right).
     \label{eq:pert_kl_objective}
 \end{align}
 %
@@ -42,7 +42,7 @@ Then
 \begin{align}
 \etathetaopt(\epsilon)  -  \etathetaopt(0) &\approx
 \frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon =
-- H^{-1} f_\eta \epsilon
+- H^{-1} f_\eta \epsilon.
 \label{eq:our_approximation}
 \end{align}
 %
@@ -64,11 +64,11 @@ is, in general, composed of many highly nonlinear steps:
 \etathetaopt(\epsilon) \mapsto
 \etazopt\left(\etathetaopt\right) \mapsto
 \textrm{Draws from }z \sim q(z \vert \etazopt) \mapsto
-\Expect_z \left[ \#\{\text{distinct clusters}\} \right]
+\Expect_z \left[ \#\{\text{distinct clusters}\} \right].
 \end{align*}
 %
-However, only the first step, $\epsilon \mapsto \etathetaopt(\epsilon)$ is
-computationally intensive (re-solving the optimization problem
+However, only the first step, $\epsilon \mapsto \etathetaopt(\epsilon)$, is
+computationally intensive (re-solving the optimization problem in
 \prettyref{eq:pert_kl_objective} with a new $\epsilon$), and it is precisely
 this first step which we approximate linearly using
 \prettyref{eq:our_approximation}, i.e., with $\epsilon \mapsto \etathetaopt(0) -
