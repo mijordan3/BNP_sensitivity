@@ -15,8 +15,8 @@ source("./Rscripts/plot_sens_results.R")
 @
 
 On the Iris data, we evaluated the expected number of clusters for a range of
-$\alpha$ between 0.5 and 6.5. Then we chose three $\alpha_0$ values, 2, 3.5, and
-5, and constructed the linear approximation centered at each of these
+$\alpha$ between 0.5 and 15. Then we chose three $\alpha_0$ values, 3, 8, and
+13, and constructed the linear approximation centered at each of these
 $\alpha_0$s. The linear approximation did quite well for choices of $\alpha$
 close to $\alpha_0$, as seen in \prettyref{fig:parametric_sens_plot}.
 %  Hence, by evaluating the objective at three $\alpha_0$s, we

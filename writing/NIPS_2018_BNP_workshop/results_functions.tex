@@ -8,11 +8,15 @@
 
 
 
-On the Iris data, we chose two different functional perturbations: for the first
-we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$;
-for the second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2,
-\sigma = 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) /
-p_{0k}(\nu_k)$.
+On the Iris data, we chose two different functional perturbations: for the first, we let 
+$\phi(\nu_k) = e^{\nu_k}$, and for the second, we let $\phi(\nu_k) = e^{1 - \nu_k}$. In the latter case, we 
+are moving the prior mass on the sticks forward towards 1, so we expect the number of clusters to decrease; in the former case, we are moving the prior mass on the sticks backwards toward zero, so we expect the number of clusters to increase.   
+
+% for the first
+% we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$;
+% for the second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2,
+% \sigma = 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) /
+% p_{0k}(\nu_k)$.
 
 
 
@@ -24,8 +28,8 @@ p_{0k}(\nu_k)$.
 }
 
 \caption{\label{fig:func_sens_e_num_clusters}
-Left column: the original prior $p_{0k}$ in purple,
-the perturbed prior $p^c_k$ in red. Right: linearly approximated vs.
+Left column: the original prior $p_{0k}$ in orange,
+the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
 re-fitted expected number of clusters after the pertubation.  }\label{fig:functional_sens_plot}
 \end{figure}
 
