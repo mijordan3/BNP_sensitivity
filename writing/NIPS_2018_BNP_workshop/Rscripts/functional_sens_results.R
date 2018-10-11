@@ -13,8 +13,9 @@ prior_pert1_plot <-
   prior_pert1_df %>%
   gather(which_prior, p, -nu_k) %>%
   ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-    theme(legend.position = c(0.8, 0.8), legend.title=element_blank()) +
-    xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$"))
+    theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) +
+    xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$")) + 
+  scale_color_manual(values=c("red", "blue"))
 # prior_pert1_plot
 
 # the second one
@@ -26,8 +27,9 @@ colnames(prior_pert2_df) <- c('nu_k', 'p0', 'pc')
 prior_pert2_plot <-
   prior_pert2_df %>% gather(which_prior, p, -nu_k) %>%
   ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-      theme(legend.position = c(0.8, 0.8), legend.title=element_blank()) +
-      xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$"))
+      theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) +
+      xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$")) + 
+      scale_color_manual(values=c("red", "blue"))
 # prior_pert2_plot
 
 ##########################
@@ -42,7 +44,7 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 prior_pert1_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.8, 0.3))
+  theme(legend.position = c(0.8, 0.75), legend.title=element_blank())
 # prior_pert1_results_plot
 
 # plot results from second perturbation
@@ -54,7 +56,7 @@ colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
 prior_pert2_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.15, 0.35))
+  theme(legend.position = c(0.15, 0.75), legend.title=element_blank())
 # prior_pert2_results_plot
 
 grid.arrange(

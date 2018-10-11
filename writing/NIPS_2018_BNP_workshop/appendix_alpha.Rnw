@@ -1,0 +1,46 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
+source("./Rscripts/initialize.R", echo=FALSE)
+source("./Rscripts/plot_sens_results.R")
+@
+
+
+<<fig_cap1, cache=cache_knitr>>=
+SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
+figcap <- paste(
+    "Comparison of the expected number of clusters computed by re-optimizing ",
+    "versus the linear approximation.  ",
+    "The blue vertical line indicates the location of $\\alpha_0$.", 
+    "Top row indicates the in-sample expected number of clusters (CITE EQUATION), ", 
+    "while the bottom row is the preditive expected number of clusters (CITE EQUATION). ",
+    sep="")
+@
+<<param_sens_plot_thresh_0, cache=cache_knitr, fig.show='hold', fig.cap=figcap>>=
+source("Rscripts/appendix_parametric_sens_results_thresh0.R", 
+       echo=knitr_debug, print.eval=TRUE)
+@
+
+<<fig_cap2, cache=cache_knitr>>=
+SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
+figcap <- paste(
+    "Comparison of the expected number of thresholded clusters computed by re-optimizing ",
+    "versus the linear approximation.  ",
+    "The blue vertical line indicates the location of $\\alpha_0$.", 
+    "Top row indicates the in-sample expected number of clusters (CITE EQUATION), ", 
+    "while the bottom row is the preditive expected number of clusters (CITE EQUATION). ",
+    sep="")
+@
+<<param_sens_plot_thresh_3, cache=cache_knitr, fig.show='hold', fig.cap=figcap>>=
+source("Rscripts/appendix_parametric_sens_results_thresh3.R", 
+       echo=knitr_debug, print.eval=TRUE)
+@
