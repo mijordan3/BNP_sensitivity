@@ -5,6 +5,10 @@
 \save_transient_properties true
 \origin unavailable
 \textclass article
+\begin_preamble
+\newref{prop}{name=Proposition~}
+\newref{def}{name=Definition~}
+\end_preamble
 \use_default_options true
 \begin_modules
 theorems-ams-chap-bytype
@@ -86,6 +90,15 @@ theorems-sec-bytype
 \begin_inset FormulaMacro
 \newcommand{\pert}{U}
 {U}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\pertone}{U_{1}}
+{U_{1}}
 \end_inset
 
 
@@ -230,6 +243,15 @@ theorems-sec-bytype
 \begin_inset FormulaMacro
 \newcommand{\fullmap}[1][p]{T_{#1}}
 {T_{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\etapopt}[1][p]{\eta_{#1}^{*}}
+{\eta_{#1}^{*}}
 \end_inset
 
 
@@ -778,11 +800,11 @@ and require, for each
 \end_layout
 
 \begin_layout Section
-Gradients
+Derivative
 \end_layout
 
 \begin_layout Standard
-We are at last in a position to formally define 
+We can now formally define 
 \begin_inset Formula $\fullmap:\priorspace\subseteq\funspace\rightarrow\mathbb{R}$
 \end_inset
 
@@ -814,9 +836,9 @@ noprefix "false"
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{align*}
-\eta_{p}^{*}\left(\pert\right) & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right),
-\end{align*}
+\begin{align}
+\etapopt\left(\pert\right) & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right),\label{eq:perturbed_kl}
+\end{align}
 
 \end_inset
 
@@ -825,8 +847,25 @@ we have
 \end_inset
 
 .
+ Defining 
+\begin_inset Formula $\onefun\left(\theta\right)\equiv1$
+\end_inset
+
+ to be the function that is identically one, we can see that, for each 
+\begin_inset Formula $p$
+\end_inset
+
+, we recover the base prior at 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $\contamprior[\theta\vert\onefun]=\origprior$
+\end_inset
+
+.
  For compactness, we will simply write 
-\begin_inset Formula $\eta^{*}:=\eta_{p}^{*}\left(\onefun\right)$
+\begin_inset Formula $\eta^{*}:=\etapopt\left(\onefun\right)$
 \end_inset
 
 , the VB approximation at the base prior 
@@ -855,24 +894,7 @@ We begin by discussing how to choose
 \end_inset
 
 .
- Defining 
-\begin_inset Formula $\onefun\left(\theta\right)\equiv1$
-\end_inset
-
- to be the function that is identically one, we can see that, for each 
-\begin_inset Formula $p$
-\end_inset
-
-, we recover the base prior at 
-\begin_inset Formula $\pert=\onefun$
-\end_inset
-
-, i.e., 
-\begin_inset Formula $\contamprior[\theta\vert\onefun]=\origprior$
-\end_inset
-
-.
- This is equivalent to saying that Given the definitions in 
+ Given the definitions in 
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "eq:perturbation_definitions"
@@ -888,16 +910,179 @@ noprefix "false"
 
  when
 \begin_inset Formula 
-\begin{align*}
-\pert\left(\theta\right)= & \begin{cases}
+\begin{align}
+\pertone\left(\theta\right)= & \begin{cases}
 \left(\frac{\altprior}{\origprior}\right)^{p} & \textrm{ for }p<\infty\\
 \log\left(\frac{\altprior}{\origprior}\right) & \textrm{for }p=\infty
-\end{cases}.
+\end{cases}.\label{eq:pert_to_exchange_prior}
+\end{align}
+
+\end_inset
+
+(Note that for the choices of 
+\begin_inset Formula $\pert$
+\end_inset
+
+ given in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:pert_to_exchange_prior"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\altpriornorm\left(\pertone\right)=1$
+\end_inset
+
+.) Thus, once we have a linear approximation to 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+, we will approximate the effect of replacing 
+\begin_inset Formula $\origprior$
+\end_inset
+
+ with 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ by taking a unit step in the direction of the function 
+\begin_inset Formula $\pertone-\onefun$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Assuming that the KL divergence in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:perturbed_kl"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is twice smoothly differentiable, the solution to the optimization problem
+ 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:perturbed_kl"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is given by the first order condition.
+ Define
+\begin_inset Formula 
+\begin{align}
+G\left(\eta,\pert\right) & :=\frac{\partial}{\partial\eta}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right).\label{eq:gradient_defn}
+\end{align}
+
+\end_inset
+
+Then 
+\begin_inset Formula $\etapopt\left(\pert\right)$
+\end_inset
+
+ is defined as the solution to the estimating equation
+\begin_inset Formula 
+\begin{align*}
+G\left(\etapopt\left(\pert\right),\pert\right) & =0.
 \end{align*}
 
 \end_inset
 
-Consequently, 
+The implicit function theorem gives conditions for the Fréchet differentiability
+ of 
+\begin_inset Formula $\etapopt\left(\pert\right)$
+\end_inset
+
+ in terms of attributes of 
+\begin_inset Formula $G\left(\eta,\pert\right)$
+\end_inset
+
+ in a neighborhood of 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proposition
+\begin_inset CommandInset label
+LatexCommand label
+name "prop:Implicit-function-theorem"
+
+\end_inset
+
+Implicit function theorem 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "Theorem 4.B"
+key "zeidler:2013:nonlinearv1"
+literal "false"
+
+\end_inset
+
+.
+ If the 
+\begin_inset Formula $D\times D$
+\end_inset
+
+ Hessian matrix 
+\begin_inset Formula $H:=\at{\frac{\partial G\left(\eta,\pert\right)}{\partial\eta}}{\eta,\pert}$
+\end_inset
+
+ exists, is continuous, and is invertible in a neighborhood of 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+, and 
+\begin_inset Formula $G\left(\eta,\pert\right)$
+\end_inset
+
+ exists and is is continuously Fréchet differentiable in an open neighborhood
+ of 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+, then 
+\begin_inset Formula $\etapopt\left(\pert\right)$
+\end_inset
+
+ exists and is Fréchet differentiable at 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:Implicit-function-theorem"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ gives conditions
 \end_layout
 
 \begin_layout Standard
