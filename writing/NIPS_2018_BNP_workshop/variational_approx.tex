@@ -1,10 +1,10 @@
 %
-\paragraph{Variational approximation.}
-It is difficult to calculate the posterior $p\left(\nu, \mu, \Sigma, z \vert
-y\right)$, both because the normalizing constant is intractable and because
-$K=\infty$ in a true BNP representation. In order to perform approximate
-inference, we use a truncated VB approximation
-\citep{blei:2006:dirichletbnp}. For compactness of notation, let $\theta =
+\paragraph{Variational approximation.} It is difficult to calculate the
+posterior $p\left(\nu, \mu, \Sigma, z \vert y\right)$, both because the
+normalizing constant is intractable and because there are an infinite number of
+latent clusters in a true BNP representation. In order to perform approximate
+inference, we use a truncated VB approximation using $K=30$
+clusters\citep{blei:2006:dirichletbnp}. For compactness of notation, let $\theta =
 \left(\nu, \mu, \Sigma\right)$ denote the collection of ``global'' parameters,
 i.e., parameters whose values affect the data-generating process of every
 observation $y_n$.   Let $\delta\left(\cdot\right)$ denote a delta function. We

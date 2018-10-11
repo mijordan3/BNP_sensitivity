@@ -1,7 +1,7 @@
 
 \paragraph{General hyperparameter sensitivity.}
 %
-We wish to approximate the sensitity of $g(\etaopt)$ to perturbations of the
+We wish to approximate the sensitivity of $g(\etaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
 real-valued hyperparameters.  Suppose the exact posterior is parameterized by a
@@ -48,7 +48,7 @@ Then
 %
 Note that $H$ and $f_\eta$ can be easily evaluated using automatic
 differentiation without any need to re-optimize for different $\epsilon$
-\citep{maclaurin:2015:autograd} (see \prettyref{app:sensitivity}).  Furthermore,
+\citep{maclaurin:2015:autograd}.  Furthermore,
 the Hessian $H$ needs to be factorized (e.g. with a Cholesky decomposition) or
 inverted only once and then re-used to approximate $\etathetaopt(\epsilon)$ for
 many different perturbations.
