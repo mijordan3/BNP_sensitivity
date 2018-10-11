@@ -286,6 +286,15 @@ theorems-sec-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\gradpartial}[2][1][p]{d_{#1}G_{#2}}
+{d_{#1}G_{#2}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\dir}{\Delta U}
 {\Delta U}
 \end_inset
@@ -642,8 +651,10 @@ Contamination prior.
 \begin_inset Formula 
 \begin{align}
 \contamprior[\theta\vert\pert] & :=\begin{cases}
-\frac{\origprior[\theta]\pert\left(\theta\right)^{p}}{\altpriornorm\left(\pert\right)}\textrm{ where }\altpriornorm\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\pert\left(\theta\right)^{p}d\theta & \textrm{for }1\le p<\infty\\
-\frac{\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right)}{\altpriornorm[\infty]\left(\pert\right)}\textrm{ where }\altpriornorm[\infty]\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right)d\theta & \textrm{for }p=\infty
+\altpriornorm\left(\pert\right)^{-1}\origprior[\theta]\pert\left(\theta\right)^{p} & \textrm{for }1\le p<\infty\\
+\quad\quad\textrm{ where }\altpriornorm\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\pert\left(\theta\right)^{p}d\theta\\
+\altpriornorm[\infty]\left(\pert\right)^{-1}\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right) & \textrm{for }p=\infty\\
+\quad\quad\textrm{ where }\altpriornorm[\infty]\left(\pert\right):=\int_{0}^{1}\origprior[\theta]\exp\left(\pert\left(\theta\right)-1\right)d\theta
 \end{cases}.\label{eq:perturbation_definitions}
 \end{align}
 
@@ -998,11 +1009,22 @@ we have
 \begin_inset Formula $\fullmap$
 \end_inset
 
- is map between two Banach spaces, and so we can consider its derivative.
+ is map between two Banach spaces, and so we can consider its derivative
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "Chapter 4"
+key "zeidler:2013:nonlinearv1"
+literal "false"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
-The derivative of 
+One may first consider the directional derivative of 
 \begin_inset Formula $\fullmap$
 \end_inset
 
@@ -1014,7 +1036,7 @@ The derivative of
 \begin_inset Formula $\pert$
 \end_inset
 
- is given by the scalar derivative
+ is given by the scalar limit 
 \begin_inset Formula 
 \begin{align}
 \gateauxderiv\left(\pert;\dir\right) & :=\lim_{\epsilon\rightarrow0}\frac{\fullmap\left(\pert+\epsilon\dir\right)-\fullmap\left(\pert\right)}{\epsilon}.\label{eq:gateaux_derivative}
@@ -1041,8 +1063,8 @@ Gateaux derivative
 \end_inset
 
 .
- Even when a Gateaux derivative exists in all directions, it is possible
- that the error in the linear approximation to 
+ Even when a Gateaux derivative exists in every direction, it still possible
+ that the size of the error in the linear approximation to 
 \begin_inset Formula $\fullmap\left(\pert+\epsilon\dir\right)$
 \end_inset
 
@@ -1050,7 +1072,17 @@ Gateaux derivative
 \begin_inset Formula $\fullmap\left(\pert\right)+\gateauxderiv\left(\pert;\dir\right)\epsilon$
 \end_inset
 
- may grow arbitrarily large in certain directions.
+ may depend on the direction 
+\begin_inset Formula $\dir$
+\end_inset
+
+.
+ Indeed, it may be that the error is unbounded as 
+\begin_inset Formula $\dir$
+\end_inset
+
+ varies across all possible directions, even when the limit exists for every
+ particular direction.
  When this occurs, no matter how small 
 \begin_inset Formula $\epsilon>0$
 \end_inset
@@ -1064,7 +1096,7 @@ Gateaux derivative
 \end_inset
 
  may be made arbitrarily large.
- A Gateaux derivative alone does not provide a good linear approximation
+ Thus, a Gateaux derivative alone does not provide a good linear approximation
  to 
 \begin_inset Formula $\fullmap$
 \end_inset
@@ -1097,7 +1129,7 @@ literal "false"
 
 \begin_layout Standard
 The Fréchet derivative differs from the Gateaux derivative precisely in
- that it requires this uniformity of convergence.
+ that it requires uniformity of convergence.
  Formally, we say that the functional 
 \begin_inset Formula $\fullmap$
 \end_inset
@@ -1106,7 +1138,18 @@ The Fréchet derivative differs from the Gateaux derivative precisely in
 \begin_inset Formula $\pert$
 \end_inset
 
- if there exists a continuous linear map, 
+ if there exists a continuous
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Here, continuity is in the argument of the linear map, not the location
+ at which it is evaluated.
+\end_layout
+
+\end_inset
+
+ linear map, 
 \begin_inset Formula $\fullderiv\left(\pert\right):\priorspace\rightarrow\mathbb{R}$
 \end_inset
 
@@ -1226,6 +1269,10 @@ noprefix "false"
  
 \end_layout
 
+\begin_layout Section
+Differentiability of VB Optima
+\end_layout
+
 \begin_layout Standard
 Assuming that the KL divergence in 
 \begin_inset CommandInset ref
@@ -1248,7 +1295,11 @@ noprefix "false"
 \end_inset
 
  is given by a first order condition.
- Define
+ Define the map 
+\begin_inset Formula $\grad\left(\eta,\pert\right):\mathbb{R}^{D}\times\priorspace\rightarrow\mathbb{R}^{D}$
+\end_inset
+
+ by
 \begin_inset Formula 
 \begin{align}
 \grad\left(\eta,\pert\right) & :=\frac{\partial}{\partial\eta}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right).\label{eq:gradient_defn}
@@ -1260,20 +1311,29 @@ Then
 \begin_inset Formula $\etapopt\left(\pert\right)$
 \end_inset
 
- is defined as a solution to the estimating equation
+ is defined as a solution, if it exists, to the estimating equation
 \begin_inset Formula 
 \begin{align*}
-\grad\left(\etapopt\left(\pert\right),\pert\right) & =0.
+\grad\left(\etapopt\left(\pert\right),\pert\right) & =\left(\begin{array}{c}
+0\\
+\vdots\\
+0
+\end{array}\right).
 \end{align*}
 
 \end_inset
 
-The implicit function theorem gives conditions for the Fréchet differentiability
- of 
+Ultimately we are interested in the Fréchet differentiability of 
 \begin_inset Formula $\etapopt\left(\pert\right)$
 \end_inset
 
- in terms of attributes of 
+.
+ The Banach space implicit function theorem gives conditions for the Fréchet
+ differentiability of 
+\begin_inset Formula $\etapopt\left(\pert\right)$
+\end_inset
+
+ in terms of properties of 
 \begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
@@ -1301,7 +1361,7 @@ literal "false"
 \end_inset
 
 .
- If the 
+ Suppose that the 
 \begin_inset Formula $D\times D$
 \end_inset
 
@@ -1313,16 +1373,25 @@ literal "false"
 \begin_inset Formula $\left(\eta^{*},\onefun\right)$
 \end_inset
 
-, and 
+.
+ Suppose also that 
 \begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
- exists and is is continuously Fréchet differentiable in an open neighborhood
- of 
+ is continuously Fréchet differentiable in an open neighborhood of 
 \begin_inset Formula $\left(\eta^{*},\onefun\right)$
 \end_inset
 
-, then 
+.
+ Then, for 
+\begin_inset Formula $\pert$
+\end_inset
+
+ in a neighborhood of 
+\begin_inset Formula $\onefun$
+\end_inset
+
+, 
 \begin_inset Formula $\etapopt\left(\pert\right)$
 \end_inset
 
@@ -1341,16 +1410,99 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset ref
-LatexCommand formatted
-reference "prop:Implicit-function-theorem"
-plural "false"
-caps "false"
-noprefix "false"
+Note that 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ must be continuous and Fréchet differentiable in the Cartesian product
+ 
+\begin_inset Formula $\mathbb{R}^{D}\times\priorspace$
+\end_inset
+
+.
+ It will be helpful to consider the continuity and differentiability in
+ the argument separately.
+ To this end, we define the Fréchet partial derivatives (if they exist)
+ as linear approximations to 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ with one or the other of the arguments held fixed.
+ That is, we define 
+\begin_inset Formula $\gradpartial[1]\left(\eta,\pert\right):\mathbb{R}^{d}\rightarrow\mathbb{R}^{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gradpartial[2]\left(\eta,\pert\right):\priorspace\rightarrow\mathbb{R}^{d}$
+\end_inset
+
+ such that
+\begin_inset Formula 
+\begin{align*}
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta+\Delta\eta,\pert\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[1]}\left(\eta,\pert\right)\left(\Delta\eta\right)\right)}_{2}}{\norm{\Delta\eta}_{2}} & =0\\
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta,\pert+\dir\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[2]}\left(\eta,\pert\right)\left(\dir\right)\right)}_{2}}{\norm{\dir}_{p}} & =0.
+\end{align*}
 
 \end_inset
 
- gives conditions for 
+
+\end_layout
+
+\begin_layout Standard
+The following proposition relates Fréchet differentiability in 
+\begin_inset Formula $\mathbb{R}^{D}\times\priorspace$
+\end_inset
+
+ to the existence and continuity of the partial derivatives.
+\end_layout
+
+\begin_layout Proposition
+\begin_inset CommandInset label
+LatexCommand label
+name "prop:partial_derivatives"
+
+\end_inset
+
+Partial derivatives 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "Proposition 4.14"
+key "zeidler:2013:nonlinearv1"
+literal "false"
+
+\end_inset
+
+.
+ Assume that 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ has Fréchet partial derivatives with respect to 
+\begin_inset Formula $\eta$
+\end_inset
+
+ and 
+\begin_inset Formula $\pert$
+\end_inset
+
+ at 
+\begin_inset Formula $\left(\eta,U\right)$
+\end_inset
+
+ in a ball around 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+, and denote these partial derivatives 
+\begin_inset Formula $\gradpartial[1]\left(\eta^{*},\onefun\right):\mathbb{R}^{d}\rightarrow\mathbb{R}^{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gradpartial[2]\left(\eta^{*},\onefun\right):\priorspace\rightarrow\mathbb{R}^{d}$
+\end_inset
+
+, respectively.
+ If these partial derivatives are continuous.
 \end_layout
 
 \begin_layout Standard
