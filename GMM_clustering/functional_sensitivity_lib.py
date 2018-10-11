@@ -23,6 +23,8 @@ class PriorPerturbation(object):
         self.logit_v_lb = logit_v_lb
         self.logit_v_ub = logit_v_ub
 
+        self.quad_maxiter = quad_maxiter
+
         self.gustafson_style = False
 
         self.model = model
@@ -30,7 +32,7 @@ class PriorPerturbation(object):
         self.epsilon_param = vb.ScalarParam('epsilon') #, lb=0.0)
         self.epsilon_param.set(epsilon)
 
-        self.set_log_phi(log_phi, quad_maxiter = quad_maxiter)
+        self.set_log_phi(log_phi)
 
         if not model.vb_params.use_logitnormal_sticks:
             raise NotImplementedError(
@@ -132,11 +134,11 @@ class PriorPerturbation(object):
     ###################################
     # Setting functions for initialization
 
-    def set_epsilon(self, epsilon, quad_maxiter = 50):
+    def set_epsilon(self, epsilon):
         self.epsilon_param.set(epsilon)
-        self.set_log_phi(self.log_phi, quad_maxiter = quad_maxiter)
+        self.set_log_phi(self.log_phi)
 
-    def set_log_phi(self, log_phi, quad_maxiter = 50):
+    def set_log_phi(self, log_phi):
         # Set attributes derived from phi and epsilon
 
         # Initial values for the log normalzing constants which will be set below.
@@ -148,25 +150,25 @@ class PriorPerturbation(object):
         self.log_phi = log_phi
 
         norm_p0, _ = osp.integrate.quadrature(
-            lambda v: np.exp(self.get_log_p0(v)), 0, 1, maxiter = quad_maxiter)
+            lambda v: np.exp(self.get_log_p0(v)), 0, 1, maxiter = self.quad_maxiter)
         assert norm_p0 > 0
         self.log_norm_p0 = np.log(norm_p0)
 
         norm_pc, _ = osp.integrate.quadrature(
             lambda v: np.exp(self.get_log_pc(v)),
-            0, 1, maxiter = quad_maxiter)
+            0, 1, maxiter = self.quad_maxiter)
         assert norm_pc > 0
         self.log_norm_pc = np.log(norm_pc)
 
         norm_p0_logit, _ = osp.integrate.quadrature(
             lambda logit_v: np.exp(self.get_log_p0_logit(logit_v)),
-            self.logit_v_lb, self.logit_v_ub, maxiter = quad_maxiter)
+            self.logit_v_lb, self.logit_v_ub, maxiter = self.quad_maxiter)
         assert norm_p0_logit > 0
         self.log_norm_p0_logit = np.log(norm_p0_logit)
 
         norm_pc_logit, _ = osp.integrate.quadrature(
             lambda logit_v: np.exp(self.get_log_pc_logit(logit_v)),
-            self.logit_v_lb, self.logit_v_ub, maxiter = quad_maxiter)
+            self.logit_v_lb, self.logit_v_ub, maxiter = self.quad_maxiter)
         assert norm_pc_logit > 0
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 

@@ -142,7 +142,7 @@ def get_kth_weight_from_sticks(stick_lengths, k):
 
 
 def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
-                                            threshold = 0.0,
+                                            threshold = 0,
                                             n_samples = None,
                                             unv_norm_samples = None):
 
@@ -167,9 +167,12 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
     # get posterior weights
     weight_samples = get_mixture_weights_array(stick_samples)
 
-    min_num_cluster_obs = int(np.floor(n_obs * threshold))
+    # threshold is the min number of observations in each cluster
+    # for it to contribute to the expected number of clusters
+    assert isinstance(threshold, int)
+
     subtr_weight = (1 - weight_samples)**(n_obs)
-    for i in range(1, min_num_cluster_obs):
+    for i in range(1, threshold):
         subtr_weight += \
             osp.special.comb(n_obs, i) * \
             weight_samples**i * (1 - weight_samples)**(n_obs - i)
@@ -200,7 +203,7 @@ def get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
 
 
 def get_e_num_large_clusters_from_ez(e_z,
-                                    threshold = 0.0,
+                                    threshold = 0,
                                     n_samples = None,
                                     unif_samples = None):
 
@@ -220,12 +223,13 @@ def get_e_num_large_clusters_from_ez(e_z,
     e_z_cumsum = np.cumsum(e_z, axis = 1)
 
     num_heavy_clusters_vec = np.zeros(n_samples)
-    for i in range(n_clusters):
-        # z_sample is a n_obs x n_samples matrix of cluster belongings
-        z_sample = get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples)
 
+    # z_sample is a n_obs x n_samples matrix of cluster belongings
+    z_sample = get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples)
+
+    for i in range(n_clusters):
         # get number of clusters with at least enough points above the threshold
-        num_heavy_clusters_vec += np.mean(z_sample == i, axis = 0) > threshold
+        num_heavy_clusters_vec += np.sum(z_sample == i, axis = 0) > threshold
 
     return np.mean(num_heavy_clusters_vec), np.var(num_heavy_clusters_vec)
 
