@@ -745,6 +745,37 @@ If
 \end_layout
 
 \begin_layout Standard
+We note that 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "prop:norms"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ defines norms on a function space.
+ To avoid ambiguity, the unsubscripted norm 
+\begin_inset Formula $\norm{\cdot}$
+\end_inset
+
+ will refer to the Euclidean norm in 
+\begin_inset Formula $\mathbb{R}^{D}$
+\end_inset
+
+, and the absolute value sign 
+\begin_inset Formula $\left|\cdot\right|$
+\end_inset
+
+ will denote to the norm in 
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "prop:norms"
@@ -1439,17 +1470,33 @@ Note that
  such that
 \begin_inset Formula 
 \begin{align*}
-\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta+\Delta\eta,\pert\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[1]}\left(\eta,\pert\right)\left(\Delta\eta\right)\right)}_{2}}{\norm{\Delta\eta}_{2}} & =0\\
-\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta,\pert+\dir\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[2]}\left(\eta,\pert\right)\left(\dir\right)\right)}_{2}}{\norm{\dir}_{p}} & =0.
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta+\Delta\eta,\pert\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[1]}\left(\eta,\pert\right)\left(\Delta\eta\right)\right)}}{\norm{\Delta\eta}} & =0\\
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta,\pert+\dir\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[2]}\left(\eta,\pert\right)\left(\dir\right)\right)}}{\norm{\dir}_{p}} & =0.
 \end{align*}
 
 \end_inset
 
+We will need to discuss the continuity of the partial derivatives in the
+ location at which they are evaluated, for which we must define a norm.
+ Noting that 
+\begin_inset Formula $\gradpartial[1]\left(\eta,\pert\right)$
+\end_inset
 
-\end_layout
+ and 
+\begin_inset Formula $\gradpartial[2]\left(\eta,\pert\right)$
+\end_inset
 
-\begin_layout Standard
-The following proposition relates Fréchet differentiability in 
+ exist in the space of linear operators, so we use the operator norm.
+\begin_inset Formula 
+\begin{align*}
+\norm{{\gradpartial[1]}\left(\eta,\pert\right)}_{op} & :=\sup_{v\in\mathbb{R}^{D}}\frac{\norm{{\gradpartial[1]}\left(\eta,\pert\right)\left(v\right)}}{\norm v}\\
+\norm{{\gradpartial[2]}\left(\eta,\pert\right)}_{op} & :=\sup_{V\in\funspace}\frac{\norm{{\gradpartial[2]}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{p}}.
+\end{align*}
+
+\end_inset
+
+With this definition in hand, following proposition relates Fréchet differentiab
+ility in 
 \begin_inset Formula $\mathbb{R}^{D}\times\priorspace$
 \end_inset
 
@@ -1502,7 +1549,30 @@ literal "false"
 \end_inset
 
 , respectively.
- If these partial derivatives are continuous.
+ If these partial derivatives are continuous in a ball around 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+, then 
+\begin_inset Formula $\grad$
+\end_inset
+
+ is Fréchet differentiable at 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Standard
