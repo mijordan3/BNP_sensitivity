@@ -23,13 +23,13 @@ results_df_3 <- as.data.frame(t(results_matrix_3))
 w <- 1.1
 grid.arrange(
   plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) + 
-    ylab('thresholded expected #(clusters)') + ggtitle('In-sample quantity') + 
-    theme(legend.position = c(0.25, 0.8)), 
+    ylab('E[#(clusters thresholded)]') + ggtitle('In-sample quantity') + 
+    theme(legend.position = c(0.25, 0.8), legend.title=element_blank()), 
   plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) + 
-    ylab('thresholded expected #(clusters)') + ggtitle(' ') + 
+    ylab('E[#(clusters thresholded)]') + ggtitle(' ') + 
     theme(legend.position="none"), 
   plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) + 
-    ylab('thresholded expected #(clusters)') + ggtitle(' ') + 
+    ylab('E[#(clusters thresholded)]') + ggtitle(' ') + 
     theme(legend.position="none"),
   ncol  = 3)
 
@@ -58,13 +58,13 @@ results_df_3 <- as.data.frame(t(results_matrix_3))
 w <- 1.1
 grid.arrange(
   plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) + 
-    ylab('thresholded expected #(predicted clusters)') + ggtitle('Preditive quantity') + 
-    theme(legend.position = c(0.25, 0.8)), 
+    ylab('E[#(predicted clusters thresholded)]') + ggtitle('Preditive quantity') + 
+    theme(legend.position = c(0.25, 0.8), legend.title=element_blank()), 
   plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) + 
-    ylab('thresholded expected #(predicted clusters)') + ggtitle(' ') + 
+    ylab('E[#(predicted clusters thresholded)]') + ggtitle(' ') + 
     theme(legend.position="none"), 
   plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) + 
-    ylab('thresholded expected #(predicted clusters)') + ggtitle(' ') + 
+    ylab('E[#(predicted clusters thresholded)]') + ggtitle(' ') + 
     theme(legend.position="none"),
   ncol  = 3)
 

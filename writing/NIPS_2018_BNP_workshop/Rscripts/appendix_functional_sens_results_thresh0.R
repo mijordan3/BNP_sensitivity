@@ -74,7 +74,7 @@ prior_pert1_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) + 
-  ylab('expected #(predicted clusters)') 
+  ylab('E[#(predicted clusters)]') 
 # prior_pert1_pred_results_plot
 
 # plot results from second perturbation
@@ -88,7 +88,7 @@ prior_pert2_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) + 
-  ylab('expected #(predicted clusters)')
+  ylab('E[#(predicted clusters)]')
 # prior_pert2_pred_results_plot
 
 

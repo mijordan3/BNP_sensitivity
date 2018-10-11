@@ -12,7 +12,7 @@ plot_parametric_sensitivity <- function(
     geom_point(aes(x = alpha, y = e_num_clusters, color = method)) +
     geom_line(data = subset(results_df_long, method == 'linear approx'),
               aes(x = alpha, y = e_num_clusters, color = method)) +
-    xlab(xlabel) + ylab('expected #(clusters)') +
+    xlab(xlabel) + ylab('E[#(clusters)]') +
     theme(legend.position = c(0.75, 0.2))
 
   if(alpha_0 > 0){

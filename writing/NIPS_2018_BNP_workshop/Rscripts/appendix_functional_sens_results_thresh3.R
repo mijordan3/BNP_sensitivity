@@ -45,7 +45,8 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 prior_pert1_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.25, 0.75), legend.title=element_blank())
+  theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) + 
+  ylab('E[#(clusters thresholded)]') 
 # prior_pert1_results_plot
 
 # plot results from second perturbation
@@ -57,7 +58,8 @@ colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
 prior_pert2_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.25, 0.75), legend.title=element_blank())
+  theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) +
+  ylab('E[#(clusters thresholded)]') 
 # prior_pert2_results_plot
 
 ##########################
@@ -74,7 +76,7 @@ prior_pert1_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) + 
-  ylab('expected #(predicted clusters)') 
+  ylab('E[#(predicted clusters thresholded)]') 
 # prior_pert1_pred_results_plot
 
 # plot results from second perturbation
@@ -88,7 +90,7 @@ prior_pert2_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
   theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) + 
-  ylab('expected #(predicted clusters)')
+  ylab('E[#(predicted clusters thresholded)]')
 # prior_pert2_pred_results_plot
 
 
