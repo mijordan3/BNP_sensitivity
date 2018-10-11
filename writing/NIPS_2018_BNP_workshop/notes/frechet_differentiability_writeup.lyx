@@ -1301,7 +1301,7 @@ noprefix "false"
 \end_layout
 
 \begin_layout Section
-Differentiability of VB Optima
+Estimating Equations for VB
 \end_layout
 
 \begin_layout Standard
@@ -1524,36 +1524,12 @@ literal "false"
 \begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
- has Fréchet partial derivatives with respect to 
-\begin_inset Formula $\eta$
-\end_inset
-
- and 
-\begin_inset Formula $\pert$
-\end_inset
-
- at 
-\begin_inset Formula $\left(\eta,U\right)$
-\end_inset
-
- in a ball around 
+ has continuous Fréchet partial derivatives in a ball around 
 \begin_inset Formula $\left(\eta^{*},\onefun\right)$
 \end_inset
 
-, and denote these partial derivatives 
-\begin_inset Formula $\gradpartial[1]\left(\eta^{*},\onefun\right):\mathbb{R}^{d}\rightarrow\mathbb{R}^{d}$
-\end_inset
-
- and 
-\begin_inset Formula $\gradpartial[2]\left(\eta^{*},\onefun\right):\priorspace\rightarrow\mathbb{R}^{d}$
-\end_inset
-
-, respectively.
- If these partial derivatives are continuous in a ball around 
-\begin_inset Formula $\left(\eta^{*},\onefun\right)$
-\end_inset
-
-, then 
+.
+ Then 
 \begin_inset Formula $\grad$
 \end_inset
 
@@ -1571,7 +1547,280 @@ literal "false"
 
 \end_layout
 
+\begin_layout Section
+Differentiability of VB Optima
+\end_layout
+
 \begin_layout Standard
+Using the tools articulated above, we can now consider the differentiability
+ of 
+\begin_inset Formula $\grad$
+\end_inset
+
+.
+ To begin, we write out 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ explicitly\SpecialChar endofsentence
+ We will assume that we can exchange differentiation with respect
+ to 
+\begin_inset Formula $\eta$
+\end_inset
+
+ and integration with respect to 
+\begin_inset Formula $\vbdist[\theta\vert\eta]$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\grad\left(\eta,\pert\right) & :=\frac{\partial}{\partial\eta}\expect_{\vbdist[\theta\vert\eta]}\left[\log\vbdist-\log P\left(X\vert\theta\right)-\log\contamprior[\theta\vert\pert]\right]+Constant.
+\end{align*}
+
+\end_inset
+
+In the preceding equation, 
+\begin_inset Formula $Constant$
+\end_inset
+
+ does not depend on 
+\begin_inset Formula $\eta$
+\end_inset
+
+.
+ Expanding the log prior term,
+\begin_inset Formula 
+\begin{align*}
+\log\contamprior[\theta\vert\pert] & =\begin{cases}
+\log\origprior+p\log\pert-\log\left(\altpriornorm\left(\pert\right)\right) & p<\infty\\
+\log\origprior+\pert-1-\log\left(\altpriornorm[\infty]\left(\pert\right)\right) & p=\infty
+\end{cases}.
+\end{align*}
+
+\end_inset
+
+Noting that 
+\begin_inset Formula $\altpriornorm\left(\pert\right)$
+\end_inset
+
+ is a constant, so 
+\begin_inset Formula $\frac{\partial}{\partial\eta}\expect_{\vbdist[\theta\vert\eta]}\left[\log\left(\altpriornorm\left(\pert\right)\right)\right]=0$
+\end_inset
+
+, we can see that the dependence of 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ on 
+\begin_inset Formula $\pert$
+\end_inset
+
+ only enters in a single term.
+\begin_inset Formula 
+\begin{align}
+\grad\left(\eta,\pert\right)-\grad\left(\eta,\onefun\right) & =\begin{cases}
+-\frac{\partial}{\partial\eta}\expect_{\vbdist[\theta\vert\eta]}\left[p\log\pert\right] & p<\infty\\
+-\frac{\partial}{\partial\eta}\expect_{\vbdist[\theta\vert\eta]}\left[\pert\right] & p=\infty
+\end{cases}\nonumber \\
+ & =\begin{cases}
+-p\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist\log\pert d\theta & p<\infty\\
+-\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist\pert d\theta & p=\infty
+\end{cases}.\label{eq:g_explicit_form}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Multiplicative Perturbations.
+\end_layout
+
+\begin_layout Standard
+First, we consider 
+\begin_inset Formula $p=\infty$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Theorem
+\begin_inset CommandInset label
+LatexCommand label
+name "thm:mult_frechet"
+
+\end_inset
+
+
+\begin_inset Formula $\fullmap[\infty]$
+\end_inset
+
+ is Fréchet differentiable.
+\end_layout
+
+\begin_layout Proof
+One can see from 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:g_explicit_form"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ is in fact linear in 
+\begin_inset Formula $\pert$
+\end_inset
+
+, with the linear operator given by
+\begin_inset Formula 
+\begin{align*}
+\gradpartial[2][\infty]\left(\eta,\pert\right)\left(\cdot\right) & =\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist\left(\cdot\right)d\theta.
+\end{align*}
+
+\end_inset
+
+Consequently, as long as 
+\begin_inset Formula $\gradpartial[2][\infty]\left(\eta,\pert\right)$
+\end_inset
+
+ is continuous, it a Fréchet derivative.
+ Linear operators are continuous if an only if they are bounded 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "Chapter 5.2"
+key "luenberger:1997:vectorspaceoptimization"
+literal "false"
+
+\end_inset
+
+, so it suffices to calculate the operator norm 
+\begin_inset Formula $\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)}_{op}$
+\end_inset
+
+.
+ Recall that, for 
+\begin_inset Formula $p=\infty$
+\end_inset
+
+, we are using the norm 
+\begin_inset Formula $\norm{\cdot}_{\infty}$
+\end_inset
+
+ for 
+\begin_inset Formula $\pert$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)}_{op} & =\sup_{V\in\funspace[\infty]}\frac{\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{\infty}}\\
+ & =\sup_{V\in\funspace[\infty]}\frac{\norm{\int\frac{\partial\log{\vbdist}}{\partial\eta}{\vbdist}Vd\theta}}{\norm V_{\infty}}\\
+ & \le\sup_{V\in\funspace[\infty]}\frac{\norm V_{\infty}\int\norm{\frac{\partial\log{\vbdist}}{\partial\eta}}\vbdist d\theta}{\norm V_{\infty}}\\
+ & =\int\norm{\frac{\partial\log{\vbdist}}{\partial\eta}}\vbdist d\theta.
+\end{align*}
+
+\end_inset
+
+It follows that 
+\begin_inset Formula $\gradpartial[2][\infty]\left(\eta,\pert\right)$
+\end_inset
+
+ is a Fréchet derivative.
+ Furthermore, because 
+\begin_inset Formula $\frac{\partial\log\vbdist}{\partial\eta}\vbdist$
+\end_inset
+
+ is a continuous function of 
+\begin_inset Formula $\eta$
+\end_inset
+
+, it is continuous as a function of 
+\begin_inset Formula $\left(\eta,\pert\right)$
+\end_inset
+
+.
+ Then put together the pieces above.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Non-multiplicative Perturbations.
+\end_layout
+
+\begin_layout Standard
+Next, we consider 
+\begin_inset Formula $p<\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Theorem
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ is a discontinuous function of 
+\begin_inset Formula $\pert$
+\end_inset
+
+ at 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+\begin_inset Formula $-p\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist\log\pert d\theta$
+\end_inset
+
+ is composed of two maps:
+\begin_inset Formula 
+\begin{align*}
+U & \mapsto\log U\\
+V & \mapsto-p\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist Vd\theta.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Lemma
+In general, 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+ is not Fréchet differentiable for 
+\begin_inset Formula $p<\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+Fréchet differentiable functions are continuous.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
 
 \end_layout
 
@@ -1607,7 +1856,7 @@ name "app:normchoice"
 \end_layout
 
 \begin_layout Standard
-ok
+Put this here
 \end_layout
 
 \end_body
