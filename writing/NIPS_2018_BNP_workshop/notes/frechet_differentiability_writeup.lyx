@@ -250,8 +250,44 @@ theorems-sec-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
+\newcommand{\fullderiv}[1][p]{dT_{#1}}
+{dT_{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\gateauxderiv}[1][p]{\delta T_{#1}}
+{\delta T_{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
 \newcommand{\etapopt}[1][p]{\eta_{#1}^{*}}
 {\eta_{#1}^{*}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\grad}[1][p]{G_{#1}}
+{G_{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\dir}{\Delta U}
+{\Delta U}
 \end_inset
 
 
@@ -799,8 +835,93 @@ and require, for each
 .
 \end_layout
 
+\begin_layout Standard
+We end this section by discussing how to choose 
+\begin_inset Formula $\pert$
+\end_inset
+
+ to approximate the effect of replacing 
+\begin_inset Formula $\origprior$
+\end_inset
+
+ with a different proper prior, 
+\begin_inset Formula $\altprior$
+\end_inset
+
+.
+ Given the definitions in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:perturbation_definitions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we can see that 
+\begin_inset Formula $\contamprior[\theta\vert\pert]=\altprior$
+\end_inset
+
+ when
+\begin_inset Formula 
+\begin{align}
+\pertone\left(\theta\right)= & \begin{cases}
+\left(\frac{\altprior}{\origprior}\right)^{p} & \textrm{ for }p<\infty\\
+\log\left(\frac{\altprior}{\origprior}\right) & \textrm{for }p=\infty
+\end{cases}.\label{eq:pert_to_exchange_prior}
+\end{align}
+
+\end_inset
+
+(Note that for the choices of 
+\begin_inset Formula $\pert$
+\end_inset
+
+ given in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:pert_to_exchange_prior"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\altpriornorm\left(\pertone\right)=1$
+\end_inset
+
+.) Thus, once we have a linear approximation to the dependence of 
+\begin_inset Formula $\expect_{\vbdist[\theta\vert\eta^{*}]}\left[\targetfun\right]$
+\end_inset
+
+ on 
+\begin_inset Formula $\pert$
+\end_inset
+
+, we will approximate the effect of replacing 
+\begin_inset Formula $\origprior$
+\end_inset
+
+ with 
+\begin_inset Formula $\altprior$
+\end_inset
+
+ by taking a unit step in function space from 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+ in the direction given by the function 
+\begin_inset Formula $\dir=\pertone-\onefun$
+\end_inset
+
+.
+ 
+\end_layout
+
 \begin_layout Section
-Derivative
+Derivatives
 \end_layout
 
 \begin_layout Standard
@@ -881,79 +1002,227 @@ we have
 \end_layout
 
 \begin_layout Standard
-We begin by discussing how to choose 
+The derivative of 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+ in the direction 
+\begin_inset Formula $\dir$
+\end_inset
+
+ at 
 \begin_inset Formula $\pert$
 \end_inset
 
- to approximate the effect of replacing 
-\begin_inset Formula $\origprior$
-\end_inset
-
- with a different proper prior, 
-\begin_inset Formula $\altprior$
-\end_inset
-
-.
- Given the definitions in 
-\begin_inset CommandInset ref
-LatexCommand formatted
-reference "eq:perturbation_definitions"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-, we can see that 
-\begin_inset Formula $\contamprior[\theta\vert\pert]=\altprior$
-\end_inset
-
- when
+ is given by the scalar derivative
 \begin_inset Formula 
 \begin{align}
-\pertone\left(\theta\right)= & \begin{cases}
-\left(\frac{\altprior}{\origprior}\right)^{p} & \textrm{ for }p<\infty\\
-\log\left(\frac{\altprior}{\origprior}\right) & \textrm{for }p=\infty
-\end{cases}.\label{eq:pert_to_exchange_prior}
+\gateauxderiv\left(\pert;\dir\right) & :=\lim_{\epsilon\rightarrow0}\frac{\fullmap\left(\pert+\epsilon\dir\right)-\fullmap\left(\pert\right)}{\epsilon}.\label{eq:gateaux_derivative}
 \end{align}
 
 \end_inset
 
-(Note that for the choices of 
-\begin_inset Formula $\pert$
-\end_inset
 
- given in 
 \begin_inset CommandInset ref
 LatexCommand formatted
-reference "eq:pert_to_exchange_prior"
+reference "eq:gateaux_derivative"
 plural "false"
 caps "false"
 noprefix "false"
 
 \end_inset
 
-, 
-\begin_inset Formula $\altpriornorm\left(\pertone\right)=1$
+ is known as a 
+\begin_inset Quotes eld
 \end_inset
 
-.) Thus, once we have a linear approximation to 
-\begin_inset Formula $\fullmap$
-\end_inset
-
-, we will approximate the effect of replacing 
-\begin_inset Formula $\origprior$
-\end_inset
-
- with 
-\begin_inset Formula $\altprior$
-\end_inset
-
- by taking a unit step in the direction of the function 
-\begin_inset Formula $\pertone-\onefun$
+Gateaux derivative
+\begin_inset Quotes erd
 \end_inset
 
 .
+ Even when a Gateaux derivative exists in all directions, it is possible
+ that the error in the linear approximation to 
+\begin_inset Formula $\fullmap\left(\pert+\epsilon\dir\right)$
+\end_inset
+
+ given by 
+\begin_inset Formula $\fullmap\left(\pert\right)+\gateauxderiv\left(\pert;\dir\right)\epsilon$
+\end_inset
+
+ may grow arbitrarily large in certain directions.
+ When this occurs, no matter how small 
+\begin_inset Formula $\epsilon>0$
+\end_inset
+
+ may be, there will exist directions 
+\begin_inset Formula $\dir$
+\end_inset
+
+ for which 
+\begin_inset Formula $\left|\fullmap\left(\pert+\epsilon\dir\right)-\left(\fullmap\left(\pert\right)+\gateauxderiv\left(\pert;\dir\right)\epsilon\right)\right|$
+\end_inset
+
+ may be made arbitrarily large.
+ A Gateaux derivative alone does not provide a good linear approximation
+ to 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+; we require an additional condition on the uniformity of the accuracy of
+ the linear approximation.
+ Perhaps surprisingly, this phenomenon can occur even in 
+\begin_inset Formula $\mathbb{R}^{2}$
+\end_inset
+
+ at a point where a function is continuous and differentiable 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "Example 1.9"
+key "averbukh:1967:theory"
+literal "false"
+
+\end_inset
+
+.
+ However, as one might expect, non-uniformity of the linear approximation
+ is a more common phenomenon in infinite-dimensional vector spaces where
+ there are more directions 
+\begin_inset Formula $\dir$
+\end_inset
+
+ to choose from than in finite-dimensional vector spaces.
+ 
+\end_layout
+
+\begin_layout Standard
+The Fréchet derivative differs from the Gateaux derivative precisely in
+ that it requires this uniformity of convergence.
+ Formally, we say that the functional 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+ is Fréchet differentiable at 
+\begin_inset Formula $\pert$
+\end_inset
+
+ if there exists a continuous linear map, 
+\begin_inset Formula $\fullderiv\left(\pert\right):\priorspace\rightarrow\mathbb{R}$
+\end_inset
+
+, such that
+\begin_inset Formula 
+\begin{align}
+\lim_{\norm{\dir}_{p}\rightarrow0} & \frac{\left|\fullmap\left(\pert+\dir\right)-\left(\fullmap\left(\pert\right)+\fullderiv\left(\pert\right)\left(\dir\right)\right)\right|}{\norm{\dir}_{p}}=0.\label{eq:frechet_derivative}
+\end{align}
+
+\end_inset
+
+Let us take a moment to parse each term in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:frechet_derivative"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ First, recall that 
+\begin_inset Formula $\fullmap\left(\pert+\dir\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\fullmap\left(\pert\right)$
+\end_inset
+
+ are both in 
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+.
+ The term 
+\begin_inset Formula $\fullderiv\left(\pert\right)$
+\end_inset
+
+ is a linear map from 
+\begin_inset Formula $\priorspace\rightarrow\mathbb{R}$
+\end_inset
+
+, so its domain and co-domain are the same as that of 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+, though in general, unlike 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+, it is a linear function.
+ Thus 
+\begin_inset Formula $\fullderiv\left(\pert\right)\left(\dir\right)$
+\end_inset
+
+ is 
+\begin_inset Formula $\fullderiv\left(\pert\right)$
+\end_inset
+
+ evaluated at 
+\begin_inset Formula $\dir\in\priorspace$
+\end_inset
+
+, and thus is in 
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+.
+ The entire numerator of 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:frechet_derivative"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is thus in 
+\begin_inset Formula $\mathbb{R}$
+\end_inset
+
+, and so we use the ordinary absolute value 
+\begin_inset Formula $\left|\cdot\right|$
+\end_inset
+
+ as the norm.
+ In the denominator, we have 
+\begin_inset Formula $\norm{\dir}_{p}$
+\end_inset
+
+, the size of the step taken from 
+\begin_inset Formula $\pert$
+\end_inset
+
+.
+ The moral of 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "eq:frechet_derivative"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is that the linear approximation provided by 
+\begin_inset Formula $\fullmap\left(\pert\right)+\fullderiv\left(\pert\right)\left(\dir\right)$
+\end_inset
+
+ is guaranteed to be more accurate as 
+\begin_inset Formula $\norm{\dir}_{p}$
+\end_inset
+
+ gets small.
  
 \end_layout
 
@@ -968,8 +1237,7 @@ noprefix "false"
 
 \end_inset
 
- is twice smoothly differentiable, the solution to the optimization problem
- 
+ is smoothly differentiable, a solution to the optimization problem 
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "eq:perturbed_kl"
@@ -979,11 +1247,11 @@ noprefix "false"
 
 \end_inset
 
- is given by the first order condition.
+ is given by a first order condition.
  Define
 \begin_inset Formula 
 \begin{align}
-G\left(\eta,\pert\right) & :=\frac{\partial}{\partial\eta}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right).\label{eq:gradient_defn}
+\grad\left(\eta,\pert\right) & :=\frac{\partial}{\partial\eta}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right).\label{eq:gradient_defn}
 \end{align}
 
 \end_inset
@@ -992,10 +1260,10 @@ Then
 \begin_inset Formula $\etapopt\left(\pert\right)$
 \end_inset
 
- is defined as the solution to the estimating equation
+ is defined as a solution to the estimating equation
 \begin_inset Formula 
 \begin{align*}
-G\left(\etapopt\left(\pert\right),\pert\right) & =0.
+\grad\left(\etapopt\left(\pert\right),\pert\right) & =0.
 \end{align*}
 
 \end_inset
@@ -1006,7 +1274,7 @@ The implicit function theorem gives conditions for the Fréchet differentiabilit
 \end_inset
 
  in terms of attributes of 
-\begin_inset Formula $G\left(\eta,\pert\right)$
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
  in a neighborhood of 
@@ -1038,7 +1306,7 @@ literal "false"
 \end_inset
 
  Hessian matrix 
-\begin_inset Formula $H:=\at{\frac{\partial G\left(\eta,\pert\right)}{\partial\eta}}{\eta,\pert}$
+\begin_inset Formula $H:=\at{\frac{\partial G\left(\eta,\pert\right)}{\partial\eta^{T}}}{\eta,\pert}$
 \end_inset
 
  exists, is continuous, and is invertible in a neighborhood of 
@@ -1046,7 +1314,7 @@ literal "false"
 \end_inset
 
 , and 
-\begin_inset Formula $G\left(\eta,\pert\right)$
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
  exists and is is continuously Fréchet differentiable in an open neighborhood
@@ -1082,7 +1350,7 @@ noprefix "false"
 
 \end_inset
 
- gives conditions
+ gives conditions for 
 \end_layout
 
 \begin_layout Standard
