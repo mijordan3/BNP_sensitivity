@@ -12,6 +12,8 @@ import autograd.scipy as sp
 
 import scipy as osp
 
+import warnings
+
 from scipy import optimize
 from scipy import linalg
 from scipy import sparse
@@ -506,9 +508,14 @@ class DPGaussianMixture(object):
         gamma_init = np.zeros((self.k_approx, dim, dim))
         for k in range(self.k_approx):
             indx = np.argwhere(km_best.labels_ == k).flatten()
-            resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
-            gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
-                                    np.eye(dim) * 1e-4)
+            if len(indx == 1):
+                # if there's only one datapoint in the cluster,
+                # the covariance is not defined.
+                gamma_init[k, :, :] = np.eye(dim)
+            else:
+                resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
+                gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
+                                        np.eye(dim) * 1e-4)
 
         self.vb_params['global']['gamma'].set(gamma_init)
 
@@ -531,7 +538,8 @@ class DPGaussianMixture(object):
         def local_precondition_and_optimize(x):
             return precondition_and_optimize(self.objective, x)
 
-        return opt_lib.repeatedly_optimize(
+        best_param, converged, x_conv, f_conv, grad_conv, obj_opt, opt_results = \
+         opt_lib.repeatedly_optimize(
             objective=self.objective,
             optimization_fun=local_precondition_and_optimize,
             init_x=init_free_par,
@@ -539,6 +547,15 @@ class DPGaussianMixture(object):
             max_iter=100,
             gtol=1e-8, ftol=1e-8, xtol=1e-8, disp=False,
             keep_intermediate_optimizations=True)
+
+        self.global_vb_params.set_free(best_param)
+        self.set_optimal_z()
+
+        class_weights = np.sum(self.e_z, axis=0) / self.n_obs
+        if class_weights[-1] > 1/self.k_approx:
+            warnings.warn('last cluster may not be un-occupied')
+
+        return best_param, converged, x_conv, f_conv, grad_conv, obj_opt, opt_results
 
 
 ########################
@@ -588,12 +605,13 @@ class InterestingMoments(object):
         return self.moment_params.get_vector()
 
 # Get the expected posterior predictive number of distinct clusters.
-def get_e_num_pred_clusters_from_free_par(free_par, model):
+def get_e_num_pred_clusters_from_free_par(free_par, model, n_samples = 100000):
     model.global_vb_params.set_free(free_par)
     mu = model.global_vb_params['v_sticks']['mean'].get()
     sigma = 1 / np.sqrt(model.global_vb_params['v_sticks']['info'].get())
     n_obs = model.n_obs
-    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs)
+    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs, \
+                                                        n_samples = n_samples)
 
 # Get the expected posterior number of distinct clusters.
 def get_e_num_clusters_from_free_par(free_par, model):
@@ -601,6 +619,57 @@ def get_e_num_clusters_from_free_par(free_par, model):
     model.set_optimal_z()
     return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
 
+class ExpectedPredNumClusters(object):
+    # Get the expected posterior predictive number of distinct clusters above
+    # some given threshold.
+    # Note that we cache the normal samples that we use to sample
+    # cluster belongings.
+
+    def __init__(self, model):
+        self.model = model
+        self.n_obs = self.model.y.shape[0]
+        self.k_approx = self.model.k_approx
+
+        self.set_normal_samples()
+
+    def set_normal_samples(self, n_samples = 10000):
+        self.unv_norm_samples = np.random.normal(0, 1, \
+                                    size = (n_samples, self.k_approx - 1))
+
+    def get_e_num_pred_heavy_clusters_from_free_par(self, free_par, threshold = 0):
+        self.model.global_vb_params.set_free(free_par)
+        self.model.set_optimal_z()
+
+        mu = self.model.global_vb_params['v_sticks']['mean'].get()
+        sigma = 1 / np.sqrt(self.model.global_vb_params['v_sticks']['info'].get())
+
+        return modeling_lib.get_e_number_clusters_from_logit_sticks(
+                                    mu, sigma, self.n_obs,
+                                    threshold = threshold,
+                                    unv_norm_samples = self.unv_norm_samples)
+
+class ExpectedNumClustersFromZ(object):
+    # Get the expected posterior number of distinct clusters above
+    # some given threshold.
+    # Note that we cache the uniform samples that we use to sample
+    # cluster belongings.
+
+    def __init__(self, model):
+        self.model = model
+        self.n_obs = self.model.y.shape[0]
+
+        self.set_uniform_samples()
+
+    def set_uniform_samples(self, n_samples = 10000):
+        self.unif_samples = np.random.random((self.n_obs, n_samples))
+
+    def get_e_num_heavy_clusters_from_free_par(self, free_par, threshold = 0):
+        self.model.global_vb_params.set_free(free_par)
+        self.model.set_optimal_z()
+
+        return modeling_lib.get_e_num_large_clusters_from_ez(self.model.e_z,
+                                                threshold = threshold,
+                                                unif_samples = self.unif_samples)
 
 
 #################################

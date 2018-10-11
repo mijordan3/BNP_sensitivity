@@ -8,6 +8,7 @@ import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
 
+import scipy as osp
 ################
 # define entropies
 
@@ -140,26 +141,43 @@ def get_kth_weight_from_sticks(stick_lengths, k):
     return (stick_remaining * stick_length)
 
 
-def get_e_number_clusters_from_logit_sticks(
-    mu, sigma, n_obs, threshold = 0.0, samples = 100000):
+def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
+                                            threshold = 0,
+                                            n_samples = None,
+                                            unv_norm_samples = None):
 
     # get logitnormal params
     # mu = model.vb_params['global']['v_sticks']['mean'].get()
     # sigma = model.vb_params['global']['v_sticks']['info'].get()
-    k_approx = len(mu)
+    n_sticks = len(mu)
 
     # sample from univariate normal
     # TODO: keep these draws fixed to reduce simulation noise --
     # "Rao-Blackwellize" this statistic.
-    unv_norm_samples = np.random.normal(0, 1, size = (samples, k_approx))
+    if unv_norm_samples is None:
+        assert n_samples is not None
+        unv_norm_samples = np.random.normal(0, 1, size = (n_samples, n_sticks))
+    if n_samples is None:
+        assert unv_norm_samples is not None
+        assert unv_norm_samples.shape[1] == n_sticks
 
     # sample sticks from variational distribution
-    stick_samples = sp.special.expit(unv_norm_samples / np.sqrt(sigma) + mu)
+    stick_samples = sp.special.expit(unv_norm_samples * sigma + mu)
 
     # get posterior weights
     weight_samples = get_mixture_weights_array(stick_samples)
 
-    return np.mean(np.sum(1 - (1 - weight_samples)**n_obs, axis = 1))
+    # threshold is the min number of observations in each cluster
+    # for it to contribute to the expected number of clusters
+    assert isinstance(threshold, int)
+
+    subtr_weight = (1 - weight_samples)**(n_obs)
+    for i in range(1, threshold):
+        subtr_weight += \
+            osp.special.comb(n_obs, i) * \
+            weight_samples**i * (1 - weight_samples)**(n_obs - i)
+
+    return np.mean(np.sum(1 - subtr_weight, axis = 1))
 
 
 def get_e_number_clusters_from_ez(e_z):
@@ -168,7 +186,52 @@ def get_e_number_clusters_from_ez(e_z):
     k = np.shape(e_z)[1]
     return k - np.sum(np.prod(1 - e_z, axis = 0))
 
+def get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
+    # returns a n_obs x n_samples matrix encoding the cluster belonging
+    # of the nth observation in nth sample
 
+    n_obs = e_z_cumsum.shape[0]
+
+    # unif_sample should be a matrix of shape n_obs x n_samples
+    assert len(unif_samples.shape) == 2
+    assert unif_samples.shape[0] == n_obs
+
+    # get which cluster the sample belongs to
+    z_sample = (e_z_cumsum[:, :, None] > unif_samples[:, None, :]).argmax(1)
+
+    return z_sample
+
+
+def get_e_num_large_clusters_from_ez(e_z,
+                                    threshold = 0,
+                                    n_samples = None,
+                                    unif_samples = None):
+
+    n_obs = e_z.shape[0]
+    n_clusters = e_z.shape[1]
+
+    # draw uniform samples
+    if unif_samples is None:
+        assert n_samples is not None
+        unif_samples = np.random.random((n_obs, n_samples))
+
+    else:
+        assert unif_samples is not None
+        assert unif_samples.shape[0] == n_obs
+
+    n_samples = unif_samples.shape[1]
+    e_z_cumsum = np.cumsum(e_z, axis = 1)
+
+    num_heavy_clusters_vec = np.zeros(n_samples)
+
+    # z_sample is a n_obs x n_samples matrix of cluster belongings
+    z_sample = get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples)
+
+    for i in range(n_clusters):
+        # get number of clusters with at least enough points above the threshold
+        num_heavy_clusters_vec += np.sum(z_sample == i, axis = 0) > threshold
+
+    return np.mean(num_heavy_clusters_vec), np.var(num_heavy_clusters_vec)
 
 
 # def get_e_number_clusters_from_logit_sticks_diffble(vb_params, samples = 10000):

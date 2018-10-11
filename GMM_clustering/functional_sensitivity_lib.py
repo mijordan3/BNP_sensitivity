@@ -18,9 +18,12 @@ from copy import deepcopy
 class PriorPerturbation(object):
     def __init__(self, model, log_phi, epsilon=1.0,
                         logit_v_ub = 4,
-                        logit_v_lb = -4):
+                        logit_v_lb = -4,
+                        quad_maxiter = 50):
         self.logit_v_lb = logit_v_lb
         self.logit_v_ub = logit_v_ub
+
+        self.quad_maxiter = quad_maxiter
 
         self.gustafson_style = False
 
@@ -103,7 +106,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc
         else:
-            assert epsilon <= 1
+            # assert epsilon <= 1
             return \
                 self.get_log_p0(v) + \
                 epsilon * self.log_phi(logit_v) - \
@@ -122,7 +125,7 @@ class PriorPerturbation(object):
                 log_epsilon - \
                 self.log_norm_pc_logit
         else:
-            assert epsilon <= 1
+            # assert epsilon <= 1
             return \
                 self.get_log_p0_logit(logit_v) + \
                 epsilon * self.log_phi(logit_v) - \
@@ -147,25 +150,25 @@ class PriorPerturbation(object):
         self.log_phi = log_phi
 
         norm_p0, _ = osp.integrate.quadrature(
-            lambda v: np.exp(self.get_log_p0(v)), 0, 1)
+            lambda v: np.exp(self.get_log_p0(v)), 0, 1, maxiter = self.quad_maxiter)
         assert norm_p0 > 0
         self.log_norm_p0 = np.log(norm_p0)
 
         norm_pc, _ = osp.integrate.quadrature(
             lambda v: np.exp(self.get_log_pc(v)),
-            0, 1)
+            0, 1, maxiter = self.quad_maxiter)
         assert norm_pc > 0
         self.log_norm_pc = np.log(norm_pc)
 
         norm_p0_logit, _ = osp.integrate.quadrature(
             lambda logit_v: np.exp(self.get_log_p0_logit(logit_v)),
-            self.logit_v_lb, self.logit_v_ub)
+            self.logit_v_lb, self.logit_v_ub, maxiter = self.quad_maxiter)
         assert norm_p0_logit > 0
         self.log_norm_p0_logit = np.log(norm_p0_logit)
 
         norm_pc_logit, _ = osp.integrate.quadrature(
             lambda logit_v: np.exp(self.get_log_pc_logit(logit_v)),
-            self.logit_v_lb, self.logit_v_ub)
+            self.logit_v_lb, self.logit_v_ub, maxiter = self.quad_maxiter)
         assert norm_pc_logit > 0
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
