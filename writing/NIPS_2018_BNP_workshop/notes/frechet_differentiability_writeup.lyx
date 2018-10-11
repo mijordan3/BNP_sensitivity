@@ -1768,9 +1768,10 @@ Next, we consider
 \end_inset
 
 .
+ 
 \end_layout
 
-\begin_layout Theorem
+\begin_layout Claim
 \begin_inset Formula $\grad\left(\eta,\pert\right)$
 \end_inset
 
@@ -1786,22 +1787,127 @@ Next, we consider
 \end_layout
 
 \begin_layout Proof
-\begin_inset Formula $-p\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist\log\pert d\theta$
+First, we note that the map 
+\begin_inset Formula $L:\priorspace\rightarrow\priorspace$
 \end_inset
 
- is composed of two maps:
+ defined by 
+\begin_inset Formula $L\left(\pert\right)\left(\theta\right)=\log\pert\left(\theta\right)$
+\end_inset
+
+ is discontinuous at 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+.
+ Fix 
+\begin_inset Formula $0<\epsilon<1,$
+\end_inset
+
+some 
+\begin_inset Formula $0<\delta<1$
+\end_inset
+
+, and take some 
+\begin_inset Formula $\theta_{0}\in\left(0,1-\epsilon\right)$
+\end_inset
+
+.
+ Define the function
 \begin_inset Formula 
 \begin{align*}
-U & \mapsto\log U\\
-V & \mapsto-p\int\frac{\partial\log\vbdist}{\partial\eta}\vbdist Vd\theta.
+\dir\left(\theta\right) & :=\begin{cases}
+\delta-1 & \theta\in\left(\theta_{0},\theta_{0}+\epsilon\right)\\
+0 & \textrm{otherwise}
+\end{cases}.
 \end{align*}
 
 \end_inset
 
+Then
+\begin_inset Formula 
+\begin{align*}
+\norm{\dir}_{p} & =\left(\int_{0}^{1}\left|\dir\left(\theta\right)\right|^{p}\origprior d\theta\right)^{1/p}\\
+ & =\left(\int_{\theta_{0}}^{\theta_{0}+\epsilon}\left|\delta-1\right|^{p}\origprior d\theta\right)^{1/p}\\
+ & =\epsilon\left|\delta-1\right|\left(\int_{\theta_{0}}^{\theta_{0}+\epsilon}\origprior d\theta\right)^{1/p}\\
+ & \le\epsilon
+\end{align*}
 
+\end_inset
+
+But
+\begin_inset Formula 
+\begin{align*}
+\norm{L\left(\onefun+\dir\right)-L\left(\onefun\right)}_{p} & =\left(\int_{0}^{1}\left|\log\left(\onefun\left(\theta\right)+\dir\left(\theta\right)\right)-\log\onefun\left(\theta\right)\right|^{p}\origprior d\theta\right)^{1/p}\\
+ & =\left(\int_{\theta_{0}}^{\theta_{0}+\epsilon}\left|\log\left(\delta\right)\right|^{p}\origprior d\theta\right)^{1/p}\\
+ & =\epsilon\left|\log\left(\delta\right)\right|\left(\int_{\theta_{0}}^{\theta_{0}+\epsilon}\origprior d\theta\right)^{1/p}.
+\end{align*}
+
+\end_inset
+
+Consequently,
+\begin_inset Formula 
+\begin{align*}
+\frac{\norm{L\left(\onefun+\dir\right)-L\left(\onefun\right)}_{p}}{\norm{\dir}_{p}} & =\frac{\left|\log\left(\delta\right)\right|}{\left|\delta-1\right|}.
+\end{align*}
+
+\end_inset
+
+By making 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ arbitrarily small, 
+\begin_inset Formula $\norm{\dir}_{p}$
+\end_inset
+
+ can be made arbitrarily small.
+ But for any fixed 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+, by making 
+\begin_inset Formula $\delta$
+\end_inset
+
+ small 
+\begin_inset Formula $\norm{L\left(\onefun+\dir\right)-L\left(\onefun\right)}_{p}$
+\end_inset
+
+ can be made arbitrarily large.
+ Consequently, 
+\begin_inset Formula $L$
+\end_inset
+
+ is discontinuous.
 \end_layout
 
-\begin_layout Lemma
+\begin_layout Proof
+To show that 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ is discontinuous, set 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ so that 
+\begin_inset Formula $\inf_{\theta\in\left(\theta_{0},\theta_{0}+\epsilon\right)}\frac{\partial\log\vbdist}{\partial\eta}\vbdist>M$
+\end_inset
+
+ for some 
+\begin_inset Formula $M>0$
+\end_inset
+
+.
+ Then the same reasoning as before holds.
+\end_layout
+
+\begin_layout Corollary
 In general, 
 \begin_inset Formula $\fullmap$
 \end_inset
@@ -1815,6 +1921,19 @@ In general,
 
 \begin_layout Proof
 Fréchet differentiable functions are continuous.
+ 
+\begin_inset Formula $\grad\left(\eta,\pert\right)$
+\end_inset
+
+ is discontinuous at 
+\begin_inset Formula $\left(\eta^{*},\onefun\right)$
+\end_inset
+
+, so it is not Fréchet differentiable, and so, in general, neither is 
+\begin_inset Formula $\fullmap$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
