@@ -14,13 +14,19 @@ source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
 
+We now consider functional perturbations to the prior on the sticks. Figure~\ref{fig:functional_sens_plot_thresh0} shows the effect of our choice of $\phi$ on the expected number of distinct clusters. 
+
 <<figcap3, cache=cache_knitr>>=
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap3 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh0}
-Left column: the original prior $p_{0k}$ in orange,
-the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
-re-fitted expected number of clusters after the pertubation.  ", sep="")
+The effect of prior perturbation on the expected number of distinct clusters ($t = 0$). 
+Left column: the original prior $p_{0}$ in red,
+the perturbed prior $p^c$ in blue. 
+Middle: linearly approximated vs.
+re-fitted in-sample expected number of clusters. 
+Right: linearly approximated vs.
+re-fitted predictive expected number of clusters.  ", sep="")
 @
 
 <<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold', fig.cap=figcap3>>=
@@ -32,9 +38,14 @@ source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, 
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap4 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh3}
-Left column: the original prior $p_{0k}$ in orange,
-the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
-re-fitted expected number of clusters after the pertubation.  ", sep="")
+The effect of prior perturbation on the expected number of clusters with at least three 
+data points. ($t = 3$). 
+Left column: the original prior $p_{0}$ in red,
+the perturbed prior $p^c$ in blue. 
+Middle: linearly approximated vs.
+re-fitted in-sample expected number of clusters. 
+Right: linearly approximated vs.
+re-fitted predictive expected number of clusters.  ", sep="")
 @
 
 <<functional_sens_plot_thresh3, cache=cache_knitr, fig.show='hold', fig.cap=figcap4>>=

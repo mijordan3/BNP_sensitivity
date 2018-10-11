@@ -37,7 +37,7 @@ prior_pert2_plot <-
 
 # plot results from first perturbation
 results_matrix_prior_pert1 <-
-  read.csv('./data_for_figures/prior_pert1_enum_clust_results_pred_thresh0.csv', 
+  read.csv('./data_for_figures/prior_pert1_enum_clust_results_thresh0.csv', 
            header = FALSE)
 results_df_prior_pert1 <- as.data.frame(t(results_matrix_prior_pert1))
 colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
