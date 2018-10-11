@@ -228,8 +228,8 @@ theorems-sec-bytype
 
 \begin_layout Standard
 \begin_inset FormulaMacro
-\newcommand{\fullmap}[1][p]{T_{#1}}
-{T_{#1}}
+\newcommand{\fullmap}{T}
+{T}
 \end_inset
 
 
@@ -331,7 +331,7 @@ ing Fréchet differentiability (or non-differentiability) for other divergence
 \end_layout
 
 \begin_layout Section
-The Space of Prior Perturbations.
+Setup and definitions
 \end_layout
 
 \begin_layout Standard
@@ -487,9 +487,8 @@ a space of possible priors
 \begin_inset Quotes erd
 \end_inset
 
- (in which we can take limits), as well as a norm and what it means to add
- and subtract priors in this space—that is, we must embed our priors in
- a Banach space
+, as well as a norm and what it means to add and subtract priors in this
+ space – that is, we must embed our priors in a Banach space
 \begin_inset Foot
 status open
 
@@ -562,25 +561,6 @@ contamination prior
 \end_inset
 
 :
-\end_layout
-
-\begin_layout Definition
-\begin_inset CommandInset label
-LatexCommand label
-name "def:contamination-prior"
-
-\end_inset
-
-Contamination prior.
- For some function 
-\begin_inset Formula $\pert\left(\theta\right)$
-\end_inset
-
- define on 
-\begin_inset Formula $\left[0,1\right]$
-\end_inset
-
-, let
 \begin_inset Formula 
 \begin{align}
 \contamprior[\theta\vert\pert] & :=\begin{cases}
@@ -591,14 +571,24 @@ Contamination prior.
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Separator plain
+It is evident fromDefining 
+\begin_inset Formula $\onefun\left(\theta\right)\equiv1$
 \end_inset
 
+ to be the function that is identically one, we can see that, for each 
+\begin_inset Formula $p$
+\end_inset
 
+, we recover the base prior at 
+\begin_inset Formula $\pert=\onefun$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $\contamprior[\theta\vert\onefun]=\origprior$
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -685,7 +675,7 @@ noprefix "false"
 
 \end_inset
 
- motivates the use of 
+ strongly motivates the use of 
 \begin_inset Formula $\norm{\cdot}_{p}$
 \end_inset
 
@@ -693,7 +683,7 @@ noprefix "false"
 \begin_inset Formula $p$
 \end_inset
 
-—we would not want 
+; we would not want 
 \begin_inset Quotes eld
 \end_inset
 
@@ -711,142 +701,11 @@ small
 \end_inset
 
 .
- Adopting 
-\begin_inset Formula $\norm{\cdot}_{p}$
-\end_inset
-
- as the norm, we can see that the perturbations 
-\begin_inset Formula $\pert$
-\end_inset
-
- for a given 
-\begin_inset Formula $p$
-\end_inset
-
- are members of the Banach space 
-\begin_inset Formula $\funspace$
-\end_inset
-
-, the class of Lebesgue 
-\begin_inset Formula $p$
-\end_inset
-
--integrable functions defined on 
-\begin_inset Formula $\left[0,1\right]$
-\end_inset
-
-.
- It is evident from 
-\begin_inset CommandInset ref
-LatexCommand formatted
-reference "def:contamination-prior"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- that we additionally require 
-\begin_inset Formula $\pert\ge0$
-\end_inset
-
- almost everywhere for 
-\begin_inset Formula $p<\infty$
-\end_inset
-
-.
- Consequently, we can define 
-\begin_inset Formula 
-\begin{align*}
-\priorspace & :=\begin{cases}
-\left\{ \pert:\pert\in\funspace\textrm{ and }\pert\ge0\,a.e\right\}  & \textrm{for }p<\infty\\
-\funspace[\infty] & \textrm{for }p=\infty
-\end{cases},
-\end{align*}
-
-\end_inset
-
-and require, for each 
-\begin_inset Formula $p$
-\end_inset
-
-, that 
-\begin_inset Formula $\pert\in\priorspace$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Section
-Gradients
 \end_layout
 
 \begin_layout Standard
-We are at last in a position to formally define 
-\begin_inset Formula $\fullmap:\priorspace\subseteq\funspace\rightarrow\mathbb{R}$
-\end_inset
-
- as the map from the perturbation 
-\begin_inset Formula $\pert$
-\end_inset
-
-, using the contaminating prior 
-\begin_inset Formula $\contamprior[\theta\vert\pert]$
-\end_inset
-
-, to 
-\begin_inset Formula $\expect_{\vbdist[\theta\vert\eta^{*}]}\left[\targetfun\right]$
-\end_inset
-
- via the optimization problem defined in 
-\begin_inset CommandInset ref
-LatexCommand formatted
-reference "eq:kl_divergence"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
- That is, writing
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-\eta_{p}^{*}\left(\pert\right) & :=\underset{\eta\in\etadom}{\mathrm{argmin}}KL\left(\vbdist||\frac{P\left(X\vert\theta\right)\contamprior[\theta\vert\pert]}{\int_{0}^{1}P\left(X\vert\theta'\right)\contamprior[\theta'\vert\pert]d\theta'}\right),
-\end{align*}
-
-\end_inset
-
-we have 
-\begin_inset Formula $\fullmap\left(\pert\right)=\expect_{\vbdist[\theta\vert\eta_{p}^{*}\left(\pert\right)]}\left[\targetfun\right]$
-\end_inset
-
-.
- For compactness, we will simply write 
-\begin_inset Formula $\eta^{*}:=\eta_{p}^{*}\left(\onefun\right)$
-\end_inset
-
-, the VB approximation at the base prior 
-\begin_inset Formula $\origprior$
-\end_inset
-
-.
- The map 
-\begin_inset Formula $\fullmap$
-\end_inset
-
- is map between two Banach spaces, and so we can consider its derivative.
-\end_layout
-
-\begin_layout Standard
-We begin by discussing how to choose 
-\begin_inset Formula $\pert$
-\end_inset
-
- to approximate the effect of replacing 
+Suppose we wanted to use our linear approximation to approximate the effect
+ of replacing 
 \begin_inset Formula $\origprior$
 \end_inset
 
@@ -855,24 +714,7 @@ We begin by discussing how to choose
 \end_inset
 
 .
- Defining 
-\begin_inset Formula $\onefun\left(\theta\right)\equiv1$
-\end_inset
-
- to be the function that is identically one, we can see that, for each 
-\begin_inset Formula $p$
-\end_inset
-
-, we recover the base prior at 
-\begin_inset Formula $\pert=\onefun$
-\end_inset
-
-, i.e., 
-\begin_inset Formula $\contamprior[\theta\vert\onefun]=\origprior$
-\end_inset
-
-.
- This is equivalent to saying that Given the definitions in 
+ Given the definitions in 
 \begin_inset CommandInset ref
 LatexCommand formatted
 reference "eq:perturbation_definitions"
@@ -882,22 +724,7 @@ noprefix "false"
 
 \end_inset
 
-, we can see that 
-\begin_inset Formula $\contamprior[\theta\vert\pert]=\altprior$
-\end_inset
-
- when
-\begin_inset Formula 
-\begin{align*}
-\pert\left(\theta\right)= & \begin{cases}
-\left(\frac{\altprior}{\origprior}\right)^{p} & \textrm{ for }p<\infty\\
-\log\left(\frac{\altprior}{\origprior}\right) & \textrm{for }p=\infty
-\end{cases}.
-\end{align*}
-
-\end_inset
-
-Consequently, 
+, we might ask what 
 \end_layout
 
 \begin_layout Standard
