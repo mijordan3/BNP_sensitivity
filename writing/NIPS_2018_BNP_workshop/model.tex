@@ -6,8 +6,8 @@ to cluster the data with the goal of recovering the three species. Let $y_{n}\in
 \mathbb{R}^4$ be these four measurements for flower $n$.
 
 In the spirit of BNP, let us suppose that there there are an infinte number of
-distinct species of iris in the world, indexed by $k=1,2,3,\ldots$, only some
-finite number of which are present in our observed dataset.  Let $z_n$ denote
+distinct species of iris in the world, indexed by $k=1,2,3,\ldots$, and only some
+finite number of species are present in our observed dataset.  Let $z_n$ denote
 the index of the cluster (i.e. the species) to which flower $n$ belongs, i.e.,
 $z_n = k$ for exactly one $k$. Each cluster has mean $\mu_k\in
 \mathbb{R}^4$ and covariance $\Sigma_k \in \mathbb{R}^{4\times 4}$, and we write
@@ -43,6 +43,7 @@ z_n \vert \pi \iid \mathrm{Categorical}(\pi). \label{eq:stick_breaking}
 \end{align}
 %
 The concentration parameter $\alpha$ and stick-breaking prior $p_{0}$
-thus determine our prior belief about the number of clusters present.
-We will be examining the sensitivity of our posterior beliefs about the
-number of clusters present to our choice for $\alpha$ and $p_{0}$.
+thus determine our prior belief about the number of clusters present. This prior
+specification and the observed data combine to inform our posterior belief about the
+posterior number of clusters. We will be examining the sensitivity of our
+posterior belief to our choice for $\alpha$ and $p_{0}$.
