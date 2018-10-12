@@ -307,6 +307,61 @@ Frechet (non-)Differentiability of Variational Approximations
 \end_layout
 
 \begin_layout Section
+Important note
+\end_layout
+
+\begin_layout Standard
+For all the norms with 
+\begin_inset Formula $p<\infty$
+\end_inset
+
+, this work is premised on the idea that the functional is defined in an
+ 
+\begin_inset Formula $\norm{\cdot}_{p}$
+\end_inset
+
+ neighborhood of 
+\begin_inset Formula $\onefun$
+\end_inset
+
+, which is not true, but the same counterexample that gives non-differentiabilit
+y.
+ At the moment, it seems like the only way around this is to allow, Gustafson
+ style, only positive perturbations, hoping that you are differentiable
+ in the half-plane.
+ This eliminates the counterexample and will probably leave the VB estimates
+ differentiable.
+ However, this has the counterintuitive 
+\begin_inset Quotes eld
+\end_inset
+
+feature
+\begin_inset Quotes erd
+\end_inset
+
+ that the following prior 
+\begin_inset Formula 
+\begin{align*}
+P_{weird}\left(\theta\right) & =\begin{cases}
+\delta & \textrm{for }\theta\in\left[\theta_{0},\theta_{0}+\epsilon\right]\\
+\origprior & \textrm{otherwise}
+\end{cases}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is really far from 
+\begin_inset Formula $\origprior$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
 Introduction
 \end_layout
 
@@ -1470,8 +1525,8 @@ Note that
  such that
 \begin_inset Formula 
 \begin{align*}
-\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta+\Delta\eta,\pert\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[1]}\left(\eta,\pert\right)\left(\Delta\eta\right)\right)}}{\norm{\Delta\eta}} & =0\\
-\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{\grad}\left(\eta,\pert+\dir\right)-\left({\grad}\left(\eta,\pert\right)+{\gradpartial[2]}\left(\eta,\pert\right)\left(\dir\right)\right)}}{\norm{\dir}_{p}} & =0.
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{{\grad}}\left(\eta+\Delta\eta,\pert\right)-\left({{\grad}}\left(\eta,\pert\right)+{{\gradpartial[1]}}\left(\eta,\pert\right)\left(\Delta\eta\right)\right)}}{\norm{\Delta\eta}} & =0\\
+\lim_{\norm{\dir}_{p}\rightarrow0}\frac{\norm{{{\grad}}\left(\eta,\pert+\dir\right)-\left({{\grad}}\left(\eta,\pert\right)+{{\gradpartial[2]}}\left(\eta,\pert\right)\left(\dir\right)\right)}}{\norm{\dir}_{p}} & =0.
 \end{align*}
 
 \end_inset
@@ -1489,8 +1544,8 @@ We will need to discuss the continuity of the partial derivatives in the
  exist in the space of linear operators, so we use the operator norm.
 \begin_inset Formula 
 \begin{align*}
-\norm{{\gradpartial[1]}\left(\eta,\pert\right)}_{op} & :=\sup_{v\in\mathbb{R}^{D}}\frac{\norm{{\gradpartial[1]}\left(\eta,\pert\right)\left(v\right)}}{\norm v}\\
-\norm{{\gradpartial[2]}\left(\eta,\pert\right)}_{op} & :=\sup_{V\in\funspace}\frac{\norm{{\gradpartial[2]}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{p}}.
+\norm{{{\gradpartial[1]}}\left(\eta,\pert\right)}_{op} & :=\sup_{v\in\mathbb{R}^{D}}\frac{\norm{{{\gradpartial[1]}}\left(\eta,\pert\right)\left(v\right)}}{\norm v}\\
+\norm{{{\gradpartial[2]}}\left(\eta,\pert\right)}_{op} & :=\sup_{V\in\funspace}\frac{\norm{{{\gradpartial[2]}}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{p}}.
 \end{align*}
 
 \end_inset
@@ -1703,7 +1758,7 @@ literal "false"
 \end_inset
 
 , so it suffices to calculate the operator norm 
-\begin_inset Formula $\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)}_{op}$
+\begin_inset Formula $\norm{{{\gradpartial[2][\infty]}}\left(\eta,\pert\right)}_{op}$
 \end_inset
 
 .
@@ -1722,10 +1777,10 @@ literal "false"
 .
 \begin_inset Formula 
 \begin{align*}
-\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)}_{op} & =\sup_{V\in\funspace[\infty]}\frac{\norm{{\gradpartial[2][\infty]}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{\infty}}\\
- & =\sup_{V\in\funspace[\infty]}\frac{\norm{\int\frac{\partial\log{\vbdist}}{\partial\eta}{\vbdist}Vd\theta}}{\norm V_{\infty}}\\
- & \le\sup_{V\in\funspace[\infty]}\frac{\norm V_{\infty}\int\norm{\frac{\partial\log{\vbdist}}{\partial\eta}}\vbdist d\theta}{\norm V_{\infty}}\\
- & =\int\norm{\frac{\partial\log{\vbdist}}{\partial\eta}}\vbdist d\theta.
+\norm{{{\gradpartial[2][\infty]}}\left(\eta,\pert\right)}_{op} & =\sup_{V\in\funspace[\infty]}\frac{\norm{{{\gradpartial[2][\infty]}}\left(\eta,\pert\right)\left(V\right)}}{\norm V_{\infty}}\\
+ & =\sup_{V\in\funspace[\infty]}\frac{\norm{\int\frac{\partial\log{{\vbdist}}}{\partial\eta}{{\vbdist}}Vd\theta}}{\norm V_{\infty}}\\
+ & \le\sup_{V\in\funspace[\infty]}\frac{\norm V_{\infty}\int\norm{\frac{\partial\log{{\vbdist}}}{\partial\eta}}\vbdist d\theta}{\norm V_{\infty}}\\
+ & =\int\norm{\frac{\partial\log{{\vbdist}}}{\partial\eta}}\vbdist d\theta.
 \end{align*}
 
 \end_inset
