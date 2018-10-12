@@ -1,7 +1,7 @@
 
 \paragraph{General hyperparameter sensitivity.}
 %
-We wish to approximate the sensitivity of $g(\etaopt)$ to perturbations of the
+We wish to approximate the sensitivity of $g(\etathetaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
 real-valued hyperparameters.  Suppose the exact posterior is parameterized by a
@@ -22,12 +22,13 @@ KL\left(\eta_\theta, \epsilon\right) &:=
 \end{align}
 %
 In general, the dependence of $\etathetaopt\left(\epsilon\right)$ on $\epsilon$
-is complex and nonlinear, but we may approximate it with a first-order Taylor
-series. Under mild regularity conditions that are satisfied in the present case,
-\citet[Theorem 2]{giordano:2017:covariances} gives a closed form expression for
-this Taylor series. Without loss of generality, let $\epsilon=0$ represent the
-unperturbed posterior, so that $p\left(\theta, z \vert y, \epsilon=0\right) =
-p\left(\theta, z \vert y \right)$.
+is complex and nonlinear, but under mild regularity conditions---which are
+satisfied in the present case---we may approximate it with a first-order Taylor
+series. \citet[Theorem 2]{giordano:2017:covariances} gives these conditions as
+well as  a closed form expression for this Taylor series. Without loss of
+generality, let $\epsilon=0$ represent the unperturbed posterior, so that
+$p\left(\theta, z \vert y, \epsilon=0\right) = p\left(\theta, z \vert y
+\right)$.
 %
 Define the Hessian
 $H := \partial^2 KL(\eta_\theta, \epsilon) /

@@ -15,7 +15,7 @@ source("./Rscripts/plot_sens_results.R")
 @
 
 We consider a modification to the expected number of posterior clusters defined in 
-equation~\ref{eq:expected_num_clusters}. We wish to count only the clusters with at least $t$ observations, rather than the total number of distinct clusters. Hence, our posterior target quantity becomes, 
+\prettyref{eq:expected_num_clusters}. We wish to count only the clusters with at least $t$ observations, rather than the total number of distinct clusters. Hence, our posterior target quantity becomes, 
 \begin{align}
 g_t(\etathetaopt) &:=
 \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{clusters with at least $t$ data points}\} \right]  \\
@@ -26,7 +26,7 @@ g_t(\etathetaopt) &:=
 \end{align}
 Note that $t = 0$ reduces to the original target posterior defined in the equation~\ref{eq:expected_num_clusters}. 
 
-Equation~\ref{eq:expected_num_clusters_thresh} defines an \textit{in-sample} quantity, that is, the expected number of clusters we believe to be in the current Iris data set. We also consider a posterior predictive quantity, or the number of clusters we expect to see should we collect a \textit{new} data set of 150 iris flowers, given our posterior knowledge about the stick-breaking process. This is an expectation over the variational distribution of the sticks $\nu$, defined as 
+\prettyref{eq:expected_num_clusters_thresh} defines an \textit{in-sample} quantity, that is, the expected number of clusters we expect to see in the current Iris dataset. We also consider a posterior predictive quantity, or the number of clusters we expect see in a \textit{new} dataset of 150 iris flowers, given our posterior knowledge about the stick-breaking process. This is an expectation over the variational distribution of the sticks $\nu$, defined as 
 \begin{align}
 g_{t, pred}(\etathetaopt) &:=
 \Expect_{q(\nu \vert \etathetaopt)} \left[\#\{\text{clusters in new data set with at least $t$ data points}\} \right]  \\
