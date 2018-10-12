@@ -4,43 +4,42 @@
 %
 In order to measure sensitivity to changing the functional form of the prior on
 the sticks, we define a parametrized class of multiplicative perturbations to
-the base density $p_{0k}$ and apply \prettyref{eq:our_approximation}.
+the base density $p_{0}$ and apply \prettyref{eq:our_approximation}.
 Specifically, fix a multiplicative perturbation $\phi(\cdot): [0, 1] \rightarrow
 (0, \infty)$ (recall that the stick lengths $\nu_k$  lie in $[0, 1]$). Fix some
-$\delta_k\in[0, 1]$.  We then define a $\delta_k$-contaminated prior $p^c_{k}$ on
-the $k$-th stick by
+$\delta\in[0, 1]$.  We then define a $\delta$-contaminated prior $p_c$ by
 %
 \begin{align}
 \label{eq:expon_perturb}
-	p^c_{k}(\nu_k ; \delta_k, \phi) :=
-  \frac{p_{0k}(\nu_k)\phi(\nu_k)^\delta_k}
-       {\int_0^1 p_0(\nu_k')\phi(\nu_k')^\delta_k d\nu_k'}
+	p_c(\nu_k \vert \delta, \phi) :=
+  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
+       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align}
 %
-The contaminating prior $p^c_{k}$ is defined so that $\delta_k\in[0, 1]$
-interpolates multiplicatively between the original prior, $p_{0k}$, and a prior
-proportional to $\phi(\nu_k)p_{0k}$. For example, we might consider a different
-prior for the sticks, say $p_1(\nu_k)$; letting $\phi(\nu_k) = p_1(\nu_k) /
-p_{0k}(\nu_k)$, we recover $p_{0k}$ at $\delta_k = 0$ and swap the original
-prior for the new prior by taking $\delta_k \rightarrow 1$.
+The contaminating prior $p_c$ is defined so that $\delta\in[0, 1]$
+interpolates multiplicatively between the original prior, $p_{0}$, and a prior
+proportional to $\phi(\nu_k)p_{0}$. For example, we might consider a different
+prior for the sticks, say $p_1(\nu_k)$.  Letting $\phi(\nu_k) = p_1(\nu_k) /
+p_{0}(\nu_k)$, we recover $p_{0}$ at $\delta = 0$ and swap the original
+prior for the new prior by taking $\delta \rightarrow 1$.
 
 For a fixed $\phi$, we can use \prettyref{eq:our_approximation} by taking
-$\epsilon = \delta_k$ and
+$\epsilon = \delta$ and
 %
 \begin{align*}
 f^{\delta,\phi}_\eta :=
 \frac{\partial^2
-    \QExpect \left[ \log p^c_{k}(\nu_k ; \delta, \phi) \right]}
+    \QExpect \left[ \sum_{k=1}^K \log p_c(\nu_k \vert \delta, \phi) \right]}
 {\partial \eta_\theta \partial \delta}
     \Big\rvert_{\eta_\theta = \etathetaopt, \delta = 0} =
 \frac{\partial
-    \QExpect \left[ \log\phi(\nu_k) \right]}
+    \QExpect \left[ \sum_{k=1}^K  \log\phi(\nu_k) \right]}
 {\partial \eta_\theta}
-    \Big\rvert_{\eta_\theta = \etathetaopt}
+    \Big\rvert_{\eta_\theta = \etathetaopt}.
 \end{align*}
 %
-Because we have used a multiplicative perturbation, $f^{\delta_k, \phi}_\eta$
-is linear in $\delta_k$, which we might expect to improve the fidelity of a
+Because we have used a multiplicative perturbation, $f^{\delta, \phi}_\eta$
+is linear in $\delta$, which we might expect to improve the fidelity of a
 linear approximation.
 %
 %\footnote{
@@ -50,10 +49,10 @@ fact appears to recommend multiplicative perturbations amongst the class of
 nonlinear perturbations considered by \citet{gustafson:1996:localposterior}.
 %}.
 
-Finally, by linearity of the derivative, the effect of changing all the stick
-priors simultaneously by the same perturbation, $\phi$, is given by taking
-$\delta = \delta_1 = ... = \delta_K$, and
-$\frac{d\etaopt}{d\delta} \Big\rvert_{\eta_\theta = \etathetaopt, \delta=0} =
-    \sum_{k=1}^{K} \frac{d\etaopt}{d\delta_k}
-    \Big\rvert_{\eta_\theta = \etathetaopt, \delta_k=0}$
-\citep{gustafson:1996:localmarginals}.
+% Finally, by linearity of the derivative, the effect of changing all the stick
+% priors simultaneously by the same perturbation, $\phi$, is given by taking
+% $\delta = \delta_1 = ... = \delta_K$, and
+% $\frac{d\etaopt}{d\delta} \Big\rvert_{\eta_\theta = \etathetaopt, \delta=0} =
+%     \sum_{k=1}^{K} \frac{d\etaopt}{d\delta_k}
+%     \Big\rvert_{\eta_\theta = \etathetaopt, \delta_k=0}$
+% \citep{gustafson:1996:localmarginals}.

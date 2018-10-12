@@ -13,22 +13,13 @@ cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
-On the Iris data, we chose two different functional perturbations: for the first, we let 
-$\phi(\nu_k) = e^{\nu_k}$, and for the second, we let $\phi(\nu_k) = e^{1 - \nu_k}$. In the latter case, we 
-are moving the prior mass on the sticks forward towards 1, so we expect the number of clusters to decrease; in the former case, we are moving the prior mass on the sticks backwards toward zero, so we expect the number of clusters to increase.   
-
-% for the first
-% we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = -2, \sigma = 1$;
-% for the second, we let $p_1(\nu_k)$ be a logit normal with parameters $\mu = 2,
-% \sigma = 1$. In both cases, we then chose $\phi(\nu_k) = p_1(\nu_k) /
-% p_{0k}(\nu_k)$.
-
+%
 <<fig_cap2, cache=cache_knitr>>=
-SetImageSize(aspect_ratio= 1.4 * base_aspect_ratio)
+SetImageSize(aspect_ratio= 1.0 * base_aspect_ratio)
 figcap2 <- paste(
     "\\label{fig:func_sens_e_num_clusters}
-Left column: the original prior $p_{0k}$ in orange,
-the perturbed prior $p^c_k$ in green. Right: linearly approximated vs.
+Left column: the original prior $p_{0}$ in orange,
+the perturbed prior $p_c$ in green. Right: linearly approximated vs.
 re-fitted expected number of clusters after the pertubation.  ", sep="")
 @
 
@@ -36,6 +27,8 @@ re-fitted expected number of clusters after the pertubation.  ", sep="")
 source("Rscripts/functional_sens_results.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
+In \prettyref{fig:functional_sens_plot}, we show results for the functional
+perturbation $\phi(\nu_k) = e^{\nu_k}$.
 We find that the linear approximation in this case was able to capture the
 direction of the perturbation, (the expected number of clusters increased under
 the first pertubation, decreased under the second), although as $\delta
