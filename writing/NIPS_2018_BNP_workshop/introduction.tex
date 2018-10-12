@@ -26,12 +26,13 @@ Unlike previous work on local Bayesian sensitivity for BNP
 sensitivity measures to \emph{extrapolate} to different priors, rather than
 treating the sensitivity as a measure of robustness \textit{per se}.
 Extrapolation motivates the use of multiplicative perturbations to the
-functional form of the prior for VB, as the KL divergence is then linear in the
+functional form of the prior, as the KL divergence is then linear in the
 perturbation. Additionally, we linearly approximate only the computationally
 intensive part of inference---the optimization of the global parameters---and
 retain the non-linearity of easily computed quantities.
 
-We apply our methods to estimate sensitivity of the expected number of distinct
-clusters present the Iris dataset \citep{iris_data_anderson, iris_data_fisher}
-to the BNP prior specification.  We evaluate the accuracy of our approximations
-by comparing to the much more expensive process of re-fitting the model.
+We apply our methods to estimate sensitivity to the BNP prior specification of
+the expected number of distinct clusters present the Iris dataset
+\citep{iris_data_anderson, iris_data_fisher}.  We evaluate the accuracy of our
+approximations by comparing to the much more expensive process of re-fitting the
+model.

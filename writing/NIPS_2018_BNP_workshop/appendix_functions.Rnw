@@ -14,17 +14,22 @@ source("./Rscripts/initialize.R", echo=FALSE)
 source("./Rscripts/plot_sens_results.R")
 @
 
-We next consider functional perturbations to the prior on the sticks. Figure~\ref{fig:functional_sens_plot_thresh0} shows the effect of our choice of $\phi$ on the expected number of distinct clusters ($t = 0$). Both the in-sample and the predictive quantities are displayed. The approximation is most accurate at small $\epsilon$, though the predictive quantity for the first perturbation was fairly accurate for the entire range of $\epsilon \in [0, 1]$. 
+We next consider functional perturbations to the prior on the sticks.
+\prettyref{fig:functional_sens_plot_thresh0} shows the effect of our choice of
+$\phi$ on the expected number of distinct clusters ($t = 0$). Both the in-sample
+and the predictive quantities are displayed. The approximation is most accurate
+at small $\epsilon$, though the predictive quantity for the first perturbation
+was fairly accurate for the entire range of $\epsilon \in [0, 1]$.
 
 <<figcap3, cache=cache_knitr>>=
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap3 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh0}
-The effect of prior perturbation on the expected number of distinct clusters ($t = 0$). 
+The effect of prior perturbation on the expected number of distinct clusters ($t = 0$).
 Left column: the original prior $p_{0}$ in red,
-the perturbed prior $p_c$ in blue. 
+the perturbed prior $p_c$ in blue.
 Middle: linearly approximated vs.
-re-fitted in-sample expected number of clusters. 
+re-fitted in-sample expected number of clusters.
 Right: linearly approximated vs.
 re-fitted predictive expected number of clusters.  ", sep="")
 @
@@ -33,18 +38,23 @@ re-fitted predictive expected number of clusters.  ", sep="")
 source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
-Finally, we consider the same functional perturbation to the stick priors, but with the threshold for counting a cluster at $t = 3$. Figure~\ref{fig:functional_sens_plot_thresh0} displays the comparison of the linear approximation against the refitted values, for both the in-sample and the predictive quantities. In this case, the choice of perturbation did not significantly move the number of thresholded cluster in the re-fitted values. 
+Finally, we consider the same functional perturbation to the stick priors, but
+with the threshold for counting a cluster at $t = 3$.
+\prettyref{fig:functional_sens_plot_thresh0} displays the comparison of the
+linear approximation against the refitted values, for both the in-sample and the
+predictive quantities. In this case, the choice of perturbation did not
+significantly move the number of thresholded cluster in the re-fitted values.
 
 <<figcap4, cache=cache_knitr>>=
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap4 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh3}
-The effect of prior perturbation on the expected number of clusters with at least three 
-data points. ($t = 3$). 
+The effect of prior perturbation on the expected number of clusters with at least three
+data points. ($t = 3$).
 Left column: the original prior $p_{0}$ in red,
-the perturbed prior $p_c$ in blue. 
+the perturbed prior $p_c$ in blue.
 Middle: linearly approximated vs.
-re-fitted in-sample expected number of clusters. 
+re-fitted in-sample expected number of clusters.
 Right: linearly approximated vs.
 re-fitted predictive expected number of clusters.  ", sep="")
 @
