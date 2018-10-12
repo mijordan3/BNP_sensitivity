@@ -26,12 +26,12 @@ model parameters is then
 %
 For $\mu$ and $\Sigma$, we use dispersed IID conjugate priors. For the prior on
 the cluster memberships $z_n$, we use a stick breaking representation of a BNP
-Dirichlet process prior \citep{ferguson:1973:bayesian,
-sethuraman:1994:constructivedp}. Specifically, we define latent stick lengths
-$\nu=\left(\nu_1, \nu_2, ...\right)$, a concentration parameter $\alpha>0$, and
-base stick-breaking distribution $p_{0}\left(\nu_k \vert \alpha \right) =
-\mathrm{Beta}\left(\nu_k \Big\vert 1, \alpha \right)$.  The prior on the cluster
-assignments $z_n$ for $n=1,...,150$ is then given by
+Dirichlet process prior \citep{mccloskey:1965:model, ferguson:1973:bayesian,
+patil:1977:diversity, sethuraman:1994:constructivedp}. Specifically, we define
+latent stick lengths $\nu=\left(\nu_1, \nu_2, ...\right)$, a concentration
+parameter $\alpha>0$, and base stick-breaking distribution $p_{0}\left(\nu_k
+\vert \alpha \right) = \mathrm{Beta}\left(\nu_k \Big\vert 1, \alpha \right)$.
+The prior on the cluster assignments $z_n$ for $n=1,...,150$ is then given by
 %
 \begin{align}
 \nu \vert \alpha \sim \prod_{k=1}^\infty p_{0}\left(\nu_k \vert \alpha \right)
