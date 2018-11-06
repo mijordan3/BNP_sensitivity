@@ -28,6 +28,7 @@ def get_stick_entropy(vb_params_dict, gh_loc, gh_weights, use_logitnormal_sticks
     assert np.all(gh_weights > 0)
 
     if use_logitnormal_sticks:
+
         e_log_v, e_log_1mv =\
             ef.get_e_log_logitnormal(
                 lognorm_means = vb_params_dict['v_stick_mean'],
@@ -35,7 +36,7 @@ def get_stick_entropy(vb_params_dict, gh_loc, gh_weights, use_logitnormal_sticks
                 gh_loc = gh_loc,
                 gh_weights = gh_weights)
         # in this case, the .entropy() returns a UNV entropy
-        return np.sum(ef.univariate_normal_entropy(vb_params_dict['v_stick_mean'])) + \
+        return np.sum(ef.univariate_normal_entropy(vb_params_dict['v_stick_info'])) + \
                         np.sum(e_log_v + e_log_1mv)
     else:
         raise NotImplementedError()

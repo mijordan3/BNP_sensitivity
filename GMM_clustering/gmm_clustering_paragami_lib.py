@@ -185,9 +185,12 @@ def get_e_log_prior(vb_params_dict, prior_params_dict,
 ##########################
 def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights,
                     use_logitnormal_sticks = True):
-    return modeling_lib.multinom_entropy(e_z) + \
-        modeling_lib.get_stick_entropy(vb_params_dict, gh_loc, gh_weights,
-                                        use_logitnormal_sticks)
+
+    z_entropy = modeling_lib.multinom_entropy(e_z)
+    stick_entropy = modeling_lib.get_stick_entropy(vb_params_dict,
+                                gh_loc, gh_weights, use_logitnormal_sticks)
+
+    return z_entropy + stick_entropy
 
 ##########################
 # Likelihood term
