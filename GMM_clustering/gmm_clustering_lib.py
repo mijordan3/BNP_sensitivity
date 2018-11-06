@@ -37,7 +37,8 @@ from numpy.polynomial.hermite import hermgauss
 # Set up vb parameters
 ##########################
 
-def push_global_params(global_params, dim, k_approx, use_logitnormal_sticks):
+def push_global_params(global_params, dim, k_approx,
+                        use_logitnormal_sticks  = True):
     # The variational parameters for cluster centroids,
     # the stick lengths, and cluster variances
 
