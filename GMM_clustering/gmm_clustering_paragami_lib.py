@@ -333,9 +333,10 @@ class DPGaussianMixture(object):
     #         self.vb_params['global'].free_size()))
     #     self.set_optimal_z()
     #
-    # def set_from_global_free_par(self, free_par):
-    #     self.global_vb_params.set_free(free_par)
-    #     return self.set_optimal_z(return_loglik_obs_by_nk = True)
+    def set_from_global_free_par(self, free_par):
+        self.vb_params_dict = self.vb_params_paragami.fold(free_par, free = True)
+
+        return self.set_optimal_z(return_loglik_obs_by_nk = True)
 
     def get_z_nat_params(self, return_loglik_obs_by_nk = False):
         loglik_obs_by_nk = get_loglik_obs_by_nk(
@@ -431,16 +432,17 @@ class DPGaussianMixture(object):
         return -1 * elbo
 
     def get_e_cluster_probabilities(self):
-        if self.vb_params.use_logitnormal_sticks:
+        if self.use_logitnormal_sticks:
             e_v = ef.get_e_logitnormal(
-                lognorm_means = self.vb_params['global']['v_sticks']['mean'].get(),
-                lognorm_infos = self.vb_params['global']['v_sticks']['info'].get(),
-                gh_loc = self.vb_params.gh_loc,
-                gh_weights = self.vb_params.gh_weights)
+                lognorm_means = self.vb_params_dict['v_stick_mean'],
+                lognorm_infos = self.vb_params_dict['v_stick_info'],
+                gh_loc = self.gh_loc,
+                gh_weights = self.gh_weights)
         else:
-            e_sticks = self.vb_params['global']['v_sticks'].e()
-            e_v = e_sticks[0, :]
-            e_1mv = e_sticks[1, :]
+            raise NotImplementedError()
+            # e_sticks = self.vb_params['global']['v_sticks'].e()
+            # e_v = e_sticks[0, :]
+            # e_1mv = e_sticks[1, :]
 
         return modeling_lib.get_mixture_weights(e_v)
 
@@ -504,36 +506,35 @@ class DPGaussianMixture(object):
         self.e_z = e_z_init
         #self.vb_params['e_z'].set(e_z_init)
 
-        centroids_init = km_best.cluster_centers_.T
-        # beta_init / np.linalg.norm(beta_init, axis=0, keepdims=True)
-        self.vb_params['global']['centroids'].set(centroids_init)
+        self.vb_params_dict['centroids'] = km_best.cluster_centers_.T
 
-        if self.vb_params.use_logitnormal_sticks:
-            self.vb_params['global']['v_sticks']['mean'].set(
-                np.full(self.k_approx - 1, 1.0))
-            self.vb_params['global']['v_sticks']['info'].set(
-                np.full(self.k_approx - 1, 1.0))
+        if self.use_logitnormal_sticks:
+            self.vb_params_dict['v_stick_mean'] = np.ones(self.k_approx - 1)
+            self.vb_params_dict['v_stick_info'] = np.ones(self.k_approx - 1)
+
         else:
-            self.vb_params['global']['v_sticks']['alpha'].set(
-                        np.full((2, self.k_approx - 1), 1.0))
+            raise NotImplementedError()
+            # self.vb_params['global']['v_sticks']['alpha'].set(
+            #             np.full((2, self.k_approx - 1), 1.0))
 
         # Set inital covariances
         dim = self.y.shape[1]
-        gamma_init = np.zeros((self.k_approx, dim, dim))
-        for k in range(self.k_approx):
-            indx = np.argwhere(km_best.labels_ == k).flatten()
-            if len(indx == 1):
-                # if there's only one datapoint in the cluster,
-                # the covariance is not defined.
-                gamma_init[k, :, :] = np.eye(dim)
-            else:
-                resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
-                gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
-                                        np.eye(dim) * 1e-4)
+        # TODO: array of PSD matricies for vb_params not implemented yet.
+        # gamma_init = np.zeros((self.k_approx, dim, dim))
+        # for k in range(self.k_approx):
+        #     indx = np.argwhere(km_best.labels_ == k).flatten()
+        #     if len(indx == 1):
+        #         # if there's only one datapoint in the cluster,
+        #         # the covariance is not defined.
+        #         gamma_init[k, :, :] = np.eye(dim)
+        #     else:
+        #         resid_k = self.y[indx, :] - km_best.cluster_centers_[k, :]
+        #         gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
+        #                                 np.eye(dim) * 1e-4)
+        #
+        self.vb_params_dict['gamma'] = np.ones(self.k_approx) * 0.1
 
-        self.vb_params['global']['gamma'].set(gamma_init)
-
-        return self.global_vb_params.get_free()
+        return self.vb_params_paragami.flatten(self.vb_params_dict, free = True)
 
 
     def optimize_full(self, init_free_par, bfgs_init=True):
