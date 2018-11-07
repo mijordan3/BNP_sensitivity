@@ -43,7 +43,7 @@ def get_logitnorm_stick_entropy(v_stick_mean, v_stick_info, gh_loc, gh_weights):
 # define priors
 
 def get_e_logitnorm_dp_prior(v_stick_mean, v_stick_info, alpha,
-                    gh_loc, gh_weights):
+                                gh_loc, gh_weights):
 
     assert np.all(gh_weights > 0)
 
