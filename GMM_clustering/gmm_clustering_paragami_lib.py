@@ -459,7 +459,7 @@ def precondition_and_optimize(get_vb_free_params_loss, init_vb_free_params,
     return trust_ncg_vb_free_pars
 
 def optimize_full(features, vb_params_paragami, prior_params_dict,
-                    gh_loc, gh_weights,
+                    init_vb_free_params, gh_loc, gh_weights,
                     bfgs_max_iter = 50, netwon_max_iter = 50,
                     max_precondition_iter = 10,
                     gtol=1e-8, ftol=1e-8, xtol=1e-8):
@@ -479,11 +479,11 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
 
     # run a few steps of bfgs
     print('running bfgs ... ')
-    bfgs_opt = gmm_parag_lib.run_bfgs(get_vb_free_params_loss, init_vb_free_params,
+    bfgs_opt = run_bfgs(get_vb_free_params_loss, init_vb_free_params,
                                 get_vb_free_params_loss_grad,
                                  maxiter = bfgs_max_iter)
     x = bfgs_opt.x
-    fval = get_vb_free_params_loss(x)
+    f_val = get_vb_free_params_loss(x)
 
     if bfgs_opt.success:
         print('bfgs converged. Done. ')
@@ -491,10 +491,10 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
 
     else:
         # if bfgs did not converge, we precondition and run newton trust region
-        for i in range(max_precondition_iter): 
-
-            new_x = precondition_and_optimize(get_vb_free_params_loss, x,
-                                        maxiter = netwon_max_iter):
+        for i in range(max_precondition_iter):
+            print('running preconditioned newton; iter = ', i)
+            new_x = precondition_and_optimize(get_vb_free_params_loss, x,\
+                                        maxiter = netwon_max_iter)
 
             # Check convergence.
             new_f_val = get_vb_free_params_loss(new_x)
