@@ -40,13 +40,14 @@ import paragami
 # Set up vb parameters
 ##########################
 
-def get_vb_param_paragami_object(dim, k_approx, n_obs,
+def get_vb_params_paragami_object(dim, k_approx, n_obs,
                                     use_logitnormal_sticks = True):
 
     vb_params_paragami = paragami.PatternDict()
 
     # cluster centroids
-    vb_params_paragami['centroids'] = paragami.NumericArrayPattern(shape=(dim, k_approx))
+    vb_params_paragami['centroids'] = \
+        paragami.NumericArrayPattern(shape=(dim, k_approx))
 
     # BNP sticks
     if use_logitnormal_sticks:
@@ -60,27 +61,33 @@ def get_vb_param_paragami_object(dim, k_approx, n_obs,
         vb_params_paragami['v_sticks_beta'] = \
             paragami.NumericArrayPattern(shape=(2, k_approx - 1), lb = 0.)
 
-    # make this an array of PSD matrices
-    vb_params_paragami['gamma'] = paragami.NumericArrayPattern(shape=(k_approx, ), lb = 0.)
-    # vb_params_paragami['gamma'] = paragami.PSDSymmetricMatrixPattern(size=dim)
+    # cluster covariances
+    vb_params_paragami['gamma'] = \
+        paragami.pattern_containers.PatternArray(shape = (k_approx, ), \
+                                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
 
     vb_params_dict = vb_params_paragami.random()
+
     return vb_params_dict, vb_params_paragami
+
+def get_vb_params_from_dict(vb_params_dict):
+    # VB parameters
+    v_stick_mean = vb_params_dict['v_stick_mean']
+    v_stick_info = vb_params_dict['v_stick_info']
+
+    centroids = vb_params_dict['centroids']
+    gamma = vb_params_dict['gamma']
+    assert np.shape(centroids)[1] == np.shape(gamma)[0]
+    assert np.shape(centroids)[0] == np.shape(gamma)[1]
+    assert np.shape(centroids)[0] == np.shape(gamma)[2]
+
+    return v_stick_mean, v_stick_info, centroids, gamma
 
 # Set the gh_log and gh_weights attributes of the vb_params object.
 def set_gauss_hermite_points(vb_params, gh_deg):
     gh_loc, gh_weights = hermgauss(gh_deg)
     vb_params.gh_loc = gh_loc
     vb_params.gh_weights = gh_weights
-
-def set_vb_dict(centroids, v_stick_mean, v_stick_info, gamma):
-    vb_params_dict = dict()
-    vb_params_dict['centroids'] = centroids
-    vb_params_dict['v_stick_mean'] = v_stick_mean
-    vb_params_dict['v_stick_info'] = v_stick_info
-    vb_params_dict['gamma'] = gamma
-
-    return vb_params_dict
 
 ##########################
 # Set up prior parameters
@@ -118,109 +125,233 @@ def get_default_prior_params(dim):
 # Expected prior terms
 ##########################
 
-def get_e_centroid_prior(vb_params_dict, prior_params_dict):
-    beta = vb_params_dict['centroids']
+def get_e_centroid_prior(centroids, prior_mean, prior_info):
+
+    assert prior_info > 0
 
     beta_base_prior = ef.uvn_prior(
-        prior_mean = prior_params_dict['prior_centroid_mean'],
-        prior_info = prior_params_dict['prior_centroid_info'],
-        e_obs = beta.flatten(),
+        prior_mean = prior_mean,
+        prior_info = prior_info,
+        e_obs = centroids.flatten(),
         var_obs = np.array([0.]))
 
     return np.sum(beta_base_prior)
 
-def get_e_log_wishart_prior(vb_params_dict, prior_params_dict):
+def get_e_log_wishart_prior(gamma, df, V_inv):
 
-    df = prior_params_dict['prior_gamma_df']
-    V_inv = prior_params_dict['prior_gamma_inv_scale']
     dim = V_inv.shape[0]
 
-    # TODO: change this back when covariances are fixed
-    # gamma = vb_params_dict['gamma']
-    # create array of diagonal covariances
-    gamma = np.repeat(np.array([np.eye(dim)]),
-                        len(vb_params_dict['gamma']),
-                        axis = 0) * \
-                vb_params_dict['gamma'][:, None, None]
+    assert np.shape(gamma)[1] == dim
 
-    dim = np.shape(gamma)[1]
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    return np.sum((df - dim - 1) / 2 * np.linalg.slogdet(gamma)[1] -
-                    0.5 * tr_V_inv_gamma)
+    s, logdet = np.linalg.slogdet(gamma)
+    assert np.all(s > 0)
+
+    return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 
 # Get a vector of expected functions of the logit sticks.
 # You can use this to define proportional functional perturbations to the
 # logit stick distributions.
 # The function func should take arguments in the logit stick space, i.e.
 # logit_stick = log(stick / (1 - stick)).
-def get_e_func_logit_stick_vec(vb_params_dict, func):
-    lognorm_means = vb_params_dict['v_sticks_mean']
-    lognorm_infos = vb_params_dict['v_sticks_info']
-    gh_loc = vb_params.gh_loc
-    gh_weights = vb_params.gh_weights
-    # print('DEBUG: 0th lognorm mean: ', lognorm_means[0])
+def get_e_func_logit_stick_vec(vb_params_dict, gh_loc, gh_weights, func):
+    v_stick_mean = vb_params_dict['v_stick_mean']
+    v_stick_info = vb_params_dict['v_stick_info']
+
+    # print('DEBUG: 0th lognorm mean: ', v_stick_mean[0])
     e_phi = np.array([
         ef.get_e_fun_normal(
-            lognorm_means[k], lognorm_infos[k], \
+            v_stick_mean[k], v_stick_info[k], \
             gh_loc, gh_weights, func)
-        for k in range(len(lognorm_means))
+        for k in range(len(v_stick_mean))
     ])
 
     return e_phi
 
-def get_e_log_prior(vb_params_dict, prior_params_dict,
+def get_e_log_prior(v_stick_mean, v_stick_info, centroids, gamma,
+                        prior_params_dict,
                         gh_loc, gh_weights,
                         use_logitnormal_sticks = True):
-    dp_prior = modeling_lib.get_dp_prior(vb_params_dict, prior_params_dict,
-                                            gh_loc, gh_weights,
-                                            use_logitnormal_sticks)
-    e_gamma_prior = get_e_log_wishart_prior(vb_params_dict, prior_params_dict)
-    e_centroid_prior = get_e_centroid_prior(vb_params_dict, prior_params_dict)
 
-    return e_gamma_prior + e_centroid_prior + dp_prior
+    # prior parameters
+    # dp prior
+    alpha = prior_params_dict['alpha']
+
+    # wishart prior
+    df = prior_params_dict['prior_gamma_df']
+    V_inv = prior_params_dict['prior_gamma_inv_scale']
+
+    # centroid priors
+    prior_mean = prior_params_dict['prior_centroid_mean']
+    prior_info = prior_params_dict['prior_centroid_info']
+
+    if use_logitnormal_sticks:
+        dp_prior = \
+            modeling_lib.get_e_logitnorm_dp_prior(v_stick_mean, v_stick_info,
+                                                alpha, gh_loc, gh_weights)
+    else:
+        raise NotImplementedError()
+
+    e_gamma_prior = get_e_log_wishart_prior(gamma, df, V_inv)
+    e_centroid_prior = get_e_centroid_prior(centroids, prior_mean, prior_info)
+
+    return np.squeeze(e_gamma_prior + e_centroid_prior + dp_prior)
 
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights,
+def get_entropy(v_stick_mean, v_stick_info, e_z, gh_loc, gh_weights,
                     use_logitnormal_sticks = True):
 
     z_entropy = modeling_lib.multinom_entropy(e_z)
-    stick_entropy = modeling_lib.get_stick_entropy(vb_params_dict,
-                                gh_loc, gh_weights, use_logitnormal_sticks)
+    if use_logitnormal_sticks:
+        stick_entropy = \
+            modeling_lib.get_logitnorm_stick_entropy(v_stick_mean, v_stick_info,
+                                    gh_loc, gh_weights)
+    else:
+        raise NotImplementedError()
 
     return z_entropy + stick_entropy
 
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, vb_params_dict):
+def get_loglik_obs_by_nk(y, centroids, gamma):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
     # belonging to the kth cluster
 
     dim = np.shape(y)[1]
 
-    centroid = vb_params_dict['centroids']
-    # TODO: change this back when covariances are fixed
-    # gamma = vb_params_dict['gamma'].get()
-    gamma = np.repeat(np.array([np.eye(dim)]),
-                        len(vb_params_dict['gamma']),
-                        axis = 0) * \
-                vb_params_dict['gamma'][:, None, None]
-    assert np.shape(y)[1] == np.shape(centroid)[0]
-    assert np.shape(gamma)[0] == np.shape(centroid)[1]
-    assert np.shape(gamma)[1] == np.shape(centroid)[0]
+    assert np.shape(y)[1] == np.shape(centroids)[0]
+    assert np.shape(gamma)[0] == np.shape(centroids)[1]
+    assert np.shape(gamma)[1] == np.shape(centroids)[0]
 
     data2_term = np.einsum('ni, kij, nj -> nk', y, gamma, y)
-    cross_term = np.einsum('ni, kij, jk -> nk', y, gamma, centroid)
-    centroid2_term = np.einsum('ik, kij, jk -> k', centroid, gamma, centroid)
+    cross_term = np.einsum('ni, kij, jk -> nk', y, gamma, centroids)
+    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, gamma, centroids)
 
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
     return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
+
+##########################
+# Optimization over e_z
+##########################
+
+def get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
+                        gh_loc, gh_weights,
+                        use_bnp_prior = True,
+                        return_loglik_obs_by_nk = False):
+
+    # get likelihood term
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, gamma)
+
+    # get weight term
+    if use_bnp_prior:
+        e_log_cluster_probs = \
+            modeling_lib.get_e_log_cluster_probabilities(
+                            v_stick_mean, v_stick_info,
+                            gh_loc, gh_weights)
+    else:
+        e_log_cluster_probs = 0.
+
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
+
+    if return_loglik_obs_by_nk:
+        return z_nat_param, loglik_obs_by_nk
+    else:
+        return z_nat_param
+
+def get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
+                    gh_loc, gh_weights,
+                    use_bnp_prior = True,
+                    return_loglik_obs_by_nk = False):
+
+    _z_nat_param = \
+        get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
+                                    gh_loc, gh_weights,
+                                    use_bnp_prior,
+                                    return_loglik_obs_by_nk)
+
+    if return_loglik_obs_by_nk:
+        loglik_obs_by_nk = _z_nat_param[1]
+        z_nat_param = _z_nat_param[0]
+
+    else:
+        z_nat_param = _z_nat_param
+
+    log_const = sp.misc.logsumexp(z_nat_param, axis=1)
+    e_z = np.exp(z_nat_param - log_const[:, None])
+
+    if return_loglik_obs_by_nk:
+        return e_z, loglik_obs_by_nk
+    else:
+        return e_z
+
+def get_kl(y, vb_params_dict, prior_params_dict,
+                    gh_loc, gh_weights,
+                    data_weights = None,
+                    use_bnp_prior = True,
+                    use_logitnormal_sticks = True):
+
+    v_stick_mean, v_stick_info, centroids, gamma = \
+        get_vb_params_from_dict(vb_params_dict)
+
+    # get optimal cluster belongings
+    e_z, loglik_obs_by_nk = \
+            get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
+                            gh_loc, gh_weights, 
+                            return_loglik_obs_by_nk = True)
+
+    # weight data if necessary, and get likelihood of y
+    if data_weights is not None:
+        assert np.shape(data_weights)[0] == n_obs, \
+                    'data weights need to be n_obs by 1'
+        assert np.shape(data_weights)[1] == 1, \
+                    'data weights need to be n_obs by 1'
+        e_loglik_obs = np.sum(data_weights * e_z * loglik_obs_by_nk)
+    else:
+        e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+
+    # likelihood of z
+    if use_bnp_prior:
+        e_loglik_ind = modeling_lib.loglik_ind(v_stick_mean, v_stick_info, e_z,
+                            gh_loc, gh_weights,
+                            use_logitnormal_sticks)
+    else:
+        e_loglik_ind = 0.
+
+    e_loglik = e_loglik_ind + e_loglik_obs
+
+    if not np.isfinite(e_loglik):
+        print('gamma', vb_params_dict['gamma'].get())
+        print('det gamma', np.linalg.slogdet(
+            vb_params_dict['gamma'])[1])
+        print('cluster weights', np.sum(e_z, axis = 0))
+
+    assert(np.isfinite(e_loglik))
+
+    entropy = np.squeeze(get_entropy(v_stick_mean, v_stick_info, e_z,
+                                        gh_loc, gh_weights,
+                                        use_logitnormal_sticks))
+    assert(np.isfinite(entropy))
+
+    e_log_prior = get_e_log_prior(v_stick_mean, v_stick_info, centroids, gamma,
+                            prior_params_dict,
+                            gh_loc, gh_weights,
+                            use_logitnormal_sticks)
+
+    assert(np.isfinite(e_log_prior))
+
+    elbo = e_log_prior + entropy + e_loglik
+
+    return -1 * elbo
+
+
+
 
 
 def precondition_and_optimize(
@@ -437,8 +568,8 @@ class DPGaussianMixture(object):
     def get_e_cluster_probabilities(self):
         if self.use_logitnormal_sticks:
             e_v = ef.get_e_logitnormal(
-                lognorm_means = self.vb_params_dict['v_stick_mean'],
-                lognorm_infos = self.vb_params_dict['v_stick_info'],
+                v_stick_mean = self.vb_params_dict['v_stick_mean'],
+                v_stick_info = self.vb_params_dict['v_stick_info'],
                 gh_loc = self.gh_loc,
                 gh_weights = self.gh_weights)
         else:
