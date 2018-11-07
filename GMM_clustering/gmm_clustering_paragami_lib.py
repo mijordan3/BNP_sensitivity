@@ -303,7 +303,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     # get optimal cluster belongings
     e_z, loglik_obs_by_nk = \
             get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
-                            gh_loc, gh_weights, 
+                            gh_loc, gh_weights,
                             return_loglik_obs_by_nk = True)
 
     # weight data if necessary, and get likelihood of y
@@ -349,6 +349,60 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     elbo = e_log_prior + entropy + e_loglik
 
     return -1 * elbo
+
+
+##########################
+# Optimization functions
+##########################
+
+def cluster_and_get_k_means_inits(y, vb_params_paragami,
+                                n_kmeans_init = 1,
+                                z_init_eps=0.05):
+
+    vb_params_dict = vb_params_paragami.random()
+
+    k_approx = np.shape(vb_params_dict['centroids'])[1]
+    n_obs = np.shape(y)[0]
+    dim = np.shape(y)[1]
+
+    # K means init.
+    for i in range(n_kmeans_init):
+        km = KMeans(n_clusters = k_approx).fit(y)
+        enertia = km.inertia_
+        if (i == 0):
+            enertia_best = enertia
+            km_best = deepcopy(km)
+        elif (enertia < enertia_best):
+            enertia_best = enertia
+            km_best = deepcopy(km)
+
+    e_z_init = np.full((n_obs, k_approx), z_init_eps)
+    for n in range(len(km_best.labels_)):
+        e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
+    e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
+
+    vb_params_dict['centroids'] = km_best.cluster_centers_.T
+
+    vb_params_dict['v_stick_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['v_stick_info'] = np.ones(k_approx - 1)
+
+    # Set inital covariances
+    gamma_init = np.zeros((k_approx, dim, dim))
+    for k in range(k_approx):
+        indx = np.argwhere(km_best.labels_ == k).flatten()
+        if len(indx == 1):
+            # if there's only one datapoint in the cluster,
+            # the covariance is not defined.
+            gamma_init[k, :, :] = np.eye(dim)
+        else:
+            resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
+            gamma_init[k, :, :] = np.linalg.inv(np.cov(resid_k.T) + \
+                                    np.eye(dim) * 1e-4)
+    vb_params_dict['gamma'] = gamma_init
+
+    init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
+
+    return init_free_par, vb_params_dict, e_z_init
 
 
 
