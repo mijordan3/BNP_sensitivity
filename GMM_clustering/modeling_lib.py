@@ -15,7 +15,7 @@ import scipy as osp
 def multinom_entropy(e_z):
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
 
-def get_stick_entropy(vb_params):
+def get_logitnorm_stick_entropy(v_stick_mean, v_stick_info, gh_loc, gh_weights):
     # the entropy of the logitnormal v-sticks
     # we seek E[log q(V)], where q is the density of a logit-normal, and
     # V ~ logit-normal. Let W := logit(V), so W ~ Normal. Hence,
@@ -25,34 +25,37 @@ def get_stick_entropy(vb_params):
     # The jacobian term is 1/(x(1-x)), so we simply add -EV - E(1-V) to the normal
     # entropy.
 
-    if vb_params.use_logitnormal_sticks:
-        e_log_v, e_log_1mv =\
-            ef.get_e_log_logitnormal(
-                lognorm_means = vb_params['global']['v_sticks']['mean'].get(),
-                lognorm_infos = vb_params['global']['v_sticks']['info'].get(),
-                gh_loc = vb_params.gh_loc,
-                gh_weights = vb_params.gh_weights)
-        # in this case, the .entropy() returns a UNV entropy
-        return np.sum(vb_params['global']['v_sticks'].entropy()) + \
-                        np.sum(e_log_v + e_log_1mv)
-    else:
-        # in this case, the .entropy() returns a beta entropy
-        return np.sum(vb_params['global']['v_sticks'].entropy())
+    assert np.all(gh_weights > 0)
+
+    assert len(v_stick_mean) == len(v_stick_info)
+    assert np.all(v_stick_info) > 0
+
+    e_log_v, e_log_1mv =\
+        ef.get_e_log_logitnormal(
+            lognorm_means = v_stick_mean,
+            lognorm_infos = v_stick_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
+    return np.sum(ef.univariate_normal_entropy(v_stick_info)) + \
+                    np.sum(e_log_v + e_log_1mv)
 
 ################
 # define priors
 
-def get_dp_prior(vb_params, prior_params):
-    alpha = prior_params['alpha'].get()
-    if vb_params.use_logitnormal_sticks:
-        e_log_v, e_log_1mv = \
-            ef.get_e_log_logitnormal(
-                lognorm_means = vb_params['global']['v_sticks']['mean'].get(),
-                lognorm_infos = vb_params['global']['v_sticks']['info'].get(),
-                gh_loc = vb_params.gh_loc,
-                gh_weights = vb_params.gh_weights)
-    else:
-        e_log_1mv = vb_params['global']['v_sticks'].e_log()[1, :] # E[log 1 - v]
+def get_e_logitnorm_dp_prior(v_stick_mean, v_stick_info, alpha,
+                                gh_loc, gh_weights):
+
+    assert np.all(gh_weights > 0)
+
+    assert len(v_stick_mean) == len(v_stick_info)
+    assert np.all(v_stick_info) > 0
+
+    e_log_v, e_log_1mv = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = v_stick_mean,
+            lognorm_infos = v_stick_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
 
     return (alpha - 1) * np.sum(e_log_1mv)
 
@@ -75,18 +78,19 @@ def get_mixture_weights(stick_lengths):
     return stick_remain * stick_add
 
 
-def get_e_log_cluster_probabilities(vb_params):
-    if vb_params.use_logitnormal_sticks:
-        e_log_v, e_log_1mv = \
-            ef.get_e_log_logitnormal(
-                lognorm_means = vb_params['global']['v_sticks']['mean'].get(),
-                lognorm_infos = vb_params['global']['v_sticks']['info'].get(),
-                gh_loc = vb_params.gh_loc,
-                gh_weights = vb_params.gh_weights)
-    else:
-        e_log_sticks = vb_params['global']['v_sticks'].e_log()
-        e_log_v = e_log_sticks[0, :] # E[log v]
-        e_log_1mv = e_log_sticks[1, :] # E[log 1 - v]
+def get_e_log_cluster_probabilities(v_stick_mean, v_stick_info,
+                                        gh_loc, gh_weights):
+    assert np.all(gh_weights > 0)
+
+    assert len(v_stick_mean) == len(v_stick_info)
+    assert np.all(v_stick_info) > 0
+
+    e_log_v, e_log_1mv = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = v_stick_mean,
+            lognorm_infos = v_stick_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
 
     e_log_stick_remain = np.concatenate([np.array([0.]), np.cumsum(e_log_1mv)])
     e_log_new_stick = np.concatenate((e_log_v, np.array([0])))
@@ -94,10 +98,20 @@ def get_e_log_cluster_probabilities(vb_params):
     return e_log_stick_remain + e_log_new_stick
 
 
-def loglik_ind(vb_params, e_z):
+def loglik_ind(v_stick_mean, v_stick_info, e_z, gh_loc, gh_weights,
+                    use_logitnormal_sticks = True):
+
+    assert np.all(gh_weights > 0)
+
+    assert len(v_stick_mean) == len(v_stick_info)
+    assert np.all(v_stick_info) > 0
+
+
     # expected log likelihood of all indicators for all n observations
-    e_log_cluster_probs = get_e_log_cluster_probabilities(vb_params)
-    #return np.sum(vb_params['e_z'].get() * e_log_cluster_probs)
+    e_log_cluster_probs = \
+        get_e_log_cluster_probabilities(v_stick_mean, v_stick_info,
+                                        gh_loc, gh_weights)
+
     return np.sum(e_z * e_log_cluster_probs)
 
 
