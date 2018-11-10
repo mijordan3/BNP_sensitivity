@@ -370,8 +370,10 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
                                 n_kmeans_init = 1,
                                 z_init_eps=0.05):
 
+    # get dictionary of vb parameters
     vb_params_dict = vb_params_paragami.random()
 
+    # data parameters
     k_approx = np.shape(vb_params_dict['centroids'])[1]
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
@@ -410,6 +412,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
             resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
             gamma_init_ = np.linalg.inv(np.cov(resid_k.T) + \
                                     np.eye(dim) * 1e-4)
+            # symmetrize ... there might be some numerical issues otherwise
             gamma_init[k, :, :] = 0.5 * (gamma_init_ + gamma_init_.T)
 
     vb_params_dict['gamma'] = gamma_init
@@ -422,43 +425,48 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
 
 def run_bfgs(get_vb_free_params_loss, init_vb_free_params,
                     get_vb_free_params_loss_grad =  None,
-                    maxiter = 10):
+                    maxiter = 10, gtol = 1e-8):
     # `get_vb_free_params_loss` takes in vb free parameters and returns the loss
 
     if get_vb_free_params_loss_grad is None:
         get_vb_free_params_loss_grad = autograd.grad(get_vb_free_params_loss)
 
     # optimize
-    bfgs_opt = optimize.minimize(
+    bfgs_output = optimize.minimize(
             get_vb_free_params_loss,
             x0=init_vb_free_params,
             jac=get_vb_free_params_loss_grad,
             method='BFGS',
-            options={'maxiter': maxiter, 'disp': True})
+            options={'maxiter': maxiter, 'disp': True, 'gtol': gtol})
 
-    return bfgs_opt
+    bfgs_vb_free_params = bfgs_output.x
+
+    return bfgs_vb_free_params, bfgs_output
 
 def precondition_and_optimize(get_vb_free_params_loss, init_vb_free_params,
-                                maxiter = 10):
+                                maxiter = 10, gtol = 1e-8):
+    # `get_vb_free_params_loss` takes in vb free parameters and returns the loss
+
     # get preconditioned function
     precond_fun = paragami.PreconditionedFunction(get_vb_free_params_loss)
-    _ = precond_fun.set_preconditioner_with_hessian(x = init_vb_free_params, ev_min=1e-4)
+    _ = precond_fun.set_preconditioner_with_hessian(x = init_vb_free_params,
+                                                        ev_min=1e-4)
 
     # optimize
-    trust_ncg_opt_cond = optimize.minimize(
+    trust_ncg_output = optimize.minimize(
                             method='trust-ncg',
                             x0=precond_fun.precondition(init_vb_free_params),
                             fun=precond_fun,
                             jac=autograd.grad(precond_fun),
                             hess=autograd.hessian(precond_fun),
-                            options={'maxiter': maxiter, 'disp': True})
+                            options={'maxiter': maxiter, 'disp': True, 'gtol': gtol})
 
     # Uncondition
-    trust_ncg_vb_free_pars = precond_fun.unprecondition(trust_ncg_opt_cond.x)
+    trust_ncg_vb_free_pars = precond_fun.unprecondition(trust_ncg_output.x)
 
-    return trust_ncg_vb_free_pars
+    return trust_ncg_vb_free_pars, trust_ncg_output
 
-def optimize_full(features, vb_params_paragami, prior_params_dict,
+def optimize_full(y, vb_params_paragami, prior_params_dict,
                     init_vb_free_params, gh_loc, gh_weights,
                     bfgs_max_iter = 50, netwon_max_iter = 50,
                     max_precondition_iter = 10,
@@ -466,7 +474,8 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
 
     # Get loss as a function of the  vb_params_dict
     get_vb_params_loss = paragami.Functor(original_fun=get_kl, argnums=1)
-    get_vb_params_loss.cache_args(features, None, prior_params_dict, gh_loc, gh_weights)
+    get_vb_params_loss.cache_args(y, None, prior_params_dict,
+                                    gh_loc, gh_weights)
 
     # Get loss as a function vb_free_params
     get_vb_free_params_loss = paragami.FlattenedFunction(
@@ -479,22 +488,23 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
 
     # run a few steps of bfgs
     print('running bfgs ... ')
-    bfgs_opt = run_bfgs(get_vb_free_params_loss, init_vb_free_params,
+    bfgs_vb_free_params, bfgs_ouput = run_bfgs(get_vb_free_params_loss,
+                                init_vb_free_params,
                                 get_vb_free_params_loss_grad,
-                                 maxiter = bfgs_max_iter)
-    x = bfgs_opt.x
+                                maxiter = bfgs_max_iter, gtol = gtol)
+    x = bfgs_vb_free_params
     f_val = get_vb_free_params_loss(x)
 
-    if bfgs_opt.success:
+    if bfgs_ouput.success:
         print('bfgs converged. Done. ')
         return x
 
     else:
         # if bfgs did not converge, we precondition and run newton trust region
         for i in range(max_precondition_iter):
-            print('running preconditioned newton; iter = ', i)
-            new_x = precondition_and_optimize(get_vb_free_params_loss, x,\
-                                        maxiter = netwon_max_iter)
+            print('\n running preconditioned newton; iter = ', i)
+            new_x, ncg_output = precondition_and_optimize(get_vb_free_params_loss, x,\
+                                        maxiter = netwon_max_iter, gtol = gtol)
 
             # Check convergence.
             new_f_val = get_vb_free_params_loss(new_x)
@@ -510,7 +520,7 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
             x = new_x
             f_val = new_f_val
 
-            converged = x_conv or f_conv or grad_conv
+            converged = x_conv or f_conv or grad_conv or ncg_output.success
 
             print('Iter {}: x_diff = {}, f_diff = {}, grad_l1 = {}'.format(
                 i, x_diff, f_diff, grad_l1))
@@ -525,64 +535,48 @@ def optimize_full(features, vb_params_paragami, prior_params_dict,
 ########################
 # Sensitivity functions
 #######################
-# class InterestingMoments(object):
-#     def __init__(self, model):
-#         self.model = model
-#         self.moment_params = vb.ModelParamsDict('Moment parameters')
-#         self.moment_params.push_param(
-#             vb.ArrayParam('centroids', shape=(model.dim, model.k_approx)))
-#         # self.moment_params.push_param(
-#         #     vb.ArrayParam('e_z', shape=(model.n_obs, model.k_approx)))
-#         self.moment_params.push_param(
-#             vb.VectorParam('cluster_weights', size=model.k_approx))
-#         self.moment_params.push_param(
-#             vb.VectorParam('v_sticks', size=model.k_approx - 1))
-#
-#         self.moment_converter = obj_lib.ParameterConverter(
-#             par_in=self.model.global_vb_params,
-#             par_out=self.moment_params,
-#             converter=self.set_moments)
-#         self.get_moment_jacobian = self.moment_converter.free_to_vec_jacobian
-#
-#     def set_moments(self):
-#         self.set_moments_from_free_par(self.model.global_vb_params.get_free())
-#
-#     def set_moments_from_free_par(self, free_par):
-#         self.model.set_from_global_free_par(free_par)
-#         self.moment_params['centroids'].set(
-#             self.model.vb_params['global']['centroids'].get())
-#
-#         # e_z = self.model.vb_params['e_z'].get()
-#         # self.moment_params['e_z'].set(e_z)
-#         self.moment_params['cluster_weights'].set(\
-#             self.model.get_e_cluster_probabilities())
-#
-#         if self.model.vb_params.use_logitnormal_sticks:
-#             self.moment_params['v_sticks'].set(
-#                 self.model.vb_params['global']['v_sticks']['mean'].get())
-#         else:
-#             self.moment_params['v_sticks'].set(
-#                 self.model.vb_params['global']['v_sticks'].e())
-#
-#     def set_and_get_moments_from_free_par(self, free_par):
-#         self.set_moments_from_free_par(free_par)
-#         return self.moment_params.get_vector()
-#
-# # Get the expected posterior predictive number of distinct clusters.
-# def get_e_num_pred_clusters_from_free_par(free_par, model, n_samples = 100000):
-#     model.global_vb_params.set_free(free_par)
-#     mu = model.global_vb_params['v_sticks']['mean'].get()
-#     sigma = 1 / np.sqrt(model.global_vb_params['v_sticks']['info'].get())
-#     n_obs = model.n_obs
-#     return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs, \
-#                                                         n_samples = n_samples)
-#
-# # Get the expected posterior number of distinct clusters.
-# def get_e_num_clusters_from_free_par(free_par, model):
-#     model.global_vb_params.set_free(free_par)
-#     model.set_optimal_z()
-#     return modeling_lib.get_e_number_clusters_from_ez(model.e_z)
-#
+
+def get_moments_from_vb_free_params(vb_params_paragami, vb_params_free):
+    vb_params_dict = vb_params_paragami.fold(vb_params_free, free = True)
+
+    return vb_params_paragami.flatten(vb_params_dict, free = False), \
+                vb_params_dict
+
+def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
+                                                    vb_params_free,
+                                                    n_obs,
+                                                    threshold = 0,
+                                                    n_samples = 100000):
+    # get posterior predicted number of clusters
+
+    _, vb_params_dict = \
+        get_moments_from_vb_free_params(vb_params_paragami, vb_params_free)
+
+    mu = vb_params_dict['v_stick_mean']
+    sigma = 1 / np.sqrt(vb_params_dict['v_stick_info'])
+
+    return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
+                                                        n_obs,
+                                                        threshold = threshold,
+                                                        n_samples = n_samples)
+
+
+# Get the expected posterior number of distinct clusters.
+def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
+                                        gh_loc, gh_weights,
+                                        threshold = 0,
+                                        n_samples = 100000):
+
+    _, vb_params_dict = \
+        get_moments_from_vb_free_params(vb_params_paragami, vb_params_free)
+
+    e_z  = get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
+                                            use_bnp_prior = True)
+
+    return modeling_lib.get_e_num_large_clusters_from_ez(e_z,
+                                        threshold = threshold,
+                                        n_samples = 100000)
+
 # class ExpectedPredNumClusters(object):
 #     # Get the expected posterior predictive number of distinct clusters above
 #     # some given threshold.
