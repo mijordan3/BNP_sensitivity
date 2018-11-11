@@ -21,7 +21,7 @@ from copy import deepcopy
 from datetime import datetime
 import time
 
-import modeling_lib_paragami as modeling_lib
+import modeling_lib as modeling_lib
 import functional_sensitivity_lib as fun_sens_lib
 
 import json
