@@ -4,7 +4,7 @@ distinct clusters are present in a particular dataset. A Bayesian nonparametric
 (BNP) model addresses this question by placing a generative process on cluster
 assignment, making the number of distinct clusters present amenable to Bayesian
 inference.  However, like all Bayesian approaches, BNP requires the
-specification of a prior, and this prior may favor a greater or fewer number of
+specification of a prior, and this prior may favor a greater or lesser number of
 distinct clusters. In practice, it is important to quantitatively establish that
 the prior is not too informative, particularly when---as is often the case in
 BNP---the particular form of the prior is chosen for mathematical convenience
@@ -27,9 +27,11 @@ sensitivity measures to \emph{extrapolate} to different priors, rather than
 treating the sensitivity as a measure of robustness \textit{per se}.
 Extrapolation motivates the use of multiplicative perturbations to the
 functional form of the prior for VB, as the KL divergence is then linear in the
-perturbation. Additionally, we linearly approximate only the computationally
-intensive part of inference---the optimization of the global parameters---and
-retain the nonlinearity of easily computed quantities as functions of the global parameters.
+perturbation. Additionally, we linearly approximate only the optimization of
+the global parameters. In VB, this step is typically the most computationally
+intensive part of inference. Meanwhile, we retain the non-linearities of easily computed
+quantities as functions of the global parameters, such as local parameters
+and the number of distinct clusters.
 
 We apply our methods to estimate sensitivity of the expected number of distinct
 clusters present the Iris dataset \citep{iris_data_anderson, iris_data_fisher}

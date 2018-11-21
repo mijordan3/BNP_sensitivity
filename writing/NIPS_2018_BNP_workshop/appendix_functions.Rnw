@@ -40,7 +40,7 @@ SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 figcap4 <- paste(
     "\\label{fig:func_sens_e_num_clusters_thresh3}
 The effect of prior perturbation on the expected number of clusters with at least three 
-data points. ($t = 3$). 
+data points ($t = 3$). 
 Left column: the original prior $p_{0}$ in red,
 the perturbed prior $p_c$ in blue. 
 Middle: linearly approximated vs.
