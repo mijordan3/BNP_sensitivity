@@ -1,11 +1,11 @@
 
-\paragraph{General hyperparameter sensitivity.}
+\paragraph{General hyper-parameter sensitivity.}
 %
 We wish to approximate the sensitivity of $g(\etathetaopt)$ to perturbations of the
 value of $\alpha$ and to the functional form of $p_{0}$.  To do this, we will
 call on a general result for the sensitivity of VB optima to vectors of
-real-valued hyperparameters.  Suppose the exact posterior is parameterized by a
-real-valued hyperparameter $\epsilon$, i.e., the posterior is given by
+real-valued hyper-parameters.  Suppose the exact posterior is parameterized by a
+real-valued hyper-parameter $\epsilon$, i.e., the posterior is given by
 $p\left(\theta, z \vert y, \epsilon\right)$. In the present work, $\epsilon$
 will parameterize perturbations to the prior, as we will describe in more detail
 shortly.  Then the optimal variational approximation is also a function of
@@ -80,4 +80,4 @@ nonlinearity in the mapping $\etathetaopt \mapsto \Expecthat_z \left[
 
 Furthermore, we attempt to improve the linearity of the dependence of
 $\etathetaopt$ on $\epsilon$ by using an unconstrained parameterization for
-$\eta_\theta$ as in \citet{stan-manual:2015} and \citet{kucukelbir:2015:advi}.
+$\eta_\theta$ following \citet{stan-manual:2015} and \citet{kucukelbir:2015:advi}.

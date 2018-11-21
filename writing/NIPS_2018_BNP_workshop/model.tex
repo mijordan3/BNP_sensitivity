@@ -25,10 +25,10 @@ model parameters is then
 \end{align*}
 %
 For $\mu$ and $\Sigma$, we use dispersed IID conjugate priors. For the prior on
-the cluster memberships $z_n$, we use a stick breaking representation of a BNP
+the cluster memberships $z_n$, we use a stick-breaking representation of a BNP
 Dirichlet process prior \citep{mccloskey:1965:model, ferguson:1973:bayesian,
 patil:1977:diversity, sethuraman:1994:constructivedp}. Specifically, we define
-latent stick lengths $\nu=\left(\nu_1, \nu_2, ...\right)$, a concentration
+latent stick-breaking proportions $\nu=\left(\nu_1, \nu_2, ...\right)$, a concentration
 parameter $\alpha>0$, and base stick-breaking distribution $p_{0}\left(\nu_k
 \vert \alpha \right) = \mathrm{Beta}\left(\nu_k \Big\vert 1, \alpha \right)$.
 The prior on the cluster assignments $z_n$ for $n=1,...,150$ is then given by
@@ -46,4 +46,4 @@ The concentration parameter $\alpha$ and stick-breaking prior $p_{0}$
 thus determine our prior belief about the number of clusters present. This prior
 specification and the observed data combine to inform our posterior belief about the
 posterior number of clusters. We will be examining the sensitivity of our
-posterior belief to our choice for $\alpha$ and $p_{0}$.
+posterior belief to our choices for $\alpha$ and $p_{0}$.
