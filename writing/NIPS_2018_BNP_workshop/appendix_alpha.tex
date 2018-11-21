@@ -19,7 +19,7 @@ g_t(\etathetaopt) &:=
     \sum_{k=1}^K \mathbb{I}\left\{\left(\sum_{n=1}^N \mathbb{I}\{z_n = k\} \right) \geq t \right\}\right].
     \label{eq:expected_num_clusters_thresh}
 \end{align}
-Note that $t = 0$ reduces to the original target posterior defined in the equation~\ref{eq:expected_num_clusters}.
+Note that $t = 0$ reduces to the original target posterior defined in the Equation~\ref{eq:expected_num_clusters}.
 
 \prettyref{eq:expected_num_clusters_thresh} defines an \textit{in-sample} quantity, that is, the expected number of clusters we expect to see in the current Iris dataset. We also consider a posterior predictive quantity, or the number of clusters we expect see in a \textit{new} dataset of 150 iris flowers, given our posterior knowledge about the stick-breaking process. This is an expectation over the variational distribution of the sticks $\nu$, defined as
 \begin{align}
@@ -32,7 +32,7 @@ g_{t, pred}(\etathetaopt) &:=
 \end{align}
 where $\pi_k$ are the cluster probabilities induced by the the sticks $\nu$.
 
-Like before, and as described in section \ref{sec:hyper_param_sens}, only the dependence of $\etathetaopt$ on the prior perturbation is approximated linearly. Given an $\etathetaopt$ value, these expectations are computed with Monte-Carlo samples from the variational distribution $q(z \vert \etazopt(\etathetaopt))$ for the in-sample expectation. Samples aare drawn from $q(\nu \vert \etathetaopt)$ in the predictive expectation.  
+Like before, and as described in section \ref{sec:hyper_param_sens}, only the dependence of $\etathetaopt$ on the prior perturbation is approximated linearly. Given an $\etathetaopt$ value, these expectations are computed with Monte-Carlo samples from the variational distribution $q(z \vert \etazopt(\etathetaopt))$ for the in-sample expectation. Samples aare drawn from $q(\nu \vert \etathetaopt)$ in the predictive expectation.
 
 Figure~\ref{fig:param_sens_plot_thresh_0} shows both the in-sample and predictive expected number of \textit{distinct} clusters (i.e. $t = 0$). The linear approximation does equally well for both the in-sample and the predictive quantity. It works best when we set $\alpha_0 = 13$ -- that is, when we approximate from having more clusters to fewer clusters.
 
@@ -51,7 +51,7 @@ Figure~\ref{fig:param_sens_plot_thresh_0} shows both the in-sample and predictiv
 
 \end{knitrout}
 
-Next, figure~\ref{fig:param_sens_plot_thresh_3} shows both the in-sample and predicted expected number of clusters with at least three observations ($t = 3$). Again the linear approximation is best when we start at $\alpha_0 = 13$ and extrapolate to fewer clusters.
+Next, Figure~\ref{fig:param_sens_plot_thresh_3} shows both the in-sample and predicted expected number of clusters with at least three observations ($t = 3$). Again the linear approximation is best when we start at $\alpha_0 = 13$ and extrapolate to fewer clusters.
 
 
 
