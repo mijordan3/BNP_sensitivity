@@ -118,52 +118,8 @@ def get_default_prior_params(dim):
     return prior_params_dict, prior_params_paragami
 
 ##########################
-# Expected prior terms
+# Expected prior term
 ##########################
-def get_e_centroid_prior(centroids, prior_mean, prior_info):
-
-    assert prior_info > 0
-
-    beta_base_prior = ef.uvn_prior(
-        prior_mean = prior_mean,
-        prior_info = prior_info,
-        e_obs = centroids.flatten(),
-        var_obs = np.array([0.]))
-
-    return np.sum(beta_base_prior)
-
-def get_e_log_wishart_prior(gamma, df, V_inv):
-
-    dim = V_inv.shape[0]
-
-    assert np.shape(gamma)[1] == dim
-
-    tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
-
-    s, logdet = np.linalg.slogdet(gamma)
-    assert np.all(s > 0), 'some gammas are not PSD'
-
-    return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
-
-# Get a vector of expected functions of the logit sticks.
-# You can use this to define proportional functional perturbations to the
-# logit stick distributions.
-# The function func should take arguments in the logit stick space, i.e.
-# logit_stick = log(stick / (1 - stick)).
-def get_e_func_logit_stick_vec(vb_params_dict, gh_loc, gh_weights, func):
-    v_stick_mean = vb_params_dict['v_stick_mean']
-    v_stick_info = vb_params_dict['v_stick_info']
-
-    # print('DEBUG: 0th lognorm mean: ', v_stick_mean[0])
-    e_phi = np.array([
-        ef.get_e_fun_normal(
-            v_stick_mean[k], v_stick_info[k], \
-            gh_loc, gh_weights, func)
-        for k in range(len(v_stick_mean))
-    ])
-
-    return e_phi
-
 def get_e_log_prior(v_stick_mean, v_stick_info, centroids, gamma,
                         prior_params_dict,
                         gh_loc, gh_weights,
