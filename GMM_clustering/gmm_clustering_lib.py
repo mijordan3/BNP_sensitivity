@@ -29,16 +29,33 @@ import json_tricks
 
 from numpy.polynomial.hermite import hermgauss
 
-sys.path.append('./../../../paragami/')
-
 import paragami
 
 ##########################
 # Set up vb parameters
 ##########################
 
-def get_vb_params_paragami_object(dim, k_approx, n_obs,
-                                    use_logitnormal_sticks = True):
+def get_vb_params_paragami_object(dim, k_approx):
+    """
+    returns a paragami patterned dictionary
+    that stores the variational parameters
+
+    Parameters
+    ----------
+    dim : int
+        dimension of the datapoints
+    k_approx : int
+        number of components in the model
+
+    Returns
+    -------
+    vb_params_dict : dictionary
+        a dictionary that contains the variational parameters
+
+    vb_params_paragami : paragami Patterned Dictionary
+        a paragami patterned dictionary that contains the variational parameters
+
+    """
 
     vb_params_paragami = paragami.PatternDict()
 
@@ -47,16 +64,11 @@ def get_vb_params_paragami_object(dim, k_approx, n_obs,
         paragami.NumericArrayPattern(shape=(dim, k_approx))
 
     # BNP sticks
-    if use_logitnormal_sticks:
-        # variational distribution for each stick is logitnormal
-        vb_params_paragami['v_stick_mean'] = \
-            paragami.NumericArrayPattern(shape = (k_approx - 1,))
-        vb_params_paragami['v_stick_info'] = \
-            paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
-    else:
-        # else its a beta
-        vb_params_paragami['v_sticks_beta'] = \
-            paragami.NumericArrayPattern(shape=(2, k_approx - 1), lb = 0.)
+    # variational distribution for each stick is logitnormal
+    vb_params_paragami['stick_propn_mean'] = \
+        paragami.NumericArrayPattern(shape = (k_approx - 1,))
+    vb_params_paragami['stick_propn_info'] = \
+        paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
 
     # cluster covariances
     vb_params_paragami['gamma'] = \
@@ -67,15 +79,16 @@ def get_vb_params_paragami_object(dim, k_approx, n_obs,
 
     return vb_params_dict, vb_params_paragami
 
-def get_vb_params_from_dict(vb_params_dict):
-    # VB parameters
-    v_stick_mean = vb_params_dict['v_stick_mean']
-    v_stick_info = vb_params_dict['v_stick_info']
+def _get_vb_params_from_dict(vb_params_dict):
 
-    assert len(v_stick_mean) == len(v_stick_info)
+    # VB parameters
+    stick_propn_mean = vb_params_dict['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_propn_info']
+
+    assert len(stick_propn_mean) == len(stick_propn_info)
 
     centroids = vb_params_dict['centroids']
-    assert np.shape(centroids)[1] == (len(v_stick_info) + 1)
+    assert np.shape(centroids)[1] == (len(stick_propn_info) + 1)
 
     gamma = vb_params_dict['gamma']
 
@@ -83,12 +96,31 @@ def get_vb_params_from_dict(vb_params_dict):
     assert np.shape(centroids)[0] == np.shape(gamma)[1]
     assert np.shape(centroids)[0] == np.shape(gamma)[2]
 
-    return v_stick_mean, v_stick_info, centroids, gamma
+    return stick_propn_mean, stick_propn_info, centroids, gamma
 
 ##########################
 # Set up prior parameters
 ##########################
 def get_default_prior_params(dim):
+    """
+    returns a paragami patterned dictionary
+    that stores the prior parameters
+
+    Parameters
+    ----------
+    dim : int
+        dimension of the datapoints
+
+    Returns
+    -------
+    prior_params_dict : dictionary
+        a dictionary that contains the prior parameters
+
+    prior_params_paragami : paragami Patterned Dictionary
+        a paragami patterned dictionary that contains the prior parameters
+
+    """
+
     prior_params_dict = dict()
     prior_params_paragami = paragami.PatternDict()
 
@@ -120,48 +152,41 @@ def get_default_prior_params(dim):
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(v_stick_mean, v_stick_info, centroids, gamma,
+def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, gamma,
                         prior_params_dict,
-                        gh_loc, gh_weights,
-                        use_logitnormal_sticks = True):
+                        gh_loc, gh_weights):
+    # get expected prior term
 
-    # prior parameters
     # dp prior
     alpha = prior_params_dict['alpha']
+    dp_prior = \
+        modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
+                                            alpha, gh_loc, gh_weights)
 
     # wishart prior
     df = prior_params_dict['prior_gamma_df']
     V_inv = prior_params_dict['prior_gamma_inv_scale']
+    e_gamma_prior = modeling_lib.get_e_log_wishart_prior(gamma, df, V_inv)
 
-    # centroid priors
+    # centroid prior
     prior_mean = prior_params_dict['prior_centroid_mean']
     prior_info = prior_params_dict['prior_centroid_info']
-
-    if use_logitnormal_sticks:
-        dp_prior = \
-            modeling_lib.get_e_logitnorm_dp_prior(v_stick_mean, v_stick_info,
-                                                alpha, gh_loc, gh_weights)
-    else:
-        raise NotImplementedError()
-
-    e_gamma_prior = get_e_log_wishart_prior(gamma, df, V_inv)
-    e_centroid_prior = get_e_centroid_prior(centroids, prior_mean, prior_info)
+    e_centroid_prior = \
+        modeling_lib.get_e_centroid_prior(centroids, prior_mean, prior_info)
 
     return np.squeeze(e_gamma_prior + e_centroid_prior + dp_prior)
 
 ##########################
 # Entropy
 ##########################
-def get_entropy(v_stick_mean, v_stick_info, e_z, gh_loc, gh_weights,
+def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights,
                     use_logitnormal_sticks = True):
+    # get entropy term
 
     z_entropy = modeling_lib.multinom_entropy(e_z)
-    if use_logitnormal_sticks:
-        stick_entropy = \
-            modeling_lib.get_logitnorm_stick_entropy(v_stick_mean, v_stick_info,
-                                    gh_loc, gh_weights)
-    else:
-        raise NotImplementedError()
+    stick_entropy = \
+        modeling_lib.get_logitnorm_entropy(stick_propn_mean, stick_propn_info,
+                                gh_loc, gh_weights)
 
     return z_entropy + stick_entropy
 
@@ -192,7 +217,7 @@ def get_loglik_obs_by_nk(y, centroids, gamma):
 # Optimization over e_z
 ##########################
 
-def get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
+def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                         gh_loc, gh_weights,
                         use_bnp_prior = True,
                         return_loglik_obs_by_nk = False):
@@ -204,7 +229,7 @@ def get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
     if use_bnp_prior:
         e_log_cluster_probs = \
             modeling_lib.get_e_log_cluster_probabilities(
-                            v_stick_mean, v_stick_info,
+                            stick_propn_mean, stick_propn_info,
                             gh_loc, gh_weights)
     else:
         e_log_cluster_probs = 0.
@@ -216,13 +241,13 @@ def get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
     else:
         return z_nat_param
 
-def get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
+def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                     gh_loc, gh_weights,
                     use_bnp_prior = True,
                     return_loglik_obs_by_nk = False):
 
     _z_nat_param = \
-        get_z_nat_params(y, v_stick_mean, v_stick_info, centroids, gamma,
+        get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                                     gh_loc, gh_weights,
                                     use_bnp_prior,
                                     return_loglik_obs_by_nk)
@@ -242,19 +267,93 @@ def get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
     else:
         return e_z
 
+def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
+                                        use_bnp_prior = True):
+
+    """
+    returns the optimal cluster belonging probabilities, given the
+    variational parameters
+
+    Parameters
+    ----------
+    y : ndarray
+        the array of datapoints, one observation per row
+    vb_params_dict : dictionary
+        dictionary of variational parameters
+    gh_loc : vector
+        locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms
+    gh_weights : vector
+        weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms
+    use_bnp_prior : boolean
+        whether or not to use a prior on the cluster mixture weights.
+        If True, a DP prior is used.
+
+    Returns
+    -------
+    e_z : ndarray
+        the optimal cluster belongings as a function of the variational
+        parameters, stored in an array whose (n, k)th entry is the probability
+        of the nth datapoint belonging to cluster k
+
+    """
+
+    stick_propn_mean, stick_propn_info, centroids, gamma = \
+        _get_vb_params_from_dict(vb_params_dict)
+
+    e_z = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+                        gh_loc, gh_weights,
+                        use_bnp_prior = True,
+                        return_loglik_obs_by_nk = False)
+
+    return e_z
+
+##########################
+# Optimization over e_z
+##########################
+
 def get_kl(y, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
                     data_weights = None,
-                    use_bnp_prior = True,
-                    use_logitnormal_sticks = True):
+                    use_bnp_prior = True):
 
+    """
+    computes the negative ELBO using the data y, at the current variational
+    parameters and at the current prior parameters
+
+    Parameters
+    ----------
+    y : ndarray
+        the array of datapoints, one observation per row
+    vb_params_dict : dictionary
+        dictionary of variational parameters
+    prior_params_dict : dictionary
+        dictionary of prior parameters
+    gh_loc : vector
+        locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms
+    gh_weights : vector
+        weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms
+    data_weights : ndarray of shape (number of observations) x 1
+        weights for each datapoint in y
+    use_bnp_prior : boolean
+        whether or not to use a prior on the cluster mixture weights.
+        If True, a DP prior is used.
+
+    Returns
+    -------
+    kl : float
+        The negative elbo between
+    """
     # get vb parameters
-    v_stick_mean, v_stick_info, centroids, gamma = \
-        get_vb_params_from_dict(vb_params_dict)
+    stick_propn_mean, stick_propn_info, centroids, gamma = \
+        _get_vb_params_from_dict(vb_params_dict)
 
     # get optimal cluster belongings
     e_z, loglik_obs_by_nk = \
-            get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
+            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                             gh_loc, gh_weights,
                             return_loglik_obs_by_nk = True)
 
@@ -270,9 +369,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     # likelihood of z
     if use_bnp_prior:
-        e_loglik_ind = modeling_lib.loglik_ind(v_stick_mean, v_stick_info, e_z,
-                            gh_loc, gh_weights,
-                            use_logitnormal_sticks)
+        e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
+                            gh_loc, gh_weights)
     else:
         e_loglik_ind = 0.
 
@@ -287,16 +385,14 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     assert(np.isfinite(e_loglik))
 
     # entropy term
-    entropy = np.squeeze(get_entropy(v_stick_mean, v_stick_info, e_z,
-                                        gh_loc, gh_weights,
-                                        use_logitnormal_sticks))
+    entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
+                                        gh_loc, gh_weights))
     assert(np.isfinite(entropy))
 
     # prior term
-    e_log_prior = get_e_log_prior(v_stick_mean, v_stick_info, centroids, gamma,
+    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, gamma,
                             prior_params_dict,
-                            gh_loc, gh_weights,
-                            use_logitnormal_sticks)
+                            gh_loc, gh_weights)
 
     assert(np.isfinite(e_log_prior))
 
@@ -304,27 +400,37 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     return -1 * elbo
 
-# just for my convenience
-def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
-                                        use_bnp_prior = True):
-
-    v_stick_mean, v_stick_info, centroids, gamma = \
-        get_vb_params_from_dict(vb_params_dict)
-
-    e_z = get_optimal_z(y, v_stick_mean, v_stick_info, centroids, gamma,
-                        gh_loc, gh_weights,
-                        use_bnp_prior = True,
-                        return_loglik_obs_by_nk = False)
-
-    return e_z
-
 ##########################
 # Optimization functions
 ##########################
-
 def cluster_and_get_k_means_inits(y, vb_params_paragami,
                                 n_kmeans_init = 1,
                                 z_init_eps=0.05):
+    """
+    computes the negative ELBO using the data y, at the current variational
+    parameters and at the current prior parameters
+
+    Parameters
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_paragami : paragami Patterned Dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    n_kmeans_init : int
+        The number of re-initializations for K-means.
+    z_init_eps : float
+        The weight given to the clusters a data does not belong to
+        after running K-means
+
+    Returns
+    -------
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    init_free_par : vector
+        Vector of the free variational parameters
+    e_z_init : ndarray
+        Array encoding cluster belongings as found by kmeans
+    """
 
     # get dictionary of vb parameters
     vb_params_dict = vb_params_paragami.random()
@@ -352,8 +458,8 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
 
     vb_params_dict['centroids'] = km_best.cluster_centers_.T
 
-    vb_params_dict['v_stick_mean'] = np.ones(k_approx - 1)
-    vb_params_dict['v_stick_info'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_propn_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_propn_info'] = np.ones(k_approx - 1)
 
     # Set inital covariances
     gamma_init = np.zeros((k_approx, dim, dim))
@@ -382,7 +488,34 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
 def run_bfgs(get_vb_free_params_loss, init_vb_free_params,
                     get_vb_free_params_loss_grad =  None,
                     maxiter = 10, gtol = 1e-8):
-    # `get_vb_free_params_loss` takes in vb free parameters and returns the loss
+
+    """
+    Runs BFGS to find the optimal variational parameters
+
+    Parameters
+    ----------
+    get_vb_free_params_loss : Callable function
+        A callable function that takes in the variational free parameters
+        and returns the negative ELBO.
+    init_vb_free_params : vector
+        Vector of the free variational parameters at which we initialize the
+        optimization.
+    get_vb_free_params_loss_grad : Callable function (optional)
+        A callable function that takes in the variational free parameters
+        and returns the gradient of get_vb_free_params_loss.
+    maxiter : int
+        Maximum number of iterations to run bfgs
+    gtol : float
+        The tolerance used to check that the gradient is approximately
+            zero at the optimum.
+
+    Returns
+    -------
+    bfgs_vb_free_params : vec
+        Vector of optimal variational free parameters.
+    bfgs_output : class OptimizeResult from scipy.Optimize
+
+    """
 
     if get_vb_free_params_loss_grad is None:
         get_vb_free_params_loss_grad = autograd.grad(get_vb_free_params_loss)
@@ -401,7 +534,35 @@ def run_bfgs(get_vb_free_params_loss, init_vb_free_params,
 
 def precondition_and_optimize(get_vb_free_params_loss, init_vb_free_params,
                                 maxiter = 10, gtol = 1e-8):
-    # `get_vb_free_params_loss` takes in vb free parameters and returns the loss
+    """
+    Finds a preconditioner at init_vb_free_params, and then
+    runs trust Newton conjugate gradient to find the optimal
+    variational parameters.
+
+    Parameters
+    ----------
+    get_vb_free_params_loss : Callable function
+        A callable function that takes in the variational free parameters
+        and returns the negative ELBO.
+    init_vb_free_params : vector
+        Vector of the free variational parameters at which we initialize the
+        optimization.
+    get_vb_free_params_loss_grad : Callable function (optional)
+        A callable function that takes in the variational free parameters
+        and returns the gradient of get_vb_free_params_loss.
+    maxiter : int
+        Maximum number of iterations to run Newton
+    gtol : float
+        The tolerance used to check that the gradient is approximately
+            zero at the optimum.
+
+    Returns
+    -------
+    bfgs_vb_free_params : vec
+        Vector of optimal variational free parameters.
+    bfgs_output : class OptimizeResult from scipy.Optimize
+
+    """
 
     # get preconditioned function
     precond_fun = paragami.PreconditionedFunction(get_vb_free_params_loss)
@@ -427,6 +588,54 @@ def optimize_full(y, vb_params_paragami, prior_params_dict,
                     bfgs_max_iter = 50, netwon_max_iter = 50,
                     max_precondition_iter = 10,
                     gtol=1e-8, ftol=1e-8, xtol=1e-8):
+    """
+    Finds the optimal variational free parameters of using a combination of
+    BFGS and Newton trust region conjugate gradient.
+
+    Runs a few BFGS steps, and computes a preconditioner at the BFGS optimum.
+    After preconditioning, we run Newton trust region conjugate gradient.
+    If the tolerance is not satisfied after Newton steps, we compute another
+    preconditioner and repeat.
+
+    Parameters
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_paragami : paragami Patterned Dictionary
+        a paragami patterned dictionary that contains the variational parameters
+    prior_params_dict : dictionary
+        a dictionary that contains the prior parameters
+    init_vb_free_params : vector
+        Vector of the free variational parameters at which we initialize the
+    gh_loc : vector
+        locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms
+    gh_weights : vector
+        weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    bfgs_max_iter : int
+        Maximum number of iterations to run initial BFGS.
+    newton_max_iter : int
+        Maximum number of iterations to run Newton steps.
+    max_precondition_iter : int
+        Maximum number of times to recompute preconditioner.
+    ftol : float
+        The tolerance used to check that the difference in function value
+        is approximately zero at the last step.
+    xtol : float
+        The tolerance used to check that the difference in x values in the L
+        infinity norm is approximately zero at the last step.
+    gtol : float
+        The tolerance used to check that the gradient is approximately
+            zero at the optimum.
+
+    Returns
+    -------
+    vec
+        A vector of optimal variational free parameters.
+
+    """
+
 
     # Get loss as a function of the  vb_params_dict
     get_vb_params_loss = paragami.Functor(original_fun=get_kl, argnums=1)
@@ -491,7 +700,6 @@ def optimize_full(y, vb_params_paragami, prior_params_dict,
 ########################
 # Sensitivity functions
 #######################
-
 def get_moments_from_vb_free_params(vb_params_paragami, vb_params_free):
     vb_params_dict = vb_params_paragami.fold(vb_params_free, free = True)
 
@@ -508,8 +716,8 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
     _, vb_params_dict = \
         get_moments_from_vb_free_params(vb_params_paragami, vb_params_free)
 
-    mu = vb_params_dict['v_stick_mean']
-    sigma = 1 / np.sqrt(vb_params_dict['v_stick_info'])
+    mu = vb_params_dict['stick_propn_mean']
+    sigma = 1 / np.sqrt(vb_params_dict['stick_propn_info'])
 
     return modeling_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
                                                         n_obs,
