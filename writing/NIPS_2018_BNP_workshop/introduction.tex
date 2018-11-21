@@ -30,20 +30,8 @@ functional form of the prior for VB, as the KL divergence is then linear in the
 perturbation. Additionally, we linearly approximate only the optimization of
 the global parameters. In VB, this step is typically the most computationally
 intensive part of inference. Meanwhile, we retain the non-linearities of easily computed
-quantities as functions of the global parameters, such as local parameters 
+quantities as functions of the global parameters, such as local parameters
 and the number of distinct clusters.
-
-% Additionally, we linearly approximate only the computationally
-% intensive part of inference---the optimization of the global parameters---and
-% retain the nonlinearity of easily computed quantities as functions of the global parameters.
-
-% Additionally, we linearly approximate only the optimization
-% of the posterior approximation for the global parameters; in VB, this
-% step is typically the most computationally intensive part of
-% inference. Meanwhile, we will show that we retain many other desirable
-% non-linearities inherent in inference--including relations between
-% global parameters, local parameters, and the number of distinct
-% clusters
 
 We apply our methods to estimate sensitivity of the expected number of distinct
 clusters present the Iris dataset \citep{iris_data_anderson, iris_data_fisher}

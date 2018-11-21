@@ -24,7 +24,7 @@ g_t(\etathetaopt) &:=
     \sum_{k=1}^K \mathbb{I}\left\{\left(\sum_{n=1}^N \mathbb{I}\{z_n = k\} \right) \geq t \right\}\right].
     \label{eq:expected_num_clusters_thresh}
 \end{align}
-Note that $t = 0$ reduces to the original target posterior defined in the Equation~\ref{eq:expected_num_clusters}.
+Note that $t = 0$ reduces to the original target posterior defined in the \prettyref{eq:expected_num_clusters}.
 
 \prettyref{eq:expected_num_clusters_thresh} defines an \textit{in-sample} quantity, that is, the expected number of clusters we expect to see in the current Iris dataset. We also consider a posterior predictive quantity, or the number of clusters we expect see in a \textit{new} dataset of 150 iris flowers, given our posterior knowledge about the stick-breaking process. This is an expectation over the variational distribution of the sticks $\nu$, defined as
 \begin{align}
