@@ -37,7 +37,7 @@ g_{t, pred}(\etathetaopt) &:=
 \end{align}
 where $\pi_k$ are the cluster probabilities induced by the the sticks $\nu$.
 
-Like before, and as described in Section \ref{sec:hyper_param_sens}, only the dependence of $\etathetaopt$ on the prior perturbation is approximated linearly. Given an $\etathetaopt$ value, these expectations are computed with Monte-Carlo samples from the variational distribution $q(z \vert \etazopt(\etathetaopt))$ for the in-sample expectation. Samples are drawn from $q(\nu \vert \etathetaopt)$ in the predictive expectation.
+Like before, and as described in \prettyref{sec:hyper_param_sens}, only the dependence of $\etathetaopt$ on the prior perturbation is approximated linearly. Given an $\etathetaopt$ value, these expectations are computed with Monte-Carlo samples from the variational distribution $q(z \vert \etazopt(\etathetaopt))$ for the in-sample expectation. Samples are drawn from $q(\nu \vert \etathetaopt)$ in the predictive expectation.
 
 Figure~\ref{fig:param_sens_plot_thresh_0} shows both the in-sample and predictive expected number of \textit{distinct} clusters (i.e. $t = 0$). The linear approximation does equally well for both the in-sample and the predictive quantity. It works best when we set $\alpha_0 = 13$ --- that is, when we approximate from having more clusters to fewer clusters.
 
