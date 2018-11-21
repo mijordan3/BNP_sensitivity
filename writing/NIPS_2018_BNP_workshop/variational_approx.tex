@@ -2,9 +2,9 @@
 \paragraph{Variational approximation.} It is difficult to calculate the
 posterior $p\left(\nu, \mu, \Sigma, z \vert y\right)$, both because the
 normalizing constant is intractable and because there are an infinite number of
-latent clusters in a true BNP representation. In order to perform approximate
+latent components in a true BNP representation. In order to perform approximate
 inference, we use a truncated VB approximation using $K=30$
-clusters\citep{blei:2006:dirichletbnp}, and assert that the later clusters are
+components \citep{blei:2006:dirichletbnp} and assert that the later components are
 essentially unoccupied in the posterior. For compactness of notation, let $\theta =
 \left(\nu, \mu, \Sigma\right)$ denote the collection of ``global'' parameters,
 i.e., parameters whose values affect the data-generating process of every
@@ -23,14 +23,13 @@ q\left(z_n\right) = \mathrm{Categorical}\left(z_n\right)
 \end{align*}
 %
 The family $\vbfamily$ is parameterized by a finite-dimensional vector containing
-the locations of the delta functions and the parameters for the lognormal
+(1) the locations of the delta functions and (2) the parameters for the lognormal
 distributions,
-%
-\footnote{We use the lognormal distribution rather than the conjugate Beta
+\footnote{We use the lognormal distribution rather than the conjugate beta
 distribution because the lognormal makes numerical integration easier when
-re-optimizing using non-conjugate $p_{0}$.  Were one to simply rely on our
+re-optimizing using non-conjugate $p_{0}$.  Were one to rely on our
 sensitivity measures and not re-optimize, there would be no need for numerical
-integration, and the more convenient Beta variational approximation could be
+integration, and the more convenient beta variational approximation could be
 used.}
 %
 which we denote by $\eta_\theta$, and the parameters for the

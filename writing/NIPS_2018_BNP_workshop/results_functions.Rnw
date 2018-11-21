@@ -20,7 +20,7 @@ figcap2 <- paste(
     "\\label{fig:func_sens_e_num_clusters}
 Left column: the original prior $p_{0}$ in orange,
 the perturbed prior $p_c$ in green. Right: linearly approximated vs.
-re-fitted expected number of clusters after the pertubation.  ", sep="")
+re-fitted expected number of clusters after the perturbation.  ", sep="")
 @
 
 <<functional_sens_plot, cache=cache_knitr, fig.show='hold', fig.cap=figcap2>>=
@@ -30,6 +30,6 @@ source("Rscripts/functional_sens_results.R", echo=knitr_debug, print.eval=TRUE)
 In \prettyref{fig:functional_sens_plot}, we show results for the functional
 perturbation $\phi(\nu_k) = 1 - e^{\nu_k}$.
 We find that the linear approximation in this case was able to capture the
-direction of the perturbation, (the expected number of clusters increased under
-the first perturbation, decreased under the second), although as $\delta
+direction of the perturbation (the expected number of clusters increased under
+the perturbation), although as $\delta
 \rightarrow 1$ the quality of the approximation degraded.
