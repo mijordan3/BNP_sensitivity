@@ -309,34 +309,37 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
 
     return e_z
 
-##########################
-# Optimization over e_z
-##########################
 
 def get_kl(y, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
+                    e_z = None,
                     data_weights = None,
                     use_bnp_prior = True):
 
     """
-    computes the negative ELBO using the data y, at the current variational
+    Computes the negative ELBO using the data y, at the current variational
     parameters and at the current prior parameters
 
     Parameters
     ----------
     y : ndarray
-        the array of datapoints, one observation per row
+        The array of datapoints, one observation per row.
     vb_params_dict : dictionary
-        dictionary of variational parameters
+        Dictionary of variational parameters.
     prior_params_dict : dictionary
-        dictionary of prior parameters
+        Dictionary of prior parameters.
     gh_loc : vector
-        locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
     gh_weights : vector
-        weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms
-    data_weights : ndarray of shape (number of observations) x 1
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    e_z : ndarray (optional)
+        the optimal cluster belongings as a function of the variational
+        parameters, stored in an array whose (n, k)th entry is the probability
+        of the nth datapoint belonging to cluster k.
+        If ``None``, we set the optimal z
+    data_weights : ndarray of shape (number of observations) x 1 (optional)
         weights for each datapoint in y
     use_bnp_prior : boolean
         whether or not to use a prior on the cluster mixture weights.
@@ -352,10 +355,13 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         _get_vb_params_from_dict(vb_params_dict)
 
     # get optimal cluster belongings
-    e_z, loglik_obs_by_nk = \
+    e_z_opt, loglik_obs_by_nk = \
             get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                             gh_loc, gh_weights,
                             return_loglik_obs_by_nk = True)
+    if e_z is None:
+        e_z = e_z_opt
+    
 
     # weight data if necessary, and get likelihood of y
     if data_weights is not None:
