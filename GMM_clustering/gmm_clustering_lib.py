@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
-
 import LinearResponseVariationalBayes as vb
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -37,23 +34,23 @@ import paragami
 
 def get_vb_params_paragami_object(dim, k_approx):
     """
-    returns a paragami patterned dictionary
-    that stores the variational parameters
+    Returns a paragami patterned dictionary
+    that stores the variational parameters.
 
     Parameters
     ----------
     dim : int
-        dimension of the datapoints
+        Dimension of the datapoints.
     k_approx : int
-        number of components in the model
+        Number of components in the model.
 
     Returns
     -------
     vb_params_dict : dictionary
-        a dictionary that contains the variational parameters
+        A dictionary that contains the variational parameters.
 
-    vb_params_paragami : paragami Patterned Dictionary
-        a paragami patterned dictionary that contains the variational parameters
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
 
     """
 
@@ -73,7 +70,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     # cluster covariances
     vb_params_paragami['gamma'] = \
         paragami.pattern_containers.PatternArray(shape = (k_approx, ), \
-                                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -103,21 +100,21 @@ def _get_vb_params_from_dict(vb_params_dict):
 ##########################
 def get_default_prior_params(dim):
     """
-    returns a paragami patterned dictionary
-    that stores the prior parameters
+    Returns a paragami patterned dictionary
+    that stores the prior parameters.
 
     Parameters
     ----------
     dim : int
-        dimension of the datapoints
+        Dimension of the datapoints.
 
     Returns
     -------
     prior_params_dict : dictionary
-        a dictionary that contains the prior parameters
+        A dictionary that contains the prior parameters.
 
     prior_params_paragami : paragami Patterned Dictionary
-        a paragami patterned dictionary that contains the prior parameters
+        A paragami patterned dictionary that contains the prior parameters.
 
     """
 
@@ -271,29 +268,29 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
                                         use_bnp_prior = True):
 
     """
-    returns the optimal cluster belonging probabilities, given the
-    variational parameters
+    Returns the optimal cluster belonging probabilities, given the
+    variational parameters.
 
     Parameters
     ----------
     y : ndarray
-        the array of datapoints, one observation per row
+        The array of datapoints, one observation per row.
     vb_params_dict : dictionary
-        dictionary of variational parameters
+        Dictionary of variational parameters.
     gh_loc : vector
-        locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
     gh_weights : vector
-        weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
     use_bnp_prior : boolean
-        whether or not to use a prior on the cluster mixture weights.
+        Whether or not to use a prior on the cluster mixture weights.
         If True, a DP prior is used.
 
     Returns
     -------
     e_z : ndarray
-        the optimal cluster belongings as a function of the variational
+        The optimal cluster belongings as a function of the variational
         parameters, stored in an array whose (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k
 
@@ -335,20 +332,20 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         Weights for gauss-hermite quadrature. We need this compute the
         expected prior terms.
     e_z : ndarray (optional)
-        the optimal cluster belongings as a function of the variational
+        The optimal cluster belongings as a function of the variational
         parameters, stored in an array whose (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k.
-        If ``None``, we set the optimal z
+        If ``None``, we set the optimal z.
     data_weights : ndarray of shape (number of observations) x 1 (optional)
-        weights for each datapoint in y
+        Weights for each datapoint in y.
     use_bnp_prior : boolean
-        whether or not to use a prior on the cluster mixture weights.
+        Whether or not to use a prior on the cluster mixture weights.
         If True, a DP prior is used.
 
     Returns
     -------
     kl : float
-        The negative elbo between
+        The negative elbo.
     """
     # get vb parameters
     stick_propn_mean, stick_propn_info, centroids, gamma = \
@@ -361,7 +358,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
                             return_loglik_obs_by_nk = True)
     if e_z is None:
         e_z = e_z_opt
-    
+
 
     # weight data if necessary, and get likelihood of y
     if data_weights is not None:
@@ -413,8 +410,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
                                 n_kmeans_init = 1,
                                 z_init_eps=0.05):
     """
-    computes the negative ELBO using the data y, at the current variational
-    parameters and at the current prior parameters
+    Runs k-means to initialize the variational parameters.
 
     Parameters
     ----------
@@ -510,7 +506,7 @@ def run_bfgs(get_vb_free_params_loss, init_vb_free_params,
         A callable function that takes in the variational free parameters
         and returns the gradient of get_vb_free_params_loss.
     maxiter : int
-        Maximum number of iterations to run bfgs
+        Maximum number of iterations to run bfgs.
     gtol : float
         The tolerance used to check that the gradient is approximately
             zero at the optimum.
@@ -519,7 +515,8 @@ def run_bfgs(get_vb_free_params_loss, init_vb_free_params,
     -------
     bfgs_vb_free_params : vec
         Vector of optimal variational free parameters.
-    bfgs_output : class OptimizeResult from scipy.Optimize
+    bfgs_output :
+        The OptimizeResult class from returned by scipy.optimize.minimize.
 
     """
 
@@ -746,55 +743,3 @@ def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
     return modeling_lib.get_e_num_large_clusters_from_ez(e_z,
                                         threshold = threshold,
                                         n_samples = 100000)
-
-# class ExpectedPredNumClusters(object):
-#     # Get the expected posterior predictive number of distinct clusters above
-#     # some given threshold.
-#     # Note that we cache the normal samples that we use to sample
-#     # cluster belongings.
-#
-#     def __init__(self, model):
-#         self.model = model
-#         self.n_obs = self.model.y.shape[0]
-#         self.k_approx = self.model.k_approx
-#
-#         self.set_normal_samples()
-#
-#     def set_normal_samples(self, n_samples = 10000):
-#         self.unv_norm_samples = np.random.normal(0, 1, \
-#                                     size = (n_samples, self.k_approx - 1))
-#
-#     def get_e_num_pred_heavy_clusters_from_free_par(self, free_par, threshold = 0):
-#         self.model.global_vb_params.set_free(free_par)
-#         self.model.set_optimal_z()
-#
-#         mu = self.model.global_vb_params['v_sticks']['mean'].get()
-#         sigma = 1 / np.sqrt(self.model.global_vb_params['v_sticks']['info'].get())
-#
-#         return modeling_lib.get_e_number_clusters_from_logit_sticks(
-#                                     mu, sigma, self.n_obs,
-#                                     threshold = threshold,
-#                                     unv_norm_samples = self.unv_norm_samples)
-#
-# class ExpectedNumClustersFromZ(object):
-#     # Get the expected posterior number of distinct clusters above
-#     # some given threshold.
-#     # Note that we cache the uniform samples that we use to sample
-#     # cluster belongings.
-#
-#     def __init__(self, model):
-#         self.model = model
-#         self.n_obs = self.model.y.shape[0]
-#
-#         self.set_uniform_samples()
-#
-#     def set_uniform_samples(self, n_samples = 10000):
-#         self.unif_samples = np.random.random((self.n_obs, n_samples))
-#
-#     def get_e_num_heavy_clusters_from_free_par(self, free_par, threshold = 0):
-#         self.model.global_vb_params.set_free(free_par)
-#         self.model.set_optimal_z()
-#
-#         return modeling_lib.get_e_num_large_clusters_from_ez(self.model.e_z,
-#                                                 threshold = threshold,
-#                                                 unif_samples = self.unif_samples)

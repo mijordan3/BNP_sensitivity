@@ -6,10 +6,10 @@ def _cumprod_through_log(x, axis = None):
     # Autograd doesn't work with the original cumprod.
     return np.exp(np.cumsum(np.log(x), axis = axis))
 
-def get_mixture_weights_from_stick_break_prorns(stick_break_propns):
+def get_mixture_weights_from_stick_break_propns(stick_break_propns):
     """
-    computes stick lengths (i.e. mixture weights) from stick breaking
-    proportions
+    Computes stick lengths (i.e. mixture weights) from stick breaking
+    proportions.
 
     Parameters
     ----------
@@ -21,7 +21,7 @@ def get_mixture_weights_from_stick_break_prorns(stick_break_propns):
     mixture_weights : ndarray
         An array  the same size as stick_break_propns,
         with the mixture weights computed for each row of
-        stick breaking proportions
+        stick breaking proportions.
 
     """
 
@@ -50,25 +50,25 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
                                             unv_norm_samples = None):
     """
     Computes the expected number of clusters with at least t observations
-    from logitnormal parameters mu and sigma
+    from logitnormal parameters mu and sigma, using Monte Carlo.
 
     Parameters
     ----------
     mu : vec
-        vector of logitnormal location parameters
+        Vector of logitnormal location parameters.
     sigma : vec
-        vector of logitnormal scale paramters
+        Vector of logitnormal scale paramters.
     threshold : int
-        miniumum number of observations for a cluster to be counted
+        Miniumum number of observations for a cluster to be counted.
     n_obs : int
-        number of observations in a dataset
+        Number of observations in a dataset
     n_samples : int
-        Mumber of Monte Carlo samples used to compute the expected
-        number of clusters
+        Number of Monte Carlo samples used to compute the expected
+        number of clusters.
     unv_norm_samples : ndarray, optional
         The user may pass in a precomputed array of uniform random variables
         on which the reparameterization trick is applied to compute the
-        expected number of clusters
+        expected number of clusters.
 
 
     Returns
@@ -108,18 +108,19 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
 
 def get_e_num_clusters_from_ez(e_z):
     """
-    computes the expected number of clusters from cluster belongings e_z
+    EAnalytically computes the expected number of clusters from cluster
+    belongings e_z.
 
     Parameters
     ----------
     e_z : ndarray
         Array whose (n, k)th entry is the probability of the nth
-        datapoint belonging to cluster k
+        datapoint belonging to cluster k.
 
     Returns
     -------
     float
-        The expected number of clusters in the dataset
+        The expected number of clusters in the dataset.
 
     """
 
@@ -147,8 +148,8 @@ def get_e_num_large_clusters_from_ez(e_z,
                                     n_samples = None,
                                     unif_samples = None):
     """
-    computes the expected number of clusters with at least t
-    observations from cluster belongings e_z
+    Computes the expected number of clusters with at least t
+    observations from cluster belongings e_z.
 
     Parameters
     ----------
@@ -156,14 +157,14 @@ def get_e_num_large_clusters_from_ez(e_z,
         Array whose (n, k)th entry is the probability of the nth
         datapoint belonging to cluster k
     n_obs : int
-        number of observations in a dataset
+        Number of observations in a dataset.
     n_samples : int
-        Mumber of Monte Carlo samples used to compute the expected
-        number of clusters
+        Number of Monte Carlo samples used to compute the expected
+        number of clusters.
     unv_norm_samples : ndarray, optional
         The user may pass in a precomputed array of uniform random variables
         on which the reparameterization trick is applied to compute the
-        expected number of clusters
+        expected number of clusters.
 
     Returns
     -------
