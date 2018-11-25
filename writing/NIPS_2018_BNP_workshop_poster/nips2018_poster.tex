@@ -1,0 +1,454 @@
+\documentclass[a0,plainsections]{sciposter}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage{graphicx}
+% \usepackage{subcaption}
+\usepackage{caption}
+
+\usepackage{epstopdf, graphicx}
+\usepackage{booktabs,dcolumn}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{hhline}
+\usepackage{multicol}
+\setlength{\columnseprule}{0pt}
+
+\usepackage{boxedminipage}
+
+\newcommand{\widgraph}[2]{\includegraphics[keepaspectratio,width=#1]{#2}}
+
+\newcommand{\Rbb}{\mathbb{R}}
+\newcommand{\Expect}{\mathbb{E}}
+\newcommand{\Expecthat}{\hat{\mathbb{E}}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\vbfamily}{\mathcal{Q}}
+\newcommand{\etaopt}{\eta^{*}}
+\newcommand{\etazopt}{\eta_z^{*}}
+\newcommand{\etathetaopt}{\eta_\theta^{*}}
+%\newcommand{\qopt}{q^{*}}
+\newcommand{\targethat}{\hat{g}}
+\newcommand{\QExpect}
+{\Expect_{q\left(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta)\right)}}
+\newcommand{\atzero}{\Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}}
+\newcommand{\etathetalin}{\eta_\theta^{LIN}}
+
+\usepackage[framemethod=TikZ, xcolor=RGB]{mdframed}
+
+\definecolor{mydarkblue}{rgb}{0,.06,.5}
+\definecolor{mydarkred}{rgb}{.5,0,.1}
+\definecolor{myroyalblue}{rgb}{0,.1,.8}
+
+\usepackage{sectsty}
+\sectionfont{\color{mydarkblue}\centering\LARGE\bf}
+
+\mdfdefinestyle{MyFrame}{%
+    linecolor=mydarkblue,
+    outerlinewidth=2pt,
+    roundcorner=20pt,
+    innertopmargin=10pt,
+    innerbottommargin=10pt,
+    innerrightmargin=10pt,
+    innerleftmargin=10pt,
+    backgroundcolor=blue!10}
+
+
+\title{\textcolor{mydarkblue}{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics
+}}
+% \usepackage{authblk}
+% \author[1]{Author A}
+% \author[1]{Author B}
+% \author[1]{Author C}
+% \author[1]{Author D}
+% \author[2]{Author E}
+% \affil[1]{Department of Computer Science, \LaTeX\ University}
+% \affil[2]{Department of Mechanical Engineering, \LaTeX\ University}
+
+\author{Ryan Giordano\textsuperscript{1*} \quad 
+Runjing Liu\textsuperscript{1*} \quad 
+Michael I. Jordan\textsuperscript{1} \quad 
+Tamara Broderick\textsuperscript{2} \\
+{\large\normalfont\textsuperscript{*} These authors contributed equally}\\
+ {\large\normalfont\textsuperscript{1} Department of Statistics, UC Berkeley \quad \textsuperscript{2} Department of EECS, MIT}
+ }
+
+\leftlogo[1]{images/logo_left.png}
+\rightlogo[1]{images/logo_right.png}
+
+% Set the color used for the section headings here
+\definecolor{SectionCol}{rgb}{0,.06,.5}
+\definecolor{lightblue}{rgb}{0.8,0.8,1}
+
+% Set some fbox commands line width and the color we use in the f boxes
+\setlength{\fboxrule}{.09cm}
+\definecolor{boxcolor}{rgb}{1,1,1}
+\definecolor{innerboxcolor}{rgb}{.9,.94,.98}
+
+% Math macros
+\newcommand{\eq}[1]{Eq.~(\ref{eq:#1})}
+
+\newcommand{\kl}{\textrm{KL}}
+\newcommand{\mbe}{\mathbb{E}}
+\newcommand{\mbeq}{\mathbb{E}_{q}}
+\newcommand{\var}{\textrm{Var}}
+\newcommand{\cov}{\textrm{Cov}}
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\indep}{\stackrel{indep}{\sim}}
+\newcommand{\gauss}{\mathcal{N}} % Gaussian distribution
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% \newcommand{\npp}{\tilde{\eta}} % natural parameter for the p distribution
+% \newcommand{\npq}{\eta} % natural parameter for the q distribution
+% \newcommand{\mpp}{\tilde{m}} % mean parameter for the p distribution
+% \newcommand{\mpq}{m} % mean parameter for the q distribution
+% \newcommand{\mpopt}{m^*} % mean parameter for the q^* distribution
+% \newcommand{\npopt}{\eta^*} % mean parameter for the q^* distribution
+% \newcommand{\truecov}{\Sigma} % True posterior covariance
+% \newcommand{\lrcov}{\hat{\Sigma}} % LR cov estimate
+% \newcommand{\vbcov}{V} % Variational posterior covariance
+% \newcommand{\constant}{C} % A constant
+
+% my added commands
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{figure}{\vskip-2ex}
+\AfterEndEnvironment{figure}{\vskip-1ex}
+
+% Fiddle with the margin
+\addtolength{\topmargin}{-0.5in}
+% \addtolength{\topmargin}{-0.875in}
+\addtolength{\textheight}{1in}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\conference{NIPS 2017}
+
+
+\setlength{\parskip}{0.25em}
+
+\maketitle
+
+\vspace{-1in}
+
+
+\newcommand{\bnpalpha}{2}
+\newcommand{\betamean}{0.38}
+\newcommand{\betainfo}{0.10}
+\newcommand{\gammascale}{0.10}
+\newcommand{\gammashape}{10.00}
+\newcommand{\bmean}{0}
+\newcommand{\binfo}{0.10}
+\newcommand{\nboot}{200}
+\newcommand{\kapprox}{30}
+\newcommand{\nobs}{1000}
+\newcommand{\betadim}{7}
+\newcommand{\ntime}{14}
+\newcommand{\splinedegree}{3}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\columnbreak
+
+\begin{minipage}[t]{0.45\textwidth}
+
+\begin{mdframed}[style=MyFrame]
+%%%%%%%%%%%%%%%%%%%
+\section*{Overview}
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item We evaluate the {\bf local sensitivity} of posterior inferences in a {\bf Bayesian nonparametric model} when using a {\bf variational Bayes approximation}. 
+
+\item We use the linear approximation provided by local sensitivity measures to {\bf efficiently extrapolate posterior results} after changing prior specifications. 
+
+\item The linear approximation provides {\bf an alternative to the expensive process of refitting a VB model.}
+
+\item We use BNP to infer the number of distinct species present in the iris dataset \cite{iris_data_anderson}, and use the linear approximation to evaluate our results under various BNP prior specifications. 
+
+\end{itemize}
+\end{mdframed}
+\vspace{-0.7in}
+
+%%%%%%%%%%%%%%%%%%%
+\section*{Model}
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%%
+We cluster the features collected on irises, visually displayed on the right, below. A graphical model for the data is shown on the left. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width = 0.99\textwidth]{./images/BNP_graphical_model2.png}
+\caption{In the graphical model, $y_{n}$ are the features for iris $n$, and $z_n$ is the component (species) to which the iris belongs. For each component $k$, we model $y_n$ as drawn from a multivariate normal with mean $\mu_k$ and covariance $\Sigma_k$.
+
+One the right, the features of the irises plotted along the first two principal components. Color corresponds to the true iris species. }
+\setlength{\textfloatsep}{-10pt}
+\end{figure}
+
+\begin{itemize}
+
+\item We infer the means $\mu_k$, covariance $\Sigma_k$, the sticks-breaking proportions $\nu_k$, and cluster belongings $z_n$ using mean field variational inference. For shorthand, define $\theta$ to be the global parameters $\mu_k$, $\Sigma_k$, and $\nu_k$. 
+
+\item Let $\eta_\theta$ be the variational parameters for $\mu_k$ and $\Sigma_k$. Let $\eta_z$ be the variational parameters for $z_n$. Importantly, we let $q(z | \eta_z)$ be a categorical distribution, so we have a conditionally conjugate model. {\bf Hence, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.} 
+
+\item Our objective is then 
+$\etathetaopt = 
+\argmin_{\eta_\theta} KL\left(
+    q(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta) \big\| p(\theta, z | y)
+    \right)$. 
+\end{itemize}
+\vspace{-0.6in}
+%%%%%%%%%%%%%%%%%%
+\subsection*{The posterior target: }
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%
+We are interested in inferring the number of components (i.e. species) present in a dataset. We consider two possible posterior quantities. 
+
+The first is an {\bf in-sample quantity}, the expected number of clusters in the given iris dataset. This is given by 
+%
+\vspace{-0.3in}
+\begin{align}
+g_t(\etathetaopt) &:=
+\Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]
+= \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[
+    \sum_{k=1}^K \left(1 - \prod_{n=1}^N \mathbb{I}\{z_n \ne k\} \right) \right].
+\label{eq:expected_num_clusters_thresh}
+\end{align}
+
+We also consider a {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge. This is
+\begin{align}
+g_{t, pred}(\etathetaopt) &:=
+\Expect_{q(\nu \vert \etathetaopt)} 
+\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right]  =
+\Expect_{q(\nu \vert \etathetaopt)} \left[\sum_{k=1}^K \left(1 -
+(1 - \pi_k)^{N}\right)\right].
+    \label{eq:expected_num_clusters_pred_thresh}
+\end{align}
+where $\pi_k$ are the cluster probabilities induced by the the stick-breaking proportions $\nu$.
+
+%%%%%%%%%%%%%%%%%%
+\vspace{-0.6in}
+\section*{Hyperparameter sensitivity}
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item Suppose the prior is parameterized by a real-valued hyperparameter $\epsilon$. 
+
+\item We want to evaluate the the posterior quantities in Equations \ref{eq:expected_num_clusters_thresh} and \ref{eq:expected_num_clusters_pred_thresh} as $\epsilon$ varies. 
+
+\item The in-sample quantity (Equation \ref{eq:expected_num_clusters_thresh}) is a composition of the functions, 
+\begin{align*}
+\epsilon \mapsto
+\etathetaopt(\epsilon) \mapsto
+\etazopt\left(\etathetaopt\right) \mapsto
+\Expect_{q(z | \etazopt)} \left[ \#\{\text{distinct clusters}\} \right].
+\end{align*}
+Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pred_thresh}): 
+\begin{align*}
+\epsilon \mapsto
+\etathetaopt(\epsilon) \mapsto
+\Expect_{q(\nu | \etathetaopt)} \left[ \#\{\text{distinct clusters}\} \right].
+\end{align*}
+
+\item Note that $\etathetaopt(\epsilon)$ depends on $\epsilon$ through optimizing the KL objective and therefore expensive to evaluate. Hence, {\bf we use a linear approximation for the map $\epsilon \mapsto \etathetaopt(\epsilon)$}. {\bf We retain the nonlinearities in remaining maps. }
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%
+\vspace{0.9in}
+{\bf References}
+%%%%%%%%%%%%%%%%%%
+\renewcommand{\section}[2]{}%
+\footnotesize{
+  \bibliographystyle{abbrv}
+  \bibliography{./references}
+}
+% 
+
+% \vspace{-0.5in}
+\end{minipage}
+\hfill \vrule \hfill
+\begin{minipage}[t]{0.45\textwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{0.3in}
+\subsection*{Linear approximation}
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item WOLOG, let $\epsilon=0$ represent the original posterior, and approximate $\etathetaopt(\epsilon)$ as  
+\begin{align}
+\etathetaopt(\epsilon)  &\approx  \etathetaopt(0) + 
+\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
+\end{align}
+We compute the derivative following \cite{giordano:2017:covariances} as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$ 
+where 
+\begin{align}
+H := \frac{\partial^2 KL(\eta_\theta, \epsilon) }{
+    \partial \eta_\theta \partial \eta_\theta^T}
+    \atzero
+\qquad 
+f_\eta := \frac{\partial^2
+    \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
+    \atzero.
+    \label{eq:sensitivity_formulae}
+\end{align}
+\end{itemize}
+
+
+
+
+%%%%%%%%%%%%%%%%%%
+\section*{Results}
+% \vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%
+{\bf \large Sensitivity to $\alpha$. }
+We apply Equation \ref{eq:sensitivity_formulae} to approximate the dependence of the expected number of clusters to the DP prior parameter $\alpha$. We compare our approximation to the more expensive process of re-fitting the VB model.  
+%
+% \begin{align*}
+% f^\alpha_\eta := \frac{\partial^2
+%   \QExpect
+%   \left[ \log p\left(\nu \vert \alpha \right) \right]}
+% { \partial \eta_\theta \partial \alpha^T }
+% \Big\rvert_{\eta_\theta = \etathetaopt, \alpha = \alpha_0},
+% \end{align*}
+
+% \vspace{-0.4in}
+
+
+
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{figure/param_sens_plot_thresh_0-1} 
+\includegraphics[width=0.98\linewidth,height=0.294\linewidth]{figure/param_sens_plot_thresh_0-2} 
+
+}
+
+
+
+\end{knitrout}
+\caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimizing versus the linear approximation. 
+The blue vertical line indicates the location of $\alpha_0$}
+\end{figure}
+
+{\bf \large Sensitivity to functional perturbations. }
+We consider a multiplicative perturbation $\phi$ to
+the original beta distribution $p_0$ for the stick-breaking proportions. The contaminated prior is given by 
+\begin{align}
+\label{eq:expon_perturb}
+	p_c(\nu_k \vert \delta, \phi) :=
+  \frac{p_{0}(\nu_k)\phi(\nu_k)^\epsilon}
+       {\int_0^1 p_0(\nu_k')\phi(\nu')^\epsilon d\nu_k'}.
+\end{align}
+We again apply Equation \ref{eq:sensitivity_formulae} to approximate the dependence of the posterior number of clusters to the choice of $\epsilon$. 
+\begin{figure}
+\centering
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{figure/functional_sens_plot_thresh0-1} 
+
+}
+
+
+
+\end{knitrout}
+\caption{The effect of prior perturbation on the expected number of distinct clusters . Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\epsilon = 1$, in blue. Middle: linearly approximated vs.
+re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
+\end{figure}
+
+Because we have used a multiplicative perturbation, $f_\eta$
+is linear in $\epsilon$. We might expect this to improve the fidelity of a
+linear approximation. 
+
+\begin{mdframed}[style=MyFrame]
+%%%%%%%%%%%%%%%%%%
+\vspace{-0.6in}
+\section*{Conclusion}
+\vspace{-0.3in}
+%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+
+\item The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. 
+
+\item We applied the approximation to both parametric and functional perturbations to the stick-breaking prior.
+
+\item We attempted to improve the linearity by approximating only the dependence of the global parameters on the prior parameter, while retaining the non-linearity of the map from global parameter to posterior quantity. 
+
+\end{itemize}
+\end{mdframed}
+
+% \vspace{-0.5in}
+\end{minipage}\\
+
+\begin{center}
+\begin{minipage}[t]{\textwidth}
+% %%%%%%%%%%%%%%%%%%
+{\bf Acknowledgments}:
+% %%%%%%%%%%%%%%%%%%
+Ryan Giordano's research was funded in full by the
+Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
+{\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
+\end{minipage}
+\end{center}
+
+\end{document}
