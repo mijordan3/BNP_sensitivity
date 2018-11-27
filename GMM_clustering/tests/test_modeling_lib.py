@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.insert(0, '../')
+
 import autograd.numpy as np
 import autograd.scipy as sp
 
@@ -11,10 +14,12 @@ from numpy.polynomial.hermite import hermgauss
 
 import unittest
 
-np.random.seed(456456)
+import numpy.testing as testing
 
 class TestModelingLib(unittest.TestCase):
     def test_logitnorm_entropy(self):
+        np.random.seed(456456)
+
         gh_deg = 8
         gh_loc, gh_weights = hermgauss(gh_deg)
 
@@ -24,7 +29,7 @@ class TestModelingLib(unittest.TestCase):
 
         # compute entropy
         logitnormal_entropy = \
-            modeling_lib.get_logitnorm_entropy(mu, info, gh_loc, gh_weights)
+            modeling_lib.get_stick_breaking_entropy(mu, info, gh_loc, gh_weights)
 
         # sample from logitnormal
         n_samples = 100000
@@ -43,9 +48,10 @@ class TestModelingLib(unittest.TestCase):
 
         # check diff in mean
         mean_sampled_entropy = np.mean(sampled_entropy)
-        diff = np.abs(logitnormal_entropy - mean_sampled_entropy)
-        assert diff < 0.01, 'diff = {}'.format(diff)
-
+        # diff = np.abs(logitnormal_entropy - mean_sampled_entropy)
+        # assert diff < 0.01, 'diff = {}'.format(diff)
+        testing.assert_allclose(mean_sampled_entropy, logitnormal_entropy,
+                                atol = 1e-2, rtol = 0)
 
 
 if __name__ == '__main__':

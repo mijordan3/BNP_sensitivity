@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.insert(0, '../')
+
 import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
@@ -13,10 +16,17 @@ from numpy.polynomial.hermite import hermgauss
 
 import unittest
 
-np.random.seed(456456)
+import numpy.testing as testing
+
 
 class TestOptimalEz(unittest.TestCase):
     def test_set_z_nat_params(self):
+        # Test whether our function to set the z natural parameters as a
+        # function of the global parameters actually returns the optimal z.
+        # To do so, we check that the gradient wrt to z at the optimum is 0
+
+        np.random.seed(456456)
+
         # simulate data from gmm mixture
         n_obs = 1000
         dim = 2
@@ -62,8 +72,9 @@ class TestOptimalEz(unittest.TestCase):
 
         grad_at_opt = kl_z_nat_param_grad(y, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights, z_nat_param)
-        grad_norm = np.max(np.abs(grad_at_opt))
-        assert grad_norm < 1e-8, 'L inf of gradient : {}'.format(grad_norm)
+
+        # assert gradient is 0
+        testing.assert_allclose(grad_at_opt, 0, rtol = 0.0, atol = 1e-8)
 
 # TODO: this test NOT finished yet
 # class TestOptimization(unittest.TestCase):

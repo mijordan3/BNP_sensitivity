@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.insert(0, '../')
+
 import autograd.numpy as np
 import autograd.scipy as sp
 
 import cluster_quantities_lib
 import unittest
 
-np.random.seed(24524)
+import numpy.testing as testing
 
 class TestClusteringSamples(unittest.TestCase):
     def test_sampling_clusters_from_uniform(self):
         # check the sampling of _get_clusters_from_ez_and_unif_samples
+        np.random.seed(24524)
 
         # cluster belonging probabilities
         n_obs = 5
@@ -43,6 +47,8 @@ class TestClusteringSamples(unittest.TestCase):
         # the expected number of clusters via MC matches the
         # analytic expectation
 
+        np.random.seed(54654)
+
         n_obs = 5
         n_clusters = 3
         e_z = np.random.random((n_obs, n_clusters))
@@ -57,10 +63,9 @@ class TestClusteringSamples(unittest.TestCase):
         e_num_clusters_analytic = \
             cluster_quantities_lib.get_e_num_clusters_from_ez(e_z)
 
-        assert np.abs(e_num_clusters_analytic - e_num_clusters_sampled) < \
-                    np.sqrt(var_num_clusters_sampled) * 3, \
-                    'diff: {}'.format(np.abs(e_num_clusters_analytic - \
-                                                e_num_clusters_sampled))
-
+        testing.assert_allclose(e_num_clusters_analytic,
+                                e_num_clusters_sampled,
+                                atol = np.sqrt(var_num_clusters_sampled) * 3,
+                                rtol = 0)
 if __name__ == '__main__':
     unittest.main()

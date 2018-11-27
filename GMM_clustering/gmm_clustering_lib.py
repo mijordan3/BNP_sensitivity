@@ -154,7 +154,7 @@ def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights,
 
     z_entropy = modeling_lib.multinom_entropy(e_z)
     stick_entropy = \
-        modeling_lib.get_logitnorm_entropy(stick_propn_mean, stick_propn_info,
+        modeling_lib.get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights)
 
     return z_entropy + stick_entropy

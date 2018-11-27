@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, './../../LinearResponseVariationalBayes.py')
-
 import LinearResponseVariationalBayes as vb
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -16,9 +13,11 @@ def multinom_entropy(e_z):
     # returns the entropy of the cluster belongings
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
 
-def get_logitnorm_entropy(mu, info, gh_loc, gh_weights):
-    # return the sum of entropies of logitnormal distriibutions whose
-    # logit has mean mu and information info
+def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
+                                gh_loc, gh_weights):
+    # return the entropy of logitnormal distriibution on the sticks whose
+    # logit has mean stick_propn_mean and information stick_propn_info
+    # Integration is done on the real line with respect to the Lesbegue measure
 
     # integration is done numerical with Gauss Hermite quadrature.
     # gh_loc and gh_weights specifiy the location and weights of the
@@ -34,17 +33,17 @@ def get_logitnorm_entropy(mu, info, gh_loc, gh_weights):
 
     assert np.all(gh_weights > 0)
 
-    assert len(mu) == len(info)
-    assert np.all(info) > 0
+    assert len(stick_propn_mean) == len(stick_propn_info)
+    assert np.all(stick_propn_info) > 0
 
     e_log_v, e_log_1mv =\
         ef.get_e_log_logitnormal(
-            lognorm_means = mu,
-            lognorm_infos = info,
+            lognorm_means = stick_propn_mean,
+            lognorm_infos = stick_propn_info,
             gh_loc = gh_loc,
             gh_weights = gh_weights)
 
-    return np.sum(ef.univariate_normal_entropy(info)) + \
+    return np.sum(ef.univariate_normal_entropy(stick_propn_info)) + \
                     np.sum(e_log_v + e_log_1mv)
 
 ################
