@@ -44,20 +44,24 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
 
     return mixture_weights
 
-def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
-                                            threshold = 0,
+def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
+                                            n_obs, threshold = 0,
                                             n_samples = None,
                                             unv_norm_samples = None):
     """
     Computes the expected number of clusters with at least t observations
-    from logitnormal parameters mu and sigma, using Monte Carlo.
+    from logitnormal stick-breaking parameters,
+    ``stick_propn_mean`` and ``stick_propn_info``,
+    using Monte Carlo.
 
     Parameters
     ----------
-    mu : vec
-        Vector of logitnormal location parameters.
-    sigma : vec
-        Vector of logitnormal scale paramters.
+    stick_propn_mean : vec
+        Vector of mean parameters for the logit of the
+        stick-breaking proportions
+    stick_propn_info : vec
+        Vector of information paramters for the logit of the
+        stick-breaking proportions
     threshold : int
         Miniumum number of observations for a cluster to be counted.
     n_obs : int
@@ -78,7 +82,7 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
         in a dataset of size n_obs
     """
 
-    n_sticks = len(mu)
+    n_sticks = len(stick_propn_mean)
 
     assert (n_samples is not None) & (unv_norm_samples is not None), \
         'both n_samples and unv_norm_samples cannot be None'
@@ -89,7 +93,8 @@ def get_e_number_clusters_from_logit_sticks(mu, sigma, n_obs,
         assert unv_norm_samples.shape[1] == n_sticks
 
     # sample sticks proportions from logitnormal
-    stick_propn_samples = sp.special.expit(unv_norm_samples * sigma + mu)
+    stick_propn_samples = sp.special.expit(unv_norm_samples * \
+                            1 / sqrt(stick_propn_info) + stick_propn_mean)
 
     # get posterior weights
     weight_samples = \

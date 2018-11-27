@@ -17,8 +17,8 @@ def multinom_entropy(e_z):
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
 
 def get_logitnorm_entropy(mu, info, gh_loc, gh_weights):
-    # return the sum of entropies of logitnormal distriibutions with
-    # location parameters mu and scale parameters sigma
+    # return the sum of entropies of logitnormal distriibutions whose
+    # logit has mean mu and information info
 
     # integration is done numerical with Gauss Hermite quadrature.
     # gh_loc and gh_weights specifiy the location and weights of the

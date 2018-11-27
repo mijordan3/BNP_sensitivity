@@ -1,13 +1,6 @@
-import LinearResponseVariationalBayes as vb
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
-
 import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
-
-import scipy as osp
-
-import warnings
 
 from scipy import optimize
 
@@ -15,16 +8,8 @@ from sklearn.cluster import KMeans
 
 from copy import deepcopy
 
-from datetime import datetime
-import time
-
 import modeling_lib as modeling_lib
 import functional_sensitivity_lib as fun_sens_lib
-
-import json
-import json_tricks
-
-from numpy.polynomial.hermite import hermgauss
 
 import paragami
 
@@ -76,24 +61,6 @@ def get_vb_params_paragami_object(dim, k_approx):
 
     return vb_params_dict, vb_params_paragami
 
-def _get_vb_params_from_dict(vb_params_dict):
-
-    # VB parameters
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
-
-    assert len(stick_propn_mean) == len(stick_propn_info)
-
-    centroids = vb_params_dict['centroids']
-    assert np.shape(centroids)[1] == (len(stick_propn_info) + 1)
-
-    gamma = vb_params_dict['gamma']
-
-    assert np.shape(centroids)[1] == np.shape(gamma)[0]
-    assert np.shape(centroids)[0] == np.shape(gamma)[1]
-    assert np.shape(centroids)[0] == np.shape(gamma)[2]
-
-    return stick_propn_mean, stick_propn_info, centroids, gamma
 
 ##########################
 # Set up prior parameters
@@ -102,6 +69,11 @@ def get_default_prior_params(dim):
     """
     Returns a paragami patterned dictionary
     that stores the prior parameters.
+
+    Default prior parameters are those set for the experiments in
+    "Evaluating Sensitivity to the Stick Breaking Prior in
+    Bayesian Nonparametrics"
+    https://arxiv.org/abs/1810.06587
 
     Parameters
     ----------
@@ -216,8 +188,7 @@ def get_loglik_obs_by_nk(y, centroids, gamma):
 
 def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                         gh_loc, gh_weights,
-                        use_bnp_prior = True,
-                        return_loglik_obs_by_nk = False):
+                        use_bnp_prior = True):
 
     # get likelihood term
     loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, gamma)
@@ -233,36 +204,21 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
 
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
-    if return_loglik_obs_by_nk:
-        return z_nat_param, loglik_obs_by_nk
-    else:
-        return z_nat_param
+    return z_nat_param, loglik_obs_by_nk
 
 def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                     gh_loc, gh_weights,
-                    use_bnp_prior = True,
-                    return_loglik_obs_by_nk = False):
+                    use_bnp_prior = True):
 
-    _z_nat_param = \
+    z_nat_param, loglik_obs_by_nk= \
         get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                                     gh_loc, gh_weights,
-                                    use_bnp_prior,
-                                    return_loglik_obs_by_nk)
-
-    if return_loglik_obs_by_nk:
-        loglik_obs_by_nk = _z_nat_param[1]
-        z_nat_param = _z_nat_param[0]
-
-    else:
-        z_nat_param = _z_nat_param
+                                    use_bnp_prior)
 
     log_const = sp.misc.logsumexp(z_nat_param, axis=1)
     e_z = np.exp(z_nat_param - log_const[:, None])
 
-    if return_loglik_obs_by_nk:
-        return e_z, loglik_obs_by_nk
-    else:
-        return e_z
+    return e_z, loglik_obs_by_nk
 
 def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
                                         use_bnp_prior = True):
@@ -296,13 +252,16 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
 
     """
 
-    stick_propn_mean, stick_propn_info, centroids, gamma = \
-        _get_vb_params_from_dict(vb_params_dict)
+    # get global vb parameters
+    stick_propn_mean = vb_params_dict['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_propn_info']
+    centroids = vb_params_dict['centroids']
+    gamma = vb_params_dict['gamma']
 
-    e_z = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+    # compute optimal e_z from vb global parameters
+    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                         gh_loc, gh_weights,
-                        use_bnp_prior = True,
-                        return_loglik_obs_by_nk = False)
+                        use_bnp_prior = True)
 
     return e_z
 
@@ -348,14 +307,15 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         The negative elbo.
     """
     # get vb parameters
-    stick_propn_mean, stick_propn_info, centroids, gamma = \
-        _get_vb_params_from_dict(vb_params_dict)
+    stick_propn_mean = vb_params_dict['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_propn_info']
+    centroids = vb_params_dict['centroids']
+    gamma = vb_params_dict['gamma']
 
     # get optimal cluster belongings
     e_z_opt, loglik_obs_by_nk = \
             get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
-                            gh_loc, gh_weights,
-                            return_loglik_obs_by_nk = True)
+                            gh_loc, gh_weights)
     if e_z is None:
         e_z = e_z_opt
 
@@ -701,13 +661,8 @@ def optimize_full(y, vb_params_paragami, prior_params_dict,
 
 
 ########################
-# Sensitivity functions
+# Posterior quantities of interest
 #######################
-def get_moments_from_vb_free_params(vb_params_paragami, vb_params_free):
-    vb_params_dict = vb_params_paragami.fold(vb_params_free, free = True)
-
-    return vb_params_paragami.flatten(vb_params_dict, free = False), \
-                vb_params_dict
 
 def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
                                                     vb_params_free,
