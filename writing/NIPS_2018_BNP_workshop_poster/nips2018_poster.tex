@@ -201,6 +201,7 @@ Tamara Broderick\textsuperscript{2} \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIRST COLUMN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\columnbreak
@@ -208,157 +209,190 @@ Tamara Broderick\textsuperscript{2} \\
 \begin{minipage}[t]{0.45\textwidth}
 
 \begin{mdframed}[style=MyFrame]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%
 \section*{Overview}
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
 \item We evaluate the {\bf local sensitivity} of posterior inferences in a {\bf Bayesian nonparametric model} when using a {\bf variational Bayes approximation}. 
+
+\item Specifically, we evaluate the sensitivity of the expected number of posterior to the stick-breaking prior's concentration parameter and functional form. 
 
 \item We use the linear approximation provided by local sensitivity measures to {\bf efficiently extrapolate posterior results} after changing prior specifications. 
 
 \item The linear approximation provides {\bf an alternative to the expensive process of refitting a VB model.}
 
-\item We use BNP to infer the number of distinct species present in the iris dataset \cite{iris_data_anderson}, and use the linear approximation to evaluate our results under various BNP prior specifications. 
-
 \end{itemize}
 \end{mdframed}
 \vspace{-0.7in}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%
 \section*{Model}
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%%
-We cluster the features collected on irises, visually displayed on the right, below. A graphical model for the data is shown on the left. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We use a BNP model to infer the number of distinct species in the iris dataset \cite{iris_data_anderson}. 
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.99\textwidth]{./images/BNP_graphical_model2.png}
-\caption{In the graphical model, $y_{n}$ are the features for iris $n$, and $z_n$ is the component (species) to which the iris belongs. For each component $k$, we model $y_n$ as drawn from a multivariate normal with mean $\mu_k$ and covariance $\Sigma_k$.
+\vspace{-0.9in}
+\caption{(Left) The iris data projected onto the first two principal components. Color corresponds to the true iris species. (Right) The graphical model for the data. }
 
-One the right, the features of the irises plotted along the first two principal components. Color corresponds to the true iris species. }
+% \caption{In the graphical model, $y_{n}$ are the features for iris $n$, and $z_n$ is the component (species) to which the iris belongs. For each component $k$, we model $y_n$ as drawn from a multivariate normal with mean $\mu_k$ and covariance $\Sigma_k$.
+% 
+% One the right, the features of the irises plotted along the first two principal components. Color corresponds to the true iris species. }
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
+\vspace{-0.3in}
+{\bf Notation: }
 
 \begin{itemize}
+\item Random variables
+\begin{itemize}
+\item $z_n$: categorical variable indicating cluster belonging. 
+\item $\mu_k, \Sigma_k$: Gaussian mean and covariance of cluster $k$. 
+\item $\nu_k$: stick-breaking proportions. 
+\end{itemize}
+\item Variational parameters 
+\begin{itemize}
+\item $\eta_\theta$: the variational parameters for $\mu_k$, $\Sigma_k$, and $\nu_k$. $\theta$ is short-hand for $(\mu_k,\Sigma_k,\nu_k)$. 
+\item $\eta_z$: the variational parameters for the categorical distributions on the 
+$z$'s. 
+\end{itemize}
+\end{itemize}
 
-\item We infer the means $\mu_k$, covariance $\Sigma_k$, the sticks-breaking proportions $\nu_k$, and cluster belongings $z_n$ using mean field variational inference. For shorthand, define $\theta$ to be the global parameters $\mu_k$, $\Sigma_k$, and $\nu_k$. 
+We let $q(z | \eta_z)$ be a categorical distribution, so we have a conditionally conjugate model. {\bf Hence, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.}
 
-\item Let $\eta_\theta$ be the variational parameters for $\mu_k$ and $\Sigma_k$. Let $\eta_z$ be the variational parameters for $z_n$. Importantly, we let $q(z | \eta_z)$ be a categorical distribution, so we have a conditionally conjugate model. {\bf Hence, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.} 
-
-\item Our objective is then 
-$\etathetaopt = 
+Our objective is then 
+\vspace{-0.2in}
+\begin{align}
+\etathetaopt =
 \argmin_{\eta_\theta} KL\left(
     q(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta) \big\| p(\theta, z | y)
-    \right)$. 
-\end{itemize}
-\vspace{-0.6in}
+    \right)
+    \label{eq:kl_objective}
+\end{align}
+
+\vspace{-0.7in}
+
 %%%%%%%%%%%%%%%%%%
-\subsection*{The posterior target: }
+\subsection*{Posterior expectations of interest: }
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
-We are interested in inferring the number of components (i.e. species) present in a dataset. We consider two possible posterior quantities. 
+We consider two possible posterior quantities:
 
-The first is an {\bf in-sample quantity}, the expected number of clusters in the given iris dataset. This is given by 
-%
+\begin{enumerate}
+\item An {\bf in-sample quantity}, the expected number of clusters in the given iris dataset:
 \vspace{-0.3in}
 \begin{align}
-g_t(\etathetaopt) &:=
 \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]
-= \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[
-    \sum_{k=1}^K \left(1 - \prod_{n=1}^N \mathbb{I}\{z_n \ne k\} \right) \right].
 \label{eq:expected_num_clusters_thresh}
 \end{align}
 
-We also consider a {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge. This is
+\item A {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge:
 \begin{align}
-g_{t, pred}(\etathetaopt) &:=
 \Expect_{q(\nu \vert \etathetaopt)} 
-\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right]  =
-\Expect_{q(\nu \vert \etathetaopt)} \left[\sum_{k=1}^K \left(1 -
-(1 - \pi_k)^{N}\right)\right].
+\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right] 
     \label{eq:expected_num_clusters_pred_thresh}
 \end{align}
-where $\pi_k$ are the cluster probabilities induced by the the stick-breaking proportions $\nu$.
 
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \vspace{-0.6in}
 \section*{Hyperparameter sensitivity}
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item Suppose the prior is parameterized by a real-valued hyperparameter $\epsilon$. 
+
+\item Let $\epsilon$ be a real-valued parameter for the stick-breaking distribution. 
+
+\item The VB parameters $(\eta_\theta, \eta_z)$ depend on the stick-breaking distribution through $\epsilon$. 
 
 \item We want to evaluate the the posterior quantities in Equations \ref{eq:expected_num_clusters_thresh} and \ref{eq:expected_num_clusters_pred_thresh} as $\epsilon$ varies. 
 
 \item The in-sample quantity (Equation \ref{eq:expected_num_clusters_thresh}) is a composition of the functions, 
-\begin{align*}
+\begin{align}
 \epsilon \mapsto
 \etathetaopt(\epsilon) \mapsto
 \etazopt\left(\etathetaopt\right) \mapsto
 \Expect_{q(z | \etazopt)} \left[ \#\{\text{distinct clusters}\} \right].
-\end{align*}
+\label{eq:maps_in_sample}
+\end{align}
 Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pred_thresh}): 
-\begin{align*}
+\begin{align}
 \epsilon \mapsto
 \etathetaopt(\epsilon) \mapsto
-\Expect_{q(\nu | \etathetaopt)} \left[ \#\{\text{distinct clusters}\} \right].
-\end{align*}
-
-\item Note that $\etathetaopt(\epsilon)$ depends on $\epsilon$ through optimizing the KL objective and therefore expensive to evaluate. Hence, {\bf we use a linear approximation for the map $\epsilon \mapsto \etathetaopt(\epsilon)$}. {\bf We retain the nonlinearities in remaining maps. }
-
+\Expect_{q(\nu \vert \etathetaopt)} 
+\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
+\label{eq:maps_predictive}
+\end{align}
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%
-\vspace{0.9in}
-{\bf References}
-%%%%%%%%%%%%%%%%%%
-\renewcommand{\section}[2]{}%
-\footnotesize{
-  \bibliographystyle{abbrv}
-  \bibliography{./references}
-}
-% 
-
-% \vspace{-0.5in}
-\end{minipage}
-\hfill \vrule \hfill
-\begin{minipage}[t]{0.45\textwidth}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\vspace{0.3in}
+\vspace{-0.7in}
 \subsection*{Linear approximation}
-\vspace{-0.3in}
+\vspace{-0.2in}
 %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
 \item WOLOG, let $\epsilon=0$ represent the original posterior, and approximate $\etathetaopt(\epsilon)$ as  
 \begin{align}
 \etathetaopt(\epsilon)  &\approx  \etathetaopt(0) + 
 \frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
+\label{eq:linear_approx}
 \end{align}
-We compute the derivative following \cite{giordano:2017:covariances} as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$ 
-where 
-\begin{align}
-H := \frac{\partial^2 KL(\eta_\theta, \epsilon) }{
-    \partial \eta_\theta \partial \eta_\theta^T}
-    \atzero
-\qquad 
-f_\eta := \frac{\partial^2
-    \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
-    \atzero.
-    \label{eq:sensitivity_formulae}
-\end{align}
+
+\item Evaluation of the derivative can be done efficiently using formulas from \cite{giordano:2017:covariances} and auto-differentiation tools \cite{maclaurin:2015:autograd}.
+
+\item In contrast, exactly evaluating $\etathetaopt(\epsilon)$ involves re-optimizing the KL objective at a new posterior, which is computationally expensive. 
+
+\item We only use a linear approximation for the map $\epsilon \mapsto \etathetaopt(\epsilon)$. {We retain the non-linearities in the other maps of (\ref{eq:maps_in_sample}) and (\ref{eq:maps_predictive}). }
+
+% as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$ 
+
 \end{itemize}
+% where 
+% \begin{align}
+% H := \frac{\partial^2 KL(\eta_\theta, \epsilon) }{
+%     \partial \eta_\theta \partial \eta_\theta^T}
+%     \atzero
+% \qquad 
+% f_\eta := \frac{\partial^2
+%     \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
+%     \atzero.
+%     \label{eq:sensitivity_formulae}
+% \end{align}
+% where $KL(\eta_\theta, \epsilon)$ is the KL objective in Equation~\ref{eq:kl_objective}.
+% \end{itemize}
+
+\end{minipage}
+\hfill \vrule \hfill
+\begin{minipage}[t]{0.45\textwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECOND COLUMN 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \section*{Results}
-% \vspace{-0.3in}
+\vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\bf \large Sensitivity to $\alpha$. }
-We apply Equation \ref{eq:sensitivity_formulae} to approximate the dependence of the expected number of clusters to the DP prior parameter $\alpha$. We compare our approximation to the more expensive process of re-fitting the VB model.  
+We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$. We compare our approximation to the more expensive process of re-fitting the VB model.  
 %
 % \begin{align*}
 % f^\alpha_\eta := \frac{\partial^2
@@ -395,10 +429,10 @@ the original beta distribution $p_0$ for the stick-breaking proportions. The con
 \begin{align}
 \label{eq:expon_perturb}
 	p_c(\nu_k \vert \delta, \phi) :=
-  \frac{p_{0}(\nu_k)\phi(\nu_k)^\epsilon}
-       {\int_0^1 p_0(\nu_k')\phi(\nu')^\epsilon d\nu_k'}.
+  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
+       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align}
-We again apply Equation \ref{eq:sensitivity_formulae} to approximate the dependence of the posterior number of clusters to the choice of $\epsilon$. 
+We evaluate the dependence of the expected posterior number of clusters to the choice of $\delta$. 
 \begin{figure}
 \centering
 
@@ -412,39 +446,60 @@ We again apply Equation \ref{eq:sensitivity_formulae} to approximate the depende
 
 
 \end{knitrout}
-\caption{The effect of prior perturbation on the expected number of distinct clusters . Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\epsilon = 1$, in blue. Middle: linearly approximated vs.
+\caption{The effect of prior perturbation on the expected number of distinct clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\delta = 1$, in blue. Middle: linearly approximated vs.
 re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
 \end{figure}
 
-Because we have used a multiplicative perturbation, $f_\eta$
-is linear in $\epsilon$. We might expect this to improve the fidelity of a
-linear approximation. 
-
+% Because we have used a multiplicative perturbation, $f_\eta$
+% is linear in $\epsilon$. We might expect this to improve the fidelity of a
+% linear approximation. 
+\vspace{0.3in}
 \begin{mdframed}[style=MyFrame]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \vspace{-0.6in}
 \section*{Conclusion}
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{itemize}
 
 \item The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. 
 
 \item We applied the approximation to both parametric and functional perturbations to the stick-breaking prior.
 
-\item We attempted to improve the linearity by approximating only the dependence of the global parameters on the prior parameter, while retaining the non-linearity of the map from global parameter to posterior quantity. 
+\item We attempted to improve the linearity by approximating only the dependence of the global parameters on the prior parameter. We retained the non-linearity of the map from global parameters to posterior quantity. 
 
 \end{itemize}
 \end{mdframed}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+\vspace{0.9in}
+{\bf References}
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\section}[2]{}%
+\small{
+  \bibliographystyle{abbrv}
+  \bibliography{./references}
+}
+% 
+
+% \vspace{-0.5in}
 
 % \vspace{-0.5in}
 \end{minipage}\\
 
 \begin{center}
 \begin{minipage}[t]{\textwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%
 {\bf Acknowledgments}:
 % %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Ryan Giordano's research was funded in full by the
 Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
 {\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
