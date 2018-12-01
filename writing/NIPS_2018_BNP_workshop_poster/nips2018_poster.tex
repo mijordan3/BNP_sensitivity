@@ -1,4 +1,4 @@
-\documentclass[a0,plainsections]{sciposter}\usepackage[]{graphicx}\usepackage[]{color}
+\documentclass[a0,plainsections,30pt]{sciposter}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
 %% otherwise use linewidth (to make sure the graphics do not exceed the margin)
 \makeatletter
@@ -124,7 +124,7 @@ Tamara Broderick\textsuperscript{2} \\
  }
 
 \leftlogo[1]{images/logo_left.png}
-\rightlogo[1]{images/logo_right.png}
+\rightlogo[1]{images/logo_right2.png}
 
 % Set the color used for the section headings here
 \definecolor{SectionCol}{rgb}{0,.06,.5}
@@ -216,13 +216,20 @@ Tamara Broderick\textsuperscript{2} \\
 %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item We evaluate the {\bf local sensitivity} of posterior inferences in a {\bf Bayesian nonparametric model} when using a {\bf variational Bayes approximation}. 
 
-\item Specifically, we evaluate the sensitivity of the expected number of posterior to the stick-breaking prior's concentration parameter and functional form. 
-
-\item We use the linear approximation provided by local sensitivity measures to {\bf efficiently extrapolate posterior results} after changing prior specifications. 
-
-\item The linear approximation provides {\bf an alternative to the expensive process of refitting a VB model.}
+\item Data analysts are often interested to discover the number of
+clusters in a dataset. 
+\item Bayesian nonparametrics (BNP) allows discovery of cluster
+cardinality for a fixed dataset size. 
+\item Variational Bayes (VB) is a way to approximate the BNP posterior. 
+\item \textbf{Problem}: \textbf{how sensitive is the resulting
+VB approximation of cluster cardinality to BNP model choices}? Evaluating
+for multiple model choices would be expensive. 
+\item \textbf{We propose}: \textbf{a linear approximation} to efficiently
+estimate BNP sensitivity \textbf{from a single run of VB} (to avoid
+expensive refitting). 
+\item Namely, we evaluate sensitivity of cluster cardinality to the Dirichlet process
+stick-breaking parameter and functional form. 
 
 \end{itemize}
 \end{mdframed}
@@ -230,77 +237,85 @@ Tamara Broderick\textsuperscript{2} \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%
-\section*{Model}
+\section*{Model and inference }
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-We use a BNP model to infer the number of distinct species in the iris dataset \cite{iris_data_anderson}. 
+
+The \textbf{Dirichlet process} is a popular Bayesian nonparametric
+(BNP) model often used to model clusters. We wish to know if
+varying the stick-breaking proportion distribution $p_0 = \text{Beta}(1, \alpha)$ will substantively affect the inferred number of clusters.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width = 0.99\textwidth]{./images/BNP_graphical_model2.png}
-\vspace{-0.9in}
-\caption{(Left) The iris data projected onto the first two principal components. Color corresponds to the true iris species. (Right) The graphical model for the data. }
-
-% \caption{In the graphical model, $y_{n}$ are the features for iris $n$, and $z_n$ is the component (species) to which the iris belongs. For each component $k$, we model $y_n$ as drawn from a multivariate normal with mean $\mu_k$ and covariance $\Sigma_k$.
-% 
-% One the right, the features of the irises plotted along the first two principal components. Color corresponds to the true iris species. }
+\includegraphics[width = 0.95\textwidth]{./images/DP_stick_breaking.png}
+\caption{The Dirichlet stick-breaking process. We start with a stick of
+length 1, and recursively break off proportions of length $\nu_1$, $\nu_2$, $\nu_3$, ...}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
+
+%%% iris figure
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width = 0.7\textwidth]{./images/iris_data.png}
+% 
+% \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species. }
+% 
+% \setlength{\textfloatsep}{-10pt}
+% \end{figure}
+
 \vspace{-0.3in}
-{\bf Notation: }
+
+\textbf{Variational Bayes} (VB) is a popular posterior approximation
+algorithm, often used with the Dirichlet process. Some notation: 
 
 \begin{itemize}
-\item Random variables
-\begin{itemize}
-\item $z_n$: categorical variable indicating cluster belonging. 
-\item $\mu_k, \Sigma_k$: Gaussian mean and covariance of cluster $k$. 
-\item $\nu_k$: stick-breaking proportions. 
-\end{itemize}
-\item Variational parameters 
-\begin{itemize}
-\item $\eta_\theta$: the variational parameters for $\mu_k$, $\Sigma_k$, and $\nu_k$. $\theta$ is short-hand for $(\mu_k,\Sigma_k,\nu_k)$. 
+\item $\eta_\theta$: the variational parameters for the global parameters (the stick-breaking proportions, the cluster centroids, the cluster covariances). 
 \item $\eta_z$: the variational parameters for the categorical distributions on the 
-$z$'s. 
+cluster belongings $z$. 
 \end{itemize}
-\end{itemize}
 
-We let $q(z | \eta_z)$ be a categorical distribution, so we have a conditionally conjugate model. {\bf Hence, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.}
+Note that by choosing a conditionally conjugate model for the cluster belongings, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.
 
-Our objective is then 
-\vspace{-0.2in}
-\begin{align}
-\etathetaopt =
-\argmin_{\eta_\theta} KL\left(
-    q(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta) \big\| p(\theta, z | y)
-    \right)
-    \label{eq:kl_objective}
-\end{align}
+\begin{mdframed}[style=MyFrame]
+While VB is fast, refitting for multiple choices of the DP prior would be
+computationally prohibitive. {\bf Hence, propose a linear approximation, derived from local sensitity measures. }
+\end{mdframed}
 
-\vspace{-0.7in}
+% Our objective is then 
+% \vspace{-0.2in}
+% \begin{align}
+% \etathetaopt =
+% \argmin_{\eta_\theta} KL\left(
+%     q(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta) \big\| p(\theta, z | y)
+%     \right)
+%     \label{eq:kl_objective}
+% \end{align}
 
-%%%%%%%%%%%%%%%%%%
-\subsection*{Posterior expectations of interest: }
-\vspace{-0.3in}
-%%%%%%%%%%%%%%%%%%
-We consider two possible posterior quantities:
+% \vspace{-0.7in}
 
-\begin{enumerate}
-\item An {\bf in-sample quantity}, the expected number of clusters in the given iris dataset:
-\vspace{-0.3in}
-\begin{align}
-\Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]
-\label{eq:expected_num_clusters_thresh}
-\end{align}
-
-\item A {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge:
-\begin{align}
-\Expect_{q(\nu \vert \etathetaopt)} 
-\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right] 
-    \label{eq:expected_num_clusters_pred_thresh}
-\end{align}
-
-\end{enumerate}
+% %%%%%%%%%%%%%%%%%%
+% \subsection*{Posterior expectations of interest: }
+% \vspace{-0.3in}
+% %%%%%%%%%%%%%%%%%%
+% We consider two possible posterior quantities:
+% 
+% \begin{enumerate}
+% \item An {\bf in-sample quantity}, the expected number of clusters in the given iris dataset.
+% % \vspace{-0.3in}
+% % \begin{align}
+% % \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]
+% % \label{eq:expected_num_clusters_thresh}
+% % \end{align}
+% 
+% \item A {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge.
+% % \begin{align}
+% % \Expect_{q(\nu \vert \etathetaopt)} 
+% % \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right] 
+% %     \label{eq:expected_num_clusters_pred_thresh}
+% % \end{align}
+% 
+% \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -309,15 +324,16 @@ We consider two possible posterior quantities:
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{itemize}
 
-\item Let $\epsilon$ be a real-valued parameter for the stick-breaking distribution. 
+\item Let $\epsilon$ be a real-valued hyperparameter for the stick-breaking distribution
+(for example, this could be the $\alpha$ concentration parameter). 
 
 \item The VB parameters $(\eta_\theta, \eta_z)$ depend on the stick-breaking distribution through $\epsilon$. 
 
-\item We want to evaluate the the posterior quantities in Equations \ref{eq:expected_num_clusters_thresh} and \ref{eq:expected_num_clusters_pred_thresh} as $\epsilon$ varies. 
-
-\item The in-sample quantity (Equation \ref{eq:expected_num_clusters_thresh}) is a composition of the functions, 
+\item The expected number of clusters present in the {\itshape current} iris dataset is a composition of the functions, 
+\vspace{-0.1in}
 \begin{align}
 \epsilon \mapsto
 \etathetaopt(\epsilon) \mapsto
@@ -325,7 +341,9 @@ We consider two possible posterior quantities:
 \Expect_{q(z | \etazopt)} \left[ \#\{\text{distinct clusters}\} \right].
 \label{eq:maps_in_sample}
 \end{align}
-Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pred_thresh}): 
+\vspace{-0.1in}
+Similarly for the predictive quantity, the expected number of clusters present in a {\itshape new} dataset: 
+\vspace{-0.1in}
 \begin{align}
 \epsilon \mapsto
 \etathetaopt(\epsilon) \mapsto
@@ -337,13 +355,13 @@ Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pr
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\vspace{-0.7in}
+\vspace{-0.9in}
 \subsection*{Linear approximation}
 \vspace{-0.2in}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item WOLOG, let $\epsilon=0$ represent the original posterior, and approximate $\etathetaopt(\epsilon)$ as  
+\item WOLOG, let $\epsilon=0$ represent the original posterior, and we approximate
 \begin{align}
 \etathetaopt(\epsilon)  &\approx  \etathetaopt(0) + 
 \frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
@@ -352,8 +370,8 @@ Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pr
 
 \item Evaluation of the derivative can be done efficiently using formulas from \cite{giordano:2017:covariances} and auto-differentiation tools \cite{maclaurin:2015:autograd}.
 
-\item In contrast, exactly evaluating $\etathetaopt(\epsilon)$ involves re-optimizing the KL objective at a new posterior, which is computationally expensive. 
-
+\item In contrast, exactly evaluating $\etathetaopt(\epsilon)$ involves re-optimizing the KL objective at a new posterior, which is computationally expensive.
+% 
 \item We only use a linear approximation for the map $\epsilon \mapsto \etathetaopt(\epsilon)$. {We retain the non-linearities in the other maps of (\ref{eq:maps_in_sample}) and (\ref{eq:maps_predictive}). }
 
 % as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$ 
@@ -391,8 +409,8 @@ Similarly for the predictive quantity (Equation \ref{eq:expected_num_clusters_pr
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-{\bf \large Sensitivity to $\alpha$. }
-We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$. We compare our approximation to the more expensive process of re-fitting the VB model.  
+{\bf \large Sensitivity to $\alpha$.}
+We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$. 
 %
 % \begin{align*}
 % f^\alpha_\eta := \frac{\partial^2
@@ -425,14 +443,15 @@ The blue vertical line indicates the location of $\alpha_0$}
 
 {\bf \large Sensitivity to functional perturbations. }
 We consider a multiplicative perturbation $\phi$ to
-the original beta distribution $p_0$ for the stick-breaking proportions. The contaminated prior is given by 
+the original beta distribution $p_0$ for the stick-breaking proportions:
+\vspace{-0.2in}
 \begin{align}
 \label{eq:expon_perturb}
 	p_c(\nu_k \vert \delta, \phi) :=
   \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align}
-We evaluate the dependence of the expected posterior number of clusters to the choice of $\delta$. 
+We evaluate the effect of $\delta$:
 \begin{figure}
 \centering
 
@@ -453,7 +472,6 @@ re-fitted in-sample expected number of clusters. Right: linearly approximated vs
 % Because we have used a multiplicative perturbation, $f_\eta$
 % is linear in $\epsilon$. We might expect this to improve the fidelity of a
 % linear approximation. 
-\vspace{0.3in}
 \begin{mdframed}[style=MyFrame]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -476,25 +494,19 @@ re-fitted in-sample expected number of clusters. Right: linearly approximated vs
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
-\vspace{0.9in}
 {\bf References}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand{\section}[2]{}%
-\small{
+\footnotesize{
   \bibliographystyle{abbrv}
   \bibliography{./references}
 }
-% 
-
-% \vspace{-0.5in}
-
-% \vspace{-0.5in}
 \end{minipage}\\
 
 \begin{center}
 \begin{minipage}[t]{\textwidth}
-
+\small{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%
 {\bf Acknowledgments}:
@@ -503,6 +515,7 @@ re-fitted in-sample expected number of clusters. Right: linearly approximated vs
 Ryan Giordano's research was funded in full by the
 Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
 {\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
+}
 \end{minipage}
 \end{center}
 
