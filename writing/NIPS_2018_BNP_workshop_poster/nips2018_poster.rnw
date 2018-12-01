@@ -189,8 +189,7 @@ stick-breaking parameter and functional form.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The \textbf{Dirichlet process} is a popular Bayesian nonparametric
-(BNP) model often used to model clusters. We wish to know if
-varying the stick-breaking proportion distribution $p_0 = \text{Beta}(1, \alpha)$ will substantively affect the inferred number of clusters.
+(BNP) model often used to model clusters. 
 
 \begin{figure}[!h]
 \centering
@@ -224,7 +223,9 @@ cluster belongings $z$.
 Note that by choosing a conditionally conjugate model for the cluster belongings, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.
 
 \begin{mdframed}[style=MyFrame]
-While VB is fast, refitting for multiple choices of the DP prior would be
+- We wish to know how varying the stick-breaking proportion distribution $\nu_k \sim \text{Beta}(1, \alpha)$ will affect the inferred number of clusters. 
+
+- While VB is fast, refitting for multiple choices of the DP prior would be
 computationally prohibitive. {\bf Hence, propose a linear approximation, derived from local sensitity measures. }
 \end{mdframed}
 
@@ -274,7 +275,7 @@ computationally prohibitive. {\bf Hence, propose a linear approximation, derived
 \begin{itemize}
 
 \item Let $\epsilon$ be a real-valued hyperparameter for the stick-breaking distribution
-(for example, this could be the $\alpha$ concentration parameter). 
+(e.\ g.\ , this could be the $\alpha$ concentration parameter). 
 
 \item The VB parameters $(\eta_\theta, \eta_z)$ depend on $\epsilon$. 
 
@@ -353,9 +354,13 @@ Similarly for the predictive quantity, the expected number of clusters present i
 \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We infer the number of distinct species in the iris
+dataset \cite{iris_data_anderson}, and evaluate its sensitivity to the BNP prior.  
+\vspace{0.1in}
+
 {\bf \large Sensitivity to $\alpha$.}
 We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$. 
-%
+
 % \begin{align*}
 % f^\alpha_\eta := \frac{\partial^2
 %   \QExpect
@@ -394,6 +399,7 @@ the original beta distribution $p_0$ for the stick-breaking proportions:
        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align}
 We evaluate the effect of $\delta$:
+\vspace{0.1in}
 \begin{figure}
 \centering
 <<fig_cap2, cache=cache_knitr>>=
@@ -446,11 +452,11 @@ re-fitted in-sample expected number of clusters. Right: linearly approximated vs
 \small{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %%%%%%%%%%%%%%%%%%
-{\bf Acknowledgments}:
-% %%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ryan Giordano's research was funded in full by the
-Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
+% {\bf Acknowledgments}:
+% % %%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ryan Giordano's research was funded in full by the
+% Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
 {\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
 }
 \end{minipage}

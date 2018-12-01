@@ -13,7 +13,7 @@ prior_pert1_plot <-
   prior_pert1_df %>%
   gather(which_prior, p, -nu_k) %>%
   ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-  theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) +
+  theme(legend.position = c(0.85, 0.80), legend.title=element_blank()) +
   xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$")) + 
   scale_color_manual(values=c("red", "blue"))
 # prior_pert1_plot
@@ -27,7 +27,7 @@ colnames(prior_pert2_df) <- c('nu_k', 'p0', 'pc')
 prior_pert2_plot <-
   prior_pert2_df %>% gather(which_prior, p, -nu_k) %>%
   ggplot() + geom_line(aes(x = nu_k, y = p, color = which_prior)) +
-  theme(legend.position = c(0.75, 0.75), legend.title=element_blank()) +
+  theme(legend.position = 'None', legend.title=element_blank()) +
   xlab(TeX("$\\nu_k$")) + ylab(TeX("$p(\\nu_k)$")) + 
   scale_color_manual(values=c("red", "blue"))
 # prior_pert2_plot
@@ -45,19 +45,19 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 prior_pert1_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.75, 0.75), legend.title=element_blank())
+  theme(legend.position = c(0.65, 0.81), legend.title=element_blank())
 # prior_pert1_results_plot
 
 # plot results from second perturbation
 results_matrix_prior_pert2 <-
   read.csv('./data_for_figures/prior_pert2_enum_clust_results_thresh0.csv', header = FALSE)
 results_df_prior_pert2 <- as.data.frame(t(results_matrix_prior_pert2))
-colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
+colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'lin approx')
 
 prior_pert2_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.25, 0.75), legend.title=element_blank())
+  theme(legend.position = 'none', legend.title=element_blank())
 # prior_pert2_results_plot
 
 ##########################
@@ -73,7 +73,7 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 prior_pert1_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.75, 0.75), legend.title=element_blank())
+  theme(legend.position = 'None', legend.title=element_blank())
 # prior_pert1_pred_results_plot
 
 # plot results from second perturbation
@@ -81,22 +81,25 @@ results_matrix_prior_pert2 <-
   read.csv('./data_for_figures/prior_pert2_enum_clust_results_pred_thresh0.csv', 
            header = FALSE)
 results_df_prior_pert2 <- as.data.frame(t(results_matrix_prior_pert2))
-colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'linear approx')
+colnames(results_df_prior_pert2) <- c('alpha', 'refitted', 'lin approx')
 
 prior_pert2_pred_results_plot <-
   plot_parametric_sensitivity(
     results_df_prior_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.25, 0.75), legend.title=element_blank()) 
+  theme(legend.position = 'None', legend.title=element_blank()) 
 # prior_pert2_pred_results_plot
 
 
-
+set_font_sizes <- theme(plot.title = element_text(size = 20, face = "bold"), 
+                        axis.text=element_text(size=12),
+                        axis.title=element_text(size=18), 
+                        legend.text=element_text(size=15))
 grid.arrange(
-  prior_pert1_plot + ggtitle('Priors'), 
-  prior_pert1_results_plot + ggtitle('In-sample quantity'),
-  prior_pert1_pred_results_plot + ggtitle('Predictive quantity'),
-  prior_pert2_plot + ggtitle(' '), 
-  prior_pert2_results_plot + ggtitle(' '),
-  prior_pert2_pred_results_plot + ggtitle(' '),
+  prior_pert1_plot + ggtitle('Priors') + set_font_sizes, 
+  prior_pert1_results_plot + ggtitle('In-sample quantity') + set_font_sizes,
+  prior_pert1_pred_results_plot + ggtitle('Predictive quantity') + set_font_sizes,
+  prior_pert2_plot + set_font_sizes, 
+  prior_pert2_results_plot + set_font_sizes,
+  prior_pert2_pred_results_plot + set_font_sizes,
   ncol  = 3)
 
