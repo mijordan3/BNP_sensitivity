@@ -122,7 +122,7 @@ inferences on cluster cardinality to BNP model choices}?
 \section{The BNP Model}
 
 \begin{frame}{The BNP Model}
-We model the prior on the cluster memberships $z_n$ using a
+We model the prior on the cluster proportions $\pi$ using a
 a stick breaking representation of a BNP Dirichlet process prior.
 \vspace{-0.1in}
 \begin{figure}[!h]
@@ -185,6 +185,14 @@ We use take a mean-field variational distribution where the
 \item the cluster centroids $\mu_k$ and cluster covariances $\Sigma_k$ are point masses; 
 \item and the cluster belongings $z_n$ are categorical. 
 \end{itemize}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width = 0.6\textwidth]{./images/iris_vb_fit.png}
+\caption{The iris data projected onto the first two principal components. Overlayed are the fit from VB. }
+\setlength{\textfloatsep}{-10pt}
+\end{figure}
+
 \end{frame}
 
 % \begin{align*}
@@ -226,16 +234,16 @@ Our objective is then
 
 \begin{frame}{The Posterior Quantity of Interest}
 
-We are interested in discovering how many clusters are present. 
+We are interested in discovering how many iris species are present. 
 
 \pause
 We can ask: 
 \begin{enumerate}[(1)]
-\item Under a BNP model, how many distinct components exist in the world? 
+\item Under a BNP model, how many distinct species exist in the world? 
 \pause
-\item How many clusters would we expect to be present in a {\bf new} dataset of particular size?
+\item How many species would we expect to be present in a {\bf new} dataset of particular size?
 \pause
-\item How many clusters are present in the {\bf current} dataset?
+\item How many species are present in the {\bf current} dataset?
 \end{enumerate}
 
 \end{frame}
@@ -370,7 +378,10 @@ Suppose we wish to evaluate the sensitivity to the DP concentration parameter $\
 Let $\alpha_0$ be a base value of $\alpha$ at which we optimize for
 $\etaopt$. We can apply the previous formula by taking $\epsilon = \alpha - \alpha_0$, and setting 
 \begin{align*}
-f^\alpha_\eta := \frac{\partial^2
+f^\alpha_\eta &:= \frac{\partial^2
+      \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
+      \atzero.\\
+&= \frac{\partial^2
     \QExpect
         \left[ \log p\left(\nu \vert \alpha \right) \right]}
 { \partial \eta_\theta \partial \alpha^T }
@@ -408,10 +419,21 @@ the original beta distribution $p_0$ for the stick-breaking proportions:
        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align*}
 
-\pause 
+INSERT DIAGRAM HERE 
 
-For a fixed $\phi$, we can use our approximation by taking
-$\epsilon = \delta$ and
+\end{frame}
+
+\begin{frame}{Results: functional perturbation}
+With our multiplicative perturbation
+%
+\begin{align*}
+	p_c(\nu_k \vert \delta, \phi) :=
+  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
+       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
+\end{align*}
+
+We can use our approximation by taking
+$\epsilon = \delta$ and compute 
 %
 \begin{align*}
 f^{\delta,\phi}_\eta &:=
@@ -441,6 +463,22 @@ source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, 
 \caption{The effect of prior perturbation on the expected number of distinct clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\delta = 1$, in blue. Middle and right column: linearly approximated vs.
 re-fitted expected number of clusters}
 \end{figure}
+
+\end{frame}
+
+\section{Next Steps and Summary}
+
+\begin{frame}{Next Steps}
+
+\begin{itemize}
+
+\item Investigate other shapes of functional perturbations. What is the appropriate notion of size here?
+
+\item Investigate the sensitivity of other metrics for ``number of clusters." Also look at sensitivity of other posterior quantities, e.g.\ the cluster centroids or the covariances. 
+
+\item Investigate issues with multiple optima. Does extrapolating from more to less clusters actually give better performance?
+
+\end{itemize}
 
 \end{frame}
 
