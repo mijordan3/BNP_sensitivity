@@ -141,35 +141,54 @@ Bayesian Nonparametrics}
 
 We are interested in inferring the number of clusters in a dataset.
 
-\pause
-\begin{figure}[!h]
-\centering
-\includegraphics[width = 0.5\textwidth]{./images/iris_data.png}
-%\caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species. }
-\setlength{\textfloatsep}{-10pt}
-\end{figure}
+% \pause
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width = 0.5\textwidth]{./images/iris_data.png}
+% %\caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species. }
+% \setlength{\textfloatsep}{-10pt}
+% \end{figure}
+% \vspace{-0.2in}
 \pause
 
 A Bayesian nonparametric (BNP) model makes inferring the number of clusters amenable to
-Bayesian inference.
-
+Bayesian inference. The exact posterior is approximated using variational Bayes. 
 \pause
 
-\textbf{Question}: \textbf{how sensitive are the resulting
-inferences on cluster cardinality to BNP model choices}?
+\textbf{Problem}: how sensitive is the resulting
+VB approximation of cluster cardinality to BNP model choices? Evaluating
+for multiple model choices would be expensive. 
+
+\pause 
+
+\textbf{We propose}: a linear approximation to efficiently
+estimate BNP sensitivity from a single run of VB (to avoid
+expensive refitting). 
 
 \end{frame}
 
 \begin{frame}{Outline}
-   \tableofcontents
-\end{frame}
 
-\section{The BNP Model}
+{\bf The BNP Model} 
+\vspace{0.1in}
+
+{\bf The variational approximation}
+\vspace{0.1in}
+
+{\bf The posterior quantity of interest:} defining ``the number of clusters"
+\vspace{0.1in}
+
+{\bf Hyperparameter sensitivity:} our linear approximation for VB sensitivity
+\vspace{0.1in}
+
+{\bf Results:} sensitivity to both parametric and functional perturbations
+
+\end{frame}
 
 \begin{frame}{The BNP Model}
 We model the prior on the cluster proportions $\pi$ using a
-a stick breaking representation of a BNP Dirichlet process prior.
-\vspace{-0.1in}
+a stick breaking representation of a Dirichlet process prior.
+\vspace{-0.2in}
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./figures/DP_stick_breaking.png}
@@ -181,17 +200,12 @@ The prior on the cluster proportions $\pi_1, \pi_2, ..., $ are given by
 \nu_k \vert \alpha &\overset{\text{iid}}{\sim} \text{Beta}\left(1, \alpha \right)\quad k = 1, 2, ..., \infty \\
 \pi_k | \nu &:= \nu_k \prod_{j=1}^{k-1} (1 - \nu_j) \quad k = 1, 2, ..., \infty
 \end{align*}
-% The stick-breaking proportions are drawn from a beta distribution, and the weights are then defined :
-% \begin{align*}
-% \nu_k \vert \alpha \overset{\text{iid}}{\sim} \text{Beta}\left(1, \alpha \right) \quad k = 1, 2, ..., \infty
-% \end{align*}
-% The cluster proportions are defined:
-% \begin{align*}
-% \pi_k | \nu := \nu_k \prod_{j=1}^{k-1} (1 - \nu_j) \quad k = 1, 2, ..., \infty
-% \end{align*}
 %
-\vspace{-0.1in}\pause 
-%
+The cluster belongings $z$ are then drawn 
+$z_n\overset{\text{iid}}{\sim} \mathrm{Categorical}(\pi)$. 
+
+\pause 
+
 \begin{mdframed}[style=MyFrame]
 \begin{center}
 {\bf What makes this stick-breaking prior a reasonable one?}
@@ -200,142 +214,61 @@ The prior on the cluster proportions $\pi_1, \pi_2, ..., $ are given by
 
 \end{frame}
 
-\begin{frame}{The BNP Model}
-The cluster belongings are then drawn
-\begin{align*}
-  z_n \vert \pi \overset{\text{iid}}{\sim} \mathrm{Categorical}(\pi)
-  \quad n = 1, 2, ..., N
-\end{align*}
-%
-And the data $y_n$ are drawn,
-\begin{align*}
-	y_n | z_n, \mu, \Sigma \sim
-        \mathcal{N}\left(
-            y_n \Big\vert
-                \sum_{k=1}^\infty \mathbb{I}\{z_n = k\} \mu_k \;,
-              \; \sum_{k=1}^\infty \mathbb{I}\{z_n = k\} \Sigma_k\right),
-	\quad n = 1, ..., N.
-\end{align*}
-%
-With conjugate priors for $\mu$ and $\Sigma$.
-
-\end{frame}
-
-\section{The Variational Approximation}
-
-\begin{frame}{The Variational Approximation}
-We use take a mean-field variational distribution where the 
-\begin{itemize}
-\item stick-breaking proportions $\nu_k$ are logitnormal; 
-\item the cluster centroids $\mu_k$ and cluster covariances $\Sigma_k$ are point masses; 
-\item and the cluster belongings $z_n$ are categorical. 
-\end{itemize}
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width = 0.6\textwidth]{./images/iris_vb_fit.png}
-\caption{The iris data projected onto the first two principal components. Overlayed are the fit from VB. }
-\setlength{\textfloatsep}{-10pt}
-\end{figure}
-
-\end{frame}
-
-% \begin{align*}
-%   \mathcal{Q} := \Big\{ q:
-%   q(\nu, \mu, \Sigma, z) &=
-%   \left(\prod_{k=1}^{K}q\left(\nu_{k}\right)\delta\left(\mu_{k}\right)
-%       \delta\left(\Sigma_{k}\right)\right)
-%       \left(\prod_{n=1}^{N}q\left(z_{n}\right) \right)\textrm{, where } \\
-%   q\left(\nu_{k}\right) &= \mathrm{Lognormal}\left(\nu_k\right) \textrm{ and }
-%   q\left(z_n\right) = \mathrm{Categorical}\left(z_n\right)
-%   \Big\}.
-% \end{align*}
-
 \begin{frame}{The Variational Approximation}
 
-Define:
+We posit a class of mean-field distributions parameterized by a real vector $\eta$. 
 
-- $\eta_\theta$: the variational parameters for the global parameters
-(the stick-breaking proportions, the cluster centroids, the cluster covariances).
-
-- $\eta_z$: the variational parameters for the categorical distributions on the
-cluster belongings $z$.
-
-Note that by choosing a conditionally conjugate model for the cluster belongings,
-for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.
-
-\pause
-
-Our objective is then
+We solve
 \begin{align*}
-  \argmin_{\eta_\theta} KL\left(
-      q(\theta, z \vert \eta_\theta, \eta_z^*(\eta_\theta) \big\| p(\theta, z | y)
+  \eta^* = \argmin_{\eta} KL\left(
+      q(\theta \vert \eta \big\| p(\theta | y)
       \right)
 \end{align*}
 %
-{\bf All posterior quantities are then functions of $\eta_\theta$. }
+Note that 
+
+\begin{itemize}
+\item All posterior quantities are then functions of $\eta^*$
+\item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective. 
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}{The Posterior Quantity of Interest}
 
-We are interested in discovering how many iris species are present. 
-
-\pause
 We can ask: 
 \begin{enumerate}[(1)]
-\item Under a BNP model, how many distinct species exist in the world? 
+\item Under a BNP model, how many distinct components exist in the world? 
+\pause\par 
+- an infinite number of components  
+
+\item How many clusters would we expect to be present in a {\bf new} dataset of particular size?
+
 \pause
-\item How many species would we expect to be present in a {\bf new} dataset of particular size?
+
+\item How many clusters are present in the {\bf current} dataset?
 \pause
-\item How many species are present in the {\bf current} dataset?
+
 \end{enumerate}
-
-\end{frame}
-
-\begin{frame}{The Posterior Quantity of Interest}
-Question (2) asks for a {\bf predictive} quantity: 
+\vspace{0.2in}
+The quantities in (2) and (3) are functions of the optimal variational parameter $\eta^*$: 
+%
 \begin{align*}
-g_{pred}(\etathetaopt) &:=
-\Expect_{q(\nu \vert \etathetaopt)} \left[\#\{\text{clusters in new data set of size $N$}\} \right]  \\
-&=
-\Expect_{q(\nu \vert \etathetaopt)} \left[\sum_{k=1}^K \left(1 - (1 - \pi_k)^{N}\right)\right].
-% g_{t, pred}(\etathetaopt) &:=
-% \Expect_{q(\nu \vert \etathetaopt)} \left[\#\{\text{clusters in new data set with at least $t$ data points}\} \right]  \\
-% &=
-% \Expect_{q(\nu \vert \etathetaopt)} \left[\sum_{k=1}^K \left(1 - \sum_{i = 0}^t {n\choose i}
-% \pi_k^{i} (1 - \pi_k)^{n - i}\right)\right].
+\eta^* \mapsto
+\Expect_{q_{\eta^*}} \left[ \#\{\text{distinct clusters}\} \right]
+\quad \text{ or } \quad
+\eta^* \mapsto
+\Expect_{q_{\eta^*}} 
+\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
 \end{align*}
-%
-\pause 
-%
-Question (3) asks for an {\bf in-sample} quantity: 
-\begin{align*}
-g(\etathetaopt) &:=
-\Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]  \\
-&=
-\Expect_{q(z \vert \etazopt(\etathetaopt))} \left[
-    \sum_{k=1}^K \left(1 - \prod_{n=1}^N \mathbb{I}\{z_n \ne k\} \right)
-    \right]
-% g_t(\etathetaopt) &:=
-% \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{clusters with at least $t$ data points}\} \right]  \\
-% &=
-% \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[
-%     \sum_{k=1}^K \mathbb{I}\left\{\left(\sum_{n=1}^N \mathbb{I}\{z_n = k\} \right) \geq t \right\}\right].
-\end{align*}
-%
-\pause\vspace{-0.1in}
-%
+
 \begin{mdframed}[style=MyFrame]
-\begin{center}
-{\bf How do these quantities vary as the BNP prior varies? }
+\begin{center} 
+{\bf How do these quantities vary as the Dirichlet process prior varies?}
 \end{center}
 \end{mdframed}
 
 \end{frame}
-
-
-\section{Hyperparameter Sensitivity}
 
 \begin{frame}{Hyperparameter Sensitivity}
 
@@ -344,60 +277,25 @@ Let $\epsilon$ be a real-valued hyperparameter for the stick-breaking distributi
 
 \pause
 
-The expected number of clusters present in the {\itshape current} iris dataset is a composition of the functions,
-\begin{align*}
-  \epsilon \mapsto
-  \etathetaopt(\epsilon) \mapsto
-  \etazopt\left(\etathetaopt\right) \mapsto
-  \Expect_{q(z | \etazopt)} \left[ \#\{\text{distinct clusters}\} \right].
-\end{align*}
-
-\pause
-
-Similarly for the predictive quantity, the expected number of clusters present in a {\itshape new} dataset:
-\begin{align*}
-  \epsilon \mapsto
-  \etathetaopt(\epsilon) \mapsto
-  \Expect_{q(\nu \vert \etathetaopt)}
-  \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
-\end{align*}
-
-
-\end{frame}
-
-\begin{frame}{Hyperparameter Sensitivity}
-
-We approximate the dependence of $\etathetaopt$ on $\epsilon$ with a first-order
+{\bf Main idea: } We approximate the dependence of $\eta^*$ on $\epsilon$ with a first-order
 Taylor expansion:
 
 \begin{align*}
-  \etathetaopt(\epsilon)  &\approx  \etathetaopt(0) +
-  \frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
+  \eta^*(\epsilon)  &\approx  \eta^*(0) +
+  \frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
 \end{align*}
+
+\pause 
+
+Notes: 
+\begin{itemize}
+\item Evaluation of the derivative can be done efficiently using formulas from Giordano et al. 2018 and auto-differentiation tools (Maclaurin et al. 2015).
+ 
+\item We only use a linear approximation for the map $\epsilon \mapsto \eta^*(\epsilon)$. We retain nonlinearities in the map $\eta^* \mapsto
+\Expect_{q_{\eta^*}} \left[ \#\{\text{distinct clusters}\} \right]$
+
+\end{itemize}
 \end{frame}
-
-
-\begin{frame}{Hyperparameter Sensitivity}
-We compute the derivative following Giordano et al. 2018:
-\begin{align*}
-\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1}f_\eta
-\end{align*}
-where
-\begin{align*}
-  H &:= \frac{\partial^2 KL(\eta_\theta, \epsilon) }{
-      \partial \eta_\theta \partial \eta_\theta^T}
-      \atzero
-\\
-  f_\eta &:= \frac{\partial^2
-      \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
-      \atzero.
-\end{align*}
-
-These computations are done efficiently using automatic differentiation (Maclaurin et al. 2015). 
-
-\end{frame}
-
-\section{Results}
 
 \begin{frame}{Results}
 
@@ -416,25 +314,14 @@ We use BNP to infer the number of species in iris dataset (Anderson 1936).
 
 \begin{frame}{Results: parametric sensitivity}
 
-Suppose we wish to evaluate the sensitivity to the DP concentration parameter $\alpha$.
-
-\pause 
-
-Let $\alpha_0$ be a base value of $\alpha$ at which we optimize for
-$\etaopt$. We can apply the previous formula by taking $\epsilon = \alpha - \alpha_0$, and setting 
+Recall that the stick breaking proportions were drawn 
 \begin{align*}
-f^\alpha_\eta &:= \frac{\partial^2
-      \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
-      \atzero.\\
-&= \frac{\partial^2
-    \QExpect
-        \left[ \log p\left(\nu \vert \alpha \right) \right]}
-{ \partial \eta_\theta \partial \alpha^T }
-    \Big\rvert_{\eta_\theta = \etathetaopt, \alpha = \alpha_0},
+\nu_k \overset{\text{iid}}{\sim} \text{Beta}(1, \alpha)
 \end{align*}
 
-\end{frame}
+We first evaluate the sensitivity to the DP concentration parameter $\alpha$. 
 
+\end{frame}
 \begin{frame}{Results: parametric sensitivity}
 
 \begin{figure}
@@ -475,38 +362,16 @@ the original beta distribution $p_0$ for the stick-breaking proportions:
   \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
 \end{align*}
+\pause 
+In particular, suppose we wish to replace the original beta prior $p_0$ with another distribution $p_1$. Then we set $\phi(\nu_k) = \frac{p_1(\nu_k)}{p_0(\nu_k)}$ and take $\delta \rightarrow 1$. 
 
-INSERT DIAGRAM HERE 
-
-\end{frame}
-
-\begin{frame}{Results: functional perturbation}
-With our multiplicative perturbation
-%
-\begin{align*}
-	p_c(\nu_k \vert \delta, \phi) :=
-  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
-       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
-\end{align*}
-
-We can use our approximation by taking
-$\epsilon = \delta$ and compute 
-%
-\begin{align*}
-f^{\delta,\phi}_\eta &:=
-\frac{\partial^2
-    \QExpect \left[ \sum_{k=1}^K \log p_c(\nu_k \vert \delta, \phi) \right]}
-{\partial \eta_\theta \partial \delta}
-    \Big\rvert_{\eta_\theta = \etathetaopt, \delta = 0} \\
-    &=
-\frac{\partial
-    \QExpect \left[ \sum_{k=1}^K  \log\phi(\nu_k) \right]}
-{\partial \eta_\theta}
-    \Big\rvert_{\eta_\theta = \etathetaopt}.
-\end{align*}
+\begin{figure}[!h]
+\centering
+\includegraphics[width = 0.45\textwidth]{./images/functional_perturbation.png}
+\setlength{\textfloatsep}{-10pt}
+\end{figure}
 
 \end{frame}
-
 
 \begin{frame}{Results: functional perturbation}
 \begin{figure}
@@ -528,7 +393,6 @@ re-fitted expected number of clusters}
 
 \end{frame}
 
-\section{Next Steps and Summary}
 
 \begin{frame}{Next Steps}
 
@@ -569,20 +433,29 @@ re-fitted expected number of clusters}
 
 \begin{frame}
 
-Thank you!
+{\bf For more, see our paper: }\newline
+Runjing Liu, Ryan Giordano, Michael I. Jordan, Tamara Broderick. \newline
+“Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics.” \newline {\color{blue}\url{https://arxiv.org/pdf/1810.06587.pdf}}
 
-\end{frame}
+{\bf And our code: }\newline
+Paragami: library for sensitivity analysis in optimization problems \newline
+{\color{blue}\url{https://github.com/rgiordan/paragami}}
 
-\begin{frame}{References}
+Repo to BNP code
 
-\begin{itemize}
-\item E. Anderson. The species problem in iris. {\itshape Annals of the Missouri Botanical Garden}, 23(3):457–509, 1936.
+\vspace{0.2in}
 
-\item R. Giordano, T. Broderick, and M. I. Jordan. Covariances, robustness, and variational Bayes. {\itshape Journal of Machine Learning Research}, 19(51):1–49, 2018.
+\begin{scriptsize}
 
-\item D. Maclaurin, D. Duvenaud, and R. P. Adams. Autograd: Effortless gradients in numpy. {\itshape In International Conference on Machine Learning 2015 AutoML Workshop}, 2015.
+{\bf References}
 
-\end{itemize}
+E. Anderson. The species problem in iris. {\itshape Annals of the Missouri Botanical Garden}, 23(3):457–509, 1936.
+
+R. Giordano, T. Broderick, and M. I. Jordan. Covariances, robustness, and variational Bayes. {\itshape Journal of Machine Learning Research}, 19(51):1–49, 2018.
+
+D. Maclaurin, D. Duvenaud, and R. P. Adams. Autograd: Effortless gradients in numpy. {\itshape In International Conference on Machine Learning 2015 AutoML Workshop}, 2015.
+
+\end{scriptsize}
 
 \end{frame}
 
