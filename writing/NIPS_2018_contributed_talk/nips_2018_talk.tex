@@ -169,16 +169,16 @@ expensive refitting).
 
 \begin{frame}{Outline}
 
-{\bf The BNP Model} 
+{\bf The BNP Model}
 \vspace{0.1in}
 
-{\bf The variational approximation}
+{\bf The Variational Approximation}
 \vspace{0.1in}
 
-{\bf The posterior quantity of interest:} defining ``the number of clusters"
+{\bf The Posterior Quantity of Interest:} defining ``the number of clusters"
 \vspace{0.1in}
 
-{\bf Hyperparameter sensitivity:} our linear approximation for VB sensitivity
+{\bf Hyperparameter Sensitivity:} our linear approximation for VB sensitivity
 \vspace{0.1in}
 
 {\bf Results:} sensitivity to both parametric and functional perturbations
@@ -186,7 +186,7 @@ expensive refitting).
 \end{frame}
 
 \begin{frame}{The BNP Model}
-We model the prior on the cluster proportions $\pi$ using a
+We model the prior on the component proportions $\pi$ using a
 a stick breaking representation of a Dirichlet process prior.
 \vspace{-0.2in}
 \begin{figure}[!h]
@@ -194,7 +194,7 @@ a stick breaking representation of a Dirichlet process prior.
 \includegraphics[width = 0.95\textwidth]{./figures/DP_stick_breaking.png}
 \end{figure}
 \vspace{-0.1in}
-The prior on the cluster proportions $\pi_1, \pi_2, ..., $ are given by
+The prior on the component proportions $\pi_1, \pi_2, ..., $ are given by
 %
 \begin{align*}
 \nu_k \vert \alpha &\overset{\text{iid}}{\sim} \text{Beta}\left(1, \alpha \right)\quad k = 1, 2, ..., \infty \\
@@ -228,19 +228,22 @@ We solve
 Note that 
 
 \begin{itemize}
-\item All posterior quantities are then functions of $\eta^*$
 \item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective. 
+
+\item All posterior quantities are then functions of $\eta^*$
+
 \end{itemize}
 
 \end{frame}
 
-\begin{frame}{The Posterior Quantity of Interest}
+\begin{frame}{The Posterior Quantity of Interest: number of clusters}
 
 We can ask: 
 \begin{enumerate}[(1)]
-\item Under a BNP model, how many distinct components exist in the world? 
+\item Under our BNP model, how many distinct components exist in the world? 
 \pause\par 
 - an infinite number of components  
+\pause 
 
 \item How many clusters would we expect to be present in a {\bf new} dataset of particular size?
 
@@ -412,7 +415,7 @@ re-fitted expected number of clusters}
 
 \begin{itemize}
 
-\item The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. 
+\item {\bf The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. }
 
 \pause 
 
@@ -424,7 +427,7 @@ re-fitted expected number of clusters}
 
 \pause 
 
-\item Furthermore, we approximated only the dependence of the global parameters on the prior parameter. We retained the non-linearity of the map from global parameters to posterior quantity.
+\item Furthermore, we approximated only the dependence of the optimal variational parameters on the prior parameter. We retained the non-linearity of the map from the optimal variational parameters to posterior quantity.
 
 \end{itemize}
 
