@@ -1,0 +1,2147 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Basic Model and Definitions
+\end_layout
+
+\begin_layout Standard
+Each population is represented by a set of 
+\begin_inset Formula $L$
+\end_inset
+
+ probabilities:
+\begin_inset Formula 
+\begin{eqnarray*}
+P_{k} & = & \left\{ p_{1k},...,p_{Lk}\right\} \\
+k & \in & 1...K\\
+K & = & \textrm{number of populations}\\
+L & = & \textrm{number of loci}\\
+P_{ki} & \sim & Beta\left(a_{ki},b_{ki}\right)\\
+\log f\left(P_{ki}\right) & = & a_{ki}\log P_{ki}+b_{ki}\log\left(1-P_{ki}\right)\\
+a_{ki} & = & b_{ki}=1\textrm{ (this is the paper's "simple prior")}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Alternatively, the paper has a 
+\begin_inset Quotes eld
+\end_inset
+
+logistic normal prior
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P_{lk} & = & \frac{1}{1+\exp\left(-R_{lk}\right)}\\
+R_{lk} & = & \log\left(\frac{P_{lk}}{1-P_{lk}}\right)\\
+f\left(R_{lk}\right) & = & \mathcal{N}\left(\mu_{l},\lambda_{k}\right)\\
+\log f\left(R_{lk}\right) & = & -\frac{\left(R_{lk}-\mu_{l}\right)^{2}}{2\lambda_{k}}\\
+\log f\left(P_{lk}\right) & = & -\frac{1}{2\lambda_{k}}\left(\log\left(\frac{P_{lk}}{1-P_{lk}}\right)-\mu_{l}\right)^{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each individual is a mix of populations:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+Q_{n} & = & \left\{ Q_{n1},...,Q_{nK}\right\} \\
+\sum_{i=1}^{K}Q_{ni} & = & 1\\
+n & \in & 1...N\\
+N & = & \textrm{Number of observed individuals}\\
+Q_{n} & \sim & Dirichlet(\alpha)\\
+\log P\left(Q_{n}\right) & = & \sum_{k=1}^{K}\alpha_{k}\log Q_{nk}\\
+\alpha_{k} & = & \frac{1}{K}\textrm{ (this is assumed by the paper)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The allele at each locus has exactly two variants, 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ The genotype is whether the locus has two 
+\begin_inset Formula $a$
+\end_inset
+
+ variants, two 
+\begin_inset Formula $b$
+\end_inset
+
+ variants, or one of each.
+ There is no ordering to the alleles.
+ Each locus has a latent population and a genotype.
+ The latent populations are indicated by the 
+\begin_inset Formula $k-$
+\end_inset
+
+dimensional binary vectors 
+\begin_inset Formula $Z_{nl}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $Z_{nl}^{b}$
+\end_inset
+
+, where 
+\begin_inset Formula 
+\begin{eqnarray*}
+Z_{nlk}^{i} & = & \begin{cases}
+1 & \textrm{ if allele }a\textrm{ at location }l\textrm{ came from population }k\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When the genotype is 
+\begin_inset Formula $aa$
+\end_inset
+
+ or 
+\begin_inset Formula $bb$
+\end_inset
+
+, 
+\begin_inset Formula $Z_{nk}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $Z_{nk}^{b}$
+\end_inset
+
+ are exchangeable, but when there is one 
+\begin_inset Formula $a$
+\end_inset
+
+ and one 
+\begin_inset Formula $b$
+\end_inset
+
+ type, then 
+\begin_inset Formula $Z_{nl}^{a}$
+\end_inset
+
+ denotes the population of the 
+\begin_inset Formula $a$
+\end_inset
+
+ allele, and 
+\begin_inset Formula $Z_{nl}^{b}$
+\end_inset
+
+ denotes the population of the 
+\begin_inset Formula $b$
+\end_inset
+
+ allele.
+ The populations are chosen independently given 
+\begin_inset Formula $Q_{n}$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray*}
+Z_{nl}^{a}|Q_{n} & \sim & Multinoulli(Q_{n})\\
+Z_{nl}^{b}|Q_{n} & \sim & Multinoulli(Q_{n})\\
+\sum_{k=1}^{K}Z_{nlk}^{a}=\sum_{k=1}^{K}Z_{nlk}^{b} & = & 1\\
+\log P\left(Z_{nl}^{a},Z_{nl}^{b}|Q_{n}\right) & = & \sum_{k=1}^{K}\left(Z_{nlk}^{a}+Z_{nlk}^{b}\right)\log Q_{nk}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given that at locus 
+\begin_inset Formula $l$
+\end_inset
+
+ the latent populations are 
+\begin_inset Formula $k$
+\end_inset
+
+ and 
+\begin_inset Formula $k'$
+\end_inset
+
+, the genotypes are drawn independently from their population.
+ The genotype is a number in 
+\begin_inset Formula $\left\{ 0,1,2\right\} $
+\end_inset
+
+, which is the count of the 
+\begin_inset Formula $a$
+\end_inset
+
+ allele at locus 
+\begin_inset Formula $l$
+\end_inset
+
+ in individual 
+\begin_inset Formula $n$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{eqnarray*}
+bb & \rightarrow & G_{nl}=0\\
+ab\textrm{ or }ba & \rightarrow & G_{nl}=1\\
+aa & \rightarrow & G_{nl}=2\\
+G_{nlg} & = & 1\left(G_{nl}=g\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given this, we can write out the conditional log probability of an observed
+ genotype.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\log P\left(G_{nl0},G_{nl1},G_{nl2}|Z_{nl}^{a},Z_{nl}^{b},P_{k},P_{k'}\right) & = & G_{nl0}\sum_{k=1}^{K}\log\left(1-P_{lk}\right)\left(Z_{nlk}^{a}+Z_{nlk}^{b}\right)+\\
+ &  & G_{nl1}\left(\sum_{k=1}^{K}\log\left(P_{lk}\right)Z_{nlk}^{a}+\sum_{k=1}^{K}\log\left(1-P_{lk}\right)Z_{nlk}^{b}\right)+\\
+ &  & G_{nl2}\sum_{k=1}^{K}\sum_{k'=1}^{K}\log\left(P_{lk}\right)\left(Z_{nlk}^{a}+Z_{nlk'}^{b}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Combining these, the log likelihood is given by
+\begin_inset Formula 
+\begin{eqnarray*}
+\log f\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b}\vert G_{n}\right) & = & \sum_{k=1}^{K}\sum_{l=1}^{L}\left(a_{kl}\log P_{lk}+b_{kl}\log\left(1-P_{lk}\right)\right)\textrm{ (prior on allele frequencies)}+\\
+ &  & \sum_{n=1}^{N}\sum_{k=1}^{K}\alpha_{k}\log Q_{nk}\textrm{ (individuals' populations)}+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(Z_{nlk}^{a}+Z_{nlk}^{b}\right)\log Q_{nk}\textrm{ (loci latent populations)}+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(G_{nl0}\log\left(1-P_{lk}\right)+\left(G_{nl1}+G_{nl2}\right)\log\left(P_{lk}\right)\right)Z_{nlk}^{a}+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(\left(G_{nl0}+G_{nl1}\right)\log\left(1-P_{lk}\right)+G_{nl2}\log\left(P_{lk}\right)\right)Z_{nlk}^{b}+\\
+ &  & \textrm{constant}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Variational Distributions
+\end_layout
+
+\begin_layout Standard
+Each 
+\begin_inset Formula $Q_{n}$
+\end_inset
+
+, 
+\begin_inset Formula $P_{l}$
+\end_inset
+
+, and 
+\begin_inset Formula $Z_{nl}$
+\end_inset
+
+ gets its own independent variational distribution.
+ By inspection, these distributions will be in the exponential family, given
+ by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\log q\left(Z_{nl}^{a}\right) & = & \sum_{k=1}^{K}\eta_{k}^{Z_{nl}^{a}}Z_{nlk}^{a}+\textrm{constant}\textrm{ (Categorical)}\\
+\log q\left(Z_{nl}^{b}\right) & = & \sum_{k=1}^{K}\eta_{k}^{Z_{nl}^{a}}Z_{nlk}^{a}+\textrm{constant}\textrm{ (Categorical)}\\
+\log q\left(Q_{n}\right) & = & \sum_{k=1}^{K}\eta_{k}^{Q_{n}}\log Q_{nk}+\textrm{constant}\textrm{ (Dirichlet)}\\
+\log q\left(P_{lk}\right) & = & \eta_{a}^{P_{n}^{a}}\log P_{lk}+\eta_{a}^{P_{n}^{b}}\log\left(1-P_{lk}\right)+\textrm{constant}\textrm{ (Beta)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So the sufficient statistics are
+\begin_inset Formula 
+\begin{eqnarray*}
+\theta & = & \left(...,Z_{nlk}^{a},Z_{nlk}^{b},\log Q_{nk},\log\left(P_{lk}\right),\log\left(1-P_{lk}\right),...\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for all 
+\begin_inset Formula $1\le n\le N$
+\end_inset
+
+, 
+\begin_inset Formula $1\le l\le L$
+\end_inset
+
+, and 
+\begin_inset Formula $1\le k\le K$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Section
+LRVB derivations
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\mbe}{\mathbb{E}}
+{\mathbb{E}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\mbi}{\mathbb{I}}
+{\mathbb{I}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The expected log likelihood is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\log f\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b}\vert G_{n}\right) & = & \textrm{Priors }+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(\mbe\left[Z_{nlk}^{a}\right]+\mbe\left[Z_{nlk}^{b}\right]\right)\mbe\left[\log Q_{nk}\right]\textrm{ (loci latent populations)}+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(G_{nl0}\mbe\left[\log\left(1-P_{lk}\right)\right]+\left(G_{nl1}+G_{nl2}\right)\mbe\left[\log\left(P_{lk}\right)\right]\right)\mbe\left[Z_{nlk}^{a}\right]+\\
+ &  & \sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(\left(G_{nl0}+G_{nl1}\right)\mbe\left[\log\left(1-P_{lk}\right)\right]+G_{nl2}\mbe\left[\log\left(P_{lk}\right)\right]\right)\mbe\left[Z_{nlk}^{b}\right]+\\
+ &  & \textrm{constant}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is evident that only the cross-terms with 
+\begin_inset Formula $\mbe\left[Z\right]$
+\end_inset
+
+ are non-zero in the Hessian, and that
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{z^{a}\log q} & = & H_{z^{b}\log q}=\mbi\left(n_{z}=n_{q}\right)\mbi\left(k_{z}=k_{q}\right)\\
+H_{z^{a}\log p} & = & \mbi\left(l_{z}=l_{p}\right)\mbi\left(k_{z}=k_{p}\right)\left(G_{nl1}+G_{nl2}\right)\\
+H_{z^{b}\log p} & = & \mbi\left(l_{z}=l_{p}\right)\mbi\left(k_{z}=k_{p}\right)G_{nl2}\\
+H_{z^{a}\log\left(1-p\right)} & = & \mbi\left(l_{z}=l_{p}\right)\mbi\left(k_{z}=k_{p}\right)G_{nl2}\\
+H_{z^{b}\log\left(1-p\right)} & = & \mbi\left(l_{z}=l_{p}\right)\mbi\left(k_{z}=k_{p}\right)\left(G_{nl0}+G_{nl1}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the formula from the paper,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\hat{\Sigma}_{\alpha} & = & \left(I_{\alpha}-V_{\alpha}H_{\alpha}-V_{\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{z}\right)^{-1}V_{z}H_{z\alpha}\right)^{-1}V_{\alpha}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which in this case simplifies to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\hat{\Sigma}_{\alpha} & = & \left(I_{\alpha}-V_{\alpha}H_{\alpha z}V_{z}H_{z\alpha}\right)^{-1}V_{\alpha}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Imagine adding a little bit of weight, 
+\begin_inset Formula $\delta$
+\end_inset
+
+ to a single individual 
+\begin_inset Formula $n_{i}$
+\end_inset
+
+.
+ The perturbed log likelihood would be
+\begin_inset Formula 
+\begin{eqnarray*}
+\log f\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b}\vert G_{n}\right) & = & \log f\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b}\vert G_{n}\right)+\delta g\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b}\vert G_{n}\right)\\
+g & = & \sum_{l=1}^{L}\sum_{k=1}^{K}\left(G_{n_{i}l0}\mbe\left[\log\left(1-P_{lk}\right)\right]+\left(G_{n_{i}l1}+G_{n_{i}l2}\right)\mbe\left[\log\left(P_{lk}\right)\right]\right)\mbe\left[Z_{n_{i}lk}^{a}\right]+\\
+ &  & \sum_{l=1}^{L}\sum_{k=1}^{K}\left(\left(G_{n_{i}l0}+G_{n_{i}l1}\right)\mbe\left[\log\left(1-P_{lk}\right)\right]+G_{n_{i}l2}\mbe\left[\log\left(P_{lk}\right)\right]\right)\mbe\left[Z_{n_{i}lk}^{b}\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial^{2}}{\partial\delta\partial m}\mbe_{q}\left[\delta g\right] & = & \nabla_{m}\mbe_{q}\left[g\right]\\
+\frac{\partial}{\partial\mbe\left[\log\left(P_{lk}\right)\right]}\mbe_{q}\left[g\right] & = & \left(G_{n_{i}l1}+G_{n_{i}l2}\right)\mbe\left[Z_{n_{i}lk}^{a}\right]+G_{n_{i}l2}\mbe\left[Z_{n_{i}lk}^{b}\right]\\
+\frac{\partial}{\partial\mbe\left[\log\left(1-P_{lk}\right)\right]}\mbe_{q}\left[g\right] & = & G_{n_{i}l0}\mbe\left[Z_{n_{i}lk}^{a}\right]+\left(G_{n_{i}l0}+G_{n_{i}l1}\right)\mbe\left[Z_{n_{i}lk}^{b}\right]\\
+\frac{\partial}{\partial\mbe\left[Z_{n_{i}lk}^{a}\right]}\mbe_{q}\left[g\right] & = & G_{n_{i}l0}\mbe\left[\log\left(1-P_{lk}\right)\right]+\left(G_{n_{i}l1}+G_{n_{i}l2}\right)\mbe\left[\log\left(P_{lk}\right)\right]\\
+\frac{\partial}{\partial\mbe\left[Z_{n_{i}lk}^{b}\right]}\mbe_{q}\left[g\right] & = & \left(G_{n_{i}l0}+G_{n_{i}l1}\right)\mbe\left[\log\left(1-P_{lk}\right)\right]+G_{n_{i}l2}\mbe\left[\log\left(P_{lk}\right)\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We have
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{dm}{d\delta} & = & \left(\begin{array}{cc}
+\hat{\Sigma}_{\alpha\alpha} & \hat{\Sigma}_{\alpha z}\\
+\hat{\Sigma}_{z\alpha} & \hat{\Sigma}_{zz}
+\end{array}\right)\left(\begin{array}{c}
+g_{\alpha}\\
+g_{z}
+\end{array}\right)=\left(\begin{array}{c}
+\hat{\Sigma}_{\alpha\alpha}g_{\alpha}+\hat{\Sigma}_{\alpha z}g_{z}\\
+\hat{\Sigma}_{z\alpha}g_{\alpha}+\hat{\Sigma}_{zz}g_{z}
+\end{array}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To get the sensitivity of a particular parameter (e.g.
+ 
+\begin_inset Formula $\mbe_{q}\left[\log q_{n_{j}k}\right]$
+\end_inset
+
+), we only need an inner product with 
+\begin_inset Formula $g_{m}$
+\end_inset
+
+, but we also need the whole row of 
+\begin_inset Formula $\hat{\Sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Um
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+\hat{\Sigma}_{\alpha\alpha} & \hat{\Sigma}_{\alpha z}\\
+\hat{\Sigma}_{z\alpha} & \hat{\Sigma}_{zz}
+\end{array}\right) & = & \left(\begin{array}{cc}
+I_{\alpha}-V_{\alpha}H_{\alpha\alpha} & -V_{\alpha}H_{\alpha z}\\
+-V_{z}H_{z\alpha} & I_{z}-V_{z}H_{zz}
+\end{array}\right)^{-1}\left(\begin{array}{cc}
+V_{\alpha} & 0\\
+0 & V_{z}
+\end{array}\right)\\
+ & =: & \left(\begin{array}{cc}
+Q_{\alpha\alpha} & Q_{\alpha z}\\
+Q_{z\alpha} & Q_{zz}
+\end{array}\right)\left(\begin{array}{cc}
+V_{\alpha} & 0\\
+0 & V_{z}
+\end{array}\right)\\
+ & = & \left(\begin{array}{cc}
+Q_{\alpha\alpha}V_{\alpha} & Q_{\alpha z}V_{z}\\
+Q_{z\alpha}V_{\alpha} & Q_{zz}V_{z}
+\end{array}\right)\\
+Q_{\alpha\alpha}^{-1} & = & I_{\alpha}-V_{\alpha}H_{\alpha\alpha}-V_{\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{zz}\right)^{-1}V_{z}H_{z\alpha}\\
+\hat{\Sigma}_{\alpha\alpha} & = & Q_{\alpha\alpha}V_{\alpha}\\
+Q_{\alpha z} & = & Q_{\alpha\alpha}V_{\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{zz}\right)^{-1}\\
+\hat{\Sigma}_{\alpha z} & = & Q_{\alpha\alpha}V_{\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{zz}\right)^{-1}V_{z}\\
+ & = & \hat{\Sigma}_{\alpha\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{zz}\right)^{-1}V_{z}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In our case, this simplifies to
+\begin_inset Formula 
+\begin{eqnarray*}
+Q_{\alpha\alpha}^{-1} & = & I_{\alpha}-V_{\alpha}H_{\alpha z}V_{z}H_{z\alpha}\\
+\hat{\Sigma}_{\alpha z} & = & \hat{\Sigma}_{\alpha\alpha}H_{\alpha z}V_{z}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the variational distribution, 
+\begin_inset Formula $Z_{nl\left(\cdot\right)}^{a}$
+\end_inset
+
+ are correlated and 
+\begin_inset Formula $Z_{nl\left(\cdot\right)}^{b}$
+\end_inset
+
+ are correlated.
+ All other elements of 
+\begin_inset Formula $V_{z}$
+\end_inset
+
+ are zero.
+ Now,
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{\alpha z}V_{z} & = & \left[\begin{array}{c}
+H_{\alpha z_{n_{1}l_{1}}^{a}}\\
+H_{\alpha z_{n_{1}l_{2}}^{a}}\\
+\vdots\\
+H_{\alpha z_{n_{N}l_{L}}^{a}}\\
+\begin{array}{c}
+H_{\alpha z_{n_{1}l_{1}}^{b}}\\
+H_{\alpha z_{n_{1}l_{2}}^{b}}\\
+\vdots\\
+H_{\alpha z_{n_{N}l_{L}}^{b}}
+\end{array}
+\end{array}\right]\left[\begin{array}{cccc}
+V_{z_{n_{1}l_{1}}^{a}} & 0 & 0 & 0\\
+0 & V_{z_{n_{1}l_{2}}^{a}}\\
+0 &  & \ddots\\
+0 &  &  & V_{z_{n_{N}l_{L}}^{b}}
+\end{array}\right]\\
+ & = & \left[\begin{array}{cccccc}
+H_{\alpha z_{n_{1}l_{1}}^{a}} & \cdots & H_{\alpha z_{n_{N}l_{L}}^{a}} & H_{\alpha z_{n_{1}l_{1}}^{b}} & \cdots & H_{\alpha z_{n_{N}l_{L}}^{b}}\end{array}\right]\left[\begin{array}{ccc}
+V_{z_{n_{1}l_{1}}^{a}} & 0\\
+0 & \ddots\\
+ &  & V_{z_{n_{N}l_{L}}^{b}}
+\end{array}\right]\\
+ & = & \left[\begin{array}{ccccc}
+H_{\alpha z_{n_{1}l_{1}}^{a}}V_{z_{n_{1}l_{1}}^{a}} & \cdots & H_{\alpha z_{n_{N}l_{L}}^{a}}V_{z_{n_{N}l_{L}}^{a}} & H_{\alpha z_{n_{1}l_{1}}^{b}}V_{z_{n_{1}l_{1}}^{b}} & \cdots\end{array}\right]\\
+H_{\alpha z}V_{z}H_{z\alpha} & = & \left[\begin{array}{ccccc}
+H_{\alpha z_{n_{1}l_{1}}^{a}}V_{z_{n_{1}l_{1}}^{a}} & \cdots & H_{\alpha z_{n_{N}l_{L}}^{a}}V_{z_{n_{N}l_{L}}^{a}} & H_{\alpha z_{n_{1}l_{1}}^{b}}V_{z_{n_{1}l_{1}}^{b}} & \cdots\end{array}\right]\left[\begin{array}{c}
+H_{z_{n_{1}l_{1}}^{a}\alpha}\\
+\vdots\\
+\begin{array}{c}
+H_{z_{n_{N}l_{L}}^{b}\alpha}\end{array}
+\end{array}\right]\\
+ & = & \sum_{n,l}\left(H_{\alpha z_{nl}^{a}}V_{z_{nl}^{a}}H_{z_{nl}^{a}\alpha}+H_{\alpha z_{nl}^{b}}V_{z_{nl}^{b}}H_{z_{nl}^{b}\alpha}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly,
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{\alpha z}V_{z}g_{z} & = & \sum_{n,l}\left(H_{\alpha z_{nl}^{a}}V_{z_{nl}^{a}}g_{z_{nl}^{a}}+H_{\alpha z_{nl}^{b}}V_{z_{nl}^{b}}g_{z_{nl}^{b}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From these formulas, you can see that all we need is the ability to calculate
+ 
+\begin_inset Formula $H_{\alpha z_{nl}^{*}}$
+\end_inset
+
+ and 
+\begin_inset Formula $V_{z_{nl}^{*}}$
+\end_inset
+
+ for one 
+\begin_inset Formula $n,l$
+\end_inset
+
+ pair at a time and accumulate the results.
+\end_layout
+
+\begin_layout Standard
+Putting this together,
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{dm_{\alpha}}{dw} & = & \hat{\Sigma}_{\alpha\alpha}g_{\alpha}+\hat{\Sigma}_{\alpha z}g_{z}\\
+ & = & Q_{\alpha\alpha}^{-1}V_{\alpha}g_{\alpha}+Q_{\alpha\alpha}^{-1}V_{\alpha}H_{\alpha z}V_{z}g_{z}\\
+ & = & Q_{\alpha\alpha}^{-1}V_{\alpha}\left(g_{\alpha}+H_{\alpha z}V_{z}g_{z}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+fastStructure version of the log likelihood.
+\end_layout
+
+\begin_layout Standard
+The fastStructure code casts things a little differently.
+ As the expected log likelihood is a sum of terms over 
+\begin_inset Formula $N$
+\end_inset
+
+ and 
+\begin_inset Formula $L$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\xi_{k}^{a} & := & \exp\left(\mbe\left[\log\left(P_{lk}\right)\right]+\mbe\left[\log Q_{nk}\right]\right)\\
+\xi_{k}^{b} & := & \exp\left(\mbe\left[\log\left(1-P_{lk}\right)\right]+\mbe\left[\log Q_{nk}\right]\right)\\
+\textrm{if }g=2:\mbe\left[Z_{nlk}^{a}\right]=\mbe\left[Z_{nlk}^{b}\right] & = & \xi_{k}^{a}/\sum_{k'}\xi_{k'}^{a}\\
+\textrm{if }g=0:\mbe\left[Z_{nlk}^{a}\right]=\mbe\left[Z_{nlk}^{b}\right] & = & \xi_{k}^{b}/\sum_{k'}\xi_{k'}^{b}\\
+\textrm{if }g=1: &  & \textrm{they take their respective terms}\\
+\textrm{if }g=2:L_{nl} & = & 2\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\left(\mbe\left[\log Q_{nk}\right]+\mbe\left[\log\left(P_{lk}\right)\right]\right)\\
+ & = & 2\sum_{k}\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\log\xi_{k}^{a}=2\frac{\sum_{k}\xi_{k}^{a}\log\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\\
+\textrm{if }g=0:L_{nl} & = & 2\frac{\sum_{k}\xi_{k}^{b}\log\xi_{k}^{b}}{\sum_{k'}\xi_{k'}^{b}}\\
+\textrm{if }g=1:L_{nl} & = & \sum_{k}\left(\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}+\frac{\xi_{k}^{b}}{\sum_{k'}\xi_{k'}^{b}}\right)\mbe\left[\log Q_{nk}\right]+\\
+ &  & \sum_{k}\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\mbe\left[\log\left(P_{lk}\right)\right]+\sum_{k}\frac{\xi_{k}^{b}}{\sum_{k'}\xi_{k'}^{b}}\mbe\left[\log\left(1-P_{lk}\right)\right]\\
+ & = & \frac{\sum_{k}\xi_{k}^{a}\log\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}+\frac{\sum_{k}\xi_{k}^{b}\log\xi_{k}^{b}}{\sum_{k'}\xi_{k'}^{b}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This still doesn't look like what they have.
+ Dig that the 
+\begin_inset Formula $Z$
+\end_inset
+
+ entropy if 
+\begin_inset Formula $g\ne0$
+\end_inset
+
+, is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+S\left(Z_{nl}^{a}\right) & = & -\sum_{k}\mbe\left[Z_{nl}^{a}\right]\log\left(\mbe\left[Z_{nl}^{a}\right]\right)\\
+ & = & -\sum_{k}\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\log\left(\frac{\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}\right)\\
+ & = & -\frac{\sum_{k}\xi_{k}^{a}\log\left(\xi_{k}^{a}\right)}{\sum_{k'}\xi_{k'}^{a}}+\log\left(\sum_{k'}\xi_{k'}^{a}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So it follows that if, say, 
+\begin_inset Formula $g=1$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{eqnarray*}
+L_{nl}+S\left(Z_{nl}^{a}\right)+S\left(Z_{nl}^{b}\right) & = & \frac{\sum_{k}\xi_{k}^{a}\log\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}+\frac{\sum_{k}\xi_{k}^{b}\log\xi_{k}^{b}}{\sum_{k'}\xi_{k'}^{b}}\\
+ &  & -\frac{\sum_{k}\xi_{k}^{a}\log\left(\xi_{k}^{a}\right)}{\sum_{k'}\xi_{k'}^{a}}+\log\left(\sum_{k'}\xi_{k'}^{a}\right)\\
+ &  & -\frac{\sum_{k}\xi_{k}^{b}\log\left(\xi_{k}^{b}\right)}{\sum_{k'}\xi_{k'}^{b}}+\log\left(\sum_{k'}\xi_{k'}^{b}\right)\\
+ & = & \log\left(\sum_{k'}\xi_{k'}^{a}\right)+\log\left(\sum_{k'}\xi_{k'}^{b}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+...with similar results for other 
+\begin_inset Formula $g$
+\end_inset
+
+.
+ Note that this requires cancelation of terms like 
+\begin_inset Formula $\frac{\sum_{k}\xi_{k}^{a}\log\xi_{k}^{a}}{\sum_{k'}\xi_{k'}^{a}}$
+\end_inset
+
+, many of which could be very small.
+ Could that be causing numerical problems in my code? Note that
+\begin_inset Formula 
+\begin{eqnarray*}
+\log\left(\sum_{k'}\xi_{k'}^{a}\right) & = & \log\left(\sum_{k'}\exp\left(\mbe\left[\log\left(P_{lk}\right)\right]+\mbe\left[\log Q_{nk}\right]\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+so the logsumexp function can be used.
+\end_layout
+
+\begin_layout Section
+Parameter transformations
+\end_layout
+
+\begin_layout Standard
+We are actually interested in 
+\begin_inset Formula $\mbe\left[q\right]$
+\end_inset
+
+ not 
+\begin_inset Formula $\mbe\left[\log q\right]$
+\end_inset
+
+.
+ To change variables we need
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{d\mbe\left[q\right]}{d\mbe\left[\log q\right]^{T}} & = & \frac{\mbe\left[q\right]}{d\alpha^{T}}\frac{d\alpha}{d\mbe\left[\log q\right]^{T}}\\
+ & = & \left(\frac{d\mbe\left[q\right]}{d\alpha^{T}}\right)^{T}V_{q}^{-1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And
+\begin_inset Formula 
+\begin{eqnarray*}
+\mbe\left[q_{i}\right] & = & \frac{\alpha_{i}}{\sum_{k}\alpha_{k}}\Rightarrow\\
+\frac{d\mbe\left[q_{i}\right]}{d\alpha_{j}} & = & -\frac{\alpha_{i}}{\left(\sum_{k}\alpha_{k}\right)^{2}}=-\frac{\mbe\left[q_{i}\right]}{\sum_{k}\alpha_{k}}\\
+\frac{d\mbe\left[q_{i}\right]}{d\alpha_{i}} & = & -\frac{\mbe\left[q_{i}\right]}{\sum_{k}\alpha_{k}}+\frac{1}{\sum_{k}\alpha_{k}}\\
+ & = & \frac{1}{\sum_{k}\alpha_{k}}\left(1-\mbe\left[q_{i}\right]\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Once we have that we get
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{d\mbe\left[q\right]}{dt} & = & \frac{d\mbe\left[q\right]}{d\alpha^{T}}V_{q}^{-1}\left(I-V_{q}H\right)^{-1}V_{q}g_{t}\\
+ & = & \frac{d\mbe\left[q\right]}{d\alpha^{T}}\left(V_{q}^{-1}\left(I-V_{q}H\right)V_{q}\right)^{-1}g_{t}\\
+ & = & \frac{d\mbe\left[q\right]}{d\alpha^{T}}\left(I-HV_{q}\right)^{-1}g_{t}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As above,
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+I_{\alpha}-H_{\alpha\alpha}V_{\alpha} & -H_{\alpha z}V_{z}\\
+-H_{z\alpha}V_{\alpha} & I_{z}-H_{zz}V_{z}
+\end{array}\right)^{-1} & =: & \left(\begin{array}{cc}
+R_{\alpha\alpha} & R_{\alpha z}\\
+R_{z\alpha} & R_{zz}
+\end{array}\right)\\
+R_{\alpha\alpha}^{-1} & = & I_{\alpha}-H_{\alpha\alpha}V_{\alpha}-H_{\alpha z}V_{z}\left(I_{z}-H_{zz}V_{z}\right)^{-1}H_{z\alpha}V_{\alpha}\\
+Q_{\alpha\alpha}^{-1} & = & I_{\alpha}-V_{\alpha}H_{\alpha\alpha}-V_{\alpha}H_{\alpha z}\left(I_{z}-V_{z}H_{zz}\right)^{-1}V_{z}H_{z\alpha}\Rightarrow\\
+Q_{\alpha\alpha} & = & R_{\alpha\alpha}^{T}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Suppose you are interested instead in the change in the natural parameters,
+ which, though they are not really an expectation, are a function of the
+ mean parameters.
+ And of course
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{d\eta}{dm} & = & V_{q}^{-1}\Rightarrow\\
+\frac{d\eta}{dt} & = & V_{q}^{-1}\hat{\Sigma}g_{t}\\
+ & = & V_{q}^{-1}\left(I-V_{q}H\right)^{-1}V_{q}g_{t}\\
+ & = & V_{q}^{-1}\left(V_{q}^{-1}-H\right)^{-1}g_{t}\\
+ & = & \left(\left(V_{q}^{-1}-H\right)V_{q}\right)^{-1}V_{q}g_{t}\\
+ & = & \left(I-HV_{q}\right)^{-1}g_{t}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That is nice, especially since
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(I-HV_{q}\right)^{T} & = & \left(I-V_{q}H\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note also that
+\begin_inset Formula 
+\begin{eqnarray*}
+g_{t} & = & \frac{d}{dm}f\left(m\right)\\
+ & = & \frac{d\eta^{T}}{dm}\frac{df\left(m\right)}{d\eta}\\
+ & = & V_{q}^{-1}g_{\eta}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{d\eta}{dt} & = & V_{q}^{-1}\hat{\Sigma}V_{q}^{-1}g_{\eta}\\
+ & = & V_{q}^{-1}\left(I-V_{q}H\right)^{-1}V_{q}V_{q}^{-1}g_{\eta}\\
+ & = & \left(V_{q}-V_{q}HV_{q}\right)^{-1}g_{\eta}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Epsilon contamination
+\end_layout
+
+\begin_layout Standard
+From the paper, if
+\begin_inset Formula 
+\begin{eqnarray*}
+p_{\epsilon}\left(\theta\right) & = & \left(1-\epsilon\right)p\left(\theta\vert\alpha\right)+\epsilon p_{c}\left(\theta\right)\\
+\frac{d\mbe\left[\log p_{\epsilon}\left(\theta\right)\right]}{d\epsilon} & = & \mbe\left[\frac{p_{c}\left(\theta\right)}{p\left(\theta\vert\alpha\right)}\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the paper, they have two priors for 
+\begin_inset Formula $P_{lk}$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{eqnarray*}
+p\left(P_{lk}\vert\alpha\right) & = & Beta\left(\alpha\right)\\
+ & = & \frac{\Gamma\left(\alpha_{p}+\beta_{p}\right)}{\Gamma\left(\alpha_{p}\right)\Gamma\left(\beta_{p}\right)}P_{lk}^{\alpha_{p}-1}\left(1-P_{lk}\right)^{\beta_{p}-1}\\
+P_{lk} & = & \frac{1}{1+\exp\left(-R_{lk}\right)}\\
+R_{lk} & = & \log P_{lk}-\log\left(1-P_{lk}\right)\\
+p\left(R_{lk}\right) & = & \mathcal{N}\left(\mu_{l},\lambda_{k}\right)\\
+ & = & \frac{1}{\sqrt{2\pi\lambda_{k}}}\exp\left(-\frac{\left(R_{lk}-\mu_{l}\right)^{2}}{2\lambda_{k}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We need the gradient of the variational expectation of the ratio of the
+ densities.
+\begin_inset Formula 
+\begin{eqnarray*}
+q\left(P_{lk}\right) & \sim & Beta\left(m_{1},m_{2}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The trouble will be the differentiation under the integral, and I don't
+ think there's a reparameterization trick for Dirichlet RVs.
+\end_layout
+
+\begin_layout Standard
+Or is there? You can generate uniform Dirichlet RVs by sorting uniforms.
+ If
+\begin_inset Formula 
+\begin{eqnarray*}
+P_{\alpha}\left(\delta\right) & = & \frac{\Gamma\left(2\alpha\right)}{\Gamma\left(\alpha\right)^{2}}\delta_{1}^{\alpha}\delta_{2}^{\alpha}\\
+\left(\gamma_{1},\gamma_{2}\right) & = & \left(\delta_{1}^{\theta_{1}},\delta_{2}^{\theta_{2}}\right)\\
+\left(\gamma_{1}^{\frac{1}{\theta_{1}}},\gamma_{2}^{\frac{1}{\theta_{2}}}\right) & = & \left(\delta_{1},\delta_{2}\right)\\
+\frac{d\gamma}{d\delta} & = & \left(\begin{array}{cc}
+\theta_{1}\delta_{1}^{\theta_{1}-1} & 0\\
+0 & \theta_{2}\delta_{2}^{\theta_{2}-1}
+\end{array}\right)\\
+\left|J\right| & = & \theta_{1}\theta_{2}\delta_{1}^{\theta_{1}-1}\delta_{2}^{\theta_{2}-1}\\
+ & = & \theta_{1}\theta_{2}\gamma_{1}^{\frac{\theta_{1}-1}{\theta_{1}}}\gamma_{2}^{\frac{\theta_{2}-1}{\theta_{2}}}\\
+P\left(\gamma\right) & = & \frac{\Gamma\left(2\alpha\right)}{\Gamma\left(\alpha\right)^{2}}\gamma_{1}^{\frac{\alpha}{\theta_{1}}}\gamma_{2}^{\frac{\alpha}{\theta_{2}}}\frac{1}{\theta_{2}\theta_{2}}\gamma_{1}^{-\frac{\theta_{1}-1}{\theta_{1}}}\gamma_{2}^{-\frac{\theta_{2}-1}{\theta_{2}}}\\
+ & = & \frac{\Gamma\left(2\alpha\right)}{\Gamma\left(\alpha\right)^{2}}\frac{1}{\theta_{2}\theta_{2}}\gamma_{1}^{\frac{\alpha}{\theta_{1}}-\frac{\theta_{1}-1}{\theta_{1}}}\gamma_{2}^{\frac{\alpha}{\theta_{2}}-\frac{\theta_{2}-1}{\theta_{2}}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Take
+\begin_inset Formula 
+\begin{eqnarray*}
+\alpha_{i} & = & \frac{\alpha}{\theta_{i}}-\frac{\theta_{i}-1}{\theta_{i}}\\
+\theta_{i}\alpha_{i} & = & \alpha-\theta_{i}+1\\
+\theta_{i}\left(\alpha_{i}+1\right) & = & \alpha+1\\
+\theta_{i} & = & \frac{\alpha+1}{\alpha_{i}+1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+But this is no longer defined on the simplex.
+\end_layout
+
+\begin_layout Standard
+The influence function actually gives you a way out -- just compute it on
+ a grid.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{d\mbe\left[\theta\right]}{d\epsilon} & = & \frac{q\left(\theta_{0i}\right)}{p\left(\theta_{0i}\vert\alpha\right)}\left(I-VH\right)^{-1}\left(\begin{array}{c}
+\theta_{0i}-m_{i}\\
+0
+\end{array}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The computationally expensive term, 
+\begin_inset Formula $\left(I-VH\right)^{-1}\left(\begin{array}{c}
+\theta_{0i}\\
+0
+\end{array}\right)$
+\end_inset
+
+, is just reading off terms from the inverse 
+\begin_inset Formula $\left(I-VH\right)^{-1}$
+\end_inset
+
+.
+ In particular, it is terms in the sub-matrix of 
+\begin_inset Formula $P_{lk}$
+\end_inset
+
+ sensitivities.
+\end_layout
+
+\begin_layout Section
+Old style of LRVB derivations
+\end_layout
+
+\begin_layout Standard
+The variational fixed points are given by 
+\begin_inset Formula 
+\begin{eqnarray*}
+\eta_{k}^{Z_{nl}^{a}} & = & E_{q}\left(\log Q_{nk}\right)+G_{nl0}E_{q}\left(\log\left(1-P_{lk}\right)\right)+\left(G_{nl1}+G_{nl2}\right)E_{q}\left(\log\left(P_{lk}\right)\right)\\
+\eta_{k}^{Z_{nl}^{b}} & = & E_{q}\left(\log Q_{nk}\right)+\left(G_{nl0}+G_{nl1}\right)E_{q}\left(\log\left(1-P_{lk}\right)\right)+G_{nl2}E_{q}\left(\log\left(P_{lk}\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\eta_{k}^{Q_{n}} & = & \left(\alpha_{k}+\sum_{l=1}^{L}\left(E_{q}\left(Z_{nlk}^{a}\right)+E_{q}\left(Z_{nlk}^{b}\right)\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And
+\begin_inset Formula 
+\begin{eqnarray*}
+\eta_{k}^{P_{n}^{a}} & = & a_{kl}+\sum_{n=1}^{N}\left(\left(G_{nl1}+G_{nl2}\right)E_{q}\left(Z_{nlk}^{a}\right)+G_{nl2}E_{q}\left(Z_{nlk}^{b}\right)\right)\\
+\eta_{k}^{P_{n}^{b}} & = & b_{kl}+\sum_{n=1}^{N}\left(G_{nl0}E_{q}\left(Z_{nlk}^{a}\right)+\left(G_{nl0}+G_{nl1}\right)E_{q}\left(Z_{nlk}^{b}\right)\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From these, one can read off the elements of 
+\begin_inset Formula $H$
+\end_inset
+
+ directly.
+ TODO: Tamara, is it clearer to write this with derivatives of expectations
+ or as second derivatives of 
+\begin_inset Formula $\log q$
+\end_inset
+
+?
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial\eta_{k}^{Q_{n}}}{\partial E_{q}\left(Z_{nl}^{a}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{a}}}{\partial E_{q}\left(\log Q_{nk}\right)} & = & 1\\
+\frac{\partial\eta_{k}^{Q_{n}}}{\partial E_{q}\left(Z_{nl}^{b}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{b}}}{\partial E_{q}\left(\log Q_{nk}\right)} & = & 1\\
+\frac{\partial\eta_{k}^{P_{lk}^{a}}}{\partial E_{q}\left(Z_{nl}^{a}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{a}}}{\partial E_{q}\left(\log P_{lk}\right)} & = & G_{nl1}+G_{nl2}\\
+\frac{\partial\eta_{k}^{P_{lk}^{b}}}{\partial E_{q}\left(Z_{nl}^{a}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{a}}}{\partial E_{q}\left(\log\left(1-P_{lk}\right)\right)} & = & G_{nl0}\\
+\frac{\partial\eta_{k}^{P_{lk}^{a}}}{\partial E_{q}\left(Z_{nl}^{b}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{b}}}{\partial E_{q}\left(\log P_{lk}\right)} & = & G_{nl2}\\
+\frac{\partial\eta_{k}^{P_{lk}^{b}}}{\partial E_{q}\left(Z_{nl}^{b}\right)}=\frac{\partial\eta_{k}^{Z_{nl}^{b}}}{\partial E_{q}\left(\log\left(1-P_{lk}\right)\right)} & = & G_{nl0}+G_{nl1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+...with all other derivatives being 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ Recalling that 
+\begin_inset Formula $G_{nl0}+G_{nl1}+G_{nl2}=1$
+\end_inset
+
+, one can see that the matrix 
+\begin_inset Formula $H$
+\end_inset
+
+ is a binary matrix with nonzero entries only in rows and columns corresponding
+ to elements of 
+\begin_inset Formula $Z$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Perturbation
+\end_layout
+
+\begin_layout Standard
+In order to measure the effect of one data point's inclusion on the group
+ assignment of another, consider adding an additional set of 
+\begin_inset Formula $N$
+\end_inset
+
+ variables called 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ for 
+\begin_inset Formula $1\le n\le N$
+\end_inset
+
+ to the original log likelihood: 
+\begin_inset Formula 
+\begin{eqnarray*}
+\log f\left(P_{k},Q_{n},Z_{n}^{a},Z_{n}^{b},\delta_{n}\vert G_{n}\right) & = & \textrm{priors}+\\
+ &  & \sum_{n=1}^{N}\delta_{n}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(Z_{nlk}^{a}+Z_{nlk}^{b}\right)\log Q_{nk}\textrm{ (loci latent populations)}+\\
+ &  & \sum_{n=1}^{N}\delta_{n}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(G_{nl0}\log\left(1-P_{lk}\right)+G_{nl1}\log\left(P_{lk}\right)+G_{nl2}\log\left(P_{lk}\right)\right)Z_{nlk}^{a}+\\
+ &  & \sum_{n=1}^{N}\delta_{n}\sum_{l=1}^{L}\sum_{k=1}^{K}\left(G_{nl0}\log\left(1-P_{lk}\right)+G_{nl1}\log\left(1-P_{lk}\right)+G_{nl2}\log\left(P_{lk}\right)\right)Z_{nlk}^{b}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ be independent binary random variables, where for some infinitesimal 
+\begin_inset Formula $\epsilon>0$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(\delta_{n}=1\right) & = & 1-\epsilon\\
+P\left(\delta_{n}=0\right) & = & \epsilon
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Give each 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ its own variational distribution, where
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{q}\left(\delta_{n}\right) & = & 1\\
+var_{q}\left(\delta_{n}\right) & = & \epsilon
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In fact, the precise distribution of 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ doesn't matter, only these two moments.
+ The non-zero elements of 
+\begin_inset Formula $H$
+\end_inset
+
+ corresponding to 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ are
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial^{2}\log q}{\partial\delta_{n}\partial\log Q_{nk}} & = & \sum_{l=1}^{L}\left(E_{q}\left(Z_{nlk}^{a}\right)+E_{q}\left(Z_{nlk}^{b}\right)\right)=L\\
+\frac{\partial^{2}\log q}{\partial\delta_{n}\partial\log P_{lk}} & = & E_{q}\left(Z_{nlk}^{a}\right)\left(G_{nl1}+G_{nl2}\right)+E_{q}\left(Z_{nlk}^{b}\right)G_{nl0}\\
+\frac{\partial^{2}\log q}{\partial\delta_{n}\partial\log\left(1-P_{lk}\right)} & = & E_{q}\left(Z_{nlk}^{a}\right)G_{nl2}+E_{q}\left(Z_{nlk}^{b}\right)\left(G_{nl0}+G_{nl1}\right)\\
+\frac{\partial^{2}\log q}{\partial\delta_{n}\partial Z_{nlk}^{a}} & = & G_{nl0}E_{q}\left(\log\left(1-P_{lk}\right)\right)+\left(G_{nl1}+G_{nl2}\right)E_{q}\left(\log\left(P_{lk}\right)\right)+E_{q}\left(\log Q_{nk}\right)\\
+\frac{\partial^{2}\log q}{\partial\delta_{n}\partial Z_{nlk}^{b}} & = & \left(G_{nl0}+G_{nl1}\right)E_{q}\left(\log\left(1-P_{lk}\right)\right)+G_{nl2}E_{q}\left(\log\left(P_{lk}\right)\right)+E_{q}\left(\log Q_{nk}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can now write
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma & = & \left[\begin{array}{cccc}
+\Sigma_{qq} & \Sigma_{qx} & \Sigma_{qp} & \Sigma_{qz}\\
+\Sigma_{xq} & \Sigma_{xx} & \Sigma_{xp} & \Sigma_{xz}\\
+\Sigma_{pq} & \Sigma_{px} & \Sigma_{pp} & \Sigma_{pz}\\
+\Sigma_{zq} & \Sigma_{zx} & \Sigma_{zp} & \Sigma_{zz}
+\end{array}\right]=\left(I-VH\right)^{-1}V\\
+V & = & \left[\begin{array}{cccc}
+V_{q} & 0 & 0 & 0\\
+0 & \epsilon I_{x} & 0 & 0\\
+0 & 0 & V_{p} & 0\\
+0 & 0 & 0 & V_{z}
+\end{array}\right]\\
+H & = & \left[\begin{array}{cccc}
+0 & H_{qx} & 0 & H_{qz}\\
+H_{xq} & 0 & H_{xp} & H_{xz}\\
+0 & H_{p_{a}x} & 0 & H_{p_{a}z}\\
+H_{zq} & H_{zx} & H_{zp} & 0
+\end{array}\right]\\
+I-VH & = & \left[\begin{array}{cccc}
+I_{q} & -V_{q}H_{qx} & 0 & -V_{q}H_{qz}\\
+-\epsilon H_{xq} & I_{x} & -\epsilon H_{xp} & -\epsilon H_{xz}\\
+0 & -V_{p}H_{px} & I_{p} & -V_{p}H_{pz}\\
+-V_{z}H_{zq} & -V_{z}H_{zx} & -V_{z}H_{zp} & I_{z}
+\end{array}\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The full matrix 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ is very large (for example, the section of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ corresponding to the 
+\begin_inset Formula $Z$
+\end_inset
+
+ variables has 
+\begin_inset Formula $2\times N\times L\times K$
+\end_inset
+
+ entries), and we are only interested in 
+\begin_inset Formula $\Sigma_{qx}$
+\end_inset
+
+, the section corresponding to the correlation between the individuals'
+ population assignments, 
+\begin_inset Formula $Q_{n}$
+\end_inset
+
+, and the variables 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+.
+ We will re-arrange terms so that we don't have to do any large, difficult
+ matrix inverses.
+\end_layout
+
+\begin_layout Standard
+Treating 
+\begin_inset Formula $P$
+\end_inset
+
+ and 
+\begin_inset Formula $Z$
+\end_inset
+
+ as nuisance variables and applying formula (REF) gives
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+\Sigma_{qq} & \Sigma_{qx}\\
+\Sigma_{xq} & \Sigma_{xx}
+\end{array}\right) & = & \left[\left(\begin{array}{cc}
+I_{q} & -V_{q}H_{qx}\\
+-\epsilon H_{xq} & I_{x}
+\end{array}\right)-\left(\begin{array}{cc}
+0 & -V_{q}H_{qz}\\
+-\epsilon H_{xp} & -\epsilon H_{xz}
+\end{array}\right)\left(\begin{array}{cc}
+I_{p} & -V_{p}H_{pz}\\
+-V_{z}H_{zp} & I_{z}
+\end{array}\right)^{-1}\left(\begin{array}{cc}
+0 & -V_{p}H_{px}\\
+-V_{z}H_{zq} & -V_{z}H_{zx}
+\end{array}\right)\right]^{-1}\left(\begin{array}{cc}
+V_{\theta} & 0\\
+0 & \epsilon I_{x}
+\end{array}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As in (REF), let 
+\begin_inset Formula $R=VH$
+\end_inset
+
+, and let 
+\begin_inset Formula $\zeta$
+\end_inset
+
+ denote the nuisance variables 
+\begin_inset Formula $\log P$
+\end_inset
+
+, 
+\begin_inset Formula $\log\left(1-P\right)$
+\end_inset
+
+, 
+\begin_inset Formula $Z^{a}$
+\end_inset
+
+, and 
+\begin_inset Formula $Z^{b}$
+\end_inset
+
+.
+ Then this can be written more compactly as
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+0 & -V_{q}H_{qz}\\
+-\epsilon H_{xp} & -\epsilon H_{xz}
+\end{array}\right) & = & \left(\begin{array}{c}
+R_{q\zeta}\\
+R_{x\zeta}
+\end{array}\right)\\
+\left(\begin{array}{cc}
+0 & -V_{p}H_{px}\\
+-V_{z}H_{zq} & -V_{z}H_{zx}
+\end{array}\right) & = & \left(\begin{array}{cc}
+R_{\zeta q} & R_{\zeta x}\end{array}\right)\\
+V_{q}H_{qx} & = & R_{qx}\\
+\epsilon H_{xq} & = & R_{xq}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO: don't define these with the minus signs.
+\end_layout
+
+\begin_layout Standard
+The inverse is still a large matrix.
+ However, using the Schur inverse we can evaluate the inverse using only
+ an inverse of the size of 
+\begin_inset Formula $P$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+I_{p} & -V_{p}H_{pz}\\
+-V_{z}H_{zp} & I_{z}
+\end{array}\right)^{-1} & := & A=\left(\begin{array}{cc}
+A_{11} & A_{12}\\
+A_{21} & A_{22}
+\end{array}\right)\\
+A_{11} & = & \left(I_{p}-V_{p}H_{pz}V_{z}H_{zp}\right)^{-1}\\
+A_{12} & = & A_{11}V_{p}H_{pz}\\
+A_{21} & = & V_{z}H_{zp}A_{11}\\
+A_{22} & = & I_{z}+V_{z}H_{zp}A_{11}V_{p}H_{pz}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plugging this in,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+\Sigma_{qq} & \Sigma_{qx}\\
+\Sigma_{xq} & \Sigma_{xx}
+\end{array}\right) & = & \left[\left(\begin{array}{cc}
+I_{q} & -R_{qx}\\
+-R_{xq} & I_{x}
+\end{array}\right)-\left(\begin{array}{c}
+R_{q\zeta}\\
+R_{x\zeta}
+\end{array}\right)A\left(\begin{array}{cc}
+R_{\zeta q} & R_{\zeta x}\end{array}\right)\right]^{-1}\left(\begin{array}{cc}
+V_{q} & 0\\
+0 & \epsilon I_{x}
+\end{array}\right)\\
+ & = & \left[\left(\begin{array}{cc}
+I_{q} & -R_{qx}\\
+-R_{xq} & I_{x}
+\end{array}\right)-\left(\begin{array}{cc}
+R_{q\zeta}AR_{\zeta q} & R_{q\zeta}AR_{\zeta x}\\
+R_{x\zeta}AR_{\zeta q} & R_{x\zeta}AR_{\zeta x}
+\end{array}\right)\right]^{-1}\left(\begin{array}{cc}
+V_{q} & 0\\
+0 & \epsilon I_{x}
+\end{array}\right)\\
+ & = & \left[\begin{array}{cc}
+I_{q}-R_{q\zeta}AR_{\zeta q} & -R_{qx}-R_{q\zeta}AR_{\zeta x}\\
+-R_{xq}-R_{x\zeta}AR_{\zeta q} & I_{x}-R_{x\zeta}AR_{\zeta x}
+\end{array}\right]^{-1}\left(\begin{array}{cc}
+V_{q} & 0\\
+0 & \epsilon I_{x}
+\end{array}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We are now in a position to evaluate the 
+\begin_inset Formula $\left(\begin{array}{cc}
+\Sigma_{qq} & \Sigma_{qx}\end{array}\right)$
+\end_inset
+
+ block row with another Schur inverse.
+ First,
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qq} & = & \left(I_{q}-R_{q\zeta}AR_{\zeta q}-\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-R_{x\zeta}AR_{\zeta x}\right)^{-1}\left(R_{xq}+R_{x\zeta}AR_{\zeta q}\right)\right)^{-1}V_{q}\\
+ & = & \left(I_{q}-R_{q\zeta}AR_{\zeta q}-\epsilon\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-R_{x\zeta}AR_{\zeta x}\right)^{-1}\left(H_{xq}+H_{x\zeta}AR_{\zeta q}\right)\right)^{-1}V_{q}\\
+ & \approx & \left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(I_{q}+\epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-R_{x\zeta}AR_{\zeta x}\right)^{-1}\left(H_{xq}+H_{x\zeta}AR_{\zeta q}\right)\right)^{-1}V_{q}\\
+ & \approx & \left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}V_{q}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where we have used a matrix Taylor expansion and the fact that 
+\begin_inset Formula $\epsilon\rightarrow0$
+\end_inset
+
+.
+ Plugging this approximation into the formula for 
+\begin_inset Formula $\Sigma_{qx}$
+\end_inset
+
+ gives
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qx} & = & \epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-R_{x\zeta}AR_{\zeta x}\right)^{-1}\\
+ & = & \epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-\epsilon H_{x\zeta}AR_{\zeta x}\right)^{-1}\\
+ & \approx & \epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}+\epsilon H_{x\zeta}AR_{\zeta x}\right)\\
+ & \approx & \epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\\
+ & = & \epsilon\left(I_{q}-R_{q\zeta}AR_{\zeta q}\right)^{-1}V_{q}\left(H_{qx}+H_{q\zeta}AR_{\zeta x}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plugging in for 
+\begin_inset Formula $R$
+\end_inset
+
+ gives
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qq} & = & \left(I_{q}-V_{q}H_{q\zeta}AV_{\zeta}H_{\zeta q}\right)^{-1}V_{q}\\
+\Sigma_{qx} & = & \epsilon\Sigma_{qq}\left(H_{qx}+H_{q\zeta}AV_{\zeta}H_{\zeta x}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At this point, we can plug in for 
+\begin_inset Formula $A$
+\end_inset
+
+ to see exactly what large matrix multiplications we must compute.
+ We need to calculate 
+\begin_inset Formula $H_{q\zeta}AV_{\zeta}H_{\zeta q}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{q\zeta}AV_{\zeta}H_{\zeta x}$
+\end_inset
+
+.
+ Recall that 
+\begin_inset Formula $H_{qp}=0$
+\end_inset
+
+.
+ In general, we can write
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{q\zeta}AV_{\zeta}H_{\zeta i} & = & \left(\begin{array}{cc}
+H_{qp} & H_{qz}\end{array}\right)\left(\begin{array}{cc}
+A_{11} & A_{11}V_{p}H_{pz}\\
+V_{z}H_{zp}A_{11} & I_{z}+V_{z}H_{zp}A_{11}V_{p}H_{pz}
+\end{array}\right)\left(\begin{array}{c}
+V_{p}H_{pi}\\
+V_{z}H_{zi}
+\end{array}\right)\\
+ & = & \left(\begin{array}{cc}
+0 & H_{qz}\end{array}\right)\left(\begin{array}{c}
+A_{11}V_{p}H_{pi}+A_{11}V_{p}H_{pz}V_{z}H_{zi}\\
+V_{z}H_{zp}A_{11}V_{p}H_{pi}+\left(I_{z}+V_{z}H_{zp}A_{11}V_{p}H_{pz}\right)V_{z}H_{zi}
+\end{array}\right)\\
+ & = & \left(H_{qz}V_{z}H_{zp}\right)A_{11}V_{p}H_{pi}+\left(H_{qz}V_{z}H_{zi}\right)+\left(H_{qz}V_{z}H_{zp}\right)A_{11}V_{p}\left(H_{pz}V_{z}H_{zi}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+ERROR ERROR: there is an error in the above formulat when 
+\begin_inset Formula $q$
+\end_inset
+
+ is not the left factor.
+ It should be:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{i\zeta}AV_{\zeta}H_{\zeta j} & = & \left(\begin{array}{cc}
+H_{ip} & H_{iz}\end{array}\right)\left(\begin{array}{cc}
+A_{11} & A_{11}V_{p}H_{pz}\\
+V_{z}H_{zp}A_{11} & \left(I_{z}+V_{z}H_{zp}A_{11}V_{p}H_{pz}\right)
+\end{array}\right)\left(\begin{array}{c}
+V_{p}H_{pj}\\
+V_{z}H_{zj}
+\end{array}\right)\\
+ & = & \left(\begin{array}{cc}
+H_{ip} & H_{iz}\end{array}\right)\left(\begin{array}{c}
+A_{11}V_{p}H_{pj}+A_{11}V_{p}H_{pz}V_{z}H_{zj}\\
+V_{z}H_{zp}A_{11}V_{p}H_{pj}+\left(I_{z}+V_{z}H_{zp}A_{11}V_{p}H_{pz}\right)V_{z}H_{zj}
+\end{array}\right)\\
+ & = & H_{ip}A_{11}V_{p}H_{pj}+\\
+ &  & H_{ip}A_{11}V_{p}H_{pz}V_{z}H_{zj}+\\
+ &  & H_{iz}V_{z}H_{zp}A_{11}V_{p}H_{pj}+\\
+ &  & H_{iz}V_{z}H_{zj}+\\
+ &  & H_{iz}V_{z}H_{zp}A_{11}V_{p}H_{pz}V_{z}H_{zj}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, consider 
+\begin_inset Formula $A_{11}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+A_{11} & = & \left(I_{p}-V_{p}H_{pz}V_{z}H_{zp}\right)^{-1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The terms 
+\begin_inset Formula $H_{pz}$
+\end_inset
+
+ are sparse and highly structured.
+ The only terms that are nonzero are where a 
+\begin_inset Formula $P_{lk}$
+\end_inset
+
+ shares indices with a 
+\begin_inset Formula $Z_{nlk}^{a}$
+\end_inset
+
+ or a 
+\begin_inset Formula $Z_{nlk}^{b}$
+\end_inset
+
+ term and 
+\begin_inset Formula $G_{nl}$
+\end_inset
+
+ takes an appropriate value, which happens at most 
+\begin_inset Formula $2k$
+\end_inset
+
+ times per row.
+ If the 
+\begin_inset Formula $k$
+\end_inset
+
+ terms are grouped together (i.e., 
+\begin_inset Formula $k$
+\end_inset
+
+ is the fastest-moving index in the matrix indices), the non-zero areas
+ will be 
+\begin_inset Formula $k\times k$
+\end_inset
+
+ contiguous blocks.
+ 
+\begin_inset Formula $V_{z}$
+\end_inset
+
+ is block diagonal with blocks of size 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $\left(H_{pz}\right)_{l_{a}\cdot}$
+\end_inset
+
+ denote the 
+\begin_inset Formula $k$
+\end_inset
+
+ rows of 
+\begin_inset Formula $H_{pz}$
+\end_inset
+
+ corresponding to 
+\begin_inset Formula $\log\left(P_{l}\right)$
+\end_inset
+
+, and 
+\begin_inset Formula $\left(H_{pz}\right)_{l_{b}\cdot}$
+\end_inset
+
+ denote the 
+\begin_inset Formula $k$
+\end_inset
+
+ rows corresponding to 
+\begin_inset Formula $\log\left(1-P_{l}\right)$
+\end_inset
+
+, with similar notation for the columns of 
+\begin_inset Formula $H_{zp}$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula 
+\begin{eqnarray*}
+\left(H_{pz}V_{z}H_{zp}\right)_{l_{a}^{1}l_{a}^{2}} & = & 1\left(l_{a}^{1}=l_{a}^{2}\right)\sum_{n}\left(H_{pz}\right)_{l_{a}^{1}}\left(V_{z}^{a}+V_{z}^{b}\right)_{nl_{a}^{1}}\left(H_{zp}\right)_{l_{a}^{1}}\\
+\left(H_{pz}V_{z}H_{zp}\right)_{l_{b}^{1}l_{b}^{2}} & = & 1\left(l_{b}^{1}=l_{b}^{2}\right)\sum_{n}\left(H_{pz}\right)_{l_{b}^{1}}\left(V_{z}^{a}+V_{z}^{b}\right)_{nl_{b}^{1}}\left(H_{zp}\right)_{l_{b}^{1}}\\
+\left(H_{pz}V_{z}H_{zp}\right)_{l_{a}^{1}l_{b}^{1}} & = & 1\left(l_{a}^{1}=l_{b}^{1}\right)\sum_{n}\left(H_{pz}\right)_{l_{a}^{1}}\left(V_{z}^{a}+V_{z}^{b}\right)_{nl_{a}^{1}}\left(H_{zp}\right)_{l_{a}^{1}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $V_{z}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $V_{z}^{b}$
+\end_inset
+
+ denote the covariance matrices of 
+\begin_inset Formula $Z^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $Z^{b}$
+\end_inset
+
+, respectively.
+ Consequently, 
+\begin_inset Formula $H_{pz}V_{z}H_{zp}$
+\end_inset
+
+ is a three-banded matrix, where each band is of width at most 
+\begin_inset Formula $k$
+\end_inset
+
+, and contains sums of the variational 
+\begin_inset Formula $Z$
+\end_inset
+
+ covariances.
+ This should be easy to invert even if 
+\begin_inset Formula $L$
+\end_inset
+
+ is very large.
+\end_layout
+
+\begin_layout Standard
+Similarly, each 
+\begin_inset Formula $k$
+\end_inset
+
+-block of rows of 
+\begin_inset Formula $H_{qz}V_{z}H_{zp}$
+\end_inset
+
+ is a sum of as most two 
+\begin_inset Formula $Z$
+\end_inset
+
+ covariances -- 
+\begin_inset Formula $Z_{nl}^{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $Z_{nl}^{b}$
+\end_inset
+
+, where the row is of 
+\begin_inset Formula $Q_{n}$
+\end_inset
+
+ and the column is of 
+\begin_inset Formula $\log\left(P_{l}\right)$
+\end_inset
+
+ or 
+\begin_inset Formula $\log\left(1-P_{l}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Calculating the 
+\begin_inset Formula $H_{\cdot}H_{\cdot}$
+\end_inset
+
+terms with a sum does not save a lot of space, since they are relatively
+ sparse as-is.
+\end_layout
+
+\begin_layout Standard
+Actually, no individual matrix has more than 
+\begin_inset Formula $2k^{2}nl$
+\end_inset
+
+ terms, which is the same order as the result for the worst case.
+\end_layout
+
+\begin_layout Standard
+Here, I group together things that it makes sense to 
+\begin_inset Quotes eld
+\end_inset
+
+cache
+\begin_inset Quotes erd
+\end_inset
+
+ for each 
+\begin_inset Formula $i$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{q\zeta}AV_{\zeta}H_{\zeta q} & = & H_{qz}V_{z}H_{zq}+\left(H_{qz}V_{z}H_{zp}\right)\left(A_{11}V_{p}\right)H_{pz}V_{z}H_{zq}\\
+H_{q\zeta}AV_{\zeta}H_{\zeta x} & = & H_{qz}V_{z}H_{zx}+\left(H_{qz}V_{z}H_{zp}\right)\left(A_{11}V_{p}\right)H_{pz}V_{z}H_{zx}+\left(H_{qz}V_{z}H_{zp}\right)\left(A_{11}V_{p}\right)H_{px}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That thing is 
+\begin_inset Formula $H_{qz}V_{z}H_{zp}$
+\end_inset
+
+ and 
+\begin_inset Formula $A_{11}V_{p}$
+\end_inset
+
+.
+ Also, you probably want to LU factorize 
+\begin_inset Formula $A_{11}$
+\end_inset
+
+.
+ (It is not symmetric.)
+\end_layout
+
+\begin_layout Standard
+A reminder:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qq} & = & \left(I_{q}-V_{q}H_{q\zeta}AV_{\zeta}H_{\zeta q}\right)^{-1}V_{q}\\
+\Sigma_{qx} & = & \epsilon\Sigma_{qq}\left(H_{qx}+H_{q\zeta}AV_{\zeta}H_{\zeta x}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Old formula seems to match:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+AQB & = & A_{p}CB_{p}+A_{p}CV_{p}H_{pz}B_{z}+A_{z}V_{z}H_{zp}CB_{p}+A_{z}B_{z}+A_{z}V_{z}H_{zp}CV_{p}H_{pz}B_{z}\\
+A_{q}QB & = & A_{z}V_{z}H_{zp}CB_{p}+A_{z}B_{z}+A_{z}V_{z}H_{zp}CV_{p}H_{pz}B_{z}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Why Isn't This Working
+\end_layout
+
+\begin_layout Standard
+Some numeric results show that this isn't working very well at predicting
+ the effect of removing a data point.
+ Maybe the 
+\begin_inset Formula $\epsilon\approx0$
+\end_inset
+
+ just isn't a good approximation here.
+ Numerically, the full 
+\begin_inset Formula $\Sigma_{\theta}$
+\end_inset
+
+ matrix is not positive definite with 
+\begin_inset Formula $\epsilon=1$
+\end_inset
+
+, which possibly indicated a disconnect between the infinitesimal result
+ and the effect of removing a point.
+\end_layout
+
+\begin_layout Standard
+Evaluating with 
+\begin_inset Formula $\epsilon=1$
+\end_inset
+
+ is an LRVB bootstrap.
+ It is worth considering what it would take to do it.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qq} & = & \left(I_{q}-R_{q\zeta}AR_{\zeta q}-\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-R_{x\zeta}AR_{\zeta x}\right)^{-1}\left(R_{xq}+R_{x\zeta}AR_{\zeta q}\right)\right)^{-1}V_{q}\\
+ & = & \left(I_{q}-V_{q}H_{q\zeta}AR_{\zeta q}-\epsilon V_{q}\left(H_{qx}+H_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-\epsilon H_{x\zeta}AR_{\zeta x}\right)^{-1}\left(H_{xq}+H_{x\zeta}AR_{\zeta q}\right)\right)^{-1}V_{q}
+\end{eqnarray*}
+
+\end_inset
+
+Plugging this into the Schur inverse formula for 
+\begin_inset Formula $\Sigma_{qx}$
+\end_inset
+
+ and pulling out a 
+\begin_inset Formula $V_{q}$
+\end_inset
+
+ gives
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qx} & = & \epsilon\Sigma_{qq}V_{q}^{-1}\left(R_{qx}+R_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-\epsilon H_{x\zeta}AR_{\zeta x}\right)^{-1}\\
+ & = & \epsilon\Sigma_{qq}\left(H_{qx}+H_{q\zeta}AR_{\zeta x}\right)\left(I_{x}-\epsilon H_{x\zeta}AR_{\zeta x}\right)^{-1}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that in order to use a left solve routine, you need that
+\begin_inset Formula 
+\begin{eqnarray*}
+BA^{-1} & = & \left(\left(BA^{-1}\right)^{T}\right)^{T}\\
+ & = & \left(\left(A^{T}\right)^{-1}B^{T}\right)^{T}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Contrast with
+\begin_inset Formula 
+\begin{eqnarray*}
+\Sigma_{qq} & \approx & \left(I_{q}-V_{q}H_{q\zeta}AR_{\zeta q}\right)^{-1}V_{q}\\
+\Sigma_{qx} & \approx & \epsilon\Sigma_{qq}\left(H_{qx}+H_{q\zeta}AR_{\zeta x}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The expensive matrix operations for 
+\begin_inset Formula $\Sigma_{qx}$
+\end_inset
+
+ are no different -- they are the calculation of 
+\begin_inset Formula $H_{q\zeta}AR_{\zeta q}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{q\zeta}AR_{\zeta x}$
+\end_inset
+
+.
+ However, for 
+\begin_inset Formula $\Sigma_{qq}$
+\end_inset
+
+ we additionally have 
+\begin_inset Formula $H_{x\zeta}AR_{\zeta x}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{x\zeta}AR_{\zeta q}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{x\zeta}AR_{\zeta q} & = & H_{x\zeta}AV_{\zeta}H_{\zeta q}\\
+ & \ne & \left(H_{q\zeta}AV_{\zeta}H_{\zeta x}\right)^{T}\\
+ & = & H_{x\zeta}V_{\zeta}A^{T}H_{\zeta q}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These are dense matrices.
+ Let's revisit the 
+\begin_inset Formula $A$
+\end_inset
+
+ multiplication:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+H_{i\zeta}AV_{\zeta}H_{\zeta j} & = & H_{ip}\left(A_{11}V_{p}\right)H_{pj}+\\
+ &  & H_{ip}\left(A_{11}V_{p}\right)\left(H_{pz}V_{z}H_{zj}\right)+\\
+ &  & \left(H_{iz}V_{z}H_{zp}\right)\left(A_{11}V_{p}\right)H_{pj}+\\
+ &  & \left(H_{iz}V_{z}H_{zj}\right)+\\
+ &  & \left(H_{iz}V_{z}H_{zp}\right)\left(A_{11}V_{p}\right)\left(H_{pz}V_{z}H_{zj}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now consider which terms are sparse.
+ The construction of 
+\begin_inset Formula $Z-$
+\end_inset
+
+sized matrices involving 
+\begin_inset Formula $A_{11}$
+\end_inset
+
+ or 
+\begin_inset Formula $V_{p}$
+\end_inset
+
+ will generally have more than 
+\begin_inset Formula $nlk^{2}$
+\end_inset
+
+ rows, which is our scalability target.
+ So I think the computation should be done by the grouping shown.
+\end_layout
+
+\end_body
+\end_document
