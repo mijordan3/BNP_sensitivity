@@ -211,8 +211,7 @@ length 1, and recursively break off proportions of length $\nu_1$, $\nu_2$, $\nu
 
 \vspace{-0.3in}
 
-\textbf{Variational Bayes} (VB) is a popular posterior approximation
-algorithm, often used with the Dirichlet process. Some notation: 
+We approximate the true posterior using \textbf{Variational Bayes} (VB). Note that: 
 
 \begin{itemize}
 \item $\eta_\theta$: the variational parameters for the global parameters (the stick-breaking proportions, the cluster centroids, the cluster covariances). 

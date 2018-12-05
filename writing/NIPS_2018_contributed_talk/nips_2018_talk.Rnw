@@ -92,27 +92,28 @@ Bayesian Nonparametrics}
 
 \end{frame}
 
-\begin{frame}{Question of Interest}
+\begin{frame}{Our resesarch problem}
 
-We are interested in inferring the number of clusters in a dataset.
+Researchers often want to estimate the number of clusters are present in a dataset. 
+\vspace{-0.1in}
+\pause
+\begin{itemize}
+\item[--] e.g., number of ancentral populations from DNA sequences; number of clusters from gene expressions; number of topics in a corpus. 
+\end{itemize}
 
-% \pause
-% \begin{figure}[!h]
-% \centering
-% \includegraphics[width = 0.5\textwidth]{./images/iris_data.png}
-% %\caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species. }
-% \setlength{\textfloatsep}{-10pt}
-% \end{figure}
-% \vspace{-0.2in}
 \pause
 
 A Bayesian nonparametric (BNP) model makes inferring the number of clusters amenable to
 Bayesian inference. The exact posterior is approximated using variational Bayes. 
+
 \pause
 
-\textbf{Problem}: how sensitive is the resulting
-VB approximation of cluster cardinality to BNP model choices? Evaluating
-for multiple model choices would be expensive. 
+\textbf{Question}: how sensitive is the resulting
+VB approximation of cluster cardinality to BNP model choices? 
+
+\pause 
+
+\textbf{Problem}: evaluating for multiple model choices would be expensive. 
 
 \pause 
 
@@ -137,29 +138,18 @@ expensive refitting).
 \vspace{0.1in}
 
 {\bf Results:} sensitivity to both parametric and functional perturbations
+\vspace{0.1in}
 
 \end{frame}
 
 \begin{frame}{The BNP Model}
-We model the prior on the component proportions $\pi$ using a
-a stick breaking representation of a Dirichlet process prior.
+A {\bf Dirichlet process prior} allows for an infinite number of components. 
 \vspace{-0.2in}
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./figures/DP_stick_breaking.png}
+\caption{A schematic of the Dirichlet process prior}
 \end{figure}
-\vspace{-0.1in}
-The prior on the component proportions $\pi_1, \pi_2, ..., $ are given by
-%
-\begin{align*}
-\nu_k \vert \alpha &\overset{\text{iid}}{\sim} \text{Beta}\left(1, \alpha \right)\quad k = 1, 2, ..., \infty \\
-\pi_k | \nu &:= \nu_k \prod_{j=1}^{k-1} (1 - \nu_j) \quad k = 1, 2, ..., \infty
-\end{align*}
-%
-The cluster belongings $z$ are then drawn 
-$z_n\overset{\text{iid}}{\sim} \mathrm{Categorical}(\pi)$. 
-
-\pause 
 
 \begin{mdframed}[style=MyFrame]
 \begin{center}
@@ -195,16 +185,16 @@ Note that
 
 We can ask: 
 \begin{enumerate}[(1)]
-\item Under our BNP model, how many distinct components exist in the world? 
-\pause\par 
-- an infinite number of components  
+\item Under our Dirichlet process prior, there are an infinite number of components. 
+
+\pause 
+
+\item How many clusters are present in the {\bf current} dataset?
+
 \pause 
 
 \item How many clusters would we expect to be present in a {\bf new} dataset of particular size?
 
-\pause
-
-\item How many clusters are present in the {\bf current} dataset?
 \pause
 
 \end{enumerate}
@@ -270,16 +260,100 @@ We use BNP to infer the number of species in iris dataset (Anderson 1936).
 
 \end{frame}
 
+%%%%%%%%%%
+% Only refitted values 
 \begin{frame}{Results: parametric sensitivity}
 
-Recall that the stick breaking proportions were drawn 
-\begin{align*}
-\nu_k \overset{\text{iid}}{\sim} \text{Beta}(1, \alpha)
-\end{align*}
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-We first evaluate the sensitivity to the DP concentration parameter $\alpha$. 
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{masked_results_fig/param_sens_plot_thresh_0_masked1-1} 
+
+}
+
+
+
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{masked_results_fig/param_sens_plot_thresh_0b_masked-1} 
+
+}
+
+
+
+\end{knitrout}
+\end{figure}
 
 \end{frame}
+
+%%%%%%%%%%
+% Refitted and LR 
+\begin{frame}{Results: parametric sensitivity}
+
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{masked_results_fig/param_sens_plot_thresh_0_masked1-2} 
+
+}
+
+
+
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{masked_results_fig/param_sens_plot_thresh_0b_masked-1} 
+
+}
+
+
+
+\end{knitrout}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%
+% first row
+\begin{frame}{Results: parametric sensitivity}
+
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{figure/param_sens_plot_thresh_0-1} 
+
+}
+
+
+
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{masked_results_fig/param_sens_plot_thresh_0b_masked-1} 
+
+}
+
+
+
+\end{knitrout}
+% \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimizing versus the linear approximation. 
+% The blue vertical line indicates the location of $\alpha_0$}
+\end{figure}
+
+
+\end{frame}
+
+
 \begin{frame}{Results: parametric sensitivity}
 
 \begin{figure}
@@ -292,32 +366,58 @@ source("./Rscripts/appendix_parametric_sens_results_thresh0.R",
 source("./Rscripts/appendix_parametric_sens_results_thresh0_pred.R",
       echo=knitr_debug, print.eval=TRUE)
 @
-\caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimizing versus the linear approximation. 
-The blue vertical line indicates the location of $\alpha_0$}
+% \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimizing versus the linear approximation. 
+% The blue vertical line indicates the location of $\alpha_0$}
 \end{figure}
 
 \end{frame}
 
 \begin{frame}{Results: functional perturbation}
-Now consider a multiplicative perturbation $\phi$ to
-the original beta distribution $p_0$ for the stick-breaking proportions:
-%
+% Now consider a multiplicative perturbation $\phi$ to
+% the original beta distribution $p_0$ for the stick-breaking proportions:
+% %
+% \begin{align*}
+% \label{eq:expon_perturb}
+% 	p_c(\nu_k \vert \delta, \phi) :=
+%   \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
+%        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
+% \end{align*}
+% \pause 
+Suppose we wish to replace the original beta prior $p_0$ with another distribution $p_1$. Then we set our perturbation to be
 \begin{align*}
-\label{eq:expon_perturb}
-	p_c(\nu_k \vert \delta, \phi) :=
-  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
-       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
+p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\right)^\delta
 \end{align*}
-\pause 
-In particular, suppose we wish to replace the original beta prior $p_0$ with another distribution $p_1$. Then we set $\phi(\nu_k) = \frac{p_1(\nu_k)}{p_0(\nu_k)}$ and take $\delta \rightarrow 1$. 
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width = 0.45\textwidth]{./images/functional_perturbation.png}
+\includegraphics[width = 0.55\textwidth]{./images/functional_perturbation.png}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
 
 \end{frame}
+
+\begin{frame}{Results: functional perturbation}
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked1} 
+}
+\end{knitrout}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Results: functional perturbation}
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked2} 
+}
+\end{knitrout}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}{Results: functional perturbation}
 \begin{figure}
@@ -328,47 +428,29 @@ SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 <<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold'>>=
 source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
 @
-\caption{The effect of prior perturbation on the expected number of distinct clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\delta = 1$, in blue. Middle and right column: linearly approximated vs.
-re-fitted expected number of clusters}
 \end{figure}
 
 \end{frame}
 
 
-\begin{frame}{Next Steps}
-
-\begin{itemize}
-
-\item Investigate other shapes of functional perturbations. What is the appropriate notion of size here?
-
-\item Investigate the sensitivity of other metrics for ``number of clusters." Also look at sensitivity of other posterior quantities, e.g.\ the cluster centroids or the covariances. 
-
-\item Investigate issues with multiple optima. Does extrapolating from more to less clusters actually give better performance?
-
-\end{itemize}
-
-\end{frame}
-
 \begin{frame}{Summary}
 
+{\bf Next steps}
 \begin{itemize}
-
-\item {\bf The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. }
-
+\item Other forms of functional perturbations
 \pause 
-
-\item We applied the approximation to both parametric and functional perturbations to the stick-breaking prior.
-
+\item Other metrics for ``number of clusters"
+\pause
+\item Issues with multiple optima
 \pause 
-
-\item For the functional perturbation, we proposed to use multiplicative perturbations to improve linearity. 
-
-\pause 
-
-\item Furthermore, we approximated only the dependence of the optimal variational parameters on the prior parameter. We retained the non-linearity of the map from the optimal variational parameters to posterior quantity.
-
 \end{itemize}
+\vspace{0.2in}
 
+\begin{mdframed}[style=MyFrame]
+\begin{center}
+{\bf In summary, the linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior.}
+\end{center}
+\end{mdframed}
 
 \end{frame}
 
