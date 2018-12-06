@@ -195,7 +195,7 @@ A {\bf Dirichlet process prior} allows for an infinite number of components.
 \includegraphics[width = 0.95\textwidth]{./figures/DP_stick_breaking.png}
 \caption{A schematic of the Dirichlet process prior}
 \end{figure}
-
+\pause 
 \begin{mdframed}[style=MyFrame]
 \begin{center}
 {\bf What makes this stick-breaking prior a reasonable one?}
@@ -220,7 +220,7 @@ Note that
 \begin{itemize}
 \item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective. 
 
-\item All posterior quantities are then functions of $\eta^*$
+\item All approximate posterior quantities are then functions of $\eta^*$
 
 \end{itemize}
 
@@ -228,9 +228,10 @@ Note that
 
 \begin{frame}{The Posterior Quantity of Interest: number of clusters}
 
-We can ask: 
+Under our Dirichlet process prior, there are an infinite number of components. 
+
+But we can ask: 
 \begin{enumerate}[(1)]
-\item Under our Dirichlet process prior, there are an infinite number of components. 
 
 \pause 
 
@@ -244,7 +245,7 @@ We can ask:
 
 \end{enumerate}
 \vspace{0.2in}
-The quantities in (2) and (3) are functions of the optimal variational parameter $\eta^*$: 
+Both quantities are functions of the optimal variational parameter $\eta^*$: 
 %
 \begin{align*}
 \eta^* \mapsto
@@ -469,12 +470,22 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 \centering
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked2} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/functional_sens_plot_thresh0_refit_only-1} 
 }
 \end{knitrout}
 \end{figure}
 \end{frame}
 
+\begin{frame}{Results: functional perturbation}
+\begin{figure}
+\centering
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked2} 
+}
+\end{knitrout}
+\end{figure}
+\end{frame}
 
 \begin{frame}{Results: functional perturbation}
 \begin{figure}

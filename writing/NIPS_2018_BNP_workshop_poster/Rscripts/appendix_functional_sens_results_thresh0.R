@@ -7,7 +7,7 @@
 prior_pert1 <- read.csv('./data_for_figures/prior_pert1.csv',
                         sep = ',', header = FALSE)
 prior_pert1_df <- as.data.frame(t(prior_pert1))
-colnames(prior_pert1_df) <- c('nu_k', 'p0', 'pc')
+colnames(prior_pert1_df) <- c('nu_k', 'p0', 'p1')
 
 prior_pert1_plot <-
   prior_pert1_df %>%
@@ -22,7 +22,7 @@ prior_pert1_plot <-
 prior_pert2 <- read.csv('./data_for_figures/prior_pert2.csv',
                         sep = ',', header = FALSE)
 prior_pert2_df <- as.data.frame(t(prior_pert2))
-colnames(prior_pert2_df) <- c('nu_k', 'p0', 'pc')
+colnames(prior_pert2_df) <- c('nu_k', 'p0', 'p1')
 
 prior_pert2_plot <-
   prior_pert2_df %>% gather(which_prior, p, -nu_k) %>%

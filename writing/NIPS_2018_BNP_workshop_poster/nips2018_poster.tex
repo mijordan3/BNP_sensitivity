@@ -216,20 +216,22 @@ Tamara Broderick\textsuperscript{2} \\
 %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
+\item Researchers often want to estimate the number of clusters present in a dataset. 
 
-\item Data analysts are often interested to discover the number of
-clusters in a dataset. 
-\item Bayesian nonparametrics (BNP) allows discovery of cluster
-cardinality for a fixed dataset size. 
-\item Variational Bayes (VB) is a way to approximate the BNP posterior. 
-\item \textbf{Problem}: \textbf{how sensitive is the resulting
-VB approximation of cluster cardinality to BNP model choices}? Evaluating
-for multiple model choices would be expensive. 
-\item \textbf{We propose}: \textbf{a linear approximation} to efficiently
-estimate BNP sensitivity \textbf{from a single run of VB} (to avoid
+\item A Bayesian nonparametric (BNP) model makes inferring the number of clusters amenable to Bayesian inference. 
+
+\item We approximate the exact posterior with variational Bayes. 
+
+\item \textbf{Question}: how sensitive is the
+VB approximation, and the resulting inferences, to BNP model choices? 
+
+\item \textbf{Problem}: re-running VB for multiple model choices is expensive. 
+
+\item \textbf{We propose}: a linear approximation to efficiently
+estimate BNP sensitivity from a single run of VB (to avoid
 expensive refitting). 
-\item Namely, we evaluate sensitivity of cluster cardinality to the Dirichlet process
-stick-breaking parameter and functional form. 
+
+\item We evaluate sensitivity to parametric and functional perturbations. 
 
 \end{itemize}
 \end{mdframed}
@@ -243,13 +245,14 @@ stick-breaking parameter and functional form.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The \textbf{Dirichlet process} is a popular Bayesian nonparametric
-(BNP) model often used to model clusters. 
+(BNP) model used for clustering.  
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./images/DP_stick_breaking.png}
 \caption{The Dirichlet stick-breaking process. We start with a stick of
-length 1, and recursively break off proportions of length $\nu_1$, $\nu_2$, $\nu_3$, ...}
+length 1, and recursively break off proportions $\nu_1$, $\nu_2$, $\nu_3$, ...
+The weights on the components are the lengths broken off at each step.}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
 
@@ -263,24 +266,25 @@ length 1, and recursively break off proportions of length $\nu_1$, $\nu_2$, $\nu
 % \setlength{\textfloatsep}{-10pt}
 % \end{figure}
 
-\vspace{-0.3in}
-
-\textbf{Variational Bayes} (VB) is a popular posterior approximation
-algorithm, often used with the Dirichlet process. Some notation: 
-
-\begin{itemize}
-\item $\eta_\theta$: the variational parameters for the global parameters (the stick-breaking proportions, the cluster centroids, the cluster covariances). 
-\item $\eta_z$: the variational parameters for the categorical distributions on the 
-cluster belongings $z$. 
-\end{itemize}
-
-Note that by choosing a conditionally conjugate model for the cluster belongings, for a given $\eta_\theta$ we can solve in closed form the optimal $\eta_z$.
+We approximate the true posterior using \textbf{variational Bayes} (VB). Let $\eta^*$ denote the optimal variational parameters.
+% 
+% Note that: 
+% 
+% \begin{itemize}
+% 
+% \item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective. 
+% 
+% \item All approximate posterior quantities (e.g.\ the expected number of clusters) are functions of $\eta^*$. 
+% 
+% \end{itemize}
 
 \begin{mdframed}[style=MyFrame]
-- We wish to know how varying the stick-breaking proportion distribution $\nu_k \sim \text{Beta}(1, \alpha)$ will affect the inferred number of clusters. 
+- How does varying the distribution $\nu_k \sim \text{Beta}(1, \alpha)$ affect $\eta^*$?
 
 - While VB is fast, refitting for multiple choices of the DP prior would be
-computationally prohibitive. {\bf Hence, propose a linear approximation, derived from local sensitity measures. }
+computationally prohibitive.
+
+- {\bf Hence, we propose a linear approximation, derived from local sensitivity measures. }
 \end{mdframed}
 
 % Our objective is then 
@@ -329,28 +333,17 @@ computationally prohibitive. {\bf Hence, propose a linear approximation, derived
 \begin{itemize}
 
 \item Let $\epsilon$ be a real-valued hyperparameter for the stick-breaking distribution
-(e.\ g.\ , this could be the $\alpha$ concentration parameter). 
+(e.g., this could be the $\alpha$ concentration parameter). 
 
-\item The VB parameters $(\eta_\theta, \eta_z)$ depend on $\epsilon$. 
+\item The optimal VB parameters $\eta^*$ depend on $\epsilon$ through optimizing the KL objective. 
 
-\item The expected number of clusters present in the {\itshape current} iris dataset is a composition of the functions, 
+\item The expected number of clusters depend on $\eta^*$. Can use either an in-sample or a predictive quantity, 
 \vspace{-0.1in}
 \begin{align}
-\epsilon \mapsto
-\etathetaopt(\epsilon) \mapsto
-\etazopt\left(\etathetaopt\right) \mapsto
-\Expect_{q(z | \etazopt)} \left[ \#\{\text{distinct clusters}\} \right].
-\label{eq:maps_in_sample}
-\end{align}
-\vspace{-0.1in}
-Similarly for the predictive quantity, the expected number of clusters present in a {\itshape new} dataset: 
-\vspace{-0.1in}
-\begin{align}
-\epsilon \mapsto
-\etathetaopt(\epsilon) \mapsto
-\Expect_{q(\nu \vert \etathetaopt)} 
+\Expect_{q_{\eta^*}} \left[ \#\{\text{distinct clusters}\} \right]
+\quad \text{ or } \quad 
+\Expect_{q_{\eta^*}} 
 \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
-\label{eq:maps_predictive}
 \end{align}
 \end{itemize}
 
@@ -362,16 +355,16 @@ Similarly for the predictive quantity, the expected number of clusters present i
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item WOLOG, let $\epsilon=0$ represent the original posterior, and we approximate
+\item WOLOG, let $\epsilon=0$ represent the original prior at which we fit a VB approximation. Then for any other $\epsilon$ we approximate
 \begin{align}
-\etathetaopt(\epsilon)  &\approx  \etathetaopt(0) + 
-\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
+\eta^*(\epsilon)  &\approx  \eta^*(0) + 
+\frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
 \label{eq:linear_approx}
 \end{align}
 
-\item Evaluation of the derivative can be done efficiently using formulas from \cite{giordano:2017:covariances} and auto-differentiation tools \cite{maclaurin:2015:autograd}.
+\item Evaluation of the derivative is done efficiently using formulas from \cite{giordano:2017:covariances} and auto-differentiation tools \cite{maclaurin:2015:autograd}.
  
-\item We only use a linear approximation for the map $\epsilon \mapsto \etathetaopt(\epsilon)$. {We retain the non-linearities in the other maps of (\ref{eq:maps_in_sample}) and (\ref{eq:maps_predictive}). }
+\item We only use a linear approximation for the dependence of $\eta^*$ on $\epsilon$. We retain the non-linearities in the map from $\eta^*$ to the expected number of clusters.
 
 % as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$ 
 
@@ -389,6 +382,32 @@ Similarly for the predictive quantity, the expected number of clusters present i
 % \end{align}
 % where $KL(\eta_\theta, \epsilon)$ is the KL objective in Equation~\ref{eq:kl_objective}.
 % \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+\begin{center}
+\noindent\rule{0.6\textwidth}{1pt}
+\end{center}
+{\bf References}
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\section}[2]{}%
+\footnotesize{
+  \bibliographystyle{abbrv}
+  \bibliography{./references}
+}
+
+% \small{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+% {\bf Acknowledgments}:
+% % %%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ryan Giordano's research was funded in full by the
+% Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research is supported by an NSF CAREER Award and an ARO YIP
+% Award. This research is supported in part by the DARPA program on
+% Lifelong Learning Machines.
+% }
 
 \end{minipage}
 \hfill \vrule \hfill
@@ -409,12 +428,13 @@ Similarly for the predictive quantity, the expected number of clusters present i
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We infer the number of distinct species in the iris
-dataset \cite{iris_data_anderson}, and evaluate its sensitivity to the BNP prior.  
+dataset \cite{iris_data_anderson}, and evaluate sensitivity to the Dirichlet process prior.  
 \vspace{0.1in}
 
 {\bf \large Sensitivity to $\alpha$.}
 We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$. 
 
+\vspace{0.05in}
 % \begin{align*}
 % f^\alpha_\eta := \frac{\partial^2
 %   \QExpect
@@ -440,21 +460,27 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 
 
 \end{knitrout}
-\caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimizing versus the linear approximation. 
-The blue vertical line indicates the location of $\alpha_0$}
+\caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange). 
+Vertical line indicates the location of $\alpha_0$, the initial fit. }
 \end{figure}
 
 {\bf \large Sensitivity to functional perturbations. }
-We consider a multiplicative perturbation $\phi$ to
-the original beta distribution $p_0$ for the stick-breaking proportions:
-\vspace{-0.2in}
-\begin{align}
-\label{eq:expon_perturb}
-	p_c(\nu_k \vert \delta, \phi) :=
-  \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
-       {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
-\end{align}
-We evaluate the effect of $\delta$:
+Suppose we replace the original beta prior $p_0$ with another distribution $p_1$. Then we set our perturbation to be
+\vspace{-0.3in}
+\begin{align*}
+p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\right)^\delta
+\end{align*}
+\vspace{-0.3in}
+
+and evaluate sensitivity to $\delta$:
+% \vspace{-0.2in}
+% \begin{align}
+% \label{eq:expon_perturb}
+% 	p_c(\nu_k \vert \delta, \phi) :=
+%   \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
+%        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
+% \end{align}
+% We evaluate the effect of $\delta$:
 \vspace{0.1in}
 \begin{figure}
 \centering
@@ -469,7 +495,7 @@ We evaluate the effect of $\delta$:
 
 
 \end{knitrout}
-\caption{The effect of prior perturbation on the expected number of distinct clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_c$, $\delta = 1$, in blue. Middle: linearly approximated vs.
+\caption{The effect of prior perturbation on the expected number of clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_1$ in blue. Middle: linearly approximated vs.
 re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
 \end{figure}
 
@@ -487,40 +513,29 @@ re-fitted in-sample expected number of clusters. Right: linearly approximated vs
 
 \begin{itemize}
 
-\item The linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior. 
+\item {\bf Our linear approximation provides a fast alternative to re-evaluating the full model after changing the BNP prior. }
 
-\item We applied the approximation to both parametric and functional perturbations to the stick-breaking prior.
+\item We applied our approximation to both parametric and functional perturbations of the stick-breaking prior.
 
-\item We attempted to improve the linearity by approximating only the dependence of the global parameters on the prior parameter. We retained the non-linearity of the map from global parameters to posterior quantity. 
+\item We attempted to improve the linearity by approximating only the dependence of the optimal variational parameters on prior parameters.
 
 \end{itemize}
 \end{mdframed}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-{\bf References}
-%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\renewcommand{\section}[2]{}%
-\footnotesize{
-  \bibliographystyle{abbrv}
-  \bibliography{./references}
-}
+{\bf Our code: }\newline
+Paragami: general library for sensitivity analysis in optimization problems\newline
+{\color{blue} https://github.com/rgiordan/paragami}
+
+Code to evaluate BNP sensitivity as shown here: \newline
+{\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
+
+
 \end{minipage}\\
 
 \begin{center}
-\begin{minipage}[t]{\textwidth}
-\small{
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%
-% {\bf Acknowledgments}:
-% % %%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ryan Giordano's research was funded in full by the
-% Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research was supported in part by a Google Faculty Research Award and the Office of Naval Research under contract/grant number N00014-17-1-2072.\\
+
 {\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
-}
-\end{minipage}
+
 \end{center}
 
 \end{document}
