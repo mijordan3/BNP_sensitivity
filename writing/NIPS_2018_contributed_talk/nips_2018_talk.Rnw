@@ -98,22 +98,22 @@ Researchers often want to estimate the number of clusters present in a dataset.
 \vspace{-0.1in}
 \pause
 \begin{itemize}
-\item[--] e.g., number of ancentral populations from DNA sequences; number of clusters from gene expressions; number of topics in a corpus. 
+\item[--] e.g., number of ancestral populations from DNA sequences; number of clusters from gene expressions; number of topics in a corpus. 
 \end{itemize}
 
 \pause
 
 A Bayesian nonparametric (BNP) model makes inferring the number of clusters amenable to
-Bayesian inference. The exact posterior is approximated using variational Bayes. 
+Bayesian inference. We approximate the exact posterior using variational Bayes. 
 
 \pause
 
-\textbf{Question}: how sensitive is the resulting
-VB approximation of cluster cardinality to BNP model choices? 
+\textbf{Question}: how sensitive is the VB approximation, and the resulting
+inferences, to BNP model choices?
 
 \pause 
 
-\textbf{Problem}: evaluating for multiple model choices would be expensive. 
+\textbf{Problem}: re-running VB for multiple model choices is expensive. 
 
 \pause 
 
@@ -124,22 +124,20 @@ expensive refitting).
 \end{frame}
 
 \begin{frame}{Outline}
-
-{\bf The BNP Model}
+\begin{itemize}
+\item {\bf The BNP Model}
 \vspace{0.1in}
 
-{\bf The Variational Approximation}
+\item {\bf The Variational Approximation}
 \vspace{0.1in}
 
-{\bf The Posterior Quantity of Interest:} defining ``the number of clusters"
+\item {\bf Hyperparameter Sensitivity:} our linear approximation for VB sensitivity
 \vspace{0.1in}
 
-{\bf Hyperparameter Sensitivity:} our linear approximation for VB sensitivity
+\item {\bf Results:} sensitivity to both parametric and functional perturbations
 \vspace{0.1in}
 
-{\bf Results:} sensitivity to both parametric and functional perturbations
-\vspace{0.1in}
-
+\end{itemize}
 \end{frame}
 
 \begin{frame}{The BNP Model}
@@ -150,7 +148,24 @@ A {\bf Dirichlet process prior} allows for an infinite number of components.
 \includegraphics[width = 0.95\textwidth]{./figures/DP_stick_breaking.png}
 \caption{A schematic of the Dirichlet process prior}
 \end{figure}
+\vspace{-0.2in}
+
+While there are an infinite number of {\bf components}, we ask about the number of {\bf clusters}. \pause E.g.
+
+\begin{enumerate}[(1)]
+\item How many clusters are in the {\itshape current} dataset?
+
 \pause 
+\item Given our current knowledge, how many clusters would we expect to see in a {\itshape new} dataset?
+
+\end{enumerate}
+
+\pause 
+
+These quantities depend on the choice of stick-breaking prior. 
+
+\pause 
+
 \begin{mdframed}[style=MyFrame]
 \begin{center}
 {\bf What makes this stick-breaking prior a reasonable one?}
@@ -166,42 +181,20 @@ We posit a class of mean-field distributions parameterized by a real vector $\et
 We solve
 \begin{align*}
   \eta^* = \argmin_{\eta} KL\left(
-      q(\theta \vert \eta \big\| p(\theta | y)
+      q(\theta \vert \eta )\big\| p(\theta | y)
       \right)
 \end{align*}
-%
+
+\pause 
+
 Note that 
 
 \begin{itemize}
 \item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective. 
 
-\item All approximate posterior quantities are then functions of $\eta^*$
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}{The Posterior Quantity of Interest: number of clusters}
-
-Under our Dirichlet process prior, there are an infinite number of components. 
-
-But we can ask: 
-\begin{enumerate}[(1)]
-
 \pause 
 
-\item How many clusters are present in the {\bf current} dataset?
-
-\pause 
-
-\item How many clusters would we expect to be present in a {\bf new} dataset of particular size?
-
-\pause
-
-\end{enumerate}
-\vspace{0.2in}
-Both quantities are functions of the optimal variational parameter $\eta^*$: 
-%
+\item The approximate posterior quantities are then functions of $\eta^*$, e.g.\
 \begin{align*}
 \eta^* \mapsto
 \Expect_{q_{\eta^*}} \left[ \#\{\text{distinct clusters}\} \right]
@@ -211,13 +204,10 @@ Both quantities are functions of the optimal variational parameter $\eta^*$:
 \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
 \end{align*}
 
-\begin{mdframed}[style=MyFrame]
-\begin{center} 
-{\bf How do these quantities vary as the Dirichlet process prior varies?}
-\end{center}
-\end{mdframed}
+\end{itemize}
 
 \end{frame}
+
 
 \begin{frame}{Hyperparameter Sensitivity}
 
@@ -388,10 +378,10 @@ Suppose we wish to replace the original beta prior $p_0$ with another distributi
 \begin{align*}
 p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\right)^\delta
 \end{align*}
-
+\vspace{-0.25in}
 \begin{figure}[!h]
 \centering
-\includegraphics[width = 0.55\textwidth]{./images/functional_perturbation.png}
+\includegraphics[width = 0.65\textwidth]{./images/functional_perturbation.png}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
 
@@ -402,7 +392,7 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 \centering
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked1} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/fun_sens_masked_1} 
 }
 \end{knitrout}
 \end{figure}
@@ -413,7 +403,7 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 \centering
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/functional_sens_plot_thresh0_refit_only-1} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/fun_sens_masked_2} 
 }
 \end{knitrout}
 \end{figure}
@@ -424,11 +414,24 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 \centering
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/func_sens_masked2} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{masked_results_fig/fun_sens_masked_3} 
 }
 \end{knitrout}
 \end{figure}
 \end{frame}
+
+% \begin{frame}{Results: functional perturbation}
+% \begin{figure}
+% \centering
+% <<foo3, cache=cache_knitr>>=
+% SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
+% @
+% <<foo, cache=cache_knitr, fig.show='hold'>>=
+% source("Rscripts/appendix_functional_sens_results_thresh0_masked.R", echo=knitr_debug, print.eval=TRUE)
+% @
+% \end{figure}
+% 
+% \end{frame}
 
 \begin{frame}{Results: functional perturbation}
 \begin{figure}
@@ -448,6 +451,8 @@ source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, 
 
 {\bf Next steps}
 \begin{itemize}
+\item Higher order Taylor-expansions. 
+\pause 
 \item Other forms of functional perturbations
 \pause 
 \item Other metrics for ``number of clusters"
@@ -459,7 +464,7 @@ source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, 
 
 \begin{mdframed}[style=MyFrame]
 \begin{center}
-{\bf In summary, the linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior.}
+{\bf In summary, our linear approximation provides a fast and reasonable alternative to re-evaluating the full model after changing the BNP prior.}
 \end{center}
 \end{mdframed}
 
@@ -475,7 +480,8 @@ Runjing Liu, Ryan Giordano, Michael I. Jordan, Tamara Broderick. \newline
 Paragami: library for sensitivity analysis in optimization problems \newline
 {\color{blue}\url{https://github.com/rgiordan/paragami}}
 
-Repo to BNP code
+Code to evaluate BNP sensitivity implemented for this talk: 
+{\color{blue}\url{https://github.com/Runjing-Liu120/sensitivity_to_stick_breaking_in_BNP}}
 
 \vspace{0.2in}
 

@@ -44,8 +44,9 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 
 prior_pert1_results_plot <-
   plot_parametric_sensitivity(
-    results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-  theme(legend.position = c(0.65, 0.81), legend.title=element_blank())
+    results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$"), filter = TRUE) +
+  theme(legend.position = c(0.65, 0.81), legend.title=element_blank()) + 
+  ylim(c(6.8, 7.65))
 # prior_pert1_results_plot
 
 # plot results from second perturbation
@@ -72,7 +73,7 @@ colnames(results_df_prior_pert1) <- c('alpha', 'refitted', 'linear approx')
 
 prior_pert1_pred_results_plot <-
   plot_parametric_sensitivity(
-    results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+    results_df_prior_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$"), filter = TRUE) +
   theme(legend.position = 'None', legend.title=element_blank())
 # prior_pert1_pred_results_plot
 
