@@ -137,7 +137,7 @@ Bayesian Nonparametrics}
 
 \end{frame}
 
-\begin{frame}{Our resesarch problem}
+\begin{frame}{Our research problem}
 
 Researchers often want to estimate the number of clusters present in a dataset. 
 \vspace{-0.1in}
@@ -195,7 +195,7 @@ A {\bf Dirichlet process prior} allows for an infinite number of components.
 \end{figure}
 \vspace{-0.2in}
 
-While there are an infinite number of {\bf components}, we ask about the number of {\bf clusters}. \pause E.g.
+While there are an infinite number of {\bf components}, there are a finite number of {\bf clusters} in a given dataset. \pause We might ask: 
 
 \begin{enumerate}[(1)]
 \item How many clusters are in the {\itshape current} dataset?
@@ -220,6 +220,8 @@ These quantities depend on the choice of stick-breaking prior.
 \end{frame}
 
 \begin{frame}{The Variational Approximation}
+
+Let $\theta$ be unknown parameters and $y$ the data. 
 
 We posit a class of mean-field distributions parameterized by a real vector $\eta$. 
 
@@ -249,7 +251,15 @@ Note that
 \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
 \end{align*}
 
+\pause 
+
 \end{itemize}
+
+\begin{mdframed}[style=MyFrame]
+\begin{center}
+{\bf How do these approximate posterior quantities depend on the DP prior?}
+\end{center}
+\end{mdframed}
 
 \end{frame}
 
@@ -513,7 +523,7 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 
 {\bf Next steps}
 \begin{itemize}
-\item Higher order Taylor-expansions. 
+\item Higher order Taylor-expansions
 \pause 
 \item Other forms of functional perturbations
 \pause 
