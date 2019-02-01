@@ -14,7 +14,7 @@ library(StructureLRVB)
 # q_prob <- ddirichlet(q, alpha)
 # mean(-log(q_prob))
 # GetDirichletEntropy(alpha)
-# 
+#
 # apply(log(q), 2, mean)
 # GetELogDirichlet(alpha)
 
@@ -22,10 +22,10 @@ library(StructureLRVB)
 
 
 repo_loc <- file.path(Sys.getenv("GIT_REPO_LOC"),
-                      "variational_bayes/structure")
-setwd(file.path(repo_loc, "r_package/StructureLRVB/inst/R/"))
+                      "BNP_sensitivity/structure")
+#setwd(file.path(repo_loc, "r_package/StructureLRVB/inst/R/"))
 source(file.path(repo_loc, "get_sensitivity_lib.R"))
-source(file.path(repo_loc, "r_package/StructureLRVB/inst/R/get_sensitivity_lib.R"))
+#source(file.path(repo_loc, "r_package/StructureLRVB/inst/R/get_sensitivity_lib.R"))
 
 
 # data <- ReadStructureData(input.basename = file.path(repo_loc, "test_input_data/testdata_plain"),
@@ -61,7 +61,7 @@ ELBOCheckQ <- function(orig_nat_params, n, k, epsilon) {
 
 elbo_diff <- sapply(1:nat_params$n_ind, function(n) ELBOCheckQ(nat_params, n, 1, 1)) - elbo
 max(elbo_diff)
-  
+
 
 n <- 2
 
@@ -286,8 +286,3 @@ alpha_q_comp <-
   mutate(diff = perturbed - original) %>%
   group_by(n) %>%
   mutate(max_x=which.max(original))
-
-
-
-
-
