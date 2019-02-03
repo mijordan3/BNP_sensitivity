@@ -1,8 +1,18 @@
-# python setup.py build_ext --inplace
+# python3 setup.py build_ext --inplace
 
-from distutils.core import setup
 from Cython.Build import cythonize
+from distutils.core import setup
+from distutils.extension import Extension
+
+ext_modules = [
+    Extension("mixtures",
+              sources=["mixtures.pyx"],
+              libraries=["m"]  # Unix-like specific
+              )
+]
+
 
 setup(
-    ext_modules = cythonize("helloworld.pyx")
-)
+    ext_modules = cythonize(
+        "mixtures.pyx",
+        annotate=True))
