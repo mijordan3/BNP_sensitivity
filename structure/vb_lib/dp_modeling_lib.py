@@ -99,11 +99,10 @@ def get_e_log_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters
     assert tau.shape[-1] == 2
-    param_dim = tau.ndim - 1
 
-    digamma_alpha = sp.special.digamma(np.take(tau, indices = 0, axis = param_dim))
-    digamma_beta = sp.special.digamma(np.take(tau, indices = 1, axis = param_dim))
+    digamma_alpha = sp.special.digamma(tau[..., 0])
+    digamma_beta = sp.special.digamma(tau[..., 1])
 
-    digamma_alpha_beta = sp.special.digamma(np.sum(tau, axis = param_dim))
+    digamma_alpha_beta = sp.special.digamma(np.sum(tau, axis = -1))
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta

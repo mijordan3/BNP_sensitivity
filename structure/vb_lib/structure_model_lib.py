@@ -116,7 +116,8 @@ def get_entropy(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
     # get entropy term
 
     # entropy on population belongings
-    z_entropy = (np.log(e_z) * e_z).sum()
+
+    z_entropy = -(np.log(e_z + 1e-12) * e_z).sum()
 
     # entropy of individual admixtures
     stick_entropy = \
@@ -149,14 +150,14 @@ def get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp):
 ##########################
 # Optimization over e_z
 ##########################
-def get_z_nat_params(g_obs, e_log_p, e_log_1mp,
+def get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
                         ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
                         gh_loc, gh_weights):
 
-    # get likelihood term
+    # get likelihood of genes
     loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp)
 
-    # get weight term
+    # log likelihood of population belongings
     n = ind_mix_stick_propn_mean.shape[0]
     k = ind_mix_stick_propn_mean.shape[1] + 1
 
@@ -166,25 +167,18 @@ def get_z_nat_params(g_obs, e_log_p, e_log_1mp,
                         gh_loc, gh_weights).reshape(n, 1, k, 1)
 
     # loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
-    z_nat_param = loglik_gene_nlk + e_log_cluster_probs
+    loglik_cond_z = loglik_gene_nlk + e_log_cluster_probs
 
-    return z_nat_param
+    return loglik_cond_z
 
-def get_optimal_z(g_obs, e_log_p, e_log_1mp,
-                        ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                        gh_loc, gh_weights):
+def get_z_opt_from_loglik_cond_z(loglik_cond_z):
+    # 2nd axis dimension is k
+    # recall that loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
+    loglik_cond_z = loglik_cond_z - np.max(loglik_cond_z, axis = 2, keepdims = True)
 
-    z_nat_param = \
-        get_z_nat_params(g_obs, e_log_p, e_log_1mp,
-                                ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                                gh_loc, gh_weights)
-    _z_nat_param = z_nat_param - np.max(z_nat_param, axis = 1, keepdims = True)
+    log_const = sp.misc.logsumexp(loglik_cond_z, axis = 2, keepdims = True)
 
-    log_const = sp.misc.logsumexp(_z_nat_param, axis=1)
-    e_z = np.exp(_z_nat_param - log_const[:, None])
-
-    return e_z, z_nat_param
-
+    return np.exp(loglik_cond_z - log_const)
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
@@ -236,33 +230,29 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     e_log_p, e_log_1mp = dp_modeling_lib.get_e_log_beta(pop_freq_beta_params)
 
     # get optimal cluster belongings
-    e_z_opt, z_nat_param = \
-            get_optimal_z(g_obs, e_log_p, e_log_1mp,
+    loglik_cond_z = \
+            get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
                             ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
                             gh_loc, gh_weights)
+
+    e_z_opt = get_z_opt_from_loglik_cond_z(loglik_cond_z)
+
     if e_z is None:
         e_z = e_z_opt
-
 
     # weight data if necessary, and get likelihood of y
     if data_weights is not None:
         raise NotImplementedError()
     else:
-        e_loglik = np.sum(e_z * z_nat_param)
-
-    if not np.isfinite(e_loglik):
-        print('gamma', vb_params_dict['gamma'].get())
-        print('det gamma', np.linalg.slogdet(
-            vb_params_dict['gamma'])[1])
-        print('cluster weights', np.sum(e_z, axis = 0))
+        e_loglik = np.sum(e_z * loglik_cond_z)
 
     assert(np.isfinite(e_loglik))
 
     # entropy term
-    entropy = np.squeeze(get_entropy(ind_mix_stick_propn_mean,
+    entropy = get_entropy(ind_mix_stick_propn_mean,
                                         ind_mix_stick_propn_info,
                                         pop_freq_beta_params,
-                                        e_z, gh_loc, gh_weights))
+                                        e_z, gh_loc, gh_weights).squeeze()
     assert(np.isfinite(entropy))
 
     # prior term
@@ -270,7 +260,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                             e_log_p, e_log_1mp,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta,
-                            gh_loc, gh_weights)
+                            gh_loc, gh_weights).squeeze()
 
     assert(np.isfinite(e_log_prior))
 
