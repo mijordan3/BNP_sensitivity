@@ -2,13 +2,13 @@
 from cpython.array cimport array, clone
 
 import numpy as np
-from libc.math cimport exp, log
+from libc.math cimport exp, log, pow
 
 print("Hello World")
 
 
 def square(float x):
-    return x ** 2
+    return pow(x, 2)
 
 
 # e_z is overwritten.
@@ -37,13 +37,27 @@ def get_row_e_z(double[:] a_row, double[:] e_z):
     return e_z;
 
 
+# All JVPs of the indicator sum can be expressed as sums of this function.
+#
 # f\left(a,g,\alpha,\beta,p\right) =
 #   \sum_{n}\sum_{k}g_{nk}\left(\alpha+\beta a_{nk}\right)m_{nk}^{p}
-def mixture_sum(double[:,:] a):
-    cdef int n, k
+def mixture_sum(double[:,:] a,
+                double[:,:] g,
+                double alpha,
+                double beta,
+                int p):
 
     cdef int n_num = a.shape[0]
     cdef int k_num = a.shape[1]
+
+    cdef bint use_g;
+    if g.shape[0] == 0:
+        assert g.shape[1] == 0
+        use_g = False
+    else:
+        assert n_num == g.shape[0]
+        assert k_num == g.shape[1]
+        use_g = True
 
     # Allocate memory for e_z.  See this StackOverflow post:
     # https://tinyurl.com/y9x8dv8s
@@ -51,10 +65,15 @@ def mixture_sum(double[:,:] a):
     e_z = clone(template, k_num, False)
 
     cdef float total = 0
+    cdef int n
     for n in range(n_num):
         get_row_e_z(a[n, :], e_z)
-        print(e_z)
         for k in range(k_num):
-            total += e_z[k] * a[n, k]
+            if use_g:
+                total += \
+                    pow(e_z[k], p) * g[n, k] * (alpha + beta *a[n, k])
+            else:
+                total += \
+                    pow(e_z[k], p) * (alpha + beta *a[n, k])
 
     return total

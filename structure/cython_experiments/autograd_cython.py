@@ -39,6 +39,5 @@ def get_e_z(x):
     return np.exp(x - log_norm)
 
 e_z = get_e_z(x)
-print(e_z)
-print(np.sum(e_z, axis=1))
-print(np.sum(e_z * x), mixtures.mixture_sum(x))
+assert np.max(np.abs(np.sum(e_z, axis=1) - 1)) < 1e-8
+print(np.sum(e_z * x), mixtures.mixture_sum(x, np.empty((0, 0)), 0, 1, 1))
