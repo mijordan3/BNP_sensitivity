@@ -69,6 +69,10 @@ def get_e_z(double[:, :] a, double[:, :] e_z, int p):
 #
 # If g.shape == (0, 0), then it is not used (i.e., it is taken to be
 # identically 1).
+#
+# Note: this is not the right quantity to evaluate, since I have made
+# an error differentiating the E_z terms. It will actually need to be
+# more complicated than this.  See the notes in structre_model_rewrite.
 def get_mixture_sum(double[:,:] a,
                     double[:,:] g,
                     double alpha,
