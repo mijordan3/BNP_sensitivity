@@ -342,8 +342,7 @@ Implementation in cython and autograd
 \end_layout
 
 \begin_layout Standard
-How can we do this efficiently? NOTE NOTE NOTE the following is incorrect
- but the idea is workable, so I'm keeping it for now.
+How can we do this efficiently?
 \end_layout
 
 \begin_layout Standard
@@ -385,84 +384,35 @@ Even the sums are an
  matrix, a matrix as large as the data itself, except it's floats, not integers.
 \end_layout
 
-\begin_layout Standard
-In simpler, general terms, we want something like
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-f\left(a,b\right)=\sum_{n=1}^{N}\sum_{l=1}^{L}\sum_{k=1}^{K} & \left(a_{nk}+b_{lk}\right)m_{nlk}\\
-m_{nlk}= & \frac{\exp\left(a_{nk}+b_{lk}\right)}{\sum_{k=1}^{K}\exp\left(a_{nk}+b_{lk}\right)}.
-\end{align*}
-
-\end_inset
-
-Then
-\begin_inset Formula 
-\begin{align*}
-\frac{\partial f}{\partial a_{nk}} & =\sum_{l=1}^{L}m_{nlk}+\sum_{l=1}^{L}\sum_{k'=1}^{K}\left(a_{nk'}+b_{lk}\right)\frac{\partial m_{nlk'}}{\partial a_{nk}}.\\
-\frac{\partial m_{nlk}}{\partial a_{nk}} & =m_{nlk}\left(1-m_{nlk}\right),
-\end{align*}
-
-\end_inset
-
-and similarly,
-\begin_inset Formula 
-\begin{align*}
-\frac{\partial f}{\partial b_{lk}} & =\sum_{n=1}^{N}m_{nlk}+\sum_{n=1}^{N}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)\frac{\partial m_{nlk}}{\partial b_{lk}}.\\
-\frac{\partial m_{nlk}}{\partial b_{lk}} & =m_{nlk}\left(1-m_{nlk}\right).
-\end{align*}
-
-\end_inset
-
-Note that the derivatives have a quadratic term.
- For example,
-\begin_inset Formula 
-\begin{align*}
-\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)\frac{\partial m_{nlk}}{\partial a_{nk}} & =\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}\left(1-m_{nlk}\right)\\
- & =\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}-\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{2}.
-\end{align*}
-
-\end_inset
-
-The derivative of this is
-\begin_inset Formula 
-\begin{align*}
-g_{n}\left(a,b\right)= & \sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{2}\\
-\frac{\partial g_{n}}{a_{nk}}= & \sum_{l=1}^{L}m_{nlk}^{2}+2\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}\frac{\partial m_{nlk}}{\partial a_{nk}}\\
-= & \sum_{l=1}^{L}m_{nlk}^{2}+2\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{2}\left(1-m_{nlk}\right).
-\end{align*}
-
-\end_inset
-
-In fact,
-\begin_inset Formula 
-\begin{align*}
-g_{n,p}\left(a,b\right)= & \sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{p}\\
-\frac{\partial g_{n,p}}{a_{nk}}= & \sum_{l=1}^{L}m_{nlk}^{p}+p\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{p}\left(1-m_{nlk}\right)\\
-= & \sum_{l=1}^{L}m_{nlk}^{p}+p\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{p}-p\sum_{l=1}^{L}\sum_{k=1}^{K}\left(a_{nk}+b_{lk}\right)m_{nlk}^{p+1}.
-\end{align*}
-
-\end_inset
-
-So abstractions to calculate sums of 
-\begin_inset Formula $\left(a_{nk}+b_{lk}\right)m_{nlk}^{p}$
-\end_inset
-
- would suffices to define all derivatives.
-\end_layout
-
 \begin_layout Subsection
-A correct version in 1d
+A version in 1d
 \end_layout
 
 \begin_layout Standard
-Let
+Can we implement a single differentiable class of functions in Cython that
+ will let us express all derivatives of the objective function at the optimal
+ 
+\begin_inset Formula $\mbe\left[Z_{nlk}^{a}\right]$
+\end_inset
+
+? Let's try, starting for simplicity in the one-dimensional case.
+ As a start, define
 \begin_inset Formula 
 \begin{align*}
 f\left(a,g,\alpha,\beta,p\right) & =\sum_{n}\sum_{k}g_{nk}\left(\alpha+\beta a_{nk}\right)m_{nk}^{p}\\
 m_{nk} & =\frac{\exp\left(a_{nk}\right)}{\sum_{k'}\exp\left(a_{nk'}\right)}.
+\end{align*}
+
+\end_inset
+
+The gradients of the 
+\begin_inset Formula $m$
+\end_inset
+
+ matrix are
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{a_{nk}}\left(m_{nk'}^{p}\right) & =pm_{nk'}^{p-1}\left(\mathbb{I}\left(k=k'\right)m_{nk}-m_{nk}m_{nk'}\right).
 \end{align*}
 
 \end_inset
@@ -489,27 +439,261 @@ The first term is
 \begin_inset Formula $f\left(a,h\odot g,p\alpha+\beta,p\beta,p\right)$
 \end_inset
 
-, but the second is not expressible in terms of 
+, but the second is not expressible in terms of a single evaluation of 
 \begin_inset Formula $f$
 \end_inset
 
  I think.
+ However, they only require evaluation of terms that are length 
+\begin_inset Formula $n$
+\end_inset
+
+ in memory.
+ Perhaps this extends to the structure case....
+\end_layout
+
+\begin_layout Subsection
+A version in 2d
 \end_layout
 
 \begin_layout Standard
-The gradients of the 
+Let
+\begin_inset Formula 
+\begin{align*}
+f\left(a,b,g,\alpha,\beta_{a},\beta_{b},p\right) & =\sum_{n}\sum_{l}\sum_{k}g_{nk}\left(\alpha+\beta_{a}a_{nk}+\beta_{b}b_{lk}\right)m_{nlk}^{p}\\
+m_{nlk} & =\frac{\exp\left(a_{nk}+b_{lk}\right)}{\sum_{k'}\exp\left(a_{nk'}+b_{lk'}\right)}.
+\end{align*}
+
+\end_inset
+
+Then
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial f}{\partial a_{nk}} & =\sum_{l}\beta_{a}g_{nk}m_{nlk}^{p}+\\
+ & \quad\sum_{l}pg_{nk}\left(\alpha+\beta_{a}a_{nk}+\beta_{b}b_{lk}\right)m_{nlk}^{p-1}m_{nlk}-\\
+ & \quad\sum_{l}\sum_{k'}pg_{nk'}\left(\alpha+\beta_{a}a_{nk'}+\beta_{b}b_{lk'}\right)m_{nlk'}^{p-1}m_{nlk'}m_{nlk}\\
+ & =\sum_{l}g_{nk}\left(\alpha+\beta_{a}+p\beta_{a}a_{nk}+p\beta_{b}b_{lk}\right)m_{nlk}^{p}-\\
+ & \quad\sum_{l}\sum_{k'}g_{nk'}\left(p\alpha+p\beta_{a}a_{nk'}+p\beta_{b}b_{lk'}\right)m_{nlk'}^{p}m_{nlk}
+\end{align*}
+
+\end_inset
+
+The first term is in the form of 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ The second is
+\begin_inset Formula 
+\begin{align*}
+Term_{2} & =\sum_{l}\sum_{k'}g_{nk'}\left(p\alpha+p\beta_{a}a_{nk'}+p\beta_{b}b_{lk'}\right)m_{nlk'}^{p}m_{nlk}\\
+ & =\sum_{k'}g_{nk'}\left(p\alpha+p\beta_{a}a_{nk'}\right)\sum_{l}m_{nlk'}^{p}m_{nlk}+\sum_{l}\sum_{k'}g_{nk'}p\beta_{b}\left(b_{lk'}m_{nlk'}^{p}\right)m_{nlk}.
+\end{align*}
+
+\end_inset
+
+These can be calculated efficiently without storing an 
+\begin_inset Formula $n\times l$
+\end_inset
+
+ matrix, but the problem is that the next derivative will have a third-order
+ term in 
+\begin_inset Formula $m_{nlk}$
+\end_inset
+
+ (with different 
+\begin_inset Formula $k$
+\end_inset
+
+) and so on, so it does not suffice to define derivatives of 
+\begin_inset Formula $f$
+\end_inset
+
+ or partial sums thereof.
+ Since we necessarily have all of 
+\begin_inset Formula $m_{nk\cdot}$
+\end_inset
+
+ in memory at a time, this is possible in principle, but we need to express
+ it tidily.
+ Also, other than 
+\begin_inset Formula $m_{\cdot}$
+\end_inset
+
+, I think we can guarantee that no other term is indexed by both 
+\begin_inset Formula $n$
+\end_inset
+
+ and 
+\begin_inset Formula $l$
+\end_inset
+
+.
+ Thus every reverse mode output will marginalize over either 
+\begin_inset Formula $n$
+\end_inset
+
+ or 
+\begin_inset Formula $l$
+\end_inset
+
+.
+ View the second term of 
+\begin_inset Formula $Term_{2}$
+\end_inset
+
+ as a loop over 
+\begin_inset Formula $l$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+ & \sum_{k'}g_{nk'}p\beta_{b}b_{lk'}m_{nlk'}^{p}m_{nlk}.
+\end{align*}
+
+\end_inset
+
+Here we have a product of 
+\begin_inset Formula $l$
+\end_inset
+
+ indexed terms and 
+\begin_inset Formula $n$
+\end_inset
+
+ indexed terms, rather than a simple sum.
+ (That requirement only came from forward mode calculations, but I hate
+ to abandon it.) In general I believe you will only have sums and products
+ of 
+\begin_inset Formula $n-$
+\end_inset
+
+ and 
+\begin_inset Formula $l-$
+\end_inset
+
+indexed expressions.
+ Also, the 
+\begin_inset Formula $k-$
+\end_inset
+
+indices on each power of 
 \begin_inset Formula $m$
 \end_inset
 
- matrix are
+ may be bound either to 
+\begin_inset Formula $n$
+\end_inset
+
+ terms, 
+\begin_inset Formula $l$
+\end_inset
+
+ terms, or both (?).
+\end_layout
+
+\begin_layout Standard
+Let
 \begin_inset Formula 
 \begin{align*}
-\frac{d}{a_{nk}}\left(m_{nk'}^{p}\right) & =pm_{nk'}^{p-1}\left(\mathbb{I}\left(k=k'\right)m_{nk}-m_{nk}m_{nk'}\right).
+f\left(a,b,g,h\right) & =\sum_{n}\sum_{l}\sum_{k}g_{nk}h_{lk}m_{nlk}\\
+\frac{\partial f}{\partial a_{nk}} & =\sum_{l}m_{nlk}\left(g_{nk}h_{lk}m_{nlk}-\sum_{k'}g_{nk'}h_{lk'}m_{nlk'}m_{nlk}\right)\\
+ & =\sum_{l}g_{nk}h_{lk}m_{nlk}^{2}-\sum_{k'}g_{nk'}h_{lk'}m_{nlk'}m_{nlk}.
 \end{align*}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+An version that is more automated
+\end_layout
+
+\begin_layout Standard
+Perhaps the powers are confusing me.
+ Can we simplify by just viewing this as a delta function?
+\begin_inset Formula 
+\begin{align*}
+\frac{dm_{nlk_{1}}}{da_{nk_{2}}} & =\delta_{k_{1}=k_{2}}m_{nlk_{1}}-m_{nlk_{1}}m_{nlk_{2}}\\
+\frac{d}{da_{nk_{3}}}\frac{dm_{nlk_{1}}}{da_{nk_{2}}} & =\delta_{k_{1}=k_{2}}\frac{d}{da_{nk_{3}}}m_{nlk_{1}}-\frac{d}{da_{nk_{3}}}m_{nlk_{1}}m_{nlk_{2}}\\
+ & =\delta_{12}\left(\delta_{13}m_{nlk_{1}}-m_{nlk_{1}}m_{nlk_{3}}\right)-\left(\delta_{13}m_{nlk_{1}}-m_{nlk_{1}}m_{nlk_{3}}\right)m_{nlk_{2}}-\left(\delta_{23}m_{nlk_{2}}-m_{nlk_{2}}m_{nlk_{3}}\right)m_{nlk_{1}}
+\end{align*}
+
+\end_inset
+
+...which of course can be simplified.
+ How to make this mechanical? Every differentiation adds an index.
+ Each index is either an 
+\begin_inset Formula $m$
+\end_inset
+
+ term or a delta function.
+ Delta functions do not depend on 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ We could also denote a single 
+\begin_inset Quotes eld
+\end_inset
+
+keep
+\begin_inset Quotes erd
+\end_inset
+
+ index, as we will sometimes return quantities that have one 
+\begin_inset Formula $k$
+\end_inset
+
+ index but never two.
+ Some efficiency could be gained by consolidating delta functions but maybe
+ it is not worth it for low-order derivatives; the main savings will be
+ in using cython instead of big memory allocations.
+\end_layout
+
+\begin_layout Standard
+To evaluate a single term, then function would take a vector of 
+\begin_inset Formula $n$
+\end_inset
+
+ and 
+\begin_inset Formula $l$
+\end_inset
+
+ indexed functions, and of 
+\begin_inset Formula $m$
+\end_inset
+
+-like terms, and evaluate
+\begin_inset Formula 
+\begin{align*}
+f\left(\mu,g,h\right) & =\sum_{l}\sum_{k_{1}}...\sum_{k_{n}}\mu_{nlk_{1}}...\mu_{nlk_{n}}h_{nk_{1}}^{1}...h_{nk_{n}}^{n}g_{lk_{1}}^{1}...g_{lk_{n}}^{n},
+\end{align*}
+
+\end_inset
+
+where each 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is either a delta function or 
+\begin_inset Formula $m_{nlk}$
+\end_inset
+
+.
+ One could optionally be a special 
+\begin_inset Quotes eld
+\end_inset
+
+keep
+\begin_inset Quotes erd
+\end_inset
+
+ index, and the output would have the second axis be that index.
+ I believe this function would be sufficiently general and mechanically
+ differentiable.
 \end_layout
 
 \begin_layout Section
