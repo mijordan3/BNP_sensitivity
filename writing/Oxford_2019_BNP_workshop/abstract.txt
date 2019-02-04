@@ -1,0 +1,37 @@
+
+
+
+----------------
+
+A central question in many probabilistic clustering problems is how many
+distinct clusters are present in a particular dataset. Bayesian nonparametrics
+(BNP) addresses this question by placing a generative process on cluster
+assignment, making the number of distinct clusters present amenable to Bayesian
+inference. However, like all Bayesian approaches, BNP requires the specification
+of a prior, and this prior may favor a greater or fewer number of distinct
+clusters. In practice, it is important to quantitatively establish that the
+prior is not too informative, particularly when—as is often the case in BNP—the
+particular form of the prior is chosen for mathematical convenience rather than
+because of a considered subjective belief.
+
+We derive local sensitivity measures for a truncated variational Bayes
+approximation based on the Kullback-Leibler divergence. Local sensitivity
+measures approximate the nonlinear dependence of a VB optimum on prior
+parameters using a local Taylor series approximation. Using a stick-breaking
+representation of a Dirichlet process, we consider perturbations both to the
+scalar concentration parameter and to the functional form of the stick- breaking
+distribution.
+
+In the design and evaluation of our local sensitivity measures we pay special
+attention to our ability to accurately extrapolate to different priors, rather
+than treating the sensitivity as a measure of robustness per se. Extrapolation
+motivates the use of multiplicative perturbations to the functional form of the
+prior for VB, as the KL divergence is then linear in the perturbation.
+Additionally, we linearly approximate only the computationally intensive part of
+inference—the optimization of the global parameters—and retain the non-linearity
+of easily computed quantities.s
+
+We apply our methods to real and simulated datasets to estimate sensitivity of
+the expected number of distinct clusters present to the BNP prior specification,
+evaluating the accuracy of our approximations by comparing to the much more
+expensive process of re-fitting the model.

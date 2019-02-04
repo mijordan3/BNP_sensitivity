@@ -4,23 +4,25 @@ ReadStructureData <- function(input.basename, output.basename) {
   # Read the structure data and return a list of R data structures.
   # Args:
   #   *.basename: The base filename of the files missing only the file extensions
-  
+  #
+  # input.basename is not used.
+
   `%.%` <- function(x, y) {
     paste(x, y, sep=".")
   }
-  
+
   genome.matrix <- read.delim(output.basename %.% "genome", sep="", header=F)
   n <- nrow(genome.matrix)
   l <- ncol(genome.matrix)
   genome.matrix <- matrix(as.numeric(as.matrix(genome.matrix)), ncol=l, nrow=n)
-  
+
   # Load the outputs of the VB analysis.
   mean.p <- read.delim(output.basename %.% "meanP", sep="", header=F)
   k <- ncol(mean.p)
   names(mean.p) <- paste("p", 1:k, sep=".")
   mean.q <- read.delim(output.basename %.% "meanQ", sep="", header=F)
   names(mean.q) <- paste("q", 1:k, sep=".")
-  
+
   # The "var" files contain the actual variational parameters.
   # The varP file has two copies of variational parameters. -- the first
   # k columns are pi.var_beta, and the next k columns are pi.var_gamma.
@@ -28,7 +30,7 @@ ReadStructureData <- function(input.basename, output.basename) {
   colnames(var.p) <- paste(rep(c("p.beta", "p.gamma"), each=k), rep(1:k, 2), sep=".")
   var.q <- as.matrix(read.delim(output.basename %.% "varQ", sep="", header=F))
   colnames(var.q) <- paste("q", 1:k, sep=".")
-  
+
   return(list(genome.matrix=genome.matrix, mean.p=mean.p, mean.q=mean.q,
               var.p=var.p, var.q=var.q))
 }
@@ -36,11 +38,11 @@ ReadStructureData <- function(input.basename, output.basename) {
 
 SetMomentParams <- function(data) {
   pop_params <- list()
-  
+
   pop_params$n_ind <- nrow(data$var.q) # Number of individuals
   pop_params$n_gene <- nrow(data$var.p) # Number of genes
   pop_params$n_pop <- ncol(data$var.q) # Number of populations
-  
+
   pop_params$p_vec <- list()
   pop_params$omp_vec <- list()
   for (gene_ind in 1:pop_params$n_gene) {
@@ -60,7 +62,7 @@ SetMomentParams <- function(data) {
     pop_params$p_vec[[gene_ind]] <- e_log_p_vec
     pop_params$omp_vec[[gene_ind]] <- e_log_omp_vec
   }
-  
+
   pop_params$q_vec <- list()
   for (ind in 1:pop_params$n_ind) {
     e_log_q <- DirichletELogX(data$var.q[ind, ])
@@ -71,11 +73,11 @@ SetMomentParams <- function(data) {
 
 SetNaturalParams <- function(data) {
   nat_params <- list()
-  
+
   nat_params$n_ind <- nrow(data$var.q) # Number of individuals
   nat_params$n_gene <- nrow(data$var.p) # Number of genes
   nat_params$n_pop <- ncol(data$var.q) # Number of populations
-  
+
   # Actually these will be the natural parameters not the moment parameters.
   nat_params$p_vec <- list()
   nat_params$omp_vec <- list()
@@ -95,7 +97,7 @@ SetNaturalParams <- function(data) {
     nat_params$p_vec[[gene_ind]] <- alpha_p_vec
     nat_params$omp_vec[[gene_ind]] <- alpha_omp_vec
   }
-  
+
   nat_params$q_vec <- list()
   for (ind in 1:nat_params$n_ind) {
     alpha_q <- data$var.q[ind, ]
@@ -133,10 +135,8 @@ ConvertParameterListToDataFrame <- function(par_list) {
 GetELBO <- function(genome_matrix_int, loc_natural_params, prior_params, use_kahan_sum=TRUE) {
   loc_moment_params <- GetMomentParameters(loc_natural_params)
   log_lik <- GetLogLikelihood(genome_matrix_int, loc_moment_params, prior_params, use_kahan_sum)
-  entropy <- GetEntropy(genome_matrix_int, loc_natural_params, use_kahan_sum) 
+  entropy <- GetEntropy(genome_matrix_int, loc_natural_params, use_kahan_sum)
   cat("Log Lik: ", log_lik, "\n")
   cat("Entropy: ", entropy, "\n")
   return(log_lik + entropy)
 }
-
-
