@@ -474,10 +474,9 @@ m_{nk} & =\frac{\exp\left(a_{nk}\right)}{\sum_{k'}\exp\left(a_{nk'}\right)}.
 The reverse mode and forward mode products are given by:
 \begin_inset Formula 
 \begin{align*}
-\frac{\partial f}{\partial a_{nk}} & =g_{nk}\beta m_{nk}^{p}+g_{nk}\left(\alpha+\beta a_{nk}\right)pm_{nk}^{p-1}m_{nk}-\sum_{k'}g_{nk'}\left(\alpha+\beta a_{nk'}\right)pm_{nk'}^{p-1}m_{nk'}^{2}\\
- & =g_{nk}\left(\left(p\alpha+\beta\right)+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{k'}g_{nk'}\left(p\alpha+p\beta a_{nk'}\right)m_{nk'}^{p+1}\\
-\sum_{n}\sum_{k}\frac{\partial f}{\partial a_{nk}}h_{nk} & =\sum_{n}\sum_{k}h_{nk}g_{nk}\left(p\alpha+\beta+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{n}\sum_{k}\left(\sum_{k'}h_{nk'}\right)g_{nk}\left(p\alpha+p\beta a_{nk}\right)m_{nk}^{p+1}\\
- & =f\left(a,h\odot g,p\alpha+\beta,p\beta,p\right)-f\left(a,\left(\sum_{k'}h_{nk'}\right)\odot g,p\alpha,p\beta,p+1\right).
+\frac{\partial f}{\partial a_{nk}} & =g_{nk}\beta m_{nk}^{p}+g_{nk}\left(\alpha+\beta a_{nk}\right)pm_{nk}^{p-1}m_{nk}-m_{nk}\sum_{k'}g_{nk'}\left(\alpha+\beta a_{nk'}\right)pm_{nk'}^{p-1}m_{nk'}\\
+ & =g_{nk}\left(\left(p\alpha+\beta\right)+p\beta a_{nk}\right)m_{nk}^{p}-m_{nk}\sum_{k'}g_{nk'}\left(p\alpha+p\beta a_{nk'}\right)m_{nk'}^{p}\\
+\sum_{n}\sum_{k}\frac{\partial f}{\partial a_{nk}}h_{nk} & =\sum_{n}\sum_{k}h_{nk}g_{nk}\left(p\alpha+\beta+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{n}\left(\sum_{k}h_{nk}m_{nk}\right)\left(\sum_{k'}g_{nk'}\left(p\alpha+p\beta a_{nk'}\right)m_{nk'}^{p}\right)
 \end{align*}
 
 \end_inset
@@ -486,15 +485,31 @@ The reverse mode and forward mode products are given by:
 \end_layout
 
 \begin_layout Standard
-Consequently, a cython implementation of 
+The first term is 
+\begin_inset Formula $f\left(a,h\odot g,p\alpha+\beta,p\beta,p\right)$
+\end_inset
+
+, but the second is not expressible in terms of 
 \begin_inset Formula $f$
 \end_inset
 
- is also capable of expressing all Jacobian-vector products of 
-\begin_inset Formula $f$
+ I think.
+\end_layout
+
+\begin_layout Standard
+The gradients of the 
+\begin_inset Formula $m$
 \end_inset
 
-.
+ matrix are
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{a_{nk}}\left(m_{nk'}^{p}\right) & =pm_{nk'}^{p-1}\left(\mathbb{I}\left(k=k'\right)m_{nk}-m_{nk}m_{nk'}\right).
+\end{align*}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

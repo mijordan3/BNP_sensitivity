@@ -21,25 +21,26 @@ alpha = 0
 beta = 1
 p = 1
 
-def get_e_z(x):
+def get_e_z(x, p=1):
     log_norm = sp.misc.logsumexp(x, axis=1, keepdims=True)
-    return np.exp(x - log_norm)
+    e_z = np.exp(x - log_norm)
+    return e_z ** p
 
-e_z = get_e_z(x)
-assert np.max(np.abs(np.sum(e_z, axis=1) - 1)) < 1e-8
+assert np.max(np.abs(np.sum(get_e_z(x), axis=1) - 1)) < 1e-8
 
 
-def mix_get_e_z(x):
+def mix_get_e_z(x, p=1):
     e_z = np.zeros_like(x)
-    mixtures.get_e_z(x, e_z, 1)
+    mixtures.get_e_z(x, e_z, p)
     return e_z
 
-assert np.max(np.abs(mix_get_e_z(x) - e_z) < 1e-8)
+assert np.max(np.abs(mix_get_e_z(x, 2) - get_e_z(x, 2)) < 1e-8)
 print('ok')
 
 
-#
-#
+
+
+
 # print('sum accuracy ', np.sum(e_z * x) -
 #       mixtures.get_mixture_sum(x, np.ones_like(x), 0, 1, 1, np.empty((0, 0))))
 #
