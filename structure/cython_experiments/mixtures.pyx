@@ -4,11 +4,17 @@ from cpython.array cimport array, clone
 import numpy as np
 from libc.math cimport exp, log, pow
 
-print("Hello World")
+
+def myprod(double x, double y):
+    return x * pow(y, 2)
+
+
+def mypow(float x, int p):
+    return pow(x, p)
 
 
 def square(float x):
-    return pow(x, 2)
+    return mypow(x, 2)
 
 
 # e_z is overwritten.
@@ -41,11 +47,15 @@ def get_row_e_z(double[:] a_row, double[:] e_z):
 #
 # f\left(a,g,\alpha,\beta,p\right) =
 #   \sum_{n}\sum_{k}g_{nk}\left(\alpha+\beta a_{nk}\right)m_{nk}^{p}
-def mixture_sum(double[:,:] a,
-                double[:,:] g,
-                double alpha,
-                double beta,
-                int p):
+#
+# If g.shape == (0, 0), then it is not used (i.e., it is taken to be
+# identically 1).
+def get_mixture_sum(double[:,:] a,
+                    double[:,:] g,
+                    double alpha,
+                    double beta,
+                    int p,
+                    double[:,:] result):
 
     cdef int n_num = a.shape[0]
     cdef int k_num = a.shape[1]
@@ -59,21 +69,38 @@ def mixture_sum(double[:,:] a,
         assert k_num == g.shape[1]
         use_g = True
 
+    cdef bint save_result;
+    if result.shape[0] == 0:
+        assert result.shape[1] == 0
+        save_result = False
+    else:
+        assert n_num == result.shape[0]
+        assert k_num == result.shape[1]
+        save_result = True
+
     # Allocate memory for e_z.  See this StackOverflow post:
     # https://tinyurl.com/y9x8dv8s
     cdef array[double] arr, template = array('d')
     e_z = clone(template, k_num, False)
 
-    cdef float total = 0
+    cdef double total = 0
     cdef int n
+    cdef double g_n_k = 1;
+    cdef double e_z_k_p;
+    cdef double term;
     for n in range(n_num):
         get_row_e_z(a[n, :], e_z)
         for k in range(k_num):
             if use_g:
-                total += \
-                    pow(e_z[k], p) * g[n, k] * (alpha + beta *a[n, k])
+                g_n_k = g[n, k]
+            if p == 1:
+                e_z_k_p = e_z[k]
             else:
-                total += \
-                    pow(e_z[k], p) * (alpha + beta *a[n, k])
+                e_z_k_p = pow(e_z[k], p)
+
+            term = e_z_k_p * g_n_k * (alpha + beta * a[n, k])
+            if save_result:
+                result[n, k] = term
+            total += term
 
     return total

@@ -467,7 +467,11 @@ m_{nk} & =\frac{\exp\left(a_{nk}\right)}{\sum_{k'}\exp\left(a_{nk'}\right)}.
 
 \end_inset
 
-Then
+
+\end_layout
+
+\begin_layout Standard
+The reverse mode and forward mode products are given by:
 \begin_inset Formula 
 \begin{align*}
 \frac{\partial f}{\partial a_{nk}} & =g_{nk}\beta m_{nk}^{p}+g_{nk}\left(\alpha+\beta a_{nk}\right)pm_{nk}^{p-1}m_{nk}-\sum_{k'}g_{nk'}\left(\alpha+\beta a_{nk'}\right)pm_{nk'}^{p-1}m_{nk'}^{2}\\
@@ -478,6 +482,10 @@ Then
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 Consequently, a cython implementation of 
 \begin_inset Formula $f$
 \end_inset
