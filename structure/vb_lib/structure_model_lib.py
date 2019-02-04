@@ -139,11 +139,11 @@ def get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp):
 
     genom_loglik_nlk_a = \
         np.einsum('nl, lk -> nlk', g_obs[:, :, 0], e_log_1mp) + \
-            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + g_obs[:, :, 2], e_log_1mp)
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + g_obs[:, :, 2], e_log_p)
 
     genom_loglik_nlk_b = \
         np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + g_obs[:, :, 1], e_log_1mp) + \
-            np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_1mp)
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_p)
 
     return np.stack((genom_loglik_nlk_a, genom_loglik_nlk_b), axis = -1)
 
@@ -183,7 +183,8 @@ def get_z_opt_from_loglik_cond_z(loglik_cond_z):
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
                     e_z = None,
-                    data_weights = None):
+                    data_weights = None,
+                    true_pop_allele_freq = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -227,7 +228,11 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
 
     # expected log beta and expected log(1 - beta)
-    e_log_p, e_log_1mp = dp_modeling_lib.get_e_log_beta(pop_freq_beta_params)
+    if true_pop_allele_freq is None:
+        e_log_p, e_log_1mp = dp_modeling_lib.get_e_log_beta(pop_freq_beta_params)
+    else:
+        e_log_p = np.log(true_pop_allele_freq + 1e-8)
+        e_log_1mp = np.log(1 - true_pop_allele_freq + 1e-8)
 
     # get optimal cluster belongings
     loglik_cond_z = \
