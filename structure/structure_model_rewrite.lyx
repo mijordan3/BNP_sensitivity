@@ -475,7 +475,7 @@ The reverse mode and forward mode products are given by:
 \begin_inset Formula 
 \begin{align*}
 \frac{\partial f}{\partial a_{nk}} & =g_{nk}\beta m_{nk}^{p}+g_{nk}\left(\alpha+\beta a_{nk}\right)pm_{nk}^{p-1}m_{nk}-\sum_{k'}g_{nk'}\left(\alpha+\beta a_{nk'}\right)pm_{nk'}^{p-1}m_{nk'}^{2}\\
- & =g_{nk}\left(p\alpha+\beta+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{k'}g_{nk'}\left(p\alpha+p\beta a_{nk'}\right)m_{nk'}^{p+1}\\
+ & =g_{nk}\left(\left(p\alpha+\beta\right)+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{k'}g_{nk'}\left(p\alpha+p\beta a_{nk'}\right)m_{nk'}^{p+1}\\
 \sum_{n}\sum_{k}\frac{\partial f}{\partial a_{nk}}h_{nk} & =\sum_{n}\sum_{k}h_{nk}g_{nk}\left(p\alpha+\beta+p\beta a_{nk}\right)m_{nk}^{p}-\sum_{n}\sum_{k}\left(\sum_{k'}h_{nk'}\right)g_{nk}\left(p\alpha+p\beta a_{nk}\right)m_{nk}^{p+1}\\
  & =f\left(a,h\odot g,p\alpha+\beta,p\beta,p\right)-f\left(a,\left(\sum_{k'}h_{nk'}\right)\odot g,p\alpha,p\beta,p+1\right).
 \end{align*}

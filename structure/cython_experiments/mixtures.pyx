@@ -60,6 +60,7 @@ def get_mixture_sum(double[:,:] a,
     cdef int n_num = a.shape[0]
     cdef int k_num = a.shape[1]
 
+    # Check whether g is identically one
     cdef bint use_g;
     if g.shape[0] == 0:
         assert g.shape[1] == 0
@@ -69,6 +70,7 @@ def get_mixture_sum(double[:,:] a,
         assert k_num == g.shape[1]
         use_g = True
 
+    # Check whether to save the matrix of results
     cdef bint save_result;
     if result.shape[0] == 0:
         assert result.shape[1] == 0
