@@ -43,6 +43,25 @@ def get_row_e_z(double[:] a_row, double[:] e_z):
     return e_z;
 
 
+# Get e_z to a power in place.
+def get_e_z(double[:, :] a, double[:, :] e_z, int p):
+    cdef int n_num = a.shape[0]
+    cdef int k_num = a.shape[1]
+    assert n_num == e_z.shape[0]
+    assert k_num == e_z.shape[1]
+
+    # Allocate memory for e_z.  See this StackOverflow post:
+    # https://tinyurl.com/y9x8dv8s
+    cdef array[double] arr, template = array('d')
+    e_z_row = clone(template, k_num, False)
+
+    for n in range(n_num):
+        get_row_e_z(a[n, :], e_z_row)
+        for k in range(k_num):
+            e_z[n, k] = pow(e_z_row[k], p)
+
+
+
 # All JVPs of the indicator sum can be expressed as sums of this function.
 #
 # f\left(a,g,\alpha,\beta,p\right) =
