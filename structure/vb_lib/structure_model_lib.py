@@ -152,7 +152,8 @@ def get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp):
 ##########################
 def get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
                         ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                        gh_loc, gh_weights):
+                        gh_loc, gh_weights,
+                        true_ind_admix_propn = None):
 
     # get likelihood of genes
     loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp)
@@ -161,10 +162,13 @@ def get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
     n = ind_mix_stick_propn_mean.shape[0]
     k = ind_mix_stick_propn_mean.shape[1] + 1
 
-    e_log_cluster_probs = \
-        dp_modeling_lib.get_e_log_cluster_probabilities(
-                        ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                        gh_loc, gh_weights).reshape(n, 1, k, 1)
+    if true_ind_admix_propn is None:
+        e_log_cluster_probs = \
+            dp_modeling_lib.get_e_log_cluster_probabilities(
+                            ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
+                            gh_loc, gh_weights).reshape(n, 1, k, 1)
+    else:
+        e_log_cluster_probs = np.log(true_ind_admix_propn).reshape(n, 1, k, 1)
 
     # loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
     loglik_cond_z = loglik_gene_nlk + e_log_cluster_probs
@@ -184,7 +188,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
                     e_z = None,
                     data_weights = None,
-                    true_pop_allele_freq = None):
+                    true_pop_allele_freq = None,
+                    true_ind_admix_propn = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -238,7 +243,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     loglik_cond_z = \
             get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
                             ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                            gh_loc, gh_weights)
+                            gh_loc, gh_weights,
+                            true_ind_admix_propn = true_ind_admix_propn)
 
     e_z_opt = get_z_opt_from_loglik_cond_z(loglik_cond_z)
 
