@@ -95,6 +95,55 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
 
     return e_log_stick_remain + e_log_new_stick
 
+def _cumprod_through_log(x, axis = None):
+    # a replacement for np.cumprod since
+    # Autograd doesn't work with the original cumprod.
+    return np.exp(np.cumsum(np.log(x), axis = axis))
+
+def get_mixture_weights_from_stick_break_propns(stick_break_propns):
+    """
+    Computes stick lengths (i.e. mixture weights) from stick breaking
+    proportions.
+    Parameters
+    ----------
+    stick_break_propns : ndarray
+        Array of stick breaking proportions.
+    Returns
+    -------
+    mixture_weights : ndarray
+        An array  the same size as stick_break_propns,
+        with the mixture weights computed for each row of
+        stick breaking proportions.
+    """
+
+    # if input is a vector, make it a 1 x k_approx array
+    if len(np.shape(stick_break_propns)) == 1:
+        stick_break_propns = np.array([stick_break_propns])
+
+    # number of components
+    k_approx = np.shape(stick_break_propns)[1]
+    # number of mixtures
+    n = np.shape(stick_break_propns)[0]
+
+    stick_break_propns_1m = 1 - stick_break_propns
+    stick_remain = np.hstack((np.ones((n, 1)),
+                        _cumprod_through_log(stick_break_propns_1m, axis = 1)))
+    stick_add = np.hstack((stick_break_propns,
+                                np.ones((n, 1))))
+
+    mixture_weights = (stick_remain * stick_add).squeeze()
+
+    return mixture_weights
+
+def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
+                                        gh_loc, gh_weights):
+    e_cluster_probs = \
+        ef.get_e_logitnormal(stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
+
+    return get_mixture_weights_from_stick_break_propns(e_cluster_probs)
+
+
+
 def get_e_log_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters

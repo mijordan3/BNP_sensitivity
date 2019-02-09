@@ -9,9 +9,11 @@ from sklearn.cluster import KMeans
 from copy import deepcopy
 
 import paragami
+from paragami import OptimizationObjective
+
+import time
 
 def run_bfgs(get_loss, init_vb_free_params,
-                    get_loss_grad =  None,
                     maxiter = 10, gtol = 1e-8):
 
     """
@@ -42,15 +44,13 @@ def run_bfgs(get_loss, init_vb_free_params,
         The OptimizeResult class from returned by scipy.optimize.minimize.
 
     """
-
-    if get_loss_grad is None:
-        get_loss_grad = autograd.grad(get_loss)
+    get_loss_objective = OptimizationObjective(get_loss)
 
     # optimize
     bfgs_output = optimize.minimize(
-            get_loss,
+            get_loss_objective.f,
             x0=init_vb_free_params,
-            jac=get_loss_grad,
+            jac=get_loss_objective.grad,
             method='BFGS',
             options={'maxiter': maxiter, 'disp': True, 'gtol': gtol})
 
@@ -92,18 +92,21 @@ def precondition_and_optimize(get_loss, init_vb_free_params,
 
     # get preconditioned function
     print('computing preconditioner ')
+    t0 = time.time()
     precond_fun = paragami.PreconditionedFunction(get_loss)
     _ = precond_fun.set_preconditioner_with_hessian(x = init_vb_free_params,
                                                         ev_min=1e-4)
+    print('preconditioning time: {0:.2f}'.format(time.time() - t0))
 
     # optimize
+    get_loss_precond_objective = OptimizationObjective(precond_fun)
     print('running newton steps')
     trust_ncg_output = optimize.minimize(
                             method='trust-ncg',
                             x0=precond_fun.precondition(init_vb_free_params),
-                            fun=precond_fun,
-                            jac=autograd.grad(precond_fun),
-                            hessp=autograd.hessian_vector_product(precond_fun),
+                            fun=get_loss_precond_objective.f,
+                            jac=get_loss_precond_objective.grad,
+                            hessp=get_loss_precond_objective.hessian_vector_product,
                             options={'maxiter': maxiter, 'disp': True, 'gtol': gtol})
 
     # Uncondition
@@ -154,14 +157,14 @@ def optimize_full(get_loss, init_vb_free_params,
 
     """
 
-    # compute the gradient
     get_loss_grad = autograd.grad(get_loss)
 
     # run a few steps of bfgs
     print('running bfgs ... ')
     bfgs_vb_free_params, bfgs_ouput = run_bfgs(get_loss,
                                 init_vb_free_params,
-                                maxiter = bfgs_max_iter, gtol = gtol)
+                                maxiter = bfgs_max_iter,
+                                gtol = gtol)
     x = bfgs_vb_free_params
     f_val = get_loss(x)
 
