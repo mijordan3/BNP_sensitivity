@@ -11,7 +11,66 @@ from copy import deepcopy
 import paragami
 from paragami import OptimizationObjective
 
+from sklearn.decomposition import NMF
+
 import time
+
+import dp_modeling_lib
+
+def cluster_and_get_init(g_obs, k):
+    # g_obs should be n_obs x n_loci x 3,
+    # a one-hot encoding of genotypes
+    assert len(g_obs.shape) == 3
+
+    # convert one-hot encoding to probability of A genotype, {0, 0.5, 1}
+    x = g_obs.argmax(axis = 2) / 2
+
+    # run NMF
+    model = NMF(n_components=k, init='random')
+    init_ind_admix_propn_unscaled = model.fit_transform(x)
+    init_pop_allele_freq_unscaled = model.components_.T
+
+    # divide by largest allele frequency, so all numbers between 0 and 1
+    denom_pop_allele_freq = np.max(init_pop_allele_freq_unscaled)
+    init_pop_allele_freq = init_pop_allele_freq_unscaled / \
+                                denom_pop_allele_freq
+
+    # normalize rows
+    denom_ind_admix_propn = \
+        init_ind_admix_propn_unscaled.sum(axis = 1, keepdims = True)
+    init_ind_admix_propn = \
+        init_ind_admix_propn_unscaled / denom_ind_admix_propn
+    # clip again and renormalize
+    init_ind_admix_propn = init_ind_admix_propn.clip(0.05, 0.95)
+    init_ind_admix_propn = init_ind_admix_propn / \
+                            init_ind_admix_propn.sum(axis = 1, keepdims = True)
+
+    return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
+
+def set_init_vb_params(g_obs, k_approx, vb_params_dict):
+    # get initial admixtures, and population frequencies
+    init_ind_admix_propn, init_pop_allele_freq = \
+            cluster_and_get_init(g_obs, k_approx)
+
+    # set bnp parameters for individual admixture
+    # set mean to be logit(stick_breaking_propn), info to be 1
+    stick_break_propn = \
+        dp_modeling_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
+    ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
+    ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
+
+    # set beta paramters for population paramters
+    # set beta = 1, alpha to have the correct mean
+    pop_freq_beta_params1 = init_pop_allele_freq / (1 - init_pop_allele_freq)
+    pop_freq_beta_params2 = np.ones(init_pop_allele_freq.shape)
+    pop_freq_beta_params = np.concatenate((pop_freq_beta_params1[:, :, None],
+                                       pop_freq_beta_params2[:, :, None]), axis = 2)
+
+    vb_params_dict['ind_mix_stick_propn_mean'] = ind_mix_stick_propn_mean
+    vb_params_dict['ind_mix_stick_propn_info'] = ind_mix_stick_propn_info
+    vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
+
+    return vb_params_dict
 
 def run_bfgs(get_loss, init_vb_free_params,
                     maxiter = 10, gtol = 1e-8):

@@ -142,7 +142,27 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
 
     return get_mixture_weights_from_stick_break_propns(e_cluster_probs)
 
+def get_stick_break_propns_from_mixture_weights(mixture_weights):
+    n_obs = mixture_weights.shape[0]
+    k_approx = mixture_weights.shape[1]
 
+    stick_break_propn = np.zeros((n_obs, k_approx - 1))
+    stick_remain = np.ones(n_obs)
+
+    for i in range(k_approx - 1):
+        stick_break_propn[:, i] = mixture_weights[:, i] / stick_remain
+        stick_remain *= (1 - stick_break_propn[:, i])
+
+    return stick_break_propn
+
+def get_e_beta(tau):
+    # tau should have shape (..., 2). The last dimensions are the
+    # beta parameters
+    assert tau.shape[-1] == 2
+
+    sum_alpha_beta = np.sum(tau, axis = -1)
+
+    return tau[..., 0] / sum_alpha_beta
 
 def get_e_log_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the

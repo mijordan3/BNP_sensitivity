@@ -1,5 +1,10 @@
 import numpy as np
 
+from scipy import spatial
+import scipy.cluster.hierarchy as sch
+
+from itertools import permutations
+
 def get_one_hot(targets, nb_classes):
     # TODO: test this
     res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
@@ -37,3 +42,37 @@ def draw_data(pop_allele_freq, ind_admix_propn):
     g_obs = get_one_hot(g_obs, nb_classes=3)
 
     return g_obs
+
+
+####################
+# Other utils for
+# permuting / clustering matrices
+####################
+def find_min_perm(x, y, axis = 0):
+    # perumutes array x along axis to find closest
+    # match to y
+
+    perms = list(permutations(np.arange(x.shape[axis])))
+
+    i = 0
+    diff_best = np.Inf
+    for perm in perms:
+
+        x_perm = x.take(perm, axis)
+
+        diff = np.sum((x_perm - y)**2)
+
+        if diff < diff_best:
+            diff_best = diff
+            i_best = i
+
+        i += 1
+
+    return perms[i_best]
+
+def cluster_admix_get_indx(ind_admix_propn):
+    # clusters the individual admixtures for better plotting
+    y = sch.linkage(ind_admix_propn, method='average')
+    indx = sch.dendrogram(y, no_plot=True)["leaves"]
+
+    return indx
