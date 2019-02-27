@@ -4,9 +4,14 @@ import autograd.scipy as sp
 
 import paragami
 
-import dp_modeling_lib
+import sys
+sys.path.insert(0, '../../BNP_modeling/')
+import modeling_lib
+import cluster_quantities_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
+
+from sklearn.decomposition import NMF
 
 ##########################
 # Set up vb parameters
@@ -97,7 +102,7 @@ def get_e_log_prior(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
 
     # dp prior on individual mixtures
     ind_mix_dp_prior = \
-        dp_modeling_lib.get_e_logitnorm_dp_prior(ind_mix_stick_propn_mean,
+        modeling_lib.get_e_logitnorm_dp_prior(ind_mix_stick_propn_mean,
                                             ind_mix_stick_propn_info,
                                             dp_prior_alpha, gh_loc, gh_weights)
 
@@ -121,7 +126,7 @@ def get_entropy(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
 
     # entropy of individual admixtures
     stick_entropy = \
-        dp_modeling_lib.get_stick_breaking_entropy(
+        modeling_lib.get_stick_breaking_entropy(
                                 ind_mix_stick_propn_mean,
                                 ind_mix_stick_propn_info,
                                 gh_loc, gh_weights)
@@ -164,7 +169,7 @@ def get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
 
     if true_ind_admix_propn is None:
         e_log_cluster_probs = \
-            dp_modeling_lib.get_e_log_cluster_probabilities(
+            modeling_lib.get_e_log_cluster_probabilities(
                             ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
                             gh_loc, gh_weights).reshape(n, 1, k, 1)
     else:
@@ -234,7 +239,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     # expected log beta and expected log(1 - beta)
     if true_pop_allele_freq is None:
-        e_log_p, e_log_1mp = dp_modeling_lib.get_e_log_beta(pop_freq_beta_params)
+        e_log_p, e_log_1mp = modeling_lib.get_e_log_beta(pop_freq_beta_params)
     else:
         e_log_p = np.log(true_pop_allele_freq + 1e-8)
         e_log_1mp = np.log(1 - true_pop_allele_freq + 1e-8)
@@ -278,3 +283,61 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     elbo = e_log_prior + entropy + e_loglik
 
     return -1 * elbo
+
+
+###############
+# functions for initializing
+def cluster_and_get_init(g_obs, k):
+    # g_obs should be n_obs x n_loci x 3,
+    # a one-hot encoding of genotypes
+    assert len(g_obs.shape) == 3
+
+    # convert one-hot encoding to probability of A genotype, {0, 0.5, 1}
+    x = g_obs.argmax(axis = 2) / 2
+
+    # run NMF
+    model = NMF(n_components=k, init='random')
+    init_ind_admix_propn_unscaled = model.fit_transform(x)
+    init_pop_allele_freq_unscaled = model.components_.T
+
+    # divide by largest allele frequency, so all numbers between 0 and 1
+    denom_pop_allele_freq = np.max(init_pop_allele_freq_unscaled)
+    init_pop_allele_freq = init_pop_allele_freq_unscaled / \
+                                denom_pop_allele_freq
+
+    # normalize rows
+    denom_ind_admix_propn = \
+        init_ind_admix_propn_unscaled.sum(axis = 1, keepdims = True)
+    init_ind_admix_propn = \
+        init_ind_admix_propn_unscaled / denom_ind_admix_propn
+    # clip again and renormalize
+    init_ind_admix_propn = init_ind_admix_propn.clip(0.05, 0.95)
+    init_ind_admix_propn = init_ind_admix_propn / \
+                            init_ind_admix_propn.sum(axis = 1, keepdims = True)
+
+    return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
+
+def set_init_vb_params(g_obs, k_approx, vb_params_dict):
+    # get initial admixtures, and population frequencies
+    init_ind_admix_propn, init_pop_allele_freq = \
+            cluster_and_get_init(g_obs, k_approx)
+
+    # set bnp parameters for individual admixture
+    # set mean to be logit(stick_breaking_propn), info to be 1
+    stick_break_propn = \
+        cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
+    ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
+    ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
+
+    # set beta paramters for population paramters
+    # set beta = 1, alpha to have the correct mean
+    pop_freq_beta_params1 = init_pop_allele_freq / (1 - init_pop_allele_freq)
+    pop_freq_beta_params2 = np.ones(init_pop_allele_freq.shape)
+    pop_freq_beta_params = np.concatenate((pop_freq_beta_params1[:, :, None],
+                                       pop_freq_beta_params2[:, :, None]), axis = 2)
+
+    vb_params_dict['ind_mix_stick_propn_mean'] = ind_mix_stick_propn_mean
+    vb_params_dict['ind_mix_stick_propn_info'] = ind_mix_stick_propn_info
+    vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
+
+    return vb_params_dict
