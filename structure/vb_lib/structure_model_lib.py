@@ -4,10 +4,7 @@ import autograd.scipy as sp
 
 import paragami
 
-import sys
-sys.path.insert(0, '../../BNP_modeling/')
-import modeling_lib
-import cluster_quantities_lib
+from BNP_modeling import cluster_quantities_lib, modeling_lib, optimization_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -341,3 +338,25 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict):
     vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
 
     return vb_params_dict
+
+
+def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
+                        prior_params_dict, gh_loc, gh_weights):
+    # this function checks that vb_opt_dict are at a kl optimum for the given
+    # prior parameters
+
+    # get loss as a function of vb parameters
+    get_free_vb_params_loss = paragami.FlattenFunctionInput(
+                                    original_fun=get_kl,
+                                    patterns = vb_params_paragami,
+                                    free = True,
+                                    argnums = 1)
+    # cache other parameters
+    get_free_vb_params_loss_cached = \
+        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict, gh_loc, gh_weights,
+                                          true_pop_allele_freq = None,
+                                          true_ind_admix_propn = None)
+    grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
+    linf_grad = np.max(np.abs(grad_get_loss(vb_params_paragami.flatten(vb_opt_dict, free = True))))
+
+    assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
