@@ -18,4 +18,6 @@
 *.err
 deleteme
 *.toc
-
+*.Rhistory
+*-concordance.tex
+*-Copy1.ipynb
