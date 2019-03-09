@@ -14,7 +14,8 @@ from sklearn.decomposition import NMF
 # Set up vb parameters
 ##########################
 
-def get_vb_params_paragami_object(n_obs, n_loci, k_approx):
+def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
+                                    use_logitnormal_sticks = True):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
@@ -39,11 +40,16 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx):
         paragami.NumericArrayPattern(shape=(n_loci, k_approx, 2), lb = 0.0)
 
     # BNP sticks
-    # variational distribution for each stick is logitnormal
-    vb_params_paragami['ind_mix_stick_propn_mean'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
-    vb_params_paragami['ind_mix_stick_propn_info'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,), lb = 1e-4)
+    if use_logitnormal_sticks:
+        # variational distribution for each stick is logitnormal
+        vb_params_paragami['ind_mix_stick_propn_mean'] = \
+            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
+        vb_params_paragami['ind_mix_stick_propn_info'] = \
+            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,), lb = 1e-4)
+    else:
+        # else they are beta distributed
+        vb_params_paragami['ind_mix_stick_beta_params'] = \
+            paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2), lb = 0.0)
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -107,9 +113,12 @@ def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
 ##########################
 # Entropy
 ##########################
-def get_entropy(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                    pop_freq_beta_params,
-                    e_z, gh_loc, gh_weights):
+def get_entropy(ind_mix_stick_propn_mean,
+                ind_mix_stick_propn_info,
+                pop_freq_beta_params,
+                e_z, gh_loc, gh_weights,
+                use_logitnormal_sticks = True,
+                ind_mix_stick_beta_params = None):
     # get entropy term
 
     # entropy on population belongings
@@ -117,11 +126,16 @@ def get_entropy(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
     z_entropy = -(np.log(e_z + 1e-12) * e_z).sum()
 
     # entropy of individual admixtures
-    stick_entropy = \
-        modeling_lib.get_stick_breaking_entropy(
-                                ind_mix_stick_propn_mean,
-                                ind_mix_stick_propn_info,
-                                gh_loc, gh_weights)
+    if use_logitnormal_sticks:
+        stick_entropy = \
+            modeling_lib.get_stick_breaking_entropy(
+                                    ind_mix_stick_propn_mean,
+                                    ind_mix_stick_propn_info,
+                                    gh_loc, gh_weights)
+    else:
+        assert ind_mix_stick_beta_params is not None
+        nk = ind_mix_stick_beta_params.shape[0] * ind_mix_stick_beta_params.shape[1]
+        stick_entropy = ef.beta_entropy(tau = stick_beta_params.reshape((nk, 2)))
 
     # beta entropy term
     lk = pop_freq_beta_params.shape[0] * pop_freq_beta_params.shape[1]
@@ -180,17 +194,12 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
                                     data_weights = None,
-                                    true_ind_admix_propn = None,
                                     return_ez = False):
 
     # log likelihood of individual population belongings
-    if true_ind_admix_propn is None:
-        e_log_cluster_probs = \
-            modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                                e_log_sticks, e_log_1m_sticks)
-
-    else:
-        e_log_cluster_probs = np.log(true_ind_admix_propn)
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
 
     # get optimal cluster belongings
     loglik_cond_z = \
@@ -224,11 +233,10 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
-                    gh_loc, gh_weights,
+                    gh_loc = None, gh_weights = None,
+                    use_logitnormal_sticks = True,
                     e_z = None,
-                    data_weights = None,
-                    true_pop_allele_freq = None,
-                    true_ind_admix_propn = None):
+                    data_weights = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -266,41 +274,35 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
     allele_prior_beta = prior_params_dict['allele_prior_beta']
 
-    # get vb parameters
-    ind_mix_stick_propn_mean = vb_params_dict['ind_mix_stick_propn_mean']
-    ind_mix_stick_propn_info = vb_params_dict['ind_mix_stick_propn_info']
-    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
-
-    # expected log beta and expected log(1 - beta)
-    if true_pop_allele_freq is None:
+    e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
-            modeling_lib.get_e_log_beta(pop_freq_beta_params)
-    else:
-        e_log_pop_freq = np.log(true_pop_allele_freq + 1e-8)
-        e_log_1m_pop_freq = np.log(1 - true_pop_allele_freq + 1e-8)
-
-
-    e_log_sticks, e_log_1m_sticks = \
-        ef.get_e_log_logitnormal(
-            lognorm_means = ind_mix_stick_propn_mean,
-            lognorm_infos = ind_mix_stick_propn_info,
-            gh_loc = gh_loc,
-            gh_weights = gh_weights)
-
+            get_moments_from_vb_params_dict(g_obs, vb_params_dict,
+                                    use_logitnormal_sticks = use_logitnormal_sticks,
+                                    gh_loc = gh_loc,
+                                    gh_weights = gh_weights)
     # joint log likelihood
     log_lik, e_z = get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                 e_log_pop_freq, e_log_1m_pop_freq,
                                 e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta,
-                                data_weights, true_ind_admix_propn,
+                                data_weights,
                                 return_ez = True)
 
     # entropy term
-    entropy = get_entropy(ind_mix_stick_propn_mean,
-                            ind_mix_stick_propn_info,
+    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
+    if use_logitnormal_sticks:
+        entropy = get_entropy(vb_params_dict['ind_mix_stick_propn_mean'],
+                                vb_params_dict['ind_mix_stick_propn_info'],
+                                pop_freq_beta_params,
+                                e_z, gh_loc, gh_weights).squeeze()
+    else:
+        beta_params = vb_params_dict['ind_mix_stick_beta_params']
+        entropy = get_entropy(None, None,
                             pop_freq_beta_params,
-                            e_z, gh_loc, gh_weights).squeeze()
+                            e_z, gh_loc, gh_weights,
+                            use_logitnormal_sticks = True,
+                            ind_mix_stick_beta_params = beta_params).squeeze()
 
     assert(np.isfinite(entropy))
 
@@ -308,6 +310,36 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     return -1 * elbo
 
+def get_moments_from_vb_params_dict(g_obs, vb_params_dict,
+                                    use_logitnormal_sticks = True,
+                                    gh_loc = None,
+                                    gh_weights = None):
+    # get expected sticks
+    if use_logitnormal_sticks:
+        assert gh_loc is not None
+        assert gh_weights is not None
+
+        ind_mix_stick_propn_mean = vb_params_dict['ind_mix_stick_propn_mean']
+        ind_mix_stick_propn_info = vb_params_dict['ind_mix_stick_propn_info']
+
+        e_log_sticks, e_log_1m_sticks = \
+            ef.get_e_log_logitnormal(
+                lognorm_means = ind_mix_stick_propn_mean,
+                lognorm_infos = ind_mix_stick_propn_info,
+                gh_loc = gh_loc,
+                gh_weights = gh_weights)
+    else:
+        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
+        e_log_sticks, e_log_1m_sticks = \
+            modeling_lib.get_e_log_beta(ind_mix_stick_beta_params)
+
+    # population beta parameters
+    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
+    e_log_pop_freq, e_log_1m_pop_freq = \
+        modeling_lib.get_e_log_beta(pop_freq_beta_params)
+
+    return e_log_sticks, e_log_1m_sticks, \
+                e_log_pop_freq, e_log_1m_pop_freq
 
 ###############
 # functions for initializing
@@ -341,7 +373,8 @@ def cluster_and_get_init(g_obs, k):
 
     return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
 
-def set_init_vb_params(g_obs, k_approx, vb_params_dict):
+def set_init_vb_params(g_obs, k_approx, vb_params_dict,
+                        use_logitnormal_sticks = True):
     # get initial admixtures, and population frequencies
     init_ind_admix_propn, init_pop_allele_freq = \
             cluster_and_get_init(g_obs, k_approx)
@@ -350,8 +383,17 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict):
     # set mean to be logit(stick_breaking_propn), info to be 1
     stick_break_propn = \
         cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
-    ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
-    ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
+    if use_logitnormal_sticks:
+        ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
+        ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
+        vb_params_dict['ind_mix_stick_propn_mean'] = ind_mix_stick_propn_mean
+        vb_params_dict['ind_mix_stick_propn_info'] = ind_mix_stick_propn_info
+    else:
+        ind_mix_stick_beta_param1 = np.ones(stick_break_propn.shape)
+        ind_mix_stick_beta_param2 = (1 - stick_break_propn) / stick_break_propn
+        vb_params_dict['ind_mix_stick_beta_params'] = \
+            np.concatenate((ind_mix_stick_beta_param1[:, :, None],
+                            ind_mix_stick_beta_param2[:, :, None]), axis = 2)
 
     # set beta paramters for population paramters
     # set beta = 1, alpha to have the correct mean
@@ -360,12 +402,9 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict):
     pop_freq_beta_params = np.concatenate((pop_freq_beta_params1[:, :, None],
                                        pop_freq_beta_params2[:, :, None]), axis = 2)
 
-    vb_params_dict['ind_mix_stick_propn_mean'] = ind_mix_stick_propn_mean
-    vb_params_dict['ind_mix_stick_propn_info'] = ind_mix_stick_propn_info
     vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
 
     return vb_params_dict
-
 
 def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
                         prior_params_dict, gh_loc, gh_weights):
