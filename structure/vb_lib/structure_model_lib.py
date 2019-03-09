@@ -90,22 +90,17 @@ def get_default_prior_params():
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                        e_log_p, e_log_1mp,
+def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
                         dp_prior_alpha, allele_prior_alpha,
-                        allele_prior_beta,
-                        gh_loc, gh_weights):
+                        allele_prior_beta):
     # get expected prior term
 
     # dp prior on individual mixtures
-    ind_mix_dp_prior = \
-        modeling_lib.get_e_logitnorm_dp_prior(ind_mix_stick_propn_mean,
-                                            ind_mix_stick_propn_info,
-                                            dp_prior_alpha, gh_loc, gh_weights)
+    ind_mix_dp_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
 
     # allele frequency prior
-    allele_freq_beta_prior = np.sum((allele_prior_alpha - 1) * e_log_p + \
-                                    (allele_prior_beta - 1) * e_log_1mp)
+    allele_freq_beta_prior = np.sum((allele_prior_alpha - 1) * e_log_pop_freq + \
+                                    (allele_prior_beta - 1) * e_log_1m_pop_freq)
 
     return ind_mix_dp_prior + allele_freq_beta_prior
 
@@ -137,43 +132,35 @@ def get_entropy(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp):
+def get_loglik_gene_nlk(g_obs, e_log_pop_freq, e_log_1m_pop_freq):
 
     genom_loglik_nlk_a = \
-        np.einsum('nl, lk -> nlk', g_obs[:, :, 0], e_log_1mp) + \
-            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + g_obs[:, :, 2], e_log_p)
+        np.einsum('nl, lk -> nlk', g_obs[:, :, 0], e_log_1m_pop_freq) + \
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + g_obs[:, :, 2], e_log_pop_freq)
 
     genom_loglik_nlk_b = \
-        np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + g_obs[:, :, 1], e_log_1mp) + \
-            np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_p)
+        np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + g_obs[:, :, 1], e_log_1m_pop_freq) + \
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_pop_freq)
 
     return np.stack((genom_loglik_nlk_a, genom_loglik_nlk_b), axis = -1)
 
 ##########################
 # Optimization over e_z
 ##########################
-def get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
-                        ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                        gh_loc, gh_weights,
-                        true_ind_admix_propn = None):
+def get_loglik_cond_z(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
+                        e_log_cluster_probs):
 
     # get likelihood of genes
-    loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_p, e_log_1mp)
+    loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_pop_freq, e_log_1m_pop_freq)
 
     # log likelihood of population belongings
-    n = ind_mix_stick_propn_mean.shape[0]
-    k = ind_mix_stick_propn_mean.shape[1] + 1
+    n = e_log_cluster_probs.shape[0]
+    k = e_log_cluster_probs.shape[1]
 
-    if true_ind_admix_propn is None:
-        e_log_cluster_probs = \
-            modeling_lib.get_e_log_cluster_probabilities(
-                            ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                            gh_loc, gh_weights).reshape(n, 1, k, 1)
-    else:
-        e_log_cluster_probs = np.log(true_ind_admix_propn).reshape(n, 1, k, 1)
+    _e_log_cluster_probs = e_log_cluster_probs.reshape(n, 1, k, 1)
 
     # loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
-    loglik_cond_z = loglik_gene_nlk + e_log_cluster_probs
+    loglik_cond_z = loglik_gene_nlk + _e_log_cluster_probs
 
     return loglik_cond_z
 
@@ -185,6 +172,56 @@ def get_z_opt_from_loglik_cond_z(loglik_cond_z):
     log_const = sp.misc.logsumexp(loglik_cond_z, axis = 2, keepdims = True)
 
     return np.exp(loglik_cond_z - log_const)
+
+
+def get_e_joint_loglik_from_nat_params(g_obs, e_z,
+                                    e_log_pop_freq, e_log_1m_pop_freq,
+                                    e_log_sticks, e_log_1m_sticks,
+                                    dp_prior_alpha, allele_prior_alpha,
+                                    allele_prior_beta,
+                                    data_weights = None,
+                                    true_ind_admix_propn = None,
+                                    return_ez = False):
+
+    # log likelihood of individual population belongings
+    if true_ind_admix_propn is None:
+        e_log_cluster_probs = \
+            modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                                e_log_sticks, e_log_1m_sticks)
+
+    else:
+        e_log_cluster_probs = np.log(true_ind_admix_propn)
+
+    # get optimal cluster belongings
+    loglik_cond_z = \
+            get_loglik_cond_z(g_obs, e_log_pop_freq,
+                                e_log_1m_pop_freq, e_log_cluster_probs)
+
+    if e_z is None:
+        # set at optimal e_z
+        e_z = get_z_opt_from_loglik_cond_z(loglik_cond_z)
+
+    # weight data if necessary, and get likelihood of y
+    if data_weights is not None:
+        raise NotImplementedError()
+    else:
+        e_loglik = np.sum(e_z * loglik_cond_z)
+
+    assert(np.isfinite(e_loglik))
+
+    # prior term
+    e_log_prior = get_e_log_prior(e_log_1m_sticks,
+                            e_log_pop_freq, e_log_1m_pop_freq,
+                            dp_prior_alpha, allele_prior_alpha,
+                            allele_prior_beta).squeeze()
+
+    assert(np.isfinite(e_log_prior))
+
+    if return_ez:
+        return e_log_prior + e_loglik, e_z
+    else:
+        return e_log_prior + e_loglik
+
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights,
@@ -236,48 +273,38 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     # expected log beta and expected log(1 - beta)
     if true_pop_allele_freq is None:
-        e_log_p, e_log_1mp = modeling_lib.get_e_log_beta(pop_freq_beta_params)
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            modeling_lib.get_e_log_beta(pop_freq_beta_params)
     else:
-        e_log_p = np.log(true_pop_allele_freq + 1e-8)
-        e_log_1mp = np.log(1 - true_pop_allele_freq + 1e-8)
+        e_log_pop_freq = np.log(true_pop_allele_freq + 1e-8)
+        e_log_1m_pop_freq = np.log(1 - true_pop_allele_freq + 1e-8)
 
-    # get optimal cluster belongings
-    loglik_cond_z = \
-            get_loglik_cond_z(g_obs, e_log_p, e_log_1mp,
-                            ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                            gh_loc, gh_weights,
-                            true_ind_admix_propn = true_ind_admix_propn)
 
-    e_z_opt = get_z_opt_from_loglik_cond_z(loglik_cond_z)
+    e_log_sticks, e_log_1m_sticks = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = ind_mix_stick_propn_mean,
+            lognorm_infos = ind_mix_stick_propn_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
 
-    if e_z is None:
-        e_z = e_z_opt
-
-    # weight data if necessary, and get likelihood of y
-    if data_weights is not None:
-        raise NotImplementedError()
-    else:
-        e_loglik = np.sum(e_z * loglik_cond_z)
-
-    assert(np.isfinite(e_loglik))
+    # joint log likelihood
+    log_lik, e_z = get_e_joint_loglik_from_nat_params(g_obs, e_z,
+                                e_log_pop_freq, e_log_1m_pop_freq,
+                                e_log_sticks, e_log_1m_sticks,
+                                dp_prior_alpha, allele_prior_alpha,
+                                allele_prior_beta,
+                                data_weights, true_ind_admix_propn,
+                                return_ez = True)
 
     # entropy term
     entropy = get_entropy(ind_mix_stick_propn_mean,
-                                        ind_mix_stick_propn_info,
-                                        pop_freq_beta_params,
-                                        e_z, gh_loc, gh_weights).squeeze()
+                            ind_mix_stick_propn_info,
+                            pop_freq_beta_params,
+                            e_z, gh_loc, gh_weights).squeeze()
+
     assert(np.isfinite(entropy))
 
-    # prior term
-    e_log_prior = get_e_log_prior(ind_mix_stick_propn_mean, ind_mix_stick_propn_info,
-                            e_log_p, e_log_1mp,
-                            dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta,
-                            gh_loc, gh_weights).squeeze()
-
-    assert(np.isfinite(e_log_prior))
-
-    elbo = e_log_prior + entropy + e_loglik
+    elbo = log_lik + entropy
 
     return -1 * elbo
 
