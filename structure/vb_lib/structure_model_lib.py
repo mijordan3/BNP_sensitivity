@@ -135,7 +135,7 @@ def get_entropy(ind_mix_stick_propn_mean,
     else:
         assert ind_mix_stick_beta_params is not None
         nk = ind_mix_stick_beta_params.shape[0] * ind_mix_stick_beta_params.shape[1]
-        stick_entropy = ef.beta_entropy(tau = stick_beta_params.reshape((nk, 2)))
+        stick_entropy = ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
 
     # beta entropy term
     lk = pop_freq_beta_params.shape[0] * pop_freq_beta_params.shape[1]
@@ -193,7 +193,8 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
-                                    data_weights = None,
+                                    obs_weights = None,
+                                    loci_weights = None,
                                     return_ez = False):
 
     # log likelihood of individual population belongings
@@ -201,20 +202,37 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
-    # get optimal cluster belongings
-    loglik_cond_z = \
-            get_loglik_cond_z(g_obs, e_log_pop_freq,
-                                e_log_1m_pop_freq, e_log_cluster_probs)
+    # if loci_weights is not None:
+    #     assert len(loci_weights) == g_obs.shape[1]
+    #     which_loci_boolean = loci_weights == 1
+    #     loglik_cond_z = \
+    #             get_loglik_cond_z(g_obs[:, which_loci_boolean, :],
+    #                             e_log_pop_freq[which_loci_boolean, :],
+    #                             e_log_1m_pop_freq[which_loci_boolean, :],
+    #                             e_log_cluster_probs)
+    #
+    if obs_weights is not None:
+        assert len(obs_weights) == g_obs.shape[0]
+        which_loci_boolean = (obs_weights == 1)
+        loglik_cond_z = \
+                get_loglik_cond_z(g_obs[which_loci_boolean, :, :],
+                                    e_log_pop_freq,
+                                    e_log_1m_pop_freq,
+                                    e_log_cluster_probs)
+
+        print(g_obs[which_loci_boolean, :, :].shape)
+        print(loglik_cond_z.shape)
+
+    else:
+        loglik_cond_z = \
+                get_loglik_cond_z(g_obs, e_log_pop_freq,
+                                    e_log_1m_pop_freq, e_log_cluster_probs)
 
     if e_z is None:
         # set at optimal e_z
         e_z = get_z_opt_from_loglik_cond_z(loglik_cond_z)
 
-    # weight data if necessary, and get likelihood of y
-    if data_weights is not None:
-        raise NotImplementedError()
-    else:
-        e_loglik = np.sum(e_z * loglik_cond_z)
+    e_loglik = np.sum(e_z * loglik_cond_z)
 
     assert(np.isfinite(e_loglik))
 
@@ -236,7 +254,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc = None, gh_weights = None,
                     use_logitnormal_sticks = True,
                     e_z = None,
-                    data_weights = None):
+                    obs_weights = None,
+                    loci_weights = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -286,7 +305,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                 e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta,
-                                data_weights,
+                                obs_weights = obs_weights,
+                                loci_weights = loci_weights,
                                 return_ez = True)
 
     # entropy term
@@ -301,7 +321,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         entropy = get_entropy(None, None,
                             pop_freq_beta_params,
                             e_z, gh_loc, gh_weights,
-                            use_logitnormal_sticks = True,
+                            use_logitnormal_sticks = False,
                             ind_mix_stick_beta_params = beta_params).squeeze()
 
     assert(np.isfinite(entropy))
