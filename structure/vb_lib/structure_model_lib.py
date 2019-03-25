@@ -196,37 +196,19 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                     obs_weights = None,
                                     loci_weights = None,
                                     return_ez = False):
+    if obs_weights is not None:
+        raise NotImplementedError()
+    if loci_weights is not None:
+        raise NotImplementedError()
 
     # log likelihood of individual population belongings
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
-    # if loci_weights is not None:
-    #     assert len(loci_weights) == g_obs.shape[1]
-    #     which_loci_boolean = loci_weights == 1
-    #     loglik_cond_z = \
-    #             get_loglik_cond_z(g_obs[:, which_loci_boolean, :],
-    #                             e_log_pop_freq[which_loci_boolean, :],
-    #                             e_log_1m_pop_freq[which_loci_boolean, :],
-    #                             e_log_cluster_probs)
-    #
-    if obs_weights is not None:
-        assert len(obs_weights) == g_obs.shape[0]
-        which_loci_boolean = (obs_weights == 1)
-        loglik_cond_z = \
-                get_loglik_cond_z(g_obs[which_loci_boolean, :, :],
-                                    e_log_pop_freq,
-                                    e_log_1m_pop_freq,
-                                    e_log_cluster_probs)
-
-        print(g_obs[which_loci_boolean, :, :].shape)
-        print(loglik_cond_z.shape)
-
-    else:
-        loglik_cond_z = \
-                get_loglik_cond_z(g_obs, e_log_pop_freq,
-                                    e_log_1m_pop_freq, e_log_cluster_probs)
+    loglik_cond_z = \
+            get_loglik_cond_z(g_obs, e_log_pop_freq,
+                                e_log_1m_pop_freq, e_log_cluster_probs)
 
     if e_z is None:
         # set at optimal e_z
@@ -280,8 +262,6 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         parameters, stored in an array whose (n, l, k, i)th entry is the probability
         of the nth datapoint at locus l and chromosome i belonging to cluster k.
         If ``None``, we set the optimal z.
-    data_weights : ndarray of shape (number of observations) x 1 (optional)
-        Weights for each datapoint in g_obs.
 
     Returns
     -------
