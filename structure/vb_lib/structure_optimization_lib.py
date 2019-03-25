@@ -51,19 +51,19 @@ def check_hessian(vb_sens, which_prior):
         vb_grad = vb_sens._obj_fun_grad(vb_free_params, prior_free_params)
         return np.dot(hess_inverse, vb_grad)
 
-    _get_term3_derivataive = \
+    _get_term3_derivative = \
         vittles.sensitivity_lib._append_jvp(get_term3_objective,
                                    num_base_args = 3,
                                    argnum = 1)
 
     get_term3_derivative = \
-        vittles.sensitivity_lib._append_jvp(_get_term3_derivataive,
+        vittles.sensitivity_lib._append_jvp(_get_term3_derivative,
                                    num_base_args = 4,
                                    argnum = 1)
     sens_mat = np.einsum('nj, j -> n', vb_sens._sens_mat, which_prior)
 
     term3_derivative = \
         get_term3_derivative(vb_sens, vb_opt_free_params, prior_free_params,
-                                        sens_mat, step)
+                                        -sens_mat, step)
 
     return term2_derivative + term3_derivative
