@@ -167,10 +167,10 @@ np.savez(outfile + '_sens_obj',
         hessian = vb_sens._hess0,
         cross_hess = vb_sens._cross_hess)
 
-print('checking sensitivity derivative ... ')
-which_prior = np.array([1., 0., 0.])
-hessian_dir = str_opt_lib.check_hessian(vb_sens, which_prior)
-print('L inf norm of sensitivity derivative: {}'.format(
-            np.max(np.abs(hessian_dir))))
+# print('checking sensitivity derivative ... ')
+# which_prior = np.array([1., 0., 0.])
+# hessian_dir = str_opt_lib.check_hessian(vb_sens, which_prior)
+# print('L inf norm of sensitivity derivative: {}'.format(
+#             np.max(np.abs(hessian_dir))))
 
 print('done. ')
