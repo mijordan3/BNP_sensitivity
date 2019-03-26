@@ -93,6 +93,7 @@ print(vb_params_paragami)
 ######################
 # get init
 ######################
+init_optim_time = time.time()
 if not args.warm_start:
     vb_params_dict = \
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
@@ -135,6 +136,8 @@ paragami.save_folded(outfile,
                      alpha = prior_params_dict['dp_prior_alpha'],
                      gh_deg = gh_deg,
                      use_logitnormal_sticks = args.use_logitnormal_sticks)
+
+print('Total optimization time: {:03f} secs'.format(time.time() - init_optim_time))
 
 #######################
 # Get Hessian and save
