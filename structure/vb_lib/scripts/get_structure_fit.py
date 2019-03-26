@@ -162,7 +162,7 @@ vb_sens = \
 
 print('Hessian time: {:03f}'.format(time.time() - t0))
 
-np.save(outfile + '_sens_obj',
+np.savez(outfile + '_sens_obj',
         hessian = vb_sens._hess0,
         cross_hess = vb_sens._cross_hess)
 
