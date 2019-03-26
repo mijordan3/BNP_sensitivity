@@ -56,7 +56,7 @@ np.random.seed(args.seed)
 # DRAW DATA
 ######################
 # observations
-data = np.load('../data/simulated_structure_data_nobs50_nloci40_npop4.npz')
+data = np.load(args.data_file)
 
 g_obs = data['g_obs']
 
