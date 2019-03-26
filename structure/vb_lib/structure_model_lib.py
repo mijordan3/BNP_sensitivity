@@ -15,7 +15,7 @@ from sklearn.decomposition import NMF
 ##########################
 
 def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
-                                    use_logitnormal_sticks = True):
+                                    use_logitnormal_sticks):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
@@ -117,7 +117,7 @@ def get_entropy(ind_mix_stick_propn_mean,
                 ind_mix_stick_propn_info,
                 pop_freq_beta_params,
                 e_z, gh_loc, gh_weights,
-                use_logitnormal_sticks = True,
+                use_logitnormal_sticks,
                 ind_mix_stick_beta_params = None):
     # get entropy term
 
@@ -233,8 +233,8 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
+                    use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
-                    use_logitnormal_sticks = True,
                     e_z = None,
                     obs_weights = None,
                     loci_weights = None):
@@ -311,7 +311,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     return -1 * elbo
 
 def get_moments_from_vb_params_dict(g_obs, vb_params_dict,
-                                    use_logitnormal_sticks = True,
+                                    use_logitnormal_sticks,
                                     gh_loc = None,
                                     gh_weights = None):
     # get expected sticks
@@ -374,7 +374,7 @@ def cluster_and_get_init(g_obs, k):
     return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
 
 def set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                        use_logitnormal_sticks = True):
+                        use_logitnormal_sticks):
     # get initial admixtures, and population frequencies
     init_ind_admix_propn, init_pop_allele_freq = \
             cluster_and_get_init(g_obs, k_approx)
@@ -407,7 +407,8 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     return vb_params_dict
 
 def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-                        prior_params_dict, gh_loc, gh_weights):
+                        prior_params_dict, gh_loc, gh_weights,
+                        use_logitnormal_sticks):
     # this function checks that vb_opt_dict are at a kl optimum for the given
     # prior parameters
 
@@ -419,9 +420,9 @@ def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
                                     argnums = 1)
     # cache other parameters
     get_free_vb_params_loss_cached = \
-        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict, gh_loc, gh_weights,
-                                          true_pop_allele_freq = None,
-                                          true_ind_admix_propn = None)
+        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict, use_logitnormal_sticks,
+                                        gh_loc, gh_weights)
+
     grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
     linf_grad = np.max(np.abs(grad_get_loss(vb_params_paragami.flatten(vb_opt_dict, free = True))))
 

@@ -178,6 +178,9 @@ def get_mfvb_covariance_objective(g_obs, vb_params_dict, vb_params_paragami,
                                 vb_free_params_opt,
                                 use_logitnormal_sticks = use_logitnormal_sticks)
 
+##################################
+# FUNCTION TO OPTIMIZE STRUCTURE
+##################################
 
 def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
                     prior_params_dict,
@@ -197,17 +200,21 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
 
     get_loss = \
         lambda x : get_free_vb_params_loss(g_obs,
-                                    x, prior_params_dict, gh_loc, gh_weights,
-                                    use_logitnormal_sticks)
+                                    x, prior_params_dict,
+                                    use_logitnormal_sticks,
+                                    gh_loc, gh_weights)
     get_loss_grad = autograd.grad(get_loss)
 
     if run_cavi:
         # RUN CAVI
+
+        # get initial moments
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
                 structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
                                         vb_params_dict, use_logitnormal_sticks)
 
+        # get beta parameters for sticks and populations
         _, stick_beta_params, pop_beta_params = \
             cavi_lib.run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
                                 e_log_sticks, e_log_1m_sticks,
@@ -258,7 +265,7 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
 
         x = new_x
         f_val = new_f_val
-        vb_params_dict = vb_params_paragami.flatten(x, free = True)
+        vb_params_dict = vb_params_paragami.fold(x, free = True)
 
         converged = x_conv or f_conv or grad_conv or ncg_output.success
 
