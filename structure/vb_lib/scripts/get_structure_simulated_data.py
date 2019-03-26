@@ -18,8 +18,8 @@ import os
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--seed', type=int, default=45426543)
-parser.add_argument('--n_obs', type=int, default=50)
-parser.add_argument('--n_loci', type=int, default=40)
+parser.add_argument('--n_obs', type=int, default=100)
+parser.add_argument('--n_loci', type=int, default=2000)
 parser.add_argument('--n_pop', type=int, default=4)
 
 parser.add_argument('--outfolder', default='../data/')
