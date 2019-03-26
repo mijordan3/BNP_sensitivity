@@ -98,6 +98,7 @@ if not args.warm_start:
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
                                                 args.use_logitnormal_sticks)
 else:
+    print('warm start from ', args.init_file)
     vb_params_dict, _, _ = \
         paragami.load_folded(args.init_file)
 
