@@ -159,7 +159,7 @@ def _mfvb_covariance_objective(g_obs,
                             e_log_sticks = e_log_sticks,
                             e_log_1m_sticks = e_log_1m_sticks)
 
-def get_mfvb_covariance_objective(g_obs, vb_params_dict, vb_params_paragami,
+def get_mfvb_covariance(g_obs, vb_params_dict, vb_params_paragami,
                                 vb_free_params_opt,
                                 use_logitnormal_sticks = True):
 
@@ -169,10 +169,10 @@ def get_mfvb_covariance_objective(g_obs, vb_params_dict, vb_params_paragami,
                                         free = True,
                                         argnums = 1)
 
-    get_mfvb_covariance = autograd.jacobian(mfvb_covariance_objective_flattened,
+    get_mfvb_covariance_fun = autograd.jacobian(mfvb_covariance_objective_flattened,
                                                 argnum = 1)
 
-    return get_mfvb_covariance(g_obs,
+    return get_mfvb_covariance_fun(g_obs,
                                 deepcopy(vb_free_params_opt),
                                 vb_params_paragami,
                                 vb_free_params_opt,
@@ -239,7 +239,7 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
         if approximate_hessian:
             t0 = time.time()
 
-            init_hessian = get_mfvb_covariance_objective(g_obs,
+            init_hessian = get_mfvb_covariance(g_obs,
                                 vb_params_dict, vb_params_paragami, x,
                                 use_logitnormal_sticks = use_logitnormal_sticks)
 
