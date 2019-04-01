@@ -14,14 +14,14 @@ import cavi_lib
 
 import BNP_modeling.optimization_lib as optim_lib
 
-from preconditioner_lib import get_mfvb_covariance
+from preconditioner_lib import get_mfvb_cov_preconditioner
 
 def check_hessian(vb_sens, which_prior):
     """
     If L(theta) := H^{-1}S, the sensitivity matrix, the computes the
     derivative of L(theta) in the direction of the next Newton step.
-
     which_prior is a boolean vector specifying the index of the prior parameter
+
     for which sensitivity will be computed
     """
 
@@ -140,9 +140,10 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
         if approximate_hessian:
             t0 = time.time()
 
-            init_hessian = get_mfvb_covariance(vb_params_dict,
-                                    vb_params_paragami,
-                                    use_logitnormal_sticks)
+            a_inv, a = \
+                get_mfvb_cov_preconditioner( \
+                                vb_params_dict, vb_params_paragami,
+                                 use_logitnormal_sticks)
 
             print('approximate preconditioner time: ' +
                     '{:3f} secs'.format(time.time() - t0))
@@ -151,7 +152,7 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
 
         new_x, ncg_output = optim_lib.precondition_and_optimize(get_loss, x,\
                                     maxiter = netwon_max_iter, gtol = gtol,
-                                    hessian = init_hessian)
+                                    preconditioner = (a, a_inv))
 
         # Check convergence.
         new_f_val = get_loss(new_x)

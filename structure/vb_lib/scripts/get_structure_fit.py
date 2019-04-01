@@ -35,7 +35,7 @@ parser.add_argument('--warm_start', type=distutils.util.strtobool, default='Fals
 parser.add_argument('--init_fit', type=str)
 
 parser.add_argument('--alpha', type=float, default = 4.0)
-parser.add_argument('--k_approx', type = int, default = 12)
+parser.add_argument('--k_approx', type = int, default = 6)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
                         default='False')
 parser.add_argument('--save_hessian', type=distutils.util.strtobool,
