@@ -10,7 +10,6 @@ from copy import deepcopy
 
 import structure_model_lib
 
-
 def get_log_beta_covariance(alpha, beta):
     # returns the covariance of the score function
     # of the beta distribution

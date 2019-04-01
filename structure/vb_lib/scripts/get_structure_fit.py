@@ -38,6 +38,8 @@ parser.add_argument('--alpha', type=float, default = 4.0)
 parser.add_argument('--k_approx', type = int, default = 12)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
                         default='False')
+parser.add_argument('--save_hessian', type=distutils.util.strtobool,
+                        default='True')
 
 
 args = parser.parse_args()
@@ -112,7 +114,7 @@ vb_opt_free_params = \
                                 gh_loc, gh_weights,
                                 use_logitnormal_sticks = args.use_logitnormal_sticks,
                                 run_cavi = True,
-                                cavi_max_iter = 2000,
+                                cavi_max_iter = 50,
                                 cavi_tol = 1e-2,
                                 netwon_max_iter = 20,
                                 max_precondition_iter = 25,
@@ -142,38 +144,40 @@ print('Total optimization time: {:03f} secs'.format(time.time() - init_optim_tim
 #######################
 # Get Hessian and save
 #######################
-print('getting sensitivity object: ')
-t0 = time.time()
-get_kl_from_vb_free_prior_free = \
-    paragami.FlattenFunctionInput(original_fun=structure_model_lib.get_kl,
-                                    patterns = [vb_params_paragami, prior_params_paragami],
-                                    free = True,
-                                    argnums = [1, 2])
-objective_fun = lambda x, y: \
-    get_kl_from_vb_free_prior_free(g_obs, x, y, args.use_logitnormal_sticks,
-                                    gh_loc, gh_weights)
-vb_sens = \
-    vittles.HyperparameterSensitivityLinearApproximation(
-        objective_fun = objective_fun,
-        opt_par_value = vb_opt_free_params,
-        hyper_par_value = prior_params_paragami.flatten(prior_params_dict, free=True),
-        validate_optimum=False,
-        hessian_at_opt=None,
-        cross_hess_at_opt=None,
-        factorize_hessian=True,
-        hyper_par_objective_fun=None,
-        grad_tol=1e-8)
+if args.save_hessian:
+    print('getting sensitivity object: ')
+    t0 = time.time()
+    get_kl_from_vb_free_prior_free = \
+        paragami.FlattenFunctionInput(original_fun=structure_model_lib.get_kl,
+                                        patterns = [vb_params_paragami, prior_params_paragami],
+                                        free = True,
+                                        argnums = [1, 2])
+    objective_fun = lambda x, y: \
+        get_kl_from_vb_free_prior_free(g_obs, x, y, args.use_logitnormal_sticks,
+                                        gh_loc, gh_weights)
+    vb_sens = \
+        vittles.HyperparameterSensitivityLinearApproximation(
+            objective_fun = objective_fun,
+            opt_par_value = vb_opt_free_params,
+            hyper_par_value = prior_params_paragami.flatten(prior_params_dict, free=True),
+            validate_optimum=False,
+            hessian_at_opt=None,
+            cross_hess_at_opt=None,
+            factorize_hessian=True,
+            hyper_par_objective_fun=None,
+            grad_tol=1e-8)
 
-print('Hessian time: {:03f}'.format(time.time() - t0))
+    print('Hessian time: {:03f}'.format(time.time() - t0))
 
-np.savez(outfile + '_sens_obj',
-        hessian = vb_sens._hess0,
-        cross_hess = vb_sens._cross_hess)
+    np.savez(outfile + '_sens_obj',
+            hessian = vb_sens._hess0,
+            cross_hess = vb_sens._cross_hess)
 
-# print('checking sensitivity derivative ... ')
-# which_prior = np.array([1., 0., 0.])
-# hessian_dir = str_opt_lib.check_hessian(vb_sens, which_prior)
-# print('L inf norm of sensitivity derivative: {}'.format(
-#             np.max(np.abs(hessian_dir))))
+    # This throws an autodiff error on the slurm cluster for some reason
+    # print('checking sensitivity derivative ... ')
+    # which_prior = np.array([1., 0., 0.])
+    # hessian_dir = str_opt_lib.check_hessian(vb_sens, which_prior)
+    # print('L inf norm of sensitivity derivative: {}'.format(
+    #             np.max(np.abs(hessian_dir))))
 
 print('done. ')
