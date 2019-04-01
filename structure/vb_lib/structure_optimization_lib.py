@@ -14,6 +14,8 @@ import cavi_lib
 
 import BNP_modeling.optimization_lib as optim_lib
 
+from preconditioner_lib import get_mfvb_covariance
+
 def check_hessian(vb_sens, which_prior):
     """
     If L(theta) := H^{-1}S, the sensitivity matrix, the computes the
@@ -77,107 +79,6 @@ def check_hessian(vb_sens, which_prior):
 
     return term2_derivative + term3_derivative
 
-###########################
-# THESE FUNCTIONS ARE FOR COMPUTING AN APPROXIMATE HESSIAN
-# USING THE MFVB COVARIANCE
-###########################
-def get_log_beta_density(tau, e_log_beta, e_log_1m_beta):
-    # tau should have shape (..., 2). The last dimensions are the
-    # beta parameters
-    assert tau.shape[-1] == 2
-    assert tau[..., 0].shape == e_log_beta.shape
-    assert tau[..., 1].shape == e_log_1m_beta.shape
-
-    return (tau[..., 0] - 1) * e_log_beta + (tau[:, :, 1] - 1) * e_log_1m_beta
-
-def _score_objective(vb_params_dict,
-                        e_log_pop_freq, e_log_1m_pop_freq,
-                        e_logit_sticks, e_logit_sticks2,
-                        use_logitnormal_sticks = False,
-                        e_log_sticks = None,
-                        e_log_1m_sticks = None):
-
-    # A derivative of this with respect to vb_params_dict (flattened)
-    # returns the the score function
-
-    if use_logitnormal_sticks:
-        raise NoneImplementedError()
-
-    else:
-        assert e_log_sticks is not None
-        assert e_log_1m_sticks is not None
-
-        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
-        ind_sticks_log_q = get_log_beta_density(ind_mix_stick_beta_params,
-                                                e_log_sticks,
-                                                e_log_1m_sticks).sum()
-
-    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
-    pop_freq_log_q = get_log_beta_density(pop_freq_beta_params,
-                                          e_log_pop_freq,
-                                          e_log_1m_pop_freq).sum()
-
-    return ind_sticks_log_q + pop_freq_log_q
-
-def _mfvb_covariance_objective(g_obs,
-                                vb_params_dict, vb_params_paragami,
-                                vb_free_params_opt,
-                                use_logitnormal_sticks = True):
-    # a derivative with respect to vb_params_dict
-    # gives the mfvb covariance
-
-    # we do not take a derivative wrt vb_free_params_opt!
-
-    # Get expected sufficient statistics
-    if use_logitnormal_sticks:
-        raise NotImplementedError()
-    else:
-        e_log_sticks, e_log_1m_sticks, \
-            e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(
-                                        g_obs, vb_params_dict,
-                                        use_logitnormal_sticks = False,
-                                        gh_loc = None,
-                                        gh_weights = None)
-        e_logit_sticks = None
-        e_logit_sticks2 = None
-
-    # get score function
-    score_objective_flattened = \
-        paragami.FlattenFunctionInput(original_fun=_score_objective,
-                                    patterns = vb_params_paragami,
-                                    free = True,
-                                    argnums = 0)
-
-    score_function = autograd.grad(score_objective_flattened, argnum = 0)
-
-    return score_function(vb_free_params_opt,
-                            e_log_pop_freq, e_log_1m_pop_freq,
-                            e_logit_sticks = e_logit_sticks,
-                            e_logit_sticks2 = e_logit_sticks2,
-                            use_logitnormal_sticks = use_logitnormal_sticks,
-                            e_log_sticks = e_log_sticks,
-                            e_log_1m_sticks = e_log_1m_sticks)
-
-def get_mfvb_covariance(g_obs, vb_params_dict, vb_params_paragami,
-                                vb_free_params_opt,
-                                use_logitnormal_sticks = True):
-
-    mfvb_covariance_objective_flattened = \
-        paragami.FlattenFunctionInput(original_fun=_mfvb_covariance_objective,
-                                        patterns = vb_params_paragami,
-                                        free = True,
-                                        argnums = 1)
-
-    get_mfvb_covariance_fun = autograd.jacobian(mfvb_covariance_objective_flattened,
-                                                argnum = 1)
-
-    return get_mfvb_covariance_fun(g_obs,
-                                deepcopy(vb_free_params_opt),
-                                vb_params_paragami,
-                                vb_free_params_opt,
-                                use_logitnormal_sticks = use_logitnormal_sticks)
-
 ##################################
 # FUNCTION TO OPTIMIZE STRUCTURE
 ##################################
@@ -239,9 +140,9 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
         if approximate_hessian:
             t0 = time.time()
 
-            init_hessian = get_mfvb_covariance(g_obs,
-                                vb_params_dict, vb_params_paragami, x,
-                                use_logitnormal_sticks = use_logitnormal_sticks)
+            init_hessian = get_mfvb_covariance(vb_params_dict,
+                                    vb_params_paragami,
+                                    use_logitnormal_sticks)
 
             print('approximate preconditioner time: ' +
                     '{:3f} secs'.format(time.time() - t0))
