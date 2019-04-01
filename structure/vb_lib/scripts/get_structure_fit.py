@@ -113,7 +113,7 @@ vb_opt_free_params = \
                                 use_logitnormal_sticks = args.use_logitnormal_sticks,
                                 run_cavi = True,
                                 cavi_max_iter = 2000,
-                                cavi_tol = 1e-2,
+                                cavi_tol = 10,
                                 netwon_max_iter = 20,
                                 max_precondition_iter = 25,
                                 gtol=1e-8, ftol=1e-8, xtol=1e-8,
