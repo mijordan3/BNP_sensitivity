@@ -114,7 +114,7 @@ vb_opt_free_params = \
                                 gh_loc, gh_weights,
                                 use_logitnormal_sticks = args.use_logitnormal_sticks,
                                 run_cavi = True,
-                                cavi_max_iter = 50,
+                                cavi_max_iter = 10,
                                 cavi_tol = 1e-2,
                                 netwon_max_iter = 20,
                                 max_precondition_iter = 25,
