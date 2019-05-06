@@ -6,8 +6,8 @@ alpha_vec=(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)
 
 seed=453
 
-nobs=50
-nloci=40
+nobs=40
+nloci=50
 npop=4
 
 alpha=${alpha_vec[$SLURM_ARRAY_TASK_ID]}
