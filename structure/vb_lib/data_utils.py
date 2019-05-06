@@ -10,7 +10,7 @@ def get_one_hot(targets, nb_classes):
     res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
     return res.reshape(list(targets.shape)+[nb_classes])
 
-def draw_data(pop_allele_freq, ind_admix_propn):
+def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
     # pop_allele_freq is n_loci x n_population
     # ind_admix_propn is n_obs x n_population
 
@@ -42,6 +42,23 @@ def draw_data(pop_allele_freq, ind_admix_propn):
     g_obs = get_one_hot(g_obs, nb_classes=3)
 
     return g_obs
+
+def draw_data(n_obs, n_loci, n_pop):
+    true_pop_allele_freq = np.random.random((n_loci, n_pop))
+
+    # individual admixtures
+    true_ind_admix_propn = \
+        np.random.dirichlet(np.ones(n_pop) / n_pop, size = (n_obs))
+
+    # cluster the individuals
+    clustering_indx = cluster_admix_get_indx(true_ind_admix_propn)
+    true_ind_admix_propn = true_ind_admix_propn[clustering_indx, :]
+
+    # draw data
+    g_obs = draw_data_from_popfreq_and_admix(true_pop_allele_freq,
+                                                true_ind_admix_propn)
+
+    return g_obs, true_pop_allele_freq, true_ind_admix_propn
 
 
 ####################
