@@ -18,11 +18,11 @@ from preconditioner_lib import get_mfvb_cov_preconditioner
 
 def check_hessian(vb_sens, which_prior):
     """
-    If L(theta) := H^{-1}S, the sensitivity matrix, the computes the
+    If L(theta) := H^{-1}S, the sensitivity matrix, we compute here the
     derivative of L(theta) in the direction of the next Newton step.
-    which_prior is a boolean vector specifying the index of the prior parameter
 
-    for which sensitivity will be computed
+    `which_prior` is a boolean vector specifying the index of the prior
+    parameter for which sensitivity will be computed
     """
 
     vb_opt_free_params = vb_sens._opt0
@@ -147,8 +147,6 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
 
             print('approximate preconditioner time: ' +
                     '{:3f} secs'.format(time.time() - t0))
-        else:
-            init_hessian = None
 
         new_x, ncg_output = optim_lib.precondition_and_optimize(get_loss, x,\
                                     maxiter = netwon_max_iter, gtol = gtol,

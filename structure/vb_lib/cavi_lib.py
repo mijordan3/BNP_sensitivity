@@ -39,6 +39,7 @@ def update_pop_beta(g_obs, e_z,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
+    # update population frequency parameters
 
     beta_param1 = get_pop_beta_update1(g_obs, e_z,
                     e_log_pop_freq, e_log_1m_pop_freq,
@@ -62,6 +63,8 @@ def update_stick_beta(g_obs, e_z,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
+
+    # update individual admixtures
 
     beta_param1 = get_stick_update1(g_obs, e_z,
                 e_log_pop_freq, e_log_1m_pop_freq,

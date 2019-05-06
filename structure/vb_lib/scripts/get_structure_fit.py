@@ -50,6 +50,8 @@ def validate_args():
     if args.warm_start:
         assert os.path.isfile(args.init_fit)
 
+    assert os.path.isfile(args.data_file)
+
 validate_args()
 
 np.random.seed(args.seed)

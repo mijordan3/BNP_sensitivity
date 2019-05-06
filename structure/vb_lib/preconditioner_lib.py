@@ -32,6 +32,8 @@ def get_log_beta_covariance(alpha, beta):
 
 def get_mfvb_cov_preconditioner(vb_params_dict, vb_params_paragami,
                         use_logitnormal_sticks):
+    # compute preconditioner from MFVB covariances
+
     # get (constrained parameters):
     vb_params = vb_params_paragami.flatten(vb_params_dict, free = False)
 
