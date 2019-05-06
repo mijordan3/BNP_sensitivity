@@ -4,8 +4,8 @@ source activate genomic_time_series_py35
 
 seed=345345
 
-nobs=40
-nloci=50
+nobs=100
+nloci=2000
 npop=4
 
 alpha=5.0
@@ -19,4 +19,4 @@ alpha=5.0
   --n_pop ${npop} \
   --outfolder /scratch/users/genomic_times_series_bnp/structure/fits \
   --out_filename structure_fit_nobs${nobs}_nloci${nloci}_npop${npop}_alpha${alpha} \
-  --save_cross_hess_only True 
+  --save_cross_hess_only True
