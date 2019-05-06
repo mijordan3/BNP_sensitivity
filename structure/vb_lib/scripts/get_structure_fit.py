@@ -9,6 +9,8 @@ sys.path.insert(0, '../')
 
 import structure_model_lib
 import structure_optimization_lib as str_opt_lib
+import data_utils 
+import preconditioner_lib 
 
 import paragami
 import vittles
@@ -45,7 +47,7 @@ parser.add_argument('--init_fit', type=str)
 
 # model parameters
 parser.add_argument('--alpha', type=float, default = 4.0)
-parser.add_argument('--k_approx', type = int, default = 6)
+parser.add_argument('--k_approx', type = int, default = 10)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
                         default='False')
 
@@ -73,13 +75,11 @@ np.random.seed(args.seed)
 ######################
 # DRAW DATA
 ######################
-if os.path.isfile(args.data_file):
+if args.load_data:
     print('loading data from ', args.data_file)
     data = np.load(args.data_file)
 
     g_obs = data['g_obs']
-    n_obs = g_obs.shape[0]
-    n_loci = g_obs.shape[1]
 
 else:
     g_obs, true_pop_allele_freq, true_ind_admix_propn = \
@@ -90,6 +90,9 @@ else:
             g_obs = g_obs,
             true_pop_allele_freq = true_pop_allele_freq,
             true_ind_admix_propn = true_ind_admix_propn)
+
+n_obs = g_obs.shape[0]
+n_loci = g_obs.shape[1]
 
 print('g_obs.shape', g_obs.shape)
 
