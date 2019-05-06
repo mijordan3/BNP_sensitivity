@@ -295,7 +295,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         entropy = get_entropy(vb_params_dict['ind_mix_stick_propn_mean'],
                                 vb_params_dict['ind_mix_stick_propn_info'],
                                 pop_freq_beta_params,
-                                e_z, gh_loc, gh_weights).squeeze()
+                                e_z, gh_loc, gh_weights,
+                                use_logitnormal_sticks = True).squeeze()
     else:
         beta_params = vb_params_dict['ind_mix_stick_beta_params']
         entropy = get_entropy(None, None,
