@@ -221,6 +221,7 @@ if args.save_sensitivity:
                                 validate_optimum=False,
                                 hessian_at_opt=None,
                                 cross_hess_at_opt=None,
+                                sens_mat = None,
                                 factorize_hessian=True,
                                 hyper_par_objective_fun=None,
                                 grad_tol=1e-8,
@@ -231,7 +232,8 @@ if args.save_sensitivity:
 
     np.savez(outfile + '_sens_obj',
             hessian = vb_sens._hess0,
-            cross_hess = vb_sens._cross_hess)
+            cross_hess = vb_sens._cross_hess,
+            sens_mat = vb_sens._sens_mat)
 
     # NOTE: checking the hessian. This throws an autodiff error on the slurm cluster for some reason
     # print('checking sensitivity derivative ... ')
