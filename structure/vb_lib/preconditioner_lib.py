@@ -10,6 +10,8 @@ import paragami
 
 from copy import deepcopy
 
+import warnings
+
 import structure_model_lib
 
 from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
@@ -89,6 +91,12 @@ class SystemSolverFromHVP:
         out = np.zeros((self.hess_dim, n_vec))
 
         for i in range(n_vec):
-            out[:, i] = osp.sparse.linalg.cg(self.hvp_at_opt, v[:, i], **self.cg_opts)[0]
+            cg_out = osp.sparse.linalg.cg(self.hvp_at_opt, v[:, i], **self.cg_opts)
+            out[:, i] = cg_out[0]
+
+            if not cg_out[1] == 0:
+                warning_message = 'conjugate-gradient tolerance not  ' + \
+                                'acheived after {} iterations'.format(cg_out[1])
+                warnings.warn(warning_message)
 
         return out
