@@ -16,6 +16,7 @@ echo $alpha
 
 /usr/bin/env python3 ./get_structure_fit.py \
   --seed ${seed} \
+  --alpha ${alpha} \
   --load_data True \
   --data_file /scratch/users/genomic_times_series_bnp/structure/data/simulated_structure_data_nobs${nobs}_nloci${nloci}_npop${npop}.npz \
   --n_obs ${nobs} \
