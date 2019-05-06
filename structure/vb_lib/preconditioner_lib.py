@@ -2,6 +2,8 @@ import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
 
+import scipy as osp
+
 from scipy import sparse
 
 import paragami
@@ -59,3 +61,34 @@ def get_mfvb_cov_preconditioner(vb_params_dict, vb_params_paragami,
 
     return sparse.block_diag(block_mfvb_cov),\
                 sparse.block_diag(block_mfvb_info)
+
+
+class SystemSolverFromHVP:
+    def __init__(self, hvp, opt0, hyper0, cg_opts = {}):
+        self.hvp = hvp
+        self.opt0 = opt0
+        self.hyper0 = hyper0
+
+        self.hess_dim = len(opt0)
+
+        self.hvp_at_opt = osp.sparse.linalg.LinearOperator(\
+                                        shape = (self.hess_dim, self.hess_dim), \
+                                        matvec = lambda v : hvp(opt0, hyper0, v))
+        self.cg_opts = cg_opts
+
+    def solve(self, v):
+        assert len(v.shape) <= 2
+
+        if len(v.shape) == 1:
+            # if v is just a vector, make it hess_dim x 1
+            v = np.array([v]).T
+
+        n_vec = v.shape[1]
+        assert v.shape[0] == self.hess_dim
+
+        out = np.zeros((self.hess_dim, n_vec))
+
+        for i in range(n_vec):
+            out[:, i] = osp.sparse.linalg.cg(self.hvp_at_opt, v[:, i], **self.cg_opts)[0]
+
+        return out
