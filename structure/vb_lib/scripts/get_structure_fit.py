@@ -9,8 +9,8 @@ sys.path.insert(0, '../')
 
 import structure_model_lib
 import structure_optimization_lib as str_opt_lib
-import data_utils 
-import preconditioner_lib 
+import data_utils
+import preconditioner_lib
 
 import paragami
 import vittles
@@ -67,6 +67,9 @@ def validate_args():
 
     if args.warm_start:
         assert os.path.isfile(args.init_fit)
+
+    if args.load_data:
+        assert os.path.isfile(args.data_file)
 
 validate_args()
 
