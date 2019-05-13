@@ -35,7 +35,7 @@ def get_log_beta_covariance(alpha, beta):
                      [I12 * alpha * beta, I22 * beta**2]])
 
 def get_mfvb_cov_preconditioner(vb_params_dict, vb_params_paragami,
-                        use_logitnormal_sticks):
+                                use_logitnormal_sticks):
     # compute preconditioner from MFVB covariances
 
     # get (constrained parameters):
@@ -82,7 +82,7 @@ class SystemSolverFromHVP:
         assert len(v.shape) <= 2
 
         if len(v.shape) == 1:
-            # if v is just a vector, make it hess_dim x 1
+            # if v is just a vector, make it (hess_dim x 1)
             v = np.array([v]).T
 
         n_vec = v.shape[1]

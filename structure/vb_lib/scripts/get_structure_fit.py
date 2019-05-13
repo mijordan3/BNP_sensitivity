@@ -193,7 +193,8 @@ if args.save_sensitivity:
         prior_params_paragami.flatten(prior_params_dict, free = True)
 
     if args.save_cross_hess_only:
-        # if the hessian is large, we only save the cross hessian
+        # if the hessian is large, we only save the cross hessian and
+        # sensitivty matrix 
 
         # preconditioner for conjugate-gradient
         mfvb_cov, mfvb_info = \

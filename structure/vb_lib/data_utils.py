@@ -6,13 +6,29 @@ import scipy.cluster.hierarchy as sch
 from itertools import permutations
 
 def get_one_hot(targets, nb_classes):
-    # TODO: test this
     res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
     return res.reshape(list(targets.shape)+[nb_classes])
 
 def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
-    # pop_allele_freq is n_loci x n_population
-    # ind_admix_propn is n_obs x n_population
+    """
+    Draws data for structure
+
+    Parameters
+    ----------
+    true_pop_allele_freq : ndarray
+        The true population frequencies from which to draw g_obs,
+        in a (n_loci x n_population) array.
+    true_ind_admix_propn : ndarray
+        The true individual admixtures from which to draw g_obs,
+        in a (n_obs x n_population) array.
+
+    Returns
+    -------
+    g_obs : ndarray
+        Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
+        genotypes
+
+    """
 
     n_obs = ind_admix_propn.shape[0]
     n_pop = ind_admix_propn.shape[1]
@@ -44,13 +60,40 @@ def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
     return g_obs
 
 def draw_data(n_obs, n_loci, n_pop):
+    """
+    Draws data for structure
+
+    Parameters
+    ----------
+    n_obs : integer
+        The number of observations
+    n_loci : integer
+        The number of loci per observation
+    n_pop : integer
+        The number of populations in the model
+
+    Returns
+    -------
+    g_obs : ndarray
+        Array of size n_obs x n_loci x 3, giving a one-hot encoding of
+        genotypes
+    true_pop_allele_freq : ndarray
+        The true population frequencies from which g_obs was drawn,
+        in a (n_loci x n_population) array.
+    true_ind_admix_propn : ndarray
+        The true individual admixtures from which g_obs was drawn,
+        in a (n_obs x n_population) array.
+    """
+
+
+    # draw population allele frequencies
     true_pop_allele_freq = np.random.random((n_loci, n_pop))
 
     # individual admixtures
     true_ind_admix_propn = \
         np.random.dirichlet(np.ones(n_pop) / n_pop, size = (n_obs))
 
-    # cluster the individuals
+    # cluster the individuals (just for better plotting)
     clustering_indx = cluster_admix_get_indx(true_ind_admix_propn)
     true_ind_admix_propn = true_ind_admix_propn[clustering_indx, :]
 
@@ -66,7 +109,7 @@ def draw_data(n_obs, n_loci, n_pop):
 # permuting / clustering matrices
 ####################
 def find_min_perm(x, y, axis = 0):
-    # perumutes array x along axis to find closest
+    # perumutes array x along `axis' to find closest
     # match to y
 
     perms = list(permutations(np.arange(x.shape[axis])))

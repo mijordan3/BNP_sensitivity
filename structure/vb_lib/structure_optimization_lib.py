@@ -84,13 +84,58 @@ def check_hessian(vb_sens, which_prior):
 ##################################
 
 def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
-                    prior_params_dict,
-                    gh_loc, gh_weights, use_logitnormal_sticks = True,
-                    run_cavi = True, cavi_max_iter = 50, cavi_tol = 1e-6,
-                    netwon_max_iter = 50,
-                    max_precondition_iter = 10,
-                    gtol=1e-8, ftol=1e-8, xtol=1e-8,
-                    approximate_hessian = False):
+                        prior_params_dict,
+                        gh_loc, gh_weights,
+                        use_logitnormal_sticks = True,
+                        run_cavi = True,
+                        cavi_max_iter = 50,
+                        cavi_tol = 1e-6,
+                        netwon_max_iter = 50,
+                        max_precondition_iter = 10,
+                        gtol=1e-8,
+                        ftol=1e-8,
+                        xtol=1e-8,
+                        approximate_preconditioner = False):
+    """
+    Optimizes the structure model using a combination of CAVI
+    and preconditioned Newton's method.
+
+    Parameters
+    ----------
+    g_obs : ndarray
+        Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
+        genotypes
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    use_logitnormal_sticks : boolean
+        Whether to use a logitnormal approximation to infer the sticks.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    run_cavi : boolean
+        Whether to run CAVI steps before the Newton steps.
+    cavi_max_iter : int
+        Maximum interations to run CAVI
+    cavi_tol : float
+        tolerance on difference of objective function to terminate CAVI
+    netwon_max_iter : int
+        Maximum interations to run Newton
+    max_precondition_iter : int
+        Maximum times to recompute preconditioner
+    approximate_preconditioner : boolean
+        whether to approximate the preconditioner using MFVB covariance.
+        if False, the Hessian is computed and used as a preconditioner
+
+    Parameters
+    ----------
+    The optimal free variational parameters 
+
+    """
 
     # get loss as a function of vb free parameters
     get_free_vb_params_loss = paragami.FlattenFunctionInput(
@@ -104,11 +149,12 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
                                     x, prior_params_dict,
                                     use_logitnormal_sticks,
                                     gh_loc, gh_weights)
+
     get_loss_grad = autograd.grad(get_loss)
 
     if run_cavi:
         # RUN CAVI
-
+        print('running CAVI. ')
         # get initial moments
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
@@ -137,7 +183,9 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
     for i in range(max_precondition_iter):
         print('\n running preconditioned newton; iter = ', i)
 
-        if approximate_hessian:
+        if approximate_preconditioner:
+            # get approximate preconditioner using MFVB covariance
+
             t0 = time.time()
 
             a_inv, a = \
