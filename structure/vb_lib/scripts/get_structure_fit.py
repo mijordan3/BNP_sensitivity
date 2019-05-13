@@ -4,13 +4,8 @@ import autograd.numpy as np
 import autograd.scipy as sp
 from numpy.polynomial.hermite import hermgauss
 
-import sys
-sys.path.insert(0, '../')
-
-import structure_model_lib
-import structure_optimization_lib as str_opt_lib
-import data_utils
-import preconditioner_lib
+from vb_lib import structure_model_lib, data_utils, preconditioner_lib
+import vb_lib.structure_optimization_lib as str_opt_lib
 
 import paragami
 import vittles
@@ -194,7 +189,7 @@ if args.save_sensitivity:
 
     if args.save_cross_hess_only:
         # if the hessian is large, we only save the cross hessian and
-        # sensitivty matrix 
+        # sensitivty matrix
 
         # preconditioner for conjugate-gradient
         mfvb_cov, mfvb_info = \
