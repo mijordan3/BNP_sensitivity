@@ -12,7 +12,7 @@ from copy import deepcopy
 
 import warnings
 
-import structure_model_lib
+from vb_lib import structure_model_lib
 
 from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
                                             _get_matrix_from_operator

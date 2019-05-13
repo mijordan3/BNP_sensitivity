@@ -9,12 +9,12 @@ import vittles
 from copy import deepcopy
 import time
 
-import structure_model_lib
-import cavi_lib
+from vb_lib import structure_model_lib, cavi_lib
+
+from vb_lib.preconditioner_lib import get_mfvb_cov_preconditioner
 
 import BNP_modeling.optimization_lib as optim_lib
 
-from preconditioner_lib import get_mfvb_cov_preconditioner
 
 def check_hessian(vb_sens, which_prior):
     """
@@ -133,7 +133,7 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
 
     Parameters
     ----------
-    The optimal free variational parameters 
+    The optimal free variational parameters
 
     """
 

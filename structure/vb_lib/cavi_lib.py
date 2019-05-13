@@ -3,7 +3,8 @@ import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
 
-import structure_model_lib
+from vb_lib import structure_model_lib
+
 from BNP_modeling import cluster_quantities_lib, modeling_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
