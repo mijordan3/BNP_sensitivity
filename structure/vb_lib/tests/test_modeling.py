@@ -6,12 +6,8 @@ from numpy.polynomial.hermite import hermgauss
 
 import scipy as osp
 
-import sys
-sys.path.insert(0, '../')
-
-import structure_model_lib
-import structure_optimization_lib as str_opt_lib
-import preconditioner_lib
+from vb_lib import structure_model_lib, preconditioner_lib, data_utils
+import vb_lib.structure_optimization_lib as str_opt_lib
 
 import paragami
 import vittles
@@ -22,8 +18,6 @@ import argparse
 import distutils.util
 
 import os
-
-import data_utils
 
 from BNP_modeling import cluster_quantities_lib, modeling_lib
 import BNP_modeling.optimization_lib as opt_lib

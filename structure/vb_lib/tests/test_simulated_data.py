@@ -4,11 +4,7 @@ import autograd.numpy as np
 import autograd.scipy as sp
 from numpy.polynomial.hermite import hermgauss
 
-import sys
-sys.path.insert(0, '../')
-
-import structure_model_lib
-import data_utils
+from vb_lib import structure_model_lib, data_utils
 
 import paragami
 

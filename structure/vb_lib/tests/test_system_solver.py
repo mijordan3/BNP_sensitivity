@@ -6,12 +6,8 @@ from numpy.polynomial.hermite import hermgauss
 
 import scipy as osp
 
-import sys
-sys.path.insert(0, '../')
-
-import structure_model_lib
-import structure_optimization_lib as str_opt_lib
-import preconditioner_lib
+from vb_lib import structure_model_lib, preconditioner_lib, data_utils
+import vb_lib.structure_optimization_lib as str_opt_lib
 
 import paragami
 import vittles
@@ -83,7 +79,7 @@ class TestSystemSolver(unittest.TestCase):
                                         netwon_max_iter = 20,
                                         max_precondition_iter = 25,
                                         gtol=1e-8, ftol=1e-8, xtol=1e-8,
-                                        approximate_hessian = True)
+                                        approximate_preconditioner = True)
 
         vb_params_dict = vb_params_paragami.fold(vb_opt_free_params, free=True)
 
