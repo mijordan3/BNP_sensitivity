@@ -15,18 +15,34 @@ from sklearn.decomposition import NMF
 ##########################
 
 def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
-                                    use_logitnormal_sticks = True):
+                                    use_logitnormal_sticks):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
 
     Parameters
     ----------
+    n_obs : integer
+        The number of observations
+    n_loci : integer
+        The number of loci per observation
+    k_approx : integer
+        The number of components in the model
+    use_logitnormal_sticks : boolean
+        Whether to use a logitnormal approximation to infer the sticks.
 
     Returns
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
+        The beta parameters are for population frequencies are
+        stored in 'pop_freq_beta_params'.
+        If use_logitnormal_sticks = True, then we model the sticks
+        for the individual admixtures using logitnormals,
+        whose means and infos are stored in 'ind_mix_stick_propn_mean'
+        and 'ind_mix_stick_propn_info'.
+        Else, we use a beta approximation to the sticks, and
+        these are stored in 'ind_mix_stick_beta_params'
 
     vb_params_paragami : paragami patterned dictionary
         A paragami patterned dictionary that contains the variational parameters.
@@ -45,11 +61,13 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
         vb_params_paragami['ind_mix_stick_propn_mean'] = \
             paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
         vb_params_paragami['ind_mix_stick_propn_info'] = \
-            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,), lb = 1e-4)
+            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
+                                            lb = 1e-4)
     else:
         # else they are beta distributed
         vb_params_paragami['ind_mix_stick_beta_params'] = \
-            paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2), lb = 0.0)
+            paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2),
+                                            lb = 0.0)
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -117,7 +135,7 @@ def get_entropy(ind_mix_stick_propn_mean,
                 ind_mix_stick_propn_info,
                 pop_freq_beta_params,
                 e_z, gh_loc, gh_weights,
-                use_logitnormal_sticks = True,
+                use_logitnormal_sticks,
                 ind_mix_stick_beta_params = None):
     # get entropy term
 
@@ -134,8 +152,10 @@ def get_entropy(ind_mix_stick_propn_mean,
                                     gh_loc, gh_weights)
     else:
         assert ind_mix_stick_beta_params is not None
-        nk = ind_mix_stick_beta_params.shape[0] * ind_mix_stick_beta_params.shape[1]
-        stick_entropy = ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
+        nk = ind_mix_stick_beta_params.shape[0] * \
+                ind_mix_stick_beta_params.shape[1]
+        stick_entropy = \
+            ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
 
     # beta entropy term
     lk = pop_freq_beta_params.shape[0] * pop_freq_beta_params.shape[1]
@@ -150,10 +170,12 @@ def get_loglik_gene_nlk(g_obs, e_log_pop_freq, e_log_1m_pop_freq):
 
     genom_loglik_nlk_a = \
         np.einsum('nl, lk -> nlk', g_obs[:, :, 0], e_log_1m_pop_freq) + \
-            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + g_obs[:, :, 2], e_log_pop_freq)
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + \
+                                        g_obs[:, :, 2], e_log_pop_freq)
 
     genom_loglik_nlk_b = \
-        np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + g_obs[:, :, 1], e_log_1m_pop_freq) + \
+        np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + \
+                                    g_obs[:, :, 1], e_log_1m_pop_freq) + \
             np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_pop_freq)
 
     return np.stack((genom_loglik_nlk_a, genom_loglik_nlk_b), axis = -1)
@@ -165,7 +187,8 @@ def get_loglik_cond_z(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
                         e_log_cluster_probs):
 
     # get likelihood of genes
-    loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_pop_freq, e_log_1m_pop_freq)
+    loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_pop_freq, \
+                                            e_log_1m_pop_freq)
 
     # log likelihood of population belongings
     n = e_log_cluster_probs.shape[0]
@@ -233,8 +256,8 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
+                    use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
-                    use_logitnormal_sticks = True,
                     e_z = None,
                     obs_weights = None,
                     loci_weights = None):
@@ -251,6 +274,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         Dictionary of variational parameters.
     prior_params_dict : dictionary
         Dictionary of prior parameters.
+    use_logitnormal_sticks : boolean
+        Whether to use a logitnormal approximation to infer the sticks.
     gh_loc : vector
         Locations for gauss-hermite quadrature. We need this compute the
         expected prior terms.
@@ -262,6 +287,10 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         parameters, stored in an array whose (n, l, k, i)th entry is the probability
         of the nth datapoint at locus l and chromosome i belonging to cluster k.
         If ``None``, we set the optimal z.
+    obs_weights: ndarray
+        weights for the individual observations
+    loci_weights: ndarray
+        weights for the loci
 
     Returns
     -------
@@ -295,7 +324,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         entropy = get_entropy(vb_params_dict['ind_mix_stick_propn_mean'],
                                 vb_params_dict['ind_mix_stick_propn_info'],
                                 pop_freq_beta_params,
-                                e_z, gh_loc, gh_weights).squeeze()
+                                e_z, gh_loc, gh_weights,
+                                use_logitnormal_sticks = True).squeeze()
     else:
         beta_params = vb_params_dict['ind_mix_stick_beta_params']
         entropy = get_entropy(None, None,
@@ -311,7 +341,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     return -1 * elbo
 
 def get_moments_from_vb_params_dict(g_obs, vb_params_dict,
-                                    use_logitnormal_sticks = True,
+                                    use_logitnormal_sticks,
                                     gh_loc = None,
                                     gh_weights = None):
     # get expected sticks
@@ -374,7 +404,7 @@ def cluster_and_get_init(g_obs, k):
     return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
 
 def set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                        use_logitnormal_sticks = True):
+                        use_logitnormal_sticks):
     # get initial admixtures, and population frequencies
     init_ind_admix_propn, init_pop_allele_freq = \
             cluster_and_get_init(g_obs, k_approx)
@@ -407,7 +437,8 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     return vb_params_dict
 
 def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-                        prior_params_dict, gh_loc, gh_weights):
+                        prior_params_dict, gh_loc, gh_weights,
+                        use_logitnormal_sticks):
     # this function checks that vb_opt_dict are at a kl optimum for the given
     # prior parameters
 
@@ -419,10 +450,12 @@ def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
                                     argnums = 1)
     # cache other parameters
     get_free_vb_params_loss_cached = \
-        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict, gh_loc, gh_weights,
-                                          true_pop_allele_freq = None,
-                                          true_ind_admix_propn = None)
+        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict,
+                                        use_logitnormal_sticks,
+                                        gh_loc, gh_weights)
+
     grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
-    linf_grad = np.max(np.abs(grad_get_loss(vb_params_paragami.flatten(vb_opt_dict, free = True))))
+    linf_grad = np.max(np.abs(grad_get_loss(\
+                    vb_params_paragami.flatten(vb_opt_dict, free = True))))
 
     assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)

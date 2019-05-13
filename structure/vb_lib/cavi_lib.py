@@ -3,7 +3,8 @@ import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
 
-import structure_model_lib
+from vb_lib import structure_model_lib
+
 from BNP_modeling import cluster_quantities_lib, modeling_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
@@ -39,6 +40,7 @@ def update_pop_beta(g_obs, e_z,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
+    # update population frequency parameters
 
     beta_param1 = get_pop_beta_update1(g_obs, e_z,
                     e_log_pop_freq, e_log_1m_pop_freq,
@@ -62,6 +64,8 @@ def update_stick_beta(g_obs, e_z,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
+
+    # update individual admixtures
 
     beta_param1 = get_stick_update1(g_obs, e_z,
                 e_log_pop_freq, e_log_1m_pop_freq,
@@ -87,6 +91,47 @@ def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
                 prior_params_dict,
                 f_tol = 1e-6,
                 max_iter = 1000):
+    """
+    Runs coordinate ascent on the VB parameters. This is only implemented
+    for the beta approximation to the stick-breaking distribution.
+
+    Parameters
+    ----------
+    g_obs : ndarray
+        Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
+        genotypes
+    e_log_pop_freq : ndarray
+        Array of size n_loci x n_pop specifying the expected log
+        population frequencies
+    e_log_1m_pop_freq : ndarray
+        Array of size n_loci x n_pop specifying the expected
+        log(1 - population frequency)
+    e_log_sticks : ndarray
+        Array of size n_obs x n_pop specifying the expected
+        log sticks of the individual admixtures
+     e_log_1m_sticks : ndarray
+         Array of size n_obs x n_pop specifying the expected
+         log(1 - sticks) of the individual admixtures
+    prior_params_dict : dictionary
+        A dictionary that contains the prior parameters.
+
+    Returns
+    -------
+    e_z : ndarray
+        Array of size (n_obs x n_loci x k_approx x 2)
+        specifying the expected belonging of the nth individual
+        at the mth loci belonging to the kth population of either
+        chromosome.
+    stick_beta_params : ndarray
+        Array of size (n_obs x k_approx x 2)
+        specifying the beta parameters of the individual admixture
+        stick-breaking disribution
+    pop_beta_params : ndarray
+        Array of size (n_loci x k_approx x 2)
+        specifying the beta parameters of the population
+        allele frequencies
+    """
+
 
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
@@ -138,7 +183,7 @@ def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
         assert kl_diff > 0
 
         if kl_diff < f_tol:
-            print('done. Termination after {} steps in {} seconds'.format(
+            print('CAVI done. Termination after {} steps in {} seconds'.format(
                     i, round(time.time() - t0, 2)))
             break
 
