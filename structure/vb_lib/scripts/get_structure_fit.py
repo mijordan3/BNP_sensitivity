@@ -146,7 +146,7 @@ vb_opt_free_params = \
                         netwon_max_iter = 20,
                         max_precondition_iter = 25,
                         gtol=1e-8, ftol=1e-8, xtol=1e-8,
-                        approximate_hessian = True)
+                        approximate_preconditioner = True)
 
 vb_opt_dict = vb_params_paragami.fold(vb_opt_free_params, free=True)
 
