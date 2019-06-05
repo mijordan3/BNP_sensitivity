@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.insert(0, '../libraries')
-
 import autograd
 import autograd.numpy as np
 import autograd.scipy as sp
 
 import scipy as osp
 
-import gmm_clustering_lib as gmm_lib
-import simulation_lib
+from bnpgmm_runjingdev import gmm_clustering_lib as gmm_lib
+from bnpgmm_runjingdev import simulation_lib
 
 from numpy.polynomial.hermite import hermgauss
 

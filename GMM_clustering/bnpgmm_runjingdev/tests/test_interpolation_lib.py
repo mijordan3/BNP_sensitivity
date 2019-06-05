@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.insert(0, '../libraries')
-
 import autograd.numpy as np
 import autograd.scipy as sp
 
 from autograd import elementwise_grad
 
-import interpolation_lib as interp
+from bnpgmm_runjingdev import interpolation_lib as interp
 import unittest
 
 import numpy.testing as testing
