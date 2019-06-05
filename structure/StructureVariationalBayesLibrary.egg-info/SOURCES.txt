@@ -1,0 +1,11 @@
+README
+StructureVariationalBayesLibrary.egg-info/PKG-INFO
+StructureVariationalBayesLibrary.egg-info/SOURCES.txt
+StructureVariationalBayesLibrary.egg-info/dependency_links.txt
+StructureVariationalBayesLibrary.egg-info/top_level.txt
+vb_lib/__init__.py
+vb_lib/cavi_lib.py
+vb_lib/data_utils.py
+vb_lib/preconditioner_lib.py
+vb_lib/structure_model_lib.py
+vb_lib/structure_optimization_lib.py
