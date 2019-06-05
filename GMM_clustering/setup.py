@@ -6,8 +6,6 @@ import sys
 
 here = path.abspath(path.dirname(__file__))
 
-print(here)
-
 pip_version_match = re.search(r'^[0-9]*', pip.__version__)
 if pip_version_match:
     if int(pip_version_match.group(0)) < 19:
@@ -23,24 +21,8 @@ with open(path.join(here, 'requirements.txt')) as requirements_file:
 requirements = [line for line in requirements_lines
                 if not (line.startswith('#')) ]
 
-# requirements = [line for line in requirements_lines
-#                 if not (line.startswith('#') or line.startswith('git'))]
-#
-# git_requirements = [line for line in requirements_lines
-#                      if line.startswith('git')]
-#
-# # git repos also need to be listed in the requirements.
-# for git_req in git_requirements:
-#     print('---------------\n', git_req, requirements)
-#     loc = git_requirements[0].find('egg=') + 4
-#     requirements += [ git_requirements[0][loc:] ]
-
-print(requirements)
-
-#exit(0)
-
 setup(
-    name='bnpgmm-runjingdev',
+    name='bnpgmm_runjingdev',
     version='0.1',
     description='Development version of GMM clustering scripts with BNP.',
     author='Runjing Liu, Ryan Giordano',
