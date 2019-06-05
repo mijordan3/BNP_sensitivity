@@ -3,8 +3,8 @@
 import autograd.numpy as np
 import autograd.scipy as sp
 
-import gmm_clustering_lib as gmm_lib
-import modeling_lib as model_lib
+from bnpgmm_runjingdev import gmm_clustering_lib as gmm_lib
+from bnpmodeling_runjingdev import modeling_lib as model_lib
 
 import scipy as osp
 
