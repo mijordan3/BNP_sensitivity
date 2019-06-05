@@ -312,4 +312,4 @@ class InfluenceFunction(object):
 #         for k in range(self.model.k_approx - 1):
 #             log_influence_fun_array[k, :] = self.get_influence_function_k(logit_v, k)
 
-#         return osp.misc.logsumexp(log_influence_fun_array, axis = 0)
+#         return osp.special.logsumexp(log_influence_fun_array, axis = 0)

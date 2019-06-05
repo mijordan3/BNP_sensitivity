@@ -210,7 +210,7 @@ def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
                                     gh_loc, gh_weights,
                                     use_bnp_prior)
 
-    log_const = sp.misc.logsumexp(z_nat_param, axis=1)
+    log_const = sp.special.logsumexp(z_nat_param, axis=1)
     e_z = np.exp(z_nat_param - log_const[:, None])
 
     return e_z, loglik_obs_by_nk

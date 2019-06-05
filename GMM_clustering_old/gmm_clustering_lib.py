@@ -357,7 +357,7 @@ class DPGaussianMixture(object):
             z_nat_param = \
                     self.get_z_nat_params(return_loglik_obs_by_nk)
 
-        log_const = sp.misc.logsumexp(z_nat_param, axis=1)
+        log_const = sp.special.logsumexp(z_nat_param, axis=1)
         #self.vb_params['e_z'].set(np.exp(z_nat_param - log_const[:, None]))
         self.e_z = np.exp(z_nat_param - log_const[:, None])
 

@@ -49,7 +49,7 @@ class TestOptimalEz(unittest.TestCase):
         def get_kl_from_z_nat_param(y, vb_params_dict, prior_params_dict,
                     gh_loc, gh_weights, z_nat_param):
 
-            log_const = sp.misc.logsumexp(z_nat_param, axis=1)
+            log_const = sp.special.logsumexp(z_nat_param, axis=1)
             e_z = np.exp(z_nat_param - log_const[:, None])
 
             return gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,

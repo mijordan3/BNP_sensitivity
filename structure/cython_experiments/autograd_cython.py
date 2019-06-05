@@ -22,7 +22,7 @@ beta = 1
 p = 1
 
 def get_e_z(x, p=1):
-    log_norm = sp.misc.logsumexp(x, axis=1, keepdims=True)
+    log_norm = sp.special.logsumexp(x, axis=1, keepdims=True)
     e_z = np.exp(x - log_norm)
     return e_z ** p
 
