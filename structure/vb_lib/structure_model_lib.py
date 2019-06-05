@@ -4,7 +4,7 @@ import autograd.scipy as sp
 
 import paragami
 
-from BNP_modeling import cluster_quantities_lib, modeling_lib, optimization_lib
+from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib, optimization_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
