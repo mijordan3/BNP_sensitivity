@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
-sys.path.insert(0, '../')
 
 import autograd.numpy as np
 import autograd.scipy as sp
 
-import cluster_quantities_lib
+from bnpmodeling_runjingdev import cluster_quantities_lib
 import unittest
 
 import numpy.testing as testing

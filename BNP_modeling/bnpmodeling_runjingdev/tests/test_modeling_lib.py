@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.insert(0, '../libraries')
-
 import autograd.numpy as np
 import autograd.scipy as sp
 
 import scipy as osp
 
-import modeling_lib
+from bnpmodeling_runjingdev import modeling_lib
 
 from numpy.polynomial.hermite import hermgauss
 
