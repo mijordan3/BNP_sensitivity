@@ -143,7 +143,7 @@ class PriorPerturbation(object):
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
 
-def get_e_log_perturbation(log_phi, vb_params_dict, epsilon_param_dict,
+def get_e_log_perturbation(log_phi, vb_params_dict, epsilon,
                            gh_loc, gh_weights, sum_vector=True):
 
     """
@@ -155,8 +155,8 @@ def get_e_log_perturbation(log_phi, vb_params_dict, epsilon_param_dict,
         The log of the multiplicative perturbation in logit space
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters
-    epsilon_param_dict : dictionary
-        Dictionary with key 'epsilon' specififying the multiplicative perturbation
+    epsilon : float
+        The 'epsilon' specififying the multiplicative perturbation
     gh_loc : vector
         Locations for gauss-hermite quadrature. We need this compute the
         expected prior terms.
@@ -174,7 +174,7 @@ def get_e_log_perturbation(log_phi, vb_params_dict, epsilon_param_dict,
     """
 
     perturbation_fun = \
-        lambda logit_v: log_phi(logit_v) * epsilon_param_dict['epsilon']
+        lambda logit_v: log_phi(logit_v) * epsilon
 
     e_perturbation_vec = model_lib.get_e_func_logit_stick_vec(
         vb_params_dict, gh_loc, gh_weights, perturbation_fun)
@@ -184,7 +184,7 @@ def get_e_log_perturbation(log_phi, vb_params_dict, epsilon_param_dict,
     else:
         return -1 * e_perturbation_vec
 
-def get_perturbed_kl(y, vb_params_dict, epsilon_param_dict, log_phi,
+def get_perturbed_kl(y, vb_params_dict, epsilon, log_phi,
                      prior_params_dict, gh_loc, gh_weights):
 
     """
@@ -196,8 +196,8 @@ def get_perturbed_kl(y, vb_params_dict, epsilon_param_dict, log_phi,
         The array of datapoints, one observation per row.
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters
-    epsilon_param_dict : dictionary
-        Dictionary with key 'epsilon' specififying the multiplicative perturbation
+    epsilon: float
+        The epsilon specifying the multiplicative perturbation
     log_phi : Callable function
         The log of the multiplicative perturbation in logit space
     gh_loc : vector
@@ -217,8 +217,7 @@ def get_perturbed_kl(y, vb_params_dict, epsilon_param_dict, log_phi,
     """
 
     e_log_pert = get_e_log_perturbation(log_phi, vb_params_dict,
-                            epsilon_param_dict,
-                            gh_loc, gh_weights, sum_vector=True)
+                            epsilon, gh_loc, gh_weights, sum_vector=True)
 
     return gmm_lib.get_kl(y, vb_params_dict,
                             prior_params_dict, gh_loc, gh_weights) + e_log_pert
