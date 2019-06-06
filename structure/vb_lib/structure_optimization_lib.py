@@ -13,7 +13,7 @@ from vb_lib import structure_model_lib, cavi_lib
 
 from vb_lib.preconditioner_lib import get_mfvb_cov_preconditioner
 
-import BNP_modeling.optimization_lib as optim_lib
+import bnpmodeling_runjingdev.optimization_lib as optim_lib
 
 
 def check_hessian(vb_sens, which_prior):

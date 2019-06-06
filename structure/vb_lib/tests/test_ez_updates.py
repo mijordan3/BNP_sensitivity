@@ -6,7 +6,7 @@ from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils
 
-from BNP_modeling import modeling_lib
+from bnpmodeling_runjingdev import modeling_lib
 
 import unittest
 

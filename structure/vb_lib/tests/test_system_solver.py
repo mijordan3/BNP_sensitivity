@@ -21,8 +21,8 @@ import os
 
 import data_utils
 
-from BNP_modeling import cluster_quantities_lib, modeling_lib
-import BNP_modeling.optimization_lib as opt_lib
+from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
+import bnpmodeling_runjingdev.optimization_lib as opt_lib
 
 import unittest
 

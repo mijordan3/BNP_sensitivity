@@ -4,7 +4,7 @@ import autograd.scipy as sp
 
 import paragami
 
-from BNP_modeling import cluster_quantities_lib, modeling_lib, optimization_lib
+from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib, optimization_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -206,7 +206,7 @@ def get_z_opt_from_loglik_cond_z(loglik_cond_z):
     # recall that loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
     loglik_cond_z = loglik_cond_z - np.max(loglik_cond_z, axis = 2, keepdims = True)
 
-    log_const = sp.misc.logsumexp(loglik_cond_z, axis = 2, keepdims = True)
+    log_const = sp.special.logsumexp(loglik_cond_z, axis = 2, keepdims = True)
 
     return np.exp(loglik_cond_z - log_const)
 
