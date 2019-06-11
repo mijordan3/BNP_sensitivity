@@ -326,6 +326,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
     # likelihood of z
+    # TODO: I believe we are calculating this and adding it to the natural
+    # parameter already to get the optimal e_z.  Why do it twice?
     if use_bnp_prior:
         e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
                             gh_loc, gh_weights)
