@@ -26,7 +26,7 @@ import time
 from aistats2019_ij_paper.regression_lib import get_regression_array_pattern
 from aistats2019_ij_paper.regression_mixture_lib import get_prior_params_pattern
 from aistats2019_ij_paper.regression_mixture_lib import get_base_prior_params
-from aistats2019_ij_paper.regression_mixture_lib import get_log_lik_nk
+#from aistats2019_ij_paper.regression_mixture_lib import get_log_lik_nk
 
 def get_gmm_params_pattern(obs_dim, num_components):
     """A ``paragami`` pattern for a mixture model.
@@ -244,6 +244,11 @@ class GMM(gmm_lib.GMM):
         return get_kl(
             gmm_params, self.reg_params, self.prior_params,
             self.gh_loc, self.gh_weights)
+
+    def get_e_z(self, gmm_params):
+        _, e_z = get_loglik_terms(
+            gmm_params, self.reg_params, self.gh_loc, self.gh_weights)
+        return e_z
 
     def to_json(self):
         gmm_dict = dict()
