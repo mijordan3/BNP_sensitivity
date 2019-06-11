@@ -90,6 +90,7 @@ class GMM(object):
 
         # Model for regression output.
         self.num_components = num_components
+        self.reg_params = reg_params
 
         # # Terms that affect how the regression covariance is used
         # # in clustering.
@@ -120,11 +121,16 @@ class GMM(object):
         #         trans_reg_lib.get_reversible_predict_and_demean_matrix(
         #             regs.x)
         #
-        # self.obs_dim = self.transform_mat.shape[0]
+        self.obs_dim = self.reg_params['beta_mean'].shape[1]
+        self.num_obs = self.reg_params['beta_mean'].shape[0]
+        if not self.reg_params['beta_info'].shape[0] == self.num_obs:
+            raise ValueError('Wrong number of observations for beta_info')
+
+        if not (self.reg_params['beta_info'].shape[1] == self.obs_dim and
+                self.reg_params['beta_info'].shape[2] == self.obs_dim):
+            raise ValueError('Wrong shape for beta_info')
 
         # self.set_regression_params(reg_params)
-
-        self.reg_params = reg_params
 
         self.gmm_params_pattern = get_gmm_params_pattern(
             obs_dim=self.obs_dim,
