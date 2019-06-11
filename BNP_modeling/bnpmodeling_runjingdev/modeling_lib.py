@@ -15,7 +15,7 @@ def multinom_entropy(e_z):
 
 def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights):
-    # return the entropy of logitnormal distriibution on the sticks whose
+    # return the entropy of logitnormal distribution on the sticks whose
     # logit has mean stick_propn_mean and information stick_propn_info
     # Integration is done on the real line with respect to the Lesbegue measure
 

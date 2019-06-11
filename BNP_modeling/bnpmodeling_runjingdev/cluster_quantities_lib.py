@@ -39,8 +39,9 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
     ones_shape = stick_break_propns.shape[0:-1] + (1,)
 
     stick_break_propns_1m = 1 - stick_break_propns
-    stick_remain = np.concatenate((np.ones(ones_shape),
-                        _cumprod_through_log(stick_break_propns_1m, axis = -1)), axis = -1)
+    stick_remain = np.concatenate(
+        (np.ones(ones_shape),
+        _cumprod_through_log(stick_break_propns_1m, axis = -1)), axis = -1)
     stick_add = np.concatenate((stick_break_propns,
                                 np.ones(ones_shape)), axis = -1)
 
@@ -51,7 +52,8 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
 def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
                                         gh_loc, gh_weights):
     e_stick_lengths = \
-        ef.get_e_logitnormal(stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
+        ef.get_e_logitnormal(
+            stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
 
     return get_mixture_weights_from_stick_break_propns(e_stick_lengths)
 
