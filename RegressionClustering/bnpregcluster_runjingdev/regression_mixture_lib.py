@@ -1,7 +1,7 @@
 """Functions for estimaing a discrete mixture of regressions.
 """
 
-#import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
 import autograd
 import autograd.numpy as np
@@ -38,7 +38,7 @@ def get_log_prior(centroids, probs, prior_params):
     log_probs = np.log(probs[0, :])
     #log_prior += ef.dirichlet_prior(prior_params['probs_alpha'], log_probs)
 
-    assert False
+    #assert False
     # TODO: BNP prior here
 
     for k in range(num_components):
@@ -70,7 +70,7 @@ def wrap_get_kl(gmm_params, reg_params, prior_params):
 ##################
 # Mixture model class
 
-class GMM(object):
+class GMM(gmm_lib.GMM):
     def __init__(self, num_components, prior_params, reg_params):
         """A class for estimating mixtures of regressions.
 
@@ -92,35 +92,6 @@ class GMM(object):
         self.num_components = num_components
         self.reg_params = reg_params
 
-        # # Terms that affect how the regression covariance is used
-        # # in clustering.
-        # self.inflate_coef_cov = inflate_coef_cov
-        # self.cov_regularization = cov_regularization
-        #
-        # # Set up the transformed parameters.  These are what we actually
-        # # cluster.
-        # if (transform_mat is not None) and (unrotate_transform_mat is not None):
-        #     self.transform_mat = transform_mat
-        #     self.unrotate_transform_mat = unrotate_transform_mat
-        #     if self.transform_mat.shape[1] != regs.x.shape[1]:
-        #         raise ValueError(
-        #             'transform_mat has the wrong number of columns.')
-        #     if self.unrotate_transform_mat.shape[1] != transform_mat.shape[0]:
-        #         raise ValueError(
-        #             'unrotate_transform_mat has the wrong number of columns.')
-        #     if self.unrotate_transform_mat.shape[0] != regs.x.shape[0]:
-        #         raise ValueError(
-        #             'unrotate_transform_mat has the wrong number of rows.')
-        # else:
-        #     if (transform_mat is not None) or \
-        #        (unrotate_transform_mat is not None):
-        #        raise ValueError(
-        #         '``transform_mat`` and ``unrotate_transform_mat`` ' +
-        #         'must be both either ``None`` or not ``None``.')
-        #     self.transform_mat, self.unrotate_transform_mat = \
-        #         trans_reg_lib.get_reversible_predict_and_demean_matrix(
-        #             regs.x)
-        #
         self.obs_dim = self.reg_params['beta_mean'].shape[1]
         self.num_obs = self.reg_params['beta_mean'].shape[0]
         if not self.reg_params['beta_info'].shape[0] == self.num_obs:
@@ -156,56 +127,30 @@ class GMM(object):
         self.conditioned_obj = paragami.OptimizationObjective(
             self.get_kl_conditioned)
 
-        # This is for the cross Hessian between the regression and gmm.
-        # self.get_reg_params_kl_flat = paragami.FlattenFunctionInput(
-        #     self.get_reg_params_kl,
-        #     free=True,
-        #     patterns=[self.gmm_params_pattern, regs.reg_params_pattern])
-        # self.get_reg_params_kl_flat_grad = autograd.grad(
-        #     self.get_reg_params_kl_flat, argnum=0)
-        # self.get_reg_params_kl_flat_cross_hess = autograd.jacobian(
-        #     self.get_reg_params_kl_flat_grad, argnum=1)
+    def transform_regression_parameters(self):
+        raise NotImplementedError
 
-    def initialize_preconditioner(self):
-        self.get_kl_conditioned.set_preconditioner_matrix(
-            np.eye(self.gmm_params_pattern.flat_length(free=True)))
+    def set_regression_params(self):
+        raise NotImplementedError
 
-    def update_preconditioner(self, gmm_params_free, ev_min=1e-4):
-        """Set the optimization preconditioner using the objective
-        Hessian at ``gmm_params_free``.
-        """
-        hessian = self.kl_obj.hessian(gmm_params_free)
-        self.get_kl_conditioned.set_preconditioner_with_hessian(
-            hessian=hessian, ev_min=ev_min)
-        return hessian
+    def get_reg_params_kl(self):
+        raise NotImplementedError
 
-    # def transform_regression_parameters(self, reg_params):
-    #     """Transform the regression parameters ``reg_params`` into the
-    #     space being clustered.
+    def get_reg_params_kl(self):
+        raise NotImplementedError
+
+    # def initialize_preconditioner(self):
+    #     self.get_kl_conditioned.set_preconditioner_matrix(
+    #         np.eye(self.gmm_params_pattern.flat_length(free=True)))
+    #
+    # def update_preconditioner(self, gmm_params_free, ev_min=1e-4):
+    #     """Set the optimization preconditioner using the objective
+    #     Hessian at ``gmm_params_free``.
     #     """
-    #     return transform_regression_parameters(
-    #         reg_params, self.transform_mat,
-    #         cov_regularization=self.cov_regularization,
-    #         inflate_coef_cov=self.inflate_coef_cov)
-
-    # def set_regression_params(self, reg_params):
-    #     """Set the class's ``transformed_reg_params`` from ``reg_params``.
-    #     It is this values in ``transformed_reg_params`` that are clustered.
-    #     """
-    #     self.transformed_reg_params = \
-    #         self.transform_regression_parameters(reg_params)
-    #     self.num_obs = self.transformed_reg_params['beta_mean'].shape[0]
-
-    # def get_reg_params_kl(self, gmm_params, reg_params):
-    #     """Get the optimization objective as a function of both the mixture
-    #     and regression parameters.
-    #     """
-    #     # In order to avoid ArrayBoxes, don't set
-    #     # ``self.tranform_reg_params`` here.
-    #     transformed_reg_params = \
-    #         self.transform_regression_parameters(reg_params)
-    #     return wrap_get_kl(
-    #         gmm_params, transformed_reg_params, self.prior_params)
+    #     hessian = self.kl_obj.hessian(gmm_params_free)
+    #     self.get_kl_conditioned.set_preconditioner_with_hessian(
+    #         hessian=hessian, ev_min=ev_min)
+    #     return hessian
 
     def get_params_kl(self, gmm_params):
         """Get the optimization objective as a function of the mixture
@@ -214,81 +159,81 @@ class GMM(object):
         return wrap_get_kl(
             gmm_params, self.reg_params, self.prior_params)
 
-    def optimize(self, init_x, maxiter=500, gtol=1e-6):
-        """Optimize the preconditioned objective starting at ``init_x``,
-        ``init_x`` should be a flat free value of the gmm parameters.
-        """
-        init_x_cond = self.get_kl_conditioned.precondition(init_x)
-        gmm_opt_cond = osp.optimize.minimize(
-            self.conditioned_obj.f,
-            x0=init_x_cond,
-            jac=self.conditioned_obj.grad,
-            hessp=self.conditioned_obj.hessian_vector_product,
-            method='trust-ncg',
-            options={'maxiter': maxiter, 'gtol': gtol})
-
-        # Remember that gmm_opt_cond.x is in the conditioned space..
-        return \
-            gmm_opt_cond, \
-            self.get_kl_conditioned.unprecondition(gmm_opt_cond.x)
-
-    def optimize_fully(self, init_x,
-                       x_tol=1e-6, maxiter=500, gtol=1e-6,
-                       max_num_restarts=4, verbose=False):
-        """Optimize, repeatedly re-calculating the preconditioner,
-        until the optimal parameters don't change more than ``x_tol``.
-
-        Returns
-        ------------
-        opt_results
-            A dictionary containing a summary of the optimization
-        new_x : `numpy.ndarray`
-            The optimal free flat value of the mixture parameters.
-        """
-        def verbose_print(s):
-            if verbose:
-                print(s)
-
-        # Reset the logging.
-        self.conditioned_obj.reset()
-
-        last_x = deepcopy(init_x)
-        kl_hess = None
-
-        restart_num = 1
-        x_diff = float('inf')
-        while x_diff > x_tol and restart_num <= max_num_restarts:
-            verbose_print('Preconditioned iteration {}'.format(restart_num))
-
-            # On the first round, use the existing preconditioner.
-            # After that re-calculate the preconditioner using the last
-            # optimal value.
-            if restart_num > 1:
-                verbose_print('  Getting Hessian and preconditioner.')
-                kl_hess = self.update_preconditioner(last_x)
-
-            verbose_print('  Running preconditioned optimization.')
-            gmm_opt_cond, new_x = self.optimize(
-                last_x, maxiter=maxiter, gtol=gtol)
-
-            restart_num += 1
-            x_diff = np.linalg.norm(new_x - last_x)
-            last_x = deepcopy(new_x)
-
-        if x_diff <= x_tol:
-            verbose_print('Converged.')
-        else:
-            verbose_print(
-                'Terminated after {} iterations without converging.'.format(
-                    max_num_restarts))
-
-        opt_results = dict()
-        opt_results['gmm_opt_cond'] = gmm_opt_cond
-        opt_results['x_diff'] = x_diff
-        opt_results['converged'] = x_diff <= x_tol
-        opt_results['kl_hess'] = kl_hess
-
-        return opt_results, new_x
+    # def optimize(self, init_x, maxiter=500, gtol=1e-6):
+    #     """Optimize the preconditioned objective starting at ``init_x``,
+    #     ``init_x`` should be a flat free value of the gmm parameters.
+    #     """
+    #     init_x_cond = self.get_kl_conditioned.precondition(init_x)
+    #     gmm_opt_cond = osp.optimize.minimize(
+    #         self.conditioned_obj.f,
+    #         x0=init_x_cond,
+    #         jac=self.conditioned_obj.grad,
+    #         hessp=self.conditioned_obj.hessian_vector_product,
+    #         method='trust-ncg',
+    #         options={'maxiter': maxiter, 'gtol': gtol})
+    #
+    #     # Remember that gmm_opt_cond.x is in the conditioned space..
+    #     return \
+    #         gmm_opt_cond, \
+    #         self.get_kl_conditioned.unprecondition(gmm_opt_cond.x)
+    #
+    # def optimize_fully(self, init_x,
+    #                    x_tol=1e-6, maxiter=500, gtol=1e-6,
+    #                    max_num_restarts=4, verbose=False):
+    #     """Optimize, repeatedly re-calculating the preconditioner,
+    #     until the optimal parameters don't change more than ``x_tol``.
+    #
+    #     Returns
+    #     ------------
+    #     opt_results
+    #         A dictionary containing a summary of the optimization
+    #     new_x : `numpy.ndarray`
+    #         The optimal free flat value of the mixture parameters.
+    #     """
+    #     def verbose_print(s):
+    #         if verbose:
+    #             print(s)
+    #
+    #     # Reset the logging.
+    #     self.conditioned_obj.reset()
+    #
+    #     last_x = deepcopy(init_x)
+    #     kl_hess = None
+    #
+    #     restart_num = 1
+    #     x_diff = float('inf')
+    #     while x_diff > x_tol and restart_num <= max_num_restarts:
+    #         verbose_print('Preconditioned iteration {}'.format(restart_num))
+    #
+    #         # On the first round, use the existing preconditioner.
+    #         # After that re-calculate the preconditioner using the last
+    #         # optimal value.
+    #         if restart_num > 1:
+    #             verbose_print('  Getting Hessian and preconditioner.')
+    #             kl_hess = self.update_preconditioner(last_x)
+    #
+    #         verbose_print('  Running preconditioned optimization.')
+    #         gmm_opt_cond, new_x = self.optimize(
+    #             last_x, maxiter=maxiter, gtol=gtol)
+    #
+    #         restart_num += 1
+    #         x_diff = np.linalg.norm(new_x - last_x)
+    #         last_x = deepcopy(new_x)
+    #
+    #     if x_diff <= x_tol:
+    #         verbose_print('Converged.')
+    #     else:
+    #         verbose_print(
+    #             'Terminated after {} iterations without converging.'.format(
+    #                 max_num_restarts))
+    #
+    #     opt_results = dict()
+    #     opt_results['gmm_opt_cond'] = gmm_opt_cond
+    #     opt_results['x_diff'] = x_diff
+    #     opt_results['converged'] = x_diff <= x_tol
+    #     opt_results['kl_hess'] = kl_hess
+    #
+    #     return opt_results, new_x
 
     def to_json(self):
         gmm_dict = dict()
