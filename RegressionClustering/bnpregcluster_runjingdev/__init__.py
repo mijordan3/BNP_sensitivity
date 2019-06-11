@@ -1,1 +1,1 @@
-import regression_mixture_lib
+from . import regression_mixture_lib

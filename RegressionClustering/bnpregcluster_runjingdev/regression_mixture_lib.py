@@ -1,7 +1,7 @@
 """Functions for estimaing a discrete mixture of regressions.
 """
 
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+#import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
 import autograd
 import autograd.numpy as np
