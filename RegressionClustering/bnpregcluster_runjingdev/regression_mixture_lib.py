@@ -264,6 +264,14 @@ class GMM(gmm_lib.GMM):
     def get_reg_params_kl(self):
         raise NotImplementedError
 
+    def get_params_prior_kl(self, gmm_params, prior_params):
+        """Get the optimization objective as a function of the mixture
+        parameters.
+        """
+        return get_kl(
+            gmm_params, self.reg_params, prior_params,
+            self.gh_loc, self.gh_weights)
+
     def get_params_kl(self, gmm_params):
         """Get the optimization objective as a function of the mixture
         parameters.
