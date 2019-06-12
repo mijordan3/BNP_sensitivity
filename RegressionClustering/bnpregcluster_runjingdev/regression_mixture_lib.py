@@ -93,6 +93,7 @@ def get_loglik_obs_by_nk(gmm_params, reg_params):
     centroids = gmm_params['centroids']
     x = reg_params['beta_mean']
     x_infos = reg_params['beta_info']
+
     loglik_obs_by_nk = \
         -0.5 * (-2 * np.einsum('ni,kj,nij->nk', x, centroids, x_infos) +
                 np.einsum('ki,kj,nij->nk', centroids, centroids, x_infos))
@@ -136,13 +137,8 @@ def get_entropy(gmm_params, e_z, gh_loc, gh_weights):
 
 
 def _collapse(x):
-    return np.atleast_1d(x)[0]
     # Convert a single-element array to a number.
-    # if type(x) is np.ndarray:
-    #     assert x.shape == (1,)
-    #     return x[0]
-    # else:
-    #     return x
+    return np.atleast_1d(x)[0]
 
 
 def get_kl(gmm_params, reg_params, prior_params, gh_loc, gh_weights):
@@ -163,6 +159,37 @@ def get_kl(gmm_params, reg_params, prior_params, gh_loc, gh_weights):
     assert(np.isfinite(entropy))
 
     return -1 * (entropy + loglik)
+
+
+def backtrack(fun, theta0, v0, alpha=0.5, max_tries=10, tol=1e-7):
+    """Backtracking search for a descent direction.  Use to take a
+    safe newton step.
+    """
+    if alpha <= 0 or alpha >= 1:
+        raise ValueError('alpha must be in (0, 1)')
+
+    i = 0
+    v = v0
+    f0 = fun(theta0)
+    while i < max_tries:
+        fv = fun(theta0 + v)
+        print(f0 - fv)
+        if not np.isnan(fv):
+            if fun(theta0 + v) < f0 - tol:
+                print('Success.')
+                success = True
+                return theta0 + v, success
+        print('Shrinking step.')
+        v *= alpha
+        if np.max(np.abs(v)) < tol:
+            print('Under tolerance.')
+            success = False
+            return theta0, success
+        i += 1
+
+    print('Maximum tries reached.')
+    success = False
+    return theta0, success
 
 
 ##################
@@ -249,6 +276,107 @@ class GMM(gmm_lib.GMM):
         _, e_z = get_loglik_terms(
             gmm_params, self.reg_params, self.gh_loc, self.gh_weights)
         return e_z
+
+
+    def optimize_fully(self, init_x,
+                       x_tol=1e-7, f_tol=1e-7, g_tol=1e-7, maxiter=500,
+                       kl_hess=None, max_num_restarts=5, verbose=False):
+        """Optimize, repeatedly re-calculating the preconditioner,
+        until the optimal parameters don't change more than ``x_tol``.
+
+        Returns
+        ------------
+        opt_results
+            A dictionary containing a summary of the optimization
+        new_x : `numpy.ndarray`
+            The optimal free flat value of the mixture parameters.
+        """
+        def verbose_print(s):
+            if verbose:
+                print(s)
+
+        # Reset the logging.
+        self.conditioned_obj.reset()
+
+        if kl_hess is None:
+            kl_hess = self.update_preconditioner(init_x)
+
+        last_x = None
+        last_f = None
+        last_g = None
+        def log_iteration(x, f, g):
+            nonlocal last_x
+            nonlocal last_f
+            nonlocal last_g
+            last_x = deepcopy(x)
+            last_f = f
+            last_g = deepcopy(g)
+
+        log_iteration(init_x, self.kl_obj.f(init_x), self.kl_obj.grad(init_x))
+
+        def check_converged(it, x, f, g):
+            """ iteration, argument, function value, gradient
+
+            Returns terminate, success
+            """
+            if np.mean(np.abs(x - last_x)) < x_tol:
+                verbose_print('x convergence.')
+                return True, True
+
+            if last_f - f < f_tol:
+                verbose_print('f convergence.')
+                return True, True
+
+            if np.mean(np.abs(g - last_g)) < g_tol:
+                verbose_print('g convergence.')
+                return True, True
+
+            if it > max_num_restarts:
+                return True, False
+
+            return False, False
+
+        restart_num = 1
+        terminate = False
+        success = None
+        while not terminate:
+            verbose_print('Preconditioned iteration {}'.format(restart_num))
+
+            # On the first round, use the existing preconditioner.
+            # After that re-calculate the preconditioner using the last
+            # optimal value.
+            if restart_num > 1:
+                verbose_print('  Getting Hessian and preconditioner.')
+                kl_hess = self.update_preconditioner(last_x)
+
+            verbose_print('  Taking Newton step.')
+            print(kl_hess.shape)
+            print(last_g.shape)
+            newton_step = -1 * np.linalg.solve(kl_hess, last_g)
+            if np.mean(np.abs(newton_step)) > g_tol:
+                newton_x, _ = backtrack(self.kl_obj.f, last_x, newton_step)
+                verbose_print('  Running preconditioned optimization.')
+                gmm_opt_cond, new_x = self.optimize(
+                    newton_x, maxiter=maxiter, gtol=g_tol)
+
+                new_f = self.kl_obj.f(new_x)
+                new_g = self.kl_obj.grad(new_x)
+                restart_num += 1
+                terminate, success = \
+                    check_converged(restart_num, new_x, new_f, new_g)
+                log_iteration(new_x, new_f, new_g)
+            else:
+                verbose_print('  Converging with small Newton step.')
+                terminate = True
+                success = True
+
+        opt_results = dict()
+        opt_results['gmm_opt_cond'] = gmm_opt_cond
+        opt_results['converged'] = success
+        opt_results['kl_hess'] = kl_hess
+
+        return opt_results, new_x
+
 
     def to_json(self):
         gmm_dict = dict()
