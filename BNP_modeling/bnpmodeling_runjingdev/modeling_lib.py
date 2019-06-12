@@ -71,8 +71,12 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    s, logdet = np.linalg.slogdet(gamma)
-    assert np.all(s > 0), 'some gammas are not PSD'
+    # To use forward mode autodiff you cannot vectorize slogdet.
+    # s, logdet = np.linalg.slogdet(gamma)
+    # assert np.all(s > 0), 'some gammas are not PSD'
+    num_k = gamma.shape[0]
+    logdet = np.array([
+        np.linalg.slogdet(gamma[k, :, :])[1] for k in range(num_k) ])
 
     return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 

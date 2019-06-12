@@ -50,7 +50,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     # cluster covariances
     vb_params_paragami['gamma'] = \
         paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
-                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+            base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -175,7 +175,12 @@ def get_loglik_obs_by_nk(y, centroids, gamma):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
+    # Forward differentiation requires doing slogdet one at a time.
+    num_k = gamma.shape[0]
+    slogdet_by_k = np.array([
+        np.linalg.slogdet(gamma[k, :, :])[1] for k in range(num_k) ])
+    return - 0.5 * squared_term + 0.5 * slogdet_by_k[None, :]
+    # return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
 
 ##########################
 # Optimization over e_z
@@ -337,7 +342,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     e_loglik = e_loglik_ind + e_loglik_obs
 
     if not np.isfinite(e_loglik):
-        print('gamma', vb_params_dict['gamma'].get())
+        print('gamma', vb_params_dict['gamma'])
         print('det gamma', np.linalg.slogdet(
             vb_params_dict['gamma'])[1])
         print('cluster weights', np.sum(e_z, axis = 0))
