@@ -350,8 +350,6 @@ class GMM(gmm_lib.GMM):
                 kl_hess = self.update_preconditioner(last_x)
 
             verbose_print('  Taking Newton step.')
-            print(kl_hess.shape)
-            print(last_g.shape)
             newton_step = -1 * np.linalg.solve(kl_hess, last_g)
             if np.mean(np.abs(newton_step)) > g_tol:
                 newton_x, _ = backtrack(self.kl_obj.f, last_x, newton_step)
