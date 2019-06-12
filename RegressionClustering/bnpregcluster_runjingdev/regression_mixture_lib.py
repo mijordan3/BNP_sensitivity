@@ -299,6 +299,7 @@ class GMM(gmm_lib.GMM):
         self.conditioned_obj.reset()
 
         if kl_hess is None:
+            verbose_print('Setting initial preconditioner.')
             kl_hess = self.update_preconditioner(init_x)
 
         last_x = None
@@ -323,6 +324,7 @@ class GMM(gmm_lib.GMM):
                 verbose_print('x convergence.')
                 return True, True
 
+            verbose_print('f_diff: {}'.format(last_f - f))
             if last_f - f < f_tol:
                 verbose_print('f convergence.')
                 return True, True
