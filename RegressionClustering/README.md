@@ -15,7 +15,11 @@ python3 -m ipykernel install --user --name=bnpregcluster_runjingdev
 ~~~
 
 Then check out and install ``aistats2019_ij_paper`` from the (private) repo
-[InfinitesimalJackknifeGenomicsExperiment](https://github.com/Runjing-Liu120/InfinitesimalJackknifeGenomicsExperiment).  Finally,
+[InfinitesimalJackknifeGenomicsExperiment](https://github.com/Runjing-Liu120/InfinitesimalJackknifeGenomicsExperiment).
+
+Also you have to install the other libraries in this repo.
+
+Finally,
 
 ~~~
 pip install -e .
