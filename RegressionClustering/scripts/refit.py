@@ -3,6 +3,12 @@
 """Load a previous fit and refit, possibly with a new alpha.
 
 This uses the output of the jupyter notebook InitialFit.
+
+Example usage:
+
+./refit.py \
+    --input_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/transformed_gene_regression_df4_degree3_genes700_num_components30_inflate1.0_shrunkTrue_fit.npz \
+    --alpha_scale 0.01
 """
 
 import argparse
@@ -28,15 +34,11 @@ parser.add_argument('--out_filename', default=None, type=str)
 
 # Specify either the initinal fit file or the df, degree, and num_components.
 parser.add_argument('--input_filename', required=True, type=str)
-parser.add_argument('--alpha_scale', default=None, type=int)
+parser.add_argument('--alpha_scale', default=None, type=float)
 
 args = parser.parse_args()
 
 np.random.seed(args.seed)
-
-outdir, _ = os.path.split(args.out_filename)
-if not os.path.exists(outdir):
-    raise ValueError('Destination directory {} does not exist'.format(outdir))
 
 if not os.path.isfile(args.input_filename):
     raise ValueError('Initial fit file {} does not exist'.format(
@@ -69,6 +71,24 @@ reg_params = dict()
 with np.load(datafile) as infile:
     reg_params['beta_mean'] = infile['transformed_beta_mean']
     reg_params['beta_info'] = infile['transformed_beta_info']
+    inflate_cov = infile.get('inflate_cov', 0)
+    eb_shrunk = infile.get('eb_shrunk', False)
+
+num_genes = reg_params['beta_mean'].shape[0]
+
+if args.out_filename is None:
+    analysis_name = \
+        ('transformed_gene_regression_df{}_degree{}_genes{}_' +
+         'num_components{}_inflate{}_shrunk{}_refit').format(
+        df, degree, num_genes, num_components, inflate_cov, eb_shrunk)
+    outdir, _ = os.path.split(args.input_filename)
+    outfile = os.path.join(outdir, '{}.npz'.format(analysis_name))
+else:
+    outfile = args.out_filename
+
+outdir, _ = os.path.split(outfile)
+if not os.path.exists(outdir):
+    raise ValueError('Destination directory {} does not exist'.format(outdir))
 
 
 # Re-optimize.
@@ -94,24 +114,24 @@ opt_time = time.time() - tic
 print('Done.')
 print('Re-optimization time: {} seconds'.format(opt_time))
 
+reopt_gmm_params = gmm.gmm_params_pattern.fold(gmm_opt_x, free=True)
 
-# TODO: finish saving the data
-save_dict = deepcopy(gmm_opt)
+# Save the refit
+print('Saving to {}'.format(outfile))
+
+save_dict = dict()
+
 save_dict['input_filename'] = args.input_filename
-# save_dict['datafile'] = datafile
-# save_dict['num_components'] = num_components
-# save_dict['gmm_params_pattern_json'] = \
-#     gmm.gmm_params_pattern.to_json()
-# save_dict['opt_gmm_params_flat'] = \
-#     gmm.gmm_params_pattern.flatten(opt_gmm_params, free=False)
-# save_dict['prior_params_pattern_json'] = \
-#     prior_params_pattern.to_json()
-# save_dict['prior_params_flat'] = \
-#     prior_params_pattern.flatten(prior_params, free=False)
-#
-# save_dict['opt_time'] = opt_time
-#
-# outfile = './fits/{}.npz'.format(analysis_name)
-# print('Saving to {}'.format(outfile))
-#
-# np.savez_compressed(file=outfile, **save_dict)
+save_dict['alpha_scale'] = args.alpha_scale
+save_dict['new_alpha'] = new_alpha
+save_dict['reopt_gmm_params_flat'] = \
+    gmm.gmm_params_pattern.flatten(reopt_gmm_params, free=False)
+save_dict['reopt_time'] = opt_time
+save_dict['gmm_params_pattern_json'] = gmm.gmm_params_pattern.to_json()
+save_dict['reopt_kl_hess'] = gmm_opt['kl_hess']
+save_dict['reopt_prior_params_flat'] = \
+    prior_params_pattern.flatten(gmm.prior_params, free=False)
+save_dict['reopt_prior_params_pattern_json'] = \
+    prior_params_pattern.to_json()
+
+np.savez_compressed(file=outfile, **save_dict)
