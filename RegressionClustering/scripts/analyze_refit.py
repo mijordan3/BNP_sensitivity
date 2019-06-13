@@ -24,10 +24,7 @@ import vittles
 from copy import deepcopy
 
 import bnpregcluster_runjingdev.regression_mixture_lib as gmm_lib
-from bnpmodeling_runjingdev.cluster_quantities_lib import \
-    get_e_num_large_clusters_from_ez
-from bnpmodeling_runjingdev.cluster_quantities_lib import \
-    get_e_number_clusters_from_logit_sticks
+import bnpregcluster_runjingdev.posterior_quantities_lib as post_lib
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=42)
@@ -59,6 +56,7 @@ with np.load(args.refit_filename) as infile:
     reopt_prior_params = prior_params_pattern.fold(
         infile['reopt_prior_params_flat'], free=False)
     reopt_time = infile['reopt_time']
+    alpha_scale = infile['alpha_scale']
 
 if not os.path.isfile(initial_fitfile):
     raise ValueError('Initial fit {} not found'.format(initial_fitfile))
@@ -88,7 +86,11 @@ with np.load(datafile) as infile:
     inflate_cov = infile.get('inflate_cov', 0)
     eb_shrunk = infile.get('eb_shrunk', False)
 
-print('New alpha: ', np.unique(reopt_prior_params['probs_alpha']))
+orig_alpha =  np.unique(prior_params['probs_alpha'])
+new_alpha =  np.unique(reopt_prior_params['probs_alpha'])
+print('New alpha: ', new_alpha)
+print('Old alpha: ', orig_alpha)
+
 num_genes = reg_params['beta_mean'].shape[0]
 
 gmm = gmm_lib.GMM(num_components, reopt_prior_params, reg_params)
@@ -99,8 +101,8 @@ if args.out_filename is None:
         ('transformed_gene_regression_df{}_degree{}_genes{}_' +
          'num_components{}_inflate{}_shrunk{}_alphascale{}_analysis').format(
         df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
-        args.alpha_scale)
-    outdir, _ = os.path.split(args.input_filename)
+        alpha_scale)
+    outdir, _ = os.path.split(args.refit_filename)
     # Note!  Not npz this time.
     outfile = os.path.join(outdir, '{}.json'.format(analysis_name))
 else:
@@ -111,6 +113,8 @@ if not os.path.exists(outdir):
     raise ValueError('Destination directory {} does not exist'.format(outdir))
 
 # Set up the approximation
+prior_free = False
+taylor_order = args.taylor_order
 
 get_kl_from_vb_free_prior_free = \
     paragami.FlattenFunctionInput(original_fun=
@@ -141,14 +145,13 @@ predict_gmm_params = \
 # Get a range of posterior quantities
 
 n_samples = 10000
-taylor_order = args.taylor_order
-prior_free = False
 
 results = []
 
 for threshold in np.arange(0, 10):
     for predictive in [True, False]:
 
+        threshold = int(threshold)
         get_posterior_quantity = post_lib.get_posterior_quantity_function(
             predictive, gmm, n_samples, threshold)
 
@@ -160,9 +163,11 @@ for threshold in np.arange(0, 10):
         e_num1 = get_posterior_quantity(reopt_gmm_params)
         e_num_pred = get_posterior_quantity(pred_gmm_params)
 
-        print('\n----------------------\nPredictive: {}\tthreshold: {}\n')
-        print('Orig e: \t{}\nRefit e:\t{}\nPred e:\t\t{}\n' +
-              'Actual diff:\t{:0.5}\nPred diff:\t{:0.5}'.format(
+        print(('\n----------------------\n' +
+               'Predictive: {}\tthreshold: {}\n').format(
+            predictive, threshold))
+        print(('Orig e: \t{}\nRefit e:\t{}\nPred e:\t\t{}\n' +
+              'Actual diff:\t{:0.5}\nPred diff:\t{:0.5}').format(
                 e_num0, e_num1, e_num_pred,
                 e_num1 - e_num0,
                 e_num_pred - e_num0))
@@ -174,6 +179,7 @@ for threshold in np.arange(0, 10):
               'threshold': threshold,
               'predictive': predictive,
               'taylor_order': taylor_order,
+              'prior_free': prior_free,
               'alpha1': new_alpha,
               'alpha0': orig_alpha,
               'e_num0': e_num0,
