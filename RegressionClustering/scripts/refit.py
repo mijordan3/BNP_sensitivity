@@ -7,7 +7,7 @@ This uses the output of the jupyter notebook InitialFit.
 Example usage:
 
 ./refit.py \
-    --input_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/transformed_gene_regression_df4_degree3_genes700_num_components30_inflate1.0_shrunkTrue_fit.npz \
+    --input_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/transformed_gene_regression_df4_degree3_genes700_num_components40_inflate1.0_shrunkTrue_fit.npz \
     --alpha_scale 0.001
 """
 
@@ -34,7 +34,7 @@ parser.add_argument('--out_filename', default=None, type=str)
 
 # Specify either the initinal fit file or the df, degree, and num_components.
 parser.add_argument('--input_filename', required=True, type=str)
-parser.add_argument('--alpha_scale', default=None, type=float)
+parser.add_argument('--alpha_scale', required=True, type=float)
 
 args = parser.parse_args()
 
