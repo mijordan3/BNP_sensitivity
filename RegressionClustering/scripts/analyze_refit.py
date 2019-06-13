@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-"""Load a previous fit and refit, possibly with a new alpha.
-
-This uses the output of the jupyter notebook InitialFit.
+"""Load a refit and compare to the Taylor series approximation for a range of
+posterior quantites.
 
 Example usage:
 
-./refit.py \
+./analyze_refit.py \
     --refit_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/transformed_gene_regression_df4_degree3_genes700_num_components40_inflate0.0_shrunkTrue_alphascale100.0_refit.npz
 """
 
@@ -102,7 +101,8 @@ if args.out_filename is None:
         df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
         args.alpha_scale)
     outdir, _ = os.path.split(args.input_filename)
-    outfile = os.path.join(outdir, '{}.npz'.format(analysis_name))
+    # Note!  Not npz this time.
+    outfile = os.path.join(outdir, '{}.json'.format(analysis_name))
 else:
     outfile = args.out_filename
 
@@ -160,12 +160,15 @@ for threshold in np.arange(0, 10):
         e_num1 = get_posterior_quantity(reopt_gmm_params)
         e_num_pred = get_posterior_quantity(pred_gmm_params)
 
+        print('\n----------------------\nPredictive: {}\tthreshold: {}\n')
         print('Orig e: \t{}\nRefit e:\t{}\nPred e:\t\t{}\n' +
-            'Actual diff:\t{:0.5}\nPred diff:\t{:0.5}'.format(
+              'Actual diff:\t{:0.5}\nPred diff:\t{:0.5}'.format(
                 e_num0, e_num1, e_num_pred,
                 e_num1 - e_num0,
                 e_num_pred - e_num0))
 
+        # Save in a redundant format that will be easily converted to a
+        # tidy dataframe.
         results.append(
             { 'n_samples': n_samples,
               'threshold': threshold,
@@ -177,4 +180,8 @@ for threshold in np.arange(0, 10):
               'e_num1': e_num1,
               'e_num_pred': e_num_pred,
               'lr_time': lr_time,
-              'refit_time': reopt_time })
+              'refit_time': reopt_time,
+              'refit_filename': args.refit_filename })
+
+with open(outfile, 'w') as outfile:
+    outfile.write(json_tricks.dumps(results))
