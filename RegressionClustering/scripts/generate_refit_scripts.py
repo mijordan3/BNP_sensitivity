@@ -24,12 +24,13 @@ args = parser.parse_args()
 
 # Set parameters for refitting.
 
-small = False
+small = True
 if small:
     # Use strings to avoid formatting problems.
     initial_alpha = '2.0'
     num_components = '40'
-    inflate = '0.0'
+    #inflate = '0.0'
+    inflate = '1.0'
     genes = '700'
     alpha_scales = \
         np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
