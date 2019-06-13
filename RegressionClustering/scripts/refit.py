@@ -8,7 +8,7 @@ Example usage:
 
 ./refit.py \
     --input_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/transformed_gene_regression_df4_degree3_genes700_num_components30_inflate1.0_shrunkTrue_fit.npz \
-    --alpha_scale 0.01
+    --alpha_scale 0.001
 """
 
 import argparse
@@ -79,8 +79,9 @@ num_genes = reg_params['beta_mean'].shape[0]
 if args.out_filename is None:
     analysis_name = \
         ('transformed_gene_regression_df{}_degree{}_genes{}_' +
-         'num_components{}_inflate{}_shrunk{}_refit').format(
-        df, degree, num_genes, num_components, inflate_cov, eb_shrunk)
+         'num_components{}_inflate{}_shrunk{}_alphascale{}_refit').format(
+        df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
+        args.alpha_scale)
     outdir, _ = os.path.split(args.input_filename)
     outfile = os.path.join(outdir, '{}.npz'.format(analysis_name))
 else:
