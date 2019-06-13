@@ -1,5 +1,6 @@
 import autograd.numpy as np
 import autograd.scipy as sp
+import scipy as osp
 
 import LinearResponseVariationalBayes as vb
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
@@ -127,6 +128,7 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
         in a dataset of size n_obs
     """
 
+    # TODO: why add the dimensions here?
     assert stick_propn_mean.shape == stick_propn_info.shape
     if len(stick_propn_mean.shape) == 1:
         stick_propn_mean = stick_propn_mean[None, :]
@@ -139,7 +141,14 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
         unif_samples_shape = (n_samples, ) + stick_propn_mean.shape
         unv_norm_samples = np.random.normal(0, 1, size = unif_samples_shape)
     if n_samples is None:
-        assert unv_norm_samples.shape[1:] == stick_propn_mean.shape
+        # TODO: why this roundabout dimension check?
+        if unv_norm_samples.shape[1:] != stick_propn_mean.shape[1:]:
+            raise ValueError((
+                'The second dimension of ``unv_norm_samples`` must ' +
+                'match the size of ``stick_propn_mean``.  Got {}, ' +
+                'expected {}.').format(
+                    unv_norm_samples.shape[1:],
+                    stick_propn_mean.shape[1:]))
 
     # sample sticks proportions from logitnormal
     # this is n_samples x ... x (k_approx - 1)
@@ -164,7 +173,7 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
 
 def get_e_num_clusters_from_ez(e_z):
     """
-    EAnalytically computes the expected number of clusters from cluster
+    Analytically computes the expected number of clusters from cluster
     belongings e_z.
     Parameters
     ----------
