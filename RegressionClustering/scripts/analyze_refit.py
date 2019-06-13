@@ -123,12 +123,13 @@ get_kl_from_vb_free_prior_free = \
         free = [True, prior_free],
         argnums = [0, 1])
 
-
 vb_sens = \
     vittles.ParametricSensitivityTaylorExpansion(
         objective_function =    get_kl_from_vb_free_prior_free,
-        input_val0 =            gmm.gmm_params_pattern.flatten(opt_gmm_params, free=True),
-        hyper_val0 =            prior_params_pattern.flatten(prior_params, free=prior_free),
+        input_val0 =            gmm.gmm_params_pattern.flatten(
+                                    opt_gmm_params, free=True),
+        hyper_val0 =            prior_params_pattern.flatten(
+                                    prior_params, free=prior_free),
         order =                 taylor_order,
         hess0 =                 kl_hess)
 
@@ -148,6 +149,10 @@ n_samples = 10000
 
 results = []
 
+lr_time = time.time()
+pred_gmm_params = predict_gmm_params(reopt_prior_params)
+lr_time = lr_time - time.time()
+
 for threshold in np.arange(0, 10):
     for predictive in [True, False]:
 
@@ -155,16 +160,12 @@ for threshold in np.arange(0, 10):
         get_posterior_quantity = post_lib.get_posterior_quantity_function(
             predictive, gmm, n_samples, threshold)
 
-        lr_time = time.time()
-        pred_gmm_params = predict_gmm_params(reopt_prior_params)
-        lr_time = lr_time - time.time()
-
         e_num0 = get_posterior_quantity(opt_gmm_params)
         e_num1 = get_posterior_quantity(reopt_gmm_params)
         e_num_pred = get_posterior_quantity(pred_gmm_params)
 
         print(('\n----------------------\n' +
-               'Predictive: {}\tthreshold: {}\n').format(
+               'Predictive: {}\nThreshold: {}\n').format(
             predictive, threshold))
         print(('Orig e: \t{}\nRefit e:\t{}\nPred e:\t\t{}\n' +
               'Actual diff:\t{:0.5}\nPred diff:\t{:0.5}').format(
