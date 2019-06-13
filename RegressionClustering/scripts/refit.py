@@ -29,10 +29,7 @@ import bnpregcluster_runjingdev.regression_mixture_lib as gmm_lib
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=42)
 
-# results folders
 parser.add_argument('--out_filename', default=None, type=str)
-
-# Specify either the initinal fit file or the df, degree, and num_components.
 parser.add_argument('--input_filename', required=True, type=str)
 parser.add_argument('--alpha_scale', required=True, type=float)
 

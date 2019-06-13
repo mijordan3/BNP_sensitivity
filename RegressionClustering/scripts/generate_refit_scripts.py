@@ -24,14 +24,25 @@ args = parser.parse_args()
 
 # Set parameters for refitting.
 
-# Use strings to avoid formatting problems.
-initial_alpha = '2.0'
-num_components = '40'
-inflate = '0.0'
-genes = '700'
-alpha_scales = \
-    np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
-alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
+small = False
+if small:
+    # Use strings to avoid formatting problems.
+    initial_alpha = '2.0'
+    num_components = '40'
+    inflate = '0.0'
+    genes = '700'
+    alpha_scales = \
+        np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
+    alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
+else:
+    # Use strings to avoid formatting problems.
+    initial_alpha = '2.0'
+    num_components = '60'
+    inflate = '0.0'
+    genes = '7000'
+    alpha_scales = \
+        np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
+    alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
 
 script_dir = './slurm_scripts'
 if not os.path.isdir(script_dir):
@@ -50,7 +61,7 @@ initial_fitfile = initial_fit_template.format(
 if not os.path.isfile(initial_fitfile):
     raise ValueError('Input file {} does not exist.'.format(initial_fitfile))
 
-activate_venv_cmd = 'source ../venv/bin/activate'
+activate_venv_cmd = 'source ../../venv/bin/activate'
 
 for alpha_scale in alpha_scales:
     script_name = ('refit_script_' +
@@ -60,7 +71,7 @@ for alpha_scale in alpha_scales:
     with open(full_script_name, 'w') as slurm_script:
         slurm_script.write('#!/bin/bash\n')
         slurm_script.write(activate_venv_cmd + '\n')
-        cmd = ('./refit.py ' +
+        cmd = ('../refit.py ' +
                '--input_filename {input_filename} ' +
                '--alpha_scale {alpha_scale} ' +
                '\n').format(
