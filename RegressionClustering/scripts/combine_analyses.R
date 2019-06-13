@@ -14,9 +14,14 @@ fit_file <- paste(
   "transformed_gene_regression_df4_degree3_genes700_num_components40_",
   " inflate0.0_shrunkTrue_alphascale0.22508_analysis.json", sep="")
 
-fit_files <- system(sprintf("ls %s/*genes700_*inflate0.0*_analysis.json", fit_dir), intern=TRUE)
 
-analysis_name <- "genes700_inflate0.0"
+genes <- "700"
+inflate <- "1.0"
+
+fit_files <- system(sprintf("ls %s/*genes%s_*inflate%s*_analysis.json", genes, inflate, fit_dir), intern=TRUE)
+analysis_name <- sprintf("genes%s_inflate%s", genes, inflate)
+
+
 ResultDictToDF <- function(result_dict) {
   df  <- data.frame(analysis=analysis_name)
   for (key in names(result_dict)) {
@@ -44,8 +49,18 @@ with open(fit_filename, 'r') as infile:
 results <- results %>%
   select(-refit_filename)
 
-ggplot(results) +
-  geom_point(aes(x=alpha1, y=e_num1, color="True")) +
-  geom_point(aes(x=alpha1, y=e_num_pred, color="predicted")) +
+ggplot(filter(results, alpha1 > alpha0)) +
+  geom_point(aes(x=alpha1, y=e_num1, color="Refitting")) +
+  geom_point(aes(x=alpha1, y=e_num_pred, color="Approximation")) +
+  geom_line(aes(x=alpha1, y=e_num1, color="Refitting")) +
+  geom_line(aes(x=alpha1, y=e_num_pred, color="Approximation")) +
+  geom_vline(aes(xintercept=alpha0)) +
   facet_grid(predictive ~ threshold)
-  
+
+ggplot(filter(results, alpha1 < alpha0)) +
+  geom_point(aes(x=alpha1, y=e_num1, color="Refitting")) +
+  geom_point(aes(x=alpha1, y=e_num_pred, color="Approximation")) +
+  geom_line(aes(x=alpha1, y=e_num1, color="Refitting")) +
+  geom_line(aes(x=alpha1, y=e_num_pred, color="Approximation")) +
+  geom_vline(aes(xintercept=alpha0)) +
+  facet_grid(predictive ~ threshold)
