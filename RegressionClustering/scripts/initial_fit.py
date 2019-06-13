@@ -7,7 +7,7 @@ This uses the output of the jupyter notebook PreprocessData.
 Example usage:
 
 ./initial_fit.py \
-    --data_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/shrunken_transformed_gene_regression_df4_degree3_genes1000_inflate1.0.npz \
+    --data_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/shrunken_transformed_gene_regression_df4_degree3_genes1000_inflate0.0.npz \
     --alpha 2.0 \
     --num_components 40
 """
