@@ -36,7 +36,7 @@ if small:
     inflate = '1.0'
     genes = '700'
     alpha_scales = \
-        np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
+        np.hstack([np.linspace(0.0001, 0.95, 10), np.linspace(1.2, 30, 10)])
     alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
 else:
     # Use strings to avoid formatting problems.
@@ -45,7 +45,7 @@ else:
     inflate = '0.0'
     genes = '7000'
     alpha_scales = \
-        np.hstack([np.linspace(0.0001, 0.9, 5), np.linspace(2, 100, 5)])
+        np.hstack([np.linspace(0.0001, 0.95, 10), np.linspace(1.2, 30, 10)])
     alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
 
 script_dir = './slurm_scripts'
@@ -76,9 +76,11 @@ for alpha_scale in alpha_scales:
         slurm_script.write('#!/bin/bash\n')
         slurm_script.write(activate_venv_cmd + '\n')
         cmd = ('../refit.py ' +
+               '--fit_directory {fit_directory} ' +
                '--input_filename {input_filename} ' +
                '--alpha_scale {alpha_scale} ' +
                '\n').format(
+            fit_directory=args.fit_dir,
             alpha_scale=alpha_scale,
             input_filename=initial_fitfile
             )

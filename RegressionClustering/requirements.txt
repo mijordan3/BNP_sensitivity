@@ -2,6 +2,8 @@ autograd @ git+https://github.com/HIPS/autograd/@815a0b97ada3c0c4b854c961706cc56
 emfathy @ git+https://github.com/rgiordan/emfathy@master#egg=emfathy
 json-tricks>=3.11.2
 numpy>=1.16.1
+matplotlib>=3.0.1
+numpy>=1.16.1
 paragami @ git+https://github.com/rgiordan/paragami@master#egg=paragami
 vittles @ git+https://github.com/rgiordan/vittles@master#egg=vittles
 LinearResponseVariationalBayes @ git+https://github.com/rgiordan/LinearResponseVariationalBayes.py@master#egg=LinearResponseVariationalBayes
