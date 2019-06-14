@@ -5,6 +5,9 @@ Optionally submit the shell scripts to slurm.
 ./generate_refit_scripts.py \
     --fit_dir '/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits' \
     --no-submit
+
+./generate_refit_scripts.py  --fit_dir '/accounts/grad/rgiordano/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits'  --no-submit
+
 """
 
 import argparse
