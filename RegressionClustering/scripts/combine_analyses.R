@@ -11,9 +11,9 @@ import numpy as np
 import json_tricks
 ")
 
-fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/"
+fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/cluster"
 
-genes <- "700"
+genes <- "7000"
 
 results <- data.frame()
 
@@ -51,7 +51,7 @@ results <- results %>%
   select(-refit_filename) %>%
   mutate(alpha_increase=alpha1 > alpha0)
 
-table(results$inflate)
+table(results[c("inflate", "alpha1")])
 
 MakePlot <- function(use_alpha_increase, use_predictive, use_inflate) {
   ggplot(filter(results,
