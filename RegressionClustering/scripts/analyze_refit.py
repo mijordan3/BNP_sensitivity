@@ -6,7 +6,8 @@ posterior quantites.
 Example usage:
 
 ./analyze_refit.py \
-    --refit_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/transformed_gene_regression_df4_degree3_genes700_num_components40_inflate0.0_shrunkTrue_alphascale100.0_refit.npz
+    --fit_directory /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/ \
+    --refit_filename transformed_gene_regression_df4_degree3_genes700_num_components40_inflate0.0_shrunkTrue_alphascale100.0_refit.npz
 """
 
 import argparse
@@ -34,10 +35,29 @@ parser.add_argument('--refit_filename', required=True, type=str)
 parser.add_argument('--out_filename', default=None, type=str)
 parser.add_argument('--taylor_order', default=1, type=int)
 
+# If the fit_directory argument is set, use that as the location for
+# all datafiles.
+parser.add_argument('--fit_directory', default=None, type=str)
+
 args = parser.parse_args()
 
 np.random.seed(args.seed)
 
+if args.fit_directory is not None:
+    if not os.path.isdir(args.fit_directory):
+        raise ValueError('Fit directory {} does not exist'.format(
+            args.fit_directory))
+
+def set_directory(filename):
+    # If the fit_directory argument is set, replace a datafile's directory
+    # with the specified fit_directory and return the new location.
+    if args.fit_directory is None:
+        return filename
+    else:
+        _, file_only_name = os.path.split(filename)
+        return os.path.join(args.fit_directory, file_only_name)
+
+args.refit_filename = set_directory(args.refit_filename)
 if not os.path.isfile(args.refit_filename):
     raise ValueError('Refit file {} does not exist'.format(
         args.refit_filename))
@@ -46,7 +66,7 @@ if args.taylor_order < 1:
     raise ValueError('``taylor_order`` must be greater than zero.')
 
 with np.load(args.refit_filename) as infile:
-    initial_fitfile = str(infile['input_filename'])
+    initial_fitfile = set_directory(str(infile['input_filename']))
     gmm_params_pattern = paragami.get_pattern_from_json(
         str(infile['gmm_params_pattern_json']))
     reopt_gmm_params = gmm_params_pattern.fold(
@@ -73,7 +93,7 @@ with np.load(initial_fitfile) as infile:
     kl_hess = infile['kl_hess']
     df = infile['df']
     degree = infile['degree']
-    datafile = str(infile['datafile'])
+    datafile = set_directory(str(infile['datafile']))
     num_components = int(infile['num_components'])
 
 if not os.path.isfile(datafile):
