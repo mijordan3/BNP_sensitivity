@@ -1,21 +1,21 @@
 autograd @ git+https://github.com/HIPS/autograd/@815a0b97ada3c0c4b854c961706cc56cca8b7834#egg=autograd
 emfathy @ git+https://github.com/rgiordan/emfathy@master#egg=emfathy
-json-tricks==3.11.2
-matplotlib==3.0.1
-numpy==1.16.1
-pandas==0.22.0
+json-tricks>=3.11.2
+matplotlib>=3.0.1
+numpy>=1.16.1
+pandas>=0.22.0
 paragami @ git+https://github.com/rgiordan/paragami@master#egg=paragami
 vittles @ git+https://github.com/rgiordan/vittles@master#egg=vittles
 LinearResponseVariationalBayes @ git+https://github.com/rgiordan/LinearResponseVariationalBayes.py@master#egg=LinearResponseVariationalBayes
-scipy==1.0.1
-sklearn==0.0
-jupyter==1.0.0
-jupyter-client==5.2.4
-jupyter-console==6.0.0
-jupyter-contrib-core==0.3.3
-jupyter-contrib-nbextensions==0.5.1
-jupyter-core==4.4.0
-jupyter-highlight-selected-word==0.2.0
-jupyter-latex-envs==1.4.6
-jupyter-nbextensions-configurator==0.4.1
+scipy>=1.0.1
+sklearn>=0.0
+jupyter>=1.0.0
+jupyter-client>=5.2.4
+jupyter-console>=6.0.0
+jupyter-contrib-core>=0.3.3
+jupyter-contrib-nbextensions>=0.5.1
+jupyter-core>=4.4.0
+jupyter-highlight-selected-word>=0.2.0
+jupyter-latex-envs>=1.4.6
+jupyter-nbextensions-configurator>=0.4.1
 tqdm

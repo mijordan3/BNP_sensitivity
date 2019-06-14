@@ -7,7 +7,8 @@ This uses the output of the jupyter notebook InitialFit.
 Example usage:
 
 ./refit.py \
-    --input_filename /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/jupyter/fits/transformed_gene_regression_df4_degree3_genes700_num_components40_inflate0.0_shrunkTrue_alpha2.0_fit.npz \
+    --fit_directory /home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits \
+    --input_filename transformed_gene_regression_df4_degree3_genes700_num_components40_inflate0.0_shrunkTrue_alpha2.0_fit.npz \
     --alpha_scale 0.001
 """
 
@@ -30,6 +31,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=42)
 
 parser.add_argument('--out_filename', default=None, type=str)
+# If the fit_directory argument is set, use that as the location for
+# all datafiles.
+parser.add_argument('--fit_directory', default=None, type=str)
 parser.add_argument('--input_filename', required=True, type=str)
 parser.add_argument('--alpha_scale', required=True, type=float)
 
@@ -37,6 +41,21 @@ args = parser.parse_args()
 
 np.random.seed(args.seed)
 
+if args.fit_directory is not None:
+    if not os.path.isdir(args.fit_directory):
+        raise ValueError('Fit directory {} does not exist'.format(
+            args.fit_directory))
+
+def set_directory(filename):
+    # If the fit_directory argument is set, replace a datafile's directory
+    # with the specified fit_directory and return the new location.
+    if args.fit_directory is None:
+        return filename
+    else:
+        _, file_only_name = os.path.split(filename)
+        return os.path.join(args.fit_directory, file_only_name)
+
+args.input_filename = set_directory(args.input_filename)
 if not os.path.isfile(args.input_filename):
     raise ValueError('Initial fit file {} does not exist'.format(
         args.input_filename))
@@ -58,7 +77,7 @@ with np.load(args.input_filename) as infile:
     kl_hess = infile['kl_hess']
     df = infile['df']
     degree = infile['degree']
-    datafile = str(infile['datafile'])
+    datafile = set_directory(str(infile['datafile']))
     num_components = int(infile['num_components'])
 
 if not os.path.isfile(datafile):
@@ -79,9 +98,11 @@ if args.out_filename is None:
          'num_components{}_inflate{}_shrunk{}_alphascale{}_refit').format(
         df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
         args.alpha_scale)
+    # Save in the same place as the input file.
     outdir, _ = os.path.split(args.input_filename)
     outfile = os.path.join(outdir, '{}.npz'.format(analysis_name))
 else:
+    # If out_filename is set, it overrides fit_directory.
     outfile = args.out_filename
 
 outdir, _ = os.path.split(outfile)
