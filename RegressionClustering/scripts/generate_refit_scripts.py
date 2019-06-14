@@ -32,8 +32,8 @@ if small:
     # Use strings to avoid formatting problems.
     initial_alpha = '2.0'
     num_components = '40'
-    #inflate = '0.0'
-    inflate = '1.0'
+    inflate = '0.0'
+    #inflate = '1.0'
     genes = '700'
     alpha_scales = \
         np.hstack([np.linspace(0.0001, 0.95, 10), np.linspace(1.2, 30, 10)])
@@ -43,6 +43,7 @@ else:
     initial_alpha = '2.0'
     num_components = '60'
     inflate = '0.0'
+    #inflate = '1.0'
     genes = '7000'
     alpha_scales = \
         np.hstack([np.linspace(0.0001, 0.95, 10), np.linspace(1.2, 30, 10)])
