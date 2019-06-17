@@ -26,6 +26,7 @@ import time
 from aistats2019_ij_paper.regression_lib import get_regression_array_pattern
 from aistats2019_ij_paper.regression_mixture_lib import get_prior_params_pattern
 from aistats2019_ij_paper.regression_mixture_lib import get_base_prior_params
+import bnpgmm_runjingdev.functional_sensitivity_lib as fun_sens_lib
 #from aistats2019_ij_paper.regression_mixture_lib import get_log_lik_nk
 
 def get_gmm_params_pattern(obs_dim, num_components):
@@ -441,3 +442,35 @@ class GMM(gmm_lib.GMM):
         gmm.get_kl_conditioned.set_preconditioner_matrix(preconditioner)
 
         return gmm
+
+
+class PriorPerturbation():
+    def __init__(self, log_phi, gh_loc, gh_weights):
+        """
+        Args
+        ------------
+        log_phi : callable
+            A function returning the log ratio of the new to old prior.
+        gh_loc, gh_weights :
+            Gauss-Hermite quadrature locations and weights.
+        """
+        self.log_phi = log_phi
+        self.gh_loc = gh_loc
+        self.gh_weights = gh_weights
+        self.set_epsilon(0.0)
+
+    def set_epsilon(self, epsilon):
+        self._epsilon = epsilon
+
+    def get_e_log_perturbation(self, gmm_params):
+        return fun_sens_lib.get_e_log_perturbation(
+            self.log_phi,
+            gmm_params,
+            self._epsilon,
+            self.gh_loc,
+            self.gh_weights,
+            sum_vector=True)
+
+    def get_e_log_perturbation_epsilon(self, gmm_params, epsilon):
+        self.set_epsilon(epsilon)
+        return self.get_e_log_perturbation(gmm_params)

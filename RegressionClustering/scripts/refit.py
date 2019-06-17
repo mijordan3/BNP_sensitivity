@@ -37,6 +37,11 @@ parser.add_argument('--fit_directory', default=None, type=str)
 parser.add_argument('--input_filename', required=True, type=str)
 parser.add_argument('--alpha_scale', required=True, type=float)
 
+# If ``functional`` is true, use a functional perturbation.
+parser.add_argument('--functional', dest='functional', action='store_true')
+parser.add_argument('--no-functional', dest='functional', action='store_false')
+parser.set_defaults(functional=True)
+
 args = parser.parse_args()
 
 np.random.seed(args.seed)
@@ -110,13 +115,25 @@ if not os.path.exists(outdir):
     raise ValueError('Destination directory {} does not exist'.format(outdir))
 
 
-# Re-optimize.
 
-new_alpha = prior_params['probs_alpha'] * args.alpha_scale
-new_prior_params = deepcopy(prior_params)
-new_prior_params['probs_alpha'][:] = new_alpha
+# Define a perturbation.
+if args.functional:
+    # TODO: specify this from the command line somehow?
+    log_phi_desc = 'expit'
+    def log_phi(logit_v):
+        return(sp.special.expit(logit_v))
+
+    prior_pert = gmm_lib.PriorPerturbation(log_phi, gmm.gh_loc, gmm.gh_weights)
+    gmm.set_perturbation_fun(prior_pert.get_e_log_perturbation)
+    prior_pert.set_epsilon(args.alpha_scale)
+else:
+    new_alpha = prior_params['probs_alpha'] * args.alpha_scale
+    new_prior_params = deepcopy(prior_params)
+    new_prior_params['probs_alpha'][:] = new_alpha
 
 gmm = gmm_lib.GMM(num_components, new_prior_params, reg_params)
+
+# Re-optimize.
 
 print('Setting preconditioner...')
 gmm.get_kl_conditioned.set_preconditioner_with_hessian(
@@ -141,8 +158,13 @@ print('Saving to {}'.format(outfile))
 save_dict = dict()
 
 save_dict['input_filename'] = args.input_filename
-save_dict['alpha_scale'] = args.alpha_scale
-save_dict['new_alpha'] = new_alpha
+save_dict['functional'] = args.functional
+if args.functional:
+    save_dict['log_phi_desc'] = log_phi_desc
+else:
+    save_dict['alpha_scale'] = args.alpha_scale
+    save_dict['new_alpha'] = new_alpha
+
 save_dict['reopt_gmm_params_flat'] = \
     gmm.gmm_params_pattern.flatten(reopt_gmm_params, free=False)
 save_dict['reopt_time'] = opt_time
