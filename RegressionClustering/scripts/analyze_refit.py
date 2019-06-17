@@ -77,6 +77,9 @@ with np.load(args.refit_filename) as infile:
         infile['reopt_prior_params_flat'], free=False)
     reopt_time = infile['reopt_time']
     alpha_scale = infile['alpha_scale']
+    functional = bool(infile['functional'])
+    log_phi_desc = get(infile['log_phi_desc'], None)
+    log_phi_desc = str(log_phi_desc) if log_phi_desc is not None else None
 
 if not os.path.isfile(initial_fitfile):
     raise ValueError('Initial fit {} not found'.format(initial_fitfile))
@@ -106,22 +109,32 @@ with np.load(datafile) as infile:
     inflate_cov = infile.get('inflate_cov', 0)
     eb_shrunk = infile.get('eb_shrunk', False)
 
-orig_alpha =  np.unique(prior_params['probs_alpha'])
-new_alpha =  np.unique(reopt_prior_params['probs_alpha'])
-print('New alpha: ', new_alpha)
-print('Old alpha: ', orig_alpha)
+if functional:
+    assert log_phi_desc is not None
+    gmm = gmm_lib.GMM(num_components, prior_params, reg_params)
+    epsilon = np.array([alpha_scale])
+    print('Evaluating with {} at epsilon = {}'.format(
+        log_phi_desc, epsilon))
+    new_alpha = None
+else:
+    orig_alpha =  np.unique(prior_params['probs_alpha'])
+    new_alpha =  np.unique(reopt_prior_params['probs_alpha'])
+    print('New alpha: ', new_alpha)
+    print('Old alpha: ', orig_alpha)
+    epsilon = None
+
+    gmm = gmm_lib.GMM(num_components, reopt_prior_params, reg_params)
 
 num_genes = reg_params['beta_mean'].shape[0]
-
-gmm = gmm_lib.GMM(num_components, reopt_prior_params, reg_params)
 
 
 if args.out_filename is None:
     analysis_name = \
         ('transformed_gene_regression_df{}_degree{}_genes{}_' +
-         'num_components{}_inflate{}_shrunk{}_alphascale{}_analysis').format(
+         'num_components{}_inflate{}_shrunk{}_alphascale{}_' +
+         'functional{}_logphi{}_analysis').format(
         df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
-        alpha_scale)
+        alpha_scale, functional, log_phi_desc)
     outdir, _ = os.path.split(args.refit_filename)
     # Note!  Not npz this time.
     outfile = os.path.join(outdir, '{}.json'.format(analysis_name))
@@ -133,46 +146,78 @@ if not os.path.exists(outdir):
     raise ValueError('Destination directory {} does not exist'.format(outdir))
 
 # Set up the approximation
-prior_free = False
 taylor_order = args.taylor_order
 
-get_kl_from_vb_free_prior_free = \
-    paragami.FlattenFunctionInput(original_fun=
-        gmm.get_params_prior_kl,
-        patterns = [gmm.gmm_params_pattern, prior_params_pattern],
-        free = [True, prior_free],
-        argnums = [0, 1])
 
-vb_sens = \
-    vittles.ParametricSensitivityTaylorExpansion(
-        objective_function =    get_kl_from_vb_free_prior_free,
-        input_val0 =            gmm.gmm_params_pattern.flatten(
-                                    opt_gmm_params, free=True),
-        hyper_val0 =            prior_params_pattern.flatten(
-                                    prior_params, free=prior_free),
-        order =                 taylor_order,
-        hess0 =                 kl_hess)
+if functional:
+    log_phi = gmm_lib.get_log_phi(log_phi_desc)
+    prior_pert = gmm_lib.PriorPerturbation(log_phi, gmm.gh_loc, gmm.gh_weights)
+    gmm.set_perturbation_fun(prior_pert.get_e_log_perturbation)
+    prior_pert.set_epsilon(0.0) # We evaluate derivatives at epsilon = 0
 
-predict_gmm_params = \
-    paragami.FoldFunctionInputAndOutput(
-        original_fun=vb_sens.evaluate_taylor_series,
-        input_patterns=prior_params_pattern,
-        input_free=prior_free,
-        input_argnums=[0],
-        output_patterns=gmm.gmm_params_pattern,
-        output_free=True,
-        output_retnums=[0])
+    def get_kl_from_vb_epsilon(params, epsilon):
+        prior_pert.set_epsilon(epsilon)
+        return gmm.get_params_kl(params)
+
+    get_kl_from_vb_free_prior_free = \
+        paragami.FlattenFunctionInput(
+            original_fun=get_kl_from_vb_epsilon,
+            patterns = gmm.gmm_params_pattern,
+            free = True,
+            argnums = 0)
+
+    vb_sens = \
+        vittles.ParametricSensitivityTaylorExpansion(
+            objective_function =
+                get_kl_from_vb_free_prior_free,
+            input_val0 =
+                gmm.gmm_params_pattern.flatten(opt_gmm_params, free=True),
+            hyper_val0 = np.array([0.0]),
+            order = taylor_order,
+            hess0 = kl_hess)
+    lr_time = time.time()
+    pred_gmm_params = predict_gmm_params(epsilon)
+    lr_time = lr_time - time.time()
+
+else:
+    prior_free = False
+
+    get_kl_from_vb_free_prior_free = \
+        paragami.FlattenFunctionInput(original_fun=
+            gmm.get_params_prior_kl,
+            patterns = [gmm.gmm_params_pattern, prior_params_pattern],
+            free = [True, prior_free],
+            argnums = [0, 1])
+
+    vb_sens = \
+        vittles.ParametricSensitivityTaylorExpansion(
+            objective_function =    get_kl_from_vb_free_prior_free,
+            input_val0 =            gmm.gmm_params_pattern.flatten(
+                                        opt_gmm_params, free=True),
+            hyper_val0 =            prior_params_pattern.flatten(
+                                        prior_params, free=prior_free),
+            order =                 taylor_order,
+            hess0 =                 kl_hess)
+
+    predict_gmm_params = \
+        paragami.FoldFunctionInputAndOutput(
+            original_fun=vb_sens.evaluate_taylor_series,
+            input_patterns=prior_params_pattern,
+            input_free=prior_free,
+            input_argnums=[0],
+            output_patterns=gmm.gmm_params_pattern,
+            output_free=True,
+            output_retnums=[0])
+
+    lr_time = time.time()
+    pred_gmm_params = predict_gmm_params(reopt_prior_params)
+    lr_time = lr_time - time.time()
 
 # Get a range of posterior quantities
 
 n_samples = 10000
 
 results = []
-
-lr_time = time.time()
-pred_gmm_params = predict_gmm_params(reopt_prior_params)
-lr_time = lr_time - time.time()
-
 for threshold in np.arange(0, 10):
     for predictive in [True, False]:
 
@@ -203,6 +248,9 @@ for threshold in np.arange(0, 10):
               'prior_free': prior_free,
               'alpha1': new_alpha,
               'alpha0': orig_alpha,
+              'functional': functional,
+              'epsilon': epsilon[0],
+              'log_phi_desc': log_phi_desc,
               'e_num0': e_num0,
               'e_num1': e_num1,
               'e_num_pred': e_num_pred,
