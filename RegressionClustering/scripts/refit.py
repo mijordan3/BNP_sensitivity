@@ -165,10 +165,10 @@ save_dict = dict()
 
 save_dict['input_filename'] = args.input_filename
 save_dict['functional'] = args.functional
+save_dict['alpha_scale'] = args.alpha_scale
 if args.functional:
     save_dict['log_phi_desc'] = log_phi_desc
 else:
-    save_dict['alpha_scale'] = args.alpha_scale
     save_dict['new_alpha'] = new_alpha
 
 save_dict['reopt_gmm_params_flat'] = \
