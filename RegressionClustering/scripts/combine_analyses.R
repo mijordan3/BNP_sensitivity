@@ -13,14 +13,19 @@ import json_tricks
 
 fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/cluster"
 
-genes <- "7000"
-functional <- TRUE
-results <- data.frame()
 
+genes <- "7000"
+#functional <- TRUE
+results_filename <- sprintf("combined_results_genes%s.Rdata", genes)
+
+results <- data.frame()
 for (inflate in c("0.0", "1.0")) {
+  # fit_files <- system(sprintf(
+  #   "ls %s/*genes%s_*inflate%s*_functional%s*_analysis.json",
+  #   fit_dir, genes, inflate, ifelse(functional, "True", "False")), intern=TRUE)
   fit_files <- system(sprintf(
-    "ls %s/*genes%s_*inflate%s*_functional%s*_analysis.json",
-    fit_dir, genes, inflate, ifelse(functional, "True", "False")), intern=TRUE)
+    "ls %s/*genes%s_*inflate%s*_analysis.json",
+    fit_dir, genes, inflate), intern=TRUE)
   analysis_name <- sprintf("genes%s_inflate%s_functional%s", genes, inflate, functional)
   
   ResultDictToDF <- function(result_dict) {
@@ -41,7 +46,7 @@ with open(fit_filename, 'r') as infile:
 ")
     
     for (i in 1:length(py_main$this_result)) {
-      results <- rbind(
+      results <- bind_rows(
         results,
         ResultDictToDF(py_main$this_result[[i]]) %>%
           mutate(inflate=inflate != "0.0"))
@@ -50,13 +55,14 @@ with open(fit_filename, 'r') as infile:
 }
 
 results <- results %>%
-  select(-refit_filename) 
-if (!functional) {
-  results <- mutate(results, alpha_increase=alpha1 > alpha0)
-  table(results[c("inflate", "alpha1")])
-}
+  select(-refit_filename)  %>%
+  mutate(alpha_increase=alpha1 > alpha0)
 
+save(results, file=file.path(fit_dir, results_filename))
+
+table(results[c("inflate", "alpha1")])
 table(results[c("inflate", "epsilon")])
+table(results[c("inflate", "functional")])
 
 # Functional perturbations
 use_functional <- TRUE
@@ -122,3 +128,36 @@ grid.arrange(
   MakePlot(TRUE, use_predictive, TRUE),
   ncol=4
 )
+
+
+
+###################################################
+# Load the shape of the prior perturbation
+
+
+prior_shape_file <- "prior_functional_perturbation_shape_expit.npz"
+py_main$prior_shape_file <- file.path(fit_dir, prior_shape_file)
+reticulate::py_run_string("
+with np.load(prior_shape_file) as infile:
+  logit_v_grid = infile['logit_v_grid']
+  v_grid = infile['v_grid']
+  log_p0_logit = infile['log_p0_logit']
+  log_p1_logit = infile['log_p1_logit']
+  log_p0 = infile['log_p0']
+  log_p1 = infile['log_p1']
+  log_phi = infile['log_phi']
+")
+pert_df <- data.frame(
+  logit_v_grid=py_main$logit_v_grid,
+  v_grid=py_main$v_grid,
+  log_p0_logit=py_main$log_p0_logit,
+  log_p1_logit=py_main$log_p1_logit,
+  log_p0=py_main$log_p0,
+  log_p1=py_main$log_p1,
+  log_phi=py_main$log_phi
+)
+
+ggplot(pert_df) +
+  geom_line(aes(x=v_grid, y=exp(log_p0))) +
+  geom_line(aes(x=v_grid, y=exp(log_p1)))
+  
