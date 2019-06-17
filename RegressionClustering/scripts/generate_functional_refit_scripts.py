@@ -38,25 +38,19 @@ initial_fit_template = \
 
 activate_venv_cmd = 'source ../../venv/bin/activate'
 
+# Use strings to avoid formatting problems.
+initial_alpha = '2.0'
+alpha_scales = np.linspace(0.001, 1.0, 10)
+alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
+
 for small, inflate in itertools.product([True, False], ['0.0', '1.0']):
     if small:
-        # Use strings to avoid formatting problems.
-        initial_alpha = '2.0'
         num_components = '40'
-        inflate = '0.0'
-        #inflate = '1.0'
         genes = '700'
-        alpha_scales = np.linspace(0.001, 1.0, 10)
-        alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
     else:
-        # Use strings to avoid formatting problems.
         initial_alpha = '2.0'
         num_components = '60'
-        inflate = '0.0'
-        #inflate = '1.0'
         genes = '7000'
-        alpha_scales = np.linspace(0.001, 1.0, 10)
-        alpha_scales = [np.round(alpha, 5) for alpha in alpha_scales]
 
     initial_fitfile = initial_fit_template.format(
         fit_dir=args.fit_dir,
