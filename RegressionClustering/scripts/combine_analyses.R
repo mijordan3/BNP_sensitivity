@@ -14,12 +14,14 @@ import json_tricks
 fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits/cluster"
 
 genes <- "7000"
-
+functional <- TRUE
 results <- data.frame()
 
 for (inflate in c("0.0", "1.0")) {
-  fit_files <- system(sprintf("ls %s/*genes%s_*inflate%s*_analysis.json", fit_dir, genes, inflate), intern=TRUE)
-  analysis_name <- sprintf("genes%s_inflate%s", genes, inflate)
+  fit_files <- system(sprintf(
+    "ls %s/*genes%s_*inflate%s*_functional%s*_analysis.json",
+    fit_dir, genes, inflate, ifelse(functional, "True", "False")), intern=TRUE)
+  analysis_name <- sprintf("genes%s_inflate%s_functional%s", genes, inflate, functional)
   
   ResultDictToDF <- function(result_dict) {
     df  <- data.frame(analysis=analysis_name)
@@ -48,11 +50,51 @@ with open(fit_filename, 'r') as infile:
 }
 
 results <- results %>%
-  select(-refit_filename) %>%
-  mutate(alpha_increase=alpha1 > alpha0)
+  select(-refit_filename) 
+if (!functional) {
+  results <- mutate(results, alpha_increase=alpha1 > alpha0)
+  table(results[c("inflate", "alpha1")])
+}
 
-table(results[c("inflate", "alpha1")])
+table(results[c("inflate", "epsilon")])
 
+# Functional perturbations
+use_functional <- TRUE
+use_predictive <- FALSE
+use_inflate <- TRUE
+log_phi_desc <- "expit"
+
+MakeFunPlot <- function(use_predictive, use_inflate, use_log_phi_desc) {
+  ggplot(filter(results,
+                functional==TRUE,
+                log_phi_desc == use_log_phi_desc,
+                predictive==use_predictive,
+                inflate==use_inflate)) +
+    geom_point(aes(x=epsilon, y=e_num1, color="Refitting")) +
+    geom_point(aes(x=epsilon, y=e_num_pred, color="Approximation")) +
+    geom_line(aes(x=epsilon, y=e_num1, color="Refitting")) +
+    geom_line(aes(x=epsilon, y=e_num_pred, color="Approximation")) +
+    geom_vline(aes(xintercept=0.0)) +
+    facet_grid(threshold ~ ., scales="free", labeller = label_context) +
+    ggtitle(sprintf("%s\n%s functional perturbation\n%s",
+                    ifelse(use_inflate, "Noise added", "No noise added"),
+                    log_phi_desc,
+                    ifelse(use_predictive, "Predictive", "In-sample"))) +
+    xlab("Epsilon") + ylab("Expected number of clusters")
+}
+
+
+grid.arrange(
+  MakeFunPlot(TRUE, TRUE, "expit"),
+  MakeFunPlot(TRUE, FALSE, "expit"),
+  MakeFunPlot(FALSE, TRUE, "expit"),
+  MakeFunPlot(FALSE, FALSE, "expit"),
+  ncol=4
+)
+
+
+
+# Parametric perturbations
 MakePlot <- function(use_alpha_increase, use_predictive, use_inflate) {
   ggplot(filter(results,
                 alpha_increase==use_alpha_increase,
@@ -70,6 +112,7 @@ MakePlot <- function(use_alpha_increase, use_predictive, use_inflate) {
             ifelse(use_predictive, "Predictive", "In-sample"))) +
     xlab("Alpha") + ylab("Expected number of clusters")
 }
+
 
 use_predictive <- TRUE
 grid.arrange(
