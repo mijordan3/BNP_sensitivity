@@ -115,6 +115,7 @@ if functional:
     epsilon = np.array([alpha_scale])
     print('Evaluating with {} at epsilon = {}'.format(
         log_phi_desc, epsilon))
+    orig_alpha = None
     new_alpha = None
 else:
     orig_alpha =  np.unique(prior_params['probs_alpha'])
@@ -147,9 +148,10 @@ if not os.path.exists(outdir):
 
 # Set up the approximation
 taylor_order = args.taylor_order
-
+prior_free = False
 
 if functional:
+    prior_free = False # Make sure this is False; does not support free epsilon
     log_phi = gmm_lib.get_log_phi(log_phi_desc)
     prior_pert = gmm_lib.PriorPerturbation(log_phi, gmm.gh_loc, gmm.gh_weights)
     gmm.set_perturbation_fun(prior_pert.get_e_log_perturbation)
@@ -175,13 +177,19 @@ if functional:
             hyper_val0 = np.array([0.0]),
             order = taylor_order,
             hess0 = kl_hess)
+
+    predict_gmm_params = \
+        paragami.FoldFunctionOutput(
+            original_fun=vb_sens.evaluate_taylor_series,
+            patterns=gmm.gmm_params_pattern,
+            free=True,
+            retnums=[0])
+
     lr_time = time.time()
     pred_gmm_params = predict_gmm_params(epsilon)
     lr_time = lr_time - time.time()
 
 else:
-    prior_free = False
-
     get_kl_from_vb_free_prior_free = \
         paragami.FlattenFunctionInput(original_fun=
             gmm.get_params_prior_kl,
@@ -215,7 +223,7 @@ else:
 
 # Get a range of posterior quantities
 
-n_samples = 10000
+n_samples = 1000
 
 results = []
 for threshold in np.arange(0, 10):
