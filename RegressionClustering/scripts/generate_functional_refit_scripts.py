@@ -2,11 +2,11 @@
 """Create shell scripts to run ``refit.py`` for a range of parameters.
 Optionally submit the shell scripts to slurm.
 
-./generate_refit_scripts.py \
+./generate_functional_refit_scripts.py \
     --fit_dir '/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits' \
     --no-submit
 
-./generate_refit_scripts.py  --fit_dir '/accounts/grad/rgiordano/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits'  --no-submit
+./generate_functional_refit_scripts.py  --fit_dir '/accounts/grad/rgiordano/Documents/git_repos/BNP_sensitivity/RegressionClustering/fits'  --no-submit
 
 """
 

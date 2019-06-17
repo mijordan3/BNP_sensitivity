@@ -118,10 +118,10 @@ if not os.path.exists(outdir):
 
 # Define a perturbation.
 if args.functional:
-    # TODO: specify this from the command line somehow?
+    gmm = gmm_lib.GMM(num_components, prior_params, reg_params)
+
     log_phi_desc = 'expit'
-    def log_phi(logit_v):
-        return(sp.special.expit(logit_v))
+    log_phi = gmm_lib.get_log_phi(log_phi_desc)
 
     prior_pert = gmm_lib.PriorPerturbation(log_phi, gmm.gh_loc, gmm.gh_weights)
     gmm.set_perturbation_fun(prior_pert.get_e_log_perturbation)
@@ -130,8 +130,8 @@ else:
     new_alpha = prior_params['probs_alpha'] * args.alpha_scale
     new_prior_params = deepcopy(prior_params)
     new_prior_params['probs_alpha'][:] = new_alpha
+    gmm = gmm_lib.GMM(num_components, new_prior_params, reg_params)
 
-gmm = gmm_lib.GMM(num_components, new_prior_params, reg_params)
 
 # Re-optimize.
 

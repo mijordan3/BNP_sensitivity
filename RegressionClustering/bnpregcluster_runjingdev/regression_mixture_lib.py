@@ -474,3 +474,13 @@ class PriorPerturbation():
     def get_e_log_perturbation_epsilon(self, gmm_params, epsilon):
         self.set_epsilon(epsilon)
         return self.get_e_log_perturbation(gmm_params)
+
+
+
+_log_phi_funs = {
+    'expit': lambda logit_v: sp.special.expit(logit_v)
+}
+def get_log_phi(log_phi_desc):
+    if not log_phi_desc in _log_phi_funs.keys():
+        raise ValueError('Invalid description {}'.format(log_phi_desc))
+    return _log_phi_funs[log_phi_desc]
