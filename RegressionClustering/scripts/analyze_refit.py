@@ -78,7 +78,7 @@ with np.load(args.refit_filename) as infile:
     reopt_time = infile['reopt_time']
     alpha_scale = infile['alpha_scale']
     functional = bool(infile['functional'])
-    log_phi_desc = get(infile['log_phi_desc'], None)
+    log_phi_desc = infile.get('log_phi_desc', None)
     log_phi_desc = str(log_phi_desc) if log_phi_desc is not None else None
 
 if not os.path.isfile(initial_fitfile):
