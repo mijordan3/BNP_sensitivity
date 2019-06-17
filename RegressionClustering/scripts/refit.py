@@ -42,7 +42,12 @@ parser.add_argument('--functional', dest='functional', action='store_true')
 parser.add_argument('--no-functional', dest='functional', action='store_false')
 parser.set_defaults(functional=True)
 
+parser.add_argument('--log_phi_desc', default=None, type=str)
+
 args = parser.parse_args()
+
+if args.log_phi_desc is not None and not args.functional:
+    raise ValueError('You must specify --functional to use --log_phi_desc')
 
 np.random.seed(args.seed)
 
@@ -100,9 +105,10 @@ num_genes = reg_params['beta_mean'].shape[0]
 if args.out_filename is None:
     analysis_name = \
         ('transformed_gene_regression_df{}_degree{}_genes{}_' +
-         'num_components{}_inflate{}_shrunk{}_alphascale{}_refit').format(
+         'num_components{}_inflate{}_shrunk{}_alphascale{}_' +
+         'functional{}_logphi{}_refit').format(
         df, degree, num_genes, num_components, inflate_cov, eb_shrunk,
-        args.alpha_scale)
+        args.alpha_scale, args.functional, args.log_phi_desc)
     # Save in the same place as the input file.
     outdir, _ = os.path.split(args.input_filename)
     outfile = os.path.join(outdir, '{}.npz'.format(analysis_name))
