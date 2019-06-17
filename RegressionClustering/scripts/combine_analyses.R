@@ -15,18 +15,14 @@ fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionCluster
 
 
 genes <- "7000"
-#functional <- TRUE
 results_filename <- sprintf("combined_results_genes%s.Rdata", genes)
 
 results <- data.frame()
 for (inflate in c("0.0", "1.0")) {
-  # fit_files <- system(sprintf(
-  #   "ls %s/*genes%s_*inflate%s*_functional%s*_analysis.json",
-  #   fit_dir, genes, inflate, ifelse(functional, "True", "False")), intern=TRUE)
   fit_files <- system(sprintf(
     "ls %s/*genes%s_*inflate%s*_analysis.json",
     fit_dir, genes, inflate), intern=TRUE)
-  analysis_name <- sprintf("genes%s_inflate%s_functional%s", genes, inflate, functional)
+  analysis_name <- sprintf("genes%s_inflate%s", genes, inflate)
   
   ResultDictToDF <- function(result_dict) {
     df  <- data.frame(analysis=analysis_name)
@@ -58,18 +54,11 @@ results <- results %>%
   select(-refit_filename)  %>%
   mutate(alpha_increase=alpha1 > alpha0)
 
-save(results, file=file.path(fit_dir, results_filename))
-
 table(results[c("inflate", "alpha1")])
 table(results[c("inflate", "epsilon")])
 table(results[c("inflate", "functional")])
 
 # Functional perturbations
-use_functional <- TRUE
-use_predictive <- FALSE
-use_inflate <- TRUE
-log_phi_desc <- "expit"
-
 MakeFunPlot <- function(use_predictive, use_inflate, use_log_phi_desc) {
   ggplot(filter(results,
                 functional==TRUE,
@@ -99,10 +88,10 @@ grid.arrange(
 )
 
 
-
 # Parametric perturbations
 MakePlot <- function(use_alpha_increase, use_predictive, use_inflate) {
   ggplot(filter(results,
+                !functional,
                 alpha_increase==use_alpha_increase,
                 predictive==use_predictive,
                 inflate==use_inflate)) +
@@ -161,3 +150,10 @@ ggplot(pert_df) +
   geom_line(aes(x=v_grid, y=exp(log_p0))) +
   geom_line(aes(x=v_grid, y=exp(log_p1)))
   
+
+
+##############################
+# Save for knitr
+
+save(pert_df, results, file=file.path(fit_dir, results_filename))
+
