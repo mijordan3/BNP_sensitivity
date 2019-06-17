@@ -17,7 +17,7 @@ fit_dir <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/RegressionCluster
 genes <- "7000"
 results_filename <- sprintf("combined_results_genes%s.Rdata", genes)
 
-results <- data.frame()
+raw_results <- data.frame()
 for (inflate in c("0.0", "1.0")) {
   fit_files <- system(sprintf(
     "ls %s/*genes%s_*inflate%s*_analysis.json",
@@ -42,17 +42,18 @@ with open(fit_filename, 'r') as infile:
 ")
     
     for (i in 1:length(py_main$this_result)) {
-      results <- bind_rows(
-        results,
+      raw_results <- bind_rows(
+        raw_results,
         ResultDictToDF(py_main$this_result[[i]]) %>%
           mutate(inflate=inflate != "0.0"))
     }
   }
 }
 
-results <- results %>%
+results <- raw_results %>%
   select(-refit_filename)  %>%
-  mutate(alpha_increase=alpha1 > alpha0)
+  mutate(alpha_increase=alpha1 > alpha0) %>%
+  mutate(functional=case_when(is.na(functional) ~ FALSE, TRUE ~ functional))
 
 table(results[c("inflate", "alpha1")])
 table(results[c("inflate", "epsilon")])
@@ -109,7 +110,7 @@ MakePlot <- function(use_alpha_increase, use_predictive, use_inflate) {
 }
 
 
-use_predictive <- TRUE
+use_predictive <- FALSE
 grid.arrange(
   MakePlot(FALSE, use_predictive, FALSE),
   MakePlot(FALSE, use_predictive, TRUE),
@@ -149,11 +150,69 @@ pert_df <- data.frame(
 ggplot(pert_df) +
   geom_line(aes(x=v_grid, y=exp(log_p0))) +
   geom_line(aes(x=v_grid, y=exp(log_p1)))
+
+
+
+##############################
+# Load some gene shapes
+
+inflate <- "1.0"
+pre_genes <- as.character(as.integer((as.integer(genes) / 0.7)))
+gene_shapes <- data.frame()
+
+for (inflate in c("0.0", "1.0")) {
+  py_main$datafile <- file.path(
+    fit_dir,
+    sprintf('shrunken_transformed_gene_regression_df4_degree3_genes%s_inflate%s.npz', pre_genes, inflate))
+  py_run_string("
+with np.load(datafile) as infile:
+  beta_mean = infile['transformed_beta_mean']
+  beta_info = infile['transformed_beta_info']
+
+beta_sd = np.array([ np.diag(np.sqrt(np.linalg.inv(beta_info[n, :, :])))
+                     for n in range(beta_info.shape[0])])
+")
   
+  gene_shapes <- bind_rows(
+    gene_shapes,
+    data.frame(
+      gene=1:nrow(py_main$beta_mean),
+      beta_mean=py_main$beta_mean,
+      beta_sd=py_main$beta_sd,
+      inflate=inflate,
+      genes=genes
+    )
+  )
+}
+
+
+gene_shapes_melt <- 
+  melt(gene_shapes, id.vars=c("genes", "inflate", "gene")) %>%
+  separate(variable, c("variable", "ind"), "\\.") %>%
+  #mutate(ind=paste("d", ind, sep="")) %>%
+  mutate(ind=as.numeric(ind), gene=factor(gene)) %>%
+  dcast(ind + gene + genes + inflate ~ variable)
+head(gene_shapes_melt)
+
+ggplot(filter(gene_shapes_melt, as.integer(gene) <= 6),
+       aes(fill=gene, group=gene, color=gene)) +
+  geom_ribbon(aes(x=ind,
+                  ymin=beta_mean - 1.64 * beta_sd,
+                  ymax=beta_mean + 1.64 * beta_sd, group=gene),
+              color=NA, alpha=0.4) +
+  geom_ribbon(aes(x=ind,
+                  ymin=beta_mean - beta_sd,
+                  ymax=beta_mean + beta_sd, group=gene),
+              color=NA, alpha=0.4) +
+  geom_line(aes(x=ind, y=beta_mean), lwd=2) +
+  facet_grid(inflate ~ gene)
+
 
 
 ##############################
 # Save for knitr
 
-save(pert_df, results, file=file.path(fit_dir, results_filename))
+save(pert_df, results, gene_shapes_melt, file=file.path(fit_dir, results_filename))
+
+
 
