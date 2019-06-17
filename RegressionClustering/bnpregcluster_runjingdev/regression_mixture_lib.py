@@ -196,7 +196,8 @@ def backtrack(fun, theta0, v0, alpha=0.5, max_tries=10, tol=1e-7):
 # Mixture model class
 
 class GMM(gmm_lib.GMM):
-    def __init__(self, num_components, prior_params, reg_params, gh_deg=8):
+    def __init__(self, num_components, prior_params, reg_params,
+                 gh_deg=8, perturbation_fun=None):
         """A class for estimating mixtures of regressions.
 
         Parameters
@@ -210,7 +211,9 @@ class GMM(gmm_lib.GMM):
             ``beta_mean`` and ``beta_info``, which are arrays of observation
             means and information matrices respectively.  See
             ``get_regression_array_pattern`` for more details.
-
+        perturbation_fun : `callable`
+            Optional.  A function taking a folded gmm_params as an argument
+            and returning an additive perturbation to the KL objective.
         """
 
         # Model for regression output.
@@ -252,6 +255,14 @@ class GMM(gmm_lib.GMM):
         self.conditioned_obj = paragami.OptimizationObjective(
             self.get_kl_conditioned)
 
+        self.set_perturbation_fun(perturbation_fun)
+
+    def set_perturbation_fun(self, perturbation_fun):
+        if perturbation_fun is not None:
+            self.perturbation_fun = perturbation_fun
+        else:
+            self.perturbation_fun = lambda params: 0.0
+
     def transform_regression_parameters(self):
         raise NotImplementedError
 
@@ -268,17 +279,16 @@ class GMM(gmm_lib.GMM):
         """Get the optimization objective as a function of the mixture
         parameters.
         """
-        return get_kl(
-            gmm_params, self.reg_params, prior_params,
-            self.gh_loc, self.gh_weights)
+        return \
+            get_kl(gmm_params, self.reg_params, prior_params,
+                   self.gh_loc, self.gh_weights) + \
+            self.perturbation_fun(gmm_params)
 
     def get_params_kl(self, gmm_params):
         """Get the optimization objective as a function of the mixture
         parameters.
         """
-        return get_kl(
-            gmm_params, self.reg_params, self.prior_params,
-            self.gh_loc, self.gh_weights)
+        return self.get_params_prior_kl(gmm_params, self.prior_params)
 
     def get_e_z(self, gmm_params):
         _, e_z = get_loglik_terms(

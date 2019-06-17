@@ -17,6 +17,33 @@ class PriorPerturbation(object):
                         logit_v_ub = 4,
                         logit_v_lb = -4,
                         quad_maxiter = 50):
+        """
+        A class for visualizing a set of prior perturbations.  Note
+        that this class is not needed for fitting a perturbed model.
+        For that purpose, simply use ``get_e_log_perturbation`` below.
+
+        Args
+        ------------
+        vb_params_dict : Dictionary
+            A dictionary of VB parameters with values of
+            ``stick_propn_mean`` and ``stick_propn_info`` representing vectors
+            of approximate variational posterior mean and information for each
+            stick in the unconstrained logit_stick space.
+        alpha0 : float
+            The original prior is taken to be a Beta(1, alpha0) distribution
+            in the stick space.
+        log_phi : function
+            A function taking logit_stick values as an argument and returning
+            the log ration between the original and new prior.
+        gh_loc, gh_weights : array of floats
+            Gauss Hermite quadrature locations and weights.
+        logit_v_ub, logit_v_ub : float
+            Upper and lower bounds in logit stick space for numerically
+            calculating prior normalizing constants.
+        quad_maxiter : int
+            The maximum number of iterations used when numerically calculating
+            prior normalizing constants.
+        """
 
         self.logit_v_lb = logit_v_lb
         self.logit_v_ub = logit_v_ub
