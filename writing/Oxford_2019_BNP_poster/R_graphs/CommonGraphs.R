@@ -5,7 +5,7 @@ set_font_sizes <- theme(plot.title=element_text(size=20, face="bold"),
 
 
 plot_parametric_sensitivity <- function(
-    results_df, alpha_0, xlabel=TeX('$\\alpha$')) {
+    results_df, alpha_0=-1, xlabel=TeX('$\\alpha$')) {
 
   plot <-
     ggplot(results_df) +

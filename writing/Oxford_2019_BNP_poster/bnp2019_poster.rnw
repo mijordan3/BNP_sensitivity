@@ -322,7 +322,7 @@ results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
 results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
 grid.arrange(
     plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
-      ggtitle('Predictive quantity') +
+      ggtitle('Fisher iris data') +
         theme(legend.position = 'none', legend.title=element_blank()),
     plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
       ggtitle(' ') + theme(legend.position="none"),
@@ -336,11 +336,13 @@ grid.arrange(
     plot_parametric_sensitivity(
       genomics_data$processed_results %>%
         filter(!inflate, !alpha_increase, !functional),
-      alpha_0=2.0),
+      alpha_0=2.0) +
+      ggtitle("Mouse gene data"),
   plot_parametric_sensitivity(
     genomics_data$processed_results %>%
       filter(!inflate, alpha_increase, !functional),
-    alpha_0=2.0),
+    alpha_0=2.0) +
+    ggtitle(" "),
     ncol=2
 )
 @
@@ -370,44 +372,57 @@ fig_cap2 <- paste(
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 @
 <<functional_sens_plot, cache=cache_knitr, fig.show='hold'>>=
-results_pert1 <- filter(iris_data$results_df, !pred, pert=="1")
-results_pert2 <- filter(iris_data$results_df, !pred, pert=="2")
-results_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
-results_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
+# results_pert1 <- filter(iris_data$results_df, !pred, pert=="1")
+# results_pert2 <- filter(iris_data$results_df, !pred, pert=="2")
+iris_pert1 <- filter(iris_data$prior_pert_df, filename == "prior_pert1.csv")
+iris_pert2 <- filter(iris_data$prior_pert_df, filename == "prior_pert2.csv")
+iris_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
+iris_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
+
+gene_pred_pert <- filter(genomics_data$processed_results,
+                         functional, !inflate)
 
 grid.arrange(
     # First row --- include titles.
-    plot_prior_perturbation(
-            filter(iris_data$prior_pert_df,
-                   filename == "prior_pert1.csv")) +
-        theme(legend.position = c(0.85, 0.80)) +
-        ggtitle("Priors"),
-    plot_parametric_sensitivity(
-            results_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position = c(0.65, 0.81)) +
-        ggtitle("In-sample quantity"),
-    plot_parametric_sensitivity(
-            results_pred_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  "None") +
-        ggtitle("Predictive quantity"),
+    plot_prior_perturbation(iris_pert1) +
+        theme(legend.position = "None") +
+        ggtitle("Fisher Iris Perturbation 1"),
 
-    # Second row --- no titles.
-    plot_prior_perturbation(
-            filter(iris_data$prior_pert_df,
-                   filename == "prior_pert2.csv")) +
-        theme(legend.position = "None"),
-    plot_parametric_sensitivity(
-            results_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position = c(0.65, 0.81)),
-    plot_parametric_sensitivity(
-            results_pred_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+    plot_prior_perturbation(iris_pert2) +
+        theme(legend.position = "None") +
+        ggtitle("Fisher Iris Perturbation 2"),
+
+    plot_prior_perturbation(genomics_data$processed_pert_df) +
+        theme(legend.position = c(0.85, 0.80)) +
+        ggtitle("Mice gene Perturbation"),
+
+    # Second row --- results
+    plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) +
         theme(legend.position =  "None"),
 
+    plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) +
+        theme(legend.position =  "None"),
+
+    plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
+        theme(legend.position =  "None"),
     ncol=3
 )
+
+    # plot_parametric_sensitivity(results_pert1, xlabel=TeX("$\\delta$")) +
+    #     theme(legend.position = c(0.65, 0.81)) +
+    #     ggtitle("In-sample quantity"),
+    # plot_parametric_sensitivity(results_pred_pert1, xlabel=TeX("$\\delta$")) +
+    #     theme(legend.position =  "None") +
+    #     ggtitle("Predictive quantity"),
+    #
+    # # Second row --- no titles.
+    # plot_prior_perturbation(iris_pert2) +
+    #     theme(legend.position = "None"),
+    # plot_parametric_sensitivity(results_pert2, xlabel=TeX("$\\delta$")) +
+    #     theme(legend.position = c(0.65, 0.81)),
+    # plot_parametric_sensitivity(results_pred_pert2, xlabel=TeX("$\\delta$")) +
+    #     theme(legend.position =  "None"),
 @
-%\caption{}
-%\end{figure}
 
 % \begin{mdframed}[style=MyFrame]
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

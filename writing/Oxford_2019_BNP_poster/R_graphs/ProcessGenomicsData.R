@@ -18,3 +18,10 @@ genomics_data$processed_results <-
   select(alpha, functional, alpha_increase, inflate, linear_approx, refitted) %>%
   gather(key="method", value="e_num_clusters",
          -alpha, -functional, -alpha_increase, -inflate)
+
+genomics_data$processed_pert_df <-
+    genomics_data$pert_df %>%
+        mutate(p0=exp(log_p0), p1=exp(log_p1)) %>%
+        select(v_grid, p0, p1) %>%
+        rename(nu_k=v_grid) %>%
+        gather("which_prior", "p", -nu_k)
