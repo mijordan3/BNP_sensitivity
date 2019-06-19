@@ -1,6 +1,6 @@
 \documentclass[a0,plainsections,30pt]{sciposter}
 
-\usepackage{graphicx}
+%\usepackage{graphicx}
 % \usepackage{subcaption}
 %\usepackage{caption}
 
@@ -12,6 +12,8 @@
 \usepackage{bbm}
 \usepackage{hhline}
 \usepackage{multicol}
+\usepackage[authoryear]{natbib}
+
 \setlength{\columnseprule}{0pt}
 
 \usepackage{boxedminipage}
@@ -277,7 +279,7 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \begin{center}
-\noindent\rule{0.6\textwidth}{1pt}
+\noindent\rule{0.95\textwidth}{1pt}
 \end{center}
 {\bf References}
 %%%%%%%%%%%%%%%%%%
@@ -304,49 +306,51 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 %%%%%%%%%%%%%%%%%%
 \section*{Data}
 
-\subsection*{Fisher Iris Dataset}
-\begin{figure}[!h]
-\centering
-\includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
-\caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
-\setlength{\textfloatsep}{-10pt}
-\end{figure}
 
-\subsection*{Mouse Genes}
+\begin{minipage}[t]{0.49\textwidth}
+\subsection*{Iris Data}
+<<iris_pca_cap, cache=FALSE>>=
+SetImageSize(aspect_ratio=2.0 * base_aspect_ratio,
+             image_width=0.5 * base_image_width)
+@
+
+<<iris_pca, cache=cache_knitr, fig.show='hold'>>=
+ggplot(iris_data$iris_df) +
+  geom_point(aes(x=PC1, y=PC2))
+@
+\end{minipage}
+%
+\begin{minipage}[t]{0.49\textwidth}
+%
+For our first dataset, we discard species
+information and cluster the 150 four-dimensional observations of the Fisher iris
+dataset \citep{iris_data_anderson}.
+
+A graph of the loadings on the first two principle components is shown
+to the left.
+%
+\end{minipage}
+
+
+\begin{minipage}[t]{0.49\textwidth}
+\subsection*{Mouse Data}
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
-\caption{Mouse gene expression time series.}
-\setlength{\textfloatsep}{-10pt}
+%\caption{Mouse gene expression time series.}
+%\setlength{\textfloatsep}{-10pt}
 \end{figure}
+\end{minipage}
+%
+\begin{minipage}[t]{0.49\textwidth}
+For our second dataset, we cluster these mouse genes.
+\end{minipage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \section*{Results}
 \vspace{-0.3in}
 
-
-% \begin{minipage}[t]{0.49\textwidth}
-%     %% iris figure
-%     \subsection*{Fisher Iris Dataset}
-%     \begin{figure}[!h]
-%     \centering
-%     \includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
-%     \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
-%     \setlength{\textfloatsep}{-10pt}
-%     \end{figure}
-% \end{minipage}
-% %
-% \begin{minipage}[t]{0.49\textwidth}
-%     \subsection*{Mouse Genes}
-%     \begin{figure}[!h]
-%     \centering
-%     \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
-%     \caption{Mouse gene expression time series.}
-%     \setlength{\textfloatsep}{-10pt}
-%     \end{figure}
-% \end{minipage}
-%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We infer the number of distinct species in the iris
 dataset \cite{iris_data_anderson}, and evaluate sensitivity to the Dirichlet process prior.
@@ -364,7 +368,7 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 #     "approximation (orange). Vertical line indicates the location of ",
 #     "$\\alpha_0$, the initial fit. ", sep="")
 fig_cap1 <- "Re-optimization vs approximation."
-SetImageSize(aspect_ratio= 1.0 * base_aspect_ratio)
+SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
 @
 <<param_sens_plot, cache=cache_knitr, fig.show='hold'>>=
 results_df_1 <- filter(iris_data$results_df, !pred, pert=="alpha3")
@@ -447,26 +451,6 @@ grid.arrange(
 )
 @
 
-% \begin{mdframed}[style=MyFrame]
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%
-% \vspace{-0.6in}
-% \section*{Conclusion}
-% \vspace{-0.3in}
-% %%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% \begin{itemize}
-%
-% \item {\bf Our linear approximation provides a fast alternative to re-evaluating the full model after changing the BNP prior. }
-%
-% \item We applied our approximation to both parametric and functional perturbations of the stick-breaking prior.
-%
-% \item We attempted to improve the linearity by approximating only the dependence of the optimal variational parameters on prior parameters.
-%
-% \end{itemize}
-% \end{mdframed}
-%
 % {\bf Our code: }\newline
 % Paragami: general library for sensitivity analysis in optimization problems\newline
 % {\color{blue} https://github.com/rgiordan/paragami}
@@ -474,6 +458,9 @@ grid.arrange(
 % Code to evaluate BNP sensitivity as shown here: \newline
 % {\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
 
+\begin{center}
+\noindent\rule{0.95\textwidth}{1pt}
+\end{center}
 \input{acknowledgements}
 
 \end{minipage}\\
