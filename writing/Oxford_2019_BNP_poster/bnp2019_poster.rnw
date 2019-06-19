@@ -2,7 +2,7 @@
 
 \usepackage{graphicx}
 % \usepackage{subcaption}
-\usepackage{caption}
+%\usepackage{caption}
 
 \usepackage{epstopdf, graphicx}
 \usepackage{booktabs,dcolumn}
@@ -56,14 +56,6 @@
 
 \title{\textcolor{mydarkblue}{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics
 }}
-% \usepackage{authblk}
-% \author[1]{Author A}
-% \author[1]{Author B}
-% \author[1]{Author C}
-% \author[1]{Author D}
-% \author[2]{Author E}
-% \affil[1]{Department of Computer Science, \LaTeX\ University}
-% \affil[2]{Department of Mechanical Engineering, \LaTeX\ University}
 
 \author{Ryan Giordano\textsuperscript{1*} \quad
 Runjing Liu\textsuperscript{1*} \quad
@@ -99,17 +91,6 @@ Tamara Broderick\textsuperscript{2} \\
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 
-% \newcommand{\npp}{\tilde{\eta}} % natural parameter for the p distribution
-% \newcommand{\npq}{\eta} % natural parameter for the q distribution
-% \newcommand{\mpp}{\tilde{m}} % mean parameter for the p distribution
-% \newcommand{\mpq}{m} % mean parameter for the q distribution
-% \newcommand{\mpopt}{m^*} % mean parameter for the q^* distribution
-% \newcommand{\npopt}{\eta^*} % mean parameter for the q^* distribution
-% \newcommand{\truecov}{\Sigma} % True posterior covariance
-% \newcommand{\lrcov}{\hat{\Sigma}} % LR cov estimate
-% \newcommand{\vbcov}{V} % Variational posterior covariance
-% \newcommand{\constant}{C} % A constant
-
 % my added commands
 \usepackage{etoolbox}
 \BeforeBeginEnvironment{figure}{\vskip-2ex}
@@ -120,8 +101,7 @@ Tamara Broderick\textsuperscript{2} \\
 % \addtolength{\topmargin}{-0.875in}
 \addtolength{\textheight}{1in}
 \begin{document}
-\conference{NIPS 2017}
-
+\conference{BNP 2019}
 
 \setlength{\parskip}{0.25em}
 
@@ -135,11 +115,20 @@ library(tidyverse)
 knitr_debug <- FALSE
 source("./R_graphs/Initialize.R")
 
+# Common graphs library
+source("./R_graphs/plot_sens_results.R")
+
+# This file is produced by R_graphs/data/iris_data/make_knitr_dataset.R.
 iris_data <- LoadIntoEnvironment(
     file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
 
+# This file is produced by RegressionClustering/scripts/combine_analyses.R.
+genomics_data <- LoadIntoEnvironment(
+    file.path(data_path, "genomics_data/combined_results_genes7000.Rdata"))
+
 # Turn off caching if you need to regenerate any of the R code.
-opts_chunk$set(cache=TRUE)
+knitr_debug <- FALSE # Set to true to see error output
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 @
 
 
@@ -202,16 +191,6 @@ The weights on the components are the lengths broken off at each step.}
 %
 We approximate the true posterior using \textbf{variational Bayes} (VB). Let $\eta^*$ denote the optimal variational parameters.
 %
-% Note that:
-%
-% \begin{itemize}
-%
-% \item The optimal variational parameters $\eta^*$ depend on the prior through optimizing the KL objective.
-%
-% \item All approximate posterior quantities (e.g.\ the expected number of clusters) are functions of $\eta^*$.
-%
-% \end{itemize}
-
 \begin{mdframed}[style=MyFrame]
 - How does varying the distribution $\nu_k \sim \text{Beta}(1, \alpha)$ affect $\eta^*$?
 
@@ -265,22 +244,7 @@ computationally prohibitive.
 
 \item We only use a linear approximation for the dependence of $\eta^*$ on $\epsilon$. We retain the non-linearities in the map from $\eta^*$ to the expected number of clusters.
 
-% as $\frac{d \etathetaopt(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} = H^{-1} f_\eta$
-
 \end{itemize}
-% where
-% \begin{align}
-% H := \frac{\partial^2 KL(\eta_\theta, \epsilon) }{
-%     \partial \eta_\theta \partial \eta_\theta^T}
-%     \atzero
-% \qquad
-% f_\eta := \frac{\partial^2
-%     \QExpect \left[ \log p\left(y, \theta, z \vert \epsilon \right) \right]}{\partial \eta_\theta \partial \epsilon}
-%     \atzero.
-%     \label{eq:sensitivity_formulae}
-% \end{align}
-% where $KL(\eta_\theta, \epsilon)$ is the KL objective in Equation~\ref{eq:kl_objective}.
-% \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -344,15 +308,18 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 
 \vspace{0.05in}
 %
-<<setup, include=FALSE, cache=FALSE>>=
-knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
-source("./R_graphs/plot_sens_results.R")
+<<fig_cap1, cache=FALSE>>=
+# fig_cap1 <- paste(
+#     "Comparison of in-sample (top) and predictive (bottom) expected number ",
+#     "of clusters computed by re-optimization (green) versus linear ",
+#     "approximation (orange). Vertical line indicates the location of ",
+#     "$\\alpha_0$, the initial fit. ", sep="")
+fig_cap1 <- "Re-optimization vs approximation."
+SetImageSize(aspect_ratio= 1.0 * base_aspect_ratio)
 @
-
-\begin{figure}
-\centering
-<<param_sens_plot_thresh_0, cache=cache_knitr, fig.show='hold'>>=
+% \begin{figure}
+% \centering
+<<param_sens_plot, cache=cache_knitr, fig.show='hold'>>=
 results_df_1 <- filter(iris_data$results_df, !pred, pert=="alpha3")
 results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
 results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
@@ -365,11 +332,10 @@ grid.arrange(
     plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
       ggtitle(' ') + theme(legend.position="none"),
     ncol  = 3)
-
 @
-\caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange).
-Vertical line indicates the location of $\alpha_0$, the initial fit. }
-\end{figure}
+% \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange).
+% Vertical line indicates the location of $\alpha_0$, the initial fit. }
+% \end{figure}
 
 {\bf \large Sensitivity to functional perturbations. }
 Suppose we replace the original beta prior $p_0$ with another distribution $p_1$. Then we set our perturbation to be
@@ -382,8 +348,8 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 and evaluate sensitivity to $\delta$:
 %
 \vspace{0.1in}
-\begin{figure}
-\centering
+% \begin{figure}
+% \centering
 <<fig_cap2, cache=FALSE>>=
 fig_cap2 <- paste(
     "The effect of prior perturbation on the expected number of clusters. ",
@@ -391,9 +357,11 @@ fig_cap2 <- paste(
     "in blue. Middle: linearly approximated vs. re-fitted in-sample ",
     "expected number of clusters. Right: linearly approximated vs. ",
     "re-fitted predictive expected number of clusters.", sep="")
+# TODO: I get missing number errors when I try to specify the caption with
+# fig.cap.  :(
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 @
-<<functional_sens_plot, cache=cache_knitr, fig.show='hold', caption=fig_cap2>>=
+<<functional_sens_plot, cache=cache_knitr, fig.show='hold'>>=
 results_pert1 <- filter(iris_data$results_df, !pred, pert=="1")
 results_pert2 <- filter(iris_data$results_df, !pred, pert=="2")
 results_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
@@ -431,7 +399,7 @@ grid.arrange(
 )
 @
 %\caption{}
-\end{figure}
+%\end{figure}
 
 % \begin{mdframed}[style=MyFrame]
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
