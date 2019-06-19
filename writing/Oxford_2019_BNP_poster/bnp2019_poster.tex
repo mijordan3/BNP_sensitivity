@@ -123,8 +123,8 @@ Tamara Broderick\textsuperscript{2} \\
  {\large\normalfont\textsuperscript{1} Department of Statistics, UC Berkeley \quad \textsuperscript{2} Department of EECS, MIT}
  }
 
-\leftlogo[1]{images/logo_left.png}
-\rightlogo[1]{images/logo_right2.png}
+\leftlogo[1]{static_images/logo_left.png}
+\rightlogo[1]{static_images/logo_right2.png}
 
 % Set the color used for the section headings here
 \definecolor{SectionCol}{rgb}{0,.06,.5}
@@ -234,23 +234,13 @@ The \textbf{Dirichlet process} is a popular Bayesian nonparametric
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width = 0.95\textwidth]{./images/DP_stick_breaking.png}
+\includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
 \caption{The Dirichlet stick-breaking process. We start with a stick of
 length 1, and recursively break off proportions $\nu_1$, $\nu_2$, $\nu_3$, ...
 The weights on the components are the lengths broken off at each step.}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
-
-%%% iris figure
-% \begin{figure}[!h]
-% \centering
-% \includegraphics[width = 0.7\textwidth]{./images/iris_data.png}
 %
-% \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species. }
-%
-% \setlength{\textfloatsep}{-10pt}
-% \end{figure}
-
 We approximate the true posterior using \textbf{variational Bayes} (VB). Let $\eta^*$ denote the optimal variational parameters.
 %
 % Note that:
@@ -271,41 +261,6 @@ computationally prohibitive.
 
 - {\bf Hence, we propose a linear approximation, derived from local sensitivity measures. }
 \end{mdframed}
-
-% Our objective is then
-% \vspace{-0.2in}
-% \begin{align}
-% \etathetaopt =
-% \argmin_{\eta_\theta} KL\left(
-%     q(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta) \big\| p(\theta, z | y)
-%     \right)
-%     \label{eq:kl_objective}
-% \end{align}
-
-% \vspace{-0.7in}
-
-% %%%%%%%%%%%%%%%%%%
-% \subsection*{Posterior expectations of interest: }
-% \vspace{-0.3in}
-% %%%%%%%%%%%%%%%%%%
-% We consider two possible posterior quantities:
-%
-% \begin{enumerate}
-% \item An {\bf in-sample quantity}, the expected number of clusters in the given iris dataset.
-% % \vspace{-0.3in}
-% % \begin{align}
-% % \Expect_{q(z \vert \etazopt(\etathetaopt))} \left[ \#\{\text{distinct clusters}\} \right]
-% % \label{eq:expected_num_clusters_thresh}
-% % \end{align}
-%
-% \item A {\bf posterior predictive quantity}, or the number of clusters we expect see in a \textit{new} dataset of $N$ iris flowers, given our posterior knowledge.
-% % \begin{align}
-% % \Expect_{q(\nu \vert \etathetaopt)}
-% % \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right]
-% %     \label{eq:expected_num_clusters_pred_thresh}
-% % \end{align}
-%
-% \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -382,18 +337,6 @@ computationally prohibitive.
   \bibliography{./references}
 }
 
-% \small{
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-% {\bf Acknowledgments}:
-% % %%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ryan Giordano's research was funded in full by the
-% Gordon and Betty Moore Foundation through Grant GBMF3834 and by the Alfred P. Sloan Foundation through Grant 2013-10-27 to the University of California, Berkeley. Runjing Liu's research was funded by the NSF graduate research fellowship. Tamara Broderick's research is supported by an NSF CAREER Award and an ARO YIP
-% Award. This research is supported in part by the DARPA program on
-% Lifelong Learning Machines.
-% }
-
 \end{minipage}
 \hfill \vrule \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -410,6 +353,27 @@ computationally prohibitive.
 %%%%%%%%%%%%%%%%%%
 \section*{Results}
 \vspace{-0.3in}
+
+\begin{minipage}[t]{0.49\textwidth}
+    %% iris figure
+    \subsection*{Fisher Iris Dataset}
+    \begin{figure}[!h]
+    \centering
+    \includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
+    \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
+    \setlength{\textfloatsep}{-10pt}
+    \end{figure}
+\end{minipage}
+%
+\begin{minipage}[t]{0.49\textwidth}
+    \subsection*{Mouse Genes}
+    \begin{figure}[!h]
+    \centering
+    \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
+    \caption{Mouse gene expression time series.}
+    \setlength{\textfloatsep}{-10pt}
+    \end{figure}
+\end{minipage}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We infer the number of distinct species in the iris
@@ -420,16 +384,7 @@ dataset \cite{iris_data_anderson}, and evaluate sensitivity to the Dirichlet pro
 We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$.
 
 \vspace{0.05in}
-% \begin{align*}
-% f^\alpha_\eta := \frac{\partial^2
-%   \QExpect
-%   \left[ \log p\left(\nu \vert \alpha \right) \right]}
-% { \partial \eta_\theta \partial \alpha^T }
-% \Big\rvert_{\eta_\theta = \etathetaopt, \alpha = \alpha_0},
-% \end{align*}
-
-% \vspace{-0.4in}
-
+%
 
 
 \begin{figure}
@@ -457,14 +412,7 @@ p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\
 \vspace{-0.3in}
 
 and evaluate sensitivity to $\delta$:
-% \vspace{-0.2in}
-% \begin{align}
-% \label{eq:expon_perturb}
-% 	p_c(\nu_k \vert \delta, \phi) :=
-%   \frac{p_{0}(\nu_k)\phi(\nu_k)^\delta}
-%        {\int_0^1 p_0(\nu_k')\phi(\nu')^\delta d\nu_k'}.
-% \end{align}
-% We evaluate the effect of $\delta$:
+%
 \vspace{0.1in}
 \begin{figure}
 \centering
@@ -472,44 +420,44 @@ and evaluate sensitivity to $\delta$:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{figure/functional_sens_plot_thresh0-1} 
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{figure/functional_sens_plot-1} 
 
 }
 
 
 
 \end{knitrout}
-\caption{The effect of prior perturbation on the expected number of clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_1$ in blue. Middle: linearly approximated vs.
-re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
+%\caption{}
 \end{figure}
 
-\begin{mdframed}[style=MyFrame]
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-\vspace{-0.6in}
-\section*{Conclusion}
-\vspace{-0.3in}
-%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{mdframed}[style=MyFrame]
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%
+% \vspace{-0.6in}
+% \section*{Conclusion}
+% \vspace{-0.3in}
+% %%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% \begin{itemize}
+%
+% \item {\bf Our linear approximation provides a fast alternative to re-evaluating the full model after changing the BNP prior. }
+%
+% \item We applied our approximation to both parametric and functional perturbations of the stick-breaking prior.
+%
+% \item We attempted to improve the linearity by approximating only the dependence of the optimal variational parameters on prior parameters.
+%
+% \end{itemize}
+% \end{mdframed}
+%
+% {\bf Our code: }\newline
+% Paragami: general library for sensitivity analysis in optimization problems\newline
+% {\color{blue} https://github.com/rgiordan/paragami}
+%
+% Code to evaluate BNP sensitivity as shown here: \newline
+% {\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
 
-\begin{itemize}
-
-\item {\bf Our linear approximation provides a fast alternative to re-evaluating the full model after changing the BNP prior. }
-
-\item We applied our approximation to both parametric and functional perturbations of the stick-breaking prior.
-
-\item We attempted to improve the linearity by approximating only the dependence of the optimal variational parameters on prior parameters.
-
-\end{itemize}
-\end{mdframed}
-
-{\bf Our code: }\newline
-Paragami: general library for sensitivity analysis in optimization problems\newline
-{\color{blue} https://github.com/rgiordan/paragami}
-
-Code to evaluate BNP sensitivity as shown here: \newline
-{\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
-
+\input{acknowledgements}
 
 \end{minipage}\\
 
