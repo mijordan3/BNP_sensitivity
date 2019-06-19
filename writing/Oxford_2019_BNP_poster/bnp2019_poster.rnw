@@ -308,7 +308,17 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 
 
 \begin{minipage}[t]{0.49\textwidth}
-\subsection*{Iris Data}
+%
+\subsection*{Iris data}
+For our first dataset, we discard species
+information and cluster the 150 four-dimensional observations of the Fisher iris
+dataset \citep{iris_data_anderson}.
+The loadings on the first two principle components is shown
+to the right.
+%
+\end{minipage}
+%
+\begin{minipage}[t]{0.49\textwidth}
 <<iris_pca_cap, cache=FALSE>>=
 SetImageSize(aspect_ratio=2.0 * base_aspect_ratio,
              image_width=0.5 * base_image_width)
@@ -320,31 +330,26 @@ ggplot(iris_data$iris_df) +
 @
 \end{minipage}
 %
+
+\vspace{1em}
+
 \begin{minipage}[t]{0.49\textwidth}
 %
-For our first dataset, we discard species
-information and cluster the 150 four-dimensional observations of the Fisher iris
-dataset \citep{iris_data_anderson}.
-
-A graph of the loadings on the first two principle components is shown
-to the left.
+\subsection*{Mouse data} For our second dataset, we use a publicly available
+dataset of gene expression in mice \citep{shoemaker:2015:ultrasensitive} . We
+smooth and center the gene expression time series and cluster the resulting
+patterns.  A typical smoothed time series with uncertainty is shown to the
+right.
 %
 \end{minipage}
-
-
+%
 \begin{minipage}[t]{0.49\textwidth}
-\subsection*{Mouse Data}
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
-%\caption{Mouse gene expression time series.}
-%\setlength{\textfloatsep}{-10pt}
 \end{figure}
 \end{minipage}
 %
-\begin{minipage}[t]{0.49\textwidth}
-For our second dataset, we cluster these mouse genes.
-\end{minipage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -352,21 +357,15 @@ For our second dataset, we cluster these mouse genes.
 \vspace{-0.3in}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-We infer the number of distinct species in the iris
-dataset \cite{iris_data_anderson}, and evaluate sensitivity to the Dirichlet process prior.
-\vspace{0.1in}
 
-{\bf \large Sensitivity to $\alpha$.}
-We evaluate the dependence of the expected number of clusters to the stick-breaking concentration parameter $\alpha$.
+\subsection*{Parametric sensitivity.}
+
+Vertical lines show the location of $\alpha_0$.  The approximation consistently
+\textbf{performs better when extraploating to fewer clusters}.
 
 \vspace{0.05in}
 %
 <<fig_cap1, cache=FALSE>>=
-# fig_cap1 <- paste(
-#     "Comparison of in-sample (top) and predictive (bottom) expected number ",
-#     "of clusters computed by re-optimization (green) versus linear ",
-#     "approximation (orange). Vertical line indicates the location of ",
-#     "$\\alpha_0$, the initial fit. ", sep="")
 fig_cap1 <- "Re-optimization vs approximation."
 SetImageSize(aspect_ratio=1.0 * base_aspect_ratio)
 @
@@ -376,7 +375,7 @@ results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
 results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
 grid.arrange(
     plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
-      ggtitle('Fisher iris data') +
+      ggtitle('Iris data') +
         theme(legend.position = 'none', legend.title=element_blank()),
     plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
       ggtitle(' ') + theme(legend.position="none"),
@@ -391,12 +390,12 @@ grid.arrange(
       genomics_data$processed_results %>%
         filter(!inflate, !alpha_increase, !functional),
       alpha_0=2.0) +
-      ggtitle("Mouse gene data"),
+      ggtitle("Mouse data")  + theme(legend.position="none"),
   plot_parametric_sensitivity(
     genomics_data$processed_results %>%
       filter(!inflate, alpha_increase, !functional),
     alpha_0=2.0) +
-    ggtitle(" "),
+    ggtitle(" ") + theme(legend.position=c(0.75, 0.65)),
     ncol=2
 )
 @
