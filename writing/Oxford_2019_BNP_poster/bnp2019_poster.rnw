@@ -134,9 +134,8 @@ Tamara Broderick\textsuperscript{2} \\
 library(tidyverse)
 source("./R_graphs/Initialize.R")
 
-data_path <- file.path("./R_graphs/iris/data/")
 source("./R_graphs/iris/LoadData.R")
-source("./R_graphs/iris/LoadNumbers.R")
+#source("./R_graphs/iris/LoadNumbers.R")
 
 # Turn off caching if you need to regenerate any of the R code.
 opts_chunk$set(cache=TRUE)
@@ -392,15 +391,30 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
 cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
-source("./Rscripts/initialize.R", echo=FALSE)
-source("./Rscripts/plot_sens_results.R")
+#source("./Rscripts/initialize.R", echo=FALSE)
+source("./R_graphs/plot_sens_results.R")
 @
 
 \begin{figure}
 \centering
 <<param_sens_plot_thresh_0, cache=cache_knitr, fig.show='hold'>>=
-source("./Rscripts/appendix_parametric_sens_results_thresh0.R",
-      echo=knitr_debug, print.eval=TRUE)
+# source("./Rscripts/appendix_parametric_sens_results_thresh0.R",
+#       echo=knitr_debug, print.eval=TRUE)
+
+results_df_1 <- filter(!pred, pert=="alpha3")
+results_df_2 <- filter(!pred, pert=="alpha8")
+results_df_3 <- filter(!pred, pert=="alpha13")
+grid.arrange(
+    plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
+      ggtitle('Predictive quantity') +
+        theme(legend.position = 'none', legend.title=element_blank()) +
+        set_font_sizes,
+    plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
+      ggtitle(' ') + theme(legend.position="none") + set_font_sizes,
+    plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
+      ggtitle(' ') + theme(legend.position="none") + set_font_sizes,
+    ncol  = 3)
+
 @
 \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange).
 Vertical line indicates the location of $\alpha_0$, the initial fit. }
@@ -430,15 +444,14 @@ and evaluate sensitivity to $\delta$:
 SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 @
 <<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold'>>=
+# TODO: move this over too
 source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
+
 @
 \caption{The effect of prior perturbation on the expected number of clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_1$ in blue. Middle: linearly approximated vs.
 re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
 \end{figure}
 
-% Because we have used a multiplicative perturbation, $f_\eta$
-% is linear in $\epsilon$. We might expect this to improve the fidelity of a
-% linear approximation.
 \begin{mdframed}[style=MyFrame]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
