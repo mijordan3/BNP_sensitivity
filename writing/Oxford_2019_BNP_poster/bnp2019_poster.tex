@@ -84,6 +84,9 @@
 \newcommand{\atzero}{\Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}}
 \newcommand{\etathetalin}{\eta_\theta^{LIN}}
 
+\newcommand{\targetexpectation}{\Expect_{q_{\eta^*}}
+\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right]}
+
 \usepackage[framemethod=TikZ, xcolor=RGB]{mdframed}
 
 \definecolor{mydarkblue}{rgb}{0,.06,.5}
@@ -181,23 +184,23 @@ Tamara Broderick\textsuperscript{2} \\
 %%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item Researchers often want to estimate the number of clusters present in a dataset.
+\item Researchers often want to estimate the number of distinct clusters
+that would be present in a new dataset.
 
-\item A Bayesian nonparametric (BNP) model makes inferring the number of clusters amenable to Bayesian inference.
+\item A Bayesian nonparametric (BNP) model makes inferring the number of
+clusters amenable to Bayesian inference.
+We approximate the exact posterior with variational Bayes.
 
-\item We approximate the exact posterior with variational Bayes.
-
-\item \textbf{Question}: how sensitive is the
+\item \textbf{Question}: How sensitive is the
 VB approximation, and the resulting inferences, to BNP model choices?
 
-\item \textbf{Problem}: re-running VB for multiple model choices is expensive.
+\item \textbf{Problem}: Re-running VB for multiple model choices is expensive.
 
-\item \textbf{We propose}: a linear approximation to efficiently
+\item \textbf{We propose}: A linear approximation to efficiently
 estimate BNP sensitivity from a single run of VB (to avoid
 expensive refitting).
 
 \item We evaluate sensitivity to parametric and functional perturbations.
-
 \end{itemize}
 \end{mdframed}
 \vspace{-0.7in}
@@ -210,21 +213,21 @@ expensive refitting).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The \textbf{Dirichlet process} is a popular Bayesian nonparametric
-(BNP) model used for clustering.
+(BNP) model used for clustering.  A stick-breaking representation uses
+a distribution on sticks $\nu_k$, to induce a prior on component
+probabilities, $\pi_k$.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
-\caption{The Dirichlet stick-breaking process. We start with a stick of
-length 1, and recursively break off proportions $\nu_1$, $\nu_2$, $\nu_3$, ...
-The weights on the components are the lengths broken off at each step.}
+\caption{The Dirichlet stick-breaking process with $\nu_k \sim Beta(1, \alpha)$.}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
 %
-We approximate the true posterior using \textbf{variational Bayes} (VB). Let $\eta^*$ denote the optimal variational parameters.
+We approximate the true posterior using \textbf{variational Bayes} (VB).
 %
 \begin{mdframed}[style=MyFrame]
-- How does varying the distribution $\nu_k \sim \text{Beta}(1, \alpha)$ affect $\eta^*$?
+- How does varying the distribution on $\nu_k$ affect $\eta^*$?
 
 - While VB is fast, refitting for multiple choices of the DP prior would be
 computationally prohibitive.
@@ -234,28 +237,30 @@ computationally prohibitive.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
-\vspace{-0.6in}
-\section*{Hyperparameter sensitivity}
-\vspace{-0.3in}
+% \vspace{-0.6in}
+% \section*{Hyperparameter sensitivity}
+% \vspace{-0.3in}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{itemize}
-
-\item Let $\epsilon$ be a real-valued hyperparameter for the stick-breaking distribution
-(e.g., this could be the $\alpha$ concentration parameter).
-
-\item The optimal VB parameters $\eta^*$ depend on $\epsilon$ through optimizing the KL objective.
-
-\item The expected number of clusters depend on $\eta^*$. Can use either an in-sample or a predictive quantity,
-\vspace{-0.1in}
-\begin{align}
-\Expect_{q_{\eta^*}} \left[ \#\{\text{distinct clusters}\} \right]
-\quad \text{ or } \quad
-\Expect_{q_{\eta^*}}
-\left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right].
-\end{align}
+\item Let $\etaopt$ denote the optimal variational parameters.
+\item Let $\epsilon$ be any real-valued hyperparameter for $p(\nu_k | \epsilon)$.
 \end{itemize}
+
+For example, we might take $\epsilon := \alpha$ and
+$p(\nu_k | \alpha) = \mathrm{Beta}(\nu_k | 1, \alpha)$.
+
+\begin{itemize}
+\item $\etaopt$ depends on $\epsilon$ through optimizing the KL objective.
+\item $\targetexpectation$ depends on $\etaopt$.
+\end{itemize}
+
+All together, we have a map
+%
+\begin{align*}
+\epsilon \mapsto \eta^{*} \mapsto \targetexpectation.
+\end{align*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,10 +277,11 @@ computationally prohibitive.
 \label{eq:linear_approx}
 \end{align}
 
-\item Evaluation of the derivative is done efficiently using formulas from \cite{giordano:2017:covariances} and auto-differentiation tools \cite{maclaurin:2015:autograd}.
-
-\item We only use a linear approximation for the dependence of $\eta^*$ on $\epsilon$. We retain the non-linearities in the map from $\eta^*$ to the expected number of clusters.
-
+\item Evaluation of the derivative can be done using formulas
+from \cite{giordano:2017:covariances} and automatic differentiation
+tools \cite{maclaurin:2015:autograd}.
+\item We only use a linear approximation for $\epsilon \mapsto \etaopt$.
+\item We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
