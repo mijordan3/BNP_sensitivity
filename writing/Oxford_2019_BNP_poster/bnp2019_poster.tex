@@ -1,4 +1,54 @@
-\documentclass[a0,plainsections,30pt]{sciposter}
+\documentclass[a0,plainsections,30pt]{sciposter}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 
 \usepackage{graphicx}
 % \usepackage{subcaption}
@@ -119,6 +169,7 @@ Tamara Broderick\textsuperscript{2} \\
 \addtolength{\topmargin}{-0.5in}
 % \addtolength{\topmargin}{-0.875in}
 \addtolength{\textheight}{1in}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 \conference{NIPS 2017}
 
@@ -130,17 +181,7 @@ Tamara Broderick\textsuperscript{2} \\
 \vspace{-1in}
 
 
-<<initialization, echo=FALSE, message=FALSE, results='asis'>>=
-library(tidyverse)
-knitr_debug <- FALSE
-source("./R_graphs/Initialize.R")
 
-iris_data <- LoadIntoEnvironment(
-    file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
-
-# Turn off caching if you need to regenerate any of the R code.
-opts_chunk$set(cache=FALSE)
-@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -389,33 +430,20 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 
 % \vspace{-0.4in}
 
-<<setup, include=FALSE, cache=FALSE>>=
-knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
-#source("./Rscripts/initialize.R", echo=FALSE)
-source("./R_graphs/plot_sens_results.R")
-@
+
 
 \begin{figure}
 \centering
-<<param_sens_plot_thresh_0, cache=cache_knitr, fig.show='hold'>>=
-# source("./Rscripts/appendix_parametric_sens_results_thresh0.R",
-#       echo=knitr_debug, print.eval=TRUE)
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-results_df_1 <- filter(iris_data$results_df, !pred, pert=="alpha3")
-results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
-results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
-grid.arrange(
-    plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
-      ggtitle('Predictive quantity') +
-        theme(legend.position = 'none', legend.title=element_blank()),
-    plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
-      ggtitle(' ') + theme(legend.position="none"),
-    plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
-      ggtitle(' ') + theme(legend.position="none"),
-    ncol  = 3)
+{\centering \includegraphics[width=0.98\linewidth,height=0.294\linewidth]{figure/param_sens_plot_thresh_0-1} 
 
-@
+}
+
+
+
+\end{knitrout}
 \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange).
 Vertical line indicates the location of $\alpha_0$, the initial fit. }
 \end{figure}
@@ -440,48 +468,17 @@ and evaluate sensitivity to $\delta$:
 \vspace{0.1in}
 \begin{figure}
 \centering
-<<fig_cap2, cache=cache_knitr>>=
-SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
-@
-<<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold'>>=
-# TODO: move this over too
-#source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
-results_pert1 <- filter(iris_data$results_df, !pred, pert=="1")
-results_pert2 <- filter(iris_data$results_df, !pred, pert=="2")
-results_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
-results_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
 
-grid.arrange(
-    # First row --- include titles.
-    plot_prior_perturbation(
-            filter(iris_data$prior_pert_df,
-                   filename == "prior_pert1.csv")) +
-        theme(legend.position = c(0.85, 0.80)) +
-        ggtitle("Priors"),
-    plot_parametric_sensitivity(
-            results_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position = c(0.65, 0.81)) +
-        ggtitle("In-sample quantity"),
-    plot_parametric_sensitivity(
-            results_pred_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  "None") +
-        ggtitle("Predictive quantity"),
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
-    # Second row --- no titles.
-    plot_prior_perturbation(
-            filter(iris_data$prior_pert_df,
-                   filename == "prior_pert2.csv")) +
-        theme(legend.position = "None"),
-    plot_parametric_sensitivity(
-            results_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position = c(0.65, 0.81)),
-    plot_parametric_sensitivity(
-            results_pred_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  "None"),
+{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{figure/functional_sens_plot_thresh0-1} 
 
-    ncol=3
-)
-@
+}
+
+
+
+\end{knitrout}
 \caption{The effect of prior perturbation on the expected number of clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_1$ in blue. Middle: linearly approximated vs.
 re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
 \end{figure}

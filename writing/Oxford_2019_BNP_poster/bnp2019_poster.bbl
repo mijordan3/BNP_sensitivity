@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+
+\bibitem{iris_data_anderson}
+E.~Anderson.
+\newblock The species problem in iris.
+\newblock {\em Annals of the Missouri Botanical Garden}, 23(3):457--509, 1936.
+
+\bibitem{giordano:2017:covariances}
+R.~Giordano, T.~Broderick, and M.~I. Jordan.
+\newblock Covariances, robustness, and variational {B}ayes.
+\newblock {\em Journal of Machine Learning Research}, 19(51):1--49, 2018.
+
+\bibitem{maclaurin:2015:autograd}
+D.~Maclaurin, D.~Duvenaud, and R.~P. Adams.
+\newblock Autograd: Effortless gradients in numpy.
+\newblock In {\em International Conference on Machine Learning 2015 AutoML
+  Workshop}, 2015.
+
+\end{thebibliography}
