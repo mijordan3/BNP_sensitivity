@@ -407,12 +407,11 @@ results_df_3 <- filter(!pred, pert=="alpha13")
 grid.arrange(
     plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
       ggtitle('Predictive quantity') +
-        theme(legend.position = 'none', legend.title=element_blank()) +
-        set_font_sizes,
+        theme(legend.position = 'none', legend.title=element_blank()),
     plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
-      ggtitle(' ') + theme(legend.position="none") + set_font_sizes,
+      ggtitle(' ') + theme(legend.position="none"),
     plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
-      ggtitle(' ') + theme(legend.position="none") + set_font_sizes,
+      ggtitle(' ') + theme(legend.position="none"),
     ncol  = 3)
 
 @
@@ -445,8 +444,49 @@ SetImageSize(aspect_ratio= 2.0 * base_aspect_ratio)
 @
 <<functional_sens_plot_thresh0, cache=cache_knitr, fig.show='hold'>>=
 # TODO: move this over too
-source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
+#source("Rscripts/appendix_functional_sens_results_thresh0.R", echo=knitr_debug, print.eval=TRUE)
+results_pert1 <- filter(results_df, !pred, pert=="1")
+results_pert2 <- filter(results_df, !pred, pert=="2")
+results_pred_pert1 <- filter(results_df, pred, pert=="1")
+results_pred_pert2 <- filter(results_df, pred, pert=="2")
 
+grid.arrange(
+    # First row --- include titles.
+    plot_prior_perturbation(
+            filter(prior_pert_df, filename == "prior_pert1.csv")) +
+        theme(legend.position = c(0.85, 0.80)) +
+        ggtitle("Priors"),
+    plot_parametric_sensitivity(
+            results_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+        theme(legend.position = c(0.65, 0.81)) +
+        ggtitle("In-sample quantity"),
+    plot_parametric_sensitivity(
+            results_pred_pert1, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+        theme(legend.position =  "None") +
+        ggtitle("Predictive quantity"),
+
+    # Second row --- no titles.
+    plot_prior_perturbation(
+            filter(prior_pert_df, filename == "prior_pert2.csv")) +
+        theme(legend.position = "None"),
+    plot_parametric_sensitivity(
+            results_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+        theme(legend.position = c(0.65, 0.81)),
+    plot_parametric_sensitivity(
+            results_pred_pert2, alpha_0 = -1, xlabel=TeX("$\\delta$")) +
+        theme(legend.position =  "None"),
+
+    ncol=3
+)
+
+# grid.arrange(
+#   prior_pert1_plot + ggtitle('Priors') + set_font_sizes,
+#   prior_pert1_results_plot + ggtitle('In-sample quantity') + set_font_sizes,
+#   prior_pert1_pred_results_plot + ggtitle('Predictive quantity') + set_font_sizes,
+#   prior_pert2_plot + set_font_sizes,
+#   prior_pert2_results_plot + set_font_sizes,
+#   prior_pert2_pred_results_plot + set_font_sizes,
+  # ncol  = 3)
 @
 \caption{The effect of prior perturbation on the expected number of clusters. Left column: the original prior $p_0$ in red, the perturbed prior $p_1$ in blue. Middle: linearly approximated vs.
 re-fitted in-sample expected number of clusters. Right: linearly approximated vs. re-fitted predictive expected number of clusters.}
