@@ -116,15 +116,14 @@ knitr_debug <- FALSE
 source("./R_graphs/Initialize.R")
 
 # Common graphs library
-source("./R_graphs/plot_sens_results.R")
+source("./R_graphs/CommonGraphs.R")
 
 # This file is produced by R_graphs/data/iris_data/make_knitr_dataset.R.
 iris_data <- LoadIntoEnvironment(
     file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
 
-# This file is produced by RegressionClustering/scripts/combine_analyses.R.
-genomics_data <- LoadIntoEnvironment(
-    file.path(data_path, "genomics_data/combined_results_genes7000.Rdata"))
+# Puts genomics_data in the environment.
+source("./R_graphs/ProcessGenomicsData.R")
 
 # Turn off caching if you need to regenerate any of the R code.
 knitr_debug <- FALSE # Set to true to see error output
@@ -317,8 +316,6 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 fig_cap1 <- "Re-optimization vs approximation."
 SetImageSize(aspect_ratio= 1.0 * base_aspect_ratio)
 @
-% \begin{figure}
-% \centering
 <<param_sens_plot, cache=cache_knitr, fig.show='hold'>>=
 results_df_1 <- filter(iris_data$results_df, !pred, pert=="alpha3")
 results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
@@ -333,9 +330,20 @@ grid.arrange(
       ggtitle(' ') + theme(legend.position="none"),
     ncol  = 3)
 @
-% \caption{Comparison of in-sample (top) and predictive (bottom) expected number of clusters computed by re-optimization (green) versus linear approximation (orange).
-% Vertical line indicates the location of $\alpha_0$, the initial fit. }
-% \end{figure}
+
+<<gene_param_sens_plot, cache=cache_knitr, fig.show='hold'>>=
+grid.arrange(
+    plot_parametric_sensitivity(
+      genomics_data$processed_results %>%
+        filter(!inflate, !alpha_increase, !functional),
+      alpha_0=2.0),
+  plot_parametric_sensitivity(
+    genomics_data$processed_results %>%
+      filter(!inflate, alpha_increase, !functional),
+    alpha_0=2.0),
+    ncol=2
+)
+@
 
 {\bf \large Sensitivity to functional perturbations. }
 Suppose we replace the original beta prior $p_0$ with another distribution $p_1$. Then we set our perturbation to be
