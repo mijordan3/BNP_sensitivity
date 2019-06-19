@@ -107,15 +107,18 @@
     backgroundcolor=blue!10}
 
 
-\title{\textcolor{mydarkblue}{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics
+\title{\textcolor{mydarkblue}{
+Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics
 }}
 
-\author{Ryan Giordano\textsuperscript{1*} \quad
+\author{Ryan Giordano\textsuperscript{2*} \quad
 Runjing Liu\textsuperscript{1*} \quad
 Michael I. Jordan\textsuperscript{1} \quad
 Tamara Broderick\textsuperscript{2} \\
-{\large\normalfont\textsuperscript{*} These authors contributed equally}\\
- {\large\normalfont\textsuperscript{1} Department of Statistics, UC Berkeley \quad \textsuperscript{2} Department of EECS, MIT}
+{\large\normalfont\textsuperscript{*}
+These authors contributed equally}\quad
+ {\large\normalfont\textsuperscript{1}
+ Department of Statistics, UC Berkeley \quad \textsuperscript{2} CSAIL, MIT}
  }
 
 \leftlogo[1]{static_images/logo_left.png}
@@ -189,78 +192,89 @@ that would be present in a new dataset.
 
 \item A Bayesian nonparametric (BNP) model makes inferring the number of
 clusters amenable to Bayesian inference.
-We approximate the exact posterior with variational Bayes.
+We approximate the exact posterior with variational Bayes (VB).
 
-\item \textbf{Question}: How sensitive is the
-VB approximation, and the resulting inferences, to BNP model choices?
+\item \textbf{Question}: How sensitive are the
+VB approximation and the resulting inferences to BNP model choices?
 
 \item \textbf{Problem}: Re-running VB for multiple model choices is expensive.
 
-\item \textbf{We propose}: A linear approximation to efficiently
-estimate BNP sensitivity from a single run of VB (to avoid
-expensive refitting).
+\item \textbf{We propose}: A local approximation to efficiently
+estimate BNP sensitivity from a single run of VB, avoiding
+expensive refitting.
 
-\item We evaluate sensitivity to parametric and functional perturbations.
+%\item We evaluate sensitivity to parametric and functional perturbations.
 \end{itemize}
 \end{mdframed}
 \vspace{-0.7in}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Model and inference }
 \vspace{-0.3in}
-%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% In the setting of \textbf{unsupervised clustering}, suppose we wish to know how
+% many distinct clusters we'd find in a new dataset with the same distribution as
+% observed data.  We will answer with BNP.
 
 The \textbf{Dirichlet process} is a popular Bayesian nonparametric
 (BNP) model used for clustering.  A stick-breaking representation uses
-a distribution on sticks $\nu_k$, to induce a prior on component
-probabilities, $\pi_k$.
+a distribution on sticks $\{\nu_k\}$ to induce a prior on component
+probabilities $\{\pi_k\}$.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
-\caption{The Dirichlet stick-breaking process with $\nu_k \sim Beta(1, \alpha)$.}
+\caption{The Dirichlet stick-breaking process with
+$\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
 \setlength{\textfloatsep}{-10pt}
 \end{figure}
 %
 We approximate the true posterior using \textbf{variational Bayes} (VB).
+
+\begin{itemize}
+\item $\epsilon :=$ Any real-valued hyperparameter for the stick-breaking prior
+    $p(\nu_k | \epsilon)$.
+\item $\etaopt :=$ The optimal variational parameters.
+\item $\targetexpectation :=$ The quantity we want to infer.
+\end{itemize}
+
+\textbf{Parametric perturbation.} To stay within the class of Dirichlet
+processes, we might take $\epsilon := \alpha$ and $p(\nu_k | \alpha) :=
+\mathrm{Beta}(\nu_k | 1, \alpha)$.
+
+\textbf{Functional perturbation.} Suppose we are interested in the effect of
+replacing the original beta prior $p_0(\nu_k) := \mathrm{Beta}(\nu_k | 1,
+\alpha)$ with another distribution $p_1(\nu_k)$. Then we take $\epsilon :=
+\delta$ in
 %
+\vspace{-0.3in}
+\begin{align*}
+p(\nu_k \vert \delta) \propto
+    p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\right)^\delta.
+\end{align*}
+\vspace{-0.3in}
+
+By using a multiplicative perturbation, the map $p_1 \mapsto \etaopt$ is
+Fr\'{e}chet differentiable in the norm $\left\Vert p_1 / p_0
+\right\Vert_\infty$.
+
 \begin{mdframed}[style=MyFrame]
-- How does varying the distribution on $\nu_k$ affect $\eta^*$?
-
-- While VB is fast, refitting for multiple choices of the DP prior would be
-computationally prohibitive.
-
-- {\bf Hence, we propose a linear approximation, derived from local sensitivity measures. }
+VB inference defines a map:
+%
+\begin{gather*}
+\textrm{Stick-breaking prior}
+    \mapsto \textrm{VB approximation}
+    \mapsto \textrm{Posterior expected \# clusters},\\
+\textrm{i.e.,}\\
+\epsilon
+    \mapsto \etaopt
+    \mapsto \targetexpectation.
+\end{gather*}
 \end{mdframed}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-% \vspace{-0.6in}
-% \section*{Hyperparameter sensitivity}
-% \vspace{-0.3in}
-%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{itemize}
-\item Let $\etaopt$ denote the optimal variational parameters.
-\item Let $\epsilon$ be any real-valued hyperparameter for $p(\nu_k | \epsilon)$.
-\end{itemize}
-
-For example, we might take $\epsilon := \alpha$ and
-$p(\nu_k | \alpha) = \mathrm{Beta}(\nu_k | 1, \alpha)$.
-
-\begin{itemize}
-\item $\etaopt$ depends on $\epsilon$ through optimizing the KL objective.
-\item $\targetexpectation$ depends on $\etaopt$.
-\end{itemize}
-
-All together, we have a map
-%
-\begin{align*}
-\epsilon \mapsto \eta^{*} \mapsto \targetexpectation.
-\end{align*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -269,19 +283,28 @@ All together, we have a map
 \vspace{-0.2in}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{itemize}
-\item WOLOG, let $\epsilon=0$ represent the original prior at which we fit a VB approximation. Then for any other $\epsilon$ we approximate
-\begin{align}
-\eta^*(\epsilon)  &\approx  \eta^*(0) +
-\frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon
-\label{eq:linear_approx}
-\end{align}
+Let $\epsilon=0$ represent the original prior at which we fit a VB
+approximation.
 
-\item Evaluation of the derivative can be done using formulas
-from \cite{giordano:2017:covariances} and automatic differentiation
-tools \cite{maclaurin:2015:autograd}.
-\item We only use a linear approximation for $\epsilon \mapsto \etaopt$.
-\item We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
+\begin{mdframed}[style=MyFrame]
+For any other $\epsilon \ne 0$ we approximate $\epsilon \mapsto \etaopt$ with
+\begin{align*}
+\eta^*(\epsilon)  &\approx  \eta^*(0) +
+\frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon.
+\label{eq:linear_approx}
+\end{align*}
+We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
+\end{mdframed}
+
+\begin{itemize}
+\item We can \textbf{automatically calculate}
+    $\frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0}$
+    with sensitivity analysis and automatic differentiation
+    \cite{giordano:2017:covariances, maclaurin:2015:autograd}.
+\item Sensitivity analysis requires the
+    \textbf{inverse Hessian of the variational objective}.
+% \item We only use a linear approximation for $\epsilon \mapsto \etaopt$.
+% \item We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,29 +335,50 @@ tools \cite{maclaurin:2015:autograd}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
+\section*{Data}
+
+\subsection*{Fisher Iris Dataset}
+\begin{figure}[!h]
+\centering
+\includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
+\caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
+\setlength{\textfloatsep}{-10pt}
+\end{figure}
+
+\subsection*{Mouse Genes}
+\begin{figure}[!h]
+\centering
+\includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
+\caption{Mouse gene expression time series.}
+\setlength{\textfloatsep}{-10pt}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
 \section*{Results}
 \vspace{-0.3in}
 
-\begin{minipage}[t]{0.49\textwidth}
-    %% iris figure
-    \subsection*{Fisher Iris Dataset}
-    \begin{figure}[!h]
-    \centering
-    \includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
-    \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
-    \setlength{\textfloatsep}{-10pt}
-    \end{figure}
-\end{minipage}
-%
-\begin{minipage}[t]{0.49\textwidth}
-    \subsection*{Mouse Genes}
-    \begin{figure}[!h]
-    \centering
-    \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
-    \caption{Mouse gene expression time series.}
-    \setlength{\textfloatsep}{-10pt}
-    \end{figure}
-\end{minipage}
+
+% \begin{minipage}[t]{0.49\textwidth}
+%     %% iris figure
+%     \subsection*{Fisher Iris Dataset}
+%     \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width = 0.95\textwidth]{./static_images/iris_data.png}
+%     \caption{The iris data projected onto the first two principal components. Color corresponds to the true iris species.}
+%     \setlength{\textfloatsep}{-10pt}
+%     \end{figure}
+% \end{minipage}
+% %
+% \begin{minipage}[t]{0.49\textwidth}
+%     \subsection*{Mouse Genes}
+%     \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width = 0.95\textwidth]{./static_images/mouse_genes.png}
+%     \caption{Mouse gene expression time series.}
+%     \setlength{\textfloatsep}{-10pt}
+%     \end{figure}
+% \end{minipage}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We infer the number of distinct species in the iris
@@ -369,16 +413,6 @@ We evaluate the dependence of the expected number of clusters to the stick-break
 
 \end{knitrout}
 
-{\bf \large Sensitivity to functional perturbations. }
-Suppose we replace the original beta prior $p_0$ with another distribution $p_1$. Then we set our perturbation to be
-\vspace{-0.3in}
-\begin{align*}
-p_c(\nu_k \vert \delta) \propto p_{0}(\nu_k)\left(\frac{p_1(\nu_k)}{p_0(\nu_k)}\right)^\delta
-\end{align*}
-\vspace{-0.3in}
-
-and evaluate sensitivity to $\delta$:
-%
 \vspace{0.1in}
 % \begin{figure}
 % \centering

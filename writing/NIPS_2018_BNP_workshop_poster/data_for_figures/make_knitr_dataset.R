@@ -82,4 +82,16 @@ if (FALSE) {
 }
 
 
-save(prior_pert_df, results_df, file="iris_data_for_knitr.Rdata")
+# Load the raw iris data for PC plots
+
+library(datasets)
+data(iris)
+data_names <- names(iris)[1:4]
+iris_pca <- prcomp(iris[, data_names])
+iris_df <- bind_cols(iris, data.frame(iris_pca$x))
+if (FALSE) {
+  ggplot(iris_df) +
+    geom_point(aes(x=PC1, y=PC2, color=Species))
+}
+
+save(iris_df, prior_pert_df, results_df, file="iris_data_for_knitr.Rdata")
