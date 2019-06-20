@@ -429,11 +429,11 @@ grid.arrange(
     # First row --- include titles.
     plot_prior_perturbation(iris_pert1) +
         theme(legend.position = "None") +
-        ggtitle("Iris data (a)"),
+        ggtitle(TeX("\\textbf{Iris data, first $p_1$}")),
 
     plot_prior_perturbation(iris_pert2) +
         theme(legend.position = "None") +
-        ggtitle("Iris data (b)"),
+        ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
 
     plot_prior_perturbation(genomics_data$processed_pert_df) +
         theme(legend.position = c(0.45, 0.80)) +
@@ -454,7 +454,7 @@ grid.arrange(
 
 \noindent\rule{0.95\textwidth}{1pt}
 
-{\bf Contact and code: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
+{\bf Contact and code: } rgiordan@mit.edu, runjing\_liu@berkeley.edu
 %{\bf Code: } \newline
 % \url{https://github.com/Runjing-Liu120/sensitivity_to_stick_breaking_in_BNP}{a}
 % \url{https://github.com/rgiordan/vittles}{b}
