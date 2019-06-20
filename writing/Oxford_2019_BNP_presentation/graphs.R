@@ -93,19 +93,18 @@ iris_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
 gene_pred_pert <- filter(genomics_data$processed_results,
                          functional, !inflate)
 
-grid.arrange(
-  # First row --- include titles.
+g <- grid.arrange(
   plot_prior_perturbation(iris_pert1) +
     theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, first $p_1$}")),
   plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) + ggtitle(' '), 
   
-  # Second row 
   plot_prior_perturbation(iris_pert2) +
     theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
   plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) + ggtitle(' '),
   ncol=2)
+SavePlot(g, "iris_functional.png")
 
 
 grid.arrange(
