@@ -51,41 +51,16 @@
 \usepackage{alltt}
 
 \usepackage{graphicx}
-%\usepackage{subfig}
-%\usepackage{subfigure}
-%\usepackage{caption}
-
-%\usepackage{epstopdf, graphicx}
-%\usepackage{booktabs,dcolumn}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{bbm}
-%\usepackage{hhline}
-%\usepackage{multicol}
-\usepackage[authoryear]{natbib}
-%\usepackage{hyperref} % WTF, this causes a "caption outside of float" error
+\usepackage{natbib}
 
 \setlength{\columnseprule}{0pt}
-%\usepackage{boxedminipage}
 
-\newcommand{\widgraph}[2]{\includegraphics[keepaspectratio,width=#1]{#2}}
-
-\newcommand{\Rbb}{\mathbb{R}}
 \newcommand{\Expect}{\mathbb{E}}
-\newcommand{\Expecthat}{\hat{\mathbb{E}}}
-\newcommand{\Var}{\text{Var}}
-\newcommand{\Cov}{\text{Cov}}
-\newcommand{\vbfamily}{\mathcal{Q}}
 \newcommand{\etaopt}{\eta^{*}}
-\newcommand{\etazopt}{\eta_z^{*}}
-\newcommand{\etathetaopt}{\eta_\theta^{*}}
-%\newcommand{\qopt}{q^{*}}
-\newcommand{\targethat}{\hat{g}}
-\newcommand{\QExpect}
-{\Expect_{q\left(\theta, z \vert \eta_\theta, \etazopt(\eta_\theta)\right)}}
-\newcommand{\atzero}{\Big\rvert_{\eta_\theta = \etathetaopt, \epsilon = 0}}
-\newcommand{\etathetalin}{\eta_\theta^{LIN}}
 
 \newcommand{\targetexpectation}{\Expect_{q_{\eta^*}}
 \left[\#\{\substack{\text{distinct clusters}\\\text{in new dataset}}\} \right]}
@@ -128,37 +103,8 @@ Tamara Broderick\textsuperscript{2} \\
 \leftlogo[1]{static_images/logo_left.png}
 \rightlogo[1]{static_images/faces.jpg}
 
-% Set the color used for the section headings here
-\definecolor{SectionCol}{rgb}{0,.06,.5}
-\definecolor{lightblue}{rgb}{0.8,0.8,1}
-
-% Set some fbox commands line width and the color we use in the f boxes
-\setlength{\fboxrule}{.09cm}
-\definecolor{boxcolor}{rgb}{1,1,1}
-\definecolor{innerboxcolor}{rgb}{.9,.94,.98}
-
-% Math macros
-\newcommand{\eq}[1]{Eq.~(\ref{eq:#1})}
-
-\newcommand{\kl}{\textrm{KL}}
-\newcommand{\mbe}{\mathbb{E}}
-\newcommand{\mbeq}{\mathbb{E}_{q}}
-\newcommand{\var}{\textrm{Var}}
-\newcommand{\cov}{\textrm{Cov}}
-\newcommand{\iid}{\stackrel{iid}{\sim}}
-\newcommand{\indep}{\stackrel{indep}{\sim}}
-\newcommand{\gauss}{\mathcal{N}} % Gaussian distribution
-
-\DeclareMathOperator*{\argmin}{arg\,min}
-
-% my added commands
-\usepackage{etoolbox}
-% \BeforeBeginEnvironment{figure}{\vskip-2ex}
-% \AfterEndEnvironment{figure}{\vskip-1ex}
-
 % Fiddle with the margin
 \addtolength{\topmargin}{-0.5in}
-% \addtolength{\topmargin}{-0.875in}
 \addtolength{\textheight}{1in}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
@@ -173,13 +119,11 @@ Tamara Broderick\textsuperscript{2} \\
 
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIRST COLUMN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\columnbreak
 
 \begin{minipage}[t]{0.45\textwidth}
 
@@ -219,10 +163,6 @@ expensive refitting.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% In the setting of \textbf{unsupervised clustering}, suppose we wish to know how
-% many distinct clusters we'd find in a new dataset with the same distribution as
-% observed data.  We will answer with BNP.
-
 The \textbf{Dirichlet process} is a popular Bayesian nonparametric
 (BNP) model used for clustering.  A stick-breaking representation uses
 a distribution on sticks $\{\nu_k\}$ to induce a prior on component
@@ -233,8 +173,6 @@ probabilities $\{\pi_k\}$.
 \includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
 \caption{The Dirichlet stick-breaking process with $\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
 \end{figure}
-%
-%We approximate the true posterior using \textbf{variational Bayes} (VB).
 %
 \vspace{-0.3in}
 Define:
@@ -312,20 +250,6 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \citep{gustafson:1996:localposterior}.
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%
-% \begin{center}
-% \noindent\rule{0.95\textwidth}{1pt}
-% \end{center}
-% {\bf References}
-%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \renewcommand{\section}[2]{}%
-% \footnotesize{
-%   \bibliographystyle{abbrv}
-%   \bibliography{./references}
-% }
-
 \end{minipage}
 \hfill \vrule \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -340,7 +264,6 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
-%\vspace{-0.3in}
 \section*{Data}
 \vspace{-0.3in}
 %
@@ -452,17 +375,9 @@ extrapolates best from more to fewer clusters.
 \noindent\rule{0.95\textwidth}{1pt}
 
 \textbf{Contact and code:} rgiordan@mit.edu, runjing\_liu@berkeley.edu
-%{\bf Code: } \newline
-% \url{https://github.com/Runjing-Liu120/sensitivity_to_stick_breaking_in_BNP}{a}
-% \url{https://github.com/rgiordan/vittles}{b}
 {\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
 {\color{blue} https://github.com/rgiordan/vittles}
 (sensitivity analysis)
-
-% \begin{center}
-% \noindent\rule{0.95\textwidth}{1pt}
-% \end{center}
-% \input{acknowledgements}
 
 \end{minipage}\\
 
