@@ -5,6 +5,10 @@ source("R_graphs/CommonGraphs.R")
 
 source("R_graphs/ProcessGenomicsData.R")
 
+iris_data <- LoadIntoEnvironment(
+  file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
+
+
 # Parametric graph
 plot_parametric_sensitivity(
   genomics_data$results %>%

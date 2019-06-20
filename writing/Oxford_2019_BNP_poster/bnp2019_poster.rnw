@@ -76,6 +76,9 @@ source("./R_graphs/CommonGraphs.R")
 # This file is produced by R_graphs/data/iris_data/make_knitr_dataset.R.
 iris_data <- LoadIntoEnvironment(
     file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
+# For consistency with the mouse dataset:
+iris_data$results_df$method <-
+    sub("linear approx", "approx", iris_data$results_df$method)
 
 # Puts genomics_data in the environment.
 source("./R_graphs/ProcessGenomicsData.R")
@@ -240,7 +243,7 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 For our first dataset, we discard species
 information and cluster the 150 four-dimensional observations of the Fisher iris
 dataset \citep{iris_data_anderson}.
-The loadings on the first two principle components are shown
+The loadings on the first two principal components are shown
 to the right.
 %
 \end{minipage}
@@ -305,12 +308,11 @@ results_df_2 <- filter(iris_data$results_df, !pred, pert=="alpha8")
 results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
 grid.arrange(
     plot_parametric_sensitivity(results_df_1, alpha_0 = 3.0) +
-      ggtitle('Iris data') +
-        theme(legend.position = 'none', legend.title=element_blank()),
+      ggtitle('Iris data') + theme(legend.position="none"),
     plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
       ggtitle(' ') + theme(legend.position="none"),
     plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
-      ggtitle(' ') + theme(legend.position="none"),
+      ggtitle(' ') + theme(legend.position=c(0.27, 0.77)),
     ncol  = 3)
 @
 
