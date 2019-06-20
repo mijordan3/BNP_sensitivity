@@ -14,8 +14,8 @@ genomics_data$processed_results <-
          threshold==use_threshold,
          taylor_order==use_taylor_order) %>%
   mutate(alpha=case_when(!is.na(epsilon) ~ epsilon, TRUE ~ alpha1),
-         linear_approx=e_num_pred, refitted=e_num1) %>%
-  select(alpha, functional, alpha_increase, inflate, linear_approx, refitted) %>%
+         approx=e_num_pred, refitted=e_num1) %>%
+  select(alpha, functional, alpha_increase, inflate, approx, refitted) %>%
   gather(key="method", value="e_num_clusters",
          -alpha, -functional, -alpha_increase, -inflate)
 

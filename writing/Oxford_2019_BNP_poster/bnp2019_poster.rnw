@@ -136,7 +136,7 @@ source("./R_graphs/ProcessGenomicsData.R")
 
 # Turn off caching if you need to regenerate any of the R code.
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 @
 
 
@@ -339,7 +339,7 @@ ggplot(iris_data$iris_df) +
 %
 \subsection*{Mouse data} For our second dataset, we use a publicly available
 dataset of gene expression in mice \citep{shoemaker:2015:ultrasensitive} . We
-smooth and center the gene expression time series and cluster the resulting
+smooth and center the 7000 gene expression time series and cluster the resulting
 patterns.  A typical smoothed time series with uncertainty is shown to the
 right.
 %
@@ -431,13 +431,13 @@ grid.arrange(
 
     # Second row --- results
     plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  "None"),
+        theme(legend.position = "None"),
 
     plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) +
         theme(legend.position =  "None"),
 
     plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  "None"),
+        theme(legend.position =  c(0.7, 0.8)),
     ncol=3
 )
 @
