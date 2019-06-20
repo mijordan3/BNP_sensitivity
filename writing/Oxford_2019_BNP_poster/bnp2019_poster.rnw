@@ -64,15 +64,16 @@
 Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics
 }}
 
-\author{Ryan Giordano\textsuperscript{2*} \quad
+\author{%
 Runjing Liu\textsuperscript{1*} \quad
+Ryan Giordano\textsuperscript{2*} \quad
 Michael I. Jordan\textsuperscript{1} \quad
 Tamara Broderick\textsuperscript{2} \\
-{\large\normalfont\textsuperscript{*}
-These authors contributed equally}\quad
- {\large\normalfont\textsuperscript{1}
- Department of Statistics, UC Berkeley \quad \textsuperscript{2} CSAIL, MIT}
- }
+{\large\normalfont
+ \textsuperscript{1}Department of Statistics, UC Berkeley\quad
+ \textsuperscript{2}CSAIL, MIT\quad
+ \textsuperscript{*}Equal contribution authors}
+}
 
 \leftlogo[1]{static_images/logo_left.png}
 \rightlogo[1]{static_images/logo_right2.png}
@@ -136,7 +137,7 @@ source("./R_graphs/ProcessGenomicsData.R")
 
 # Turn off caching if you need to regenerate any of the R code.
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
+cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
 @
 
 
@@ -165,7 +166,7 @@ model makes inferring the number of clusters amenable to Bayesian inference.
 %We approximate the exact posterior with variational Bayes (VB).
 
 \item \textbf{Question}: How sensitive are the
-VB approximation and the resulting inferences to BNP model choices?
+VB approximation and the resulting inference to BNP model choices?
 
 \item \textbf{Problem}: Re-running VB for multiple model choices is expensive.
 
@@ -195,13 +196,15 @@ a distribution on sticks $\{\nu_k\}$ to induce a prior on component
 probabilities $\{\pi_k\}$.
 
 \begin{figure}
-\caption{The Dirichlet stick-breaking process with $\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
+\caption{The Dirichlet stick-breaking process with $\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
 \end{figure}
 %
 %We approximate the true posterior using \textbf{variational Bayes} (VB).
 %
+\vspace{-0.3in}
+Define:
 \begin{itemize}
 \item $\epsilon :=$ Any real-valued hyperparameter for the stick-breaking prior
     $p(\nu_k | \epsilon)$.
@@ -249,7 +252,7 @@ Fr\'{e}chet differentiable in the norm $\left\Vert p_1 / p_0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{-0.3in}
-\subsection*{Linear approximation}
+\subsection*{Local approximation to dependence on the prior}
 \vspace{-0.2in}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -261,14 +264,13 @@ For any other $\epsilon \ne 0$ we approximate $\epsilon \mapsto \etaopt$ with
 \begin{align*}
 \eta^*(\epsilon)  &\approx  \eta^*(0) +
 \frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0} \epsilon.
-\label{eq:linear_approx}
 \end{align*}
 We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \end{mdframed}
 
 \begin{itemize}
 \item We can \textbf{automatically compute}
-    the approximation
+    the local approximation
     using automatic differentiation \cite{giordano:2017:covariances}.
     %\cite{giordano:2017:covariances, maclaurin:2015:autograd}.
 \item The approximation requires the
@@ -338,8 +340,8 @@ ggplot(iris_data$iris_df) +
 \begin{minipage}[t]{0.49\textwidth}
 %
 \subsection*{Mouse data} For our second dataset, we use a publicly available
-dataset of gene expression in mice \citep{shoemaker:2015:ultrasensitive} . We
-smooth and center the 7000 gene expression time series and cluster the resulting
+dataset of gene expression in mice \citep{shoemaker:2015:ultrasensitive}. We
+smooth and center 7000 gene expression time series and cluster the resulting
 patterns.  A typical smoothed time series with uncertainty is shown to the
 right.
 %
@@ -453,6 +455,7 @@ fewer clusters}.
 % \url{https://github.com/rgiordan/vittles}{b}
 {\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
 {\color{blue} https://github.com/rgiordan/vittles}
+(sensitivity analysis)
 
 % \begin{center}
 % \noindent\rule{0.95\textwidth}{1pt}
