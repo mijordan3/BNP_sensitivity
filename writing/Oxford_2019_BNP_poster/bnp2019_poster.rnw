@@ -73,12 +73,8 @@ source("./R_graphs/Initialize.R")
 # Common graphs library
 source("./R_graphs/CommonGraphs.R")
 
-# This file is produced by R_graphs/data/iris_data/make_knitr_dataset.R.
-iris_data <- LoadIntoEnvironment(
-    file.path(data_path, "iris_data/iris_data_for_knitr.Rdata"))
-# For consistency with the mouse dataset:
-iris_data$results_df$method <-
-    sub("linear approx", "approx", iris_data$results_df$method)
+# Puts iris_data in the environment.
+source("./R_graphs/LoadIrisData.R")
 
 # Puts genomics_data in the environment.
 source("./R_graphs/ProcessGenomicsData.R")
@@ -213,7 +209,6 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \item We can \textbf{automatically compute}
     the local approximation
     using automatic differentiation \cite{giordano:2017:covariances}.
-    %\cite{giordano:2017:covariances, maclaurin:2015:autograd}.
 \item The approximation requires the
     \textbf{inverse Hessian of the VB objective}.
 \item This is an application of \textbf{local Bayesian robustness}
@@ -320,12 +315,12 @@ grid.arrange(
 grid.arrange(
     plot_parametric_sensitivity(
       genomics_data$processed_results %>%
-        filter(!inflate, !alpha_increase, !functional),
+        filter(!alpha_increase, !functional),
       alpha_0=2.0) +
       ggtitle("Mouse data")  + theme(legend.position="none"),
   plot_parametric_sensitivity(
     genomics_data$processed_results %>%
-      filter(!inflate, alpha_increase, !functional),
+      filter(alpha_increase, !functional),
     alpha_0=2.0) +
     ggtitle(" ") + theme(legend.position=c(0.75, 0.65)),
     ncol=2
@@ -347,8 +342,7 @@ iris_pert2 <- filter(iris_data$prior_pert_df, filename == "prior_pert2.csv")
 iris_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
 iris_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
 
-gene_pred_pert <- filter(genomics_data$processed_results,
-                         functional, !inflate)
+gene_pred_pert <- filter(genomics_data$processed_results, functional)
 
 grid.arrange(
     # First row --- include titles.
