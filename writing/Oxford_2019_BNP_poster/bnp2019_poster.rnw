@@ -76,7 +76,7 @@ Tamara Broderick\textsuperscript{2} \\
 }
 
 \leftlogo[1]{static_images/logo_left.png}
-\rightlogo[1]{static_images/logo_right2.png}
+\rightlogo[1]{static_images/faces.jpg}
 
 % Set the color used for the section headings here
 \definecolor{SectionCol}{rgb}{0,.06,.5}
@@ -367,7 +367,7 @@ lines show regression posterior uncertainty.
 $\alpha_0$.
 \begin{itemize}
 \item VB + BNP is robust for the mouse data but not the iris data.
-\item The approximation \textbf{extrapolates best to fewer clusters.}
+\item The approximation \textbf{extrapolates best from more to fewer clusters.}
 \end{itemize}
 
 \vspace{0.05in}
@@ -410,7 +410,7 @@ grid.arrange(
 \textbf{Functional perturbation.} The first row shows the original prior
 $p_0(\nu_k)$ and the functional perturbation $p_1(\nu_k)$.  Again, VB + BNP
 is robust for the mouse data but not the iris data, and the approximation
-extrapolates best to fewer clusters.
+extrapolates best from more to fewer clusters.
 
 \vspace{0.1in}
 <<fig_cap2, cache=FALSE>>=
@@ -454,7 +454,7 @@ grid.arrange(
 
 \noindent\rule{0.95\textwidth}{1pt}
 
-{\bf Contact and code: } rgiordan@mit.edu, runjing\_liu@berkeley.edu
+\textbf{Contact and code:} rgiordan@mit.edu, runjing\_liu@berkeley.edu
 %{\bf Code: } \newline
 % \url{https://github.com/Runjing-Liu120/sensitivity_to_stick_breaking_in_BNP}{a}
 % \url{https://github.com/rgiordan/vittles}{b}
