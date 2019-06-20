@@ -21,9 +21,14 @@ SavePlot <- function(g, filename, width=10, height=5) {
 genomics_data$processed_results <-
   ProcessGenomicsData(genomics_data$results)
 
+table(genomics_data$processed_results[, c("functional", "inflate")])
+table(genomics_data$results[, c("functional", "inflate")])
 
 # Iris distribution
-g <- ggplot(iris_data$iris_df) + geom_point(aes(x=PC1, y=PC2, color=Species)) + theme(legend.position="none")
+g <-
+  ggplot(iris_data$iris_df) +
+  geom_point(aes(x=PC1, y=PC2, color=Species)) +
+  theme(legend.position="none")
 ggsave(width=5, height=3, units="in", file=file.path(plot_dir, "iris_w_species.png"))
 
 ggplot(iris_data$iris_df) + geom_point(aes(x=PC1, y=PC2))
@@ -61,37 +66,11 @@ g <- grid.arrange(
 SavePlot(g, "iris_parametric.png")
 
 
-# Mouse parametric
-MouseParametricPlot <- function(processed_results) {
-  g <- grid.arrange(
-    plot_parametric_sensitivity(
-      processed_results %>%
-        filter(!alpha_increase, !functional),
-      alpha_0=2.0) +
-      ggtitle("Mouse data")  + theme(legend.position="none"),
-    plot_parametric_sensitivity(
-      processed_results %>%
-        filter(alpha_increase, !functional),
-      alpha_0=2.0) +
-      ggtitle(" ") + theme(legend.position=c(0.75, 0.65)),
-    ncol=2
-  )
-  return(g)
-}
-
-SavePlot(MouseParametricPlot(filter(genomics_data$processed_results, !inflate)),
-         "mouse_parametric_notinflate.png")
-
-SavePlot(MouseParametricPlot(filter(genomics_data$processed_results, inflate)),
-         "mouse_parametric_inflate.png")
-
-
+# Iris functional
 iris_pert1 <- filter(iris_data$prior_pert_df, filename == "prior_pert1.csv")
 iris_pert2 <- filter(iris_data$prior_pert_df, filename == "prior_pert2.csv")
 iris_pred_pert1 <- filter(iris_data$results_df, pred, pert=="1")
 iris_pred_pert2 <- filter(iris_data$results_df, pred, pert=="2")
-gene_pred_pert <- filter(genomics_data$processed_results,
-                         functional, !inflate)
 
 g <- grid.arrange(
   plot_prior_perturbation(iris_pert1) +
@@ -103,45 +82,72 @@ g <- grid.arrange(
     theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
   plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) + ggtitle(' '),
-  ncol=2)
+  ncol=2, widths=c(0.45, 0.55))
 SavePlot(g, "iris_functional.png")
 
 
-grid.arrange(
-  # First row --- include titles.
-  plot_prior_perturbation(iris_pert1) +
-    theme(legend.position = "None") +
-    ggtitle(TeX("\\textbf{Iris data, first $p_1$}")),
-  
-  plot_prior_perturbation(iris_pert2) +
-    theme(legend.position = "None") +
-    ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
-  
-  plot_prior_perturbation(genomics_data$processed_pert_df) +
-    theme(legend.position = c(0.45, 0.80)) +
-    ggtitle("Mouse data"),
-  
-  # Second row --- results
-  plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) +
-    theme(legend.position = "None"),
-  
-  plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) +
-    theme(legend.position =  "None"),
-  
-  plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
-    theme(legend.position =  c(0.7, 0.8)) +
-    geom_text(aes(x=0.25, y=59.676, label="(lines are\n overplotted)"),
-              hjust="left"),
-  ncol=3)
+# Mouse parametric
+MouseParametricPlot <- function(processed_results, title="Mouse data") {
+  g <- grid.arrange(
+    plot_parametric_sensitivity(
+      processed_results %>%
+        filter(!alpha_increase, !functional),
+      alpha_0=2.0) +
+      ggtitle(title)  + theme(legend.position="none"),
+    plot_parametric_sensitivity(
+      processed_results %>%
+        filter(alpha_increase, !functional),
+      alpha_0=2.0) +
+      ggtitle(" ") + theme(legend.position=c(0.8, 0.65)),
+    ncol=2
+  )
+  return(g)
+}
 
 
+gp <- MouseParametricPlot(filter(genomics_data$processed_results, !inflate))
+SavePlot(gp, "mouse_parametric_notinflate.png")
+
+gpi <- MouseParametricPlot(
+  filter(genomics_data$processed_results, inflate),
+  title="Mouse data inflated variance")
+SavePlot(gpi, "mouse_parametric_inflate.png")
+
+# Mouse functional
+MouseFunctionalPlot <- function(processed_results, title="Mouse data") {
+  g <- grid.arrange(
+    plot_prior_perturbation(genomics_data$processed_pert_df) +
+      theme(legend.position = c(0.25, 0.75)) +
+      ggtitle(title),
+    
+    plot_parametric_sensitivity(
+        filter(processed_results, functional),
+        xlabel=TeX("$\\delta$")) +
+        ggtitle(' ') + theme(legend.position =  c(0.8, 0.65)),
+    ncol=2) #, widths=c(0.45, 0.55))
+  return(g)
+}
+
+gf <- MouseFunctionalPlot(filter(genomics_data$processed_results, !inflate))
+SavePlot(gf, "mouse_functional_notinflate.png")
+
+gfi <- MouseFunctionalPlot(
+  filter(genomics_data$processed_results, inflate),
+  title="Mouse data inflated variance")
+SavePlot(gfi, "mouse_functional_inflate.png")
 
 
-x_grid <- seq(0, 1, length.out=100)
-p1 <- dbeta(x_grid, shape1=1.0, shape2=2.0)
-p2 <- dbeta(x_grid, shape1=1.0, shape2=10.0)
+gpf <- grid.arrange(gp, gf, ncol=1)
+SavePlot(gpf, "mouse_notinflated.png", width=10, height=7)
 
+gpfi <- grid.arrange(gpi, gfi, ncol=1)
+SavePlot(gpfi, "mouse_inflated.png", width=10, height=7)
 
-ggplot(data.frame(x=x_grid, p1=p1, p2=p2)) +
-  geom_line(aes(x=x, y=p1, color="1")) +
-  geom_line(aes(x=x, y=p2, color="2"))
+# Timing data.  You have to get the Hessian timing with hessian_timing.py.
+genomics_data$timing_df %>%
+  group_by(n_samples,
+           taylor_order, inflate, functional, log_phi_desc) %>%
+  summarise(mean_refit_time=mean(refit_time),
+            mean_lr_time=mean(lr_time),
+            total_refit_time=sum(refit_time),
+            total_lr_time=sum(lr_time), n=n())

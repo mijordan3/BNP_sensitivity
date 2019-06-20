@@ -73,9 +73,11 @@ timing_df %>%
            taylor_order, inflate, functional, log_phi_desc) %>%
   summarise(refit_time=median(refit_time), lr_time=median(lr_time), n=n())
 
-ggplot(filter(timing_df)) +
-  geom_histogram(aes(x=refit_time), bins=50) +
-  facet_grid(functional ~ inflate, scales="free")
+if (FALSE) {
+  ggplot(filter(timing_df)) +
+    geom_histogram(aes(x=refit_time), bins=50) +
+    facet_grid(functional ~ inflate, scales="free")
+}
 
 
 # Functional perturbations
@@ -98,14 +100,15 @@ MakeFunPlot <- function(use_predictive, use_inflate, use_log_phi_desc) {
     xlab("Epsilon") + ylab("Expected number of clusters")
 }
 
-
-grid.arrange(
-  MakeFunPlot(TRUE, TRUE, "expit"),
-  MakeFunPlot(TRUE, FALSE, "expit"),
-  MakeFunPlot(FALSE, TRUE, "expit"),
-  MakeFunPlot(FALSE, FALSE, "expit"),
-  ncol=4
-)
+if (FALSE) {
+  grid.arrange(
+    MakeFunPlot(TRUE, TRUE, "expit"),
+    MakeFunPlot(TRUE, FALSE, "expit"),
+    MakeFunPlot(FALSE, TRUE, "expit"),
+    MakeFunPlot(FALSE, FALSE, "expit"),
+    ncol=4
+  )
+}
 
 
 # Parametric perturbations

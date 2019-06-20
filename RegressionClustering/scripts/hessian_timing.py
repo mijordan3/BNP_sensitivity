@@ -89,6 +89,8 @@ num_genes = reg_params['beta_mean'].shape[0]
 
 gmm = gmm_lib.GMM(num_components, prior_params, reg_params)
 
+print('Data dimension: {}'.format(reg_params['beta_mean'].shape))
+
 print('Caculating Hessian...')
 hess_time = time.time()
 init_x = gmm.gmm_params_pattern.flatten(opt_gmm_params, free=True)
