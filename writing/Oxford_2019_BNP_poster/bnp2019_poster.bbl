@@ -10,11 +10,10 @@ R.~Giordano, T.~Broderick, and M.~I. Jordan.
 \newblock Covariances, robustness, and variational {B}ayes.
 \newblock {\em Journal of Machine Learning Research}, 19(51):1--49, 2018.
 
-\bibitem{maclaurin:2015:autograd}
-D.~Maclaurin, D.~Duvenaud, and R.~P. Adams.
-\newblock Autograd: Effortless gradients in numpy.
-\newblock In {\em International Conference on Machine Learning 2015 AutoML
-  Workshop}, 2015.
+\bibitem{gustafson:1996:localposterior}
+P.~Gustafson.
+\newblock Local sensitivity of posterior expectations.
+\newblock {\em The Annals of Statistics}, 24(1):174--195, 1996.
 
 \bibitem{shoemaker:2015:ultrasensitive}
 J.~E. Shoemaker, S.~Fukuyama, A.~J. Eisfeld, D.~Zhao, E.~Kawakami, S.~Sakabe,

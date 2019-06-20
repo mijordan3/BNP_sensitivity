@@ -50,23 +50,24 @@
 
 \usepackage{alltt}
 
-%\usepackage{graphicx}
-% \usepackage{subcaption}
+\usepackage{graphicx}
+%\usepackage{subfig}
+%\usepackage{subfigure}
 %\usepackage{caption}
 
-\usepackage{epstopdf, graphicx}
-\usepackage{booktabs,dcolumn}
+%\usepackage{epstopdf, graphicx}
+%\usepackage{booktabs,dcolumn}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{bbm}
-\usepackage{hhline}
-\usepackage{multicol}
+%\usepackage{hhline}
+%\usepackage{multicol}
 \usepackage[authoryear]{natbib}
+%\usepackage{hyperref} % WTF, this causes a "caption outside of float" error
 
 \setlength{\columnseprule}{0pt}
-
-\usepackage{boxedminipage}
+%\usepackage{boxedminipage}
 
 \newcommand{\widgraph}[2]{\includegraphics[keepaspectratio,width=#1]{#2}}
 
@@ -151,8 +152,8 @@ These authors contributed equally}\quad
 
 % my added commands
 \usepackage{etoolbox}
-\BeforeBeginEnvironment{figure}{\vskip-2ex}
-\AfterEndEnvironment{figure}{\vskip-1ex}
+% \BeforeBeginEnvironment{figure}{\vskip-2ex}
+% \AfterEndEnvironment{figure}{\vskip-1ex}
 
 % Fiddle with the margin
 \addtolength{\topmargin}{-0.5in}
@@ -192,9 +193,9 @@ These authors contributed equally}\quad
 \item Researchers often want to estimate the number of distinct clusters
 that would be present in a new dataset.
 
-\item A Bayesian nonparametric (BNP) model makes inferring the number of
-clusters amenable to Bayesian inference.
-We approximate the exact posterior with variational Bayes (VB).
+\item A variational Bayes (VB) approximation to a Bayesian nonparametric (BNP)
+model makes inferring the number of clusters amenable to Bayesian inference.
+%We approximate the exact posterior with variational Bayes (VB).
 
 \item \textbf{Question}: How sensitive are the
 VB approximation and the resulting inferences to BNP model choices?
@@ -226,16 +227,14 @@ The \textbf{Dirichlet process} is a popular Bayesian nonparametric
 a distribution on sticks $\{\nu_k\}$ to induce a prior on component
 probabilities $\{\pi_k\}$.
 
-\begin{figure}[!h]
+\begin{figure}
+\caption{The Dirichlet stick-breaking process with $\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
 \centering
 \includegraphics[width = 0.95\textwidth]{./static_images/DP_stick_breaking.png}
-\caption{The Dirichlet stick-breaking process with
-$\nu_k \sim \mathrm{Beta}(1, \alpha)$.}
-\setlength{\textfloatsep}{-10pt}
 \end{figure}
 %
-We approximate the true posterior using \textbf{variational Bayes} (VB).
-
+%We approximate the true posterior using \textbf{variational Bayes} (VB).
+%
 \begin{itemize}
 \item $\epsilon :=$ Any real-valued hyperparameter for the stick-breaking prior
     $p(\nu_k | \epsilon)$.
@@ -243,8 +242,25 @@ We approximate the true posterior using \textbf{variational Bayes} (VB).
 \item $\targetexpectation :=$ The quantity we want to infer.
 \end{itemize}
 
+\begin{mdframed}[style=MyFrame]
+VB inference defines a map:
+%
+\begin{gather*}
+\textrm{Stick-breaking prior}
+    \mapsto \textrm{VB approximation}
+    \mapsto \textrm{Posterior expected \# clusters},\\
+\textrm{i.e.,}\\
+\epsilon
+    \mapsto \etaopt
+    \mapsto \targetexpectation.
+\end{gather*}
+\end{mdframed}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \textbf{Parametric perturbation.} To stay within the class of Dirichlet
-processes, we might take $\epsilon := \alpha$ and $p(\nu_k | \alpha) :=
+processes, we might take $\epsilon := \alpha - \alpha_0$ and $p(\nu_k | \alpha) :=
 \mathrm{Beta}(\nu_k | 1, \alpha)$.
 
 \textbf{Functional perturbation.} Suppose we are interested in the effect of
@@ -263,24 +279,9 @@ By using a multiplicative perturbation, the map $p_1 \mapsto \etaopt$ is
 Fr\'{e}chet differentiable in the norm $\left\Vert p_1 / p_0
 \right\Vert_\infty$.
 
-\begin{mdframed}[style=MyFrame]
-VB inference defines a map:
-%
-\begin{gather*}
-\textrm{Stick-breaking prior}
-    \mapsto \textrm{VB approximation}
-    \mapsto \textrm{Posterior expected \# clusters},\\
-\textrm{i.e.,}\\
-\epsilon
-    \mapsto \etaopt
-    \mapsto \targetexpectation.
-\end{gather*}
-\end{mdframed}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\vspace{-0.9in}
+\vspace{-0.3in}
 \subsection*{Linear approximation}
 \vspace{-0.2in}
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -299,29 +300,29 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 \end{mdframed}
 
 \begin{itemize}
-\item We can \textbf{automatically calculate}
-    $\frac{d \eta^*(\epsilon)}{d\epsilon^T}\Big|_{\epsilon=0}$
-    with sensitivity analysis and automatic differentiation
-    \cite{giordano:2017:covariances, maclaurin:2015:autograd}.
-\item Sensitivity analysis requires the
-    \textbf{inverse Hessian of the variational objective}.
-% \item We only use a linear approximation for $\epsilon \mapsto \etaopt$.
-% \item We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
+\item We can \textbf{automatically compute}
+    the approximation
+    using automatic differentiation \cite{giordano:2017:covariances}.
+    %\cite{giordano:2017:covariances, maclaurin:2015:autograd}.
+\item The approximation requires the
+    \textbf{inverse Hessian of the VB objective}.
+\item This is an application of \textbf{local Bayesian robustness}
+\citep{gustafson:1996:localposterior}.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
-\begin{center}
-\noindent\rule{0.95\textwidth}{1pt}
-\end{center}
-{\bf References}
+% \begin{center}
+% \noindent\rule{0.95\textwidth}{1pt}
+% \end{center}
+% {\bf References}
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\renewcommand{\section}[2]{}%
-\footnotesize{
-  \bibliographystyle{abbrv}
-  \bibliography{./references}
-}
+% \renewcommand{\section}[2]{}%
+% \footnotesize{
+%   \bibliographystyle{abbrv}
+%   \bibliography{./references}
+% }
 
 \end{minipage}
 \hfill \vrule \hfill
@@ -337,9 +338,10 @@ We retain the non-linearities in $\etaopt \mapsto \targetexpectation$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
+%\vspace{-0.3in}
 \section*{Data}
-
-
+\vspace{-0.3in}
+%
 \begin{minipage}[t]{0.49\textwidth}
 %
 \subsection*{Iris data}
@@ -389,15 +391,12 @@ right.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
+\vspace{-0.6in}
 \section*{Results}
 \vspace{-0.3in}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection*{Parametric sensitivity.}
-
-Vertical lines show the location of $\alpha_0$.  The approximation consistently
-\textbf{performs better when extraploating to fewer clusters}.
+\textbf{Parametric perturbation.}
+Vertical lines show the location of $\alpha_0$.
 
 \vspace{0.05in}
 %
@@ -424,9 +423,10 @@ Vertical lines show the location of $\alpha_0$.  The approximation consistently
 
 \end{knitrout}
 
+\textbf{Functional perturbation.} The first row shows the original prior
+$p_0(\nu_k)$ and the functional perturbation $p_1(\nu_k)$.
+
 \vspace{0.1in}
-% \begin{figure}
-% \centering
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
@@ -439,24 +439,34 @@ Vertical lines show the location of $\alpha_0$.  The approximation consistently
 
 \end{knitrout}
 
-% {\bf Our code: }\newline
-% Paragami: general library for sensitivity analysis in optimization problems\newline
-% {\color{blue} https://github.com/rgiordan/paragami}
-%
-% Code to evaluate BNP sensitivity as shown here: \newline
-% {\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
+The approximation consistently \textbf{performs better when extraploating to
+fewer clusters}.
+
+\noindent\rule{0.95\textwidth}{1pt}
+
+{\bf Contact and code: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
+%{\bf Code: } \newline
+% \url{https://github.com/Runjing-Liu120/sensitivity_to_stick_breaking_in_BNP}{a}
+% \url{https://github.com/rgiordan/vittles}{b}
+{\color{blue} https://github.com/Runjing-Liu120/sensitivity\_to\_stick\_breaking\_in\_BNP}
+{\color{blue} https://github.com/rgiordan/vittles}
+
+% \begin{center}
+% \noindent\rule{0.95\textwidth}{1pt}
+% \end{center}
+% \input{acknowledgements}
+
+\end{minipage}\\
 
 \begin{center}
 \noindent\rule{0.95\textwidth}{1pt}
 \end{center}
 \input{acknowledgements}
 
-\end{minipage}\\
-
-\begin{center}
-
-{\bf Contact: } rgiordano@berkeley.edu, runjing\_liu@berkeley.edu
-
-\end{center}
+\renewcommand{\section}[2]{}%
+\footnotesize{
+  \bibliographystyle{abbrv}
+  \bibliography{./references}
+}
 
 \end{document}
