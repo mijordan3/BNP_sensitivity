@@ -17,7 +17,7 @@ SavePlot <- function(g, filename, width=10, height=5) {
   ggsave(g, width=width, height=height, units="in", file=file.path(plot_dir, filename))
 }
 
-# Use both inflated and not for the presentation
+# Use both inflated and not for the presentation, unlike the poster
 genomics_data$processed_results <-
   ProcessGenomicsData(genomics_data$results)
 
@@ -62,21 +62,28 @@ SavePlot(g, "iris_parametric.png")
 
 
 # Mouse parametric
+MouseParametricPlot <- function(processed_results) {
+  g <- grid.arrange(
+    plot_parametric_sensitivity(
+      processed_results %>%
+        filter(!alpha_increase, !functional),
+      alpha_0=2.0) +
+      ggtitle("Mouse data")  + theme(legend.position="none"),
+    plot_parametric_sensitivity(
+      processed_results %>%
+        filter(alpha_increase, !functional),
+      alpha_0=2.0) +
+      ggtitle(" ") + theme(legend.position=c(0.75, 0.65)),
+    ncol=2
+  )
+  return(g)
+}
 
-g <- grid.arrange(
-  plot_parametric_sensitivity(
-    genomics_data$processed_results %>%
-      filter(!alpha_increase, !functional),
-    alpha_0=2.0) +
-    ggtitle("Mouse data")  + theme(legend.position="none"),
-  plot_parametric_sensitivity(
-    genomics_data$processed_results %>%
-      filter(!inflate, alpha_increase, !functional),
-    alpha_0=2.0) +
-    ggtitle(" ") + theme(legend.position=c(0.75, 0.65)),
-  ncol=2
-)
-SavePlot(g, "mouse_parametric_notinflate.png")
+SavePlot(MouseParametricPlot(filter(genomics_data$processed_results, !inflate)),
+         "mouse_parametric_notinflate.png")
+
+SavePlot(MouseParametricPlot(filter(genomics_data$processed_results, inflate)),
+         "mouse_parametric_inflate.png")
 
 
 iris_pert1 <- filter(iris_data$prior_pert_df, filename == "prior_pert1.csv")
@@ -89,29 +96,16 @@ gene_pred_pert <- filter(genomics_data$processed_results,
 grid.arrange(
   # First row --- include titles.
   plot_prior_perturbation(iris_pert1) +
-    theme(legend.position = "None") +
+    theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, first $p_1$}")),
+  plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) + ggtitle(' '), 
   
+  # Second row 
   plot_prior_perturbation(iris_pert2) +
-    theme(legend.position = "None") +
+    theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
-  
-  plot_prior_perturbation(genomics_data$processed_pert_df) +
-    theme(legend.position = c(0.45, 0.80)) +
-    ggtitle("Mouse data"),
-  
-  # Second row --- results
-  plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) +
-    theme(legend.position = "None"),
-  
-  plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) +
-    theme(legend.position =  "None"),
-  
-  plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
-    theme(legend.position =  c(0.7, 0.8)) +
-    geom_text(aes(x=0.25, y=59.676, label="(lines are\n overplotted)"),
-              hjust="left"),
-  ncol=3)
+  plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) + ggtitle(' '),
+  ncol=2)
 
 
 grid.arrange(
@@ -142,3 +136,13 @@ grid.arrange(
   ncol=3)
 
 
+
+
+x_grid <- seq(0, 1, length.out=100)
+p1 <- dbeta(x_grid, shape1=1.0, shape2=2.0)
+p2 <- dbeta(x_grid, shape1=1.0, shape2=10.0)
+
+
+ggplot(data.frame(x=x_grid, p1=p1, p2=p2)) +
+  geom_line(aes(x=x, y=p1, color="1")) +
+  geom_line(aes(x=x, y=p2, color="2"))

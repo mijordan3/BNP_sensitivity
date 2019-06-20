@@ -12,7 +12,6 @@ plot_parametric_sensitivity <- function(
     geom_point(aes(x = alpha, y = e_num_clusters, color = method)) +
     geom_line(aes(x = alpha, y = e_num_clusters, color = method)) +
     xlab(xlabel) + ylab('E[# clusters]') +
-    theme(legend.position = c(0.75, 0.2)) +
     set_font_sizes
 
   if(alpha_0 > 0){
