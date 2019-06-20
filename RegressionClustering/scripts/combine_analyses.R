@@ -59,6 +59,25 @@ table(results[c("inflate", "alpha1")])
 table(results[c("inflate", "epsilon")])
 table(results[c("inflate", "functional")])
 
+
+# Save the timing information
+timing_df <-
+  results %>%
+  group_by(alpha0, alpha1, epsilon, n_samples, threshold, prior_free, predictive,
+           taylor_order, inflate, functional, log_phi_desc) %>%
+  summarise(refit_time=mean(refit_time), lr_time=mean(lr_time), n=n())
+
+stopifnot(all(timing_df$n == 1))
+timing_df %>%
+  group_by(n_samples,
+           taylor_order, inflate, functional, log_phi_desc) %>%
+  summarise(refit_time=median(refit_time), lr_time=median(lr_time), n=n())
+
+ggplot(filter(timing_df)) +
+  geom_histogram(aes(x=refit_time), bins=50) +
+  facet_grid(functional ~ inflate, scales="free")
+
+
 # Functional perturbations
 MakeFunPlot <- function(use_predictive, use_inflate, use_log_phi_desc) {
   ggplot(filter(results,
@@ -212,7 +231,7 @@ ggplot(filter(gene_shapes_melt, as.integer(gene) <= 6),
 ##############################
 # Save for knitr
 
-save(pert_df, results, gene_shapes_melt, file=file.path(fit_dir, results_filename))
+save(timing_df, pert_df, results, gene_shapes_melt, file=file.path(fit_dir, results_filename))
 
 
 

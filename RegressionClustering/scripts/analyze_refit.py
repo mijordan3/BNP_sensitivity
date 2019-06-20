@@ -219,7 +219,7 @@ else:
 
     lr_time = time.time()
     pred_gmm_params = predict_gmm_params(reopt_prior_params)
-    lr_time = lr_time - time.time()
+    lr_time = time.time() - lr_time
 
 # Get a range of posterior quantities
 
