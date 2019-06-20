@@ -82,7 +82,7 @@ source("./R_graphs/ProcessGenomicsData.R")
 
 # Turn off caching if you need to regenerate any of the R code.
 knitr_debug <- FALSE # Set to true to see error output
-cache_knitr <- TRUE # Set to true to cache knitr output for this analysis.
+cache_knitr <- FALSE # Set to true to cache knitr output for this analysis.
 @
 
 
@@ -370,7 +370,9 @@ grid.arrange(
         theme(legend.position =  "None"),
 
     plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
-        theme(legend.position =  c(0.7, 0.8)),
+        theme(legend.position =  c(0.7, 0.8)) +
+        geom_text(aes(x=0.25, y=59.676, label="(lines are\n overplotted)"),
+                  hjust="left"),
     ncol=3
 )
 @

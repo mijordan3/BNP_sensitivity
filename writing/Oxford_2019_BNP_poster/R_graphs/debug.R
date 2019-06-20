@@ -40,4 +40,6 @@ plot_prior_perturbation(
 
 gene_pred_pert <- filter(genomics_data$processed_results, functional, !inflate)
 
-plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$"))
+
+plot_parametric_sensitivity(gene_pred_pert, xlabel=TeX("$\\delta$")) +
+  geom_text(aes(x=0.1, y=59.68, label="lines are overplotted"))
