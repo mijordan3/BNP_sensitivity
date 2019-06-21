@@ -10,19 +10,22 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install numpy
 pip install -r requirements.txt
-pip install -e .
-python3 -m ipykernel install --user --name=bnpregcluster_runjingdev
 ~~~
 
 Then check out and install ``aistats2019_ij_paper`` from the (private) repo
-[InfinitesimalJackknifeGenomicsExperiment](https://github.com/Runjing-Liu120/InfinitesimalJackknifeGenomicsExperiment).  Note that as of writing, you need the ``moar_genez``
-branch.
+[InfinitesimalJackknifeGenomicsExperiment](https://github.com/Runjing-Liu120/InfinitesimalJackknifeGenomicsExperiment).  Note that as of writing, you need the ``moar_genez`` branch.
 
-Also you have to install the other libraries in this repo.
-
-Finally,
+Also you have to install the other libraries in this repo.  From the base
+of the ``BNP_sensitivity`` repsository, run
 
 ~~~
-pip install -e .
+pip install GMM_clustering
+pip install BNP_modeling
+~~~
+
+Finally, install the package in ``RegressionClustering`` and create a Jupyter notebook kernel for the virual environment.
+
+~~~
+pip install -e RegressionClustering
 python3 -m ipykernel install --user --name=bnpregcluster_runjingdev
 ~~~
