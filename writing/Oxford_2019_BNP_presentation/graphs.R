@@ -44,15 +44,15 @@ results_df_3 <- filter(iris_data$results_df, !pred, pert=="alpha13")
 # Include the other two plots to get the scaling right.
 g <- grid.arrange(
   plot_parametric_sensitivity(
-    filter(results_df_1, method=="refitted"), alpha_0 = 3.0) +
+    filter(results_df_1, method=="refitted"), alpha_0 = -1) +
     scale_color_discrete(limits=c("approx", "refitted")) +
-    ggtitle('Iris data') + theme(legend.position=c(0.6, 0.17)),
+    ggtitle('Iris data') + theme(legend.position="none"),
   plot_parametric_sensitivity(results_df_2, alpha_0 = 8.0) +
     ggtitle(' ') + theme(legend.position="none"),
   plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
     ggtitle(' ') + theme(legend.position="None"),
   ncol=3)
-SavePlot(g, "iris_parametric_refitonly.png")
+SavePlot(g, "iris_parametric_refitonly.png", height=4)
 
 
 g <- grid.arrange(
@@ -63,7 +63,7 @@ g <- grid.arrange(
   plot_parametric_sensitivity(results_df_3, alpha_0 = 13.0) +
     ggtitle(' ') + theme(legend.position="None"),
   ncol=3)
-SavePlot(g, "iris_parametric.png")
+SavePlot(g, "iris_parametric.png", height=4)
 
 
 # Iris functional
@@ -76,12 +76,16 @@ g <- grid.arrange(
   plot_prior_perturbation(iris_pert1) +
     theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, first $p_1$}")),
-  plot_parametric_sensitivity(iris_pred_pert1, xlabel=TeX("$\\delta$")) + ggtitle(' '), 
+  plot_parametric_sensitivity(iris_pred_pert1,
+                              xlabel=TeX("$\\delta$"),
+                              alpha_0=0.0001) + ggtitle(' '), 
   
   plot_prior_perturbation(iris_pert2) +
     theme(legend.position = c(0.8, 0.5)) +
     ggtitle(TeX("\\textbf{Iris data, second $p_1$}")),
-  plot_parametric_sensitivity(iris_pred_pert2, xlabel=TeX("$\\delta$")) + ggtitle(' '),
+  plot_parametric_sensitivity(iris_pred_pert2,
+                              xlabel=TeX("$\\delta$"),
+                              alpha_0=0.0001) + ggtitle(' '),
   ncol=2, widths=c(0.45, 0.55))
 SavePlot(g, "iris_functional.png")
 
@@ -93,12 +97,12 @@ MouseParametricPlot <- function(processed_results, title="Mouse data") {
       processed_results %>%
         filter(!alpha_increase, !functional),
       alpha_0=2.0) +
-      ggtitle(title)  + theme(legend.position="none"),
+      ggtitle(title)  + theme(legend.position=c(0.8, 0.25)),
     plot_parametric_sensitivity(
       processed_results %>%
         filter(alpha_increase, !functional),
       alpha_0=2.0) +
-      ggtitle(" ") + theme(legend.position=c(0.8, 0.65)),
+      ggtitle(" ") + theme(legend.position="None"),
     ncol=2
   )
   return(g)
@@ -122,6 +126,7 @@ MouseFunctionalPlot <- function(processed_results, title="Mouse data") {
     
     plot_parametric_sensitivity(
         filter(processed_results, functional),
+        alpha_0=0.0001,
         xlabel=TeX("$\\delta$")) +
         ggtitle(' ') + theme(legend.position =  c(0.8, 0.65)),
     ncol=2) #, widths=c(0.45, 0.55))
@@ -138,7 +143,7 @@ SavePlot(gfi, "mouse_functional_inflate.png")
 
 
 gpf <- grid.arrange(gp, gf, ncol=1)
-SavePlot(gpf, "mouse_notinflated.png", width=10, height=7)
+SavePlot(gpf, "mouse_notinflated.png", width=10, height=6)
 
 gpfi <- grid.arrange(gpi, gfi, ncol=1)
 SavePlot(gpfi, "mouse_inflated.png", width=10, height=7)

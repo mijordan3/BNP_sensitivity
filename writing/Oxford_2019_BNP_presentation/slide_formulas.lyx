@@ -115,7 +115,7 @@ q\left(\theta\vert\eta\right) & =\textrm{Mean field variational approximation di
 
 \begin_inset Formula 
 \begin{align*}
-p_{c}\left(\nu_{k}\vert\delta\right) & =p_{0}\left(\nu_{k}\right)\left(\frac{p_{1}\left(\nu_{k}\right)}{p_{0}\left(\nu_{k}\right)}\right)^{\delta}
+p_{c}\left(\nu_{k}\vert\delta\right) & \propto p_{0}\left(\nu_{k}\right)\left(\frac{p_{1}\left(\nu_{k}\right)}{p_{0}\left(\nu_{k}\right)}\right)^{\delta}
 \end{align*}
 
 \end_inset
@@ -133,6 +133,8 @@ p_{c}\left(\nu_{k}\vert\delta\right) & =p_{0}\left(\nu_{k}\right)\left(\frac{p_{
 \begin_inset Formula 
 \begin{align*}
 \Rightarrow & \quad\eta^{*}\left(p_{1}\right)\\
+p_{0}\left(\nu_{k}\right) & =\\
+p_{1}\left(\nu_{k}\right) & =
 \end{align*}
 
 \end_inset
