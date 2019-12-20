@@ -158,23 +158,23 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
     vb_params_dict['stick_propn_mean'] = np.ones(k_approx - 1)
     vb_params_dict['stick_propn_info'] = np.ones(k_approx - 1)
 
-    # Set inital covariances
-    gamma_init = np.zeros((k_approx, dim, dim))
+    # Set inital inv. covariances
+    cluster_info_init = np.zeros((k_approx, dim, dim))
     for k in range(k_approx):
         indx = np.argwhere(km_best.labels_ == k).flatten()
 
         if len(indx == 1):
             # if there's only one datapoint in the cluster,
             # the covariance is not defined.
-            gamma_init[k, :, :] = np.eye(dim)
+            cluster_info_init[k, :, :] = np.eye(dim)
         else:
             resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
-            gamma_init_ = np.linalg.inv(np.cov(resid_k.T) + \
+            cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
                                     np.eye(dim) * 1e-4)
             # symmetrize ... there might be some numerical issues otherwise
-            gamma_init[k, :, :] = 0.5 * (gamma_init_ + gamma_init_.T)
+            cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
 
-    vb_params_dict['gamma'] = gamma_init
+    vb_params_dict['cluster_info'] = cluster_info_init
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
