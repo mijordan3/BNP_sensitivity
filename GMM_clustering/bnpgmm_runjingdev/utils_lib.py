@@ -133,7 +133,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
     np.random.seed(seed)
 
     # data parameters
-    k_approx = np.shape(vb_params_dict['centroids'])[1]
+    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[1]
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
 
@@ -153,10 +153,10 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
         e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
     e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-    vb_params_dict['centroids'] = km_best.cluster_centers_.T
+    vb_params_dict['cluster_params']['centroids'] = km_best.cluster_centers_.T
 
-    vb_params_dict['stick_propn_mean'] = np.ones(k_approx - 1)
-    vb_params_dict['stick_propn_info'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
 
     # Set inital inv. covariances
     cluster_info_init = np.zeros((k_approx, dim, dim))
@@ -174,7 +174,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
             # symmetrize ... there might be some numerical issues otherwise
             cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
 
-    vb_params_dict['cluster_info'] = cluster_info_init
+    vb_params_dict['cluster_params']['cluster_info'] = cluster_info_init
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 

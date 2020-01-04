@@ -36,26 +36,31 @@ def get_vb_params_paragami_object(dim, k_approx):
 
     vb_params_paragami = paragami.PatternDict()
 
-    # cluster centroids
-    vb_params_paragami['centroids'] = \
+    # cluster parameters
+    # centroids
+    cluster_params_paragami = paragami.PatternDict()
+    cluster_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(dim, k_approx))
+    # inverse covariances
+    cluster_params_paragami['cluster_info'] = \
+        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
+                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
 
     # BNP sticks
     # variational distribution for each stick is logitnormal
-    vb_params_paragami['stick_propn_mean'] = \
+    stick_params_paragami = paragami.PatternDict()
+    stick_params_paragami['stick_propn_mean'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    vb_params_paragami['stick_propn_info'] = \
+    stick_params_paragami['stick_propn_info'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
 
-    # cluster covariances
-    vb_params_paragami['cluster_info'] = \
-        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
-                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+    # add the vb_params
+    vb_params_paragami['cluster_params'] = cluster_params_paragami
+    vb_params_paragami['stick_params'] = stick_params_paragami
 
     vb_params_dict = vb_params_paragami.random()
 
     return vb_params_dict, vb_params_paragami
-
 
 ##########################
 # Set up prior parameters
@@ -253,10 +258,10 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
     """
 
     # get global vb parameters
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
-    centroids = vb_params_dict['centroids']
-    cluster_info = vb_params_dict['cluster_info']
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    centroids = vb_params_dict['cluster_params']['centroids']
+    cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # compute optimal e_z from vb global parameters
     e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
@@ -307,10 +312,10 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         The negative elbo.
     """
     # get vb parameters
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
-    centroids = vb_params_dict['centroids']
-    cluster_info = vb_params_dict['cluster_info']
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    centroids = vb_params_dict['cluster_params']['centroids']
+    cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
     e_z_opt, loglik_obs_by_nk = \
@@ -339,9 +344,9 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     e_loglik = e_loglik_ind + e_loglik_obs
 
     if not np.isfinite(e_loglik):
-        print('cluster_info', vb_params_dict['cluster_info'].get())
+        print('cluster_info', vb_params_dict['cluster_params']['cluster_info'].get())
         print('det cluster_info', np.linalg.slogdet(
-            vb_params_dict['cluster_info'])[1])
+            vb_params_dict['stick_params']['cluster_info'])[1])
         print('cluster weights', np.sum(e_z, axis = 0))
 
     assert(np.isfinite(e_loglik))
@@ -379,8 +384,8 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
     vb_params_dict = \
         vb_params_paragami.fold(vb_params_free, free = True)
 
-    mu = vb_params_dict['stick_propn_mean']
-    sigma = 1 / np.sqrt(vb_params_dict['stick_propn_info'])
+    mu = vb_params_dict['stick_params']['stick_propn_mean']
+    sigma = 1 / np.sqrt(vb_params_dict['stick_params']['stick_propn_info'])
 
     return cluster_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
                                                         n_obs,
