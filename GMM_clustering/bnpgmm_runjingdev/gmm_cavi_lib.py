@@ -3,6 +3,8 @@ import autograd.numpy as np
 import autograd.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
+import bnpmodeling_runjingdev.modeling_lib as modeling_lib
+
 
 def update_centroids(y, e_z, prior_params_dict):
     n_obs = e_z.sum(0, keepdims = True)
@@ -45,6 +47,32 @@ def _get_sticks_loss(y, stick_free_params, stick_params_paragmi,
     return gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
                             gh_loc, gh_weights,
                             e_z = e_z)
+
+def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
+                     e_z, vb_params_dict, prior_params_dict, gh_loc, gh_weights):
+    # returns a "pseudo-loss" as a function of the stick-breaking parameters:
+    # that is, the terms of the loss that are a function of the stick parameters only
+
+    vb_params_dict['stick_params'] = \
+        stick_params_paragmi.fold(stick_free_params, free = True)
+
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+
+    e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info,
+                            e_z, gh_loc, gh_weights)
+
+    stick_entropy = modeling_lib.get_stick_breaking_entropy(\
+                                stick_propn_mean, stick_propn_info,
+                                gh_loc, gh_weights)
+
+    alpha = prior_params_dict['alpha']
+    dp_prior = \
+        modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
+                                            alpha, gh_loc, gh_weights)
+
+    return - e_loglik_ind - dp_prior - stick_entropy
+
 
 def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                    vb_params_paragami, gh_loc, gh_weights):
@@ -136,7 +164,7 @@ def run_cavi(y, vb_params_dict,
             kl_new = gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
                                 gh_loc, gh_weights,
                                 e_z = e_z)
-            assert kl_new < kl_old, 'stick update faild'
+            assert kl_new < kl_old, 'stick update failed; diff = {}'.format(kl_new - kl_old)
             kl_old = kl_new
 
         # get loss
@@ -146,7 +174,7 @@ def run_cavi(y, vb_params_dict,
 
         if i > 0:
             diff = kl_vec[i] - kl_vec[i-1]
-            assert diff < 0
+            assert diff <= 0
 
         if np.abs(diff) < tol:
             print('done. num iterations = {}'.format(i))

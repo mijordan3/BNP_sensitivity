@@ -46,16 +46,9 @@ class TestCaviUpdates(unittest.TestCase):
         # randomly initialize vb parameters
         vb_params_dict = vb_params_paragami.random()
 
-        # get vb parameters
-        stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
-        stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
-        centroids = vb_params_dict['cluster_params']['centroids']
-        cluster_info = vb_params_dict['cluster_params']['cluster_info']
-
         # get e_z: this will be fixed for this test case
-        e_z, _ = gmm_lib.get_optimal_z(y, stick_propn_mean, stick_propn_info,
-                                        centroids, cluster_info,
-                                        gh_loc, gh_weights)
+        e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
+                                                        gh_loc, gh_weights)
 
         # get loss as a function of vb parameters
         get_vb_params_loss = paragami.FlattenFunctionInput(
@@ -108,6 +101,51 @@ class TestCaviUpdates(unittest.TestCase):
 
         assert centroid_diff < 1e-5, centroid_diff
         assert info_diff < 1e-5, info_diff
+
+    def test_stick_psloss(self):
+        # randomly initialize vb parameters
+        vb_params_dict = vb_params_paragami.random()
+        # get e_z
+        e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
+                                                        gh_loc, gh_weights)
+
+        init_stick_free_param = \
+            vb_params_paragami['stick_params'].flatten(vb_params_dict['stick_params'],
+                                                                  free = True)
+
+        # we check that the gradient of the loss is that same as the gradient of
+        # the stick pseudo-loss
+
+        # grad of full loss
+        get_stick_grad = autograd.elementwise_grad(cavi_lib._get_sticks_loss, 1)
+        get_stick_hess = autograd.hessian(cavi_lib._get_sticks_loss, 1)
+
+        stick_grad = get_stick_grad(y, init_stick_free_param,
+                                    vb_params_paragami['stick_params'],
+                                        e_z, vb_params_dict, prior_params_dict,
+                                        gh_loc, gh_weights)
+        stick_hess = get_stick_hess(y, init_stick_free_param,
+                                        vb_params_paragami['stick_params'],
+                                        e_z, vb_params_dict,
+                                        prior_params_dict, gh_loc, gh_weights)
+
+        # grad of pseudo-loss
+        get_stick_grad2 = autograd.elementwise_grad(cavi_lib._get_sticks_psloss, 1)
+        get_stick_hess2 = autograd.hessian(cavi_lib._get_sticks_psloss, 1)
+
+        stick_grad2 = get_stick_grad2(y, init_stick_free_param,
+                                    vb_params_paragami['stick_params'],
+                                        e_z, vb_params_dict, prior_params_dict,
+                                        gh_loc, gh_weights)
+        stick_hess2 = get_stick_hess2(y, init_stick_free_param,
+                                        vb_params_paragami['stick_params'],
+                                        e_z, vb_params_dict,
+                                        prior_params_dict, gh_loc, gh_weights)
+
+        assert np.abs(np.max(stick_grad - stick_grad2)) < 1e-12
+        assert np.abs(np.max(stick_hess - stick_hess2)) < 1e-12
+
+
 
     def test_run_cavi(self):
         vb_params_dict = vb_params_paragami.random()
