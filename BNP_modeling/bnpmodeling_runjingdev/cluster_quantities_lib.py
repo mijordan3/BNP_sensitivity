@@ -162,7 +162,7 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
 
 def get_e_num_clusters_from_ez(e_z):
     """
-    EAnalytically computes the expected number of clusters from cluster
+    Analytically computes the expected number of clusters from cluster
     belongings e_z.
     Parameters
     ----------

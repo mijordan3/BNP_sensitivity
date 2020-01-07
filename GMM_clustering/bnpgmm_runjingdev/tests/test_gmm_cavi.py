@@ -14,6 +14,8 @@ import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
 import bnpgmm_runjingdev.gmm_cavi_lib as cavi_lib
 import bnpgmm_runjingdev.simulation_lib as simulation_lib
 
+from bnpgmm_runjingdev.utils_lib import get_param_indices
+
 import bnpmodeling_runjingdev.optimization_lib as optimization_lib
 
 np.random.seed(35345)
@@ -153,14 +155,3 @@ class TestCaviUpdates(unittest.TestCase):
                                             vb_params_paragami, prior_params_dict,
                                             gh_loc, gh_weights,
                                            debug = True)
-
-def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
-    bool_dict = deepcopy(vb_params_dict)
-    for k in vb_params_dict.keys():
-        for j in vb_params_dict[k].keys():
-            if j == param_str:
-                bool_dict[k][j] = (vb_params_dict[k][j] == vb_params_dict[k][j])
-            else:
-                bool_dict[k][j] = (vb_params_dict[k][j] != vb_params_dict[k][j])
-
-    return vb_params_paragami.flat_indices(bool_dict, free = True)

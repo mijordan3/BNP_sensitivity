@@ -91,36 +91,42 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                                 vb_params_paragami['stick_params'],
                                 e_z, vb_params_dict, prior_params_dict,
                                 gh_loc, gh_weights)
-
     # get gradient and hessian
-    get_stick_hess = autograd.hessian(_get_sticks_psloss, 1)
+    # get_stick_hess = autograd.hessian(_get_sticks_psloss, 1)
     get_stick_grad = autograd.elementwise_grad(_get_sticks_psloss, 1)
 
-    stick_hess = get_stick_hess(y, init_stick_free_param,
-                                    vb_params_paragami['stick_params'],
-                                    e_z, vb_params_dict,
-                                    prior_params_dict, gh_loc, gh_weights)
+    # stick_hess = get_stick_hess(y, init_stick_free_param,
+    #                                 vb_params_paragami['stick_params'],
+    #                                 e_z, vb_params_dict,
+    #                                 prior_params_dict, gh_loc, gh_weights)
 
     stick_grad = get_stick_grad(y, init_stick_free_param,
                                 vb_params_paragami['stick_params'],
                                     e_z, vb_params_dict, prior_params_dict,
                                     gh_loc, gh_weights)
-
     # direction of step
-    step = - np.linalg.solve(stick_hess, stick_grad)
+    # step = - np.linalg.solve(stick_hess, stick_grad)
+    step = - stick_grad
 
     # choose stepsize
     kl_new = 1e16
     counter = 0.
-    while (kl_new > init_ps_loss):
-        update_stick_free_param = init_stick_free_param + \
-                                    0.5 ** (counter) * step
+    rho = 0.5
+    alpha = 1.0 / rho
+    correction = np.sum(stick_grad * step)
+    # for my sanity
+    assert correction < 0
+    while (kl_new > (init_ps_loss + 1e-4 * alpha * correction)):
+        alpha *= rho
+
+        update_stick_free_param = init_stick_free_param + alpha * step
 
         kl_new = _get_sticks_psloss(y, update_stick_free_param,
                                     vb_params_paragami['stick_params'],
                                     e_z, vb_params_dict, prior_params_dict,
                                     gh_loc, gh_weights)
         counter += 1
+
         if counter > 10:
             print('could not find stepsize for stick optimizer')
             break
@@ -135,6 +141,8 @@ def run_cavi(y, vb_params_dict,
                     max_iter = 100,
                     tol = 1e-8,
                     debug = False):
+
+    time0 = time.time()
 
     kl_vec = np.zeros(max_iter)
 
@@ -220,8 +228,9 @@ def run_cavi(y, vb_params_dict,
     e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
                                                     gh_loc, gh_weights)
 
-    print('stick_time: {}'.format(np.round(stick_time, 3)))
-    print('cluster_time: {}'.format(np.round(cluster_time, 3)))
-    print('e_z_time: {}'.format(np.round(e_z_time, 3)))
+    print('stick_time: {}sec'.format(np.round(stick_time, 3)))
+    print('cluster_time: {}sec'.format(np.round(cluster_time, 3)))
+    print('e_z_time: {}sec'.format(np.round(e_z_time, 3)))
+    print('**TOTAL time: {}sec**'.format(np.round(time.time() - time0, 3)))
 
     return vb_params_dict, e_z, kl_vec[0:i]

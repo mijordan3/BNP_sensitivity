@@ -71,9 +71,8 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    s, logdet = np.linalg.slogdet(gamma)
-    assert np.all(s > 0), 'some gammas are not PSD'
-
+    s, logdet = my_slogdet3d(gamma) # np.linalg.slogdet(gamma)
+    
     return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 
 # Get a vector of expected functions of the logit sticks.
@@ -203,3 +202,24 @@ def get_e_log_beta(tau):
     digamma_alpha_beta = sp.special.digamma(np.sum(tau, axis = -1))
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
+
+def my_slogdet3d(mat):
+    assert len(mat.shape) == 3
+    # number of matricies in array
+    k = mat.shape[0]
+    assert mat.shape[1] == mat.shape[2]
+
+    logdet = np.zeros(k)
+    s = np.zeros(k)
+    for i in range(k):
+        dummy = np.zeros(k)
+        dummy[i] = 1.
+
+        s_i, logdet_i = np.linalg.slogdet(mat[i])
+
+        logdet = logdet + dummy * logdet_i
+
+        # this messes with autograd array-boxes
+        # s[i] = s_i
+
+    return s, logdet

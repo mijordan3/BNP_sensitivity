@@ -5,6 +5,7 @@ import autograd.scipy as sp
 import sys
 import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
+from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
 
 import paragami
 
@@ -185,7 +186,8 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(cluster_info)[1][None, :]
+    return - 0.5 * squared_term + 0.5 * my_slogdet3d(cluster_info)[1][None, :]
+                            # np.linalg.slogdet(cluster_info)[1][None, :]
 
 ##########################
 # Optimization over e_z
@@ -357,8 +359,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     assert(np.isfinite(entropy))
 
     # prior term
-    s, logdet = np.linalg.slogdet(cluster_info)
-    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
+    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
+                            centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
 

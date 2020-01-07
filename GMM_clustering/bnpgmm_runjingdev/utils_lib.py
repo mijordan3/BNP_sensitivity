@@ -179,3 +179,15 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
     return init_free_par, vb_params_dict, e_z_init
+
+
+def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
+    bool_dict = deepcopy(vb_params_dict)
+    for k in vb_params_dict.keys():
+        for j in vb_params_dict[k].keys():
+            if j == param_str:
+                bool_dict[k][j] = (vb_params_dict[k][j] == vb_params_dict[k][j])
+            else:
+                bool_dict[k][j] = (vb_params_dict[k][j] != vb_params_dict[k][j])
+
+    return vb_params_paragami.flat_indices(bool_dict, free = True)
