@@ -163,8 +163,8 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
     for k in range(k_approx):
         indx = np.argwhere(km_best.labels_ == k).flatten()
 
-        if len(indx == 1):
-            # if there's only one datapoint in the cluster,
+        if len(indx) <= (y.shape[1] + 1):
+            # if there's less than one datapoint in the cluster,
             # the covariance is not defined.
             cluster_info_init[k, :, :] = np.eye(dim)
         else:
