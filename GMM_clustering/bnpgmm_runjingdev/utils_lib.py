@@ -133,7 +133,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
     np.random.seed(seed)
 
     # data parameters
-    k_approx = np.shape(vb_params_dict['centroids'])[1]
+    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[1]
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
 
@@ -153,29 +153,41 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
         e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
     e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-    vb_params_dict['centroids'] = km_best.cluster_centers_.T
+    vb_params_dict['cluster_params']['centroids'] = km_best.cluster_centers_.T
 
-    vb_params_dict['stick_propn_mean'] = np.ones(k_approx - 1)
-    vb_params_dict['stick_propn_info'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
 
-    # Set inital covariances
-    gamma_init = np.zeros((k_approx, dim, dim))
+    # Set inital inv. covariances
+    cluster_info_init = np.zeros((k_approx, dim, dim))
     for k in range(k_approx):
         indx = np.argwhere(km_best.labels_ == k).flatten()
 
-        if len(indx == 1):
-            # if there's only one datapoint in the cluster,
+        if len(indx) <= (y.shape[1] + 1):
+            # if there's less than one datapoint in the cluster,
             # the covariance is not defined.
-            gamma_init[k, :, :] = np.eye(dim)
+            cluster_info_init[k, :, :] = np.eye(dim)
         else:
             resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
-            gamma_init_ = np.linalg.inv(np.cov(resid_k.T) + \
+            cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
                                     np.eye(dim) * 1e-4)
             # symmetrize ... there might be some numerical issues otherwise
-            gamma_init[k, :, :] = 0.5 * (gamma_init_ + gamma_init_.T)
+            cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
 
-    vb_params_dict['gamma'] = gamma_init
+    vb_params_dict['cluster_params']['cluster_info'] = cluster_info_init
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
     return init_free_par, vb_params_dict, e_z_init
+
+
+def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
+    bool_dict = deepcopy(vb_params_dict)
+    for k in vb_params_dict.keys():
+        for j in vb_params_dict[k].keys():
+            if j == param_str:
+                bool_dict[k][j] = (vb_params_dict[k][j] == vb_params_dict[k][j])
+            else:
+                bool_dict[k][j] = (vb_params_dict[k][j] != vb_params_dict[k][j])
+
+    return vb_params_paragami.flat_indices(bool_dict, free = True)

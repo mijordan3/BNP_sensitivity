@@ -54,14 +54,15 @@ class TestOptimalEz(unittest.TestCase):
                             e_z = e_z)
 
         # get z natural parameters
-        stick_propn_mean = vb_params_dict['stick_propn_mean']
-        stick_propn_info = vb_params_dict['stick_propn_info']
-        centroids = vb_params_dict['centroids']
-        gamma = vb_params_dict['gamma']
+        stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+        stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+        centroids = vb_params_dict['cluster_params']['centroids']
+        cluster_info = vb_params_dict['cluster_params']['cluster_info']
+
 
         z_nat_param, _ = \
             gmm_lib.get_z_nat_params(y, stick_propn_mean,
-                                        stick_propn_info, centroids, gamma,
+                                        stick_propn_info, centroids, cluster_info,
                                         gh_loc, gh_weights)
 
         # compute gradient at z_nat_param

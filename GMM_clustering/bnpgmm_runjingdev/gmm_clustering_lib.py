@@ -5,6 +5,7 @@ import autograd.scipy as sp
 import sys
 import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
+from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
 
 import paragami
 
@@ -36,26 +37,31 @@ def get_vb_params_paragami_object(dim, k_approx):
 
     vb_params_paragami = paragami.PatternDict()
 
-    # cluster centroids
-    vb_params_paragami['centroids'] = \
+    # cluster parameters
+    # centroids
+    cluster_params_paragami = paragami.PatternDict()
+    cluster_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(dim, k_approx))
+    # inverse covariances
+    cluster_params_paragami['cluster_info'] = \
+        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
+                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
 
     # BNP sticks
     # variational distribution for each stick is logitnormal
-    vb_params_paragami['stick_propn_mean'] = \
+    stick_params_paragami = paragami.PatternDict()
+    stick_params_paragami['stick_propn_mean'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    vb_params_paragami['stick_propn_info'] = \
+    stick_params_paragami['stick_propn_info'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
 
-    # cluster covariances
-    vb_params_paragami['gamma'] = \
-        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
-                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+    # add the vb_params
+    vb_params_paragami['cluster_params'] = cluster_params_paragami
+    vb_params_paragami['stick_params'] = stick_params_paragami
 
     vb_params_dict = vb_params_paragami.random()
 
     return vb_params_dict, vb_params_paragami
-
 
 ##########################
 # Set up prior parameters
@@ -93,22 +99,21 @@ def get_default_prior_params(dim):
     prior_params_paragami['alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    # prior on the centroids
+    # normal-wishart prior on the centroids and cluster info
     prior_params_dict['prior_centroid_mean'] = np.array([0.0])
     prior_params_paragami['prior_centroid_mean'] = \
         paragami.NumericArrayPattern(shape=(1, ))
 
-    prior_params_dict['prior_centroid_info'] = np.array([0.1])
-    prior_params_paragami['prior_centroid_info'] = \
+    prior_params_dict['prior_lambda'] = np.array([1.0])
+    prior_params_paragami['prior_lambda'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    # prior on the variance
-    prior_params_dict['prior_gamma_df'] = np.array([8.0])
-    prior_params_paragami['prior_gamma_df'] = \
+    prior_params_dict['prior_wishart_df'] = np.array([10.0])
+    prior_params_paragami['prior_wishart_df'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_gamma_inv_scale'] = 0.62 * np.eye(dim)
-    prior_params_paragami['prior_gamma_inv_scale'] = \
+    prior_params_dict['prior_wishart_rate'] = np.eye(dim)
+    prior_params_paragami['prior_wishart_rate'] = \
         paragami.PSDSymmetricMatrixPattern(size=dim)
 
     return prior_params_dict, prior_params_paragami
@@ -116,7 +121,7 @@ def get_default_prior_params(dim):
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, gamma,
+def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         prior_params_dict,
                         gh_loc, gh_weights):
     # get expected prior term
@@ -128,17 +133,23 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, gamma,
                                             alpha, gh_loc, gh_weights)
 
     # wishart prior
-    df = prior_params_dict['prior_gamma_df']
-    V_inv = prior_params_dict['prior_gamma_inv_scale']
-    e_gamma_prior = modeling_lib.get_e_log_wishart_prior(gamma, df, V_inv)
+    df = prior_params_dict['prior_wishart_df']
+    V_inv = prior_params_dict['prior_wishart_rate']
+    e_cluster_info_prior = modeling_lib.get_e_log_wishart_prior(cluster_info, df, V_inv)
 
     # centroid prior
     prior_mean = prior_params_dict['prior_centroid_mean']
-    prior_info = prior_params_dict['prior_centroid_info']
-    e_centroid_prior = \
-        modeling_lib.get_e_centroid_prior(centroids, prior_mean, prior_info)
+    prior_lambda = prior_params_dict['prior_lambda']
 
-    return np.squeeze(e_gamma_prior + e_centroid_prior + dp_prior)
+    diff = centroids - prior_mean
+    prior_info = cluster_info * prior_lambda
+    e_centroid_prior = -0.5 * np.einsum('ji, ij -> i', diff,
+                            np.einsum('ijk, ki -> ij', prior_info, diff)).sum()
+    #
+    # e_centroid_prior = \
+    #     modeling_lib.get_e_centroid_prior(centroids, prior_mean, prior_info)
+
+    return np.squeeze(e_cluster_info_prior + e_centroid_prior + dp_prior)
 
 ##########################
 # Entropy
@@ -157,7 +168,7 @@ def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights,
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, centroids, gamma):
+def get_loglik_obs_by_nk(y, centroids, cluster_info):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
     # belonging to the kth cluster
@@ -165,28 +176,29 @@ def get_loglik_obs_by_nk(y, centroids, gamma):
     dim = np.shape(y)[1]
 
     assert np.shape(y)[1] == np.shape(centroids)[0]
-    assert np.shape(gamma)[0] == np.shape(centroids)[1]
-    assert np.shape(gamma)[1] == np.shape(centroids)[0]
+    assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
+    assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
 
-    data2_term = np.einsum('ni, kij, nj -> nk', y, gamma, y)
-    cross_term = np.einsum('ni, kij, jk -> nk', y, gamma, centroids)
-    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, gamma, centroids)
+    data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
+    cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
+    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
 
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + 0.5 * np.linalg.slogdet(gamma)[1][None, :]
+    return - 0.5 * squared_term + 0.5 * my_slogdet3d(cluster_info)[1][None, :]
+                            # np.linalg.slogdet(cluster_info)[1][None, :]
 
 ##########################
 # Optimization over e_z
 ##########################
 
-def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = True):
 
     # get likelihood term
-    loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, gamma)
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, cluster_info)
 
     # get weight term
     if use_bnp_prior:
@@ -201,12 +213,12 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
 
     return z_nat_param, loglik_obs_by_nk
 
-def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
 
     z_nat_param, loglik_obs_by_nk= \
-        get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+        get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                                     gh_loc, gh_weights,
                                     use_bnp_prior)
 
@@ -248,13 +260,13 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
     """
 
     # get global vb parameters
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
-    centroids = vb_params_dict['centroids']
-    gamma = vb_params_dict['gamma']
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    centroids = vb_params_dict['cluster_params']['centroids']
+    cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # compute optimal e_z from vb global parameters
-    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = True)
 
@@ -302,18 +314,17 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         The negative elbo.
     """
     # get vb parameters
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
-    centroids = vb_params_dict['centroids']
-    gamma = vb_params_dict['gamma']
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    centroids = vb_params_dict['cluster_params']['centroids']
+    cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
     e_z_opt, loglik_obs_by_nk = \
-            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, gamma,
+            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                             gh_loc, gh_weights)
     if e_z is None:
         e_z = e_z_opt
-
 
     # weight data if necessary, and get likelihood of y
     if data_weights is not None:
@@ -335,9 +346,9 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     e_loglik = e_loglik_ind + e_loglik_obs
 
     if not np.isfinite(e_loglik):
-        print('gamma', vb_params_dict['gamma'].get())
-        print('det gamma', np.linalg.slogdet(
-            vb_params_dict['gamma'])[1])
+        print('cluster_info', vb_params_dict['cluster_params']['cluster_info'].get())
+        print('det cluster_info', np.linalg.slogdet(
+            vb_params_dict['stick_params']['cluster_info'])[1])
         print('cluster weights', np.sum(e_z, axis = 0))
 
     assert(np.isfinite(e_loglik))
@@ -348,7 +359,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     assert(np.isfinite(entropy))
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, gamma,
+    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
+                            centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
 
@@ -374,8 +386,8 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
     vb_params_dict = \
         vb_params_paragami.fold(vb_params_free, free = True)
 
-    mu = vb_params_dict['stick_propn_mean']
-    sigma = 1 / np.sqrt(vb_params_dict['stick_propn_info'])
+    mu = vb_params_dict['stick_params']['stick_propn_mean']
+    sigma = 1 / np.sqrt(vb_params_dict['stick_params']['stick_propn_info'])
 
     return cluster_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
                                                         n_obs,
