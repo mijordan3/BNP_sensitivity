@@ -7,6 +7,8 @@ import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 import time
 
+from copy import deepcopy
+
 def update_centroids(y, e_z, prior_params_dict):
     n_obs = e_z.sum(0, keepdims = True)
 
@@ -138,9 +140,10 @@ def run_cavi(y, vb_params_dict,
                     vb_params_paragami,
                     prior_params_dict,
                     gh_loc, gh_weights,
-                    max_iter = 100,
-                    tol = 1e-8,
+                    max_iter = 1000,
+                    tol = 1e-2,
                     debug = False):
+    # runs coordinate ascent in a gmm model
 
     time0 = time.time()
 
@@ -153,12 +156,14 @@ def run_cavi(y, vb_params_dict,
     cluster_time = 0.0
     stick_time = 0.0
 
+    n_obs = y.shape[0]
+
+    success = False
     for i in range(max_iter):
         # update e_z
         t0 = time.time()
         e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
                                                         gh_loc, gh_weights)
-
         e_z_time += time.time() - t0
         if debug:
             kl_new = gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
@@ -167,12 +172,12 @@ def run_cavi(y, vb_params_dict,
             assert kl_new < kl_old, 'e_z update failed'
             kl_old = kl_new
 
-
         # update centroids
         # take step
         t0 = time.time()
         vb_params_dict['cluster_params']['centroids'] = \
             update_centroids(y, e_z, prior_params_dict)
+
 
         if debug:
             kl_new = gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
@@ -203,6 +208,7 @@ def run_cavi(y, vb_params_dict,
                                     prior_params_dict,
                                     vb_params_paragami,
                                     gh_loc, gh_weights)
+
         stick_time += time.time() - t0
         if debug:
             kl_new = gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
@@ -216,13 +222,18 @@ def run_cavi(y, vb_params_dict,
                             gh_loc, gh_weights,
                             e_z = e_z)
 
-        if i > 0:
+        if (i > 0):
             diff = kl_vec[i] - kl_vec[i-1]
             assert diff <= 0
 
         if np.abs(diff) < tol:
             print('done. num iterations = {}'.format(i))
+            success = True
             break
+
+    if not success:
+        print('warning, maximum iterations reached')
+
 
     # get e_z optima
     e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,

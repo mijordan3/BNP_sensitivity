@@ -21,7 +21,7 @@ import bnpmodeling_runjingdev.optimization_lib as optimization_lib
 np.random.seed(35345)
 
 # set up data
-n_obs = 1000
+n_obs = 30
 dim = 2
 true_k = 5
 y = simulation_lib.simulate_data(n_obs, dim,
