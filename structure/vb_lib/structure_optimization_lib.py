@@ -155,27 +155,10 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
     if run_cavi:
         # RUN CAVI
         print('running CAVI. ')
-        # get initial moments
-        e_log_sticks, e_log_1m_sticks, \
-            e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
-                                        vb_params_dict, use_logitnormal_sticks)
-
-        # get beta parameters for sticks and populations
-        _, stick_beta_params, pop_beta_params = \
-            cavi_lib.run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
-                                e_log_sticks, e_log_1m_sticks,
-                                prior_params_dict,
-                                max_iter = cavi_max_iter,
-                                f_tol = cavi_tol)
-
-        # Set VB parameters
-        if use_logitnormal_sticks:
-            # convert beta params to logitnormal
-            raise NotImplementedError()
-        else:
-            vb_params_dict['pop_freq_beta_params'] = pop_beta_params
-            vb_params_dict['ind_mix_stick_beta_params'] = stick_beta_params
+        vb_params_dict = cavi_lib.run_cavi(g_obs, vb_params_dict,
+                        prior_params_dict, use_logitnormal_sticks,
+                        max_iter = cavi_max_iter,
+                        f_tol = cavi_tol)
 
     x = vb_params_paragami.flatten(vb_params_dict, free = True)
     f_val = get_loss(x)
@@ -225,3 +208,12 @@ def optimize_structure(g_obs, vb_params_dict, vb_params_paragami,
             break
 
     return new_x
+
+def get_e_z_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks):
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                                    vb_params_dict, use_logitnormal_sticks)
+
+    return cavi_lib.update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
+                                e_log_1m_pop_freq)

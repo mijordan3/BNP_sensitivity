@@ -11,6 +11,8 @@ import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
 import time
 
+from copy import deepcopy
+
 # using autograd to get natural paramters
 # get natural beta parameters for population frequencies
 get_pop_beta_update1 = autograd.jacobian(
@@ -86,11 +88,12 @@ def update_stick_beta(g_obs, e_z,
 
     return e_log_sticks, e_log_1m_sticks, beta_params
 
-def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
-                e_log_sticks, e_log_1m_sticks,
+def run_cavi(g_obs, vb_params_dict,
                 prior_params_dict,
+                use_logitnormal_sticks,
                 f_tol = 1e-6,
-                max_iter = 1000):
+                max_iter = 1000,
+                print_every = 1):
     """
     Runs coordinate ascent on the VB parameters. This is only implemented
     for the beta approximation to the stick-breaking distribution.
@@ -100,48 +103,34 @@ def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     g_obs : ndarray
         Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
         genotypes
-    e_log_pop_freq : ndarray
-        Array of size n_loci x n_pop specifying the expected log
-        population frequencies
-    e_log_1m_pop_freq : ndarray
-        Array of size n_loci x n_pop specifying the expected
-        log(1 - population frequency)
-    e_log_sticks : ndarray
-        Array of size n_obs x n_pop specifying the expected
-        log sticks of the individual admixtures
-     e_log_1m_sticks : ndarray
-         Array of size n_obs x n_pop specifying the expected
-         log(1 - sticks) of the individual admixtures
+    vb_params_dict : dictionary
+        A dictionary that contains the variational parameters.
     prior_params_dict : dictionary
         A dictionary that contains the prior parameters.
 
     Returns
     -------
-    e_z : ndarray
-        Array of size (n_obs x n_loci x k_approx x 2)
-        specifying the expected belonging of the nth individual
-        at the mth loci belonging to the kth population of either
-        chromosome.
-    stick_beta_params : ndarray
-        Array of size (n_obs x k_approx x 2)
-        specifying the beta parameters of the individual admixture
-        stick-breaking disribution
-    pop_beta_params : ndarray
-        Array of size (n_loci x k_approx x 2)
-        specifying the beta parameters of the population
-        allele frequencies
+    vb_opt_dict : dictionary
+        A dictionary that contains the optimized variational parameters.
     """
 
+    vb_opt_dict = deepcopy(vb_params_dict)
 
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
     allele_prior_beta = prior_params_dict['allele_prior_beta']
 
+    # get initial moments from vb_params
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                                    vb_params_dict, use_logitnormal_sticks)
+
     kl_old = np.Inf
 
     t0 = time.time()
-    for i in range(max_iter):
+    for i in range(1, max_iter):
         # update z
         e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
                                 e_log_1m_pop_freq)
@@ -177,7 +166,8 @@ def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
 
         kl = - joint_log_lik - entropy
 
-        print('iteration [{}]; kl:{}'.format(i, round(kl, 6)))
+        if (i % print_every) == 0:
+            print('iteration [{}]; kl:{}'.format(i, round(kl, 6)))
 
         kl_diff = kl_old - kl
         assert kl_diff > 0
@@ -192,4 +182,12 @@ def run_cavi(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    return e_z, stick_beta_params, pop_beta_params
+    # Set VB parameters
+    if use_logitnormal_sticks:
+        # convert beta params to logitnormal
+        raise NotImplementedError()
+    else:
+        vb_opt_dict['pop_freq_beta_params'] = pop_beta_params
+        vb_opt_dict['ind_mix_stick_beta_params'] = stick_beta_params
+
+    return e_z, vb_opt_dict
