@@ -63,21 +63,29 @@ def update_pop_beta(g_obs, e_z,
 
 def update_stick_beta(g_obs, e_z,
                     e_log_pop_freq, e_log_1m_pop_freq,
-                    e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
 
-    # update individual admixtures
+    # constant
+    # this is the shape of e_log_sticks
+    constant = np.zeros((g_obs.shape[0], e_z.shape[2] - 1))
 
+    # for my sanity, check these shapes ...
+    assert g_obs.shape[0] == e_z.shape[0]
+    assert e_log_pop_freq.shape[0] == e_z.shape[1]
+    assert e_log_pop_freq.shape[1] == e_z.shape[2]
+    assert e_log_pop_freq.shape == e_log_1m_pop_freq.shape
+
+    # update individual admixtures
     beta_param1 = get_stick_update1(g_obs, e_z,
                 e_log_pop_freq, e_log_1m_pop_freq,
-                e_log_sticks, e_log_1m_sticks,
+                constant, constant,
                 dp_prior_alpha, allele_prior_alpha,
                 allele_prior_beta) + 1.0
 
     beta_param2 = get_stick_update2(g_obs, e_z,
                     e_log_pop_freq, e_log_1m_pop_freq,
-                    e_log_sticks, e_log_1m_sticks,
+                    constant, constant,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta) + 1.0
 
@@ -139,7 +147,6 @@ def run_cavi(g_obs, vb_params_dict,
         e_log_sticks, e_log_1m_sticks, stick_beta_params = \
             update_stick_beta(g_obs, e_z,
                                 e_log_pop_freq, e_log_1m_pop_freq,
-                                e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta)
 
