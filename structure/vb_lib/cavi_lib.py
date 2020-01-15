@@ -26,6 +26,7 @@ get_stick_update1 = autograd.jacobian(
 get_stick_update2 = autograd.jacobian(
     structure_model_lib.get_e_joint_loglik_from_nat_params, argnum=5)
 
+
 def update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
                                 e_log_1m_pop_freq):
     e_log_cluster_probs = \
@@ -115,8 +116,10 @@ def run_cavi(g_obs, vb_params_dict,
                 prior_params_dict,
                 use_logitnormal_sticks,
                 f_tol = 1e-6,
+                x_tol = 1e-3,
                 max_iter = 1000,
-                print_every = 1):
+                print_every = 1,
+                debug = False):
     """
     Runs coordinate ascent on the VB parameters. This is only implemented
     for the beta approximation to the stick-breaking distribution.
@@ -133,11 +136,12 @@ def run_cavi(g_obs, vb_params_dict,
 
     Returns
     -------
-    vb_opt_dict : dictionary
+    vb_params_dict : dictionary
         A dictionary that contains the optimized variational parameters.
     """
-
-    vb_opt_dict = deepcopy(vb_params_dict)
+    if use_logitnormal_sticks:
+        # convert beta params to logitnormal
+        raise NotImplementedError()
 
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
@@ -151,67 +155,64 @@ def run_cavi(g_obs, vb_params_dict,
                                     vb_params_dict, use_logitnormal_sticks)
 
     kl_old = np.Inf
+    x_old = np.Inf
+    kl_vec = []
 
     t0 = time.time()
+
+    time_vec = [t0]
+
     for i in range(1, max_iter):
         # update z
         e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
                                 e_log_1m_pop_freq)
 
         # update individual admixtures
-        e_log_sticks, e_log_1m_sticks, stick_beta_params = \
-            update_stick_beta(g_obs, e_z,
-                                e_log_pop_freq, e_log_1m_pop_freq,
+        e_log_sticks, e_log_1m_sticks, \
+            vb_params_dict['ind_mix_stick_beta_params'] = \
+                update_stick_beta(g_obs, e_z,
+                                    e_log_pop_freq, e_log_1m_pop_freq,
+                                    dp_prior_alpha, allele_prior_alpha,
+                                    allele_prior_beta)
+
+        # update population frequencies
+        e_log_pop_freq, e_log_1m_pop_freq, \
+            vb_params_dict['pop_freq_beta_params'] = \
+                update_pop_beta(g_obs, e_z,
+                                e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta)
 
-        # update population frequencies
-        e_log_pop_freq, e_log_1m_pop_freq, pop_beta_params = \
-            update_pop_beta(g_obs, e_z,
-                            e_log_sticks, e_log_1m_sticks,
-                            dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta)
+        if (i % print_every) == 0 or debug:
+            kl = structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                prior_params_dict,
+                                use_logitnormal_sticks,
+                                e_z = e_z)
+            kl_vec.append(kl)
+            time_vec.append(time.time())
 
-        # get kl:
-        joint_log_lik = \
-            structure_model_lib.get_e_joint_loglik_from_nat_params(g_obs, e_z,
-                            e_log_pop_freq, e_log_1m_pop_freq,
-                            e_log_sticks, e_log_1m_sticks,
-                            dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta)
-        entropy = structure_model_lib.get_entropy(None, None,
-                            pop_beta_params,
-                            e_z, None, None,
-                            use_logitnormal_sticks = False,
-                            ind_mix_stick_beta_params = stick_beta_params).squeeze()
+            print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,
+                                        round(kl, 6),
+                                        round(time_vec[-1] - time_vec[-2], 4)))
 
-        kl = - joint_log_lik - entropy
+            kl_diff = kl_old - kl
+            assert kl_diff > 0
 
-        if (i % print_every) == 0:
-            print('iteration [{}]; kl:{}'.format(i, round(kl, 6)))
+            kl_old = kl
 
-        kl_diff = kl_old - kl
-        assert kl_diff > 0
+        x_diff = vb_params_dict['pop_freq_beta_params'] - x_old
 
-        if kl_diff < f_tol:
+        if np.abs(x_diff).max() < x_tol:
             print('CAVI done. Termination after {} steps in {} seconds'.format(
                     i, round(time.time() - t0, 2)))
             break
 
-        kl_old = kl
+        x_old = vb_params_dict['pop_freq_beta_params']
 
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    # Set VB parameters
-    if use_logitnormal_sticks:
-        # convert beta params to logitnormal
-        raise NotImplementedError()
-    else:
-        vb_opt_dict['pop_freq_beta_params'] = pop_beta_params
-        vb_opt_dict['ind_mix_stick_beta_params'] = stick_beta_params
-
-    return e_z, vb_opt_dict
+    return e_z, vb_params_dict, np.array(kl_vec), np.array(time_vec) - t0
 
 ###############
 # functions to run stochastic VI
@@ -223,8 +224,9 @@ def update_local_params(g_obs_sampled,
                             prior_params_dict,
                             e_log_pop_freq = None,
                             e_log_1m_pop_freq = None,
-                            f_tol = 1e-3,
-                            maxiter = 100):
+                            x_tol = 1e-2,
+                            maxiter = 100,
+                            debug = False):
 
 
     # prior parameters
@@ -233,6 +235,7 @@ def update_local_params(g_obs_sampled,
     allele_prior_beta = prior_params_dict['allele_prior_beta']
 
     kl_old = 1e16
+    x_old = 1e16
 
     if (e_log_pop_freq is None) or (e_log_1m_pop_freq is None):
         e_log_pop_freq, e_log_1m_pop_freq = \
@@ -253,30 +256,34 @@ def update_local_params(g_obs_sampled,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta)
 
-        # get kl
-        joint_log_lik = \
-            structure_model_lib.get_e_joint_loglik_from_nat_params(g_obs_sampled, \
-                            e_z_sampled,
-                            e_log_pop_freq, e_log_1m_pop_freq,
-                            e_log_sticks_sampled, e_log_1m_sticks_sampled,
-                            dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta)
+        if debug:
+            # get kl
+            joint_log_lik = \
+                structure_model_lib.get_e_joint_loglik_from_nat_params(g_obs_sampled, \
+                                e_z_sampled,
+                                e_log_pop_freq, e_log_1m_pop_freq,
+                                e_log_sticks_sampled, e_log_1m_sticks_sampled,
+                                dp_prior_alpha, allele_prior_alpha,
+                                allele_prior_beta)
 
-        entropy = structure_model_lib.get_entropy(None, None,
-                            pop_beta_params,
-                            e_z_sampled, None, None,
-                            use_logitnormal_sticks = False,
-                            ind_mix_stick_beta_params = stick_beta_params_sampled).squeeze()
+            entropy = structure_model_lib.get_entropy(None, None,
+                                pop_beta_params,
+                                e_z_sampled, None, None,
+                                use_logitnormal_sticks = False,
+                                ind_mix_stick_beta_params = stick_beta_params_sampled).squeeze()
 
-        kl = - joint_log_lik - entropy
+            kl = - joint_log_lik - entropy
 
-        kl_diff = kl_old - kl
-        assert kl_diff > 0
+            kl_diff = kl_old - kl
+            assert kl_diff > 0, kl_diff
 
-        if kl_diff < f_tol:
+            kl_old = kl
+
+        x_diff = stick_beta_params_sampled - x_old
+        if np.abs(x_diff).max() < x_tol:
             break
 
-        kl_old = kl
+        x_old = stick_beta_params_sampled
 
     return e_z_sampled, e_log_sticks_sampled, \
                 e_log_1m_sticks_sampled, stick_beta_params_sampled
@@ -285,11 +292,13 @@ def run_svi(g_obs, vb_params_dict,
                 prior_params_dict,
                 e_z,
                 use_logitnormal_sticks,
-                batchsize = 1,
-                momentum = 0.1,
-                x_tol = 1e-6,
+                batchsize,
+                kappa = 0.9,
+                x_tol = 1e-3,
                 max_iter = 1000,
-                print_every = 1):
+                print_every = 1,
+                debug_local_updates = False,
+                local_x_tol = 1e-3):
     """
     Runs stochastic coordinate ascent on the VB parameters. This is only implemented
     for the beta approximation to the stick-breaking distribution.
@@ -306,7 +315,7 @@ def run_svi(g_obs, vb_params_dict,
 
     Returns
     -------
-    vb_opt_dict : dictionary
+    vb_params_dict : dictionary
         A dictionary that contains the optimized variational parameters.
     """
 
@@ -327,10 +336,14 @@ def run_svi(g_obs, vb_params_dict,
     e_log_pop_freq, e_log_1m_pop_freq = \
         modeling_lib.get_e_log_beta(vb_params_dict['pop_freq_beta_params'])
 
+    kl_vec = []
+    time_vec = [t0]
+    x_old = 1e16
+
     for i in range(1, max_iter):
 
         # sample individual
-        indx = np.random.choice(n_obs, batchsize)
+        indx = np.random.choice(n_obs, batchsize, replace = False)
 
         g_obs_sampled = g_obs[indx]
 
@@ -347,7 +360,9 @@ def run_svi(g_obs, vb_params_dict,
                                 vb_params_dict['pop_freq_beta_params'],
                                 prior_params_dict,
                                 e_log_pop_freq = e_log_pop_freq,
-                                e_log_1m_pop_freq = e_log_1m_pop_freq)
+                                e_log_1m_pop_freq = e_log_1m_pop_freq,
+                                debug = debug_local_updates,
+                                x_tol = local_x_tol)
 
         e_z[indx] = e_z_sampled
         vb_params_dict['ind_mix_stick_beta_params'][indx] = \
@@ -362,9 +377,10 @@ def run_svi(g_obs, vb_params_dict,
                                 obs_weights = obs_weights,
                                 return_moments = False)
 
+        rho = (i + 1)**(-kappa)
         vb_params_dict['pop_freq_beta_params'] = \
-            pop_beta_params_new * momentum + \
-                        vb_params_dict['pop_freq_beta_params'] * (1 - momentum)
+            pop_beta_params_new * rho + \
+                        vb_params_dict['pop_freq_beta_params'] * (1 - rho)
 
         e_log_pop_freq, e_log_1m_pop_freq = \
             modeling_lib.get_e_log_beta(vb_params_dict['pop_freq_beta_params'])
@@ -373,10 +389,23 @@ def run_svi(g_obs, vb_params_dict,
             kl = structure_model_lib.get_kl(g_obs, vb_params_dict, prior_params_dict,
                                 use_logitnormal_sticks,
                                 e_z = e_z)
+            kl_vec.append(kl)
+            time_vec.append(time.time())
 
-            print('iteration [{}]; kl:{}'.format(i, round(kl, 6)))
+            print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,
+                                        round(kl, 6),
+                                        round(time_vec[-1] - time_vec[-2], 4)))
+
+        x_diff = vb_params_dict['pop_freq_beta_params'] - x_old
+
+        if np.abs(x_diff).max() < x_tol:
+            print('SVI done. Termination after {} steps in {} seconds'.format(
+                    i, round(time.time() - t0, 2)))
+            break
+
+        x_old = vb_params_dict['pop_freq_beta_params']
 
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    return e_z, vb_params_dict
+    return e_z, vb_params_dict, np.array(kl_vec), np.array(time_vec) - t0

@@ -184,6 +184,44 @@ class TestCaviUpdate(unittest.TestCase):
 
         assert np.abs(grad).max() < 1e-12
 
+    def test_cavi(self):
+        # run cavi in full, with the debugger on
+
+        # get vb_params
+        vb_params_dict = vb_params_paragami.random()
+
+        ez_opt, vb_opt_dict, kl_vec, _ = \
+            cavi_lib.run_cavi(g_obs, vb_params_dict,
+                                prior_params_dict,
+                                use_logitnormal_sticks = False,
+                                max_iter = 10,
+                                f_tol = 1e-4,
+                                debug = True)
+
+    def test_svi(self):
+        # run svi in full, with debugger on
+
+        # get vb_params
+        vb_params_dict = vb_params_paragami.random()
+
+        # get initial z
+        e_log_sticks, e_log_1m_sticks, \
+            e_log_pop_freq, e_log_1m_pop_freq = \
+                structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                                        vb_params_dict, use_logitnormal_sticks)
+
+        e_z_init = cavi_lib.update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
+                                        e_log_1m_pop_freq)
+
+        _ = cavi_lib.run_svi(g_obs, vb_params_dict,
+                                prior_params_dict,
+                                e_z_init,
+                                use_logitnormal_sticks = False,
+                                batchsize = 2,
+                                x_tol = 1e-2,
+                                max_iter = 20,
+                                print_every = 1,
+                                debug_local_updates = True)
 
 def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
     bool_dict = deepcopy(vb_params_dict)
