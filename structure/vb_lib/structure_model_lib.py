@@ -220,7 +220,12 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                     loci_weights = None,
                                     return_ez = False):
     if obs_weights is not None:
-        raise NotImplementedError()
+        assert len(obs_weights.shape) == 1 # should be a vector
+        assert len(obs_weights) == g_obs.shape[0]
+        obs_weights = obs_weights[:, None, None, None]
+    else:
+        obs_weights = 1.0
+
     if loci_weights is not None:
         raise NotImplementedError()
 
@@ -237,7 +242,7 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
         # set at optimal e_z
         e_z = get_z_opt_from_loglik_cond_z(loglik_cond_z)
 
-    e_loglik = np.sum(e_z * loglik_cond_z)
+    e_loglik = np.sum(e_z * loglik_cond_z * obs_weights)
 
     assert(np.isfinite(e_loglik))
 

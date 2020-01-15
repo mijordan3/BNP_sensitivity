@@ -172,7 +172,6 @@ class TestCaviUpdate(unittest.TestCase):
         _, _, vb_params_dict['pop_freq_beta_params'] = \
             e_log_sticks, e_log_1m_sticks, stick_beta_params = \
                 cavi_lib.update_pop_beta(g_obs, e_z,
-                                    e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta)
