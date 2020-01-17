@@ -72,7 +72,7 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
     s, logdet = my_slogdet3d(gamma) # np.linalg.slogdet(gamma)
-    
+
     return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 
 # Get a vector of expected functions of the logit sticks.
@@ -128,7 +128,7 @@ def get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv):
                                         np.cumsum(e_log_1mv, axis = -1)], axis = -1)
     e_log_new_stick = np.concatenate((e_log_v, np.zeros(zeros_shape)), axis = -1)
 
-    return (e_log_stick_remain + e_log_new_stick).squeeze()
+    return e_log_stick_remain + e_log_new_stick
 
 def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
                                         gh_loc, gh_weights):
@@ -142,6 +142,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     if len(stick_propn_mean.shape) == 1:
         stick_propn_mean = stick_propn_mean[None, :]
         stick_propn_info = stick_propn_info[None, :]
+        squeeze = True
 
     assert np.all(stick_propn_info) > 0
 
@@ -152,7 +153,12 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
             gh_loc = gh_loc,
             gh_weights = gh_weights)
 
-    return get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv)
+    e_log_cluster_probs = \
+        get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv)
+    if squeeze:
+        return e_log_cluster_probs.squeeze()
+    else:
+        return e_log_cluster_probs
 
     # zeros_shape = stick_propn_mean.shape[0:-1] + (1,)
     #
