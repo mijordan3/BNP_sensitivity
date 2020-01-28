@@ -3,47 +3,21 @@ import autograd.numpy as np
 
 from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
 
+from scipy import sparse
+from itertools import product
+
 import paragami
 
-# def get_mvn_log_partition(mean, info):
-#     assert mean.shape[0] == info.shape[0]
-#     assert mean.shape[1] == info.shape[1]
-#
-#     info_mean = np.einsum('kij, kj -> ki', info, mean)
-#     mean_info_mean = np.einsum('ki, ki -> k', mean, info_mean)
-#
-#     return (0.5 * mean_info_mean - 0.5 * my_slogdet3d(info)[1]).sum()
-#
-# def get_log_partition_free(vb_params_free, vb_params_paragami,
-#                             use_logitnormal_sticks = True):
-#     vb_params_dict = vb_params_paragami.fold(vb_params_free, free = True)
-#
-#     cluster_log_part = get_mvn_log_partition(\
-#                     vb_params_dict['cluster_params']['centroids'].transpose(),
-#                     vb_params_dict['cluster_params']['cluster_info'])
-#
-#     if use_logitnormal_sticks:
-#         stick_log_part = get_mvn_log_partition(\
-#             vb_params_dict['stick_params']['stick_propn_mean'][:, None],
-#             vb_params_dict['stick_params']['stick_propn_info'][:, None, None])
-#
-#     else:
-#         raise NotImplementedError()
-#
-#     return cluster_log_part + stick_log_part
-#
-# get_neg_fishers_info = autograd.hessian(get_log_partition_free, 0)
-
-def get_nat_vec(param_vec, mvn_params_paragami, mvn_nat_params_paragami):
+def get_nat_vec(mvn_free_params, mvn_params_paragami, mvn_nat_params_paragami):
 
     nat_params_dict = {}
 
-    mvn_param_dict = mvn_params_paragami.fold(param_vec, free = True)
+    mvn_param_dict = mvn_params_paragami.fold(mvn_free_params, free = True)
 
     mean = mvn_param_dict['mean']
     info = mvn_param_dict['info']
 
-    nat_params_dict['nat1'] = np.einsum('kij, kj -> ki', info, mean)
+    nat_params_dict['nat1'] = np.einsum('ij, j -> i', info, mean)
     nat_params_dict['neg_nat2'] = 0.5 * info
 
     return mvn_nat_params_paragami.flatten(nat_params_dict, free = False)
@@ -57,54 +31,99 @@ def get_mvn_log_partition(nat_vec, mvn_nat_params_paragami):
 
     nat2_inv = np.linalg.inv(-neg_nat2)
 
-    nat2_inv_nat1 = np.einsum('kij, kj -> ki', nat2_inv, nat1)
-    squared_term = np.einsum('ki, ki -> k', nat1, nat2_inv_nat1)
+    nat2_inv_nat1 = np.einsum('ij, j -> i', nat2_inv, nat1)
+    squared_term = np.dot(nat1, nat2_inv_nat1)
 
-    return (- 0.25 * squared_term - 0.5 * my_slogdet3d(2 * neg_nat2)[1]).sum()
+    return - 0.25 * squared_term - 0.5 * np.linalg.slogdet(2 * neg_nat2)[1]
 
 get_jac_term = autograd.jacobian(get_nat_vec, 0)
 get_log_part_hess = autograd.hessian(get_mvn_log_partition, 0)
 
-def get_mvn_paragami_objects(k_approx, dim):
+def get_mvn_paragami_objects(dim):
     mvn_nat_params_paragami = paragami.PatternDict()
     mvn_nat_params_paragami['nat1'] = \
-        paragami.NumericArrayPattern(shape=(k_approx, dim))
+        paragami.NumericArrayPattern(shape=(dim, ))
     mvn_nat_params_paragami['neg_nat2'] = \
-        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
-                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+        paragami.PSDSymmetricMatrixPattern(size=dim)
 
     mvn_params_paragami = paragami.PatternDict()
     mvn_params_paragami['mean'] = \
-        paragami.NumericArrayPattern(shape=(k_approx, dim))
+        paragami.NumericArrayPattern(shape=(dim, ))
     mvn_params_paragami['info'] = \
-        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
-                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+        paragami.PSDSymmetricMatrixPattern(size=dim)
 
     return mvn_params_paragami, mvn_nat_params_paragami
 
 
-def get_fishers_info(mean, info):
-    assert mean.shape[0] == info.shape[0]
-    assert mean.shape[1] == info.shape[1]
-
-    k_approx = mean.shape[0]
-    dim = mean.shape[1]
+def get_fishers_info(mvn_free_params, dim):
+    # returns fisher's information
+    # for the canonical parameters, in their free parameterization
 
     # get paragami objects
     mvn_params_paragami, mvn_nat_params_paragami = \
-        get_mvn_paragami_objects(k_approx, dim)
+        get_mvn_paragami_objects(dim)
 
-    # dictionary of parameters
-    mvn_params_dict = mvn_params_paragami.random()
-    mvn_params_dict['mean'] = mean
-    mvn_params_dict['info'] = info
-
-    # vector of parameters
-    param_vec = mvn_params_paragami.flatten(mvn_params_dict, free = True)
-    nat_vec = get_nat_vec(param_vec, mvn_params_paragami, mvn_nat_params_paragami)
+    # vector of natural parameters
+    nat_vec = get_nat_vec(mvn_free_params, mvn_params_paragami, mvn_nat_params_paragami)
 
     fishers_info = get_log_part_hess(nat_vec, mvn_nat_params_paragami)
 
-    jac_term = get_jac_term(param_vec, mvn_params_paragami, mvn_nat_params_paragami)
+    jac_term = get_jac_term(mvn_free_params, mvn_params_paragami, mvn_nat_params_paragami)
 
     return np.dot(jac_term.transpose(), np.dot(fishers_info, jac_term))
+
+def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
+    preconditioner = sparse.lil_matrix((len(vb_free_params), len(vb_free_params)))
+
+    bool_dict = vb_params_paragami.empty_bool(False)
+
+    k_approx = bool_dict['cluster_params']['centroids'].shape[1]
+    dim = bool_dict['cluster_params']['centroids'].shape[0]
+
+    # get preconditioners for cluster parameters
+    for k in range(k_approx):
+        bool_dict['cluster_params']['centroids'][:, k] = True
+        bool_dict['cluster_params']['cluster_info'][k] = True
+
+        # get indices
+        indx_cluster_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
+        indx_product = np.array(list(product(indx_cluster_params_k, indx_cluster_params_k)))
+
+        # get free parameters
+        free_params_cluster_params_k = vb_free_params[indx_cluster_params_k]
+
+        # fisher information
+        fishers_info_cluster_params_k = get_fishers_info(free_params_cluster_params_k, dim)
+
+        # update preconditioner
+        preconditioner[indx_product[:, 0], indx_product[:, 1]] = \
+            np.linalg.inv(fishers_info_cluster_params_k).flatten()
+
+
+        # reset dictionary
+        bool_dict = vb_params_paragami.empty_bool(False)
+
+    # get preconditioners for stick parameters
+    for k in range(k_approx - 1):
+        bool_dict['stick_params']['stick_propn_mean'][k] = True
+        bool_dict['stick_params']['stick_propn_info'][k] = True
+
+        # get indices
+        indx_stick_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
+        indx_product = np.array(list(product(indx_stick_params_k, indx_stick_params_k)))
+
+        # get free parameters
+        free_params_stick_params_k = vb_free_params[indx_stick_params_k]
+
+        # fisher information
+        free_params_stick_params_k = get_fishers_info(free_params_stick_params_k, 1)
+
+        # update preconditioner
+        preconditioner[indx_product[:, 0], indx_product[:, 1]] = \
+            np.linalg.inv(free_params_stick_params_k).flatten()
+
+
+        # reset dictionary
+        bool_dict = vb_params_paragami.empty_bool(False)
+
+    return preconditioner
