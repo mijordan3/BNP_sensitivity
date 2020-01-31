@@ -132,7 +132,7 @@ def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
         indx_stick_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
         indx_product = np.array(list(product(indx_stick_params_k, indx_stick_params_k)))
 
-        # parameters for stick parameters
+        # indices within stick parameters
         stick_bool_dict['stick_propn_mean'][k] = True
         stick_bool_dict['stick_propn_info'][k] = True
         indx2_stick_params_k = vb_params_paragami['stick_params'].flat_indices(stick_bool_dict, free = True)
