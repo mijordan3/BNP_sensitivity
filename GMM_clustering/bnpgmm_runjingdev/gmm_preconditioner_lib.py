@@ -104,26 +104,56 @@ def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
         bool_dict = vb_params_paragami.empty_bool(False)
 
     # get preconditioners for stick parameters
+    # unfortunately we cannot use the functions above for the multivariate normal :(
+    # I didn't constrain the stick info using the PSD matrix class
+
+    # OK, first step, lets isolate the stick parameters we need:
+    bool_dict = vb_params_paragami.empty_bool(False)
+    bool_dict['stick_params']['stick_propn_mean'] += True
+    bool_dict['stick_params']['stick_propn_info'] += True
+
+    stick_free_params = vb_free_params[vb_params_paragami.flat_indices(bool_dict, free = True)]
+    stick_params_dict = vb_params_paragami['stick_params'].fold(stick_free_params, free = True)
+
+    # the jacobian for the sticks
+    stick_freeing_jac = \
+        vb_params_paragami['stick_params'].freeing_jacobian(stick_params_dict,
+                                                            sparse = False)
+
+    # reset boolean dictionaries
+    bool_dict = vb_params_paragami.empty_bool(False)
+    stick_bool_dict = vb_params_paragami['stick_params'].empty_bool(False)
+
     for k in range(k_approx - 1):
         bool_dict['stick_params']['stick_propn_mean'][k] = True
         bool_dict['stick_params']['stick_propn_info'][k] = True
 
-        # get indices
+        # indices in full vb parameters
         indx_stick_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
         indx_product = np.array(list(product(indx_stick_params_k, indx_stick_params_k)))
 
-        # get free parameters
-        free_params_stick_params_k = vb_free_params[indx_stick_params_k]
+        # parameters for stick parameters
+        stick_bool_dict['stick_propn_mean'][k] = True
+        stick_bool_dict['stick_propn_info'][k] = True
+        indx2_stick_params_k = vb_params_paragami['stick_params'].flat_indices(stick_bool_dict, free = True)
+
+        # get jacobian
+        stick_jac = np.diag(1 / np.diag(stick_freeing_jac)[indx2_stick_params_k])
 
         # fisher information
-        free_params_stick_params_k = get_fishers_info(free_params_stick_params_k, 1)
+        fishers_info = get_uvn_fisher_info(stick_params_dict['stick_propn_mean'][k],
+                                    stick_params_dict['stick_propn_info'][k])
 
         # update preconditioner
         preconditioner[indx_product[:, 0], indx_product[:, 1]] = \
-            np.linalg.inv(free_params_stick_params_k).flatten()
-
+            np.linalg.inv(np.dot(stick_jac, np.dot(fishers_info, stick_jac))).flatten()
 
         # reset dictionary
         bool_dict = vb_params_paragami.empty_bool(False)
+        stick_bool_dict = vb_params_paragami['stick_params'].empty_bool(False)
 
     return preconditioner
+
+
+def get_uvn_fisher_info(mean, info):
+    return np.array([[info, 0], [0, 0.5 / info**2]])
