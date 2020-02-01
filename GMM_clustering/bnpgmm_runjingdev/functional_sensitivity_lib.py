@@ -173,7 +173,9 @@ def get_e_log_perturbation(log_phi, vb_params_dict, epsilon,
         lambda logit_v: log_phi(logit_v) * epsilon
 
     e_perturbation_vec = model_lib.get_e_func_logit_stick_vec(
-        vb_params_dict, gh_loc, gh_weights, perturbation_fun)
+        vb_params_dict['stick_params']['stick_propn_mean'],
+        vb_params_dict['stick_params']['stick_propn_info'], 
+        gh_loc, gh_weights, perturbation_fun)
 
     if sum_vector:
         return -1 * np.sum(e_perturbation_vec)

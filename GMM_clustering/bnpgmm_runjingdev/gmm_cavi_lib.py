@@ -3,6 +3,8 @@ import autograd.numpy as np
 import autograd.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
+from bnpgmm_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
+
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 import time
@@ -52,7 +54,11 @@ def _get_sticks_loss(y, stick_free_params, stick_params_paragmi,
                             e_z = e_z)
 
 def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
-                     e_z, vb_params_dict, prior_params_dict, gh_loc, gh_weights):
+                     e_z, vb_params_dict, prior_params_dict,
+                     gh_loc, gh_weights,
+                     log_phi = None,
+                     epsilon = 0.):
+
     # returns a "pseudo-loss" as a function of the stick-breaking parameters:
     # that is, the terms of the loss that are a function of the stick parameters only
 
@@ -73,12 +79,18 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
                                             alpha, gh_loc, gh_weights).squeeze()
+    if log_phi is not None:
+        e_log_pert = get_e_log_perturbation(log_phi, vb_params_dict,
+                                epsilon, gh_loc, gh_weights, sum_vector=True)
+    else:
+        e_log_pert = 0.0
 
-    return - e_loglik_ind - dp_prior - stick_entropy
+    return - e_loglik_ind - dp_prior - stick_entropy + e_log_pert
 
 
 def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
-                   vb_params_paragami, gh_loc, gh_weights):
+                   vb_params_paragami, gh_loc, gh_weights,
+                   log_phi = None, epsilon = 0):
 
     # we use a logitnormal approximation to the sticks : thus, updates
     # can't be computed in closed form. We take a Newton step
@@ -92,7 +104,8 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
     init_ps_loss = _get_sticks_psloss(y, init_stick_free_param,
                                 vb_params_paragami['stick_params'],
                                 e_z, vb_params_dict, prior_params_dict,
-                                gh_loc, gh_weights)
+                                gh_loc, gh_weights,
+                                log_phi, epsilon)
     # get gradient and hessian
     # get_stick_hess = autograd.hessian(_get_sticks_psloss, 1)
     get_stick_grad = autograd.elementwise_grad(_get_sticks_psloss, 1)
@@ -105,7 +118,8 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
     stick_grad = get_stick_grad(y, init_stick_free_param,
                                 vb_params_paragami['stick_params'],
                                     e_z, vb_params_dict, prior_params_dict,
-                                    gh_loc, gh_weights)
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon)
     # direction of step
     # step = - np.linalg.solve(stick_hess, stick_grad)
     step = - stick_grad
@@ -126,7 +140,8 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
         kl_new = _get_sticks_psloss(y, update_stick_free_param,
                                     vb_params_paragami['stick_params'],
                                     e_z, vb_params_dict, prior_params_dict,
-                                    gh_loc, gh_weights)
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon)
         counter += 1
 
         if counter > 10:
@@ -140,6 +155,7 @@ def run_cavi(y, vb_params_dict,
                     vb_params_paragami,
                     prior_params_dict,
                     gh_loc, gh_weights,
+                    log_phi = None, epsilon = 0.,
                     max_iter = 1000,
                     x_tol = 1e-3,
                     debug = False):
@@ -205,7 +221,8 @@ def run_cavi(y, vb_params_dict,
             update_sticks(y, e_z, vb_params_dict,
                                     prior_params_dict,
                                     vb_params_paragami,
-                                    gh_loc, gh_weights)
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon)
 
         stick_time += time.time() - t0
         if debug:
