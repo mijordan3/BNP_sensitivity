@@ -11,9 +11,9 @@ import scipy as osp
 from copy import deepcopy
 
 class PriorPerturbation(object):
-    def __init__(self, vb_params_dict, alpha0,
-                        log_phi, gh_loc,
-                        gh_weights, epsilon=1.0,
+    def __init__(self, alpha0,
+                        log_phi,
+                        epsilon=1.0,
                         logit_v_ub = 4,
                         logit_v_lb = -4,
                         quad_maxiter = 50):
@@ -21,14 +21,10 @@ class PriorPerturbation(object):
         self.logit_v_lb = logit_v_lb
         self.logit_v_ub = logit_v_ub
 
-        self.gh_loc = gh_loc
-        self.gh_weights = gh_weights
-
         self.quad_maxiter = quad_maxiter
 
         self.gustafson_style = False
 
-        self.vb_params_dict = vb_params_dict
         self.alpha0 = alpha0
 
         self.epsilon_param = epsilon
@@ -38,19 +34,19 @@ class PriorPerturbation(object):
     #################
     # Functions that are used for graphing and the influence function.
 
-    # The log variational density of stick k at logit_v
-    # in the logit_stick space.
-    def get_log_q_logit_stick(self, logit_v, k):
-        mean = self.vb_params_dict['stick_propn_mean']
-        info = self.vb_params_dict['stick_propn_info']
-        return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
-
-    # Return a vector of log variational densities for all sticks at logit_v
-    # in the logit stick space.
-    def get_log_q_logit_all_sticks(self, logit_v):
-        mean = self.vb_params_dict['stick_propn_mean']
-        info = self.vb_params_dict['stick_propn_info']
-        return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
+    # # The log variational density of stick k at logit_v
+    # # in the logit_stick space.
+    # def get_log_q_logit_stick(self, logit_v, k):
+    #     mean = self.vb_params_dict['stick_propn_mean']
+    #     info = self.vb_params_dict['stick_propn_info']
+    #     return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
+    #
+    # # Return a vector of log variational densities for all sticks at logit_v
+    # # in the logit stick space.
+    # def get_log_q_logit_all_sticks(self, logit_v):
+    #     mean = self.vb_params_dict['stick_propn_mean']
+    #     info = self.vb_params_dict['stick_propn_info']
+    #     return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
 
     def get_log_p0(self, v):
         alpha = self.alpha0
