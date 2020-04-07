@@ -25,6 +25,9 @@ class HessianComponents:
         self.gh_weights = gh_weights
         self.use_bnp_prior = use_bnp_prior
 
+        self.n_obs = features.shape[0]
+        self.k_approx = len(vb_params_paragami.random()['stick_params']['stick_propn_mean']) + 1
+
     def get_kl_objective(self, vb_opt, e_z, ez_is_nat = False):
         vb_params_dict = self.vb_params_paragami.fold(vb_opt, free = True)
 
@@ -58,15 +61,23 @@ class HessianComponents:
 
 
     def get_dznat_dtheta(self, vb_opt):
-        get_ez_grad = autograd.jacobian(self.get_ez_nat)
-        return get_ez_grad(vb_opt)
+        foo = lambda x, y: (self.get_ez_nat(x) * y).sum()
+        foo_grad = autograd.grad(foo, argnum = 0)
+        get_ez_grad = autograd.jacobian(foo_grad, argnum = 1)
+        return get_ez_grad(vb_opt, np.zeros((self.n_obs, self.k_approx))).transpose((1,2,0))
 
     def get_dkl_dtheta_dznat(self, vb_opt, e_z_nat):
-
         get_kl_theta = autograd.grad(self.get_kl_objective, argnum = 0)
         get_kl_thetaez = autograd.jacobian(get_kl_theta, argnum = 1)
 
         return get_kl_thetaez(vb_opt, e_z_nat, ez_is_nat = True)
+
+    def get_cross_term(self, vb_opt):
+        grad_kl_theta =  autograd.grad(self.get_kl_objective, argnum = 0)
+
+        grad_cross_term = autograd.jacobian(lambda x : grad_kl_theta(vb_opt, self.get_ez_nat(x), ez_is_nat = True))
+
+        return grad_cross_term(vb_opt)
 
 
 
