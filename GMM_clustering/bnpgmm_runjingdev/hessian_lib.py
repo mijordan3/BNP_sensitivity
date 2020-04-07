@@ -75,7 +75,7 @@ class HessianComponents:
     def get_cross_term(self, vb_opt):
         grad_kl_theta =  autograd.grad(self.get_kl_objective, argnum = 0)
 
-        grad_cross_term = autograd.jacobian(lambda x : grad_kl_theta(vb_opt, self.get_ez_nat(x), ez_is_nat = True))
+        grad_cross_term = autograd.jacobian(lambda x : grad_kl_theta(vb_opt, self.get_ez_nat(xgit ), ez_is_nat = True))
 
         return grad_cross_term(vb_opt)
 
