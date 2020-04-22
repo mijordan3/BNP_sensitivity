@@ -5,9 +5,46 @@ import time
 import autograd.scipy as sp
 import autograd.numpy as np
 
-from bnpgmm_runjingdev.gmm_clustering_lib import \
-        get_optimal_z_from_vb_params_dict, get_z_nat_params, get_kl
+import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
 
+################
+# Functions to compute a block of the Hessian
+# corresponding to the k-largest clusters
+
+def get_subvb_params(which_k, vb_opt, vb_params_paragami):
+    bool_dict = vb_params_paragami.empty_bool(False)
+
+    dim = bool_dict['cluster_params']['cluster_info'].shape[-1]
+    k_approx = bool_dict['cluster_params']['cluster_info'].shape[0]
+
+    bool_dict['cluster_params']['centroids'][:, which_k] = True
+    bool_dict['cluster_params']['cluster_info'][which_k] = True
+
+    # last stick is deterministic; one less stick param than k_approx
+    if(np.any(which_k == (k_approx - 1))):
+        _which_k = which_k[which_k != (k_approx - 1)]
+    else:
+        _which_k = which_k[:-1]
+
+    bool_dict['stick_params']['stick_propn_mean'][_which_k] = True
+    bool_dict['stick_params']['stick_propn_info'][_which_k] = True
+
+    # free indices corresponding to sub vb parameters
+    indx = vb_params_paragami.flat_indices(bool_dict, free = True)
+
+    # get paragami and dictionary for sub vb parameters
+    _, sub_vb_params_paragami = \
+        gmm_lib.get_vb_params_paragami_object(dim, len(which_k))
+    sub_vb_params_dict = sub_vb_params_paragami.fold(vb_opt[indx], free = True)
+
+    return sub_vb_params_dict, sub_vb_params_paragami, indx
+
+
+
+################
+# Class that breaks down the Hessian of the KL into three components
+# dkl/dtheta^2; dkl/(dtheta deta); deta / dtheta
+################
 def convert_nat_param_to_ez(z_nat_param):
     log_const = sp.special.logsumexp(z_nat_param, axis=1)
     return np.exp(z_nat_param - log_const[:, None])
@@ -37,7 +74,7 @@ class HessianComponents:
         else:
             _e_z = e_z
 
-        return get_kl(self.features, vb_params_dict, self.prior_params_dict,
+        return gmm_lib.get_kl(self.features, vb_params_dict, self.prior_params_dict,
                         self.gh_loc, self.gh_weights, _e_z,
                         use_bnp_prior=self.use_bnp_prior)
 
@@ -49,7 +86,7 @@ class HessianComponents:
         centroids = vb_params_dict['cluster_params']['centroids']
         cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
-        return get_z_nat_params(self.features, stick_propn_mean,
+        return gmm_lib.get_z_nat_params(self.features, stick_propn_mean,
                             stick_propn_info, centroids, cluster_info,
                             self.gh_loc, self.gh_weights,
                             use_bnp_prior = self.use_bnp_prior)[0]
