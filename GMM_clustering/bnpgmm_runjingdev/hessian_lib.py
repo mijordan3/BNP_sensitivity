@@ -5,11 +5,32 @@ import time
 import autograd.scipy as sp
 import autograd.numpy as np
 
+from autograd.extend import primitive, defvjp, defjvp
+
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
+
+from copy import deepcopy
 
 ################
 # Functions to compute a block of the Hessian
 # corresponding to the k-largest clusters
+
+@primitive
+def replace(x_sub, x, inds):
+    x_new = np.full(x.shape, float('nan'))
+    x_new[:] = x
+    x_new[inds] = x_sub
+    return x_new
+
+defvjp(replace,
+       lambda ans, x_sub, x, inds: lambda g: g[inds],
+       lambda ans, x_sub, x, inds: lambda g: replace(0, g, inds),
+       None)
+
+defjvp(replace,
+       lambda g, ans, x_sub, x, inds: replace(g, np.zeros(len(x)), inds),
+       lambda g, ans, x_sub, x, inds: replace(0, g, inds),
+       None)
 
 def get_subvb_params(which_k, vb_opt, vb_params_paragami):
     bool_dict = vb_params_paragami.empty_bool(False)
@@ -39,6 +60,90 @@ def get_subvb_params(which_k, vb_opt, vb_params_paragami):
 
     return sub_vb_params_dict, sub_vb_params_paragami, indx
 
+def _get_kl_subparams(y, which_k, sub_vb_params_dict, vb_params_dict,
+                            prior_params_dict, gh_loc, gh_weights):
+
+    which_k_sorted = np.sort(which_k)
+
+    vb_params_dict_copy = deepcopy(vb_params_dict)
+
+    k_approx = vb_params_dict['cluster_params']['cluster_info'].shape[0]
+
+    # centroids: need to be transposed, so we're indexing into the first dimension
+    _centroids = np.transpose(vb_params_dict['cluster_params']['centroids'])
+    _centroids_repl = np.transpose(sub_vb_params_dict['cluster_params']['centroids'])
+    _centroids = replace(_centroids_repl, _centroids, which_k_sorted)
+    vb_params_dict_copy['cluster_params']['centroids'] = np.transpose(_centroids)
+
+    # cluster info
+    vb_params_dict_copy['cluster_params']['cluster_info'] = \
+        replace(sub_vb_params_dict['cluster_params']['cluster_info'],
+                vb_params_dict['cluster_params']['cluster_info'],
+                which_k_sorted)
+
+    # get indices for sticks
+    # last stick is deterministic; one less stick param than k_approx
+    if(np.any(which_k == (k_approx - 1))):
+        _which_k = which_k[which_k != (k_approx - 1)]
+    else:
+        _which_k = which_k[:-1]
+
+    _which_k_sorted = np.sort(_which_k)
+
+    # construct vb params for sticks
+    vb_params_dict_copy['stick_params']['stick_propn_mean'] = \
+        replace(sub_vb_params_dict['stick_params']['stick_propn_mean'],
+               vb_params_dict['stick_params']['stick_propn_mean'],
+               _which_k_sorted)
+
+    vb_params_dict_copy['stick_params']['stick_propn_info'] = \
+        replace(sub_vb_params_dict['stick_params']['stick_propn_info'],
+               vb_params_dict['stick_params']['stick_propn_info'],
+               _which_k_sorted)
+
+
+    return gmm_lib.get_kl(y, vb_params_dict_copy, prior_params_dict, \
+                            gh_loc, gh_weights), vb_params_dict_copy
+
+# this is more straight-forward, but slower
+def _get_kl_subparams2(y, indx, sub_vb_params,
+                       vb_opt, vb_params_paragami,
+                       prior_params_dict, gh_loc, gh_weights):
+
+    vb_opt_repl = replace(sub_vb_params, vb_opt, indx)
+
+    return gmm_lib.get_kl(y, vb_params_paragami.fold(vb_opt_repl, free = True), \
+                       prior_params_dict, gh_loc, gh_weights)
+
+
+def get_large_clusters_hessian(y, which_k, vb_opt, vb_params_paragami,
+                                prior_params_dict,
+                                gh_loc, gh_weights):
+
+    sub_vb_params_dict, sub_vb_params_paragami, indx = \
+        get_subvb_params(which_k, vb_opt, vb_params_paragami)
+
+    kl_objective = paragami.FlattenFunctionInput(
+                                original_fun= _get_kl_subparams,
+                                patterns = sub_vb_params_paragami,
+                                free = True,
+                                argnums = 2)
+
+    vb_params_dict = vb_params_paragami.fold(vb_opt, free = True)
+    kl_objective_fun = lambda x : kl_objective(y, which_k, x,
+                                        vb_params_dict, prior_params_dict,
+                                        gh_loc, gh_weights)[0]
+
+    get_sub_hess = autograd.hessian(kl_objective_fun)
+
+    sub_hess = get_sub_hess(vb_opt[indx])
+
+    est_hess = est_hess = np.zeros((len(vb_opt), len(vb_opt)))
+    for i in range(len(indx)):
+        for j in range(len(indx)):
+            est_hess[indx[i], indx[j]] = sub_hess[i, j]
+
+    return est_hess, indx
 
 
 ################
