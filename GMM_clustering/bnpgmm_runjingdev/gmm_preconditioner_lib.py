@@ -157,3 +157,32 @@ def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
 
 def get_uvn_fisher_info(mean, info):
     return np.array([[info, 0], [0, 0.5 / info**2]])
+
+#######################
+# Function for nystrom woodbury preconditioner
+#######################
+def get_nystrom_woodbury_approx(A, indx):
+    C = A[:, indx]
+    CTC = np.dot(C.transpose(), C)
+
+    A_block = A[indx][:, indx]
+
+    inv_term = np.linalg.inv(np.eye(C.shape[1]) - np.linalg.solve(A_block, CTC))
+
+    w_inv_ct = np.linalg.solve(A_block, C.transpose())
+    w_inv_ct_dot_x = lambda x : np.dot(w_inv_ct, x)
+
+    term2 = np.dot(C, inv_term)
+
+    woodb_inv_fun = lambda x : x + np.dot(term2, w_inv_ct_dot_x(x))
+
+    return woodb_inv_fun, C, A_block
+
+def get_nystrom_woodbury_precon(hess, indx, lambda_max):
+    # doesn't have to actually be the hessian : could be appropriate sub-block
+    A = np.eye(hess.shape[0]) - hess / lambda_max
+    woodb_inv, _, _ = get_nystrom_woodbury_approx(A, indx)
+    nystrom_precond = lambda x : woodb_inv(x) / lambda_max
+
+    return sparse.linalg.LinearOperator(hess.shape,
+                                            matvec = nystrom_precond)
