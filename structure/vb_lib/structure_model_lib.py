@@ -309,7 +309,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
-            get_moments_from_vb_params_dict(g_obs, vb_params_dict,
+            get_moments_from_vb_params_dict(vb_params_dict,
                                     use_logitnormal_sticks = use_logitnormal_sticks,
                                     gh_loc = gh_loc,
                                     gh_weights = gh_weights)
@@ -345,7 +345,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     return -1 * elbo
 
-def get_moments_from_vb_params_dict(g_obs, vb_params_dict,
+def get_moments_from_vb_params_dict(vb_params_dict,
                                     use_logitnormal_sticks,
                                     gh_loc = None,
                                     gh_weights = None):

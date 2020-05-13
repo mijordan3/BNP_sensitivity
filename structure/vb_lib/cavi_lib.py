@@ -138,9 +138,6 @@ def run_cavi(g_obs, vb_params_dict,
     vb_params_dict : dictionary
         A dictionary that contains the optimized variational parameters.
     """
-    if use_logitnormal_sticks:
-        # convert beta params to logitnormal
-        raise NotImplementedError()
 
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
@@ -150,8 +147,8 @@ def run_cavi(g_obs, vb_params_dict,
     # get initial moments from vb_params
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
-            structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
-                                    vb_params_dict, use_logitnormal_sticks)
+            structure_model_lib.get_moments_from_vb_params_dict(
+                vb_params_dict, use_logitnormal_sticks)
 
     kl_old = np.Inf
     x_old = np.Inf
@@ -211,7 +208,18 @@ def run_cavi(g_obs, vb_params_dict,
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    return e_z, vb_params_dict, np.array(kl_vec), np.array(time_vec) - t0
+    return vb_params_dict, e_z, np.array(kl_vec), np.array(time_vec) - t0
+
+# just a useful function
+def get_ez_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks):
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(
+                                    vb_params_dict, use_logitnormal_sticks)
+
+    return update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
+                            e_log_1m_pop_freq)
+
 
 ###############
 # functions to run stochastic VI

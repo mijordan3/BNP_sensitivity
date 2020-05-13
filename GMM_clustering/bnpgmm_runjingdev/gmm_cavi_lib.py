@@ -93,7 +93,7 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                    log_phi = None, epsilon = 0):
 
     # we use a logitnormal approximation to the sticks : thus, updates
-    # can't be computed in closed form. We take a Newton step
+    # can't be computed in closed form. We take a gradient step satisfying wolfe conditions
 
     # initial parameters
     init_stick_free_param = \
@@ -106,14 +106,8 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                                 e_z, vb_params_dict, prior_params_dict,
                                 gh_loc, gh_weights,
                                 log_phi, epsilon)
-    # get gradient and hessian
-    # get_stick_hess = autograd.hessian(_get_sticks_psloss, 1)
+    # get gradient
     get_stick_grad = autograd.elementwise_grad(_get_sticks_psloss, 1)
-
-    # stick_hess = get_stick_hess(y, init_stick_free_param,
-    #                                 vb_params_paragami['stick_params'],
-    #                                 e_z, vb_params_dict,
-    #                                 prior_params_dict, gh_loc, gh_weights)
 
     stick_grad = get_stick_grad(y, init_stick_free_param,
                                 vb_params_paragami['stick_params'],
@@ -121,7 +115,6 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                                     gh_loc, gh_weights,
                                     log_phi, epsilon)
     # direction of step
-    # step = - np.linalg.solve(stick_hess, stick_grad)
     step = - stick_grad
 
     # choose stepsize
