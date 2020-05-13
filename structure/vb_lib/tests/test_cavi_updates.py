@@ -51,7 +51,7 @@ class TestCaviUpdate(unittest.TestCase):
         # get moments
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(g_obs,
+                structure_model_lib.get_moments_from_vb_params_dict(
                                                     vb_params_dict,
                                                     use_logitnormal_sticks,
                                                     gh_loc,
@@ -96,7 +96,7 @@ class TestCaviUpdate(unittest.TestCase):
 
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                structure_model_lib.get_moments_from_vb_params_dict( \
                                         vb_params_dict, use_logitnormal_sticks)
 
         # e_z is fixed
@@ -143,7 +143,7 @@ class TestCaviUpdate(unittest.TestCase):
 
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                structure_model_lib.get_moments_from_vb_params_dict( \
                                         vb_params_dict, use_logitnormal_sticks)
 
         # e_z is fixed
@@ -192,10 +192,11 @@ class TestCaviUpdate(unittest.TestCase):
 
         ez_opt, vb_opt_dict, kl_vec, _ = \
             cavi_lib.run_cavi(g_obs, vb_params_dict,
+                                vb_params_paragami,
                                 prior_params_dict,
                                 use_logitnormal_sticks = False,
                                 max_iter = 10,
-                                f_tol = 1e-4,
+                                x_tol = 1e-4,
                                 debug = True)
 
     def test_svi(self):
@@ -207,7 +208,7 @@ class TestCaviUpdate(unittest.TestCase):
         # get initial z
         e_log_sticks, e_log_1m_sticks, \
             e_log_pop_freq, e_log_1m_pop_freq = \
-                structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
+                structure_model_lib.get_moments_from_vb_params_dict( \
                                         vb_params_dict, use_logitnormal_sticks)
 
         e_z_init = cavi_lib.update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
@@ -222,6 +223,86 @@ class TestCaviUpdate(unittest.TestCase):
                                 max_iter = 20,
                                 print_every = 1,
                                 debug_local_updates = True)
+
+    def test_logitnormal_stick_updates(self):
+        # get vb_params
+        _, vb_params_paragami = \
+            structure_model_lib.get_vb_params_paragami_object(n_obs, n_loci,
+                k_approx, use_logitnormal_sticks = True)
+
+        vb_params_dict = vb_params_paragami.random()
+
+        # get e_z
+        e_z = cavi_lib.get_ez_from_vb_params_dict(g_obs, vb_params_dict,
+                            use_logitnormal_sticks = True,
+                            gh_loc = gh_loc, gh_weights = gh_weights)
+
+        # get free parameters
+        stick_mean_free_params = vb_params_paragami['ind_mix_stick_propn_mean'].\
+                            flatten(vb_params_dict['ind_mix_stick_propn_mean'],
+                                    free = True)
+        stick_info_free_params = vb_params_paragami['ind_mix_stick_propn_info'].\
+                            flatten(vb_params_dict['ind_mix_stick_propn_info'],
+                                    free = True)
+
+        # test gradients of pseudo-loss
+        get_grad_stick_mean = autograd.grad(cavi_lib._get_logitnormal_sticks_psloss, argnum = 2)
+        get_grad_stick_info = autograd.grad(cavi_lib._get_logitnormal_sticks_psloss, argnum = 3)
+
+        stick_mean_grad = get_grad_stick_mean(g_obs, e_z, stick_mean_free_params,
+                                        stick_info_free_params,
+                                        vb_params_paragami,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights)
+
+        stick_info_grad = get_grad_stick_info(g_obs, e_z, stick_mean_free_params,
+                                                stick_info_free_params,
+                                                vb_params_paragami,
+                                                prior_params_dict,
+                                                gh_loc, gh_weights)
+
+
+        # check against gradients of actual loss
+        get_grad_stick_mean2 = autograd.grad(cavi_lib._get_logitnormal_sticks_loss, argnum = 2)
+        get_grad_stick_info2 = autograd.grad(cavi_lib._get_logitnormal_sticks_loss, argnum = 3)
+
+        stick_mean_grad2 = get_grad_stick_mean2(g_obs,
+                    e_z,
+                    stick_mean_free_params,
+                    stick_info_free_params,
+                    vb_params_dict,
+                    vb_params_paragami,
+                    prior_params_dict,
+                    gh_loc, gh_weights)
+
+        stick_info_grad2 = get_grad_stick_info2(g_obs,
+                            e_z,
+                            stick_mean_free_params,
+                            stick_info_free_params,
+                            vb_params_dict,
+                            vb_params_paragami,
+                            prior_params_dict,
+                            gh_loc, gh_weights)
+
+        assert np.all(stick_mean_grad2 == stick_mean_grad)
+        assert np.all(stick_info_grad2 == stick_info_grad)
+
+    def test_cavi_with_logitnormal_sticks(self):
+        # get vb_params
+        _, vb_params_paragami = \
+            structure_model_lib.get_vb_params_paragami_object(n_obs, n_loci,
+                k_approx, use_logitnormal_sticks = True)
+
+        vb_params_dict = vb_params_paragami.random()
+
+        _ = cavi_lib.run_cavi(g_obs, vb_params_dict,
+                                vb_params_paragami,
+                                prior_params_dict,
+                                use_logitnormal_sticks = True,
+                                debug=True,
+                                gh_loc = gh_loc,
+                                gh_weights = gh_weights)
+
 
 def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
     bool_dict = deepcopy(vb_params_dict)
