@@ -80,9 +80,8 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 # logit stick distributions.
 # The function func should take arguments in the logit stick space, i.e.
 # logit_stick = log(stick / (1 - stick)).
-def get_e_func_logit_stick_vec(vb_params_dict, gh_loc, gh_weights, func):
-    stick_propn_mean = vb_params_dict['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_propn_info']
+def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
+                                gh_loc, gh_weights, func):
 
     # print('DEBUG: 0th lognorm mean: ', stick_propn_mean[0])
     e_phi = np.array([

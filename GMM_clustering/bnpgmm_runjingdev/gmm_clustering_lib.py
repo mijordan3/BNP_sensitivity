@@ -268,7 +268,7 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
     # compute optimal e_z from vb global parameters
     e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         gh_loc, gh_weights,
-                        use_bnp_prior = True)
+                        use_bnp_prior = use_bnp_prior)
 
     return e_z
 
@@ -322,7 +322,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     # get optimal cluster belongings
     e_z_opt, loglik_obs_by_nk = \
             get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
-                            gh_loc, gh_weights)
+                            gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
     if e_z is None:
         e_z = e_z_opt
 
