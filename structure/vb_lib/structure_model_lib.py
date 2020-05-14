@@ -5,6 +5,7 @@ import autograd.scipy as sp
 import paragami
 
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib, optimization_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -464,3 +465,48 @@ def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
                     vb_params_paragami.flatten(vb_opt_dict, free = True))))
 
     assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
+
+
+#######################
+# Functions to get perturbed KL for functional sensitvity
+
+def get_perturbed_kl(g_obs, vb_params_dict, epsilon, log_phi,
+                     prior_params_dict, gh_loc, gh_weights,
+                     e_z = None):
+    """
+    Computes KL divergence after perturbing by log_phi
+
+    Parameters
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_dict : dictionary
+        A dictionary that contains the variational parameters
+    epsilon: float
+        The epsilon specifying the multiplicative perturbation
+    log_phi : Callable function
+        The log of the multiplicative perturbation in logit space
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+
+    Returns
+    -------
+    float
+        The KL divergence after perturbing by log_phi
+
+    """
+
+    e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
+                            vb_params_dict['ind_mix_stick_propn_mean'],
+                            vb_params_dict['ind_mix_stick_propn_info'],
+                            epsilon, gh_loc, gh_weights, sum_vector=True)
+
+    return get_kl(g_obs, vb_params_dict,
+                        prior_params_dict,
+                        e_z = e_z,
+                        use_logitnormal_sticks = True,
+                        gh_loc= gh_loc, gh_weights = gh_weights) + e_log_pert

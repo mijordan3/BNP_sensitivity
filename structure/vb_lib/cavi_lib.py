@@ -6,6 +6,7 @@ import autograd.scipy as sp
 from vb_lib import structure_model_lib
 
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
+from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -117,6 +118,7 @@ def run_cavi(g_obs, vb_params_dict,
                 prior_params_dict,
                 use_logitnormal_sticks,
                 gh_loc = None, gh_weights = None,
+                log_phi = None, epsilon = 0.,
                 x_tol = 1e-3,
                 max_iter = 1000,
                 print_every = 1,
@@ -166,13 +168,23 @@ def run_cavi(g_obs, vb_params_dict,
 
     time_vec = [t0]
 
-    _get_kl = lambda vb_params_dict, e_z : \
-                structure_model_lib.get_kl(g_obs, vb_params_dict,
-                                            prior_params_dict,
-                                            use_logitnormal_sticks,
-                                            e_z = e_z,
-                                            gh_loc = gh_loc,
-                                            gh_weights = gh_weights)
+    if log_phi is None:
+        _get_kl = lambda vb_params_dict, e_z : \
+                    structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                                prior_params_dict,
+                                                use_logitnormal_sticks,
+                                                e_z = e_z,
+                                                gh_loc = gh_loc,
+                                                gh_weights = gh_weights)
+    else:
+        assert use_logitnormal_sticks
+        _get_kl = lambda vb_params_dict, e_z : \
+                    structure_model_lib.get_perturbed_kl(g_obs,
+                                                vb_params_dict,
+                                                epsilon, log_phi,
+                                                prior_params_dict,
+                                                gh_loc, gh_weights,
+                                                e_z = e_z)
 
 
     for i in range(1, max_iter):
@@ -194,7 +206,8 @@ def run_cavi(g_obs, vb_params_dict,
                                     vb_params_dict['ind_mix_stick_propn_mean'],
                                     vb_params_dict['ind_mix_stick_propn_info'],
                                     vb_params_paragami, prior_params_dict,
-                                    gh_loc, gh_weights)
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon)
 
             e_log_sticks, e_log_1m_sticks = \
                 ef.get_e_log_logitnormal(\
@@ -279,7 +292,8 @@ def _get_logitnormal_sticks_psloss(g_obs,
                                     stick_info_free_params,
                                     vb_params_paragami,
                                     prior_params_dict,
-                                    gh_loc, gh_weights):
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon):
     # this function only returns the terms in the loss that depend on the
     # logitnormal sticks. The gradients wrt to the sticks are correct,
     # though the loss itself is not
@@ -312,7 +326,16 @@ def _get_logitnormal_sticks_psloss(g_obs,
 
     loglik_term = (e_log_cluster_probs.reshape(n, 1, k, 1) * e_z).sum()
 
-    return - (loglik_term + dp_prior + stick_entropy)
+    # perturbed term
+    if log_phi is not None:
+        e_log_pert = get_e_log_perturbation(log_phi,
+                                stick_mean, stick_info,
+                                epsilon, gh_loc, gh_weights, sum_vector=True)
+    else:
+        e_log_pert = 0.0
+
+
+    return - (loglik_term + dp_prior + stick_entropy) + e_log_pert
 
 def _get_logitnormal_sticks_loss(g_obs,
                     e_z,
@@ -343,7 +366,8 @@ def _get_logitnormal_sticks_loss(g_obs,
 
 def update_logitnormal_sticks(g_obs, e_z, stick_mean, stick_info,
                                 vb_params_paragami, prior_params_dict,
-                                gh_loc, gh_weights):
+                                gh_loc, gh_weights,
+                                log_phi, epsilon):
 
     # we use a logitnormal approximation to the sticks : thus, updates
     # can't be computed in closed form. We take a gradient step satisfying wolfe conditions
@@ -360,7 +384,8 @@ def update_logitnormal_sticks(g_obs, e_z, stick_mean, stick_info,
                                         init_stick_info_free,
                                         vb_params_paragami,
                                         prior_params_dict,
-                                        gh_loc, gh_weights)
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
     # get gradient
     get_grad_stick_mean = autograd.grad(_get_logitnormal_sticks_psloss, argnum = 2)
     get_grad_stick_info = autograd.grad(_get_logitnormal_sticks_psloss, argnum = 3)
@@ -370,14 +395,16 @@ def update_logitnormal_sticks(g_obs, e_z, stick_mean, stick_info,
                                         init_stick_info_free,
                                         vb_params_paragami,
                                         prior_params_dict,
-                                        gh_loc, gh_weights)
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
 
     grad_stick_info = get_grad_stick_info(g_obs, e_z,
                                         init_stick_mean_free,
                                         init_stick_info_free,
                                         vb_params_paragami,
                                         prior_params_dict,
-                                        gh_loc, gh_weights)
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
 
     # direction of step
     step1 = - grad_stick_mean
@@ -404,7 +431,8 @@ def update_logitnormal_sticks(g_obs, e_z, stick_mean, stick_info,
                                         update_stick_info_free,
                                         vb_params_paragami,
                                         prior_params_dict,
-                                        gh_loc, gh_weights)
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
 
         counter += 1
 
