@@ -251,7 +251,8 @@ def run_cavi(g_obs, vb_params_dict,
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    return vb_params_dict, e_z, np.array(kl_vec), np.array(time_vec) - t0
+    vb_opt = vb_params_paragami.flatten(vb_params_dict, free = True)
+    return vb_params_dict, vb_opt, e_z, np.array(kl_vec), np.array(time_vec) - t0
 
 # just a useful function
 def get_ez_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks,
