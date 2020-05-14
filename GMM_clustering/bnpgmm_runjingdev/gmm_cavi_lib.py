@@ -3,7 +3,7 @@ import autograd.numpy as np
 import autograd.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-from bnpgmm_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
+from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
@@ -80,7 +80,8 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
         modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
                                             alpha, gh_loc, gh_weights).squeeze()
     if log_phi is not None:
-        e_log_pert = get_e_log_perturbation(log_phi, vb_params_dict,
+        e_log_pert = get_e_log_perturbation(log_phi,
+                                stick_propn_mean, stick_propn_info,
                                 epsilon, gh_loc, gh_weights, sum_vector=True)
     else:
         e_log_pert = 0.0
