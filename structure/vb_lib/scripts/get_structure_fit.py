@@ -83,12 +83,12 @@ else:
     g_obs, true_pop_allele_freq, true_ind_admix_propn = \
         data_utils.draw_data(args.n_obs, args.n_loci, args.n_pop)
 
-    data_file = '../simulated_data/' + \
-                    'sim_data_nobs{}_nloci{}_npop{}'.format(args.n_obs,
-                                                            args.n_loci,
-                                                            args.n_pop)
-    print('saving data into ', data_file)
-    np.savez(data_file,
+    # data_file = '../simulated_data/' + \
+    #                 'sim_data_nobs{}_nloci{}_npop{}'.format(args.n_obs,
+    #                                                         args.n_loci,
+    #                                                         args.n_pop)
+    print('saving data into ', args.data_file)
+    np.savez(args.data_file,
             g_obs = g_obs,
             true_pop_allele_freq = true_pop_allele_freq,
             true_ind_admix_propn = true_ind_admix_propn)
@@ -132,9 +132,9 @@ if not args.warm_start:
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
                                                 args.use_logitnormal_sticks)
 else:
-    print('warm start from ', args.init_file)
+    print('warm start from ', args.init_fit)
     vb_params_dict, _, _ = \
-        paragami.load_folded(args.init_file)
+        paragami.load_folded(args.init_fit)
 
 ######################
 # OPTIMIZE
@@ -157,7 +157,7 @@ structure_model_lib.assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
 ######################
 # save results
 ######################
-outfile = os.path.join(args.outfolder, args.out_filename)
+outfile = os.path.join(args.outfolder, args.out_filename + '.npz')
 print('saving structure model to ', outfile)
 paragami.save_folded(outfile,
                      vb_opt_dict,
