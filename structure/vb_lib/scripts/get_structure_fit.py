@@ -44,7 +44,7 @@ parser.add_argument('--init_fit', type=str)
 parser.add_argument('--alpha', type=float, default = 4.0)
 parser.add_argument('--k_approx', type = int, default = 10)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
-                        default='False')
+                        default='True')
 
 # whether we save the sensitivty object
 parser.add_argument('--save_sensitivity', type=distutils.util.strtobool,
