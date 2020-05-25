@@ -148,7 +148,7 @@ vb_opt_dict, vb_opt, ez_opt, _, _ = \
                         gh_weights = gh_weights,
                         max_iter = 2000,
                         x_tol = 1e-4,
-                        print_every = 20)
+                        print_every = 1)
 
 structure_model_lib.assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
                         prior_params_dict, gh_loc, gh_weights,
