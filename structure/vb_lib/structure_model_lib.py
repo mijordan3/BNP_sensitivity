@@ -11,6 +11,8 @@ import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
 from sklearn.decomposition import NMF
 
+import warnings
+
 ##########################
 # Set up vb parameters
 ##########################
@@ -464,7 +466,10 @@ def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
     linf_grad = np.max(np.abs(grad_get_loss(\
                     vb_params_paragami.flatten(vb_opt_dict, free = True))))
 
-    assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
+    if linf_grad > 1e-5:
+        warnings.warn('l-inf gradient at optimum is : {}'.format(linf_grad))
+
+    # assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
 
 
 #######################
