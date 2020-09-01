@@ -4,8 +4,8 @@ source activate genomic_time_series_py35
 
 seed=345345
 
-nobs=40
-nloci=50
+nobs=100
+nloci=2000
 npop=4
 
 alpha=4.0
