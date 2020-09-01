@@ -46,14 +46,6 @@ parser.add_argument('--k_approx', type = int, default = 10)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
                         default='True')
 
-# whether we save the sensitivty object
-parser.add_argument('--save_sensitivity', type=distutils.util.strtobool,
-                        default='True')
-# if the hessian is expensive to compute, only compute the cross-hessian
-# using conjugate-gradient
-parser.add_argument('--save_cross_hess_only', type=distutils.util.strtobool,
-                        default='False')
-
 
 args = parser.parse_args()
 
@@ -80,14 +72,11 @@ if args.load_data:
     g_obs = data['g_obs']
 
 else:
+    print('simulating data')
     g_obs, true_pop_allele_freq, true_ind_admix_propn = \
         data_utils.draw_data(args.n_obs, args.n_loci, args.n_pop)
 
-    # data_file = '../simulated_data/' + \
-    #                 'sim_data_nobs{}_nloci{}_npop{}'.format(args.n_obs,
-    #                                                         args.n_loci,
-    #                                                         args.n_pop)
-    print('saving data into ', args.data_file)
+    print('saving simulated data into ', args.data_file)
     np.savez(args.data_file,
             g_obs = g_obs,
             true_pop_allele_freq = true_pop_allele_freq,
@@ -159,83 +148,16 @@ structure_model_lib.assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
 ######################
 outfile = os.path.join(args.outfolder, args.out_filename + '.npz')
 print('saving structure model to ', outfile)
+
+optim_time = time.time() - init_optim_time
 paragami.save_folded(outfile,
                      vb_opt_dict,
                      vb_params_paragami,
                      alpha = prior_params_dict['dp_prior_alpha'],
                      gh_deg = gh_deg,
-                     use_logitnormal_sticks = args.use_logitnormal_sticks)
+                     use_logitnormal_sticks = args.use_logitnormal_sticks,
+                     optim_time = optim_time)
 
-print('Total optimization time: {:03f} secs'.format(time.time() -\
-                                                        init_optim_time))
+print('Total optimization time: {:03f} secs'.format(optim_time))
 
-#######################
-# Get sensitivity object and save
-#######################
-# if args.save_sensitivity:
-#     print('getting sensitivity object: ')
-#     t0 = time.time()
-#     get_kl_from_vb_free_prior_free = \
-#         paragami.FlattenFunctionInput(original_fun=structure_model_lib.get_kl,
-#                         patterns = [vb_params_paragami, prior_params_paragami],
-#                         free = True,
-#                         argnums = [1, 2])
-#
-#     objective_fun = lambda x, y: \
-#         get_kl_from_vb_free_prior_free(g_obs, x, y, args.use_logitnormal_sticks,
-#                                         gh_loc, gh_weights)
-#     prior_free_params = \
-#         prior_params_paragami.flatten(prior_params_dict, free = True)
-#
-#     if args.save_cross_hess_only:
-#         # if the hessian is large, we only save the cross hessian and
-#         # sensitivty matrix
-#
-#         # preconditioner for conjugate-gradient
-#         mfvb_cov, mfvb_info = \
-#             preconditioner_lib.get_mfvb_cov_preconditioner(vb_opt_dict,
-#                                                     vb_params_paragami,
-#                                                     args.use_logitnormal_sticks)
-#         # hessian vector product
-#         hvp = autograd.hessian_vector_product(objective_fun, argnum=0)
-#         # system solver using CG
-#         system_solver = preconditioner_lib.SystemSolverFromHVP(hvp,
-#                                                 vb_opt_free_params,
-#                                                 prior_free_params,
-#                                                 cg_opts = {'M': mfvb_info})
-#         compute_hessian = False
-#     else:
-#         compute_hessian = True
-#         system_solver = None
-#
-#
-#     vb_sens = \
-#         vittles.HyperparameterSensitivityLinearApproximation(
-#                                 objective_fun = objective_fun,
-#                                 opt_par_value = vb_opt_free_params,
-#                                 hyper_par_value = prior_free_params,
-#                                 validate_optimum=False,
-#                                 hessian_at_opt=None,
-#                                 cross_hess_at_opt=None,
-#                                 sens_mat = None,
-#                                 factorize_hessian=True,
-#                                 hyper_par_objective_fun=None,
-#                                 grad_tol=1e-8,
-#                                 system_solver=system_solver,
-#                                 compute_hess=compute_hessian)
-#
-#     print('Hessian time: {:03f}'.format(time.time() - t0))
-#
-#     np.savez(outfile + '_sens_obj',
-#             hessian = vb_sens._hess0,
-#             cross_hess = vb_sens._cross_hess,
-#             sens_mat = vb_sens._sens_mat)
-#
-#     # NOTE: checking the hessian. This throws an autodiff error on the slurm cluster for some reason
-#     # print('checking sensitivity derivative ... ')
-#     # which_prior = np.array([1., 0., 0.])
-#     # hessian_dir = str_opt_lib.check_hessian(vb_sens, which_prior)
-#     # print('L inf norm of sensitivity derivative: {}'.format(
-#     #             np.max(np.abs(hessian_dir))))
-#
 print('done. ')
