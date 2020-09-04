@@ -84,12 +84,15 @@ def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights, func):
 
     # print('DEBUG: 0th lognorm mean: ', stick_propn_mean[0])
-    e_phi = np.array([
-        ef.get_e_fun_normal(
-            stick_propn_mean[k], stick_propn_info[k], \
+    # e_phi = np.array([
+    #     ef.get_e_fun_normal(
+    #         stick_propn_mean[k], stick_propn_info[k], \
+    #         gh_loc, gh_weights, func)
+    #     for k in range(len(stick_propn_mean))
+    # ])
+    e_phi = ef.get_e_fun_normal(
+            stick_propn_mean, stick_propn_info, \
             gh_loc, gh_weights, func)
-        for k in range(len(stick_propn_mean))
-    ])
 
     return e_phi
 

@@ -1,10 +1,7 @@
-# some extra functions to do functional sensitivity
-
 import autograd.numpy as np
 import autograd.scipy as sp
 
-from bnpgmm_runjingdev import gmm_clustering_lib as gmm_lib
-from bnpmodeling_runjingdev import modeling_lib as model_lib
+import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 import scipy as osp
 
@@ -139,7 +136,7 @@ class PriorPerturbation(object):
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
 
-def get_e_log_perturbation(log_phi, vb_params_dict, epsilon,
+def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
                            gh_loc, gh_weights, sum_vector=True):
 
     """
@@ -172,50 +169,11 @@ def get_e_log_perturbation(log_phi, vb_params_dict, epsilon,
     perturbation_fun = \
         lambda logit_v: log_phi(logit_v) * epsilon
 
-    e_perturbation_vec = model_lib.get_e_func_logit_stick_vec(
-        vb_params_dict['stick_params']['stick_propn_mean'],
-        vb_params_dict['stick_params']['stick_propn_info'], 
+    e_perturbation_vec = modeling_lib.get_e_func_logit_stick_vec(
+        stick_propn_mean, stick_propn_info,
         gh_loc, gh_weights, perturbation_fun)
 
     if sum_vector:
         return -1 * np.sum(e_perturbation_vec)
     else:
         return -1 * e_perturbation_vec
-
-def get_perturbed_kl(y, vb_params_dict, epsilon, log_phi,
-                     prior_params_dict, gh_loc, gh_weights):
-
-    """
-    Computes KL divergence after perturbing by log_phi
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_dict : dictionary
-        A dictionary that contains the variational parameters
-    epsilon: float
-        The epsilon specifying the multiplicative perturbation
-    log_phi : Callable function
-        The log of the multiplicative perturbation in logit space
-    gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    sum_vector : boolean
-        whether to sum the expectation over the k sticks
-
-    Returns
-    -------
-    float
-        The KL divergence after perturbing by log_phi
-
-    """
-
-    e_log_pert = get_e_log_perturbation(log_phi, vb_params_dict,
-                            epsilon, gh_loc, gh_weights, sum_vector=True)
-
-    return gmm_lib.get_kl(y, vb_params_dict,
-                            prior_params_dict, gh_loc, gh_weights) + e_log_pert

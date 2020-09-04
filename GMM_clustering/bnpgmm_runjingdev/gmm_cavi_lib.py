@@ -3,7 +3,7 @@ import autograd.numpy as np
 import autograd.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-from bnpgmm_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
+from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
@@ -80,7 +80,8 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
         modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
                                             alpha, gh_loc, gh_weights).squeeze()
     if log_phi is not None:
-        e_log_pert = get_e_log_perturbation(log_phi, vb_params_dict,
+        e_log_pert = get_e_log_perturbation(log_phi,
+                                stick_propn_mean, stick_propn_info,
                                 epsilon, gh_loc, gh_weights, sum_vector=True)
     else:
         e_log_pert = 0.0
@@ -93,7 +94,7 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                    log_phi = None, epsilon = 0):
 
     # we use a logitnormal approximation to the sticks : thus, updates
-    # can't be computed in closed form. We take a Newton step
+    # can't be computed in closed form. We take a gradient step satisfying wolfe conditions
 
     # initial parameters
     init_stick_free_param = \
@@ -106,14 +107,8 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                                 e_z, vb_params_dict, prior_params_dict,
                                 gh_loc, gh_weights,
                                 log_phi, epsilon)
-    # get gradient and hessian
-    # get_stick_hess = autograd.hessian(_get_sticks_psloss, 1)
+    # get gradient
     get_stick_grad = autograd.elementwise_grad(_get_sticks_psloss, 1)
-
-    # stick_hess = get_stick_hess(y, init_stick_free_param,
-    #                                 vb_params_paragami['stick_params'],
-    #                                 e_z, vb_params_dict,
-    #                                 prior_params_dict, gh_loc, gh_weights)
 
     stick_grad = get_stick_grad(y, init_stick_free_param,
                                 vb_params_paragami['stick_params'],
@@ -121,7 +116,6 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
                                     gh_loc, gh_weights,
                                     log_phi, epsilon)
     # direction of step
-    # step = - np.linalg.solve(stick_hess, stick_grad)
     step = - stick_grad
 
     # choose stepsize

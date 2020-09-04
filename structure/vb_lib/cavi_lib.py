@@ -6,6 +6,7 @@ import autograd.scipy as sp
 from vb_lib import structure_model_lib
 
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
+from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
 import LinearResponseVariationalBayes.ExponentialFamilies as ef
 
@@ -113,15 +114,17 @@ def update_stick_beta(g_obs, e_z,
     return e_log_sticks, e_log_1m_sticks, beta_params
 
 def run_cavi(g_obs, vb_params_dict,
+                vb_params_paragami,
                 prior_params_dict,
                 use_logitnormal_sticks,
+                gh_loc = None, gh_weights = None,
+                log_phi = None, epsilon = 0.,
                 x_tol = 1e-3,
                 max_iter = 1000,
                 print_every = 1,
                 debug = False):
     """
-    Runs coordinate ascent on the VB parameters. This is only implemented
-    for the beta approximation to the stick-breaking distribution.
+    Runs coordinate ascent on the VB parameters.
 
     Parameters
     ----------
@@ -139,8 +142,11 @@ def run_cavi(g_obs, vb_params_dict,
         A dictionary that contains the optimized variational parameters.
     """
     if use_logitnormal_sticks:
-        # convert beta params to logitnormal
-        raise NotImplementedError()
+        assert gh_loc is not None
+        assert gh_weights is not None
+
+        assert 'ind_mix_stick_propn_info' in vb_params_dict.keys()
+        assert 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
 
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
@@ -150,8 +156,9 @@ def run_cavi(g_obs, vb_params_dict,
     # get initial moments from vb_params
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
-            structure_model_lib.get_moments_from_vb_params_dict(g_obs, \
-                                    vb_params_dict, use_logitnormal_sticks)
+            structure_model_lib.get_moments_from_vb_params_dict(
+                vb_params_dict, use_logitnormal_sticks,
+                gh_loc, gh_weights)
 
     kl_old = np.Inf
     x_old = np.Inf
@@ -161,18 +168,66 @@ def run_cavi(g_obs, vb_params_dict,
 
     time_vec = [t0]
 
+    if log_phi is None:
+        _get_kl = lambda vb_params_dict, e_z : \
+                    structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                                prior_params_dict,
+                                                use_logitnormal_sticks,
+                                                e_z = e_z,
+                                                gh_loc = gh_loc,
+                                                gh_weights = gh_weights)
+    else:
+        assert use_logitnormal_sticks
+        _get_kl = lambda vb_params_dict, e_z : \
+                    structure_model_lib.get_perturbed_kl(g_obs,
+                                                vb_params_dict,
+                                                epsilon, log_phi,
+                                                prior_params_dict,
+                                                gh_loc, gh_weights,
+                                                e_z = e_z)
+
+
     for i in range(1, max_iter):
         # update z
         e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
                                 e_log_1m_pop_freq)
+        if debug:
+            kl = _get_kl(vb_params_dict, e_z)
+            kl_diff = kl_old - kl
+            assert kl_diff > 0
+            kl_old = kl
+
 
         # update individual admixtures
-        e_log_sticks, e_log_1m_sticks, \
-            vb_params_dict['ind_mix_stick_beta_params'] = \
-                update_stick_beta(g_obs, e_z,
-                                    e_log_pop_freq, e_log_1m_pop_freq,
-                                    dp_prior_alpha, allele_prior_alpha,
-                                    allele_prior_beta)
+        if use_logitnormal_sticks:
+            vb_params_dict['ind_mix_stick_propn_mean'], \
+                vb_params_dict['ind_mix_stick_propn_info'] = \
+                    update_logitnormal_sticks(g_obs, e_z,
+                                    vb_params_dict['ind_mix_stick_propn_mean'],
+                                    vb_params_dict['ind_mix_stick_propn_info'],
+                                    vb_params_paragami, prior_params_dict,
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon)
+
+            e_log_sticks, e_log_1m_sticks = \
+                ef.get_e_log_logitnormal(\
+                    lognorm_means = vb_params_dict['ind_mix_stick_propn_mean'],
+                    lognorm_infos = vb_params_dict['ind_mix_stick_propn_info'],
+                    gh_loc = gh_loc,
+                    gh_weights = gh_weights)
+
+        else:
+            e_log_sticks, e_log_1m_sticks, \
+                vb_params_dict['ind_mix_stick_beta_params'] = \
+                    update_stick_beta(g_obs, e_z,
+                                        e_log_pop_freq, e_log_1m_pop_freq,
+                                        dp_prior_alpha, allele_prior_alpha,
+                                        allele_prior_beta)
+        if debug:
+            kl = _get_kl(vb_params_dict, e_z)
+            kl_diff = kl_old - kl
+            assert kl_diff > 0
+            kl_old = kl
 
         # update population frequencies
         e_log_pop_freq, e_log_1m_pop_freq, \
@@ -183,10 +238,8 @@ def run_cavi(g_obs, vb_params_dict,
                                 allele_prior_beta)
 
         if (i % print_every) == 0 or debug:
-            kl = structure_model_lib.get_kl(g_obs, vb_params_dict,
-                                prior_params_dict,
-                                use_logitnormal_sticks,
-                                e_z = e_z)
+            kl = _get_kl(vb_params_dict, e_z)
+
             kl_vec.append(kl)
             time_vec.append(time.time())
 
@@ -199,19 +252,201 @@ def run_cavi(g_obs, vb_params_dict,
 
             kl_old = kl
 
-        x_diff = vb_params_dict['pop_freq_beta_params'] - x_old
+        x_diff = vb_params_paragami.flatten(vb_params_dict, free = True) - x_old
 
         if np.abs(x_diff).max() < x_tol:
             print('CAVI done. Termination after {} steps in {} seconds'.format(
                     i, round(time.time() - t0, 2)))
             break
 
-        x_old = vb_params_dict['pop_freq_beta_params']
+        x_old = vb_params_paragami.flatten(vb_params_dict, free = True)
 
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    return e_z, vb_params_dict, np.array(kl_vec), np.array(time_vec) - t0
+    vb_opt = vb_params_paragami.flatten(vb_params_dict, free = True)
+    return vb_params_dict, vb_opt, e_z, np.array(kl_vec), np.array(time_vec) - t0
+
+# just a useful function
+def get_ez_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks,
+                                gh_loc, gh_weights):
+    if use_logitnormal_sticks:
+        assert gh_loc is not None
+        assert gh_weights is not None
+
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(
+                                    vb_params_dict, use_logitnormal_sticks,
+                                    gh_loc, gh_weights)
+
+    return update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
+                            e_log_1m_pop_freq)
+
+#################
+# Functions to update logitnormal sticks
+#################
+def _get_logitnormal_sticks_psloss(g_obs,
+                                    e_z,
+                                    stick_mean_free_params,
+                                    stick_info_free_params,
+                                    vb_params_paragami,
+                                    prior_params_dict,
+                                    gh_loc, gh_weights,
+                                    log_phi, epsilon):
+    # this function only returns the terms in the loss that depend on the
+    # logitnormal sticks. The gradients wrt to the sticks are correct,
+    # though the loss itself is not
+
+    stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
+                    fold(stick_mean_free_params, free = True)
+    stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
+                    fold(stick_info_free_params, free = True)
+
+    e_log_sticks, e_log_1m_sticks = \
+            ef.get_e_log_logitnormal(
+                lognorm_means = stick_mean,
+                lognorm_infos = stick_info,
+                gh_loc = gh_loc,
+                gh_weights = gh_weights)
+
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
+
+    dp_prior = (prior_params_dict['dp_prior_alpha'] - 1) * np.sum(e_log_1m_sticks)
+    stick_entropy = \
+            modeling_lib.get_stick_breaking_entropy(
+                                    stick_mean,
+                                    stick_info,
+                                    gh_loc, gh_weights)
+
+    n = e_z.shape[0]
+    k = e_z.shape[2]
+
+    loglik_term = (e_log_cluster_probs.reshape(n, 1, k, 1) * e_z).sum()
+
+    # perturbed term
+    if log_phi is not None:
+        e_log_pert = get_e_log_perturbation(log_phi,
+                                stick_mean, stick_info,
+                                epsilon, gh_loc, gh_weights, sum_vector=True)
+    else:
+        e_log_pert = 0.0
+
+
+    return - (loglik_term + dp_prior + stick_entropy) + e_log_pert
+
+def _get_logitnormal_sticks_loss(g_obs,
+                    e_z,
+                    stick_mean_free_params,
+                    stick_info_free_params,
+                    vb_params_dict,
+                    vb_params_paragami,
+                    prior_params_dict,
+                    gh_loc, gh_weights):
+
+    # returns the kl loss as a function of stick parameters
+    # can be used to test the function above, to make sure gradients are the same
+
+
+    stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
+                    fold(stick_mean_free_params, free = True)
+    stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
+                    fold(stick_info_free_params, free = True)
+
+    vb_params_dict['ind_mix_stick_propn_mean'] = stick_mean
+    vb_params_dict['ind_mix_stick_propn_info'] = stick_info
+
+    use_logitnormal_sticks = True
+    return structure_model_lib.get_kl(g_obs, vb_params_dict, prior_params_dict,
+                        use_logitnormal_sticks,
+                        gh_loc, gh_weights,
+                        e_z = e_z)
+
+def update_logitnormal_sticks(g_obs, e_z, stick_mean, stick_info,
+                                vb_params_paragami, prior_params_dict,
+                                gh_loc, gh_weights,
+                                log_phi, epsilon):
+
+    # we use a logitnormal approximation to the sticks : thus, updates
+    # can't be computed in closed form. We take a gradient step satisfying wolfe conditions
+
+    # initial parameters
+    init_stick_mean_free = vb_params_paragami['ind_mix_stick_propn_mean'].\
+                                flatten(stick_mean, free = True)
+    init_stick_info_free = vb_params_paragami['ind_mix_stick_propn_info'].\
+                                flatten(stick_info, free = True)
+
+    # initial loss
+    init_ps_loss = _get_logitnormal_sticks_psloss(g_obs, e_z,
+                                        init_stick_mean_free,
+                                        init_stick_info_free,
+                                        vb_params_paragami,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
+    # get gradient
+    get_grad_stick_mean = autograd.grad(_get_logitnormal_sticks_psloss, argnum = 2)
+    get_grad_stick_info = autograd.grad(_get_logitnormal_sticks_psloss, argnum = 3)
+
+    grad_stick_mean = get_grad_stick_mean(g_obs, e_z,
+                                        init_stick_mean_free,
+                                        init_stick_info_free,
+                                        vb_params_paragami,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
+
+    grad_stick_info = get_grad_stick_info(g_obs, e_z,
+                                        init_stick_mean_free,
+                                        init_stick_info_free,
+                                        vb_params_paragami,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
+
+    # direction of step
+    step1 = - grad_stick_mean
+    step2 = - grad_stick_info
+
+    # choose stepsize
+    kl_new = 1e16
+    counter = 0.
+    rho = 0.5
+    alpha = 1.0 / rho
+
+    correction = np.sum(grad_stick_mean * step1) + np.sum(grad_stick_info * step2)
+
+    # for my sanity
+    assert correction < 0
+    while (kl_new > (init_ps_loss + 1e-4 * alpha * correction)):
+        alpha *= rho
+
+        update_stick_mean_free = init_stick_mean_free + alpha * step1
+        update_stick_info_free = init_stick_info_free + alpha * step2
+
+        kl_new = _get_logitnormal_sticks_psloss(g_obs, e_z,
+                                        update_stick_mean_free,
+                                        update_stick_info_free,
+                                        vb_params_paragami,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights,
+                                        log_phi, epsilon)
+
+        counter += 1
+
+        if counter > 10:
+            print('could not find stepsize for stick optimizer')
+            break
+
+    update_stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
+                            fold(update_stick_mean_free, free = True)
+
+    update_stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
+                            fold(update_stick_info_free, free = True)
+
+    return update_stick_mean, update_stick_info
 
 ###############
 # functions to run stochastic VI
