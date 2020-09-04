@@ -22,6 +22,8 @@
 
 *.npz
 
+*deleteme* 
+
 # Distribution / packaging
 .Python
 build/
