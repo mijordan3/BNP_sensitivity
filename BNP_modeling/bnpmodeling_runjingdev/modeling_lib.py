@@ -32,7 +32,7 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
     assert np.all(gh_weights > 0)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    assert np.all(stick_propn_info) > 0
+    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
     e_log_v, e_log_1mv =\
         ef.get_e_log_logitnormal(
@@ -107,7 +107,7 @@ def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
     assert np.all(gh_weights > 0)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    assert np.all(stick_propn_info) > 0
+    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -144,7 +144,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
         stick_propn_info = stick_propn_info[None, :]
         squeeze = True
 
-    assert np.all(stick_propn_info) > 0
+    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -177,7 +177,7 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     assert stick_propn_mean.shape == stick_propn_info.shape
 
-    assert np.all(stick_propn_info) > 0
+    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
 
     # expected log likelihood of all indicators for all n observations
