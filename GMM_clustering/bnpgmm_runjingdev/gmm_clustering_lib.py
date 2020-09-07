@@ -1,6 +1,6 @@
-import autograd
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax
+import jax.numpy as np
+import jax.scipy as sp
 
 import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
@@ -187,7 +187,7 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + 0.5 * my_slogdet3d(cluster_info)[1][None, :]
+    return - 0.5 * squared_term + 0.5 * np.expand_dims(my_slogdet3d(cluster_info)[1], 0)
                             # np.linalg.slogdet(cluster_info)[1][None, :]
 
 ##########################

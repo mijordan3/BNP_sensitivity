@@ -8,7 +8,7 @@ from vb_lib import structure_model_lib
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import bnpmodeling_runjingdev.exponential_families as ef
 
 import time
 

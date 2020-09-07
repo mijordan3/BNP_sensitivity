@@ -1,11 +1,9 @@
-import LinearResponseVariationalBayes as vb
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import bnpmodeling_runjingdev.exponential_families as ef
 
-import autograd
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax
+import jax.numpy as np
+import jax.scipy as sp
 
-import scipy as osp
 ################
 # define entropies
 
@@ -220,14 +218,10 @@ def my_slogdet3d(mat):
     logdet = np.zeros(k)
     s = np.zeros(k)
     for i in range(k):
-        dummy = np.zeros(k)
-        dummy[i] = 1.
 
         s_i, logdet_i = np.linalg.slogdet(mat[i])
 
-        logdet = logdet + dummy * logdet_i
-
-        # this messes with autograd array-boxes
-        # s[i] = s_i
+        logdet = jax.ops.index_update(logdet, i, logdet_i)
+        s = jax.ops.index_update(s, i, s_i)
 
     return s, logdet

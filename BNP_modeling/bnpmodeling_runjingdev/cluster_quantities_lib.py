@@ -1,8 +1,7 @@
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax.numpy as np
+import jax.scipy as sp
 
-import LinearResponseVariationalBayes as vb
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import bnpmodeling_runjingdev.exponential_families as ef
 
 
 def _cumprod_through_log(x, axis = None):
