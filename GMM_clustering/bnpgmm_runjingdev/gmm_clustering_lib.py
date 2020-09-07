@@ -346,18 +346,18 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     e_loglik = e_loglik_ind + e_loglik_obs
 
-    if not np.isfinite(e_loglik):
-        print('cluster_info', vb_params_dict['cluster_params']['cluster_info'].get())
-        print('det cluster_info', np.linalg.slogdet(
-            vb_params_dict['stick_params']['cluster_info'])[1])
-        print('cluster weights', np.sum(e_z, axis = 0))
-
-    assert(np.isfinite(e_loglik))
+    # if not np.isfinite(e_loglik):
+    #     print('cluster_info', vb_params_dict['cluster_params']['cluster_info'].get())
+    #     print('det cluster_info', np.linalg.slogdet(
+    #         vb_params_dict['stick_params']['cluster_info'])[1])
+    #     print('cluster weights', np.sum(e_z, axis = 0))
+    #
+    # assert(np.isfinite(e_loglik))
 
     # entropy term
     entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
                                         gh_loc, gh_weights))
-    assert(np.isfinite(entropy))
+    # assert(np.isfinite(entropy))
 
     # prior term
     e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
@@ -365,7 +365,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
                             prior_params_dict,
                             gh_loc, gh_weights)
 
-    assert(np.isfinite(e_log_prior))
+    # assert(np.isfinite(e_log_prior))
 
     elbo = e_log_prior + entropy + e_loglik
 
