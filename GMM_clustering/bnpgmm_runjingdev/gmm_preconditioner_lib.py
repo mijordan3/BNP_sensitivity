@@ -1,8 +1,6 @@
 import autograd
 import autograd.numpy as np
 
-from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
-
 from scipy import sparse
 from itertools import product
 

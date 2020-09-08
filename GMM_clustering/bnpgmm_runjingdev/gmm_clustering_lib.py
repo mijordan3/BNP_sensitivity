@@ -6,7 +6,7 @@ import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
-from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
+# from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
 
 import paragami
 
@@ -160,7 +160,8 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
 def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
     # get entropy term
 
-    z_entropy = modeling_lib.multinom_entropy(e_z)
+    # z_entropy = modeling_lib.multinom_entropy(e_z)
+    z_entropy = 0.
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights)
@@ -189,8 +190,8 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + 0.5 * np.expand_dims(my_slogdet3d(cluster_info)[1], 0)
-                            # np.linalg.slogdet(cluster_info)[1][None, :]
+    return - 0.5 * squared_term + np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
+        # + 0.5 * np.expand_dims(my_slogdet3d(cluster_info)[1], 0)
 
 ##########################
 # Optimization over e_z
@@ -234,7 +235,7 @@ def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info
                                     use_bnp_prior)
 
     log_const = sp.special.logsumexp(z_nat_param, axis=1)
-    e_z = np.exp(z_nat_param - log_const[:, None])
+    e_z = np.exp(z_nat_param - np.expand_dims(log_const, axis = 1))
 
     return e_z, loglik_obs_by_nk
 
@@ -286,10 +287,9 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
 
 
 def get_kl(y, vb_params_dict, prior_params_dict,
-                    gh_loc, gh_weights,
-                    e_z = None,
-                    data_weights = None,
-                    use_bnp_prior = True):
+            gh_loc, gh_weights,
+            e_z = None,
+            use_bnp_prior = True):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -314,8 +314,6 @@ def get_kl(y, vb_params_dict, prior_params_dict,
         parameters, stored in an array whose (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k.
         If ``None``, we set the optimal z.
-    data_weights : ndarray of shape (number of observations) x 1 (optional)
-        Weights for each datapoint in y.
     use_bnp_prior : boolean
         Whether or not to use a prior on the cluster mixture weights.
         If True, a DP prior is used.
@@ -338,22 +336,15 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     if e_z is None:
         e_z = e_z_opt
 
-    # weight data if necessary, and get likelihood of y
-    if data_weights is not None:
-        assert np.shape(data_weights)[0] == n_obs, \
-                    'data weights need to be n_obs by 1'
-        assert np.shape(data_weights)[1] == 1, \
-                    'data weights need to be n_obs by 1'
-        e_loglik_obs = np.sum(data_weights * e_z * loglik_obs_by_nk)
-    else:
-        e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+    e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
     # likelihood of z
-    if use_bnp_prior:
-        e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
-                            gh_loc, gh_weights)
-    else:
-        e_loglik_ind = 0.
+    # if use_bnp_prior:
+    #     e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
+    #                         gh_loc, gh_weights)
+    # else:
+    #     e_loglik_ind = 0.
+    e_loglik_ind = 0.
 
     e_loglik = e_loglik_ind + e_loglik_obs
 
@@ -366,15 +357,17 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     # assert(np.isfinite(e_loglik))
 
     # entropy term
-    entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
-                                        gh_loc, gh_weights))
+    # entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
+    #                                     gh_loc, gh_weights))
+    entropy = 0.0
     # assert(np.isfinite(entropy))
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
-                            centroids, cluster_info,
-                            prior_params_dict,
-                            gh_loc, gh_weights)
+    # e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
+    #                         centroids, cluster_info,
+    #                         prior_params_dict,
+    #                         gh_loc, gh_weights)
+    e_log_prior = 0.0
 
     # assert(np.isfinite(e_log_prior))
 

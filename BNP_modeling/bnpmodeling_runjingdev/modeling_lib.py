@@ -193,7 +193,7 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     return np.sum(e_z * e_log_cluster_probs)
 
-
+@jax.jit
 def get_e_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters
@@ -203,6 +203,7 @@ def get_e_beta(tau):
 
     return tau[..., 0] / sum_alpha_beta
 
+@jax.jit
 def get_e_log_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters
@@ -215,19 +216,20 @@ def get_e_log_beta(tau):
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
 
-def my_slogdet3d(mat):
-    assert len(mat.shape) == 3
-    # number of matricies in array
-    k = mat.shape[0]
-    assert mat.shape[1] == mat.shape[2]
-
-    logdet = np.zeros(k)
-    s = np.zeros(k)
-    for i in range(k):
-
-        s_i, logdet_i = np.linalg.slogdet(mat[i])
-
-        logdet = jax.ops.index_update(logdet, i, logdet_i)
-        s = jax.ops.index_update(s, i, s_i)
-
-    return s, logdet
+# @jax.jit
+# def my_slogdet3d(mat):
+#     assert len(mat.shape) == 3
+#     # number of matricies in array
+#     k = mat.shape[0]
+#     assert mat.shape[1] == mat.shape[2]
+#
+#     logdet = np.zeros(k)
+#     s = np.zeros(k)
+#     for i in range(k):
+#
+#         s_i, logdet_i = np.linalg.slogdet(mat[i])
+#
+#         logdet = jax.ops.index_update(logdet, i, logdet_i)
+#         s = jax.ops.index_update(s, i, s_i)
+#
+#     return s, logdet
