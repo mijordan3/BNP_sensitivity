@@ -122,6 +122,7 @@ def get_default_prior_params(dim):
 ##########################
 # Expected prior term
 ##########################
+@jax.jit
 def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         prior_params_dict,
                         gh_loc, gh_weights):
@@ -155,8 +156,8 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
 ##########################
 # Entropy
 ##########################
-def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights,
-                    use_logitnormal_sticks = True):
+@jax.jit
+def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
     # get entropy term
 
     z_entropy = modeling_lib.multinom_entropy(e_z)
@@ -169,6 +170,7 @@ def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights,
 ##########################
 # Likelihood term
 ##########################
+@jax.jit
 def get_loglik_obs_by_nk(y, centroids, cluster_info):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
@@ -193,7 +195,7 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
 ##########################
 # Optimization over e_z
 ##########################
-
+@jax.jit
 def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = True):
@@ -202,18 +204,26 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_i
     loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, cluster_info)
 
     # get weight term
-    if use_bnp_prior:
-        e_log_cluster_probs = \
-            modeling_lib.get_e_log_cluster_probabilities(
-                            stick_propn_mean, stick_propn_info,
-                            gh_loc, gh_weights)
-    else:
-        e_log_cluster_probs = 0.
+    operand = (stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
+    e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
+                    operand,
+                    lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
+                    operand,
+                    lambda x : np.zeros(len(operand[0]) + 1))
+
+    # if use_bnp_prior:
+    #     e_log_cluster_probs = \
+    #         modeling_lib.get_e_log_cluster_probabilities(
+    #                         stick_propn_mean, stick_propn_info,
+    #                         gh_loc, gh_weights)
+    # else:
+    #     e_log_cluster_probs = 0.
 
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param, loglik_obs_by_nk
 
+@jax.jit
 def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
@@ -228,6 +238,7 @@ def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info
 
     return e_z, loglik_obs_by_nk
 
+@jax.jit
 def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
                                         use_bnp_prior = True):
 
