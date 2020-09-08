@@ -6,12 +6,10 @@ import jax.scipy as sp
 
 ################
 # define entropies
-@jax.jit
 def multinom_entropy(e_z):
     # returns the entropy of the cluster belongings
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
 
-@jax.jit
 def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights):
     # return the entropy of logitnormal distriibution on the sticks whose
@@ -47,7 +45,6 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
 
 ################
 # define priors
-@jax.jit
 def get_e_centroid_prior(centroids, prior_mean, prior_info):
     # expected log prior for cluster centroids
     # Note that the variational distribution for the centroid is a dirac
@@ -62,7 +59,6 @@ def get_e_centroid_prior(centroids, prior_mean, prior_info):
 
     return np.sum(beta_base_prior)
 
-@jax.jit
 def get_e_log_wishart_prior(gamma, df, V_inv):
     # expected log prior for cluster info matrices gamma
 
@@ -72,7 +68,7 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    s, logdet = my_slogdet3d(gamma) # np.linalg.slogdet(gamma)
+    s, logdet = np.linalg.slogdet(gamma)
 
     return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 
@@ -81,7 +77,6 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 # logit stick distributions.
 # The function func should take arguments in the logit stick space, i.e.
 # logit_stick = log(stick / (1 - stick)).
-@jax.jit
 def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights, func):
 
@@ -98,7 +93,6 @@ def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
 
     return e_phi
 
-@jax.jit
 def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
                                 gh_loc, gh_weights):
     # expected log prior for the stick breaking proportions under the
@@ -125,7 +119,6 @@ def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
 
 ##############
 # likelihoods
-@jax.jit
 def get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv):
     zeros_shape = e_log_v.shape[0:-1] + (1,)
 
@@ -135,7 +128,6 @@ def get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv):
 
     return e_log_stick_remain + e_log_new_stick
 
-@jax.jit
 def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
                                         gh_loc, gh_weights):
 
@@ -174,7 +166,6 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     #
     # return (e_log_stick_remain + e_log_new_stick).squeeze()
 
-@jax.jit
 def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     # likelihood of cluster belongings e_z
@@ -193,7 +184,6 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     return np.sum(e_z * e_log_cluster_probs)
 
-@jax.jit
 def get_e_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters
@@ -203,7 +193,6 @@ def get_e_beta(tau):
 
     return tau[..., 0] / sum_alpha_beta
 
-@jax.jit
 def get_e_log_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
     # beta parameters
@@ -216,7 +205,6 @@ def get_e_log_beta(tau):
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
 
-# @jax.jit
 # def my_slogdet3d(mat):
 #     assert len(mat.shape) == 3
 #     # number of matricies in array

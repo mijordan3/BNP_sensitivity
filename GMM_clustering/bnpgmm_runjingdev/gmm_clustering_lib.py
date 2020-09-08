@@ -122,7 +122,6 @@ def get_default_prior_params(dim):
 ##########################
 # Expected prior term
 ##########################
-@jax.jit
 def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         prior_params_dict,
                         gh_loc, gh_weights):
@@ -147,16 +146,12 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
     prior_info = cluster_info * prior_lambda
     e_centroid_prior = -0.5 * np.einsum('ji, ij -> i', diff,
                             np.einsum('ijk, ki -> ij', prior_info, diff)).sum()
-    #
-    # e_centroid_prior = \
-    #     modeling_lib.get_e_centroid_prior(centroids, prior_mean, prior_info)
 
     return np.squeeze(e_cluster_info_prior + e_centroid_prior + dp_prior)
 
 ##########################
 # Entropy
 ##########################
-@jax.jit
 def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
     # get entropy term
 
@@ -171,7 +166,6 @@ def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-@jax.jit
 def get_loglik_obs_by_nk(y, centroids, cluster_info):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
@@ -196,7 +190,6 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
 ##########################
 # Optimization over e_z
 ##########################
-@jax.jit
 def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = True):
@@ -224,7 +217,6 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_i
 
     return z_nat_param, loglik_obs_by_nk
 
-@jax.jit
 def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
@@ -239,7 +231,6 @@ def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info
 
     return e_z, loglik_obs_by_nk
 
-@jax.jit
 def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
                                         use_bnp_prior = True):
 
@@ -330,13 +321,13 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
-    e_z_opt, loglik_obs_by_nk = \
-            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
-                            gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
-    if e_z is None:
-        e_z = e_z_opt
-
-    e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+    # e_z_opt, loglik_obs_by_nk = \
+    #         get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+    #                         gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
+    # if e_z is None:
+    #     e_z = e_z_opt
+    #
+    # e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
     # likelihood of z
     # if use_bnp_prior:
@@ -344,6 +335,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     #                         gh_loc, gh_weights)
     # else:
     #     e_loglik_ind = 0.
+    e_loglik_obs = 0.
     e_loglik_ind = 0.
 
     e_loglik = e_loglik_ind + e_loglik_obs
@@ -363,11 +355,11 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     # assert(np.isfinite(entropy))
 
     # prior term
-    # e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
-    #                         centroids, cluster_info,
-    #                         prior_params_dict,
-    #                         gh_loc, gh_weights)
-    e_log_prior = 0.0
+    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
+                            centroids, cluster_info,
+                            prior_params_dict,
+                            gh_loc, gh_weights)
+    # e_log_prior = 0.0
 
     # assert(np.isfinite(e_log_prior))
 
