@@ -166,8 +166,16 @@ def run_cavi(y, vb_params_dict,
     stick_obj_fun_jit = jax.jit(stick_obj_fun)
     stick_grad_fun = jax.jit(jax.grad(stick_obj_fun, 0))
 
+    # jit the flatten compution  ...
+    flatten_vb_params = lambda vb_params_dict : \
+                            vb_params_paragami.flatten(vb_params_dict,
+                                                        free = True,
+                                                        # otherwise wont work with jit
+                                                        validate_value=False)
+    flatten_vb_params = jax.jit(flatten_vb_params)
+
     success = False
-    t_loop_start = time.time()
+
     for i in range(max_iter):
         # update e_z
         t0 = time.time()
@@ -224,19 +232,18 @@ def run_cavi(y, vb_params_dict,
             assert kl_new <= kl_old, 'stick update failed; diff = {}'.format(kl_new - kl_old)
             kl_old = kl_new
 
-        diff = np.abs(vb_params_paragami.flatten(vb_params_dict, free = True) - \
-                            x_old).max()
+        x_new = flatten_vb_params(vb_params_dict)
+        diff = np.abs(x_new - x_old).max()
         if diff < x_tol:
             print('done. num iterations = {}'.format(i))
             success = True
             break
         else:
-            x_old = vb_params_paragami.flatten(vb_params_dict, free = True)
+            x_old = x_new
 
     if not success:
         print('warning, maximum iterations reached')
 
-    print('loop time: ' + time.time() - t_loop_start)
     # get e_z optima
     e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
                                                     gh_loc, gh_weights)
