@@ -6,8 +6,6 @@ import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
-# from bnpmodeling_runjingdev.modeling_lib import my_slogdet3d
-
 import paragami
 
 ##########################
@@ -144,10 +142,9 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
 
     diff = centroids - prior_mean
     prior_info = cluster_info * prior_lambda
-    e_centroid_prior = -0.5 * np.einsum('ji, ij -> i', diff,
-                            np.einsum('ijk, ki -> ij', prior_info, diff)).sum()
+    e_centroid_prior = -0.5 * np.einsum('ji, ijk, ki', diff, prior_info, diff)
 
-    return np.squeeze(e_cluster_info_prior + e_centroid_prior + dp_prior)
+    return e_cluster_info_prior + e_centroid_prior + dp_prior
 
 ##########################
 # Entropy
@@ -155,8 +152,7 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
 def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
     # get entropy term
 
-    # z_entropy = modeling_lib.multinom_entropy(e_z)
-    z_entropy = 0.
+    z_entropy = modeling_lib.multinom_entropy(e_z)
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights)
@@ -204,14 +200,6 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_i
                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
                     operand,
                     lambda x : np.zeros(len(operand[0]) + 1))
-
-    # if use_bnp_prior:
-    #     e_log_cluster_probs = \
-    #         modeling_lib.get_e_log_cluster_probabilities(
-    #                         stick_propn_mean, stick_propn_info,
-    #                         gh_loc, gh_weights)
-    # else:
-    #     e_log_cluster_probs = 0.
 
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
@@ -321,22 +309,20 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
-    # e_z_opt, loglik_obs_by_nk = \
-    #         get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
-    #                         gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
-    # if e_z is None:
-    #     e_z = e_z_opt
-    #
-    # e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+    e_z_opt, loglik_obs_by_nk = \
+            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+                            gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
+    if e_z is None:
+        e_z = e_z_opt
+
+    e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
     # likelihood of z
-    # if use_bnp_prior:
-    #     e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
-    #                         gh_loc, gh_weights)
-    # else:
-    #     e_loglik_ind = 0.
-    e_loglik_obs = 0.
-    e_loglik_ind = 0.
+    if use_bnp_prior:
+        e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
+                            gh_loc, gh_weights)
+    else:
+        e_loglik_ind = 0.
 
     e_loglik = e_loglik_ind + e_loglik_obs
 
@@ -349,9 +335,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     # assert(np.isfinite(e_loglik))
 
     # entropy term
-    # entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
-    #                                     gh_loc, gh_weights))
-    entropy = 0.0
+    entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
+                                        gh_loc, gh_weights))
     # assert(np.isfinite(entropy))
 
     # prior term
@@ -359,7 +344,6 @@ def get_kl(y, vb_params_dict, prior_params_dict,
                             centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
-    # e_log_prior = 0.0
 
     # assert(np.isfinite(e_log_prior))
 
