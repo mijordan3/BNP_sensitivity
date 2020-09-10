@@ -1,5 +1,7 @@
 import numpy as np
 
+import jax.numpy as jnp
+
 import scipy as sp
 from scipy import spatial
 import scipy.cluster.hierarchy as sch
@@ -24,7 +26,7 @@ def load_data(demean=True):
         iris_features -= np.mean(iris_features, axis = 0)[None, :]
 
     iris_species = iris[1]
-    return iris_features, iris_species
+    return jnp.array(iris_features), iris_species
 
 
 def plot_clusters(x, y, cluster_labels, colors, fig, centroids = None, cov = None):
@@ -153,10 +155,10 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
         e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
     e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-    vb_params_dict['cluster_params']['centroids'] = km_best.cluster_centers_.T
+    vb_params_dict['cluster_params']['centroids'] = jnp.array(km_best.cluster_centers_.T)
 
-    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
-    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_mean'] = jnp.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_info'] = jnp.ones(k_approx - 1)
 
     # Set inital inv. covariances
     cluster_info_init = np.zeros((k_approx, dim, dim))
@@ -174,7 +176,7 @@ def cluster_and_get_k_means_inits(y, vb_params_paragami,
             # symmetrize ... there might be some numerical issues otherwise
             cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
 
-    vb_params_dict['cluster_params']['cluster_info'] = cluster_info_init
+    vb_params_dict['cluster_params']['cluster_info'] = jnp.array(cluster_info_init)
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
