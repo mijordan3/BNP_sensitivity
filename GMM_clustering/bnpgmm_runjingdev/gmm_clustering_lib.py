@@ -219,51 +219,6 @@ def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info
 
     return e_z, loglik_obs_by_nk
 
-def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
-                                        use_bnp_prior = True):
-
-    """
-    Returns the optimal cluster belonging probabilities, given the
-    variational parameters.
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_dict : dictionary
-        Dictionary of variational parameters.
-    gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    use_bnp_prior : boolean
-        Whether or not to use a prior on the cluster mixture weights.
-        If True, a DP prior is used.
-
-    Returns
-    -------
-    e_z : ndarray
-        The optimal cluster belongings as a function of the variational
-        parameters, stored in an array whose (n, k)th entry is the probability
-        of the nth datapoint belonging to cluster k
-
-    """
-
-    # get global vb parameters
-    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
-    centroids = vb_params_dict['cluster_params']['centroids']
-    cluster_info = vb_params_dict['cluster_params']['cluster_info']
-
-    # compute optimal e_z from vb global parameters
-    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
-                        gh_loc, gh_weights,
-                        use_bnp_prior = use_bnp_prior)
-
-    return e_z
-
 
 def get_kl(y, vb_params_dict, prior_params_dict,
             gh_loc, gh_weights,
@@ -356,6 +311,52 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 ########################
 # Posterior quantities of interest
 #######################
+@jax.jit
+def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
+                                        use_bnp_prior = True):
+
+    """
+    Returns the optimal cluster belonging probabilities, given the
+    variational parameters.
+
+    Parameters
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    use_bnp_prior : boolean
+        Whether or not to use a prior on the cluster mixture weights.
+        If True, a DP prior is used.
+
+    Returns
+    -------
+    e_z : ndarray
+        The optimal cluster belongings as a function of the variational
+        parameters, stored in an array whose (n, k)th entry is the probability
+        of the nth datapoint belonging to cluster k
+
+    """
+
+    # get global vb parameters
+    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
+    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    centroids = vb_params_dict['cluster_params']['centroids']
+    cluster_info = vb_params_dict['cluster_params']['cluster_info']
+
+    # compute optimal e_z from vb global parameters
+    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+                        gh_loc, gh_weights,
+                        use_bnp_prior = use_bnp_prior)
+
+    return e_z
+
 
 def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
                                                     vb_params_free,

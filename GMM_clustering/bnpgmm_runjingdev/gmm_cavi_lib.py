@@ -1,6 +1,6 @@
-import autograd
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax
+import jax.numpy as np
+import jax.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
 from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
@@ -11,6 +11,7 @@ import time
 
 from copy import deepcopy
 
+@jax.jit
 def update_centroids(y, e_z, prior_params_dict):
     n_obs = e_z.sum(0, keepdims = True)
 
@@ -21,6 +22,7 @@ def update_centroids(y, e_z, prior_params_dict):
 
     return (prior_lambda * mu0 + centroid_sums) / (prior_lambda + n_obs)
 
+@jax.jit
 def update_cluster_info(y, e_z, centroids, prior_params_dict):
     prior_mean = prior_params_dict['prior_centroid_mean']
     prior_lambda = prior_params_dict['prior_lambda']
@@ -40,7 +42,7 @@ def update_cluster_info(y, e_z, centroids, prior_params_dict):
 
     info_update = np.linalg.inv(cov_update)
 
-    return 0.5 * (info_update.transpose(0, 2, 1) + info_update)
+    return 0.5 * (info_update.transpose((0, 2, 1)) + info_update)
 
 def _get_sticks_loss(y, stick_free_params, stick_params_paragmi,
                      e_z, vb_params_dict, prior_params_dict, gh_loc, gh_weights):
@@ -54,7 +56,7 @@ def _get_sticks_loss(y, stick_free_params, stick_params_paragmi,
                             e_z = e_z)
 
 def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
-                     e_z, vb_params_dict, prior_params_dict,
+                     e_z, prior_params_dict,
                      gh_loc, gh_weights,
                      log_phi = None,
                      epsilon = 0.):
@@ -62,11 +64,11 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
     # returns a "pseudo-loss" as a function of the stick-breaking parameters:
     # that is, the terms of the loss that are a function of the stick parameters only
 
-    vb_params_dict['stick_params'] = \
+    stick_params_dict = \
         stick_params_paragmi.fold(stick_free_params, free = True)
 
-    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    stick_propn_mean = stick_params_dict['stick_propn_mean']
+    stick_propn_info = stick_params_dict['stick_propn_info']
 
     e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info,
                             e_z, gh_loc, gh_weights)
@@ -89,32 +91,22 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
     return - e_loglik_ind - dp_prior - stick_entropy + e_log_pert
 
 
-def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
-                   vb_params_paragami, gh_loc, gh_weights,
-                   log_phi = None, epsilon = 0):
+def update_sticks(stick_obj_fun, stick_grad_fun, e_z,
+                    stick_param_dict, stick_params_paragami):
 
     # we use a logitnormal approximation to the sticks : thus, updates
     # can't be computed in closed form. We take a gradient step satisfying wolfe conditions
 
     # initial parameters
     init_stick_free_param = \
-        vb_params_paragami['stick_params'].flatten(vb_params_dict['stick_params'],
-                                                              free = True)
+        stick_params_paragami.flatten(stick_param_dict, free = True)
 
     # initial loss
-    init_ps_loss = _get_sticks_psloss(y, init_stick_free_param,
-                                vb_params_paragami['stick_params'],
-                                e_z, vb_params_dict, prior_params_dict,
-                                gh_loc, gh_weights,
-                                log_phi, epsilon)
-    # get gradient
-    get_stick_grad = autograd.elementwise_grad(_get_sticks_psloss, 1)
+    init_ps_loss = stick_obj_fun(init_stick_free_param, e_z)
 
-    stick_grad = get_stick_grad(y, init_stick_free_param,
-                                vb_params_paragami['stick_params'],
-                                    e_z, vb_params_dict, prior_params_dict,
-                                    gh_loc, gh_weights,
-                                    log_phi, epsilon)
+    # get gradient
+    stick_grad = stick_grad_fun(init_stick_free_param, e_z)
+
     # direction of step
     step = - stick_grad
 
@@ -131,18 +123,14 @@ def update_sticks(y, e_z, vb_params_dict, prior_params_dict,
 
         update_stick_free_param = init_stick_free_param + alpha * step
 
-        kl_new = _get_sticks_psloss(y, update_stick_free_param,
-                                    vb_params_paragami['stick_params'],
-                                    e_z, vb_params_dict, prior_params_dict,
-                                    gh_loc, gh_weights,
-                                    log_phi, epsilon)
+        kl_new = stick_obj_fun(update_stick_free_param, e_z)
         counter += 1
 
         if counter > 10:
             print('could not find stepsize for stick optimizer')
             break
 
-    return vb_params_paragami['stick_params'].fold(update_stick_free_param,
+    return stick_params_paragami.fold(update_stick_free_param,
                                                     free = True)
 
 def run_cavi(y, vb_params_dict,
@@ -166,7 +154,20 @@ def run_cavi(y, vb_params_dict,
 
     n_obs = y.shape[0]
 
+    # jit the stick objective and gradient
+    # used to update the logitnormal sticks
+    stick_params_paragmi = vb_params_paragami['stick_params']
+    stick_obj_fun = lambda stick_free_params, e_z : \
+                        _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
+                                             e_z, prior_params_dict,
+                                             gh_loc, gh_weights,
+                                             log_phi,
+                                             epsilon)
+    stick_obj_fun_jit = jax.jit(stick_obj_fun)
+    stick_grad_fun = jax.jit(jax.grad(stick_obj_fun, 0))
+
     success = False
+    t_loop_start = time.time()
     for i in range(max_iter):
         # update e_z
         t0 = time.time()
@@ -185,7 +186,6 @@ def run_cavi(y, vb_params_dict,
         t0 = time.time()
         vb_params_dict['cluster_params']['centroids'] = \
             update_centroids(y, e_z, prior_params_dict)
-
 
         if debug:
             kl_new = gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
@@ -212,11 +212,9 @@ def run_cavi(y, vb_params_dict,
         # update sticks
         t0 = time.time()
         vb_params_dict['stick_params'] = \
-            update_sticks(y, e_z, vb_params_dict,
-                                    prior_params_dict,
-                                    vb_params_paragami,
-                                    gh_loc, gh_weights,
-                                    log_phi, epsilon)
+            update_sticks(stick_obj_fun_jit, stick_grad_fun, e_z,
+                                vb_params_dict['stick_params'],
+                                vb_params_paragami['stick_params'])
 
         stick_time += time.time() - t0
         if debug:
@@ -238,7 +236,7 @@ def run_cavi(y, vb_params_dict,
     if not success:
         print('warning, maximum iterations reached')
 
-
+    print('loop time: ' + time.time() - t_loop_start)
     # get e_z optima
     e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
                                                     gh_loc, gh_weights)
