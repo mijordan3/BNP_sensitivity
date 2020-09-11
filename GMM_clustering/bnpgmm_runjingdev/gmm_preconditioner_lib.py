@@ -1,8 +1,10 @@
-import autograd
-import autograd.numpy as np
+import jax
+import jax.numpy as np
 
-from scipy import sparse
+from jax.scipy import sparse
 from itertools import product
+
+import numpy as onp
 
 import paragami
 
@@ -34,8 +36,8 @@ def get_mvn_log_partition(nat_vec, mvn_nat_params_paragami):
 
     return - 0.25 * squared_term - 0.5 * np.linalg.slogdet(2 * neg_nat2)[1]
 
-get_jac_term = autograd.jacobian(get_nat_vec, 0)
-get_log_part_hess = autograd.hessian(get_mvn_log_partition, 0)
+get_jac_term = jax.jacobian(get_nat_vec, 0)
+get_log_part_hess = jax.hessian(get_mvn_log_partition, 0)
 
 def get_mvn_paragami_objects(dim):
     mvn_nat_params_paragami = paragami.PatternDict()
@@ -70,8 +72,12 @@ def get_fishers_info(mvn_free_params, dim):
 
     return np.dot(jac_term.transpose(), np.dot(fishers_info, jac_term))
 
+def _update_kth_element_as_true(x, k):
+    return jax.ops.index_update(x, k, True)
+
 def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
-    preconditioner = sparse.lil_matrix((len(vb_free_params), len(vb_free_params)))
+    # preconditioner = sparse.lil_matrix((len(vb_free_params), len(vb_free_params)))
+    preconditioner = onp.zeros((len(vb_free_params), len(vb_free_params)))
 
     bool_dict = vb_params_paragami.empty_bool(False)
 
@@ -80,8 +86,11 @@ def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
 
     # get preconditioners for cluster parameters
     for k in range(k_approx):
-        bool_dict['cluster_params']['centroids'][:, k] = True
-        bool_dict['cluster_params']['cluster_info'][k] = True
+        bool_dict['cluster_params']['centroids'] = \
+            jax.ops.index_update(bool_dict['cluster_params']['centroids'],
+                                    jax.ops.index[:, k], True)
+        bool_dict['cluster_params']['cluster_info'] = \
+            _update_kth_element_as_true(bool_dict['cluster_params']['cluster_info'], k)
 
         # get indices
         indx_cluster_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
@@ -123,16 +132,18 @@ def get_gmm_preconditioner(vb_free_params, vb_params_paragami):
     stick_bool_dict = vb_params_paragami['stick_params'].empty_bool(False)
 
     for k in range(k_approx - 1):
-        bool_dict['stick_params']['stick_propn_mean'][k] = True
-        bool_dict['stick_params']['stick_propn_info'][k] = True
+        bool_dict['stick_params']['stick_propn_mean'] = \
+            _update_kth_element_as_true(bool_dict['stick_params']['stick_propn_mean'], k)
+        bool_dict['stick_params']['stick_propn_info'] = \
+            _update_kth_element_as_true(bool_dict['stick_params']['stick_propn_info'], k)
 
         # indices in full vb parameters
         indx_stick_params_k = vb_params_paragami.flat_indices(bool_dict, free = True)
         indx_product = np.array(list(product(indx_stick_params_k, indx_stick_params_k)))
 
         # indices within stick parameters
-        stick_bool_dict['stick_propn_mean'][k] = True
-        stick_bool_dict['stick_propn_info'][k] = True
+        stick_bool_dict['stick_propn_mean'] = _update_kth_element_as_true(stick_bool_dict['stick_propn_mean'], k)
+        stick_bool_dict['stick_propn_info'] = _update_kth_element_as_true(stick_bool_dict['stick_propn_info'], k)
         indx2_stick_params_k = vb_params_paragami['stick_params'].flat_indices(stick_bool_dict, free = True)
 
         # get jacobian
