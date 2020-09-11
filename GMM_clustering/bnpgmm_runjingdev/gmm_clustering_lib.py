@@ -180,7 +180,7 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
 
-    return - 0.5 * squared_term + np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
+    return - 0.5 * squared_term + 0.5 * np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
         # + 0.5 * np.expand_dims(my_slogdet3d(cluster_info)[1], 0)
 
 ##########################
