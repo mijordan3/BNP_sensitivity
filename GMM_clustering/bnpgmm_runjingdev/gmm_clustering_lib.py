@@ -362,7 +362,9 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
                                                     vb_params_free,
                                                     n_obs,
                                                     threshold = 0,
-                                                    n_samples = 100000):
+                                                    n_samples = 100000,
+                                                    rng_key = None,
+                                                    unv_norm_samples = None):
     # get posterior predicted number of clusters
 
     vb_params_dict = \
@@ -374,7 +376,9 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
     return cluster_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
                                                         n_obs,
                                                         threshold = threshold,
-                                                        n_samples = n_samples)
+                                                        n_samples = n_samples,
+                                                        rng_key = rng_key,
+                                                        unv_norm_samples = unv_norm_samples)
 
 
 # Get the expected posterior number of distinct clusters.
@@ -382,6 +386,7 @@ def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
                                         gh_loc, gh_weights,
                                         threshold = 0,
                                         n_samples = 100000,
+                                        rng_key = None,
                                         unif_samples = None):
 
     vb_params_dict = \
@@ -393,6 +398,7 @@ def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
     return cluster_lib.get_e_num_large_clusters_from_ez(e_z,
                                         threshold = threshold,
                                         n_samples = n_samples,
+                                        rng_key = rng_key,
                                         unif_samples = unif_samples)
 
 ###############
