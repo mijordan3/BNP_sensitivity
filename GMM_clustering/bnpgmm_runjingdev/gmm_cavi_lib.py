@@ -257,10 +257,10 @@ def run_cavi(y, vb_params_dict,
     e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
                                                     gh_loc, gh_weights)
 
-    print('stick_time: {}sec'.format(np.round(stick_time, 3)))
-    print('cluster_time: {}sec'.format(np.round(cluster_time, 3)))
-    print('e_z_time: {}sec'.format(np.round(e_z_time, 3)))
-    print('**CAVI time: {}sec**'.format(np.round(time.time() - time0, 3)))
+    print('stick_time: {0:.3g}sec'.format(stick_time))
+    print('cluster_time: {0:.3g}sec'.format(cluster_time))
+    print('e_z_time: {0:.3g}sec'.format(e_z_time))
+    print('**CAVI time: {0:.3g}sec**'.format(time.time() - time0))
 
     return vb_params_dict, e_z
 
@@ -285,4 +285,4 @@ def compile_cav_updates(stick_obj_fun, stick_grad_fun, flatten_vb_params,
     _ = stick_obj_fun(stick_free_params, e_z)
     _ = stick_grad_fun(stick_free_params, e_z)
 
-    print('CAVI compile time: {:0.3}sec'.format(time.time() - t0))
+    print('CAVI compile time: {0:.3g}sec'.format(time.time() - t0))
