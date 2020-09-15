@@ -143,8 +143,6 @@ def run_cavi(y, vb_params_dict,
                     debug = False):
     # runs coordinate ascent in a gmm model
 
-    time0 = time.time()
-
     x_old = 1e16
     kl_old = 1e16
 
@@ -163,10 +161,12 @@ def run_cavi(y, vb_params_dict,
                                              gh_loc, gh_weights,
                                              log_phi,
                                              epsilon)
+
     stick_obj_fun_jit = jax.jit(stick_obj_fun)
     stick_grad_fun = jax.jit(jax.grad(stick_obj_fun, 0))
 
-    # jit the flatten compution  ...
+    # jit the flatten computation  ...
+    # this is actually slow otherwise
     flatten_vb_params = lambda vb_params_dict : \
                             vb_params_paragami.flatten(vb_params_dict,
                                                         free = True,
@@ -176,6 +176,15 @@ def run_cavi(y, vb_params_dict,
 
     success = False
 
+    # Compile cavi functions
+    stick_free_params = vb_params_paragami['stick_params'].flatten(\
+                                vb_params_dict['stick_params'], free = True)
+    compile_cav_updates(stick_obj_fun_jit, stick_grad_fun, flatten_vb_params,
+                        y, vb_params_dict, prior_params_dict, stick_free_params,
+                        gh_loc, gh_weights)
+
+    print('\nRunning CAVI ... ')
+    time0 = time.time()
     for i in range(max_iter):
         # update e_z
         t0 = time.time()
@@ -251,6 +260,29 @@ def run_cavi(y, vb_params_dict,
     print('stick_time: {}sec'.format(np.round(stick_time, 3)))
     print('cluster_time: {}sec'.format(np.round(cluster_time, 3)))
     print('e_z_time: {}sec'.format(np.round(e_z_time, 3)))
-    print('**TOTAL time: {}sec**'.format(np.round(time.time() - time0, 3)))
+    print('**CAVI time: {}sec**'.format(np.round(time.time() - time0, 3)))
 
     return vb_params_dict, e_z
+
+def compile_cav_updates(stick_obj_fun, stick_grad_fun, flatten_vb_params,
+                            y, vb_params_dict, prior_params_dict, stick_free_params,
+                            gh_loc, gh_weights):
+
+    print('Compiling CAVI update functions ... ')
+    t0 = time.time()
+
+    # compile z-update
+    e_z = gmm_lib.get_optimal_z_from_vb_params_dict(y, vb_params_dict,
+                                                    gh_loc, gh_weights)
+
+    # compile centroid updates
+    _ = update_centroids(y, e_z, prior_params_dict)
+
+    # compile flatten function
+    _ = flatten_vb_params(vb_params_dict)
+
+    # compile stick objective an dfunctions
+    _ = stick_obj_fun(stick_free_params, e_z)
+    _ = stick_grad_fun(stick_free_params, e_z)
+
+    print('CAVI compile time: {:0.3}sec'.format(time.time() - t0))
