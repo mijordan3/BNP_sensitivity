@@ -1,3 +1,5 @@
+import jax
+
 import jax.numpy as np
 import jax.scipy as sp
 
@@ -83,7 +85,10 @@ def get_stick_break_propns_from_mixture_weights(mixture_weights):
     stick_remain = np.ones(n_obs)
 
     for i in range(k_approx - 1):
-        stick_break_propn[:, i] = mixture_weights[:, i] / stick_remain
+        stick_break_propn = jax.ops.index_update(stick_break_propn,
+                                                jax.ops.index[:, i],
+                                                mixture_weights[:, i] / stick_remain)
+
         stick_remain *= (1 - stick_break_propn[:, i])
 
     return stick_break_propn
