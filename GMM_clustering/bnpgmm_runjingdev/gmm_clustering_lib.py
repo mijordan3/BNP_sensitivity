@@ -257,6 +257,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     kl : float
         The negative elbo.
     """
+
     # get vb parameters
     stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
     stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
@@ -299,7 +300,6 @@ def get_kl(y, vb_params_dict, prior_params_dict,
                             centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
-
     # assert(np.isfinite(e_log_prior))
 
     elbo = e_log_prior + entropy + e_loglik
@@ -362,7 +362,7 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
                                                     vb_params_free,
                                                     n_obs,
                                                     threshold = 0,
-                                                    n_samples = 100000,
+                                                    n_samples = 10000,
                                                     rng_key = None,
                                                     unv_norm_samples = None):
     # get posterior predicted number of clusters
@@ -385,7 +385,7 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
 def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
                                         gh_loc, gh_weights,
                                         threshold = 0,
-                                        n_samples = 100000,
+                                        n_samples = 10000,
                                         rng_key = None,
                                         unif_samples = None):
 
