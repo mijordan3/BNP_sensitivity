@@ -381,7 +381,7 @@ def get_moments_from_vb_params_dict(vb_params_dict,
 
 ###############
 # functions for initializing
-def cluster_and_get_init(g_obs, k):
+def cluster_and_get_init(g_obs, k, seed):
     # g_obs should be n_obs x n_loci x 3,
     # a one-hot encoding of genotypes
     assert len(g_obs.shape) == 3
@@ -390,7 +390,7 @@ def cluster_and_get_init(g_obs, k):
     x = g_obs.argmax(axis = 2) / 2
 
     # run NMF
-    model = NMF(n_components=k, init='random')
+    model = NMF(n_components=k, init='random', random_state = seed)
     init_ind_admix_propn_unscaled = model.fit_transform(x)
     init_pop_allele_freq_unscaled = model.components_.T
 
@@ -412,10 +412,11 @@ def cluster_and_get_init(g_obs, k):
     return init_ind_admix_propn, init_pop_allele_freq.clip(0.05, 0.95)
 
 def set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                        use_logitnormal_sticks):
+                        use_logitnormal_sticks,
+                        seed):
     # get initial admixtures, and population frequencies
     init_ind_admix_propn, init_pop_allele_freq = \
-            cluster_and_get_init(g_obs, k_approx)
+            cluster_and_get_init(g_obs, k_approx, seed = seed)
 
     # set bnp parameters for individual admixture
     # set mean to be logit(stick_breaking_propn), info to be 1
