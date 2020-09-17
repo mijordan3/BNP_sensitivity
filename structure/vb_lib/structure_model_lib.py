@@ -215,24 +215,12 @@ def get_z_opt_from_loglik_cond_z(loglik_cond_z):
 
     return np.exp(loglik_cond_z - log_const)
 
-
 def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
-                                    obs_weights = None,
-                                    loci_weights = None,
-                                    return_ez = False):
-    if obs_weights is not None:
-        assert len(obs_weights.shape) == 1 # should be a vector
-        assert len(obs_weights) == g_obs.shape[0]
-        obs_weights = obs_weights[:, None, None, None]
-    else:
-        obs_weights = 1.0
-
-    if loci_weights is not None:
-        raise NotImplementedError()
+                                    set_optimal_z = True):
 
     # log likelihood of individual population belongings
     e_log_cluster_probs = \
@@ -243,13 +231,15 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
             get_loglik_cond_z(g_obs, e_log_pop_freq,
                                 e_log_1m_pop_freq, e_log_cluster_probs)
 
-    if e_z is None:
+    if set_optimal_z:
         # set at optimal e_z
         e_z = get_z_opt_from_loglik_cond_z(loglik_cond_z)
+    else:
+        assert e_z is not None
 
-    e_loglik = np.sum(e_z * loglik_cond_z * obs_weights)
+    e_loglik = np.sum(e_z * loglik_cond_z)
 
-    assert(np.isfinite(e_loglik))
+    # assert(np.isfinite(e_loglik))
 
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
@@ -257,20 +247,15 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
 
-    assert(np.isfinite(e_log_prior))
+    # assert(np.isfinite(e_log_prior))
 
-    if return_ez:
-        return e_log_prior + e_loglik, e_z
-    else:
-        return e_log_prior + e_loglik
+    return e_log_prior + e_loglik, e_z
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
-                    e_z = None,
-                    obs_weights = None,
-                    loci_weights = None):
+                    e_z = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -324,9 +309,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                 e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta,
-                                obs_weights = obs_weights,
-                                loci_weights = loci_weights,
-                                return_ez = True)
+                                set_optimal_z = (e_z is None))
 
     # entropy term
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']

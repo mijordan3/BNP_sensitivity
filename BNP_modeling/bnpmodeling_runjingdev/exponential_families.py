@@ -151,6 +151,7 @@ def get_e_logitnormal(lognorm_means, lognorm_infos, gh_loc, gh_weights):
     return get_e_fun_normal(lognorm_means, lognorm_infos, \
                             gh_loc, gh_weights, identity_fun)
 
+@jax.jit
 def get_e_log_logitnormal(lognorm_means, lognorm_infos, gh_loc, gh_weights):
     # get expectation of Elog(X) and E[1 - log(X)] when X follows a logit normal
 
