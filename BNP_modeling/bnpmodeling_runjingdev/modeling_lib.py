@@ -102,10 +102,7 @@ def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
     # gh_loc and gh_weights specifiy the location and weights of the
     # quadrature points
 
-    # assert np.all(gh_weights > 0)
-
     assert stick_propn_mean.shape == stick_propn_info.shape
-    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -158,13 +155,6 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     else:
         return e_log_cluster_probs
 
-    # zeros_shape = stick_propn_mean.shape[0:-1] + (1,)
-    #
-    # e_log_stick_remain = np.concatenate([np.zeros(zeros_shape), \
-    #                                     np.cumsum(e_log_1mv, axis = -1)], axis = -1)
-    # e_log_new_stick = np.concatenate((e_log_v, np.zeros(zeros_shape)), axis = -1)
-    #
-    # return (e_log_stick_remain + e_log_new_stick).squeeze()
 
 def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 

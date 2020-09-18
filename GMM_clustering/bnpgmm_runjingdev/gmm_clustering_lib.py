@@ -181,7 +181,6 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
                     np.expand_dims(centroid2_term, axis = 0)
 
     return - 0.5 * squared_term + 0.5 * np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
-        # + 0.5 * np.expand_dims(my_slogdet3d(cluster_info)[1], 0)
 
 ##########################
 # Optimization over e_z
@@ -282,25 +281,15 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     e_loglik = e_loglik_ind + e_loglik_obs
 
-    # if not np.isfinite(e_loglik):
-    #     print('cluster_info', vb_params_dict['cluster_params']['cluster_info'].get())
-    #     print('det cluster_info', np.linalg.slogdet(
-    #         vb_params_dict['stick_params']['cluster_info'])[1])
-    #     print('cluster weights', np.sum(e_z, axis = 0))
-    #
-    # assert(np.isfinite(e_loglik))
-
     # entropy term
-    entropy = np.squeeze(get_entropy(stick_propn_mean, stick_propn_info, e_z,
-                                        gh_loc, gh_weights))
-    # assert(np.isfinite(entropy))
+    entropy = get_entropy(stick_propn_mean, stick_propn_info, e_z,
+                                        gh_loc, gh_weights)
 
     # prior term
     e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
                             centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
-    # assert(np.isfinite(e_log_prior))
 
     elbo = e_log_prior + entropy + e_loglik
 
@@ -311,7 +300,6 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 ########################
 # Posterior quantities of interest
 #######################
-@jax.jit
 def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
                                         use_bnp_prior = True):
 

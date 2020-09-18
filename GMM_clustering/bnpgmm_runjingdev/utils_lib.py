@@ -2,10 +2,6 @@ import numpy as np
 
 import jax.numpy as jnp
 
-import scipy as sp
-from scipy import spatial
-import scipy.cluster.hierarchy as sch
-
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import matplotlib.cm as cm
