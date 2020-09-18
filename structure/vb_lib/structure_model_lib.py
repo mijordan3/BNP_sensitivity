@@ -256,7 +256,9 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
                     e_z = None,
-                    set_optimal_z = True):
+                    set_optimal_z = True,
+                    log_phi = None,
+                    epsilon = 1.):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -293,6 +295,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     kl : float
         The negative elbo.
     """
+    
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
@@ -331,6 +334,22 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     # assert(np.isfinite(entropy))
 
     elbo = log_lik + entropy
+
+    # prior perturbation
+    if log_phi is not None:
+        assert use_logitnormal_sticks
+
+        assert gh_loc is not None
+        assert gh_weights is not None
+
+        assert 'ind_mix_stick_propn_info' in vb_params_dict.keys()
+        assert 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+
+        e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
+                                vb_params_dict['ind_mix_stick_propn_mean'],
+                                vb_params_dict['ind_mix_stick_propn_info'],
+                                epsilon, gh_loc, gh_weights, sum_vector=True)
+        elbo = elbo - e_log_pert
 
     return -1 * elbo
 
@@ -458,48 +477,3 @@ def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
         warnings.warn('l-inf gradient at optimum is : {}'.format(linf_grad))
 
     # assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
-
-
-#######################
-# Functions to get perturbed KL for functional sensitvity
-
-def get_perturbed_kl(g_obs, vb_params_dict, epsilon, log_phi,
-                     prior_params_dict, gh_loc, gh_weights,
-                     e_z = None):
-    """
-    Computes KL divergence after perturbing by log_phi
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_dict : dictionary
-        A dictionary that contains the variational parameters
-    epsilon: float
-        The epsilon specifying the multiplicative perturbation
-    log_phi : Callable function
-        The log of the multiplicative perturbation in logit space
-    gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-
-    Returns
-    -------
-    float
-        The KL divergence after perturbing by log_phi
-
-    """
-
-    e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
-                            vb_params_dict['ind_mix_stick_propn_mean'],
-                            vb_params_dict['ind_mix_stick_propn_info'],
-                            epsilon, gh_loc, gh_weights, sum_vector=True)
-
-    return get_kl(g_obs, vb_params_dict,
-                        prior_params_dict,
-                        e_z = e_z,
-                        use_logitnormal_sticks = True,
-                        gh_loc= gh_loc, gh_weights = gh_weights) + e_log_pert

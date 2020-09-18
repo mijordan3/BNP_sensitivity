@@ -137,17 +137,6 @@ def run_cavi(g_obs, vb_params_dict,
     vb_params_dict : dictionary
         A dictionary that contains the optimized variational parameters.
     """
-    if use_logitnormal_sticks:
-        assert gh_loc is not None
-        assert gh_weights is not None
-
-        assert 'ind_mix_stick_propn_info' in vb_params_dict.keys()
-        assert 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
-
-    # get prior parameters
-    dp_prior_alpha = prior_params_dict['dp_prior_alpha']
-    allele_prior_alpha = prior_params_dict['allele_prior_alpha']
-    allele_prior_beta = prior_params_dict['allele_prior_beta']
 
     # get initial moments from vb_params
     e_log_sticks, e_log_1m_sticks, \
@@ -160,29 +149,18 @@ def run_cavi(g_obs, vb_params_dict,
     x_old = 1e16
     kl_vec = []
 
-    t0 = time.time()
+    # set up KL function
+    _get_kl = lambda vb_params_dict, e_z : \
+                structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                            prior_params_dict,
+                                            use_logitnormal_sticks,
+                                            gh_loc = gh_loc,
+                                            gh_weights = gh_weights,
+                                            log_phi = log_phi,
+                                            epsilon = epsilon,
+                                            e_z = e_z,
+                                            set_optimal_z = False)
 
-    time_vec = [t0]
-
-    if log_phi is None:
-        _get_kl = lambda vb_params_dict, e_z : \
-                    structure_model_lib.get_kl(g_obs, vb_params_dict,
-                                                prior_params_dict,
-                                                use_logitnormal_sticks = use_logitnormal_sticks,
-                                                e_z = e_z,
-                                                gh_loc = gh_loc,
-                                                gh_weights = gh_weights,
-                                                set_optimal_z = False)
-    else:
-        assert use_logitnormal_sticks
-        _get_kl = lambda vb_params_dict, e_z : \
-                    structure_model_lib.get_perturbed_kl(g_obs,
-                                                vb_params_dict,
-                                                epsilon, log_phi,
-                                                prior_params_dict,
-                                                gh_loc, gh_weights,
-                                                e_z = e_z,
-                                                set_optimal_z = False)
     _get_kl = jax.jit(_get_kl)
     def check_kl(vb_params_dict, e_z, kl_old):
         kl = _get_kl(vb_params_dict, e_z)
@@ -193,49 +171,36 @@ def run_cavi(g_obs, vb_params_dict,
     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
     flatten_vb_params = jax.jit(flatten_vb_params)
 
+    # compile cavi functions
+    t0 = time.time()
+    e_z = cavi_update(g_obs,
+                vb_params_dict,
+                vb_params_paragami,
+                prior_params_dict,
+                e_log_sticks, e_log_1m_sticks,
+                e_log_pop_freq, e_log_1m_pop_freq,
+                use_logitnormal_sticks,
+                gh_loc, gh_weights,
+                log_phi = None,
+                epsilon = 0.)[0]
+    _ = _get_kl(vb_params_dict, e_z)
+    _ = flatten_vb_params(vb_params_dict)
+    print('CAVI compile time: {0:.3g}sec'.format(time.time() - t0))
+
+    print('\n running CAVI ...')
+    t0 = time.time()
+    time_vec = [t0]
     for i in range(1, max_iter):
-        # update z
-        e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
-                                e_log_1m_pop_freq)
-        if debug:
-            kl_old = check_kl(vb_params_dict, e_z, kl_old)
-
-
-        # update individual admixtures
-        if use_logitnormal_sticks:
-            vb_params_dict['ind_mix_stick_propn_mean'], \
-                vb_params_dict['ind_mix_stick_propn_info'] = \
-                    update_logitnormal_sticks(g_obs, e_z,
-                                    vb_params_dict['ind_mix_stick_propn_mean'],
-                                    vb_params_dict['ind_mix_stick_propn_info'],
-                                    vb_params_paragami, prior_params_dict,
-                                    gh_loc, gh_weights,
-                                    log_phi, epsilon)
-
-            e_log_sticks, e_log_1m_sticks = \
-                ef.get_e_log_logitnormal(\
-                    lognorm_means = vb_params_dict['ind_mix_stick_propn_mean'],
-                    lognorm_infos = vb_params_dict['ind_mix_stick_propn_info'],
-                    gh_loc = gh_loc,
-                    gh_weights = gh_weights)
-
-        else:
-            e_log_sticks, e_log_1m_sticks, \
-                vb_params_dict['ind_mix_stick_beta_params'] = \
-                    update_stick_beta(g_obs, e_z,
-                                        e_log_pop_freq, e_log_1m_pop_freq,
-                                        dp_prior_alpha, allele_prior_alpha,
-                                        allele_prior_beta)
-        if debug:
-            kl_old = check_kl(vb_params_dict, e_z, kl_old)
-
-        # update population frequencies
-        e_log_pop_freq, e_log_1m_pop_freq, \
-            vb_params_dict['pop_freq_beta_params'] = \
-                update_pop_beta(g_obs, e_z,
-                                e_log_sticks, e_log_1m_sticks,
-                                dp_prior_alpha, allele_prior_alpha,
-                                allele_prior_beta)
+        e_z, e_log_sticks, e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq, \
+            vb_params_dict = cavi_update(g_obs,
+                                                vb_params_dict,
+                                                vb_params_paragami,
+                                                prior_params_dict,
+                                                e_log_sticks, e_log_1m_sticks,
+                                                e_log_pop_freq, e_log_1m_pop_freq,
+                                                use_logitnormal_sticks,
+                                                gh_loc, gh_weights,
+                                                log_phi, epsilon)
 
         if (i % print_every) == 0 or debug:
             kl = check_kl(vb_params_dict, e_z, kl_old)
@@ -251,8 +216,7 @@ def run_cavi(g_obs, vb_params_dict,
         x_diff = flatten_vb_params(vb_params_dict) - x_old
 
         if np.abs(x_diff).max() < x_tol:
-            print('CAVI done. Termination after {} steps in {} seconds'.format(
-                    i, round(time.time() - t0, 2)))
+            print('CAVI done.')
             break
 
         x_old = flatten_vb_params(vb_params_dict)
@@ -261,7 +225,68 @@ def run_cavi(g_obs, vb_params_dict,
         print('Done. Warning, max iterations reached. ')
 
     vb_opt = flatten_vb_params(vb_params_dict)
+
+    print('Elapsed: {} steps in {} seconds'.format(
+            i, round(time.time() - t0, 2)))
+
     return vb_params_dict, vb_opt, e_z, np.array(kl_vec), np.array(time_vec) - t0
+
+def cavi_update(g_obs,
+                vb_params_dict,
+                vb_params_paragami,
+                prior_params_dict,
+                e_log_sticks, e_log_1m_sticks,
+                e_log_pop_freq, e_log_1m_pop_freq,
+                use_logitnormal_sticks,
+                gh_loc, gh_weights,
+                log_phi, epsilon):
+
+    # prior parameters
+    dp_prior_alpha = prior_params_dict['dp_prior_alpha']
+    allele_prior_alpha = prior_params_dict['allele_prior_alpha']
+    allele_prior_beta = prior_params_dict['allele_prior_beta']
+
+    # update z
+    e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
+                            e_log_1m_pop_freq)
+
+    # update sticks
+    if use_logitnormal_sticks:
+        vb_params_dict['ind_mix_stick_propn_mean'], \
+            vb_params_dict['ind_mix_stick_propn_info'] = \
+                update_logitnormal_sticks(g_obs, e_z,
+                                vb_params_dict['ind_mix_stick_propn_mean'],
+                                vb_params_dict['ind_mix_stick_propn_info'],
+                                vb_params_paragami, prior_params_dict,
+                                gh_loc, gh_weights,
+                                log_phi, epsilon)
+
+        e_log_sticks, e_log_1m_sticks = \
+            ef.get_e_log_logitnormal(\
+                lognorm_means = vb_params_dict['ind_mix_stick_propn_mean'],
+                lognorm_infos = vb_params_dict['ind_mix_stick_propn_info'],
+                gh_loc = gh_loc,
+                gh_weights = gh_weights)
+
+    else:
+        e_log_sticks, e_log_1m_sticks, \
+            vb_params_dict['ind_mix_stick_beta_params'] = \
+                update_stick_beta(g_obs, e_z,
+                                e_log_pop_freq, e_log_1m_pop_freq,
+                                dp_prior_alpha, allele_prior_alpha,
+                                allele_prior_beta)
+
+    # update population frequency parameters
+    e_log_pop_freq, e_log_1m_pop_freq, \
+        vb_params_dict['pop_freq_beta_params'] = \
+            update_pop_beta(g_obs, e_z,
+                            e_log_sticks, e_log_1m_sticks,
+                            dp_prior_alpha, allele_prior_alpha,
+                            allele_prior_beta)
+
+    return e_z, e_log_sticks, e_log_1m_sticks, \
+                e_log_pop_freq, e_log_1m_pop_freq, \
+                    vb_params_dict
 
 # just a useful function
 def get_ez_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks,
