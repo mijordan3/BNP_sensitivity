@@ -168,10 +168,11 @@ def run_cavi(g_obs, vb_params_dict,
         _get_kl = lambda vb_params_dict, e_z : \
                     structure_model_lib.get_kl(g_obs, vb_params_dict,
                                                 prior_params_dict,
-                                                use_logitnormal_sticks,
+                                                use_logitnormal_sticks = use_logitnormal_sticks,
                                                 e_z = e_z,
                                                 gh_loc = gh_loc,
-                                                gh_weights = gh_weights)
+                                                gh_weights = gh_weights,
+                                                set_optimal_z = False)
     else:
         assert use_logitnormal_sticks
         _get_kl = lambda vb_params_dict, e_z : \
@@ -180,13 +181,17 @@ def run_cavi(g_obs, vb_params_dict,
                                                 epsilon, log_phi,
                                                 prior_params_dict,
                                                 gh_loc, gh_weights,
-                                                e_z = e_z)
+                                                e_z = e_z,
+                                                set_optimal_z = False)
+    _get_kl = jax.jit(_get_kl)
     def check_kl(vb_params_dict, e_z, kl_old):
         kl = _get_kl(vb_params_dict, e_z)
         kl_diff = kl_old - kl
         assert kl_diff > 0
         return kl
 
+    flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
+    flatten_vb_params = jax.jit(flatten_vb_params)
 
     for i in range(1, max_iter):
         # update z
@@ -243,19 +248,19 @@ def run_cavi(g_obs, vb_params_dict,
                                         round(kl, 6),
                                         round(time_vec[-1] - time_vec[-2], 4)))
 
-        x_diff = vb_params_paragami.flatten(vb_params_dict, free = True) - x_old
+        x_diff = flatten_vb_params(vb_params_dict) - x_old
 
         if np.abs(x_diff).max() < x_tol:
             print('CAVI done. Termination after {} steps in {} seconds'.format(
                     i, round(time.time() - t0, 2)))
             break
 
-        x_old = vb_params_paragami.flatten(vb_params_dict, free = True)
+        x_old = flatten_vb_params(vb_params_dict)
 
     if i == (max_iter - 1):
         print('Done. Warning, max iterations reached. ')
 
-    vb_opt = vb_params_paragami.flatten(vb_params_dict, free = True)
+    vb_opt = flatten_vb_params(vb_params_dict)
     return vb_params_dict, vb_opt, e_z, np.array(kl_vec), np.array(time_vec) - t0
 
 # just a useful function

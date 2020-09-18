@@ -255,7 +255,8 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
-                    e_z = None):
+                    e_z = None,
+                    set_optimal_z = True):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -309,7 +310,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                 e_log_sticks, e_log_1m_sticks,
                                 dp_prior_alpha, allele_prior_alpha,
                                 allele_prior_beta,
-                                set_optimal_z = (e_z is None))
+                                set_optimal_z = set_optimal_z)
 
     # entropy term
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
@@ -327,7 +328,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                             use_logitnormal_sticks = False,
                             ind_mix_stick_beta_params = beta_params).squeeze()
 
-    assert(np.isfinite(entropy))
+    # assert(np.isfinite(entropy))
 
     elbo = log_lik + entropy
 
