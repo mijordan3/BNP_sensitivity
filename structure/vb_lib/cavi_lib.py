@@ -156,8 +156,8 @@ def run_cavi(g_obs, vb_params_dict,
                 vb_params_dict, use_logitnormal_sticks,
                 gh_loc, gh_weights)
 
-    kl_old = np.Inf
-    x_old = np.Inf
+    kl_old = 1e16
+    x_old = 1e16
     kl_vec = []
 
     t0 = time.time()
@@ -181,6 +181,11 @@ def run_cavi(g_obs, vb_params_dict,
                                                 prior_params_dict,
                                                 gh_loc, gh_weights,
                                                 e_z = e_z)
+    def check_kl(vb_params_dict, e_z, kl_old):
+        kl = _get_kl(vb_params_dict, e_z)
+        kl_diff = kl_old - kl
+        assert kl_diff > 0
+        return kl
 
 
     for i in range(1, max_iter):
@@ -188,10 +193,7 @@ def run_cavi(g_obs, vb_params_dict,
         e_z = update_z(g_obs, e_log_sticks, e_log_1m_sticks, e_log_pop_freq,
                                 e_log_1m_pop_freq)
         if debug:
-            kl = _get_kl(vb_params_dict, e_z)
-            kl_diff = kl_old - kl
-            assert kl_diff > 0
-            kl_old = kl
+            kl_old = check_kl(vb_params_dict, e_z, kl_old)
 
 
         # update individual admixtures
@@ -220,10 +222,7 @@ def run_cavi(g_obs, vb_params_dict,
                                         dp_prior_alpha, allele_prior_alpha,
                                         allele_prior_beta)
         if debug:
-            kl = _get_kl(vb_params_dict, e_z)
-            kl_diff = kl_old - kl
-            assert kl_diff > 0
-            kl_old = kl
+            kl_old = check_kl(vb_params_dict, e_z, kl_old)
 
         # update population frequencies
         e_log_pop_freq, e_log_1m_pop_freq, \
@@ -234,19 +233,15 @@ def run_cavi(g_obs, vb_params_dict,
                                 allele_prior_beta)
 
         if (i % print_every) == 0 or debug:
-            kl = _get_kl(vb_params_dict, e_z)
-
+            kl = check_kl(vb_params_dict, e_z, kl_old)
             kl_vec.append(kl)
             time_vec.append(time.time())
+
+            kl_old = kl
 
             print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,
                                         round(kl, 6),
                                         round(time_vec[-1] - time_vec[-2], 4)))
-
-            kl_diff = kl_old - kl
-            assert kl_diff > 0
-
-            kl_old = kl
 
         x_diff = vb_params_paragami.flatten(vb_params_dict, free = True) - x_old
 
