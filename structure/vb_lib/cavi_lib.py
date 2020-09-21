@@ -10,6 +10,8 @@ from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturba
 
 import bnpmodeling_runjingdev.exponential_families as ef
 
+from paragami import FlattenFunctionInput
+
 import time
 
 from copy import deepcopy
@@ -156,16 +158,23 @@ def run_cavi(g_obs, vb_params_dict,
 
     # set up stick functions
     if use_logitnormal_sticks:
+        stick_psloss_flattened = \
+            FlattenFunctionInput(original_fun=_get_logitnormal_sticks_psloss,
+                    patterns = [vb_params_paragami['ind_mix_stick_propn_mean'],
+                                vb_params_paragami['ind_mix_stick_propn_info']],
+                    free = True,
+                    argnums = [2, 3])
+
         stick_obj_fun = lambda stick_mean_free, stick_info_free, e_z : \
-                            _get_logitnormal_sticks_psloss(g_obs,
-                                                        e_z,
-                                                        stick_mean_free,
-                                                        stick_info_free,
-                                                        vb_params_paragami,
-                                                        prior_params_dict,
-                                                        gh_loc, gh_weights,
-                                                        log_phi,
-                                                        epsilon)
+                            stick_psloss_flattened(g_obs,
+                                                    e_z,
+                                                    stick_mean_free,
+                                                    stick_info_free,
+                                                    prior_params_dict,
+                                                    gh_loc, gh_weights,
+                                                    log_phi,
+                                                    epsilon)
+
         stick_mean_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 0))
         stick_info_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 1))
         stick_obj_fun = jax.jit(stick_obj_fun)
@@ -307,20 +316,14 @@ def get_ez_from_vb_params_dict(g_obs, vb_params_dict, use_logitnormal_sticks,
 #################
 def _get_logitnormal_sticks_psloss(g_obs,
                                     e_z,
-                                    stick_mean_free,
-                                    stick_info_free,
-                                    vb_params_paragami,
+                                    stick_mean,
+                                    stick_info,
                                     prior_params_dict,
                                     gh_loc, gh_weights,
                                     log_phi, epsilon):
     # this function only returns the terms in the loss that depend on the
     # logitnormal sticks. The gradients wrt to the sticks are correct,
     # though the loss itself is not
-
-    stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
-                    fold(stick_mean_free, free = True)
-    stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
-                    fold(stick_info_free, free = True)
 
     e_log_sticks, e_log_1m_sticks = \
             ef.get_e_log_logitnormal(
@@ -354,33 +357,6 @@ def _get_logitnormal_sticks_psloss(g_obs,
         e_log_pert = 0.0
 
     return - (loglik_term + dp_prior + stick_entropy) + e_log_pert
-
-def _get_logitnormal_sticks_loss(g_obs,
-                    e_z,
-                    stick_mean_free_params,
-                    stick_info_free_params,
-                    vb_params_dict,
-                    vb_params_paragami,
-                    prior_params_dict,
-                    gh_loc, gh_weights):
-
-    # returns the kl loss as a function of stick parameters
-    # can be used to test the function above, to make sure gradients are the same
-
-
-    stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
-                    fold(stick_mean_free_params, free = True)
-    stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
-                    fold(stick_info_free_params, free = True)
-
-    vb_params_dict['ind_mix_stick_propn_mean'] = stick_mean
-    vb_params_dict['ind_mix_stick_propn_info'] = stick_info
-
-    use_logitnormal_sticks = True
-    return structure_model_lib.get_kl(g_obs, vb_params_dict, prior_params_dict,
-                        use_logitnormal_sticks,
-                        gh_loc, gh_weights,
-                        e_z = e_z)
 
 def update_logitnormal_sticks(stick_obj_fun,
                                 stick_mean_grad_fun,
