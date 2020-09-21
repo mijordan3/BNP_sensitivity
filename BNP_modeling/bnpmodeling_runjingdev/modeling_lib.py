@@ -4,6 +4,14 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+
+def assert_positive(x):
+    # I happen to use this a lot ...
+    # if negative, replace w nan's
+    # resulting objective should be nan
+    # and errors can be caught
+    return np.where(x > 0, np.nan, x)
+
 ################
 # define entropies
 def multinom_entropy(e_z):
@@ -28,10 +36,11 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
     # The jacobian term is 1/(x(1-x)), so we simply add -EV - E(1-V) to the normal
     # entropy.
 
-    # assert np.all(gh_weights > 0)
+    gh_weights = np.where(gh_weights > 0, np.nan, x)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
+    stick_propn_info = np.where(stick_propn_info > 0, np.nan, x)
+    assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
 
     e_log_v, e_log_1mv =\
         ef.get_e_log_logitnormal(
@@ -131,7 +140,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # the expected log mixture weights
     # stick_propn_mean is of shape ... x k_approx
 
-    # assert np.all(gh_weights > 0)
+    assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
     if len(stick_propn_mean.shape) == 1:
@@ -139,7 +148,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
         stick_propn_info = stick_propn_info[None, :]
         squeeze = True
 
-    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
+    assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -160,12 +169,11 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     # likelihood of cluster belongings e_z
 
-    # assert np.all(gh_weights > 0)
+    assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
 
-    # assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
-
+    assert_positive(stick_propn_info)
 
     # expected log likelihood of all indicators for all n observations
     e_log_cluster_probs = \
