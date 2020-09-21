@@ -13,7 +13,8 @@ class HyperparameterSensitivityLinearApproximation(object):
                     objective_fun,
                     opt_par_value,
                     hyper_par_value0,
-                    hyper_par_objective_fun = None):
+                    hyper_par_objective_fun = None,
+                    hess_solver = None):
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value
@@ -28,6 +29,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         self.dobj_dhyper_dinput = jax.jit(jax.jacobian(self.dobj_dhyper), 0)
 
         self.hess_fun = jax.jit(jax.hessian(self.objective_fun, argnums = 0))
+        self.hess_solver = hess_solver
 
         # compile derivatives
         print('Compiling objective function derivatives ... ')
@@ -54,14 +56,23 @@ class HyperparameterSensitivityLinearApproximation(object):
                                             self.hyper_par_value0)
         cross_hess = cross_hess.transpose((1, 0))
 
-        hessian = self.hess_fun(self.opt_par_value, self.hyper_par_value0)
+        if self.hess_solver is None:
+            hessian = self.hess_fun(self.opt_par_value, self.hyper_par_value0)
+        else:
+            hessian = None
 
         return cross_hess, hessian
 
     def _solve_system(self):
-        chol_solver = get_cholesky_solver(self.hessian)
-        return -chol_solver(self.cross_hess)
+        if self.hess_solver is None:
+            self.hess_solver = get_cholesky_solver(self.hessian)
+
+        return -self.hess_solver(self.cross_hess)
 
     def predict_opt_par_from_hyper_par(self, hyper_par_value):
         delta = (hyper_par_value - self.hyper_par_value0)
+
+        if len(self.dinput_dhyper.shape) == 1:
+            self.dinput_dhyper = np.expand_dims(self.dinput_dhyper, 1)
+
         return np.dot(self.dinput_dhyper, delta) + self.opt_par_value

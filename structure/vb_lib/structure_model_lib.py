@@ -411,6 +411,7 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     # set mean to be logit(stick_breaking_propn), info to be 1
     stick_break_propn = \
         cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
+        
     use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     if use_logitnormal_sticks:
         ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
