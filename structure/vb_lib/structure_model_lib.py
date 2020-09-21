@@ -136,12 +136,7 @@ def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
 ##########################
 # Entropy
 ##########################
-def get_entropy(ind_mix_stick_propn_mean,
-                ind_mix_stick_propn_info,
-                pop_freq_beta_params,
-                e_z, gh_loc, gh_weights,
-                use_logitnormal_sticks,
-                ind_mix_stick_beta_params = None):
+def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     # get entropy term
 
     # entropy on population belongings
@@ -149,20 +144,22 @@ def get_entropy(ind_mix_stick_propn_mean,
     z_entropy = -(np.log(e_z + 1e-12) * e_z).sum()
 
     # entropy of individual admixtures
+    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     if use_logitnormal_sticks:
         stick_entropy = \
             modeling_lib.get_stick_breaking_entropy(
-                                    ind_mix_stick_propn_mean,
-                                    ind_mix_stick_propn_info,
+                                    vb_params_dict['ind_mix_stick_propn_mean'],
+                                    vb_params_dict['ind_mix_stick_propn_info'],
                                     gh_loc, gh_weights)
     else:
-        assert ind_mix_stick_beta_params is not None
+        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
         nk = ind_mix_stick_beta_params.shape[0] * \
                 ind_mix_stick_beta_params.shape[1]
         stick_entropy = \
             ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
 
     # beta entropy term
+    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
     lk = pop_freq_beta_params.shape[0] * pop_freq_beta_params.shape[1]
     beta_entropy = ef.beta_entropy(tau = pop_freq_beta_params.reshape((lk, 2)))
 
@@ -253,7 +250,6 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
-                    use_logitnormal_sticks,
                     gh_loc = None, gh_weights = None,
                     e_z = None,
                     set_optimal_z = True,
@@ -295,7 +291,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     kl : float
         The negative elbo.
     """
-    
+
     # get prior parameters
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
@@ -304,7 +300,6 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
             get_moments_from_vb_params_dict(vb_params_dict,
-                                    use_logitnormal_sticks = use_logitnormal_sticks,
                                     gh_loc = gh_loc,
                                     gh_weights = gh_weights)
     # joint log likelihood
@@ -317,19 +312,8 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     # entropy term
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
-    if use_logitnormal_sticks:
-        entropy = get_entropy(vb_params_dict['ind_mix_stick_propn_mean'],
-                                vb_params_dict['ind_mix_stick_propn_info'],
-                                pop_freq_beta_params,
-                                e_z, gh_loc, gh_weights,
-                                use_logitnormal_sticks = True).squeeze()
-    else:
-        beta_params = vb_params_dict['ind_mix_stick_beta_params']
-        entropy = get_entropy(None, None,
-                            pop_freq_beta_params,
-                            e_z, gh_loc, gh_weights,
-                            use_logitnormal_sticks = False,
-                            ind_mix_stick_beta_params = beta_params).squeeze()
+    entropy = get_entropy(vb_params_dict,
+                            e_z, gh_loc, gh_weights).squeeze()
 
     # assert(np.isfinite(entropy))
 
@@ -337,7 +321,6 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 
     # prior perturbation
     if log_phi is not None:
-        assert use_logitnormal_sticks
 
         assert gh_loc is not None
         assert gh_weights is not None
@@ -354,9 +337,10 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     return -1 * elbo
 
 def get_moments_from_vb_params_dict(vb_params_dict,
-                                    use_logitnormal_sticks,
                                     gh_loc = None,
-                                    gh_weights = None,):
+                                    gh_weights = None):
+
+    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     # get expected sticks
     if use_logitnormal_sticks:
         assert gh_loc is not None
@@ -418,7 +402,6 @@ def cluster_and_get_init(g_obs, k, seed):
             np.array(init_pop_allele_freq.clip(0.05, 0.95))
 
 def set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                        use_logitnormal_sticks,
                         seed):
     # get initial admixtures, and population frequencies
     init_ind_admix_propn, init_pop_allele_freq = \
@@ -428,6 +411,7 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     # set mean to be logit(stick_breaking_propn), info to be 1
     stick_break_propn = \
         cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
+    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     if use_logitnormal_sticks:
         ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
         ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
@@ -451,29 +435,29 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
 
     return vb_params_dict
 
-def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-                        prior_params_dict, gh_loc, gh_weights,
-                        use_logitnormal_sticks):
-    # this function checks that vb_opt_dict are at a kl optimum for the given
-    # prior parameters
-
-    # get loss as a function of vb parameters
-    get_free_vb_params_loss = paragami.FlattenFunctionInput(
-                                    original_fun=get_kl,
-                                    patterns = vb_params_paragami,
-                                    free = True,
-                                    argnums = 1)
-    # cache other parameters
-    get_free_vb_params_loss_cached = \
-        lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict,
-                                        use_logitnormal_sticks,
-                                        gh_loc, gh_weights)
-
-    grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
-    linf_grad = np.max(np.abs(grad_get_loss(\
-                    vb_params_paragami.flatten(vb_opt_dict, free = True))))
-
-    if linf_grad > 1e-5:
-        warnings.warn('l-inf gradient at optimum is : {}'.format(linf_grad))
-
-    # assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
+# def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
+#                         prior_params_dict, gh_loc, gh_weights,
+#                         use_logitnormal_sticks):
+#     # this function checks that vb_opt_dict are at a kl optimum for the given
+#     # prior parameters
+#
+#     # get loss as a function of vb parameters
+#     get_free_vb_params_loss = paragami.FlattenFunctionInput(
+#                                     original_fun=get_kl,
+#                                     patterns = vb_params_paragami,
+#                                     free = True,
+#                                     argnums = 1)
+#     # cache other parameters
+#     get_free_vb_params_loss_cached = \
+#         lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict,
+#                                         use_logitnormal_sticks,
+#                                         gh_loc, gh_weights)
+#
+#     grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
+#     linf_grad = np.max(np.abs(grad_get_loss(\
+#                     vb_params_paragami.flatten(vb_opt_dict, free = True))))
+#
+#     if linf_grad > 1e-5:
+#         warnings.warn('l-inf gradient at optimum is : {}'.format(linf_grad))
+#
+#     # assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)

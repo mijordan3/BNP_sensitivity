@@ -114,7 +114,6 @@ def update_stick_beta(g_obs, e_z,
 def run_cavi(g_obs, vb_params_dict,
                 vb_params_paragami,
                 prior_params_dict,
-                use_logitnormal_sticks,
                 gh_loc = None, gh_weights = None,
                 log_phi = None, epsilon = 0.,
                 x_tol = 1e-3,
@@ -149,14 +148,14 @@ def run_cavi(g_obs, vb_params_dict,
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
             structure_model_lib.get_moments_from_vb_params_dict(
-                vb_params_dict, use_logitnormal_sticks,
-                gh_loc, gh_weights)
+                vb_params_dict, gh_loc, gh_weights)
 
     kl_old = 1e16
     x_old = 1e16
     kl_vec = []
 
     # set up stick functions
+    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     if use_logitnormal_sticks:
         stick_psloss_flattened = \
             FlattenFunctionInput(original_fun=_get_logitnormal_sticks_psloss,
@@ -183,7 +182,6 @@ def run_cavi(g_obs, vb_params_dict,
     _get_kl = lambda vb_params_dict, e_z : \
                 structure_model_lib.get_kl(g_obs, vb_params_dict,
                                             prior_params_dict,
-                                            use_logitnormal_sticks,
                                             gh_loc = gh_loc,
                                             gh_weights = gh_weights,
                                             log_phi = log_phi,
