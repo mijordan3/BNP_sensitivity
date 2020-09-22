@@ -1,5 +1,5 @@
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax.numpy as np
+import jax.scipy as sp
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 

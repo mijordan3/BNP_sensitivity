@@ -1,14 +1,19 @@
-import LinearResponseVariationalBayes as vb
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import bnpmodeling_runjingdev.exponential_families as ef
 
-import autograd
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax
+import jax.numpy as np
+import jax.scipy as sp
 
-import scipy as osp
+
+def assert_positive(x):
+    # I happen to use this a lot ...
+    # if negative, replace w nan's
+    # resulting objective should be nan
+    # and errors can be caught
+    return np.where(x < 0, np.nan, x)
+
 ################
 # define entropies
-
 def multinom_entropy(e_z):
     # returns the entropy of the cluster belongings
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
@@ -31,10 +36,10 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
     # The jacobian term is 1/(x(1-x)), so we simply add -EV - E(1-V) to the normal
     # entropy.
 
-    assert np.all(gh_weights > 0)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    assert np.all(stick_propn_info) > 0
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv =\
         ef.get_e_log_logitnormal(
@@ -71,7 +76,7 @@ def get_e_log_wishart_prior(gamma, df, V_inv):
 
     tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
 
-    s, logdet = my_slogdet3d(gamma) # np.linalg.slogdet(gamma)
+    s, logdet = np.linalg.slogdet(gamma)
 
     return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
 
@@ -96,7 +101,6 @@ def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
 
     return e_phi
 
-
 def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
                                 gh_loc, gh_weights):
     # expected log prior for the stick breaking proportions under the
@@ -106,10 +110,10 @@ def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
     # gh_loc and gh_weights specifiy the location and weights of the
     # quadrature points
 
-    assert np.all(gh_weights > 0)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    assert np.all(stick_propn_info) > 0
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -138,7 +142,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # the expected log mixture weights
     # stick_propn_mean is of shape ... x k_approx
 
-    assert np.all(gh_weights > 0)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
     if len(stick_propn_mean.shape) == 1:
@@ -146,7 +150,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
         stick_propn_info = stick_propn_info[None, :]
         squeeze = True
 
-    assert np.all(stick_propn_info) > 0
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -162,25 +166,16 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     else:
         return e_log_cluster_probs
 
-    # zeros_shape = stick_propn_mean.shape[0:-1] + (1,)
-    #
-    # e_log_stick_remain = np.concatenate([np.zeros(zeros_shape), \
-    #                                     np.cumsum(e_log_1mv, axis = -1)], axis = -1)
-    # e_log_new_stick = np.concatenate((e_log_v, np.zeros(zeros_shape)), axis = -1)
-    #
-    # return (e_log_stick_remain + e_log_new_stick).squeeze()
-
 
 def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     # likelihood of cluster belongings e_z
 
-    assert np.all(gh_weights > 0)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
 
-    assert np.all(stick_propn_info) > 0
-
+    stick_propn_info = assert_positive(stick_propn_info)
 
     # expected log likelihood of all indicators for all n observations
     e_log_cluster_probs = \
@@ -188,7 +183,6 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
                                         gh_loc, gh_weights)
 
     return np.sum(e_z * e_log_cluster_probs)
-
 
 def get_e_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the
@@ -210,24 +204,3 @@ def get_e_log_beta(tau):
     digamma_alpha_beta = sp.special.digamma(np.sum(tau, axis = -1))
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
-
-def my_slogdet3d(mat):
-    assert len(mat.shape) == 3
-    # number of matricies in array
-    k = mat.shape[0]
-    assert mat.shape[1] == mat.shape[2]
-
-    logdet = np.zeros(k)
-    s = np.zeros(k)
-    for i in range(k):
-        dummy = np.zeros(k)
-        dummy[i] = 1.
-
-        s_i, logdet_i = np.linalg.slogdet(mat[i])
-
-        logdet = logdet + dummy * logdet_i
-
-        # this messes with autograd array-boxes
-        # s[i] = s_i
-
-    return s, logdet

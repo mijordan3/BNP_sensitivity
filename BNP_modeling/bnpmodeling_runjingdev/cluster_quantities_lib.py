@@ -1,8 +1,11 @@
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax
 
-import LinearResponseVariationalBayes as vb
-import LinearResponseVariationalBayes.ExponentialFamilies as ef
+import jax.numpy as np
+import jax.scipy as sp
+
+from jax import random
+
+import bnpmodeling_runjingdev.exponential_families as ef
 
 
 def _cumprod_through_log(x, axis = None):
@@ -82,7 +85,10 @@ def get_stick_break_propns_from_mixture_weights(mixture_weights):
     stick_remain = np.ones(n_obs)
 
     for i in range(k_approx - 1):
-        stick_break_propn[:, i] = mixture_weights[:, i] / stick_remain
+        stick_break_propn = jax.ops.index_update(stick_break_propn,
+                                                jax.ops.index[:, i],
+                                                mixture_weights[:, i] / stick_remain)
+
         stick_remain *= (1 - stick_break_propn[:, i])
 
     return stick_break_propn
@@ -91,6 +97,7 @@ def get_stick_break_propns_from_mixture_weights(mixture_weights):
 def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
                                             n_obs, threshold = 0,
                                             n_samples = None,
+                                            rng_key = None,
                                             unv_norm_samples = None):
     """
     Computes the expected number of clusters with at least t observations
@@ -135,7 +142,7 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
 
     if unv_norm_samples is None:
         unif_samples_shape = (n_samples, ) + stick_propn_mean.shape
-        unv_norm_samples = np.random.normal(0, 1, size = unif_samples_shape)
+        unv_norm_samples = random.normal(rng_key, unif_samples_shape)
     if n_samples is None:
         assert unv_norm_samples.shape[1:] == stick_propn_mean.shape
 
@@ -197,6 +204,7 @@ def _get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
 def get_e_num_large_clusters_from_ez(e_z,
                                     threshold = 0,
                                     n_samples = None,
+                                    rng_key = None,
                                     unif_samples = None):
     """
     Computes the expected number of clusters with at least t
@@ -228,7 +236,7 @@ def get_e_num_large_clusters_from_ez(e_z,
     # draw uniform samples
     if unif_samples is None:
         assert n_samples is not None
-        unif_samples = np.random.random((n_obs, n_samples))
+        unif_samples = random.uniform(rng_key, (n_obs, n_samples))
 
     else:
         assert unif_samples is not None
