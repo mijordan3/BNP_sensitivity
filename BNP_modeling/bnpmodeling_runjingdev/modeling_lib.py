@@ -10,7 +10,7 @@ def assert_positive(x):
     # if negative, replace w nan's
     # resulting objective should be nan
     # and errors can be caught
-    return np.where(x > 0, np.nan, x)
+    return np.where(x < 0, np.nan, x)
 
 ################
 # define entropies
@@ -36,11 +36,10 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
     # The jacobian term is 1/(x(1-x)), so we simply add -EV - E(1-V) to the normal
     # entropy.
 
-    gh_weights = np.where(gh_weights > 0, np.nan, x)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-    stick_propn_info = np.where(stick_propn_info > 0, np.nan, x)
-    assert np.all(jax.lax.stop_gradient(stick_propn_info)) > 0
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv =\
         ef.get_e_log_logitnormal(
@@ -111,7 +110,10 @@ def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
     # gh_loc and gh_weights specifiy the location and weights of the
     # quadrature points
 
+    gh_weights = assert_positive(gh_weights)
+
     assert stick_propn_mean.shape == stick_propn_info.shape
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -140,7 +142,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # the expected log mixture weights
     # stick_propn_mean is of shape ... x k_approx
 
-    assert_positive(gh_weights)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
     if len(stick_propn_mean.shape) == 1:
@@ -148,7 +150,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
         stick_propn_info = stick_propn_info[None, :]
         squeeze = True
 
-    assert_positive(stick_propn_info)
+    stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
         ef.get_e_log_logitnormal(
@@ -169,11 +171,11 @@ def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
 
     # likelihood of cluster belongings e_z
 
-    assert_positive(gh_weights)
+    gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
 
-    assert_positive(stick_propn_info)
+    stick_propn_info = assert_positive(stick_propn_info)
 
     # expected log likelihood of all indicators for all n observations
     e_log_cluster_probs = \
@@ -202,20 +204,3 @@ def get_e_log_beta(tau):
     digamma_alpha_beta = sp.special.digamma(np.sum(tau, axis = -1))
 
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
-
-# def my_slogdet3d(mat):
-#     assert len(mat.shape) == 3
-#     # number of matricies in array
-#     k = mat.shape[0]
-#     assert mat.shape[1] == mat.shape[2]
-#
-#     logdet = np.zeros(k)
-#     s = np.zeros(k)
-#     for i in range(k):
-#
-#         s_i, logdet_i = np.linalg.slogdet(mat[i])
-#
-#         logdet = jax.ops.index_update(logdet, i, logdet_i)
-#         s = jax.ops.index_update(s, i, s_i)
-#
-#     return s, logdet

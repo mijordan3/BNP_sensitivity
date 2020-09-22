@@ -402,7 +402,7 @@ def update_logitnormal_sticks(stick_obj_fun,
     correction = np.sum(grad_stick_mean * step1) + np.sum(grad_stick_info * step2)
 
     # for my sanity
-    assert correction < 0
+    assert correction < 0, correction
     while (kl_new > (init_ps_loss + 1e-4 * alpha * correction)):
         alpha *= rho
 

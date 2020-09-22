@@ -236,15 +236,11 @@ def get_e_joint_loglik_from_nat_params(g_obs, e_z,
 
     e_loglik = np.sum(e_z * loglik_cond_z)
 
-    # assert(np.isfinite(e_loglik))
-
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
-
-    # assert(np.isfinite(e_log_prior))
 
     return e_log_prior + e_loglik, e_z
 
@@ -314,8 +310,6 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
     entropy = get_entropy(vb_params_dict,
                             e_z, gh_loc, gh_weights).squeeze()
-
-    # assert(np.isfinite(entropy))
 
     elbo = log_lik + entropy
 
@@ -435,30 +429,3 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
 
     return vb_params_dict
-
-# def assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-#                         prior_params_dict, gh_loc, gh_weights,
-#                         use_logitnormal_sticks):
-#     # this function checks that vb_opt_dict are at a kl optimum for the given
-#     # prior parameters
-#
-#     # get loss as a function of vb parameters
-#     get_free_vb_params_loss = paragami.FlattenFunctionInput(
-#                                     original_fun=get_kl,
-#                                     patterns = vb_params_paragami,
-#                                     free = True,
-#                                     argnums = 1)
-#     # cache other parameters
-#     get_free_vb_params_loss_cached = \
-#         lambda x : get_free_vb_params_loss(g_obs, x, prior_params_dict,
-#                                         use_logitnormal_sticks,
-#                                         gh_loc, gh_weights)
-#
-#     grad_get_loss = autograd.grad(get_free_vb_params_loss_cached)
-#     linf_grad = np.max(np.abs(grad_get_loss(\
-#                     vb_params_paragami.flatten(vb_opt_dict, free = True))))
-#
-#     if linf_grad > 1e-5:
-#         warnings.warn('l-inf gradient at optimum is : {}'.format(linf_grad))
-#
-#     # assert  linf_grad < 1e-5, 'error: {}'.format(linf_grad)
