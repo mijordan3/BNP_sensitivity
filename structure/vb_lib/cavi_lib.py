@@ -136,29 +136,7 @@ def run_cavi(g_obs, vb_params_dict,
     x_old = 1e16
     kl_vec = []
 
-    # set up stick functions
     use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
-    if use_logitnormal_sticks:
-        stick_psloss_flattened = \
-            FlattenFunctionInput(original_fun=_get_logitnormal_sticks_psloss,
-                    patterns = [vb_params_paragami['ind_mix_stick_propn_mean'],
-                                vb_params_paragami['ind_mix_stick_propn_info']],
-                    free = True,
-                    argnums = [2, 3])
-
-        stick_obj_fun = lambda stick_mean_free, stick_info_free, e_z : \
-                            stick_psloss_flattened(g_obs,
-                                                    e_z,
-                                                    stick_mean_free,
-                                                    stick_info_free,
-                                                    prior_params_dict,
-                                                    gh_loc, gh_weights,
-                                                    log_phi,
-                                                    epsilon)
-
-        stick_mean_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 0))
-        stick_info_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 1))
-        stick_obj_fun = jax.jit(stick_obj_fun)
 
     # set up KL function
     _get_kl = lambda vb_params_dict : \
@@ -173,7 +151,7 @@ def run_cavi(g_obs, vb_params_dict,
     def check_kl(vb_params_dict, kl_old):
         kl = _get_kl(vb_params_dict)
         kl_diff = kl_old - kl
-        assert kl_diff > 0
+        assert kl_diff > 0, kl_diff
         return kl
 
     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
@@ -189,13 +167,13 @@ def run_cavi(g_obs, vb_params_dict,
     _ = _get_kl(vb_params_dict)
     _ = flatten_vb_params(vb_params_dict)
     if use_logitnormal_sticks:
-        stick_mean = vb_params_paragami['ind_mix_stick_propn_mean'].\
-                        flatten(vb_params_dict['ind_mix_stick_propn_mean'], free = True)
-        stick_info = vb_params_paragami['ind_mix_stick_propn_info'].\
-                        flatten(vb_params_dict['ind_mix_stick_propn_info'], free = True)
-        _ = stick_obj_fun(stick_mean, stick_info, e_z)
-        _ = stick_mean_grad_fun(stick_mean, stick_info, e_z)
-        _ = stick_info_grad_fun(stick_mean, stick_info, e_z)
+        stick_obj_fun, stick_mean_grad_fun, stick_info_grad_fun = \
+            prepare_logitnormal_stick_updates(g_obs,
+                                      vb_params_paragami,
+                                      prior_params_dict,
+                                      gh_loc, gh_weights,
+                                      log_phi = log_phi,
+                                      epsilon = epsilon)
     else:
         _ = update_stick_beta(g_obs,
                         e_log_pop_freq, e_log_1m_pop_freq,
@@ -218,7 +196,6 @@ def run_cavi(g_obs, vb_params_dict,
                         update_logitnormal_sticks(stick_obj_fun,
                                                     stick_mean_grad_fun,
                                                     stick_info_grad_fun,
-                                                    e_z,
                                                     gh_loc,
                                                     gh_weights,
                                                     vb_params_dict,
@@ -231,6 +208,7 @@ def run_cavi(g_obs, vb_params_dict,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta)
+        kl_old = check_kl(vb_params_dict, kl_old)
 
         # update population frequency parameters
         e_log_pop_freq, e_log_1m_pop_freq, \
@@ -274,54 +252,71 @@ def run_cavi(g_obs, vb_params_dict,
 #################
 # Functions to update logitnormal sticks
 #################
-def _get_logitnormal_sticks_psloss(g_obs,
-                                    e_z,
+def prepare_logitnormal_stick_updates(g_obs,
+                                      vb_params_paragami,
+                                      prior_params_dict,
+                                      gh_loc, gh_weights,
+                                      log_phi,
+                                      epsilon):
+
+    # set up objective function
+    stick_loss_flattened = \
+            FlattenFunctionInput(original_fun =_get_logitnormal_sticks_loss,
+                    patterns = [vb_params_paragami['ind_mix_stick_propn_mean'],
+                                vb_params_paragami['ind_mix_stick_propn_info']],
+                    free = True,
+                    argnums = [1, 2])
+
+    stick_obj_fun = lambda stick_mean_free, stick_info_free, pop_freq_beta_params : \
+                        stick_loss_flattened(g_obs,
+                                                stick_mean_free,
+                                                stick_info_free,
+                                                pop_freq_beta_params,
+                                                prior_params_dict,
+                                                gh_loc, gh_weights,
+                                                log_phi,
+                                                epsilon)
+
+    # set up gradients
+    stick_mean_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 0))
+    stick_info_grad_fun = jax.jit(jax.grad(stick_obj_fun, argnums = 1))
+    stick_obj_fun_jitted = jax.jit(stick_obj_fun)
+
+    # compile gradients
+    stick_mean_free = vb_params_paragami['ind_mix_stick_propn_mean'].flatten(\
+            vb_params_paragami['ind_mix_stick_propn_mean'].random(), free = True)
+    stick_info_free = vb_params_paragami['ind_mix_stick_propn_info'].flatten(\
+            vb_params_paragami['ind_mix_stick_propn_info'].random(), free = True)
+    pop_freq_beta_params = vb_params_paragami['pop_freq_beta_params'].random()
+
+    _ = stick_obj_fun_jitted(stick_mean_free, stick_info_free, pop_freq_beta_params)
+    _ = stick_mean_grad_fun(stick_mean_free, stick_info_free, pop_freq_beta_params)
+    _ = stick_info_grad_fun(stick_mean_free, stick_info_free, pop_freq_beta_params)
+
+    return stick_obj_fun_jitted, stick_mean_grad_fun, stick_info_grad_fun
+
+def _get_logitnormal_sticks_loss(g_obs,
                                     stick_mean,
                                     stick_info,
+                                    pop_freq_beta_params,
                                     prior_params_dict,
                                     gh_loc, gh_weights,
                                     log_phi, epsilon):
-    # this function only returns the terms in the loss that depend on the
-    # logitnormal sticks. The gradients wrt to the sticks are correct,
-    # though the loss itself is not
 
-    e_log_sticks, e_log_1m_sticks = \
-            ef.get_e_log_logitnormal(
-                lognorm_means = stick_mean,
-                lognorm_infos = stick_info,
-                gh_loc = gh_loc,
-                gh_weights = gh_weights)
+    vb_params_dict = dict({'pop_freq_beta_params':pop_freq_beta_params,
+                          'ind_mix_stick_propn_mean': stick_mean,
+                          'ind_mix_stick_propn_info': stick_info})
 
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
-
-    dp_prior = (prior_params_dict['dp_prior_alpha'].squeeze() - 1) * np.sum(e_log_1m_sticks)
-    stick_entropy = \
-            modeling_lib.get_stick_breaking_entropy(
-                                    stick_mean,
-                                    stick_info,
-                                    gh_loc, gh_weights)
-
-    n = e_z.shape[0]
-    k = e_z.shape[2]
-
-    loglik_term = (e_log_cluster_probs.reshape(n, 1, k, 1) * e_z).sum()
-
-    # perturbed term
-    if log_phi is not None:
-        e_log_pert = get_e_log_perturbation(log_phi,
-                                stick_mean, stick_info,
-                                epsilon, gh_loc, gh_weights, sum_vector=True)
-    else:
-        e_log_pert = 0.0
-
-    return - (loglik_term + dp_prior + stick_entropy) + e_log_pert
+    return structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                        prior_params_dict,
+                                        gh_loc, gh_weights,
+                                        log_phi,
+                                        epsilon,
+                                        detach_ez = False)
 
 def update_logitnormal_sticks(stick_obj_fun,
                                 stick_mean_grad_fun,
                                 stick_info_grad_fun,
-                                e_z,
                                 gh_loc, gh_weights,
                                 vb_params_dict,
                                 vb_params_paragami):
@@ -331,6 +326,7 @@ def update_logitnormal_sticks(stick_obj_fun,
 
     stick_mean = vb_params_dict['ind_mix_stick_propn_mean']
     stick_info = vb_params_dict['ind_mix_stick_propn_info']
+    pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
 
     # initial parameters
     init_stick_mean_free = vb_params_paragami['ind_mix_stick_propn_mean'].\
@@ -341,15 +337,15 @@ def update_logitnormal_sticks(stick_obj_fun,
     # initial loss
     init_ps_loss = stick_obj_fun(init_stick_mean_free,
                                     init_stick_info_free,
-                                    e_z)
+                                    pop_freq_beta_params)
 
     grad_stick_mean = stick_mean_grad_fun(init_stick_mean_free,
                                     init_stick_info_free,
-                                    e_z)
+                                    pop_freq_beta_params)
 
     grad_stick_info = stick_info_grad_fun(init_stick_mean_free,
                                     init_stick_info_free,
-                                    e_z)
+                                    pop_freq_beta_params)
 
     # direction of step
     step1 = - grad_stick_mean
@@ -373,7 +369,7 @@ def update_logitnormal_sticks(stick_obj_fun,
 
         kl_new = stick_obj_fun(update_stick_mean_free,
                                 update_stick_info_free,
-                                e_z)
+                                pop_freq_beta_params)
 
         counter += 1
 
