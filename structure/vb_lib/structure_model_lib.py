@@ -229,9 +229,6 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
 
     return e_loglik, z_entropy
 
-##########################
-# Optimization over e_z
-##########################
 def get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,

@@ -208,7 +208,9 @@ def run_cavi(g_obs, vb_params_dict,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta)
-        kl_old = check_kl(vb_params_dict, kl_old)
+
+        if debug:
+            kl_old = check_kl(vb_params_dict, kl_old)
 
         # update population frequency parameters
         e_log_pop_freq, e_log_1m_pop_freq, \
