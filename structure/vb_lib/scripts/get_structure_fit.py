@@ -1,7 +1,9 @@
-import autograd
+import jax
 
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax.numpy as np
+import jax.scipy as sp
+
+import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
@@ -60,7 +62,7 @@ def validate_args():
 
 validate_args()
 
-np.random.seed(args.seed)
+onp.random.seed(args.seed)
 
 ######################
 # DRAW DATA
@@ -69,7 +71,7 @@ if args.load_data:
     print('loading data from ', args.data_file)
     data = np.load(args.data_file)
 
-    g_obs = data['g_obs']
+    g_obs = np.array(data['g_obs'])
 
 else:
     print('simulating data')
@@ -119,7 +121,7 @@ init_optim_time = time.time()
 if not args.warm_start:
     vb_params_dict = \
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                                                args.use_logitnormal_sticks)
+                                                seed = args.seed)
 else:
     print('warm start from ', args.init_fit)
     vb_params_dict, _, _ = \
@@ -128,20 +130,15 @@ else:
 ######################
 # OPTIMIZE
 ######################
-vb_opt_dict, vb_opt, ez_opt, _, _ = \
+vb_opt_dict, vb_opt, _, _ = \
     cavi_lib.run_cavi(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,
-                        args.use_logitnormal_sticks,
                         gh_loc = gh_loc,
                         gh_weights = gh_weights,
                         max_iter = 2000,
                         x_tol = 1e-4,
                         print_every = 1)
-
-structure_model_lib.assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-                        prior_params_dict, gh_loc, gh_weights,
-                        args.use_logitnormal_sticks)
 
 ######################
 # save results
