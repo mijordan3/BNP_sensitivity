@@ -181,7 +181,8 @@ def get_loglik_gene_nk(g_obs, e_log_pop_freq, e_log_1m_pop_freq, l):
 
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq, e_log_cluster_probs, l):
+def get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
+                    e_log_cluster_probs, l, detach_ez):
     # returns z-optimized log-likelihood for locus-l
 
     # get loglikelihood of observations at loci l
@@ -194,6 +195,9 @@ def get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq, e_log_cluster_probs, 
     log_const = sp.special.logsumexp(loglik_cond_z_l, axis = 1, keepdims = True)
     e_z_l = np.exp(loglik_cond_z_l - log_const)
 
+    if detach_ez:
+        e_z_l = jax.lax.stop_gradient(e_z_l)
+
     # log likelihood
     loglik_l = np.sum(loglik_cond_z_l * e_z_l)
 
@@ -204,14 +208,16 @@ def get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq, e_log_cluster_probs, 
     return np.array([loglik_l, z_entropy_l])
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
-                    e_log_sticks, e_log_1m_sticks):
+                    e_log_sticks, e_log_1m_sticks,
+                    detach_ez):
 
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
     body_fun = lambda val, l : get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
-                                            e_log_cluster_probs, l) + val
+                                        e_log_cluster_probs, l, detach_ez) + \
+                                        val
 
     scan_fun = lambda val, l : (body_fun(val, l), None)
 
@@ -230,10 +236,13 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
-                                    allele_prior_beta):
+                                    allele_prior_beta,
+                                    detach_ez = False):
 
-    e_loglik, z_entropy = get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
-                        e_log_sticks, e_log_1m_sticks)
+    e_loglik, z_entropy = get_e_loglik(g_obs,
+                                        e_log_pop_freq, e_log_1m_pop_freq, \
+                                        e_log_sticks, e_log_1m_sticks,
+                                        detach_ez = detach_ez)
 
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
