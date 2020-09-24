@@ -8,13 +8,21 @@ import time
 
 from vittles.solver_lib import get_cholesky_solver
 
+# wrapper to get hessian vector products in jax
+def get_jac_hvp_fun(f):
+    def hvp(x, v):
+        return jax.jvp(jax.grad(f), (x, ), (v, ))[1]
+    return hvp
+
+
 class HyperparameterSensitivityLinearApproximation(object):
     def __init__(self,
                     objective_fun,
                     opt_par_value,
                     hyper_par_value0,
                     hyper_par_objective_fun = None,
-                    hess_solver = None):
+                    hess_solver = None,
+                    compile_linear_system = False):
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value
@@ -43,9 +51,10 @@ class HyperparameterSensitivityLinearApproximation(object):
         print('\nObjective function derivative time: {0:.3g}sec'.format(time.time() - t0))
 
         # get dinput_dhyper
-        t0 = time.time()
-        _ = self._solve_system()
-        print('\nLinear system compile time: {0:.3g}sec'.format(time.time() - t0))
+        if compile_linear_system:
+            t0 = time.time()
+            _ = self._solve_system()
+            print('\nLinear system compile time: {0:.3g}sec'.format(time.time() - t0))
 
         t0 = time.time()
         self.dinput_dhyper = self._solve_system()
