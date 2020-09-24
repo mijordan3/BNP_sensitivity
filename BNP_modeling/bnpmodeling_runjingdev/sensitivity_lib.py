@@ -22,7 +22,7 @@ class HyperparameterSensitivityLinearApproximation(object):
                     hyper_par_value0,
                     hyper_par_objective_fun = None,
                     hess_solver = None,
-                    compile_linear_system = False):
+                    compile_linear_system = True):
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value
