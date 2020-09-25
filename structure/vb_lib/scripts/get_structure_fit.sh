@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source activate genomic_time_series_py35
+source activate bnp_sensitivity_jax
 
 seed=345345
 
@@ -12,7 +12,7 @@ alpha=4.0
 
 /usr/bin/env python3 ./get_structure_fit.py \
   --seed ${seed} \
-  --load_data True \
+  --load_data False \
   --data_file /scratch/users/genomic_times_series_bnp/structure/data/simulated_structure_data_nobs${nobs}_nloci${nloci}_npop${npop}.npz \
   --alpha ${alpha} \
   --n_obs ${nobs} \

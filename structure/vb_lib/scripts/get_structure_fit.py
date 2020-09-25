@@ -7,10 +7,8 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
-import vb_lib.structure_optimization_lib as str_opt_lib
 
 import paragami
-import vittles
 
 from copy import deepcopy
 
@@ -138,7 +136,7 @@ vb_opt_dict, vb_opt, _, _ = \
                         gh_weights = gh_weights,
                         max_iter = 2000,
                         x_tol = 1e-4,
-                        print_every = 1)
+                        print_every = 20)
 
 ######################
 # save results
