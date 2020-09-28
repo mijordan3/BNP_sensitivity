@@ -50,13 +50,13 @@ parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
 args = parser.parse_args()
 
 def validate_args():
-    assert os.path.exists(args.outfolder)
+    assert os.path.exists(args.outfolder), args.outfolder
 
     if args.warm_start:
-        assert os.path.isfile(args.init_fit)
+        assert os.path.isfile(args.init_fit), args.init_fit
 
     if args.load_data:
-        assert os.path.isfile(args.data_file)
+        assert os.path.isfile(args.data_file), args.data_file
 
 validate_args()
 
