@@ -4,8 +4,8 @@ source activate bnp_sensitivity_jax
 
 seed=345345
 
-nobs=40
-nloci=100
+nobs=100
+nloci=2000
 npop=4
 
 alpha=3.5
