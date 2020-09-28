@@ -145,12 +145,25 @@ outfile = os.path.join(args.outfolder, args.out_filename + '.npz')
 print('saving structure model to ', outfile)
 
 optim_time = time.time() - init_optim_time
+
+
+# save final KL
+final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
+                            prior_params_dict,
+                            gh_loc = gh_loc,
+                            gh_weights = gh_weights)
+
+# save paragami object
 paragami.save_folded(outfile,
                      vb_opt_dict,
                      vb_params_paragami,
-                     alpha = prior_params_dict['dp_prior_alpha'],
+                     data_file = args.data_file,
+                     dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
+                     allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
+                     allele_prior_beta = prior_params_dict['allele_prior_beta'],
                      gh_deg = gh_deg,
                      use_logitnormal_sticks = args.use_logitnormal_sticks,
+                     final_kl = final_kl,
                      optim_time = optim_time)
 
 print('Total optimization time: {:03f} secs'.format(optim_time))
