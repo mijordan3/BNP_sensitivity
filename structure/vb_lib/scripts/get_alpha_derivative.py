@@ -25,8 +25,8 @@ fit_dir = '/scratch/users/genomic_times_series_bnp/structure/fits/fits_20200928/
 ##################
 # Load data
 ##################
-n_obs = 40
-n_loci = 100
+n_obs = 100
+n_loci = 2000
 n_pop = 4
 
 data_file = data_dir + 'simulated_structure_data_nobs{}_nloci{}_npop{}.npz'.format(n_obs, n_loci, n_pop)
