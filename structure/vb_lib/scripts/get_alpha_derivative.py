@@ -17,13 +17,10 @@ from copy import deepcopy
 
 import time
 
-import matplotlib.pyplot as plt
-%matplotlib inline
-
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
-data_dir = '/scratch/users/genomic_times_series_bnp/structures/simulated_data/'
-fit_dir = '/scratch/users/genomic_times_series_bnp/structures/fits/fits_20200928/'
+data_dir = '/scratch/users/genomic_times_series_bnp/structure/data/'
+fit_dir = '/scratch/users/genomic_times_series_bnp/structure/fits/fits_20200928/'
 
 ##################
 # Load data
@@ -32,7 +29,7 @@ n_obs = 40
 n_loci = 100
 n_pop = 4
 
-data_file = data_dir + simulated_structure_data_nobs{}_nloci{}_npop{}.npz'.format(n_obs, n_loci, n_pop)
+data_file = data_dir + 'simulated_structure_data_nobs{}_nloci{}_npop{}.npz'.format(n_obs, n_loci, n_pop)
 print('loading data from ', data_file)
 data = np.load(data_file)
 
@@ -51,9 +48,9 @@ print('loading fit from ', fit_file)
 vb_opt_dict, vb_params_paragami, meta_data = \
     paragami.load_folded(fit_file)
 
-vb_opt = vb_params_paragami.flatten(vb_params_dict, free = True)
+vb_opt = vb_params_paragami.flatten(vb_opt_dict, free = True)
 
-k_approx = vb_params_dict['pop_freq_beta_params'].shape[1]
+k_approx = vb_opt_dict['pop_freq_beta_params'].shape[1]
 
 gh_deg = int(meta_data['gh_deg'])
 gh_loc, gh_weights = hermgauss(gh_deg)
@@ -80,7 +77,7 @@ prior_params_free = prior_params_paragami.flatten(prior_params_dict, free = True
 ###############
 # check KL
 ###############
-kl = structure_model_lib.get_kl(g_obs, vb_params_dict, prior_params_dict,
+kl = structure_model_lib.get_kl(g_obs, vb_opt_dict, prior_params_dict,
                                 gh_loc = gh_loc, gh_weights = gh_weights)
 # check KL's match
 print(np.abs(kl - meta_data['final_kl']))
@@ -137,7 +134,7 @@ vb_sens = HyperparameterSensitivityLinearApproximation(objective_fun_free,
                                                         hess_solver = cg_solver,
                                                         compile_linear_system = False)
 
-dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}.npz'
+dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
 print('saving derivative into ', dinput_dyper_file)
 np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
 
