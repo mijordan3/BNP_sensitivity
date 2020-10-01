@@ -108,34 +108,18 @@ objective_fun_free = paragami.FlattenFunctionInput(
                                 argnums = [0, 1])
 
 # define preconditioner
-precon_fun = jax.jit(lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
+precon_fun = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
                                             vb_params_paragami,
-                                            return_info = True))
-t0 = time.time()
-_ = precon_fun(vb_opt)
-print('preconditioner compile time: {:0.3}sec'.format(time.time() - t0))
-
-M_op = osp.sparse.linalg.LinearOperator((len(vb_opt), len(vb_opt)), precon_fun)
-t0 = time.time()
-M_op(vb_opt)
-print('preconditioner matmul time: {:0.3}sec'.format(time.time() - t0))
-
-# get solver
-obj_fun_hvp = jax.jit(get_jac_hvp_fun(lambda x : objective_fun_free(x, prior_alpha0)))
-
-cg_solver = solver_lib.get_cg_solver(lambda x : obj_fun_hvp(vb_opt, x),
-                                            dim = len(vb_opt),
-                                            cg_opts = {'M': M_op})
+                                            return_info = True)
 
 print('Computing sensitivity ...')
 vb_sens = HyperparameterSensitivityLinearApproximation(objective_fun_free,
                                                         vb_opt,
                                                         prior_alpha0,
-                                                        hess_solver = cg_solver,
-                                                        compile_linear_system = False)
+                                                        cg_precond=precon_fun)
 
-dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
-print('saving derivative into ', dinput_dyper_file)
-np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
+# dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
+# print('saving derivative into ', dinput_dyper_file)
+# np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
 
 print('done. ')
