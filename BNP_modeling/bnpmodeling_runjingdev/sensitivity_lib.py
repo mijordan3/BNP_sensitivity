@@ -4,6 +4,8 @@
 import jax
 import jax.numpy as np
 
+from jax.scipy.sparse.linalg import cg
+
 import time
 
 from vittles.solver_lib import get_cholesky_solver
@@ -21,62 +23,61 @@ class HyperparameterSensitivityLinearApproximation(object):
                     opt_par_value,
                     hyper_par_value0,
                     hyper_par_objective_fun = None,
-                    hess_solver = None,
-                    compile_linear_system = True):
+                    cg_precond = None):
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value
         self.hyper_par_value0 = hyper_par_value0
         if hyper_par_objective_fun is None:
-            self.hyper_par_objective_fun = objective_fun
-        else:
-            self.hyper_par_objective_fun = hyper_par_objective_fun
+            hyper_par_objective_fun = objective_fun
 
-        # define derivatives
-        self.dobj_dhyper = jax.jit(jax.jacobian(self.hyper_par_objective_fun, 1))
-        self.dobj_dhyper_dinput = jax.jit(jax.jacobian(self.dobj_dhyper), 0)
+        self.cg_precond = cg_precond
 
-        self.hess_fun = jax.jit(jax.hessian(self.objective_fun, argnums = 0))
-        self.hess_solver = hess_solver
+        # hessian vector products
+        self.obj_fun_hvp = get_jac_hvp_fun(lambda x : objective_fun(x, self.hyper_par_value0))
 
-        # compile derivatives
-        print('Compiling objective function derivatives ... ')
+        # compile linear system
+        self._set_hessian_solver()
+
+        # get cross hessian function
+        self._set_cross_hess_and_solve(hyper_par_objective_fun)
+
+
+    def _set_cross_hess_and_solve(self, hyper_par_objective_fun):
+        dobj_dhyper = jax.jit(jax.jacobian(hyper_par_objective_fun, 1))
+        self.dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper), 0)
+
+        print('Compiling cross hessian...')
         t0 = time.time()
-        _ = self._compute_objective_derivatives()
-        print('Compile time: {0:.3g}sec'.format(time.time() - t0))
+        out = self.dobj_dhyper_dinput(self.opt_par_value,
+                                        self.hyper_par_value0).squeeze()
+        assert (len(out.shape) == 1) and (len(out) == len(self.opt_par_value)), 'cross hessian shape: ' + str(out.shape)
+        print('Cross-hessian compile time: {0:3g}sec\n'.format(time.time() - t0))
 
-        # compute derivatives
-        t0 = time.time()
-        self.cross_hess, self.hessian = self._compute_objective_derivatives()
-        print('\nObjective function derivative time: {0:.3g}sec'.format(time.time() - t0))
+        self._set_dinput_dhyper()
 
-        # get dinput_dhyper
-        if compile_linear_system:
-            t0 = time.time()
-            _ = self._solve_system()
-            print('\nLinear system compile time: {0:.3g}sec'.format(time.time() - t0))
+    def _set_dinput_dhyper(self):
 
         t0 = time.time()
-        self.dinput_dhyper = self._solve_system()
-        print('Linear system time: {0:.3g}sec'.format(time.time() - t0))
+        cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
+                                                self.hyper_par_value0)
 
-    def _compute_objective_derivatives(self):
-        cross_hess = self.dobj_dhyper_dinput(self.opt_par_value, \
-                                            self.hyper_par_value0)
-        cross_hess = cross_hess.transpose((1, 0))
+        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze())
+        print('LR sensitivity time: {0:3g}sec\n'.format(time.time() - t0))
 
-        if self.hess_solver is None:
-            hessian = self.hess_fun(self.opt_par_value, self.hyper_par_value0)
-        else:
-            hessian = None
 
-        return cross_hess, hessian
+    def _set_hessian_solver(self):
 
-    def _solve_system(self):
-        if self.hess_solver is None:
-            self.hess_solver = get_cholesky_solver(self.hessian)
+        self.hessian_solver = \
+            jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
+                                   b = b,
+                                   M = self.cg_precond)[0])
 
-        return -self.hess_solver(self.cross_hess)
+        print('Compiling hessian solver ...')
+        t0 = time.time()
+        _ = self.hessian_solver(self.opt_par_value)
+        print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
+
 
     def predict_opt_par_from_hyper_par(self, hyper_par_value):
         delta = (hyper_par_value - self.hyper_par_value0)
