@@ -83,46 +83,47 @@ e_log_sticks, e_log_1m_sticks, \
         structure_model_lib.get_moments_from_vb_params_dict(
             vb_params_dict, gh_loc, gh_weights)
 
-from vb_lib.cavi_lib import *
+from vb_lib.cavi_lib import joint_loglik
 
+joint_loglik = jax.jit(joint_loglik)
 
 t0 = time.time()
-_ = update_pop_beta(g_obs,
+_ = joint_loglik(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta)
 
-print('pop beta compile time: ', time.time() - t0)
+print('joint loglik compile time: ', time.time() - t0)
 
 t0 = time.time()
 for i in range(100):
-    _ = update_pop_beta(g_obs,
+    _ = joint_loglik(g_obs,
                         e_log_pop_freq, e_log_1m_pop_freq,
                         e_log_sticks, e_log_1m_sticks,
                         dp_prior_alpha, allele_prior_alpha,
                         allele_prior_beta)
-print('pop beta 100 iter time: ', time.time() - t0)
+print('joint loglik 100 iter time: ', time.time() - t0)
 
 ########
-t0 = time.time()
-_ = update_stick_beta(g_obs,
-                    e_log_pop_freq, e_log_1m_pop_freq,
-                    e_log_sticks, e_log_1m_sticks,
-                    dp_prior_alpha, allele_prior_alpha,
-                    allele_prior_beta)
-
-print('stick beta compile time: ', time.time() - t0)
-
-t0 = time.time()
-for i in range(100):
-    _ = update_stick_beta(g_obs,
-                        e_log_pop_freq, e_log_1m_pop_freq,
-                        e_log_sticks, e_log_1m_sticks,
-                        dp_prior_alpha, allele_prior_alpha,
-                        allele_prior_beta)
-print('stick beta 100 iter time: ', time.time() - t0)
-
+# t0 = time.time()
+# _ = update_stick_beta(g_obs,
+#                     e_log_pop_freq, e_log_1m_pop_freq,
+#                     e_log_sticks, e_log_1m_sticks,
+#                     dp_prior_alpha, allele_prior_alpha,
+#                     allele_prior_beta)
+#
+# print('stick beta compile time: ', time.time() - t0)
+#
+# t0 = time.time()
+# for i in range(100):
+#     _ = update_stick_beta(g_obs,
+#                         e_log_pop_freq, e_log_1m_pop_freq,
+#                         e_log_sticks, e_log_1m_sticks,
+#                         dp_prior_alpha, allele_prior_alpha,
+#                         allele_prior_beta)
+# print('stick beta 100 iter time: ', time.time() - t0)
+#
 # ########
 # _ = get_pop_beta_update1(g_obs,
 #                     e_log_pop_freq, e_log_1m_pop_freq,
