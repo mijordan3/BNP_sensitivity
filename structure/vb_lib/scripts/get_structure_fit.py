@@ -1,14 +1,14 @@
-import autograd
+import jax
 
-import autograd.numpy as np
-import autograd.scipy as sp
+import jax.numpy as np
+import jax.scipy as sp
+
+import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
-import vb_lib.structure_optimization_lib as str_opt_lib
 
 import paragami
-import vittles
 
 from copy import deepcopy
 
@@ -50,17 +50,17 @@ parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
 args = parser.parse_args()
 
 def validate_args():
-    assert os.path.exists(args.outfolder)
+    assert os.path.exists(args.outfolder), args.outfolder
 
     if args.warm_start:
-        assert os.path.isfile(args.init_fit)
+        assert os.path.isfile(args.init_fit), args.init_fit
 
     if args.load_data:
-        assert os.path.isfile(args.data_file)
+        assert os.path.isfile(args.data_file), args.data_file
 
 validate_args()
 
-np.random.seed(args.seed)
+onp.random.seed(args.seed)
 
 ######################
 # DRAW DATA
@@ -69,7 +69,7 @@ if args.load_data:
     print('loading data from ', args.data_file)
     data = np.load(args.data_file)
 
-    g_obs = data['g_obs']
+    g_obs = np.array(data['g_obs'])
 
 else:
     print('simulating data')
@@ -119,7 +119,7 @@ init_optim_time = time.time()
 if not args.warm_start:
     vb_params_dict = \
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
-                                                args.use_logitnormal_sticks)
+                                                seed = args.seed)
 else:
     print('warm start from ', args.init_fit)
     vb_params_dict, _, _ = \
@@ -128,20 +128,15 @@ else:
 ######################
 # OPTIMIZE
 ######################
-vb_opt_dict, vb_opt, ez_opt, _, _ = \
+vb_opt_dict, vb_opt, _, _ = \
     cavi_lib.run_cavi(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,
-                        args.use_logitnormal_sticks,
                         gh_loc = gh_loc,
                         gh_weights = gh_weights,
                         max_iter = 2000,
                         x_tol = 1e-4,
-                        print_every = 1)
-
-structure_model_lib.assert_optimizer(g_obs, vb_opt_dict, vb_params_paragami,
-                        prior_params_dict, gh_loc, gh_weights,
-                        args.use_logitnormal_sticks)
+                        print_every = 20)
 
 ######################
 # save results
@@ -150,12 +145,25 @@ outfile = os.path.join(args.outfolder, args.out_filename + '.npz')
 print('saving structure model to ', outfile)
 
 optim_time = time.time() - init_optim_time
+
+
+# save final KL
+final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
+                            prior_params_dict,
+                            gh_loc = gh_loc,
+                            gh_weights = gh_weights)
+
+# save paragami object
 paragami.save_folded(outfile,
                      vb_opt_dict,
                      vb_params_paragami,
-                     alpha = prior_params_dict['dp_prior_alpha'],
+                     data_file = args.data_file,
+                     dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
+                     allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
+                     allele_prior_beta = prior_params_dict['allele_prior_beta'],
                      gh_deg = gh_deg,
                      use_logitnormal_sticks = args.use_logitnormal_sticks,
+                     final_kl = final_kl,
                      optim_time = optim_time)
 
 print('Total optimization time: {:03f} secs'.format(optim_time))

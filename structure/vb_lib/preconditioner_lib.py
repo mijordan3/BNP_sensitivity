@@ -1,18 +1,8 @@
-import numpy as np
-import scipy as sp
-
-from scipy import sparse
+import jax
+import jax.numpy as np
+import jax.scipy as sp
 
 import paragami
-
-from copy import deepcopy
-
-import warnings
-
-from vb_lib import structure_model_lib
-
-from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
-                                            _get_matrix_from_operator
 
 def get_log_beta_covariance(alpha, beta):
     # returns the covariance of the score function
@@ -31,50 +21,57 @@ def get_log_beta_covariance(alpha, beta):
     return np.array([[I11 * alpha**2, I12 * alpha * beta], \
                      [I12 * alpha * beta, I22 * beta**2]])
 
-def _get_cov_for_all_beta_params(vb_beta_params, return_info):
-    block_cov = ()
-    for i in range(len(vb_beta_params) // 2):
-        # get covariance
-        cov = get_log_beta_covariance(vb_beta_params[2 * i],
-                                        vb_beta_params[2 * i + 1])
+def _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, v):
+    xs = vb_params_pop_params.reshape(-1, 2)
+    xs = np.concatenate((xs, v.reshape(-1, 2)), axis = 1)
+
+    def f(carry, x):
+
+        cov = get_log_beta_covariance(x[0], x[1])
 
         if return_info:
             cov = np.linalg.inv(cov)
 
-        block_cov = block_cov + (cov, )
 
-    return block_cov
+        return carry, np.dot(cov, x[2:4])
 
-def get_mfvb_cov(vb_params_dict, vb_params_paragami,
-                    use_logitnormal_sticks,
-                    return_info = False):
+    out = jax.lax.scan(f, init = 0., xs = xs)
+
+    return out[1].flatten()
+
+def get_mfvb_cov_matmul(v, vb_params_dict,
+                        vb_params_paragami,
+                        return_info = False):
+
     # compute preconditioner from MFVB covariances
 
     block_mfvb_cov = ()
 
     ##############
     # blocks for the population frequency
-    vb_params_pop_params = np.array(vb_params_paragami['pop_freq_beta_params'].flatten(\
-                        vb_params_dict['pop_freq_beta_params'], free = False))
+    vb_params_pop_params = vb_params_paragami['pop_freq_beta_params'].flatten(\
+                        vb_params_dict['pop_freq_beta_params'], free = False)
 
-    block_mfvb_cov = block_mfvb_cov + \
-                    _get_cov_for_all_beta_params(vb_params_pop_params, return_info)
+    block1_dim = len(vb_params_pop_params)
+    block1 = _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, v[0:block1_dim])
 
     #############
     # blocks for individual admixture
+    v2 = v[block1_dim:]
+    use_logitnormal_sticks = 'ind_mix_stick_propn_info' in vb_params_dict.keys()
     if use_logitnormal_sticks:
-        infos = np.array(vb_params_paragami['ind_mix_stick_propn_info'].flatten(
+        infos = vb_params_paragami['ind_mix_stick_propn_info'].flatten(
                         vb_params_dict['ind_mix_stick_propn_info'],
-                        free = False))
+                        free = False)
+
         if return_info:
-            block_mfvb_cov = block_mfvb_cov + (np.diag(1/infos), ) + (np.eye(len(infos)) * 2., )
+            block2 = np.concatenate((1/infos * v2[0:len(infos)], v2[len(infos):] * 2))
         else:
-            block_mfvb_cov = block_mfvb_cov + (np.diag(infos), ) + (np.eye(len(infos)) * 0.5, )
+            block2 = np.concatenate((infos * v2[0:len(infos)], v2[len(infos):] * 0.5))
     else:
-        vb_params_admix = np.array(vb_params_paragami['ind_mix_stick_beta_params'].flatten(\
-                            vb_params_dict['ind_mix_stick_beta_params'], free = False))
+        vb_params_admix = vb_params_paragami['ind_mix_stick_beta_params'].flatten(\
+                            vb_params_dict['ind_mix_stick_beta_params'], free = False)
 
-        block_mfvb_cov = block_mfvb_cov + \
-                        _get_cov_for_all_beta_params(vb_params_admix, return_info)
+        block2 = _eval_popbeta_cov_matmul(vb_params_admix, return_info, v2)
 
-    return sparse.block_diag(block_mfvb_cov)
+    return np.concatenate((block1, block2))
