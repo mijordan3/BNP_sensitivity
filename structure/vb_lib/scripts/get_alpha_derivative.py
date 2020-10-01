@@ -118,8 +118,8 @@ vb_sens = HyperparameterSensitivityLinearApproximation(objective_fun_free,
                                                         prior_alpha0,
                                                         cg_precond=precon_fun)
 
-# dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
-# print('saving derivative into ', dinput_dyper_file)
-# np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
+dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
+print('saving derivative into ', dinput_dyper_file)
+np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
 
 print('done. ')
