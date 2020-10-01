@@ -67,6 +67,29 @@ vb_params_dict = \
         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
                                                 seed = 34221)
 
+
+get_kl_jitted = jax.jit(lambda g_obs, vb_params_dict, prior_params_dict:
+                            structure_model_lib.get_kl(g_obs,
+                                                        vb_params_dict,
+                                                        prior_params_dict,
+                                                        gh_loc = None, gh_weights = None,
+                                                        log_phi = None,
+                                                        epsilon = 1.,
+                                                        detach_ez = False))
+t0 = time.time()
+_ = get_kl_jitted(g_obs,
+                vb_params_dict,
+                prior_params_dict)
+
+print('kl compile time: ', time.time() - t0)
+
+t0 = time.time()
+for i in range(100):
+    _ = get_kl_jitted(g_obs,
+                    vb_params_dict,
+                    prior_params_dict)
+print('kl 100 iter time: ', time.time() - t0)
+
 ################
 # Benchmark CAVI
 ################
@@ -78,32 +101,32 @@ vb_params_dict = \
 #                         x_tol = 1e-3,
 #                         print_every = 1)
 
-e_log_sticks, e_log_1m_sticks, \
-    e_log_pop_freq, e_log_1m_pop_freq = \
-        structure_model_lib.get_moments_from_vb_params_dict(
-            vb_params_dict, gh_loc, gh_weights)
-
-from vb_lib.cavi_lib import joint_loglik
-
-joint_loglik = jax.jit(joint_loglik)
-
-t0 = time.time()
-_ = joint_loglik(g_obs,
-                    e_log_pop_freq, e_log_1m_pop_freq,
-                    e_log_sticks, e_log_1m_sticks,
-                    dp_prior_alpha, allele_prior_alpha,
-                    allele_prior_beta)
-
-print('joint loglik compile time: ', time.time() - t0)
-
-t0 = time.time()
-for i in range(100):
-    _ = joint_loglik(g_obs,
-                        e_log_pop_freq, e_log_1m_pop_freq,
-                        e_log_sticks, e_log_1m_sticks,
-                        dp_prior_alpha, allele_prior_alpha,
-                        allele_prior_beta)
-print('joint loglik 100 iter time: ', time.time() - t0)
+# e_log_sticks, e_log_1m_sticks, \
+#     e_log_pop_freq, e_log_1m_pop_freq = \
+#         structure_model_lib.get_moments_from_vb_params_dict(
+#             vb_params_dict, gh_loc, gh_weights)
+#
+# from vb_lib.cavi_lib import joint_loglik
+#
+# joint_loglik = jax.jit(joint_loglik)
+#
+# t0 = time.time()
+# _ = joint_loglik(g_obs,
+#                     e_log_pop_freq, e_log_1m_pop_freq,
+#                     e_log_sticks, e_log_1m_sticks,
+#                     dp_prior_alpha, allele_prior_alpha,
+#                     allele_prior_beta)
+#
+# print('joint loglik compile time: ', time.time() - t0)
+#
+# t0 = time.time()
+# for i in range(100):
+#     _ = joint_loglik(g_obs,
+#                         e_log_pop_freq, e_log_1m_pop_freq,
+#                         e_log_sticks, e_log_1m_sticks,
+#                         dp_prior_alpha, allele_prior_alpha,
+#                         allele_prior_beta)
+# print('joint loglik 100 iter time: ', time.time() - t0)
 
 ########
 # t0 = time.time()
