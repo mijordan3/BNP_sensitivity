@@ -89,8 +89,19 @@ for i in range(100):
     _ = get_kl_jitted(g_obs,
                     vb_params_dict,
                     prior_params_dict)
-                    
+
     print('kl time: ', time.time() - t0)
+
+print('pause. ')
+time.sleep(10)
+for i in range(100):
+    t0 = time.time()
+
+    _ = get_kl_jitted(g_obs,
+                    vb_params_dict,
+                    prior_params_dict)
+
+    print('kl time2: ', time.time() - t0)
 
 ################
 # Benchmark CAVI
