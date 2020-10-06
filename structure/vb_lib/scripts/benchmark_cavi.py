@@ -83,18 +83,19 @@ _ = get_kl_jitted(g_obs,
 
 print('kl compile time: ', time.time() - t0)
 
-for i in range(100):
+for i in range(50):
     t0 = time.time()
 
     _ = get_kl_jitted(g_obs,
                     vb_params_dict,
-                    prior_params_dict)
+                    prior_params_dict).block_until_ready()
 
     print('kl time: ', time.time() - t0)
 
 print('pause. ')
-time.sleep(10)
-for i in range(100):
+time.sleep(5)
+print('resume. ')
+for i in range(50):
     t0 = time.time()
 
     _ = get_kl_jitted(g_obs,
