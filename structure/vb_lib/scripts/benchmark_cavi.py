@@ -77,10 +77,13 @@ get_kl_jitted = jax.jit(lambda g_obs, vb_params_dict, prior_params_dict:
                                                         epsilon = 1.,
                                                         detach_ez = False))
 t0 = time.time()
-_ = get_kl_jitted(g_obs,
+kl = get_kl_jitted(g_obs,
                 vb_params_dict,
                 prior_params_dict)
 
+print('prior norm: ', (prior_params_paragami.flatten(prior_params_dict, free = True)**2).mean())
+print('vb norm: ', (vb_params_paragami.flatten(vb_params_dict, free = True)**2).mean())
+print('kl: ', kl)
 print('kl compile time: ', time.time() - t0)
 
 for i in range(50):
