@@ -89,8 +89,9 @@ optim_objective.set_print_every(1000)
 ################
 for i in range(100):
     t0 = time.time()
-    _ = optim_objective_np(init_vb_free)
-    elapsed = (time.time() - t0) / 100
+    __ = optim_objective_np(init_vb_free)
+    # _ = kl_fun_free(init_vb_free)
+    elapsed = (time.time() - t0) 
     print('objective time: {}sec'.format(elapsed))
 
 
