@@ -10,7 +10,8 @@ from paragami import OptimizationObjective
 
 import time
 
-def construct_and_compile_derivatives(get_loss, init_vb_free_params):
+def construct_and_compile_derivatives(get_loss, init_vb_free_params,
+                                        compile_hvp = True):
     get_loss_jitted = jax.jit(get_loss)
 
     # set up objective
@@ -25,7 +26,8 @@ def construct_and_compile_derivatives(get_loss, init_vb_free_params):
     print('Compiling derivatives ...')
     _ = optim_objective.f(init_vb_free_params)
     _ = optim_grad(init_vb_free_params)
-    _ = optim_hvp(init_vb_free_params, init_vb_free_params)
+    if compile_hvp:
+        _ = optim_hvp(init_vb_free_params, init_vb_free_params)
     print('Compile time: {0:3g}secs'.format(time.time() - t0))
 
     # convert to numpy
