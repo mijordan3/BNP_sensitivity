@@ -169,14 +169,12 @@ def get_loglik_gene_nk(g_obs, e_log_pop_freq, e_log_1m_pop_freq, l):
     e_log_1m_pop_freq_l = e_log_1m_pop_freq[l]
 
     loglik_a = \
-        np.einsum('n, k -> nk', g_obs_l[:, 0], e_log_1m_pop_freq_l) + \
-            np.einsum('n, k -> nk', g_obs_l[:, 1] + \
-                                        g_obs_l[:, 2], e_log_pop_freq_l)
+        np.outer(g_obs_l[:, 0], e_log_1m_pop_freq_l) + \
+            np.outer(g_obs_l[:, 1] + g_obs_l[:, 2], e_log_pop_freq_l)
 
     loglik_b = \
-        np.einsum('n, k -> nk', g_obs_l[:, 0] + \
-                                    g_obs_l[:, 1], e_log_1m_pop_freq_l) + \
-            np.einsum('n, k -> nk', g_obs_l[:, 2], e_log_pop_freq_l)
+        np.outer(g_obs_l[:, 0] + g_obs_l[:, 1], e_log_1m_pop_freq_l) + \
+            np.outer(g_obs_l[:, 2], e_log_pop_freq_l)
 
 
     return np.stack((loglik_a, loglik_b), axis = -1)
