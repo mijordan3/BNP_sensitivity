@@ -7,6 +7,11 @@ import scipy as osp
 
 from copy import deepcopy
 
+
+########################
+# Functions to evaluate expectations
+# given a functional perturbation
+########################
 class PriorPerturbation(object):
     def __init__(self, alpha0,
                         log_phi,
