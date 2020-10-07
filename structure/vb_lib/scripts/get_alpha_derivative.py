@@ -20,7 +20,7 @@ import time
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
 data_dir = '/scratch/users/genomic_times_series_bnp/structure/data/'
-fit_dir = '/scratch/users/genomic_times_series_bnp/structure/fits/fits_20200928/'
+fit_dir = '/scratch/users/genomic_times_series_bnp/structure/fits/fits_20201007/'
 
 ##################
 # Load data

@@ -24,7 +24,7 @@ scratch_folder='/scratch/users/genomic_times_series_bnp/structure'
   --n_obs ${nobs} \
   --n_loci ${nloci} \
   --n_pop ${npop} \
-  --outfolder ${scratch_folder}/fits/fits_20200928/ \
+  --outfolder ${scratch_folder}/fits/fits_20201007/ \
   --out_filename structure_fit_nobs${nobs}_nloci${nloci}_npop${npop}_alpha${alpha} \
   --warm_start True \
-  --init_fit ${scratch_folder}/fits/fits_20200928/structure_fit_nobs${nobs}_nloci${nloci}_npop${npop}_alpha3.5.npz
+  --init_fit ${scratch_folder}/fits/fits_20201007/structure_fit_nobs${nobs}_nloci${nloci}_npop${npop}_alpha3.5.npz
