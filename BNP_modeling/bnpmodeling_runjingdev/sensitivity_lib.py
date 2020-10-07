@@ -62,7 +62,9 @@ class HyperparameterSensitivityLinearApproximation(object):
         cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
                                                 self.hyper_par_value0)
 
-        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze())
+        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze()).\
+                                    block_until_ready()
+
         print('LR sensitivity time: {0:3g}sec\n'.format(time.time() - t0))
 
 

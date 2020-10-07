@@ -37,10 +37,6 @@ def update_pop_beta(g_obs,
                     allele_prior_beta):
     # update population frequency parameters
 
-    n_loci = g_obs.shape[1]
-    n_pop = e_log_sticks.shape[1] + 1
-    constant = np.zeros((n_loci, n_pop))
-
     beta_param1 = get_pop_beta_update1(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq,
                     e_log_sticks, e_log_1m_sticks,
@@ -67,11 +63,6 @@ def update_stick_beta(g_obs,
                     e_log_sticks, e_log_1m_sticks,
                     dp_prior_alpha, allele_prior_alpha,
                     allele_prior_beta):
-
-    # constant
-    # this is the shape of e_log_sticks
-    n_sticks = e_log_pop_freq.shape[1] - 1
-    constant = np.zeros((g_obs.shape[0], n_sticks))
 
     # update individual admixtures
     beta_param1 = get_stick_update1(g_obs,
