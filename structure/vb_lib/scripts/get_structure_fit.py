@@ -7,6 +7,7 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
+from vb_lib.structure_optimization_lib import optimize_structure
 
 import paragami
 
@@ -138,7 +139,7 @@ else:
 #                         x_tol = 1e-4,
 #                         print_every = 20)
 
-vb_opt_dict, vb_out _ = \
+vb_opt_dict, vb_out, _ = \
     optimize_structure(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,

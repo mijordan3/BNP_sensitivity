@@ -32,7 +32,7 @@ def optimize_structure(g_obs, vb_params_dict,
     optim_out = optimization_lib.optimize_full(kl_fun_free, init_vb_free)
 
     # construct optimum
-    vb_opt = out.x
+    vb_opt = optim_out.x
     vb_params_dict = vb_params_paragami.fold(vb_opt, free = True)
 
-    return vb_params_dict, vb_out, optim_out
+    return vb_params_dict, vb_opt, optim_out
