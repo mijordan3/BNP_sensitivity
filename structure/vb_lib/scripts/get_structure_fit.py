@@ -128,16 +128,23 @@ else:
 ######################
 # OPTIMIZE
 ######################
-vb_opt_dict, vb_opt, _, _ = \
-    cavi_lib.run_cavi(g_obs, vb_params_dict,
+# vb_opt_dict, vb_opt, _, _ = \
+#     cavi_lib.run_cavi(g_obs, vb_params_dict,
+#                         vb_params_paragami,
+#                         prior_params_dict,
+#                         gh_loc = gh_loc,
+#                         gh_weights = gh_weights,
+#                         max_iter = 2000,
+#                         x_tol = 1e-4,
+#                         print_every = 20)
+
+vb_opt_dict, vb_out _ = \
+    optimize_structure(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc = gh_loc,
-                        gh_weights = gh_weights,
-                        max_iter = 2000,
-                        x_tol = 1e-4,
-                        print_every = 20)
-
+                        gh_weights = gh_weights)
+                        
 ######################
 # save results
 ######################
