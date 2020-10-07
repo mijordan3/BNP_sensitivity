@@ -145,7 +145,7 @@ vb_opt_dict, vb_out, _ = \
                         prior_params_dict,
                         gh_loc = gh_loc,
                         gh_weights = gh_weights)
-                        
+
 ######################
 # save results
 ######################
