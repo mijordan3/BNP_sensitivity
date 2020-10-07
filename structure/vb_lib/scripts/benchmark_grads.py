@@ -87,17 +87,16 @@ optim_objective.set_print_every(1000)
 ################
 # time
 ################
-t0 = time.time()
 for i in range(100):
+    t0 = time.time()
     _ = optim_objective_np(init_vb_free)
+    elapsed = (time.time() - t0) / 100
+    print('objective time: {}sec'.format(elapsed))
 
-elapsed = (time.time() - t0) / 100
-print('objective time: {}sec'.format(elapsed))
 
-
-t0 = time.time()
-for i in range(100):
-    _ = optim_grad_np(init_vb_free)
-
-elapsed = (time.time() - t0) / 100
-print('gradient time: {}sec'.format(elapsed))
+# t0 = time.time()
+# for i in range(100):
+#     _ = optim_grad_np(init_vb_free)
+#
+# elapsed = (time.time() - t0) / 100
+# print('gradient time: {}sec'.format(elapsed))
