@@ -46,3 +46,4 @@ else:
                 g_obs = g_obs,
                 true_pop_allele_freq = true_pop_allele_freq,
                 true_ind_admix_propn = true_ind_admix_propn)
+print('done. ')
