@@ -59,9 +59,9 @@ def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
     g_obs = genotype_a + genotype_b
     g_obs = get_one_hot(g_obs, nb_classes=3)
 
-    return jnp.array(g_obs)
+    return g_obs
 
-def draw_data(n_obs, n_loci, n_pop):
+def draw_data(n_obs, n_loci, n_pop, mem_saver = False):
     """
     Draws data for structure
 
@@ -85,6 +85,9 @@ def draw_data(n_obs, n_loci, n_pop):
     true_ind_admix_propn : ndarray
         The true individual admixtures from which g_obs was drawn,
         in a (n_obs x n_population) array.
+    mem_saver : boolean
+        Whether to compute g_obs in a for-loop, to save memory.
+        Needed for simulating particularly large datasets ...
     """
 
 
@@ -100,11 +103,23 @@ def draw_data(n_obs, n_loci, n_pop):
     true_ind_admix_propn = true_ind_admix_propn[clustering_indx, :]
 
     # draw data
-    g_obs = draw_data_from_popfreq_and_admix(true_pop_allele_freq,
-                                                true_ind_admix_propn)
+    if mem_saver:
+        batchsize = 10
+    else:
+        batchsize = n_obs
 
-    return g_obs, jnp.array(true_pop_allele_freq), \
-                jnp.array(true_ind_admix_propn)
+    n_batches = int(np.ceil(n_obs / batchsize))
+    g_obs = np.zeros((n_batches * batchsize, n_loci, 3))
+    print(n_batches)
+    for i in range(n_batches):
+        g_obs[(batchsize * i) : (batchsize * (i+1))] = \
+            draw_data_from_popfreq_and_admix(true_pop_allele_freq,
+                                             true_ind_admix_propn)
+    g_obs = g_obs[0:n_obs]
+
+    return jnp.array(g_obs), \
+                jnp.array(true_pop_allele_freq), \
+                    jnp.array(true_ind_admix_propn)
 
 
 ####################
