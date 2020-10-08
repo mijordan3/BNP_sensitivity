@@ -9,13 +9,16 @@ import numpy as onp
 
 onp.random.seed(34535)
 
-n_obs = 1000
-dim = 500
-x = onp.random.random((n_obs, dim))
-y = onp.random.random((n_obs, dim))
+n_loci = 500
+n_obs = 200
+k_approx = 12
+
+x = onp.random.random((n_loci, n_obs))
+y = onp.random.random((n_loci, k_approx))
 
 def outer_fun(x_l, y_l):
-    return ((np.outer(x_l, y_l) + 4.0)**2).mean()
+    outer = np.outer(x_l, y_l)
+    return ((outer + 4.0)**2).mean()
 
 def fun(x, y):
 
