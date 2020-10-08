@@ -17,16 +17,19 @@ import numpy as onp
 onp.random.seed(53453)
 
 ################
-# Draw data
+# load data
 ################
-n_obs = 100
-n_loci = 2000
+n_obs = 200
+n_loci = 500
 n_pop = 4
 
-g_obs, true_pop_allele_freq, true_ind_admix_propn = \
-    data_utils.draw_data(n_obs, n_loci, n_pop)
+data_file = '../simulated_data/simulated_structure_data_nobs{}_nloci{}_npop{}.npz'.format(n_obs, n_loci, n_pop)
+data = np.load(data_file)
 
-print(g_obs.shape)
+g_obs = np.array(data['g_obs'])
+
+assert g_obs.shape[0] == n_obs
+assert g_obs.shape[1] == n_loci
 
 ################
 # get prior
@@ -87,17 +90,17 @@ optim_objective.set_print_every(1000)
 ################
 # time
 ################
+t0 = time.time()
 for i in range(100):
-    t0 = time.time()
     _ = optim_objective_np(init_vb_free)
-    # _ = kl_fun_free(init_vb_free)
-    elapsed = (time.time() - t0)
-    print('objective time: {}sec'.format(elapsed))
+
+elapsed = (time.time() - t0) / 100
+print('\nobjective time: {}sec'.format(elapsed))
 
 
-# t0 = time.time()
-# for i in range(100):
-#     _ = optim_grad_np(init_vb_free)
-#
-# elapsed = (time.time() - t0) / 100
-# print('gradient time: {}sec'.format(elapsed))
+t0 = time.time()
+for i in range(100):
+    _ = optim_grad_np(init_vb_free)
+
+elapsed = (time.time() - t0) / 100
+print('gradient time: {}sec'.format(elapsed))

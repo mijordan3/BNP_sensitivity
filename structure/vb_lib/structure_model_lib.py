@@ -163,10 +163,7 @@ def get_entropy(vb_params_dict, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_gene_nk(g_obs, e_log_pop_freq, e_log_1m_pop_freq, l):
-    g_obs_l = g_obs[:, l, :]
-    e_log_pop_freq_l = e_log_pop_freq[l]
-    e_log_1m_pop_freq_l = e_log_1m_pop_freq[l]
+def get_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
     loglik_a = \
         np.outer(g_obs_l[:, 0], e_log_1m_pop_freq_l) + \
@@ -179,12 +176,12 @@ def get_loglik_gene_nk(g_obs, e_log_pop_freq, e_log_1m_pop_freq, l):
 
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
-                    e_log_cluster_probs, l, detach_ez):
+def get_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                    e_log_cluster_probs, detach_ez):
     # returns z-optimized log-likelihood for locus-l
 
     # get loglikelihood of observations at loci l
-    loglik_gene_l = get_loglik_gene_nk(g_obs, e_log_pop_freq, e_log_1m_pop_freq, l)
+    loglik_gene_l = get_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
     # add individual belongings
     loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
@@ -213,8 +210,10 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
-    body_fun = lambda val, l : get_loglik_l(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
-                                        e_log_cluster_probs, l, detach_ez) + \
+    body_fun = lambda val, l : get_loglik_l(g_obs[:, l, :],
+                                        e_log_pop_freq[l],
+                                        e_log_1m_pop_freq[l],
+                                        e_log_cluster_probs, detach_ez) + \
                                         val
 
     scan_fun = lambda val, l : (body_fun(val, l), None)
