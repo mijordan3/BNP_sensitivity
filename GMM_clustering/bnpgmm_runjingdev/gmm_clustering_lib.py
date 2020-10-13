@@ -293,7 +293,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     elbo = e_log_prior + entropy + e_loglik
 
-    return -1 * elbo
+    return -1 * elbo.squeeze()
 
 
 
