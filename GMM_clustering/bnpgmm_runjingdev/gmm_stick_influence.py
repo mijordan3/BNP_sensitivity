@@ -7,9 +7,12 @@ import jax.scipy as sp
 # Functions to evaluate
 # the influence function
 ########################
-
-class InfluenceFunction(object):
+class InfluenceOperator(object):
     def __init__(self, vb_opt, vb_params_paragami, hessian_solver, alpha0):
+        # vb_opt is the vector of optimal vb parameters
+        # hessian solver is a function that takes an input vector of len(vb_opt)
+        # and returns H^{-1}v
+        # alpha0 is the DP prior parameter
 
         self.vb_opt = vb_opt
         self.vb_params_paragami = vb_params_paragami
@@ -103,3 +106,48 @@ def get_log_qk_from_free_params(logit_stick, vb_free_params, vb_params_paragami)
     info = np.expand_dims(info, 1)
 
     return sp.stats.norm.logpdf(logit_stick, mean, scale = 1 / np.sqrt(info))
+
+
+
+class WorstCasePerturbation(object):
+    def __init__(self, influence_fun, logit_v_lb = -8, logit_v_ub = 8, n_logit_v = 200):
+        # influence function is a function that takes logit-sticks
+        # and returns a scalar value for the influence
+        
+        self.logit_v_grid = np.linspace(logit_v_lb, logit_v_ub, n_logit_v)
+        self.v_grid = sp.special.expit(self.logit_v_grid)
+
+        self.influence_fun = influence_fun
+        self.influence_grid = self.influence_fun(self.logit_v_grid)
+        self.len_grid = len(self.influence_grid)
+
+        self._set_linf_worst_case()
+
+    def _set_linf_worst_case(self):
+        # the points at which the influence changes sign
+
+        s_influence1 = np.sign(self.influence_grid)[1:self.len_grid]
+        s_influence2 = np.sign(self.influence_grid)[0:(self.len_grid - 1)]
+        self._sign_diffs = - s_influence1 + s_influence2
+
+        # the points at which the influence changes sign
+        self.change_bool = self._sign_diffs != 0
+        self.change_points = logit_v_grid[self.change_bool]
+
+        # the signs
+        self.signs = s_influence2[self.change_bool]
+        self.signs = np.concatenate((self.signs, self.signs[-1][None] * -1))
+        self.sign_diffs = self._sign_diffs[self.change_bool]
+
+    def get_e_log_linf_perturbation(self, means, infos):
+        x = np.expand_dims(self.change_points, axis = 0)
+        loc = np.expand_dims(means, axis = 1)
+        scale = np.expand_dims(1 / np.sqrt(infos), axis = 1)
+
+        cdf = sp.stats.norm.cdf(x, loc, scale)
+
+        e_log_pert = (cdf * np.expand_dims(self.sign_diffs, 0)).sum()
+
+        # extra term doenst matter, just for unittesting
+        # so constants match
+        return  e_log_pert + self.signs[-1] * len(means)
