@@ -4,22 +4,14 @@ import jax.numpy as np
 import jax.scipy as sp
 
 from numpy.polynomial.hermite import hermgauss
-import scipy as osp
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
-from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
-from bnpmodeling_runjingdev.sensitivity_lib import HyperparameterSensitivityLinearApproximation, get_jac_hvp_fun
+
+from bnpmodeling_runjingdev import optimization_lib
 
 import paragami
 
-from copy import deepcopy
-
 import time
-
-import matplotlib.pyplot as plt
-
-from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
-
 
 import numpy as onp
 onp.random.seed(53453)

@@ -4,49 +4,47 @@ import jax.numpy as np
 import jax.scipy as sp
 
 from numpy.polynomial.hermite import hermgauss
-import scipy as osp
 
-from vb_lib import structure_model_lib, data_utils, cavi_lib
+from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
-from bnpmodeling_runjingdev.sensitivity_lib import HyperparameterSensitivityLinearApproximation, get_jac_hvp_fun
+from bnpmodeling_runjingdev.sensitivity_lib import HyperparameterSensitivityLinearApproximation
 
 import paragami
-from vittles import solver_lib
 
 from copy import deepcopy
 
-import time
+import os
+import argparse
+parser = argparse.ArgumentParser()
 
-from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
+parser.add_argument('--data_file', type=str)
+parser.add_argument('--fit_file', type=str)
 
-data_dir = '/scratch/users/genomic_times_series_bnp/structure/data/'
-fit_dir = '/scratch/users/genomic_times_series_bnp/structure/fits/fits_20200928/'
+parser.add_argument('--out_folder', type=str)
+parser.add_argument('--out_file', type=str)
+
+args = parser.parse_args()
+
+def validate_args():
+    assert os.path.exists(args.out_folder), args.out_folder
+    assert os.path.isfile(args.data_file), args.data_file
+    assert os.path.isfile(args.fit_file), args.fit_file
+
+
+validate_args()
 
 ##################
 # Load data
 ##################
-n_obs = 100
-n_loci = 2000
-n_pop = 4
-
-data_file = data_dir + 'simulated_structure_data_nobs{}_nloci{}_npop{}.npz'.format(n_obs, n_loci, n_pop)
-print('loading data from ', data_file)
-data = np.load(data_file)
-
+data = np.load(args.data_file)
 g_obs = np.array(data['g_obs'])
 
 ##################
 # Load initial fit
 ##################
-alpha0 = 3.5
-
-fit_file = fit_dir + 'structure_fit_nobs{}_nloci{}_npop{}_alpha{}.npz'.format(n_obs,
-                                                                              n_loci,
-                                                                              n_pop,
-                                                                              alpha0)
-print('loading fit from ', fit_file)
+print('loading fit from ', args.fit_file)
 vb_opt_dict, vb_params_paragami, meta_data = \
-    paragami.load_folded(fit_file)
+    paragami.load_folded(args.fit_file)
 
 vb_opt = vb_params_paragami.flatten(vb_opt_dict, free = True)
 
@@ -118,7 +116,7 @@ vb_sens = HyperparameterSensitivityLinearApproximation(objective_fun_free,
                                                         prior_alpha0,
                                                         cg_precond=precon_fun)
 
-dinput_dyper_file = fit_dir + 'lr_nobs{}_nloci{}_npop{}_alpha{}'.format(n_obs, n_loci, n_pop, prior_params_dict['dp_prior_alpha'][0])
+dinput_dyper_file = os.path.join(args.out_folder, args.out_file)
 print('saving derivative into ', dinput_dyper_file)
 np.save(dinput_dyper_file, vb_sens.dinput_dhyper)
 

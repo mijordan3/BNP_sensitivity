@@ -8,8 +8,6 @@ from jax.scipy.sparse.linalg import cg
 
 import time
 
-from vittles.solver_lib import get_cholesky_solver
-
 # wrapper to get hessian vector products in jax
 def get_jac_hvp_fun(f):
     def hvp(x, v):

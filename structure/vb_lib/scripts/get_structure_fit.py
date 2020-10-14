@@ -7,6 +7,7 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib, data_utils, cavi_lib
+from vb_lib.structure_optimization_lib import optimize_structure
 
 import paragami
 
@@ -23,17 +24,11 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--seed', type=int, default=42)
 
-# whether to load data, and if so, from which file
-parser.add_argument('--load_data', type=distutils.util.strtobool, default = False)
+# data file
 parser.add_argument('--data_file', type=str)
 
-# if we do not load data, generate data and save
-parser.add_argument('--n_obs', type=int, default=100)
-parser.add_argument('--n_loci', type=int, default=2000)
-parser.add_argument('--n_pop', type=int, default=4)
-
 # where to save the structure fit
-parser.add_argument('--outfolder', default='../fits/')
+parser.add_argument('--out_folder', default='../fits/')
 parser.add_argument('--out_filename', default='structure_fit', type=str)
 
 # whether to use a warm start
@@ -42,7 +37,7 @@ parser.add_argument('--init_fit', type=str)
 
 # model parameters
 parser.add_argument('--alpha', type=float, default = 4.0)
-parser.add_argument('--k_approx', type = int, default = 10)
+parser.add_argument('--k_approx', type = int, default = 15)
 parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
                         default='True')
 
@@ -50,13 +45,12 @@ parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
 args = parser.parse_args()
 
 def validate_args():
-    assert os.path.exists(args.outfolder), args.outfolder
+    assert os.path.exists(args.out_folder), args.out_folder
 
     if args.warm_start:
         assert os.path.isfile(args.init_fit), args.init_fit
 
-    if args.load_data:
-        assert os.path.isfile(args.data_file), args.data_file
+    assert os.path.isfile(args.data_file), args.data_file
 
 validate_args()
 
@@ -65,22 +59,10 @@ onp.random.seed(args.seed)
 ######################
 # DRAW DATA
 ######################
-if args.load_data:
-    print('loading data from ', args.data_file)
-    data = np.load(args.data_file)
+print('loading data from ', args.data_file)
+data = np.load(args.data_file)
+g_obs = np.array(data['g_obs'])
 
-    g_obs = np.array(data['g_obs'])
-
-else:
-    print('simulating data')
-    g_obs, true_pop_allele_freq, true_ind_admix_propn = \
-        data_utils.draw_data(args.n_obs, args.n_loci, args.n_pop)
-
-    print('saving simulated data into ', args.data_file)
-    np.savez(args.data_file,
-            g_obs = g_obs,
-            true_pop_allele_freq = true_pop_allele_freq,
-            true_ind_admix_propn = true_ind_admix_propn)
 
 n_obs = g_obs.shape[0]
 n_loci = g_obs.shape[1]
@@ -128,20 +110,27 @@ else:
 ######################
 # OPTIMIZE
 ######################
-vb_opt_dict, vb_opt, _, _ = \
-    cavi_lib.run_cavi(g_obs, vb_params_dict,
+# vb_opt_dict, vb_opt, _, _ = \
+#     cavi_lib.run_cavi(g_obs, vb_params_dict,
+#                         vb_params_paragami,
+#                         prior_params_dict,
+#                         gh_loc = gh_loc,
+#                         gh_weights = gh_weights,
+#                         max_iter = 2000,
+#                         x_tol = 1e-4,
+#                         print_every = 20)
+
+vb_opt_dict, vb_out, _ = \
+    optimize_structure(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc = gh_loc,
-                        gh_weights = gh_weights,
-                        max_iter = 2000,
-                        x_tol = 1e-4,
-                        print_every = 20)
+                        gh_weights = gh_weights)
 
 ######################
-# save results
+# save optimizaiton results
 ######################
-outfile = os.path.join(args.outfolder, args.out_filename + '.npz')
+outfile = os.path.join(args.out_folder, args.out_filename)
 print('saving structure model to ', outfile)
 
 optim_time = time.time() - init_optim_time
@@ -167,5 +156,6 @@ paragami.save_folded(outfile,
                      optim_time = optim_time)
 
 print('Total optimization time: {:03f} secs'.format(optim_time))
+
 
 print('done. ')
