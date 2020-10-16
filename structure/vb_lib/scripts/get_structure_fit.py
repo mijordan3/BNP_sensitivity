@@ -57,12 +57,11 @@ validate_args()
 onp.random.seed(args.seed)
 
 ######################
-# DRAW DATA
+# Load Data
 ######################
 print('loading data from ', args.data_file)
 data = np.load(args.data_file)
 g_obs = np.array(data['g_obs'])
-
 
 n_obs = g_obs.shape[0]
 n_loci = g_obs.shape[1]

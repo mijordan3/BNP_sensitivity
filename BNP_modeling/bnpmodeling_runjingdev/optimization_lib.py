@@ -12,21 +12,26 @@ import time
 
 def construct_and_compile_derivatives(get_loss, init_vb_free_params,
                                         compile_hvp = True):
+
     get_loss_jitted = jax.jit(get_loss)
 
     # set up objective
-    optim_objective = OptimizationObjective(get_loss_jitted)
+    optim_objective = OptimizationObjective(get_loss)
 
     # define derivatives
     optim_grad = jax.jit(optim_objective.grad)
     optim_hvp = jax.jit(optim_objective.hessian_vector_product)
+    optim_objective._objective_fun = \
+        jax.jit(optim_objective._objective_fun)
 
     # compile derivatives
     t0 = time.time()
-    print('Compiling derivatives ...')
+    print('Compiling objective ...')
     _ = optim_objective.f(init_vb_free_params)
+    print('Compiling grad ...')
     _ = optim_grad(init_vb_free_params)
     if compile_hvp:
+        print('Compiling hvp ...')
         _ = optim_hvp(init_vb_free_params, init_vb_free_params)
     print('Compile time: {0:3g}secs'.format(time.time() - t0))
 
@@ -42,7 +47,8 @@ def construct_and_compile_derivatives(get_loss, init_vb_free_params,
 def optimize_full(get_loss, init_vb_free_params):
 
     optim_objective, optim_objective_np, optim_grad_np, optim_hvp_np = \
-        construct_and_compile_derivatives(get_loss, init_vb_free_params)
+        construct_and_compile_derivatives(get_loss, init_vb_free_params,
+                                            compile_hvp = False)
 
     # run l-bfgs-b
     t0 = time.time()
