@@ -59,6 +59,8 @@ def optimize_full(get_loss, init_vb_free_params):
                         method='L-BFGS-B')
     print('done. Elapsed {0:3g}secs'.format(time.time() - t0))
 
+    print('objective value: ', optim_objective_np(out.x))
+
     return out
 
 # def run_bfgs(get_loss, init_vb_free_params,
