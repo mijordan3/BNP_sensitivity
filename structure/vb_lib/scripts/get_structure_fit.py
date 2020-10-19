@@ -124,7 +124,8 @@ vb_opt_dict, vb_out, _ = \
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc = gh_loc,
-                        gh_weights = gh_weights)
+                        gh_weights = gh_weights, 
+                        maxiter = 5)
 
 ######################
 # save optimizaiton results

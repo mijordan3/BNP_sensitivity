@@ -12,7 +12,8 @@ def optimize_structure(g_obs, vb_params_dict,
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc = None, gh_weights = None,
-                        log_phi = None, epsilon = 0.):
+                        log_phi = None, epsilon = 0., 
+                        maxiter = None):
 
     # set up loss
     _kl_fun_free = paragami.FlattenFunctionInput(
@@ -29,7 +30,7 @@ def optimize_structure(g_obs, vb_params_dict,
     init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)
 
     # optimize
-    optim_out = optimization_lib.optimize_full(kl_fun_free, init_vb_free)
+    optim_out = optimization_lib.run_lbfgs(kl_fun_free, init_vb_free, maxiter = maxiter)
 
     # construct optimum
     vb_opt = optim_out.x

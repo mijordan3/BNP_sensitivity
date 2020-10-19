@@ -9,7 +9,7 @@ alpha=3.5
 out_folder='../fits'
 out_filename='testing'
 
-data_dir='/home/rliu/Documents/BNP/fastStructure/hgdp_data/huang2011_plink_files/'
+data_dir='../../../../fastStructure/hgdp_data/huang2011_plink_files/'
 data_file=${data_dir}'phased_HGDP+India+Africa_2810SNPs-regions1to36.npz'
 
 # get fit

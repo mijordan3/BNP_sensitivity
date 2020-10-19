@@ -10,56 +10,100 @@ from paragami import OptimizationObjective
 
 import time
 
-def construct_and_compile_derivatives(get_loss, init_vb_free_params,
-                                        compile_hvp = True):
+class OptimizationObjectiveJaxtoNumpy(OptimizationObjective): 
+    def __init__(self, get_loss, init_params, compile_hvp = False): 
+        super().__init__(get_loss)
+        
+        # jit the functions
+        self.grad = jax.jit(self.grad)
+        self.hessian_vector_product = jax.jit(self.hessian_vector_product)
+        self._objective_fun = jax.jit(self._objective_fun)
+        
+        # compile
+        self.compile_derivatives(init_params, compile_hvp)
+    
+    def compile_derivatives(self, init_params, compile_hvp): 
+        # compile derivatives
+        t0 = time.time()
+        
+        print('Compiling objective ...')
+        _ = self.f(init_params)
+        
+        print('Compiling grad ...')
+        _ = self.grad(init_params)
+        
+        if compile_hvp:
+            print('Compiling hvp ...')
+            _ = self.hessian_vector_product(init_params, init_params)
+            
+        print('Compile time: {0:3g}secs'.format(time.time() - t0))
+    
+    def f_np(self, x): 
+        return onp.array(self.f(x))
+    
+    def grad_np(self, x): 
+        return onp.array(self.grad(x))
+        
+    def hvp_np(self, x, v): 
+        return onp.array(self.hessian_vector_product(x, v))
+            
 
-    get_loss_jitted = jax.jit(get_loss)
+# def construct_and_compile_derivatives(get_loss, init_vb_free_params,
+#                                         compile_hvp = True):
 
-    # set up objective
-    optim_objective = OptimizationObjective(get_loss)
+#     get_loss_jitted = jax.jit(get_loss)
 
-    # define derivatives
-    optim_grad = jax.jit(optim_objective.grad)
-    optim_hvp = jax.jit(optim_objective.hessian_vector_product)
-    optim_objective._objective_fun = \
-        jax.jit(optim_objective._objective_fun)
+#     # set up objective
+#     optim_objective = OptimizationObjective(get_loss)
 
-    # compile derivatives
-    t0 = time.time()
-    print('Compiling objective ...')
-    _ = optim_objective.f(init_vb_free_params)
-    print('Compiling grad ...')
-    _ = optim_grad(init_vb_free_params)
-    if compile_hvp:
-        print('Compiling hvp ...')
-        _ = optim_hvp(init_vb_free_params, init_vb_free_params)
-    print('Compile time: {0:3g}secs'.format(time.time() - t0))
+#     # define derivatives
+#     optim_grad = jax.jit(optim_objective.grad)
+#     optim_hvp = jax.jit(optim_objective.hessian_vector_product)
+#     optim_objective._objective_fun = \
+#         jax.jit(optim_objective._objective_fun)
 
-    # convert to numpy
-    optim_objective_np = lambda x : onp.array(optim_objective.f(x))
-    optim_grad_np = lambda x : onp.array(optim_grad(x))
-    optim_hvp_np = lambda x, v : onp.array(optim_hvp(x, v))
+#     # compile derivatives
+#     t0 = time.time()
+#     print('Compiling objective ...')
+#     _ = optim_objective.f(init_vb_free_params)
+#     print('Compiling grad ...')
+#     _ = optim_grad(init_vb_free_params)
+#     if compile_hvp:
+#         print('Compiling hvp ...')
+#         _ = optim_hvp(init_vb_free_params, init_vb_free_params)
+#     print('Compile time: {0:3g}secs'.format(time.time() - t0))
 
-    optim_objective.reset()
+#     # convert to numpy
+#     optim_objective_np = lambda x : onp.array(optim_objective.f(x))
+#     optim_grad_np = lambda x : onp.array(optim_grad(x))
+#     optim_hvp_np = lambda x, v : onp.array(optim_hvp(x, v))
 
-    return optim_objective, optim_objective_np, optim_grad_np, optim_hvp_np
+#     optim_objective.reset()
 
-def optimize_full(get_loss, init_vb_free_params):
+#     return optim_objective, optim_objective_np, optim_grad_np, optim_hvp_np
 
-    optim_objective, optim_objective_np, optim_grad_np, optim_hvp_np = \
-        construct_and_compile_derivatives(get_loss, init_vb_free_params,
+def run_lbfgs(get_loss, init_vb_free_params, maxiter = None):
+
+#     optim_objective, optim_objective_np, optim_grad_np, optim_hvp_np = \
+#         construct_and_compile_derivatives(get_loss, init_vb_free_params,
+#                                             compile_hvp = False)
+    
+    optim_objective = \
+        OptimizationObjectiveJaxtoNumpy(get_loss, init_vb_free_params,
                                             compile_hvp = False)
-
+    
     # run l-bfgs-b
     t0 = time.time()
     print('\nRunning L-BFGS-B ... ')
-    out = optimize.minimize(optim_objective_np,
+    out = optimize.minimize(optim_objective.f_np,
                         x0 = onp.array(init_vb_free_params),
-                        jac = optim_grad_np,
-                        method='L-BFGS-B')
+                        jac = optim_objective.grad_np,
+                        method='L-BFGS-B', 
+                        options = {'maxiter': maxiter})
+    
     print('done. Elapsed {0:3g}secs'.format(time.time() - t0))
 
-    print('objective value: ', optim_objective_np(out.x))
+    print('objective value: ', optim_objective.f_np(out.x))
 
     return out
 
