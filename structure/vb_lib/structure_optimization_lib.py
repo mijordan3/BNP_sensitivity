@@ -12,7 +12,8 @@ def define_structure_objective(g_obs, vb_params_dict,
                                 vb_params_paragami,
                                 prior_params_dict,
                                 gh_loc = None, gh_weights = None,
-                                log_phi = None, epsilon = 0.):
+                                log_phi = None, epsilon = 0., 
+                                compile_hvp = False):
 
     # set up loss
     _kl_fun_free = paragami.FlattenFunctionInput(
@@ -31,7 +32,7 @@ def define_structure_objective(g_obs, vb_params_dict,
     # define objective
     optim_objective = OptimizationObjectiveJaxtoNumpy(kl_fun_free, 
                                                      init_vb_free, 
-                                                      compile_hvp = False, 
+                                                      compile_hvp = compile_hvp, 
                                                       print_every = 1,
                                                       log_every = 0)
     
