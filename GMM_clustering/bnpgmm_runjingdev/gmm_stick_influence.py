@@ -113,7 +113,7 @@ class WorstCasePerturbation(object):
     def __init__(self, influence_fun, logit_v_lb = -8, logit_v_ub = 8, n_logit_v = 200):
         # influence function is a function that takes logit-sticks
         # and returns a scalar value for the influence
-        
+
         self.logit_v_grid = np.linspace(logit_v_lb, logit_v_ub, n_logit_v)
         self.v_grid = sp.special.expit(self.logit_v_grid)
 
@@ -132,7 +132,7 @@ class WorstCasePerturbation(object):
 
         # the points at which the influence changes sign
         self.change_bool = self._sign_diffs != 0
-        self.change_points = logit_v_grid[self.change_bool]
+        self.change_points = self.logit_v_grid[self.change_bool]
 
         # the signs
         self.signs = s_influence2[self.change_bool]
