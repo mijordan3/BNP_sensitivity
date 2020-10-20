@@ -4,13 +4,12 @@ source activate bnp_sensitivity_jax
 
 seed=345345
 
-nobs=200
-nloci=500
+nobs=20
+nloci=50
 npop=4
 
 alpha=3.5
 
-# scratch_folder=/scratch/users/genomic_times_series_bnp/structure/
 scratch_folder=../
 data_file=${scratch_folder}simulated_data/simulated_structure_data_nobs${nobs}_nloci${nloci}_npop${npop}.npz
 

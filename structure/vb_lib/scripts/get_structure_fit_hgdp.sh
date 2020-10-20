@@ -7,7 +7,7 @@ seed=345345
 alpha=3.5
 
 out_folder='../fits'
-out_filename='testing'
+out_filename='huang2011_fit'
 
 data_dir='../../../../fastStructure/hgdp_data/huang2011_plink_files/'
 data_file=${data_dir}'phased_HGDP+India+Africa_2810SNPs-regions1to36.npz'
