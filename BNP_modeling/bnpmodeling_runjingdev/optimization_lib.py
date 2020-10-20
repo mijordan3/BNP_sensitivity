@@ -11,8 +11,9 @@ from paragami import OptimizationObjective
 import time
 
 class OptimizationObjectiveJaxtoNumpy(OptimizationObjective): 
-    def __init__(self, get_loss, init_params, compile_hvp = False): 
-        super().__init__(get_loss)
+    def __init__(self, get_loss, init_params, compile_hvp = False, 
+                        print_every = 1, log_every = 0): 
+        super().__init__(get_loss, print_every = print_every, log_every = log_every)
         
         # jit the functions
         self.grad = jax.jit(self.grad)
