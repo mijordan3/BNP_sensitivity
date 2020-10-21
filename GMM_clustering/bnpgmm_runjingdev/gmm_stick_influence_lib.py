@@ -110,7 +110,7 @@ def get_log_qk_from_free_params(logit_stick, vb_free_params, vb_params_paragami)
 
 
 class WorstCasePerturbation(object):
-    def __init__(self, influence_fun, logit_v_lb = -8, logit_v_ub = 8, n_logit_v = 200):
+    def __init__(self, influence_fun, logit_v_lb = -10, logit_v_ub = 10, n_logit_v = 500):
         # influence function is a function that takes logit-sticks
         # and returns a scalar value for the influence
 
