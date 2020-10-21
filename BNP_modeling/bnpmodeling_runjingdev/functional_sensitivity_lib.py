@@ -179,6 +179,6 @@ def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
         gh_loc, gh_weights, perturbation_fun)
 
     if sum_vector:
-        return -1 * np.sum(e_perturbation_vec)
+        return np.sum(e_perturbation_vec)
     else:
-        return -1 * e_perturbation_vec
+        return e_perturbation_vec
