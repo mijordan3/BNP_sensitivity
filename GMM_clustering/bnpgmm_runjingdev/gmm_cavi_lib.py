@@ -3,7 +3,6 @@ import jax.numpy as np
 import jax.scipy as sp
 
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
@@ -47,22 +46,10 @@ def update_cluster_info(y, e_z, centroids, prior_params_dict):
 
     return 0.5 * (info_update.transpose((0, 2, 1)) + info_update)
 
-def _get_sticks_loss(y, stick_free_params, stick_params_paragmi,
-                     e_z, vb_params_dict, prior_params_dict, gh_loc, gh_weights):
-    # returns the loss as a function of the stick-breaking parameters
-
-    vb_params_dict['stick_params'] = \
-        stick_params_paragmi.fold(stick_free_params, free = True)
-
-    return gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
-                            gh_loc, gh_weights,
-                            e_z = e_z)
-
 def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
                      e_z, prior_params_dict,
                      gh_loc, gh_weights,
-                     log_phi = None,
-                     epsilon = 0.):
+                     e_log_phi = None):
 
     # returns a "pseudo-loss" as a function of the stick-breaking parameters:
     # that is, the terms of the loss that are a function of the stick parameters only
@@ -84,14 +71,12 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
                                             alpha, gh_loc, gh_weights).squeeze()
-    if log_phi is not None:
-        e_log_pert = get_e_log_perturbation(log_phi,
-                                stick_propn_mean, stick_propn_info,
-                                epsilon, gh_loc, gh_weights, sum_vector=True)
+    if e_log_phi is not None:
+        e_log_pert = e_log_phi(stick_propn_mean, stick_propn_info)
     else:
         e_log_pert = 0.0
 
-    return - e_loglik_ind - dp_prior - stick_entropy + e_log_pert
+    return - e_loglik_ind - dp_prior - stick_entropy - e_log_pert
 
 
 def update_sticks(stick_obj_fun, stick_grad_fun, e_z,
@@ -140,7 +125,7 @@ def run_cavi(y, vb_params_dict,
                     vb_params_paragami,
                     prior_params_dict,
                     gh_loc, gh_weights,
-                    log_phi = None, epsilon = 0.,
+                    e_log_phi = None,
                     max_iter = 1000,
                     x_tol = 1e-3,
                     debug = False):
@@ -162,8 +147,7 @@ def run_cavi(y, vb_params_dict,
                         _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
                                              e_z, prior_params_dict,
                                              gh_loc, gh_weights,
-                                             log_phi,
-                                             epsilon)
+                                             e_log_phi)
 
     stick_obj_fun_jit = jax.jit(stick_obj_fun)
     stick_grad_fun = jax.jit(jax.grad(stick_obj_fun, 0))

@@ -293,7 +293,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     elbo = e_log_prior + entropy + e_loglik
 
-    return -1 * elbo
+    return -1 * elbo.squeeze()
 
 
 
@@ -388,45 +388,3 @@ def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
                                         n_samples = n_samples,
                                         rng_key = rng_key,
                                         unif_samples = unif_samples)
-
-###############
-# perturbed KL for functional sensitivity
-def get_perturbed_kl(y, vb_params_dict, epsilon, log_phi,
-                     prior_params_dict, gh_loc, gh_weights):
-
-    """
-    Computes KL divergence after perturbing by log_phi
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_dict : dictionary
-        A dictionary that contains the variational parameters
-    epsilon: float
-        The epsilon specifying the multiplicative perturbation
-    log_phi : Callable function
-        The log of the multiplicative perturbation in logit space
-    gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    sum_vector : boolean
-        whether to sum the expectation over the k sticks
-
-    Returns
-    -------
-    float
-        The KL divergence after perturbing by log_phi
-
-    """
-
-    e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
-                            vb_params_dict['stick_params']['stick_propn_mean'],
-                            vb_params_dict['stick_params']['stick_propn_info'],
-                            epsilon, gh_loc, gh_weights, sum_vector=True)
-
-    return get_kl(y, vb_params_dict, prior_params_dict, gh_loc, gh_weights) + \
-                e_log_pert
