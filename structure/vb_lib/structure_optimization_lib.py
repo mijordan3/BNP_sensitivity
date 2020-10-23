@@ -13,6 +13,7 @@ def define_structure_objective(g_obs, vb_params_dict,
                                 prior_params_dict,
                                 gh_loc = None, gh_weights = None,
                                 log_phi = None, epsilon = 0., 
+                                use_bnp_prior = True,
                                 compile_hvp = False):
 
     # set up loss
@@ -24,7 +25,8 @@ def define_structure_objective(g_obs, vb_params_dict,
 
     kl_fun_free = lambda x : _kl_fun_free(g_obs, x, prior_params_dict,
                                                      gh_loc, gh_weights,
-                                                     log_phi, epsilon)
+                                                     log_phi, epsilon, 
+                                                     use_bnp_prior = use_bnp_prior)
 
     # initial free parameters
     init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)

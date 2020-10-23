@@ -58,7 +58,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
 
     # variational beta parameters for population allele frequencies
     vb_params_paragami['pop_freq_beta_params'] = \
-        paragami.NumericArrayPattern(shape=(n_loci, k_approx, 2), lb = 0.0)
+        paragami.NumericArrayPattern(shape=(n_loci, k_approx, 2), lb = 1e-6)
 
     # BNP sticks
     if use_logitnormal_sticks:
@@ -72,7 +72,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
         # else they are beta distributed
         vb_params_paragami['ind_mix_stick_beta_params'] = \
             paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2),
-                                            lb = 0.0)
+                                            lb = 1e-6)
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -119,39 +119,74 @@ def get_default_prior_params():
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
-                        dp_prior_alpha, allele_prior_alpha,
-                        allele_prior_beta):
+def get_e_log_prior(e_log_sticks, e_log_1m_sticks, 
+                    e_log_pop_freq, e_log_1m_pop_freq,
+                    dp_prior_alpha, allele_prior_alpha,
+                    allele_prior_beta,use_bnp_prior):
     # get expected prior term
 
-    # dp prior on individual mixtures
-    ind_mix_dp_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
+    if use_bnp_prior: 
+        # dp prior on individual mixtures
+        ind_mix_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
+    else: 
+        # else its just a dirichlet prior
+        k_approx = e_log_pop_freq.shape[1]
+        ind_mix_prior = (1 / k_approx - 1) * modeling_lib.\
+                            get_e_log_cluster_probabilities_from_e_log_stick(e_log_sticks, 
+                                                                             e_log_1m_sticks).sum()
 
     # allele frequency prior
     allele_freq_beta_prior = (allele_prior_alpha - 1) * np.sum(e_log_pop_freq) + \
                             (allele_prior_beta - 1) * np.sum(e_log_1m_pop_freq)
 
-    return ind_mix_dp_prior + allele_freq_beta_prior
+    return ind_mix_prior + allele_freq_beta_prior
 
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params_dict, gh_loc, gh_weights):
+def get_dirichlet_entropy_from_stick_beta_params(stick_beta_params): 
+    k_approx = stick_beta_params.shape[1] + 1
+    
+    alphas_i = stick_beta_params[:, :, 0]
+    alpha_k = np.expand_dims(stick_beta_params[:, -1, 1], axis = 1)
+    
+    alphas = np.concatenate((alphas_i, alpha_k), axis = 1)
+    sum_alphas = alphas.sum(1)
+    
+    log_beta = sp.special.gammaln(alphas).sum(1) - sp.special.gammaln(sum_alphas)
+    
+    term2 = (sum_alphas - k_approx) * sp.special.digamma(sum_alphas)
+    
+    term3 = ((alphas - 1) * sp.special.digamma(alphas)).sum(1)
+    
+    return (log_beta + term2 - term3).sum()
+
+def get_entropy(vb_params_dict, gh_loc, gh_weights, use_bnp_prior):
 
     # entropy of individual admixtures
     use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
     if use_logitnormal_sticks:
-        stick_entropy = \
-            modeling_lib.get_stick_breaking_entropy(
-                                    vb_params_dict['ind_mix_stick_propn_mean'],
-                                    vb_params_dict['ind_mix_stick_propn_info'],
-                                    gh_loc, gh_weights)
+        if use_bnp_prior: 
+            stick_entropy = \
+                modeling_lib.get_stick_breaking_entropy(
+                                        vb_params_dict['ind_mix_stick_propn_mean'],
+                                        vb_params_dict['ind_mix_stick_propn_info'],
+                                        gh_loc, gh_weights)
+        else: 
+            raise NotImplementedError() 
     else:
-        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
-        nk = ind_mix_stick_beta_params.shape[0] * \
-                ind_mix_stick_beta_params.shape[1]
-        stick_entropy = \
-            ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
+        if True:
+            print('foo')
+            ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
+            nk = ind_mix_stick_beta_params.shape[0] * \
+                    ind_mix_stick_beta_params.shape[1]
+            stick_entropy = \
+                ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
+        else: 
+            # to match fast-structure, 
+            # variational distribution should be dirichlet, not beta sticks
+            stick_entropy = \
+                get_dirichlet_entropy_from_stick_beta_params(vb_params_dict['ind_mix_stick_beta_params'])
 
     # beta entropy term
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
@@ -234,7 +269,8 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
-                                    detach_ez = False):
+                                    use_bnp_prior, 
+                                    detach_ez):
 
     e_loglik, z_entropy = get_e_loglik(g_obs,
                                         e_log_pop_freq, e_log_1m_pop_freq, \
@@ -242,10 +278,10 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                         detach_ez = detach_ez)
 
     # prior term
-    e_log_prior = get_e_log_prior(e_log_1m_sticks,
+    e_log_prior = get_e_log_prior(e_log_sticks, e_log_1m_sticks,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta).squeeze()
+                            allele_prior_beta, use_bnp_prior).squeeze()
 
     return e_log_prior + e_loglik, z_entropy
 
@@ -254,6 +290,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc = None, gh_weights = None,
                     log_phi = None,
                     epsilon = 1.,
+                    use_bnp_prior = True, 
                     detach_ez = False):
 
     """
@@ -308,10 +345,11 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
+                                    use_bnp_prior = use_bnp_prior,
                                     detach_ez = detach_ez)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) + z_entropy
+    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights, use_bnp_prior) + z_entropy
 
     elbo = e_loglik + entropy
 
