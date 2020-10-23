@@ -1,3 +1,8 @@
+import numpy as np
+
+import colorsys
+
+
 import matplotlib.pyplot as plt
 
 from bnpmodeling_runjingdev import modeling_lib, cluster_quantities_lib
@@ -29,7 +34,8 @@ def plot_admixture(admixture, title):
             bottoms = np.zeros((N,),dtype=float)
 
         lefts = np.arange(N)*indiv_width
-        subplot.bar(lefts, admixture[:,k], width=indiv_width, bottom=bottoms, facecolor=colors[k], edgecolor=colors[k], linewidth=0.4)
+        subplot.bar(lefts, admixture[:,k], width=indiv_width, bottom=bottoms,
+                    facecolor=colors[k], edgecolor=colors[k], linewidth=0.4)
 
         subplot.axis([0, N*indiv_width, 0, 1])
         subplot.tick_params(axis='both', top=False, right=False, left=False, bottom=False)
