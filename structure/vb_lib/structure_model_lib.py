@@ -213,16 +213,16 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
-    body_fun = lambda val, l : get_loglik_l(g_obs[:, l, :],
-                                        e_log_pop_freq[l],
-                                        e_log_1m_pop_freq[l],
+    body_fun = lambda val, x : get_loglik_l(x[0], x[1], x[2],
                                         e_log_cluster_probs, detach_ez) + \
                                         val
 
-    scan_fun = lambda val, l : (body_fun(val, l), None)
+    scan_fun = lambda val, x : (body_fun(val, x), None)
 
     init_val = np.array([0., 0.])
-    out = jax.lax.scan(scan_fun, init_val, xs = np.arange(g_obs.shape[1]))[0]
+    out = jax.lax.scan(scan_fun, init_val,
+                        xs = (g_obs.transpose((1, 0, 2)),
+                                e_log_pop_freq, e_log_1m_pop_freq))[0]
 
     e_loglik = out[0]
     z_entropy = out[1]

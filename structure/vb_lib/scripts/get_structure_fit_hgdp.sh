@@ -1,21 +1,16 @@
 #!/bin/bash
 
-source activate bnp_sensitivity_jax
+
 
 seed=345345
 
-nobs=20
-nloci=50
-npop=4
-
 alpha=3.5
 
-scratch_folder=../
-data_file=${scratch_folder}simulated_data/simulated_structure_data_nobs${nobs}_nloci${nloci}_npop${npop}.npz
+out_folder='../fits'
+out_filename='huang2011_fit'
 
-# out_folder=${scratch_folder}fits/fits_20201008/
-out_folder=${scratch_folder}fits/tmp/
-out_filename=structure_fit_nobs${nobs}_nloci${nloci}_npop${npop}_alpha${alpha}
+data_dir='../../../../fastStructure/hgdp_data/huang2011_plink_files/'
+data_file=${data_dir}'phased_HGDP+India+Africa_2810SNPs-regions1to36.npz'
 
 # get fit
 python get_structure_fit.py \

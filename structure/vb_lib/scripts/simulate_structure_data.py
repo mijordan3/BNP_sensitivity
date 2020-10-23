@@ -16,7 +16,7 @@ parser.add_argument('--mem_saver', type=distutils.util.strtobool, default='False
 
 # where to save the structure fit
 parser.add_argument('--outfolder', type=str,
-                    default='/scratch/users/genomic_times_series_bnp/structure/simulated_data/')
+                    default='../simulated_data/')
 args = parser.parse_args()
 
 np.random.seed(args.seed)

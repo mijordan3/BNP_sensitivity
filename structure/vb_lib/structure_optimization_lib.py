@@ -6,13 +6,14 @@ import paragami
 
 from vb_lib import structure_model_lib
 
-from bnpmodeling_runjingdev import optimization_lib
+from bnpmodeling_runjingdev.optimization_lib import OptimizationObjectiveJaxtoNumpy
 
-def optimize_structure(g_obs, vb_params_dict,
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc = None, gh_weights = None,
-                        log_phi = None, epsilon = 0.):
+def define_structure_objective(g_obs, vb_params_dict,
+                                vb_params_paragami,
+                                prior_params_dict,
+                                gh_loc = None, gh_weights = None,
+                                log_phi = None, epsilon = 0., 
+                                compile_hvp = False):
 
     # set up loss
     _kl_fun_free = paragami.FlattenFunctionInput(
@@ -27,12 +28,12 @@ def optimize_structure(g_obs, vb_params_dict,
 
     # initial free parameters
     init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)
-
-    # optimize
-    optim_out = optimization_lib.optimize_full(kl_fun_free, init_vb_free)
-
-    # construct optimum
-    vb_opt = optim_out.x
-    vb_params_dict = vb_params_paragami.fold(vb_opt, free = True)
-
-    return vb_params_dict, vb_opt, optim_out
+    
+    # define objective
+    optim_objective = OptimizationObjectiveJaxtoNumpy(kl_fun_free, 
+                                                     init_vb_free, 
+                                                      compile_hvp = compile_hvp, 
+                                                      print_every = 1,
+                                                      log_every = 0)
+    
+    return optim_objective, init_vb_free

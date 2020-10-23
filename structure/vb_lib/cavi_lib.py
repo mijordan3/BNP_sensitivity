@@ -29,7 +29,6 @@ get_pop_beta_update2 = jax.jit(jax.jacobian(joint_loglik, argnums=2))
 get_stick_update1 = jax.jit(jax.jacobian(joint_loglik, argnums=3))
 get_stick_update2 = jax.jit(jax.jacobian(joint_loglik, argnums=4))
 
-@jax.jit
 def update_pop_beta(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq,
                     e_log_sticks, e_log_1m_sticks,
@@ -57,7 +56,6 @@ def update_pop_beta(g_obs,
     return e_log_pop_freq, e_log_1m_pop_freq, beta_params
 
 
-@jax.jit
 def update_stick_beta(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq,
                     e_log_sticks, e_log_1m_sticks,
@@ -148,8 +146,9 @@ def run_cavi(g_obs, vb_params_dict,
     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
     flatten_vb_params = jax.jit(flatten_vb_params)
 
-    # compile cavi functions
+    # compile cavi functions    
     t0 = time.time()
+    update_pop_beta = jax.jit(update_pop_beta)
     _ = update_pop_beta(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq,
                     e_log_sticks, e_log_1m_sticks,
@@ -166,6 +165,8 @@ def run_cavi(g_obs, vb_params_dict,
                                       log_phi = log_phi,
                                       epsilon = epsilon)
     else:
+        update_stick_beta = jax.jit(update_stick_beta)
+        
         _ = update_stick_beta(g_obs,
                         e_log_pop_freq, e_log_1m_pop_freq,
                         e_log_sticks, e_log_1m_sticks,
