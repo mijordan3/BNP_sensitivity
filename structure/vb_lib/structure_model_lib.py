@@ -206,86 +206,83 @@ def get_e_loglik_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 
     return np.array([loglik_nl, z_entropy_nl])
 
-def get_e_loglik(g_obs,
-                    e_log_pop_freq, e_log_1m_pop_freq, \
-                    e_log_sticks, e_log_1m_sticks,
-                    detach_ez): 
-
-    n_obs = g_obs.shape[0]
-    n_loci = g_obs.shape[1]
-    
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
-    def body_fun(val, i): 
-        n = i // n_obs 
-        l = i % n_obs
-        return get_e_loglik_nl(g_obs[n, l], e_log_pop_freq[l], e_log_1m_pop_freq[l],
-                        e_log_cluster_probs[n], detach_ez) + val
-
-    scan_fun = lambda val, x : (body_fun(val, x), None)
-    
-    init_val = np.array([0., 0.])
-    out = jax.lax.scan(scan_fun, init_val,
-                        xs = np.arange(n_obs * n_loci))[0]
-
-    e_loglik = out[0]
-    z_entropy = out[1]
-    
-    return e_loglik, z_entropy 
-
-#     return e_loglik, z_entropy
-# def get_e_loglik_n(g_obs_n, e_log_pop_freq, e_log_1m_pop_freq, \
-#                     e_log_cluster_probs_n,
-#                     detach_ez):
-    
-#     # inner loop throug loci
-    
-#     body_fun = lambda val, x : get_e_loglik_nl(x[0], x[1], x[2],
-#                                         e_log_cluster_probs_n, detach_ez) + \
-#                                         val
-
-#     scan_fun = lambda val, x : (body_fun(val, x), None)
-
-#     init_val = np.array([0., 0.])
-#     print(g_obs_n)
-#     print(e_log_pop_freq)
-#     print(e_log_1m_pop_freq)
-#     out = jax.lax.scan(scan_fun, init_val,
-#                         xs = (g_obs_n, e_log_pop_freq, e_log_1m_pop_freq))[0]
-
-#     e_loglik_n = out[0]
-#     z_entropy_n = out[1]
-
-#     return e_loglik_n, z_entropy_n
-
 # def get_e_loglik(g_obs,
 #                     e_log_pop_freq, e_log_1m_pop_freq, \
 #                     e_log_sticks, e_log_1m_sticks,
 #                     detach_ez): 
-    
-#     # outer loop through n
+
+#     n_obs = g_obs.shape[0]
+#     n_loci = g_obs.shape[1]
     
 #     e_log_cluster_probs = \
 #         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
 #                             e_log_sticks, e_log_1m_sticks)
-
-#     body_fun = lambda val, x : get_e_loglik_n(x[0], 
-#                                             e_log_pop_freq, e_log_1m_pop_freq,
-#                                             x[1], detach_ez) + \
-#                                             val
+#     def body_fun(val, i): 
+#         n = i % n_obs 
+#         l = i // n_obs
+#         return get_e_loglik_nl(g_obs[n, l], e_log_pop_freq[l], e_log_1m_pop_freq[l],
+#                         e_log_cluster_probs[n], detach_ez) + val
 
 #     scan_fun = lambda val, x : (body_fun(val, x), None)
-
+    
 #     init_val = np.array([0., 0.])
 #     out = jax.lax.scan(scan_fun, init_val,
-#                         xs = (g_obs,
-#                               e_log_cluster_probs))[0]
+#                         xs = np.arange(n_obs * n_loci))[0]
 
 #     e_loglik = out[0]
 #     z_entropy = out[1]
+    
+#     return e_loglik, z_entropy 
 
-#     return e_loglik, z_entropy
+def get_e_loglik_n(g_obs_n, e_log_pop_freq, e_log_1m_pop_freq, \
+                    e_log_cluster_probs_n,
+                    detach_ez):
+    
+    # inner loop throug loci
+    
+    body_fun = lambda val, x : get_e_loglik_nl(x[0], x[1], x[2],
+                                        e_log_cluster_probs_n, detach_ez) + \
+                                        val
+
+    scan_fun = lambda val, x : (body_fun(val, x), None)
+
+    init_val = np.array([0., 0.])
+
+    out = jax.lax.scan(scan_fun, init_val,
+                        xs = (g_obs_n, e_log_pop_freq, e_log_1m_pop_freq))[0]
+
+    e_loglik_n = out[0]
+    z_entropy_n = out[1]
+
+    return e_loglik_n, z_entropy_n
+
+def get_e_loglik(g_obs,
+                    e_log_pop_freq, e_log_1m_pop_freq, \
+                    e_log_sticks, e_log_1m_sticks,
+                    detach_ez): 
+    
+    # outer loop through n
+    
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
+
+    body_fun = lambda val, x : get_e_loglik_n(x[0], 
+                                            e_log_pop_freq, e_log_1m_pop_freq,
+                                            x[1], detach_ez) + \
+                                            val
+
+    scan_fun = lambda val, x : (body_fun(val, x), None)
+
+    init_val = np.array([0., 0.])
+    out = jax.lax.scan(scan_fun, init_val,
+                        xs = (g_obs,
+                              e_log_cluster_probs))[0]
+
+    e_loglik = out[0]
+    z_entropy = out[1]
+
+    return e_loglik, z_entropy
 
 
 def get_e_joint_loglik_from_nat_params(g_obs,
