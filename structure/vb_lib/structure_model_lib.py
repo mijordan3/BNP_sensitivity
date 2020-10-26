@@ -184,7 +184,7 @@ def get_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
 def get_e_loglik_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                     e_log_cluster_probs_n, detach_ez):
-    
+
     # returns z-optimized log-likelihood for observation-n at locus-l
 
     # get loglikelihood of observations at loci n,l
@@ -212,10 +212,10 @@ def get_e_loglik_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 def get_e_loglik(g_obs,
                     e_log_pop_freq, e_log_1m_pop_freq, \
                     e_log_sticks, e_log_1m_sticks,
-                    detach_ez): 
-    
+                    detach_ez):
+
     # outer loop through n
-    
+
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
@@ -224,10 +224,10 @@ def get_e_loglik(g_obs,
         s.e_loglik = 0.
         s.z_entropy = 0.
         for n in s.range(g_obs.shape[0]):
-            for l in s.range(g_obs.shape[1]): 
-                e_loglik_ln, z_entropy_ln = get_e_loglik_nl(g_obs[n, l], 
+            for l in s.range(g_obs.shape[1]):
+                e_loglik_ln, z_entropy_ln = get_e_loglik_nl(g_obs[n, l],
                                         e_log_pop_freq[l], e_log_1m_pop_freq[l],
-                                        e_log_cluster_probs[n], detach_ez = True)
+                                        e_log_cluster_probs[n], detach_ez)
 
                 s.e_loglik += e_loglik_ln
                 s.z_entropy += z_entropy_ln
