@@ -2,6 +2,8 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+from jax.experimental import loops
+
 import numpy as onp
 
 import paragami
@@ -163,7 +165,7 @@ def get_entropy(vb_params_dict, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
+def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
     g_obs_l0 = g_obs_l[:, 0]
     g_obs_l1 = g_obs_l[:, 1]
@@ -180,12 +182,12 @@ def get_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                     e_log_cluster_probs, detach_ez):
     # returns z-optimized log-likelihood for locus-l
 
     # get loglikelihood of observations at loci l
-    loglik_gene_l = get_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
+    loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
     # add individual belongings
     loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
@@ -203,31 +205,30 @@ def get_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     # compute the entropy
     z_entropy_l = (sp.special.entr(e_z_l)).sum()
 
-    return np.array([loglik_l, z_entropy_l])
+    return loglik_l, z_entropy_l
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
                     e_log_sticks, e_log_1m_sticks,
                     detach_ez):
 
+
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
 
-    body_fun = lambda val, x : get_loglik_l(x[0], x[1], x[2],
-                                        e_log_cluster_probs, detach_ez) + \
-                                        val
+    with loops.Scope() as s:
+        s.e_loglik = 0.
+        s.z_entropy = 0.
+        for l in s.range(g_obs.shape[1]):
+            e_loglik_l, z_entropy_l = get_e_loglik_l(g_obs[:, l],
+                                    e_log_pop_freq[l], e_log_1m_pop_freq[l],
+                                    e_log_cluster_probs, detach_ez)
 
-    scan_fun = lambda val, x : (body_fun(val, x), None)
+            s.e_loglik += e_loglik_l
+            s.z_entropy += z_entropy_l
 
-    init_val = np.array([0., 0.])
-    out = jax.lax.scan(scan_fun, init_val,
-                        xs = (g_obs.transpose((1, 0, 2)),
-                                e_log_pop_freq, e_log_1m_pop_freq))[0]
+    return s.e_loglik, s.z_entropy
 
-    e_loglik = out[0]
-    z_entropy = out[1]
-
-    return e_loglik, z_entropy
 
 def get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
