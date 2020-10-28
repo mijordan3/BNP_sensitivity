@@ -63,19 +63,21 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
         paragami.NumericArrayPattern(shape=(n_loci, k_approx, 2), lb = 0.0)
 
     # BNP sticks
+    ind_admix_params_paragami = paragami.PatternDict()
     if use_logitnormal_sticks:
         # variational distribution for each stick is logitnormal
-        vb_params_paragami['ind_mix_stick_propn_mean'] = \
+        ind_admix_params_paragami['stick_means'] = \
             paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
-        vb_params_paragami['ind_mix_stick_propn_info'] = \
+        ind_admix_params_paragami['stick_infos'] = \
             paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
                                             lb = 1e-4)
     else:
         # else they are beta distributed
-        vb_params_paragami['ind_mix_stick_beta_params'] = \
+        ind_admix_params_paragami['stick_beta'] = \
             paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2),
                                             lb = 0.0)
-
+    vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
+    
     vb_params_dict = vb_params_paragami.random()
 
     return vb_params_dict, vb_params_paragami
@@ -141,15 +143,15 @@ def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
 def get_entropy(vb_params_dict, gh_loc, gh_weights):
 
     # entropy of individual admixtures
-    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     if use_logitnormal_sticks:
         stick_entropy = \
             modeling_lib.get_stick_breaking_entropy(
-                                    vb_params_dict['ind_mix_stick_propn_mean'],
-                                    vb_params_dict['ind_mix_stick_propn_info'],
+                                    vb_params_dict['ind_admix_params']['stick_means'],
+                                    vb_params_dict['ind_admix_params']['stick_infos'],
                                     gh_loc, gh_weights)
     else:
-        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
+        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
         nk = ind_mix_stick_beta_params.shape[0] * \
                 ind_mix_stick_beta_params.shape[1]
         stick_entropy = \
@@ -247,7 +249,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
-
+        
     return e_log_prior + e_loglik, z_entropy
 
 
@@ -322,29 +324,30 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         assert gh_loc is not None
         assert gh_weights is not None
 
-        assert 'ind_mix_stick_propn_info' in vb_params_dict.keys()
-        assert 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+        assert 'stick_means' in vb_params_dict['ind_admix_params'].keys()
+        assert 'stick_infos' in vb_params_dict['ind_admix_params'].keys()
 
         e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
-                                vb_params_dict['ind_mix_stick_propn_mean'],
-                                vb_params_dict['ind_mix_stick_propn_info'],
+                                vb_params_dict['ind_admix_params']['stick_means'],
+                                vb_params_dict['ind_admix_params']['stick_infos'],
                                 epsilon, gh_loc, gh_weights, sum_vector=True)
+                                                            
         elbo = elbo - e_log_pert
-
+    
     return -1 * elbo
 
 def get_moments_from_vb_params_dict(vb_params_dict,
                                     gh_loc = None,
                                     gh_weights = None):
 
-    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     # get expected sticks
     if use_logitnormal_sticks:
         assert gh_loc is not None
         assert gh_weights is not None
 
-        ind_mix_stick_propn_mean = vb_params_dict['ind_mix_stick_propn_mean']
-        ind_mix_stick_propn_info = vb_params_dict['ind_mix_stick_propn_info']
+        ind_mix_stick_propn_mean = vb_params_dict['ind_admix_params']['stick_means']
+        ind_mix_stick_propn_info = vb_params_dict['ind_admix_params']['stick_infos']
 
         e_log_sticks, e_log_1m_sticks = \
             ef.get_e_log_logitnormal(
@@ -353,7 +356,7 @@ def get_moments_from_vb_params_dict(vb_params_dict,
                 gh_loc = gh_loc,
                 gh_weights = gh_weights)
     else:
-        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
+        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
         e_log_sticks, e_log_1m_sticks = \
             modeling_lib.get_e_log_beta(ind_mix_stick_beta_params)
 
@@ -409,16 +412,16 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     stick_break_propn = \
         cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
 
-    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     if use_logitnormal_sticks:
         ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
         ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
-        vb_params_dict['ind_mix_stick_propn_mean'] = ind_mix_stick_propn_mean
-        vb_params_dict['ind_mix_stick_propn_info'] = ind_mix_stick_propn_info
+        vb_params_dict['ind_admix_params']['stick_means'] = ind_mix_stick_propn_mean
+        vb_params_dict['ind_admix_params']['stick_infos'] = ind_mix_stick_propn_info
     else:
         ind_mix_stick_beta_param1 = np.ones(stick_break_propn.shape)
         ind_mix_stick_beta_param2 = (1 - stick_break_propn) / stick_break_propn
-        vb_params_dict['ind_mix_stick_beta_params'] = \
+        vb_params_dict['ind_admix_params']['stick_beta'] = \
             np.concatenate((ind_mix_stick_beta_param1[:, :, None],
                             ind_mix_stick_beta_param2[:, :, None]), axis = 2)
 
