@@ -184,10 +184,9 @@ def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, detach_ez):
-    # returns z-optimized log-likelihood for locus-l
-
+def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                    e_log_cluster_probs): 
+    
     # get loglikelihood of observations at loci l
     loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
@@ -196,7 +195,17 @@ def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 
     # individal x chromosome belongings
     e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
-
+    
+    return loglik_cond_z_l, e_z_l
+    
+def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                    e_log_cluster_probs, detach_ez):
+    # returns z-optimized log-likelihood for locus-l
+    
+    loglik_cond_z_l, e_z_l = \
+        get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                    e_log_cluster_probs)
+    
     if detach_ez:
         e_z_l = jax.lax.stop_gradient(e_z_l)
 
