@@ -44,18 +44,17 @@ def plot_admixture(admixture, title):
         color='k', horizontalalignment='center', verticalalignment='center')
 
 
-def get_vb_expectations(vb_params_dict): 
-    
-    use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
+def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     
     if use_logitnormal_sticks: 
         e_ind_admix = cluster_quantities_lib.get_e_cluster_probabilities(
-                            vb_params_dict['ind_mix_stick_propn_mean'], 
-                            vb_params_dict['ind_mix_stick_propn_info'],
+                            vb_params_dict['ind_admix_params']['stick_means'], 
+                            vb_params_dict['ind_admix_params']['stick_infos'],
                             gh_loc, gh_weights)
 
     else: 
-        ind_mix_stick_beta_params = vb_params_dict['ind_mix_stick_beta_params']
+        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
         e_stick_lengths = \
                 modeling_lib.get_e_beta(ind_mix_stick_beta_params)
         e_ind_admix = cluster_quantities_lib.get_mixture_weights_from_stick_break_propns(e_stick_lengths)

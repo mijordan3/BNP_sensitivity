@@ -58,10 +58,10 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
     #############
     # blocks for individual admixture
     v2 = v[block1_dim:]
-    use_logitnormal_sticks = 'ind_mix_stick_propn_info' in vb_params_dict.keys()
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     if use_logitnormal_sticks:
-        infos = vb_params_paragami['ind_mix_stick_propn_info'].flatten(
-                        vb_params_dict['ind_mix_stick_propn_info'],
+        infos = vb_params_paragami['ind_admix_params']['stick_infos'].flatten(
+                        vb_params_dict['ind_admix_params']['stick_infos'],
                         free = False)
 
         if return_info:
@@ -69,8 +69,8 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
         else:
             block2 = np.concatenate((infos * v2[0:len(infos)], v2[len(infos):] * 0.5))
     else:
-        vb_params_admix = vb_params_paragami['ind_mix_stick_beta_params'].flatten(\
-                            vb_params_dict['ind_mix_stick_beta_params'], free = False)
+        vb_params_admix = vb_params_paragami['ind_admix_params']['stick_beta'].flatten(\
+                            vb_params_dict['ind_admix_params']['stick_beta'], free = False)
 
         block2 = _eval_popbeta_cov_matmul(vb_params_admix, return_info, v2)
 
