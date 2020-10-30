@@ -171,7 +171,8 @@ def run_cavi(g_obs, vb_params_dict,
     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
     flatten_vb_params = jax.jit(flatten_vb_params)
 
-    # compile cavi functions    
+    # compile cavi functions  
+    print('Compiling cavi functions ...')
     t0 = time.time()
     update_pop_beta_jitted = jax.jit(update_pop_beta)
     update_ind_admix_beta_jitted = jax.jit(update_ind_admix_beta)
@@ -218,7 +219,6 @@ def run_cavi(g_obs, vb_params_dict,
             kl = check_kl(vb_params_dict, kl_old)
             kl_vec.append(kl)
             time_vec.append(time.time())
-
             kl_old = kl
 
             print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,

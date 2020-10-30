@@ -18,7 +18,8 @@ python get_structure_fit.py \
   --data_file ${data_file} \
   --alpha ${alpha} \
   --out_folder ${out_folder} \
-  --out_filename ${out_filename}
+  --out_filename ${out_filename} \
+  --use_logitnormal_sticks False
 
 # compute alpha sensitivity derivatives
 # python get_alpha_derivative.py \
