@@ -48,37 +48,74 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     
     return np.stack([beta_param_l1, beta_param_l2]).transpose((1, 0))
 
-def update_pop_beta(g_obs, vb_params_dict, prior_params_dict, 
+def update_pop_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
+                       e_log_cluster_probs, prior_params_dict, 
                        gh_loc = None, gh_weights = None): 
     
     # prior parameters
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
     allele_prior_beta = prior_params_dict['allele_prior_beta']
-    
-    # get initial moments from vb_params
-    e_log_sticks, e_log_1m_sticks, \
-        e_log_pop_freq, e_log_1m_pop_freq = \
-            structure_model_lib.get_moments_from_vb_params_dict(
-                vb_params_dict, gh_loc, gh_weights)
-
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
-    
+        
     # the per-loci update function
     f = lambda x : \
             _update_pop_beta_l(x[0], x[1], x[2], 
                        e_log_cluster_probs, allele_prior_alpha, allele_prior_beta)
     
-    # the for-loop
-    updated_beta_params = jax.lax.map(f, 
-                                      (g_obs.transpose((1, 0, 2)), 
-                                       e_log_pop_freq, 
-                                       e_log_1m_pop_freq))
+    # the for-loop to update
+    beta_update = jax.lax.map(f, 
+                              (g_obs.transpose((1, 0, 2)), 
+                               e_log_pop_freq, 
+                               e_log_1m_pop_freq)) + 1
     
-    return updated_beta_params
+    # get moments 
+    e_log_pop_freq, e_log_1m_pop_freq = \
+        modeling_lib.get_e_log_beta(beta_update)
+        
+    return beta_update, e_log_pop_freq, e_log_1m_pop_freq
 
 
+def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
+                            e_log_cluster_probs, prior_params_dict): 
+    
+    
+    n_obs = g_obs.shape[0]
+    k_approx = e_log_pop_freq.shape[1]
+    
+    # prior parameters
+    dp_prior_alpha = prior_params_dict['dp_prior_alpha']
+        
+    # sum the e_z's over loci
+    body_fun = lambda val, x :\
+                    structure_model_lib.get_optimal_ezl(x[0], x[1], x[2],
+                                        e_log_cluster_probs)[1].sum(-1) + val
+    
+    scan_fun = lambda val, x : (body_fun(val, x), None)
+    
+    init_val = np.zeros((n_obs, k_approx))
+        
+    out = jax.lax.scan(scan_fun, init_val,
+                        xs = (g_obs.transpose((1, 0, 2)),
+                                e_log_pop_freq, e_log_1m_pop_freq))[0]
+    
+    # get beta updates
+    beta_update1 = out[:, 0:(k_approx-1)] + 1
+    
+    tmp = out[:, 1:k_approx]
+    beta_update2 = np.cumsum(np.flip(tmp, axis = 1), axis = 1) + \
+                        (dp_prior_alpha - 1) + 1
+    beta_update2 = np.flip(beta_update2, axis = 1)
+    
+    beta_update = np.stack([beta_update1, beta_update2]).transpose((1, 2, 0))
+    
+    # update moments
+    e_log_sticks, e_log_1m_sticks = \
+            modeling_lib.get_e_log_beta(beta_update)
+    
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+            e_log_sticks, e_log_1m_sticks)
+
+    return beta_update, e_log_cluster_probs
 
 # def update_pop_beta(g_obs,
 #                     e_log_pop_freq, e_log_1m_pop_freq,
