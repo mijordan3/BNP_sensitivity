@@ -49,8 +49,7 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     return np.stack([beta_param_l1, beta_param_l2]).transpose((1, 0))
 
 def update_pop_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
-                       e_log_cluster_probs, prior_params_dict, 
-                       gh_loc = None, gh_weights = None): 
+                       e_log_cluster_probs, prior_params_dict): 
     
     # prior parameters
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
@@ -117,218 +116,132 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
 
     return beta_update, e_log_cluster_probs
 
-# def update_pop_beta(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta):
-#     # update population frequency parameters
+def run_cavi(g_obs, vb_params_dict,
+                vb_params_paragami,
+                prior_params_dict,
+                x_tol = 1e-3,
+                max_iter = 1000,
+                print_every = 1,
+                debug = False):
+    """
+    Runs coordinate ascent on the VB parameters.
 
-#     beta_param1 = get_pop_beta_update1(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta) + 1.0
-#     beta_param2 = get_pop_beta_update2(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta) + 1.0
+    Parameters
+    ----------
+    g_obs : ndarray
+        Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
+        genotypes
+    vb_params_dict : dictionary
+        A dictionary that contains the variational parameters.
+    prior_params_dict : dictionary
+        A dictionary that contains the prior parameters.
 
-#     beta_params = np.concatenate((beta_param1[:, :, None],
-#                                 beta_param2[:, :, None]), axis = 2)
+    Returns
+    -------
+    vb_params_dict : dictionary
+        A dictionary that contains the optimized variational parameters.
+    """
 
-#     e_log_pop_freq, e_log_1m_pop_freq = \
-#         modeling_lib.get_e_log_beta(beta_params)
+    # get initial moments from vb_params
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(
+                vb_params_dict)
+    
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+            e_log_sticks, e_log_1m_sticks)
 
-#     return e_log_pop_freq, e_log_1m_pop_freq, beta_params
+    kl_old = 1e16
+    x_old = 1e16
+    kl_vec = []
 
+    # set up KL function
+    _get_kl = lambda vb_params_dict : \
+                structure_model_lib.get_kl(g_obs, 
+                                           vb_params_dict,
+                                           prior_params_dict)
+    _get_kl = jax.jit(_get_kl)
+    def check_kl(vb_params_dict, kl_old):
+        kl = _get_kl(vb_params_dict)
+        kl_diff = kl_old - kl
+        assert kl_diff > 0, kl_diff
+        return kl
+    
+    flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
+    flatten_vb_params = jax.jit(flatten_vb_params)
 
-# def update_stick_beta(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta):
+    # compile cavi functions    
+    t0 = time.time()
+    update_pop_beta_jitted = jax.jit(update_pop_beta)
+    update_ind_admix_beta_jitted = jax.jit(update_ind_admix_beta)
+    
+    out = update_pop_beta_jitted(g_obs,
+                               e_log_pop_freq,
+                               e_log_1m_pop_freq, 
+                               e_log_cluster_probs,
+                               prior_params_dict)
+    _ = out[0].block_until_ready()
+    
+    out = update_ind_admix_beta_jitted(g_obs,
+                                     e_log_pop_freq,
+                                     e_log_1m_pop_freq,
+                                     e_log_cluster_probs, 
+                                     prior_params_dict)
+    _ = out[0].block_until_ready()
+    _ = _get_kl(vb_params_dict).block_until_ready()
+    _ = flatten_vb_params(vb_params_dict).block_until_ready()
+    print('CAVI compile time: {0:.3g}sec'.format(time.time() - t0))
 
-#     # update individual admixtures
-#     beta_param1 = get_stick_update1(g_obs,
-#                 e_log_pop_freq, e_log_1m_pop_freq,
-#                 e_log_sticks, e_log_1m_sticks,
-#                 dp_prior_alpha, allele_prior_alpha,
-#                 allele_prior_beta) + 1.0
-
-#     beta_param2 = get_stick_update2(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta) + 1.0
-
-#     beta_params = np.concatenate((beta_param1[:, :, None],
-#                                     beta_param2[:, :, None]), axis = 2)
-
-#     e_log_sticks, e_log_1m_sticks = modeling_lib.get_e_log_beta(beta_params)
-
-#     return e_log_sticks, e_log_1m_sticks, beta_params
-
-# def run_cavi(g_obs, vb_params_dict,
-#                 vb_params_paragami,
-#                 prior_params_dict,
-#                 gh_loc = None, gh_weights = None,
-#                 log_phi = None, epsilon = 0.,
-#                 x_tol = 1e-3,
-#                 max_iter = 1000,
-#                 print_every = 1,
-#                 debug = False):
-#     """
-#     Runs coordinate ascent on the VB parameters.
-
-#     Parameters
-#     ----------
-#     g_obs : ndarray
-#         Array of size (n_obs x n_loci x 3), giving a one-hot encoding of
-#         genotypes
-#     vb_params_dict : dictionary
-#         A dictionary that contains the variational parameters.
-#     prior_params_dict : dictionary
-#         A dictionary that contains the prior parameters.
-
-#     Returns
-#     -------
-#     vb_params_dict : dictionary
-#         A dictionary that contains the optimized variational parameters.
-#     """
-
-#     # prior parameters
-#     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
-#     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
-#     allele_prior_beta = prior_params_dict['allele_prior_beta']
-
-#     # get initial moments from vb_params
-#     e_log_sticks, e_log_1m_sticks, \
-#         e_log_pop_freq, e_log_1m_pop_freq = \
-#             structure_model_lib.get_moments_from_vb_params_dict(
-#                 vb_params_dict, gh_loc, gh_weights)
-
-#     kl_old = 1e16
-#     x_old = 1e16
-#     kl_vec = []
-
-#     use_logitnormal_sticks = 'ind_mix_stick_propn_mean' in vb_params_dict.keys()
-
-#     # set up KL function
-#     _get_kl = lambda vb_params_dict : \
-#                 structure_model_lib.get_kl(g_obs, vb_params_dict,
-#                                             prior_params_dict,
-#                                             gh_loc = gh_loc,
-#                                             gh_weights = gh_weights,
-#                                             log_phi = log_phi,
-#                                             epsilon = epsilon)
-
-#     _get_kl = jax.jit(_get_kl)
-#     def check_kl(vb_params_dict, kl_old):
-#         kl = _get_kl(vb_params_dict)
-#         kl_diff = kl_old - kl
-#         assert kl_diff > 0, kl_diff
-#         return kl
-
-#     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
-#     flatten_vb_params = jax.jit(flatten_vb_params)
-
-#     # compile cavi functions    
-#     t0 = time.time()
-#     update_pop_beta = jax.jit(update_pop_beta)
-#     _ = update_pop_beta(g_obs,
-#                     e_log_pop_freq, e_log_1m_pop_freq,
-#                     e_log_sticks, e_log_1m_sticks,
-#                     dp_prior_alpha, allele_prior_alpha,
-#                     allele_prior_beta)
-#     _ = _get_kl(vb_params_dict)
-#     _ = flatten_vb_params(vb_params_dict)
-#     if use_logitnormal_sticks:
-#         stick_obj_fun, stick_mean_grad_fun, stick_info_grad_fun = \
-#             prepare_logitnormal_stick_updates(g_obs,
-#                                       vb_params_paragami,
-#                                       prior_params_dict,
-#                                       gh_loc, gh_weights,
-#                                       log_phi = log_phi,
-#                                       epsilon = epsilon)
-#     else:
-#         update_stick_beta = jax.jit(update_stick_beta)
+    print('\n running CAVI ...')
+    t0 = time.time()
+    time_vec = [t0]
+    for i in range(1, max_iter):
         
-#         _ = update_stick_beta(g_obs,
-#                         e_log_pop_freq, e_log_1m_pop_freq,
-#                         e_log_sticks, e_log_1m_sticks,
-#                         dp_prior_alpha, allele_prior_alpha,
-#                         allele_prior_beta)
+        # update indivual admixtures
+        vb_params_dict['ind_admix_params']['stick_beta'], \
+            e_log_cluster_probs = \
+                update_ind_admix_beta_jitted(g_obs, 
+                                  e_log_pop_freq, e_log_1m_pop_freq, 
+                                  e_log_cluster_probs, prior_params_dict)
 
-#     print('CAVI compile time: {0:.3g}sec'.format(time.time() - t0))
+        if debug:
+            kl_old = check_kl(vb_params_dict, kl_old)
 
-#     print('\n running CAVI ...')
-#     t0 = time.time()
-#     time_vec = [t0]
-#     for i in range(1, max_iter):
+        # update population frequency parameters
+        vb_params_dict['pop_freq_beta_params'], \
+            e_log_pop_freq, e_log_1m_pop_freq = \
+                update_pop_beta_jitted(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
+                       e_log_cluster_probs, prior_params_dict)
 
-#         # update sticks
-#         if use_logitnormal_sticks:
-#             e_log_sticks, e_log_1m_sticks, \
-#                 vb_params_dict['ind_mix_stick_propn_mean'], \
-#                     vb_params_dict['ind_mix_stick_propn_info'] = \
-#                         update_logitnormal_sticks(stick_obj_fun,
-#                                                     stick_mean_grad_fun,
-#                                                     stick_info_grad_fun,
-#                                                     gh_loc,
-#                                                     gh_weights,
-#                                                     vb_params_dict,
-#                                                     vb_params_paragami)
-#         else:
-#             e_log_sticks, e_log_1m_sticks, \
-#                 vb_params_dict['ind_mix_stick_beta_params'] = \
-#                     update_stick_beta(g_obs,
-#                                     e_log_pop_freq, e_log_1m_pop_freq,
-#                                     e_log_sticks, e_log_1m_sticks,
-#                                     dp_prior_alpha, allele_prior_alpha,
-#                                     allele_prior_beta)
+        if (i % print_every) == 0 or debug:
+            kl = check_kl(vb_params_dict, kl_old)
+            kl_vec.append(kl)
+            time_vec.append(time.time())
 
-#         if debug:
-#             kl_old = check_kl(vb_params_dict, kl_old)
+            kl_old = kl
 
-#         # update population frequency parameters
-#         e_log_pop_freq, e_log_1m_pop_freq, \
-#             vb_params_dict['pop_freq_beta_params'] = \
-#                 update_pop_beta(g_obs,
-#                                 e_log_pop_freq, e_log_1m_pop_freq,
-#                                 e_log_sticks, e_log_1m_sticks,
-#                                 dp_prior_alpha, allele_prior_alpha,
-#                                 allele_prior_beta)
+            print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,
+                                        round(kl, 6),
+                                        round(time_vec[-1] - time_vec[-2], 4)))
 
-#         if (i % print_every) == 0 or debug:
-#             kl = check_kl(vb_params_dict, kl_old)
-#             kl_vec.append(kl)
-#             time_vec.append(time.time())
+        x_diff = flatten_vb_params(vb_params_dict) - x_old
 
-#             kl_old = kl
+        if np.abs(x_diff).max() < x_tol:
+            print('CAVI done.')
+            break
 
-#             print('iteration [{}]; kl:{}; elapsed: {}secs'.format(i,
-#                                         round(kl, 6),
-#                                         round(time_vec[-1] - time_vec[-2], 4)))
+        x_old = flatten_vb_params(vb_params_dict)
 
-#         x_diff = flatten_vb_params(vb_params_dict) - x_old
+    if i == (max_iter - 1):
+        print('Done. Warning, max iterations reached. ')
 
-#         if np.abs(x_diff).max() < x_tol:
-#             print('CAVI done.')
-#             break
+    vb_opt = flatten_vb_params(vb_params_dict)
 
-#         x_old = flatten_vb_params(vb_params_dict)
+    print('Elapsed: {} steps in {} seconds'.format(
+            i, round(time.time() - t0, 2)))
 
-#     if i == (max_iter - 1):
-#         print('Done. Warning, max iterations reached. ')
-
-#     vb_opt = flatten_vb_params(vb_params_dict)
-
-#     print('Elapsed: {} steps in {} seconds'.format(
-#             i, round(time.time() - t0, 2)))
-
-#     return vb_params_dict, vb_opt, np.array(kl_vec), np.array(time_vec) - t0
+    return vb_params_dict, vb_opt, np.array(kl_vec), np.array(time_vec) - t0
 
 
 # #################
