@@ -9,9 +9,9 @@ from jax.scipy.sparse.linalg import cg
 import time
 
 # wrapper to get hessian vector products in jax
-def get_jac_hvp_fun(f):
+def get_jac_hvp_fun(f, argnums = 0):
     def hvp(x, v):
-        return jax.jvp(jax.grad(f), (x, ), (v, ))[1]
+        return jax.jvp(jax.grad(f, argnums = argnums), (x, ), (v, ))[1]
     return hvp
 
 
