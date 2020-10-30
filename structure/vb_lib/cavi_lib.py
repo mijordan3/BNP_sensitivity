@@ -23,13 +23,60 @@ joint_loglik = lambda *x : structure_model_lib.\
 
 
 # get natural beta parameters for population frequencies
-get_pop_beta_update1_ad = jax.jit(jax.jacobian(joint_loglik, argnums=1))
-get_pop_beta_update2 = jax.jit(jax.jacobian(joint_loglik, argnums=2))
+get_pop_beta_update1_ag = jax.jacobian(joint_loglik, argnums=1)
+get_pop_beta_update2_ag = jax.jacobian(joint_loglik, argnums=2)
 
 # get natural beta parameters for admixture sticks
-get_stick_update1_ad = jax.jit(jax.jacobian(joint_loglik, argnums=3))
-get_stick_update2_ad = jax.jit(jax.jacobian(joint_loglik, argnums=4))
+get_stick_update1_ag = jax.jacobian(joint_loglik, argnums=3)
+get_stick_update2_ag = jax.jacobian(joint_loglik, argnums=4)
 
+def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l, 
+                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta): 
+    
+    g_obs_l0 = g_obs_l[:, 0]
+    g_obs_l1 = g_obs_l[:, 1]
+    g_obs_l2 = g_obs_l[:, 2]
+    
+    _, e_z_l = structure_model_lib.get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                                                    e_log_cluster_probs)
+    
+    beta_param_l1 = np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
+                        np.dot(g_obs_l2, e_z_l[:, :, 1]) + (allele_prior_alpha - 1) 
+    
+    beta_param_l2 = np.dot(g_obs_l0, e_z_l[:, :, 0]) + \
+                        np.dot(g_obs_l0 + g_obs_l1, e_z_l[:, :, 1]) + (allele_prior_beta - 1) 
+    
+    return np.stack([beta_param_l1, beta_param_l2]).transpose((1, 0))
+
+def update_pop_beta(g_obs, vb_params_dict, prior_params_dict, 
+                       gh_loc = None, gh_weights = None): 
+    
+    # prior parameters
+    allele_prior_alpha = prior_params_dict['allele_prior_alpha']
+    allele_prior_beta = prior_params_dict['allele_prior_beta']
+    
+    # get initial moments from vb_params
+    e_log_sticks, e_log_1m_sticks, \
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            structure_model_lib.get_moments_from_vb_params_dict(
+                vb_params_dict, gh_loc, gh_weights)
+
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
+    
+    # the per-loci update function
+    f = lambda x : \
+            _update_pop_beta_l(x[0], x[1], x[2], 
+                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta)
+    
+    # the for-loop
+    updated_beta_params = jax.lax.map(f, 
+                                      (g_obs.transpose((1, 0, 2)), 
+                                       e_log_pop_freq, 
+                                       e_log_1m_pop_freq))
+    
+    return updated_beta_params
 
 
 
