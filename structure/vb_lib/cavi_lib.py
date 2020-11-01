@@ -16,20 +16,6 @@ import time
 
 from copy import deepcopy
 
-# using autograd to get natural paramters
-# for testing only 
-joint_loglik = lambda *x : structure_model_lib.\
-                    get_e_joint_loglik_from_nat_params(*x, detach_ez=True)[0]
-
-
-# get natural beta parameters for population frequencies
-get_pop_beta_update1_ag = jax.jacobian(joint_loglik, argnums=1)
-get_pop_beta_update2_ag = jax.jacobian(joint_loglik, argnums=2)
-
-# get natural beta parameters for admixture sticks
-get_stick_update1_ag = jax.jacobian(joint_loglik, argnums=3)
-get_stick_update2_ag = jax.jacobian(joint_loglik, argnums=4)
-
 def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l, 
                        e_log_cluster_probs, allele_prior_alpha, allele_prior_beta): 
     
@@ -74,7 +60,8 @@ def update_pop_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
 
 
 def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
-                            e_log_cluster_probs, prior_params_dict): 
+                            e_log_cluster_probs, prior_params_dict, 
+                            use_bnp_prior = True): 
     
     
     n_obs = g_obs.shape[0]
@@ -95,14 +82,20 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     out = jax.lax.scan(scan_fun, init_val,
                         xs = (g_obs.transpose((1, 0, 2)),
                                 e_log_pop_freq, e_log_1m_pop_freq))[0]
+    if not use_bnp_prior: 
+        print('dirch prior')
+        out = out + 1 / k_approx - 1
     
     # get beta updates
     beta_update1 = out[:, 0:(k_approx-1)] + 1
     
     tmp = out[:, 1:k_approx]
-    beta_update2 = np.cumsum(np.flip(tmp, axis = 1), axis = 1) + \
-                        (dp_prior_alpha - 1) + 1
+    beta_update2 = np.cumsum(np.flip(tmp, axis = 1), axis = 1) + 1
     beta_update2 = np.flip(beta_update2, axis = 1)
+    
+    if use_bnp_prior: 
+        print('bnp prior')
+        beta_update2 = beta_update2 + (dp_prior_alpha - 1)
     
     beta_update = np.stack([beta_update1, beta_update2]).transpose((1, 2, 0))
     
@@ -119,6 +112,7 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
 def run_cavi(g_obs, vb_params_dict,
                 vb_params_paragami,
                 prior_params_dict,
+                use_bnp_prior, 
                 x_tol = 1e-3,
                 max_iter = 1000,
                 print_every = 1,
@@ -160,12 +154,15 @@ def run_cavi(g_obs, vb_params_dict,
     _get_kl = lambda vb_params_dict : \
                 structure_model_lib.get_kl(g_obs, 
                                            vb_params_dict,
-                                           prior_params_dict)
+                                           prior_params_dict, 
+                                           use_bnp_prior=use_bnp_prior, 
+                                           detach_ez=True)
     _get_kl = jax.jit(_get_kl)
     def check_kl(vb_params_dict, kl_old):
         kl = _get_kl(vb_params_dict)
         kl_diff = kl_old - kl
-        assert kl_diff > 0, kl_diff
+        # print(kl)
+        # assert kl_diff > 0, kl_diff
         return kl
     
     flatten_vb_params = lambda x : vb_params_paragami.flatten(x, free = True, validate_value = False)
@@ -175,7 +172,7 @@ def run_cavi(g_obs, vb_params_dict,
     print('Compiling cavi functions ...')
     t0 = time.time()
     update_pop_beta_jitted = jax.jit(update_pop_beta)
-    update_ind_admix_beta_jitted = jax.jit(update_ind_admix_beta)
+    update_ind_admix_beta_jitted = jax.jit(lambda *x : update_ind_admix_beta(*x, use_bnp_prior = use_bnp_prior))
     
     out = update_pop_beta_jitted(g_obs,
                                e_log_pop_freq,

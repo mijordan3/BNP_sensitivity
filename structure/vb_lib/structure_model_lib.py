@@ -123,19 +123,30 @@ def get_default_prior_params():
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq, e_log_1m_pop_freq,
+def get_e_log_prior(e_log_sticks, e_log_1m_sticks,
+                    e_log_pop_freq, e_log_1m_pop_freq,
                         dp_prior_alpha, allele_prior_alpha,
-                        allele_prior_beta):
+                        allele_prior_beta, use_bnp_prior):
     # get expected prior term
 
     # dp prior on individual mixtures
-    ind_mix_dp_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
+    if use_bnp_prior: 
+        print('bnp prior!')
+        ind_mix_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
+    else: 
+        print('dirch prior!')
+        # else its just a dirichlet prior
+        k_approx = e_log_pop_freq.shape[1]
+        ind_mix_prior = (1 / k_approx - 1) * \
+                            modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(\
+                                e_log_sticks, 
+                                e_log_1m_sticks).sum()
 
     # allele frequency prior
     allele_freq_beta_prior = (allele_prior_alpha - 1) * np.sum(e_log_pop_freq) + \
                             (allele_prior_beta - 1) * np.sum(e_log_1m_pop_freq)
 
-    return ind_mix_dp_prior + allele_freq_beta_prior
+    return ind_mix_prior + allele_freq_beta_prior
 
 ##########################
 # Entropy
@@ -246,6 +257,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
+                                    use_bnp_prior, 
                                     detach_ez = False):
 
     e_loglik, z_entropy = get_e_loglik(g_obs,
@@ -254,19 +266,20 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                         detach_ez = detach_ez)
 
     # prior term
-    e_log_prior = get_e_log_prior(e_log_1m_sticks,
+    e_log_prior = get_e_log_prior(e_log_sticks, e_log_1m_sticks,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
-                            allele_prior_beta).squeeze()
+                            allele_prior_beta, use_bnp_prior).squeeze()
         
     return e_log_prior + e_loglik, z_entropy
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
-                    gh_loc = None, gh_weights = None,
-                    log_phi = None,
-                    epsilon = 1.,
-                    detach_ez = False):
+                use_bnp_prior = True, 
+                gh_loc = None, gh_weights = None,
+                log_phi = None,
+                epsilon = 1.,
+                detach_ez = False):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -320,6 +333,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
+                                    use_bnp_prior, 
                                     detach_ez = detach_ez)
 
     # entropy term
