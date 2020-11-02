@@ -12,8 +12,9 @@ from vb_lib.cavi_lib import update_pop_beta
 
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
-
 from bnpmodeling_runjingdev.optimization_lib import OptimizationObjectiveJaxtoNumpy
+
+import time 
 
 ###############
 # functions for initializing
@@ -93,6 +94,8 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
                        n_iter = 5): 
     
     # get nmf init
+    t0 = time.time()
+    print('running NMF ...')
     vb_params_dict = \
         set_nmf_init_vb_params(g_obs, k_approx, vb_params_dict, seed)
     
@@ -100,6 +103,7 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
     # and implicity the ezs. 
     # these updates are closed form, and relatively fast
     
+    print('running a few cavi steps for pop beta ...')
     # get initial moments from vb_params
     e_log_sticks, e_log_1m_sticks, \
         e_log_pop_freq, e_log_1m_pop_freq = \
@@ -118,11 +122,14 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
                                 e_log_pop_freq, e_log_1m_pop_freq,
                                 e_log_cluster_probs,
                                 prior_params_dict)
+    print('done. Elapsed: {0:3g}'.format(time.time() - t0))
+    
     return vb_params_dict
 
-    
-    
 
+#################
+# Functions to specificially optmize 
+# the individual admixture stick parameters
 def get_ind_admix_params_psloss(g_obs, ind_admix_params, 
                                 e_log_pop_freq, e_log_1m_pop_freq, 
                                 prior_params_dict, 
@@ -139,7 +146,6 @@ def get_ind_admix_params_psloss(g_obs, ind_admix_params,
     # data parameters
     n_obs = g_obs.shape[0]
     k_approx = e_log_pop_freq.shape[1]
-    
     
     # get expecations
     e_log_sticks, e_log_1m_sticks = \
@@ -200,6 +206,92 @@ def get_ind_admix_params_loss(g_obs,
                                         gh_loc, gh_weights,
                                         detach_ez = detach_ez)
 
+class StickObjective():
+    def __init__(self, vb_params_paragami, prior_params_dict, 
+                            gh_loc, gh_weights): 
+
+        self.vb_params_paragami = vb_params_paragami
+        
+        self.prior_params_dict = prior_params_dict
+        self.gh_loc = gh_loc
+        self.gh_weights = gh_weights
+        
+        # objective and gradients
+        self.stick_objective_fun = \
+            paragami.FlattenFunctionInput(
+                original_fun = get_ind_admix_params_psloss,
+                patterns = vb_params_paragami['ind_admix_params'],
+                free = True,
+                argnums = 1)
+        
+        self._grad_tmp = jax.grad(self.stick_objective_fun, argnums = 1)  
+        
+        self._compile_functions()
+        
+    def _f(self, 
+          g_obs, 
+          ind_admix_params_free, 
+          e_log_pop_freq, 
+          e_log_1m_pop_freq): 
+        
+        return self.stick_objective_fun(g_obs, 
+                                        ind_admix_params_free, 
+                                        e_log_pop_freq, e_log_1m_pop_freq, 
+                                        self.prior_params_dict, 
+                                        self.gh_loc, self.gh_weights)
+    def _grad(self, 
+             g_obs, 
+             ind_admix_params_free, 
+              e_log_pop_freq, 
+              e_log_1m_pop_freq): 
+        
+        return self._grad_tmp(g_obs, 
+                            ind_admix_params_free, 
+                            e_log_pop_freq, e_log_1m_pop_freq, 
+                            self.prior_params_dict, 
+                            self.gh_loc, self.gh_weights)
+
+    def _hvp(self, 
+            g_obs, 
+            ind_admix_params_free, 
+            e_log_pop_freq, 
+            e_log_1m_pop_freq, 
+            v): 
+
+        loss = lambda x : self.stick_objective_fun(g_obs, 
+                                    x, 
+                                    e_log_pop_freq, e_log_1m_pop_freq, 
+                                    self.prior_params_dict, 
+                                    self.gh_loc, self.gh_weights)
+    
+        return jax.jvp(jax.grad(loss), (ind_admix_params_free, ), (v, ))[1]
+    
+    def _compile_functions(self): 
+        
+        self.f = jax.jit(self._f)
+        self.grad = jax.jit(self._grad)
+        self.hvp = jax.jit(self._hvp)
+        
+        # compile 
+        print('compiling stick objective and gradients ...')
+        t0 = time.time()
+        
+        # draw random parameters        
+        param_dict = self.vb_params_paragami.random()
+        stick_free_params = self.vb_params_paragami['ind_admix_params'].flatten(
+                                param_dict['ind_admix_params'], free = True)
+        
+        n_obs = param_dict['ind_admix_params']['stick_means'].shape[0]
+        n_loci = param_dict['pop_freq_beta_params'].shape[0]
+        g_obs = np.ones((n_obs, n_loci, 2), dtype = int)
+
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            modeling_lib.get_e_log_beta(param_dict['pop_freq_beta_params'])
+
+        _ = self.f(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq)
+        _ = self.grad(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq)
+        _ = self.hvp(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq, stick_free_params)
+        print('compile time: {0:.3g}sec'.format(time.time() - t0))
 
 ########################
 # A helper function to get

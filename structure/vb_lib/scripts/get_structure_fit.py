@@ -62,7 +62,7 @@ onp.random.seed(args.seed)
 ######################
 print('loading data from ', args.data_file)
 data = np.load(args.data_file)
-g_obs = np.array(data['g_obs'])
+g_obs = np.array(data['g_obs'], dtype = int)
 
 n_obs = g_obs.shape[0]
 n_loci = g_obs.shape[1]

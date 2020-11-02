@@ -157,10 +157,7 @@ def get_entropy(vb_params_dict, gh_loc, gh_weights):
     pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
     lk = pop_freq_beta_params.shape[0] * pop_freq_beta_params.shape[1]
     beta_entropy = ef.beta_entropy(tau = pop_freq_beta_params.reshape((lk, 2)))
-    
-    print('stick entropy: ', stick_entropy)
-    print('beta entropy: ', beta_entropy) 
-    
+        
     return stick_entropy + beta_entropy
 
 ##########################
@@ -341,10 +338,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                 epsilon, gh_loc, gh_weights, sum_vector=True)
                                                             
         elbo = elbo - e_log_pert
-    
-    print(e_loglik)
-    print(entropy)
-    
+        
     return -1 * elbo
 
 def get_moments_from_vb_params_dict(vb_params_dict,
