@@ -2,6 +2,8 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+from scipy import optimize 
+
 import numpy as onp
 from sklearn.decomposition import NMF
 
@@ -207,8 +209,9 @@ def get_ind_admix_params_loss(g_obs,
                                         detach_ez = detach_ez)
 
 class StickObjective():
-    def __init__(self, vb_params_paragami, prior_params_dict, 
-                            gh_loc, gh_weights): 
+    def __init__(self, g_obs, vb_params_paragami, prior_params_dict, 
+                          gh_loc, gh_weights, 
+                          compute_hess = False): 
 
         self.vb_params_paragami = vb_params_paragami
         
@@ -225,8 +228,15 @@ class StickObjective():
                 argnums = 1)
         
         self._grad_tmp = jax.grad(self.stick_objective_fun, argnums = 1)  
+        self._hess_tmp = jax.hessian(self.stick_objective_fun, argnums = 1)
         
-        self._compile_functions()
+        self.compute_hess = compute_hess 
+        
+        self._compile_functions(g_obs)
+    
+    def _flatten_ind_admix_params(self, ind_admix_params): 
+        return self.vb_params_paragami['ind_admix_params'].flatten(ind_admix_params, 
+                                                                   free = True)
         
     def _f(self, 
           g_obs, 
@@ -266,11 +276,29 @@ class StickObjective():
     
         return jax.jvp(jax.grad(loss), (ind_admix_params_free, ), (v, ))[1]
     
-    def _compile_functions(self): 
+    def _hess(self, 
+                g_obs, 
+                ind_admix_params_free, 
+                e_log_pop_freq, 
+                e_log_1m_pop_freq): 
+        
+        return self._hess_tmp(g_obs, 
+                            ind_admix_params_free, 
+                            e_log_pop_freq, e_log_1m_pop_freq, 
+                            self.prior_params_dict, 
+                            self.gh_loc, self.gh_weights)
+    
+    def _compile_functions(self, g_obs): 
         
         self.f = jax.jit(self._f)
         self.grad = jax.jit(self._grad)
         self.hvp = jax.jit(self._hvp)
+        self.flatten_ind_admix_params = jax.jit(self._flatten_ind_admix_params)
+        
+        if self.compute_hess: 
+            self.hess = jax.jit(self._hess)
+        else: 
+            self.hess = None
         
         # compile 
         print('compiling stick objective and gradients ...')
@@ -278,21 +306,52 @@ class StickObjective():
         
         # draw random parameters        
         param_dict = self.vb_params_paragami.random()
-        stick_free_params = self.vb_params_paragami['ind_admix_params'].flatten(
-                                param_dict['ind_admix_params'], free = True)
+        stick_free_params = self.flatten_ind_admix_params(param_dict['ind_admix_params'])
         
-        n_obs = param_dict['ind_admix_params']['stick_means'].shape[0]
-        n_loci = param_dict['pop_freq_beta_params'].shape[0]
-        g_obs = np.ones((n_obs, n_loci, 2), dtype = int)
-
         e_log_pop_freq, e_log_1m_pop_freq = \
             modeling_lib.get_e_log_beta(param_dict['pop_freq_beta_params'])
-
-        _ = self.f(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq)
-        _ = self.grad(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq)
-        _ = self.hvp(g_obs, stick_free_params, e_log_pop_freq, e_log_1m_pop_freq, stick_free_params)
+        
+        # compile functions
+        _ = self.f(g_obs, stick_free_params, 
+                   e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
+        _ = self.grad(g_obs, stick_free_params, 
+                      e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
+        _ = self.hvp(g_obs, stick_free_params, 
+                     e_log_pop_freq, e_log_1m_pop_freq, 
+                     stick_free_params).block_until_ready()
+        
+        if self.compute_hess: 
+            _ = self.hess(g_obs, stick_free_params, 
+                      e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
+                
         print('compile time: {0:.3g}sec'.format(time.time() - t0))
-
+    
+    def optimize_sticks(self, 
+                        g_obs, 
+                        ind_admix_params, 
+                        e_log_pop_freq, 
+                        e_log_1m_pop_freq, 
+                        maxiter = 1): 
+        
+        if self.hess is None: 
+            raise NotImplementedError()
+            
+        x0 = self.flatten_ind_admix_params(ind_admix_params)
+        fun = lambda x : onp.array(self.f(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
+        jac = lambda x : onp.array(self.grad(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
+        hess = lambda x : onp.array(self.hess(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
+                                   
+        out = optimize.minimize(fun = fun, 
+                              jac = jac, 
+                              hess = hess, 
+                              x0 = x0, 
+                              method = 'trust-exact', 
+                              options = {'maxiter': maxiter})
+                                   
+        ind_admix_params_opt = self.vb_params_paragami['ind_admix_params'].fold(out.x, free = True)
+                                   
+        return ind_admix_params_opt, out
+    
 ########################
 # A helper function to get
 # objective functions and gradients
