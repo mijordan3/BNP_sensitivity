@@ -31,7 +31,8 @@ get_stick_update1_ag = jax.jacobian(joint_loglik, argnums=3)
 get_stick_update2_ag = jax.jacobian(joint_loglik, argnums=4)
 
 def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l, 
-                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta): 
+                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta, 
+                       data_weight): 
     
     g_obs_l0 = g_obs_l[:, 0]
     g_obs_l1 = g_obs_l[:, 1]
@@ -40,16 +41,19 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     _, e_z_l = structure_model_lib.get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                                                     e_log_cluster_probs)
     
-    beta_param_l1 = np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
-                        np.dot(g_obs_l2, e_z_l[:, :, 1]) + (allele_prior_alpha - 1) 
+    beta_param_l1 = (np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
+                        np.dot(g_obs_l2, e_z_l[:, :, 1])) * data_weight + \
+                        (allele_prior_alpha - 1) 
     
-    beta_param_l2 = np.dot(g_obs_l0, e_z_l[:, :, 0]) + \
-                        np.dot(g_obs_l0 + g_obs_l1, e_z_l[:, :, 1]) + (allele_prior_beta - 1) 
+    beta_param_l2 = (np.dot(g_obs_l0, e_z_l[:, :, 0]) + \
+                        np.dot(g_obs_l0 + g_obs_l1, e_z_l[:, :, 1])) * data_weight + \
+                            (allele_prior_beta - 1) 
     
     return np.stack([beta_param_l1, beta_param_l2]).transpose((1, 0))
 
 def update_pop_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq, 
-                       e_log_cluster_probs, prior_params_dict): 
+                       e_log_cluster_probs, prior_params_dict, 
+                       data_weight = 1): 
     
     # prior parameters
     allele_prior_alpha = prior_params_dict['allele_prior_alpha']
@@ -58,7 +62,8 @@ def update_pop_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     # the per-loci update function
     f = lambda x : \
             _update_pop_beta_l(x[0], x[1], x[2], 
-                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta)
+                       e_log_cluster_probs, allele_prior_alpha, allele_prior_beta, 
+                       data_weight)
     
     # the for-loop to update
     beta_update = jax.lax.map(f, 
