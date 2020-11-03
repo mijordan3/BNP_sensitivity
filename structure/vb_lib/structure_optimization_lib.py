@@ -324,7 +324,7 @@ class StickObjective():
             _ = self.hess(g_obs, stick_free_params, 
                       e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
                 
-        print('compile time: {0:.3g}sec'.format(time.time() - t0))
+        print('sticks compile time: {0:.3g}sec'.format(time.time() - t0))
     
     def optimize_sticks(self, 
                         g_obs, 
