@@ -6,6 +6,7 @@ import jax.scipy as sp
 import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
+import vb_lib.structure_model_lib as structure_model_lib
 from vb_lib.structure_optimization_lib import set_init_vb_params
 from vb_lib.structure_preconditioned_optimization_lib import optimize_structure
 
@@ -106,6 +107,7 @@ else:
                                         k_approx, 
                                         vb_params_dict,
                                         prior_params_dict,
+                                        gh_loc, gh_weights,
                                         seed = args.seed)
 
 
