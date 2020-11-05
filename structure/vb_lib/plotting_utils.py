@@ -5,7 +5,7 @@ import colorsys
 
 from bnpmodeling_runjingdev import modeling_lib, cluster_quantities_lib
 
-def plot_admixture(admixture, title):
+def plot_admixture(admixture, ax):
     # copied over form distruct.py file in faststructure
     # adapted for python 3
     
@@ -15,15 +15,7 @@ def plot_admixture(admixture, title):
     bg_color = 'w'
     fontsize = 12
 
-    figure = plt.figure(figsize=(5,3))
-
-    xmin = 0.13
-    ymin = 0.2
-    height = 0.6
-    width = 0.74
-    indiv_width = width/N
-    subplot = figure.add_axes([xmin,ymin,width,height])
-    [spine.set_linewidth(0.001) for spine in subplot.spines.values()]
+    indiv_width = 1./N
 
     for k in range(K):
         if k:
@@ -32,22 +24,13 @@ def plot_admixture(admixture, title):
             bottoms = np.zeros((N,),dtype=float)
 
         lefts = np.arange(N)*indiv_width
-        subplot.bar(lefts, admixture[:,k], width=indiv_width, bottom=bottoms, 
+        ax.bar(lefts, admixture[:,k], width=indiv_width, bottom=bottoms, 
                     facecolor=colors[k], edgecolor=colors[k], linewidth=0.4)
-
-        subplot.axis([0, N*indiv_width, 0, 1])
-        subplot.tick_params(axis='both', top=False, right=False, left=False, bottom=False)
-        xtick_labels = tuple(map(str,['']*N))
-        subplot.set_xticklabels(xtick_labels)
-        ytick_labels = tuple(map(str,['']*K))
-        subplot.set_yticklabels(ytick_labels)
-
-    position = subplot.get_position()
-    title_position = (0.5, 0.9)
-    figure.text(title_position[0], title_position[1], title, fontsize=fontsize, \
-        color='k', horizontalalignment='center', verticalalignment='center')
-
-
+    ax.set_ylim((0, 1.))
+    ax.set_xlim((0, 1.))
+    ax.set_xticks([])
+    ax.set_yticks([])
+    
 def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
     
     use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
