@@ -132,6 +132,7 @@ def set_init_vb_params(g_obs, k_approx, vb_params_dict,
 #################
 # Functions to specificially optmize 
 # the individual admixture stick parameters
+#################
 def get_ind_admix_params_psloss(g_obs, ind_admix_params, 
                                 e_log_pop_freq, e_log_1m_pop_freq, 
                                 prior_params_dict, 
@@ -355,6 +356,7 @@ class StickObjective():
 ########################
 # A helper function to get
 # objective functions and gradients
+#################
 def define_structure_objective(g_obs, vb_params_dict,
                                 vb_params_paragami,
                                 prior_params_dict,

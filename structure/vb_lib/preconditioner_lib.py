@@ -7,7 +7,7 @@ import paragami
 from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
                                         _get_matrix_from_operator
 
-def get_log_beta_covariance(alpha, beta, return_sqrt):
+def get_log_beta_covariance(alpha, beta, return_info, return_sqrt, v):
     # returns the covariance of the score function
     # of the beta distribution
 
@@ -26,29 +26,30 @@ def get_log_beta_covariance(alpha, beta, return_sqrt):
                      [I12 * alpha * beta, I22 * beta**2]])
     
     if return_sqrt: 
-        sqrt_fun = _get_sym_matrix_inv_sqrt_funcs(out)[0]
-        return np.array([sqrt_fun(np.array([1., 0.])), \
-                         sqrt_fun(np.array([0., 1.]))])
+        matmul_funs = _get_sym_matrix_inv_sqrt_funcs(out)
+    
     else: 
-        return out
+        matmul_funs = (lambda v : np.dot(out, v), 
+                       lambda v : np.linalg.solve(out, v))
+        
+    if return_info: 
+        return matmul_funs[1](v)
+    else: 
+        return matmul_funs[0](v)
 
 def _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, return_sqrt, v):
     xs = vb_params_pop_params.reshape(-1, 2)
     xs = np.concatenate((xs, v.reshape(-1, 2)), axis = 1)
 
-    def f(carry, x):
+    def f(x):
 
-        cov = get_log_beta_covariance(x[0], x[1], return_sqrt)
+        cov = get_log_beta_covariance(x[0], x[1], return_info, return_sqrt, x[2:4])
 
-        if return_info:
-            cov = np.linalg.inv(cov)
+        return cov
 
+    out = jax.lax.map(f, xs = xs)
 
-        return carry, np.dot(cov, x[2:4])
-
-    out = jax.lax.scan(f, init = 0., xs = xs)
-
-    return out[1].flatten()
+    return out.flatten()
 
 def get_mfvb_cov_matmul(v, vb_params_dict,
                         vb_params_paragami,
