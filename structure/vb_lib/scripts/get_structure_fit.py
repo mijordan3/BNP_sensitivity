@@ -6,9 +6,8 @@ import jax.scipy as sp
 import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
-from vb_lib import structure_model_lib, data_utils, cavi_lib
-from vb_lib.structure_optimization_lib import define_structure_objective
-from bnpmodeling_runjingdev.optimization_lib import run_lbfgs
+from vb_lib.structure_optimization_lib import set_init_vb_params
+from vb_lib.structure_preconditioned_optimization_lib import optimize_structure
 
 import paragami
 
@@ -102,10 +101,12 @@ if args.warm_start:
     print('warm start from ', args.init_fit)
     vb_params_dict, _, _ = \
         paragami.load_folded(args.init_fit)
-# else: 
-#     vb_params_dict = \
-#         structure_model_lib.set_init_vb_params(g_obs, k_approx, vb_params_dict,
-#                                                 seed = args.seed)
+else: 
+    vb_params_dict = set_init_vb_params(g_obs, 
+                                        k_approx, 
+                                        vb_params_dict,
+                                        prior_params_dict,
+                                        seed = args.seed)
 
 
 ######################
@@ -124,11 +125,19 @@ if args.warm_start:
 # vb_opt = out.x
 # vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
 
-vb_opt_dict, vb_opt, _, _  = \
-    cavi_lib.run_cavi(g_obs, vb_params_dict,
-                vb_params_paragami,
-                prior_params_dict, 
-                print_every = 20)
+# vb_opt_dict, vb_opt, _, _  = \
+#     cavi_lib.run_cavi(g_obs, vb_params_dict,
+#                 vb_params_paragami,
+#                 prior_params_dict, 
+#                 print_every = 20)
+
+# optimize with preconditioner 
+vb_opt_dict, vb_opt, out, precond_objective = \
+    optimize_structure(g_obs, 
+                        vb_params_dict, 
+                        vb_params_paragami,
+                        prior_params_dict,
+                        gh_loc, gh_weights)
 
 ######################
 # save optimizaiton results
