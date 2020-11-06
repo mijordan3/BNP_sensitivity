@@ -5,12 +5,16 @@ import colorsys
 
 from bnpmodeling_runjingdev import modeling_lib, cluster_quantities_lib
 
-def plot_admixture(admixture, ax):
+def plot_admixture(admixture, ax, colors = None):
     # copied over form distruct.py file in faststructure
     # adapted for python 3
     
     N,K = admixture.shape
-    colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,K+1)[:-1]]
+    if colors is None: 
+        colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,K+1)[:-1]]
+    else:
+        assert len(colors) == K
+    
     text_color = 'k'
     bg_color = 'w'
     fontsize = 12
@@ -26,10 +30,12 @@ def plot_admixture(admixture, ax):
         lefts = np.arange(N)*indiv_width
         ax.bar(lefts, admixture[:,k], width=indiv_width, bottom=bottoms, 
                     facecolor=colors[k], edgecolor=colors[k], linewidth=0.4)
-    ax.set_ylim((0, 1.))
-    ax.set_xlim((0, 1.))
+    ax.set_ylim((0, 1))
+    ax.set_xlim((- 0.5 * indiv_width, 1 - 0.5 * indiv_width))
     ax.set_xticks([])
     ax.set_yticks([])
+    
+    return colors
     
 def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
     
