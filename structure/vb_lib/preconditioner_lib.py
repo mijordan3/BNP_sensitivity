@@ -4,7 +4,10 @@ import jax.scipy as sp
 
 import paragami
 
-def get_log_beta_covariance(alpha, beta):
+from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
+                                        _get_matrix_from_operator
+
+def get_log_beta_covariance(alpha, beta, return_info, return_sqrt, v):
     # returns the covariance of the score function
     # of the beta distribution
 
@@ -18,30 +21,40 @@ def get_log_beta_covariance(alpha, beta):
     # mulitply by alphas and betas because we are using
     # an unconstrained parameterization, where log(alpha) = free_param
     # TODO: better way to do this using autodiff?
-    return np.array([[I11 * alpha**2, I12 * alpha * beta], \
+    
+    out = np.array([[I11 * alpha**2, I12 * alpha * beta], \
                      [I12 * alpha * beta, I22 * beta**2]])
+    
+    if return_sqrt: 
+        matmul_funs = _get_sym_matrix_inv_sqrt_funcs(out)
+    
+    else: 
+        matmul_funs = (lambda v : np.dot(out, v), 
+                       lambda v : np.linalg.solve(out, v))
+        
+    if return_info: 
+        return matmul_funs[1](v)
+    else: 
+        return matmul_funs[0](v)
 
-def _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, v):
+def _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, return_sqrt, v):
     xs = vb_params_pop_params.reshape(-1, 2)
     xs = np.concatenate((xs, v.reshape(-1, 2)), axis = 1)
 
-    def f(carry, x):
+    def f(x):
 
-        cov = get_log_beta_covariance(x[0], x[1])
+        cov = get_log_beta_covariance(x[0], x[1], return_info, return_sqrt, x[2:4])
 
-        if return_info:
-            cov = np.linalg.inv(cov)
+        return cov
 
+    out = jax.lax.map(f, xs = xs)
 
-        return carry, np.dot(cov, x[2:4])
-
-    out = jax.lax.scan(f, init = 0., xs = xs)
-
-    return out[1].flatten()
+    return out.flatten()
 
 def get_mfvb_cov_matmul(v, vb_params_dict,
                         vb_params_paragami,
-                        return_info = False):
+                        return_info = False, 
+                        return_sqrt = False):
 
     # compute preconditioner from MFVB covariances
 
@@ -53,25 +66,34 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
                         vb_params_dict['pop_freq_beta_params'], free = False)
 
     block1_dim = len(vb_params_pop_params)
-    block1 = _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, v[0:block1_dim])
+    block1 = _eval_popbeta_cov_matmul(vb_params_pop_params, 
+                                      return_info, return_sqrt,
+                                      v[0:block1_dim])
 
     #############
     # blocks for individual admixture
     v2 = v[block1_dim:]
-    use_logitnormal_sticks = 'ind_mix_stick_propn_info' in vb_params_dict.keys()
+    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
     if use_logitnormal_sticks:
-        infos = vb_params_paragami['ind_mix_stick_propn_info'].flatten(
-                        vb_params_dict['ind_mix_stick_propn_info'],
+        infos = vb_params_paragami['ind_admix_params']['stick_infos'].flatten(
+                        vb_params_dict['ind_admix_params']['stick_infos'],
                         free = False)
-
+        a1 = infos 
+        a2 = 0.5
+        
+        if return_sqrt: 
+            a1 = np.sqrt(infos)
+            a2 = np.sqrt(a2)
+        
         if return_info:
-            block2 = np.concatenate((1/infos * v2[0:len(infos)], v2[len(infos):] * 2))
+            block2 = np.concatenate((1/a1 * v2[0:len(infos)], v2[len(infos):] * 1/a2))
         else:
-            block2 = np.concatenate((infos * v2[0:len(infos)], v2[len(infos):] * 0.5))
+            block2 = np.concatenate((a1 * v2[0:len(infos)], v2[len(infos):] * a2))
     else:
-        vb_params_admix = vb_params_paragami['ind_mix_stick_beta_params'].flatten(\
-                            vb_params_dict['ind_mix_stick_beta_params'], free = False)
+        vb_params_admix = vb_params_paragami['ind_admix_params']['stick_beta'].flatten(\
+                            vb_params_dict['ind_admix_params']['stick_beta'], free = False)
 
-        block2 = _eval_popbeta_cov_matmul(vb_params_admix, return_info, v2)
+        block2 = _eval_popbeta_cov_matmul(vb_params_admix, return_info,
+                                          return_sqrt, v2)
 
     return np.concatenate((block1, block2))

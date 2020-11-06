@@ -11,8 +11,7 @@ import warnings
 
 from vb_lib import structure_model_lib
 
-from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
-                                            _get_matrix_from_operator
+from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs
 
 def get_log_beta_covariance(alpha, beta):
     # returns the covariance of the score function
@@ -63,16 +62,16 @@ def get_mfvb_cov(vb_params_dict, vb_params_paragami,
     #############
     # blocks for individual admixture
     if use_logitnormal_sticks:
-        infos = np.array(vb_params_paragami['ind_mix_stick_propn_info'].flatten(
-                        vb_params_dict['ind_mix_stick_propn_info'],
+        infos = np.array(vb_params_paragami['ind_admix_params']['stick_infos'].flatten(
+                        vb_params_dict['ind_admix_params']['stick_infos'],
                         free = False))
         if return_info:
             block_mfvb_cov = block_mfvb_cov + (np.diag(1/infos), ) + (np.eye(len(infos)) * 2., )
         else:
             block_mfvb_cov = block_mfvb_cov + (np.diag(infos), ) + (np.eye(len(infos)) * 0.5, )
     else:
-        vb_params_admix = np.array(vb_params_paragami['ind_mix_stick_beta_params'].flatten(\
-                            vb_params_dict['ind_mix_stick_beta_params'], free = False))
+        vb_params_admix = np.array(vb_params_paragami['ind_admix_params']['stick_beta'].flatten(\
+                            vb_params_dict['ind_admix_params']['stick_beta'], free = False))
 
         block_mfvb_cov = block_mfvb_cov + \
                         _get_cov_for_all_beta_params(vb_params_admix, return_info)
