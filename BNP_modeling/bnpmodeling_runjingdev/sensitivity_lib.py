@@ -33,7 +33,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         self._hessian_solver_jitted = jax.jit(self._hessian_solver) 
                 
         # set up cross hessian 
-        self._set_cross_hess_and_compile(hyper_par_objective_fun)
+        self._set_cross_hess(hyper_par_objective_fun)
         
         # set derivatives
         # this will be slow because of compile time ... 
@@ -43,7 +43,13 @@ class HyperparameterSensitivityLinearApproximation(object):
         self.set_derivatives(opt_par_value, hyper_par_value0)
         print('Compile time: {0:3g}sec\n'.format(time.time() - t0))
 
-    def _set_cross_hess_and_compile(self, hyper_par_objective_fun):
+    def _set_cross_hess(self, hyper_par_objective_fun):
+        # note to myself: 
+        # to test a new multiplicative perturbation, 
+        # just reset the cross hessian and then rerun 
+        # _set_dinput_dhyper(). The linear system 
+        # doesnt need to be recompiled. 
+        
         dobj_dhyper = jax.jacobian(hyper_par_objective_fun, 1)
         self.dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper), 0)
         
