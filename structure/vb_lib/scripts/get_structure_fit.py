@@ -7,8 +7,10 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 import vb_lib.structure_model_lib as structure_model_lib
-from vb_lib.structure_optimization_lib import set_init_vb_params
+from vb_lib.structure_optimization_lib import set_init_vb_params, define_structure_objective
 from vb_lib.structure_preconditioned_optimization_lib import optimize_structure
+
+from bnpmodeling_runjingdev.optimization_lib import run_lbfgs 
 
 import paragami
 
@@ -115,17 +117,17 @@ else:
 # OPTIMIZE
 ######################
 # get optimization objective 
-# optim_objective, init_vb_free = \
-#     define_structure_objective(g_obs, vb_params_dict,
-#                         vb_params_paragami,
-#                         prior_params_dict,
-#                         gh_loc = gh_loc,
-#                         gh_weights = gh_weights)
+optim_objective, init_vb_free = \
+    define_structure_objective(g_obs, vb_params_dict,
+                        vb_params_paragami,
+                        prior_params_dict,
+                        gh_loc = gh_loc,
+                        gh_weights = gh_weights)
 
-# out = run_lbfgs(optim_objective, init_vb_free)
+out = run_lbfgs(optim_objective, init_vb_free)
 
-# vb_opt = out.x
-# vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
+vb_opt = out.x
+vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
 
 # vb_opt_dict, vb_opt, _, _  = \
 #     cavi_lib.run_cavi(g_obs, vb_params_dict,
@@ -134,12 +136,12 @@ else:
 #                 print_every = 20)
 
 # optimize with preconditioner 
-vb_opt_dict, vb_opt, out, precond_objective = \
-    optimize_structure(g_obs, 
-                        vb_params_dict, 
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc, gh_weights)
+# vb_opt_dict, vb_opt, out, precond_objective = \
+#     optimize_structure(g_obs, 
+#                         vb_params_dict, 
+#                         vb_params_paragami,
+#                         prior_params_dict,
+#                         gh_loc, gh_weights)
 
 ######################
 # save optimizaiton results

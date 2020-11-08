@@ -8,8 +8,8 @@ import paragami
 
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
-from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
 import warnings
 
@@ -341,6 +341,11 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         
     return -1 * elbo
 
+
+######################
+# Some helpful functions to get posterior moments
+######################
+
 def get_moments_from_vb_params_dict(vb_params_dict,
                                     gh_loc = None,
                                     gh_weights = None):
@@ -373,3 +378,30 @@ def get_moments_from_vb_params_dict(vb_params_dict,
     return e_log_sticks, e_log_1m_sticks, \
                 e_log_pop_freq, e_log_1m_pop_freq
 
+def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
+                    key, n_samples = 10000): 
+    
+    # If I sample one more loci for every individual in my dataset, 
+    # how many clusters would I expect to see?
+    
+    # sample standard normal
+    shape = (n_samples, ) + stick_means.shape 
+    normal_samples = jax.random.normal(key, shape)
+    
+    # sample sticks: shape is n_samples x n_obs x k_approx 
+    sds = np.expand_dims((1 / np.sqrt(stick_infos)), axis = 0)
+    means = np.expand_dims(stick_means, axis = 0)
+    sticks_sampled = sp.special.expit(normal_samples * sds + means)
+    
+    # get mixture weights
+    ind_admix_sampled = \
+        cluster_quantities_lib.\
+            get_mixture_weights_from_stick_break_propns(sticks_sampled)
+        
+    # get expected number of clusters 
+    # loop over n_samples 
+    e_num_clusters_sampled = \
+        jax.lax.map(cluster_quantities_lib.get_e_num_clusters_from_ez,
+                    ind_admix_sampled)
+    
+    return e_num_clusters_sampled.mean()
