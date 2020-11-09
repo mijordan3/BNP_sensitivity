@@ -57,22 +57,22 @@ def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
     stick_params_dict = \
         stick_params_paragmi.fold(stick_free_params, free = True)
 
-    stick_propn_mean = stick_params_dict['stick_propn_mean']
-    stick_propn_info = stick_params_dict['stick_propn_info']
+    stick_means = stick_params_dict['stick_means']
+    stick_infos = stick_params_dict['stick_infos']
 
-    e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info,
+    e_loglik_ind = modeling_lib.loglik_ind(stick_means, stick_infos,
                             e_z, gh_loc, gh_weights)
 
     stick_entropy = modeling_lib.get_stick_breaking_entropy(\
-                                stick_propn_mean, stick_propn_info,
+                                stick_means, stick_infos,
                                 gh_loc, gh_weights)
 
     alpha = prior_params_dict['alpha']
     dp_prior = \
-        modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
+        modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                             alpha, gh_loc, gh_weights).squeeze()
     if e_log_phi is not None:
-        e_log_pert = e_log_phi(stick_propn_mean, stick_propn_info)
+        e_log_pert = e_log_phi(stick_means, stick_infos)
     else:
         e_log_pert = 0.0
 

@@ -49,9 +49,9 @@ def get_vb_params_paragami_object(dim, k_approx):
     # BNP sticks
     # variational distribution for each stick is logitnormal
     stick_params_paragami = paragami.PatternDict()
-    stick_params_paragami['stick_propn_mean'] = \
+    stick_params_paragami['stick_means'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    stick_params_paragami['stick_propn_info'] = \
+    stick_params_paragami['stick_infos'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
 
     # add the vb_params
@@ -120,7 +120,7 @@ def get_default_prior_params(dim):
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
+def get_e_log_prior(stick_means, stick_infos, centroids, cluster_info,
                         prior_params_dict,
                         gh_loc, gh_weights):
     # get expected prior term
@@ -128,7 +128,7 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
     # dp prior
     alpha = prior_params_dict['alpha']
     dp_prior = \
-        modeling_lib.get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info,
+        modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                             alpha, gh_loc, gh_weights)
 
     # wishart prior
@@ -149,12 +149,12 @@ def get_e_log_prior(stick_propn_mean, stick_propn_info, centroids, cluster_info,
 ##########################
 # Entropy
 ##########################
-def get_entropy(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
+def get_entropy(stick_means, stick_infos, e_z, gh_loc, gh_weights):
     # get entropy term
 
     z_entropy = modeling_lib.multinom_entropy(e_z)
     stick_entropy = \
-        modeling_lib.get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
+        modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
 
     return z_entropy + stick_entropy
@@ -185,7 +185,7 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
 ##########################
 # Optimization over e_z
 ##########################
-def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = True):
 
@@ -193,7 +193,7 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_i
     loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, cluster_info)
 
     # get weight term
-    operand = (stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
+    operand = (stick_means, stick_infos, gh_loc, gh_weights)
     e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
                     operand,
                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
@@ -204,12 +204,12 @@ def get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_i
 
     return z_nat_param, loglik_obs_by_nk
 
-def get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
 
     z_nat_param, loglik_obs_by_nk= \
-        get_z_nat_params(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+        get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                                     gh_loc, gh_weights,
                                     use_bnp_prior)
 
@@ -258,14 +258,14 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     """
 
     # get vb parameters
-    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
     centroids = vb_params_dict['cluster_params']['centroids']
     cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
     e_z_opt, loglik_obs_by_nk = \
-            get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+            get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                             gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
     if e_z is None:
         e_z = e_z_opt
@@ -274,7 +274,7 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 
     # likelihood of z
     if use_bnp_prior:
-        e_loglik_ind = modeling_lib.loglik_ind(stick_propn_mean, stick_propn_info, e_z,
+        e_loglik_ind = modeling_lib.loglik_ind(stick_means, stick_infos, e_z,
                             gh_loc, gh_weights)
     else:
         e_loglik_ind = 0.
@@ -282,11 +282,11 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     e_loglik = e_loglik_ind + e_loglik_obs
 
     # entropy term
-    entropy = get_entropy(stick_propn_mean, stick_propn_info, e_z,
+    entropy = get_entropy(stick_means, stick_infos, e_z,
                                         gh_loc, gh_weights)
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_propn_mean, stick_propn_info,
+    e_log_prior = get_e_log_prior(stick_means, stick_infos,
                             centroids, cluster_info,
                             prior_params_dict,
                             gh_loc, gh_weights)
@@ -333,13 +333,13 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
     """
 
     # get global vb parameters
-    stick_propn_mean = vb_params_dict['stick_params']['stick_propn_mean']
-    stick_propn_info = vb_params_dict['stick_params']['stick_propn_info']
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
     centroids = vb_params_dict['cluster_params']['centroids']
     cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # compute optimal e_z from vb global parameters
-    e_z, _ = get_optimal_z(y, stick_propn_mean, stick_propn_info, centroids, cluster_info,
+    e_z, _ = get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                         gh_loc, gh_weights,
                         use_bnp_prior = use_bnp_prior)
 
@@ -358,8 +358,8 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
     vb_params_dict = \
         vb_params_paragami.fold(vb_params_free, free = True)
 
-    mu = vb_params_dict['stick_params']['stick_propn_mean']
-    sigma = 1 / np.sqrt(vb_params_dict['stick_params']['stick_propn_info'])
+    mu = vb_params_dict['stick_params']['stick_means']
+    sigma = 1 / np.sqrt(vb_params_dict['stick_params']['stick_infos'])
 
     return cluster_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
                                                         n_obs,

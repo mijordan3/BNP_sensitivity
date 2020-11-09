@@ -8,7 +8,10 @@ import jax.scipy as sp
 # the influence function
 ########################
 class InfluenceOperator(object):
-    def __init__(self, vb_opt, vb_params_paragami, hessian_solver, alpha0):
+    def __init__(self, vb_opt, vb_params_paragami, 
+                 hessian_solver, alpha0, 
+                 stick_key = 'stick_params'):
+        
         # vb_opt is the vector of optimal vb parameters
         # hessian solver is a function that takes an input vector of len(vb_opt)
         # and returns H^{-1}v
@@ -21,10 +24,12 @@ class InfluenceOperator(object):
 
         # stick densities
         # this returns the per stick density
+        # (first dimension is k, the stick index)
         self.get_log_qk = lambda logit_stick, vb_free_params : \
                         get_log_qk_from_free_params(logit_stick,
                                                     vb_free_params,
-                                                    self.vb_params_paragami)
+                                                    self.vb_params_paragami, 
+                                                    stick_key)
 
         # this returns the sum over sticks
         self.get_log_q = lambda logit_stick, vb_free_params : \
@@ -36,7 +41,8 @@ class InfluenceOperator(object):
         # with 1 if the ith vb free parameter affects the jth stick distribution.
         self.stick_params_mapping = \
                 get_stick_params_mapping(self.vb_opt,
-                                         self.vb_params_paragami)
+                                         self.vb_params_paragami, 
+                                         stick_key)
 
     def get_influence(self, logit_stick):
 
@@ -66,23 +72,23 @@ class InfluenceOperator(object):
         # this is log q(logit_stick)  - log p_0(logit_stick)
         # returns a matrix of (k_approx - 1) x length(logit_stick)
 
-
         log_beta_prior = get_log_logitstick_prior(logit_stick, self.alpha0)
         log_ratio = self.get_log_qk(logit_stick, self.vb_opt) \
                         - np.expand_dims(log_beta_prior, 0)
 
         return log_ratio
 
-def stick_params_mapping_obj(vb_free_params, vb_params_paragami):
+def stick_params_mapping_obj(vb_free_params, vb_params_paragami, stick_key):
     vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
-    return vb_params_dict['stick_params']['stick_propn_mean'] + \
-                vb_params_dict['stick_params']['stick_propn_info']
+    return (vb_params_dict[stick_key]['stick_means'] + \
+                vb_params_dict[stick_key]['stick_infos']).flatten()
 
 stick_params_mapping_jac = jax.jacobian(stick_params_mapping_obj, argnums = 0)
 
-def get_stick_params_mapping(vb_free_params, vb_params_paragami):
+def get_stick_params_mapping(vb_free_params, vb_params_paragami, stick_key):
     return stick_params_mapping_jac(vb_free_params,
-                                    vb_params_paragami).transpose() != 0
+                                    vb_params_paragami, 
+                                    stick_key).transpose() != 0
 
 # get explicit density (not expectations) for logit-sticks
 # log p_0
@@ -95,11 +101,13 @@ def get_log_logitstick_prior(logit_stick, alpha):
                 np.log(stick) + np.log(1 - stick)
 
 
-def get_log_qk_from_free_params(logit_stick, vb_free_params, vb_params_paragami):
+def get_log_qk_from_free_params(logit_stick, vb_free_params, 
+                                vb_params_paragami, stick_key):
+    
     vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
 
-    mean = vb_params_dict['stick_params']['stick_propn_mean']
-    info = vb_params_dict['stick_params']['stick_propn_info']
+    mean = vb_params_dict[stick_key]['stick_means'].flatten()
+    info = vb_params_dict[stick_key]['stick_infos'].flatten()
 
     logit_stick = np.expand_dims(logit_stick, 0)
     mean = np.expand_dims(mean, 1)
