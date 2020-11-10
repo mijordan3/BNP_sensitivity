@@ -36,6 +36,26 @@ def plot_admixture(admixture, ax, colors = None):
     ax.set_yticks([])
     
     return colors
+
+def plot_top_clusters(e_ind_admix, axarr, n_top_clusters = 5): 
+    # plot only the top clusters    
+    
+    # find top clusters
+    top_clusters = np.argsort(- e_ind_admix.sum(0))
+    top_clusters = top_clusters[0:n_top_clusters]
+    e_ind_admix = e_ind_admix[:, top_clusters]
+    
+    # append remaining probability
+    remaining_probs = 1 - e_ind_admix.sum(1, keepdims = True)
+    e_ind_admix = np.hstack((e_ind_admix, remaining_probs))
+    
+    # get colors: last color is grey
+    colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,n_top_clusters+1)[:-1]]
+    colors += ['grey']
+    
+    # plot
+    plot_admixture(e_ind_admix, axarr, colors)
+
     
 def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
     

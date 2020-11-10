@@ -260,8 +260,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
                     gh_loc = None, gh_weights = None,
-                    log_phi = None,
-                    epsilon = 1.,
+                    e_log_phi = None,
                     detach_ez = False):
 
     """
@@ -324,20 +323,12 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
     elbo = e_loglik + entropy
 
     # prior perturbation
-    if log_phi is not None:
+    if e_log_phi is not None:
 
-        assert gh_loc is not None
-        assert gh_weights is not None
-
-        assert 'stick_means' in vb_params_dict['ind_admix_params'].keys()
-        assert 'stick_infos' in vb_params_dict['ind_admix_params'].keys()
-
-        e_log_pert = func_sens_lib.get_e_log_perturbation(log_phi,
-                                vb_params_dict['ind_admix_params']['stick_means'],
-                                vb_params_dict['ind_admix_params']['stick_infos'],
-                                epsilon, gh_loc, gh_weights, sum_vector=True)
+        e_log_pert = e_log_phi(vb_params_dict['ind_admix_params']['stick_means'],
+                               vb_params_dict['ind_admix_params']['stick_infos'])
                                                             
-        elbo = elbo - e_log_pert
+        elbo = elbo + e_log_pert
         
     return -1 * elbo
 

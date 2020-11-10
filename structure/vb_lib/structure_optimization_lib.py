@@ -356,12 +356,12 @@ class StickObjective():
 ########################
 # A helper function to get
 # objective functions and gradients
-#################
+########################
 def define_structure_objective(g_obs, vb_params_dict,
                                 vb_params_paragami,
                                 prior_params_dict,
                                 gh_loc = None, gh_weights = None,
-                                log_phi = None, epsilon = 0., 
+                                e_log_phi = None, 
                                 compile_hvp = False):
 
     # set up loss
@@ -373,7 +373,7 @@ def define_structure_objective(g_obs, vb_params_dict,
 
     kl_fun_free = lambda x : _kl_fun_free(g_obs, x, prior_params_dict,
                                                      gh_loc, gh_weights,
-                                                     log_phi, epsilon)
+                                                     e_log_phi = e_log_phi)
 
     # initial free parameters
     init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)
