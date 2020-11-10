@@ -116,18 +116,18 @@ else:
 ######################
 # OPTIMIZE
 ######################
-# get optimization objective 
-optim_objective, init_vb_free = \
-    define_structure_objective(g_obs, vb_params_dict,
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc = gh_loc,
-                        gh_weights = gh_weights)
+# # get optimization objective 
+# optim_objective, init_vb_free = \
+#     define_structure_objective(g_obs, vb_params_dict,
+#                         vb_params_paragami,
+#                         prior_params_dict,
+#                         gh_loc = gh_loc,
+#                         gh_weights = gh_weights)
 
-out = run_lbfgs(optim_objective, init_vb_free)
+# out = run_lbfgs(optim_objective, init_vb_free)
 
-vb_opt = out.x
-vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
+# vb_opt = out.x
+# vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
 
 # vb_opt_dict, vb_opt, _, _  = \
 #     cavi_lib.run_cavi(g_obs, vb_params_dict,
@@ -136,12 +136,12 @@ vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
 #                 print_every = 20)
 
 # optimize with preconditioner 
-# vb_opt_dict, vb_opt, out, precond_objective = \
-#     optimize_structure(g_obs, 
-#                         vb_params_dict, 
-#                         vb_params_paragami,
-#                         prior_params_dict,
-#                         gh_loc, gh_weights)
+vb_opt_dict, vb_opt, out, precond_objective = \
+    optimize_structure(g_obs, 
+                        vb_params_dict, 
+                        vb_params_paragami,
+                        prior_params_dict,
+                        gh_loc, gh_weights)
 
 ######################
 # save optimizaiton results

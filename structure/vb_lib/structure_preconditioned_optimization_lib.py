@@ -15,8 +15,7 @@ class StructurePrecondObjective():
                     vb_params_paragami,
                     prior_params_dict, 
                     gh_loc, gh_weights, 
-                    log_phi = None,
-                    epsilon = 0.): 
+                    e_log_phi = None): 
         
         self.g_obs = g_obs
         self.vb_params_paragami = vb_params_paragami 
@@ -24,8 +23,7 @@ class StructurePrecondObjective():
         
         self.gh_loc = gh_loc
         self.gh_weights = gh_weights 
-        self.log_phi = log_phi 
-        self.epsilon = epsilon 
+        self.e_log_phi = e_log_phi 
                 
         self.compile_objectives()
         self.compile_preconditioned_objectives()
@@ -37,8 +35,7 @@ class StructurePrecondObjective():
         return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
                                   self.prior_params_dict, 
                                   self.gh_loc, self.gh_weights, 
-                                  log_phi = self.log_phi, 
-                                  epsilon = self.epsilon)
+                                  e_log_phi = self.e_log_phi)
     
     def _precondition(self, x, precond_params): 
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
@@ -98,16 +95,17 @@ def optimize_structure(g_obs,
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc, gh_weights, 
-                        log_phi = None, epsilon = 0., 
+                        e_log_phi = None, 
                         precondition_every = 20, 
-                        maxiter = 2000): 
+                        maxiter = 2000, 
+                        x_tol = 1e-3): 
     
     # preconditioned objective 
     precon_objective = StructurePrecondObjective(g_obs, 
                                 vb_params_paragami,
                                 prior_params_dict,
                                 gh_loc = gh_loc, gh_weights = gh_weights,                       
-                                log_phi = log_phi, epsilon = epsilon)
+                                e_log_phi = e_log_phi)
     
     t0 = time.time()
     
@@ -128,28 +126,37 @@ def optimize_structure(g_obs,
                                         round(time.time() - t0, 4)))
     
     # precondition and run
-    while (success == False) and (iters < maxiter): 
+    while (iters < maxiter): 
         t1 = time.time() 
         
         # transform into preconditioned space
-        x0 = precon_objective.precondition(vb_params_free, vb_params_free)
+        x0 = vb_params_free
+        x0_c = precon_objective.precondition(x0, vb_params_free)
         
         out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
-                        x0 = onp.array(x0),
+                        x0 = onp.array(x0_c),
                         jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
                         method='L-BFGS-B', 
                         options = {'maxiter': precondition_every})
         
         iters += out.nit
-        success = out.success
-        
-        # transform to original parameterization
-        vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
-        
+                
         print('iteration [{}]; kl:{}; elapsed: {}secs'.format(iters,
                                         np.round(out.fun, 6),
                                         round(time.time() - t1, 4)))
         
+        # transform to original parameterization
+        vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
+
+        x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
+        if x_tol_success:
+            print('x-tolerance reached')
+            break
+           
+        if out.success: 
+            print('lbfgs converged successfully')
+            break
+
     vb_opt = vb_params_free
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     
