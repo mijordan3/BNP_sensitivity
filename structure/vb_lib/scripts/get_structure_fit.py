@@ -7,6 +7,7 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 import vb_lib.structure_model_lib as structure_model_lib
+import vb_lib.cavi_lib as cavi_lib
 from vb_lib.structure_optimization_lib import set_init_vb_params, define_structure_objective
 from vb_lib.structure_preconditioned_optimization_lib import optimize_structure
 
@@ -129,19 +130,19 @@ else:
 # vb_opt = out.x
 # vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
 
-# vb_opt_dict, vb_opt, _, _  = \
-#     cavi_lib.run_cavi(g_obs, vb_params_dict,
-#                 vb_params_paragami,
-#                 prior_params_dict, 
-#                 print_every = 20)
+vb_opt_dict, vb_opt, _, _  = \
+    cavi_lib.run_cavi(g_obs, vb_params_dict,
+                vb_params_paragami,
+                prior_params_dict, 
+                print_every = 20)
 
 # optimize with preconditioner 
-vb_opt_dict, vb_opt, out, precond_objective = \
-    optimize_structure(g_obs, 
-                        vb_params_dict, 
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc, gh_weights)
+# vb_opt_dict, vb_opt, out, precond_objective = \
+#     optimize_structure(g_obs, 
+#                         vb_params_dict, 
+#                         vb_params_paragami,
+#                         prior_params_dict,
+#                         gh_loc, gh_weights)
 
 ######################
 # save optimizaiton results

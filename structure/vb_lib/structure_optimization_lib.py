@@ -15,6 +15,7 @@ from vb_lib.cavi_lib import update_pop_beta
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 from bnpmodeling_runjingdev.optimization_lib import OptimizationObjectiveJaxtoNumpy
+from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 
 import time 
 
@@ -386,3 +387,60 @@ def define_structure_objective(g_obs, vb_params_dict,
                                                       log_every = 0)
     
     return optim_objective, init_vb_free
+
+#########################
+# Function to convert beta sticks to 
+# logitnormal sticks
+#########################
+def convert_beta_sticks_to_logitnormal(stick_betas, 
+                                       stick_params_dict,
+                                       stick_params_paragami, 
+                                       gh_loc, gh_weights): 
+    
+    # check shapes
+    assert stick_params_dict['stick_means'].shape[0] == \
+                stick_betas.shape[0]
+    assert stick_params_dict['stick_means'].shape[1] == \
+                stick_betas.shape[1]
+    assert stick_betas.shape[2] == 2
+    
+    # the moments from the beta parameters
+    target_sticks, target_1m_sticks = modeling_lib.get_e_log_beta(stick_betas)
+    
+    # square error loss
+    def _loss(stick_params_free): 
+
+        stick_params_dict = stick_params_paragami.fold(stick_params_free, free = True)
+
+        stick_means = stick_params_dict['stick_means']
+        stick_infos = stick_params_dict['stick_infos']
+
+        e_log_sticks, e_log_1m_sticks = \
+            ef.get_e_log_logitnormal(
+                lognorm_means = stick_means,
+                lognorm_infos = stick_infos,
+                gh_loc = gh_loc,
+                gh_weights = gh_weights)
+    
+        loss = (e_log_sticks - target_sticks)**2 +\
+                (e_log_1m_sticks - target_1m_sticks)**2
+        
+        return loss.sum()
+    
+    # optimize
+    loss = jax.jit(_loss)
+    loss_grad = jax.jit(jax.grad(_loss))
+    loss_hvp = jax.jit(get_jac_hvp_fun(_loss))
+    
+    stick_params_free = stick_params_paragami.flatten(stick_params_dict, 
+                                                      free = True)
+    
+    out = optimize.minimize(fun = lambda x : onp.array(loss(x)), 
+                                  x0 = stick_params_free, 
+                                  jac = lambda x : onp.array(loss_grad(x)), 
+                                  hessp = lambda x,v : onp.array(loss_hvp(x, v)), 
+                                  method = 'trust-ncg')
+    
+    opt_stick_params = stick_params_paragami.fold(out.x, free = True)
+    
+    return opt_stick_params, out
