@@ -15,16 +15,19 @@ class StructurePrecondObjective():
                     vb_params_paragami,
                     prior_params_dict, 
                     gh_loc, gh_weights, 
-                    e_log_phi = None): 
+                    e_log_phi = None, 
+                    identity_precond = False): 
         
         self.g_obs = g_obs
         self.vb_params_paragami = vb_params_paragami 
         self.prior_params_dict = prior_params_dict 
-        
+
         self.gh_loc = gh_loc
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
-                
+        
+        self.identity_precond = identity_precond 
+        
         self.compile_preconditioned_objectives()
     
     def _f(self, x):
@@ -37,6 +40,9 @@ class StructurePrecondObjective():
                                   e_log_phi = self.e_log_phi)
     
     def _precondition(self, x, precond_params): 
+        if self.identity_precond: 
+            return x
+
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
         return get_mfvb_cov_matmul(x, vb_params_dict,
@@ -45,6 +51,8 @@ class StructurePrecondObjective():
                                 return_sqrt = True)
     
     def _unprecondition(self, x_c, precond_params): 
+        if self.identity_precond: 
+            return x_c
         
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
