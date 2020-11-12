@@ -185,6 +185,39 @@ def get_e_num_clusters_from_ez(e_z):
     k = np.shape(e_z)[1]
     return k - np.sum(np.prod(1 - e_z, axis = 0))
 
+def get_e_num_clusters_from_ez_2d(e_z): 
+    # e_z is of shape n_samples x ... x k_approx
+    # returns the expected number of clusters 
+    # for each n_sample (output is of length n_samples)
+    
+    n_samples = e_z.shape[0]
+    k_approx = e_z.shape[-1]
+    
+    e_z = e_z.reshape(n_samples, -1, k_approx)
+    
+    return k_approx - (1 - e_z).prod(1).sum(-1)    
+
+def sample_ez(e_z, n_samples, seed): 
+    # e_z is of shape n x k
+    # index (n,k) is probability of n-th observation 
+    # belonging to cluster k
+    
+    logits = np.log(e_z)
+    
+    
+    z_samples = jax.random.categorical(key = jax.random.PRNGKey(seed), 
+                               logits = logits, 
+                               shape = (n_samples, e_z.shape[0]))
+    
+    # shape is n_samples x n x k
+    return jax.nn.one_hot(z_samples, num_classes = e_z.shape[1])
+
+
+###################
+# TODO: 
+# the unform sufficient statistics are unnecessary now
+# with jax.random.PRNG_key 
+###################
 def _get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
     # returns a n_obs x n_samples binary  matrix encoding the cluster belonging
     # of the nth observation in nth sample

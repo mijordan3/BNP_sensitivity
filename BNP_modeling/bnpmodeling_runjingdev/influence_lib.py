@@ -44,7 +44,7 @@ class InfluenceOperator(object):
                                          self.vb_params_paragami, 
                                          stick_key)
 
-    def get_influence(self, logit_stick):
+    def get_influence(self, logit_stick, grad_g = None):
 
         # this is len(vb_opt) x len(logit_stick)
         grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
@@ -58,15 +58,22 @@ class InfluenceOperator(object):
 
         # combine prior ratio and grad log q
         grad_log_q_prior_rat = grad_log_q * prior_ratio_expanded
-
+        
         # solve
-        # somehow jax.lax.map is super slow?
-        # jut using python for loop here ...
-        influence_operator = \
-            - np.stack([self.hessian_solver(x) \
-                        for x in grad_log_q_prior_rat.transpose()])
+        if grad_g is None: 
+            print('warning this might be slow ...')
+            # somehow jax.lax.map is super slow?
+            # jut using python for loop here ...
+            influence = \
+                - np.stack([self.hessian_solver(x) \
+                            for x in grad_log_q_prior_rat.transpose()])
+            influence = influence.transpose()
+        else: 
+            assert len(grad_g) == len(self.vb_opt)
+            influence = self.hessian_solver(grad_g)
+            influence = - np.dot(influence, grad_log_q_prior_rat)
 
-        return influence_operator.transpose()
+        return influence
 
     def get_q_prior_log_ratio(self, logit_stick):
         # this is log q(logit_stick)  - log p_0(logit_stick)
