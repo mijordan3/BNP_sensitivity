@@ -57,7 +57,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
     # variational beta parameters for population allele frequencies
     vb_params_paragami['pop_freq_beta_params'] = \
         paragami.NumericArrayPattern(shape=(n_loci, k_approx, 2), 
-                                     lb = 0.0, ub = 1e6)
+                                     lb = 0.0)
 
     # BNP sticks
     ind_admix_params_paragami = paragami.PatternDict()
@@ -72,7 +72,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
         # else they are beta distributed
         ind_admix_params_paragami['stick_beta'] = \
             paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2),
-                                            lb = 0.0, ub = 1e6)
+                                            lb = 0.0)
     vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
     
     vb_params_dict = vb_params_paragami.random()
