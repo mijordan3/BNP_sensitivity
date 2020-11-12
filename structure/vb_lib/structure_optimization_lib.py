@@ -393,14 +393,14 @@ def define_structure_objective(g_obs, vb_params_dict,
 # logitnormal sticks
 #########################
 def convert_beta_sticks_to_logitnormal(stick_betas, 
-                                       stick_params_dict,
-                                       stick_params_paragami, 
+                                       logitnorm_stick_params_dict,
+                                       logitnorm_stick_params_paragami, 
                                        gh_loc, gh_weights): 
     
     # check shapes
-    assert stick_params_dict['stick_means'].shape[0] == \
+    assert logitnorm_stick_params_dict['stick_means'].shape[0] == \
                 stick_betas.shape[0]
-    assert stick_params_dict['stick_means'].shape[1] == \
+    assert logitnorm_stick_params_dict['stick_means'].shape[1] == \
                 stick_betas.shape[1]
     assert stick_betas.shape[2] == 2
     
@@ -410,10 +410,12 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     # square error loss
     def _loss(stick_params_free): 
 
-        stick_params_dict = stick_params_paragami.fold(stick_params_free, free = True)
+        logitnorm_stick_params_dict = \
+            logitnorm_stick_params_paragami.fold(stick_params_free, 
+                                                 free = True)
 
-        stick_means = stick_params_dict['stick_means']
-        stick_infos = stick_params_dict['stick_infos']
+        stick_means = logitnorm_stick_params_dict['stick_means']
+        stick_infos = logitnorm_stick_params_dict['stick_infos']
 
         e_log_sticks, e_log_1m_sticks = \
             ef.get_e_log_logitnormal(
@@ -432,8 +434,9 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     loss_grad = jax.jit(jax.grad(_loss))
     loss_hvp = jax.jit(get_jac_hvp_fun(_loss))
     
-    stick_params_free = stick_params_paragami.flatten(stick_params_dict, 
-                                                      free = True)
+    stick_params_free = \
+        logitnorm_stick_params_paragami.flatten(logitnorm_stick_params_dict, 
+                                                free = True)
     
     out = optimize.minimize(fun = lambda x : onp.array(loss(x)), 
                                   x0 = stick_params_free, 
@@ -441,6 +444,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
                                   hessp = lambda x,v : onp.array(loss_hvp(x, v)), 
                                   method = 'trust-ncg')
     
-    opt_stick_params = stick_params_paragami.fold(out.x, free = True)
+    opt_logitnorm_stick_params = \
+        logitnorm_stick_params_paragami.fold(out.x, free = True)
     
-    return opt_stick_params, out
+    return opt_logitnorm_stick_params, out

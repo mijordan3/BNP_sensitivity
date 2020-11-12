@@ -25,7 +25,6 @@ class StructurePrecondObjective():
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
                 
-        self.compile_objectives()
         self.compile_preconditioned_objectives()
     
     def _f(self, x):
@@ -58,18 +57,11 @@ class StructurePrecondObjective():
                     
         return self._f(self._unprecondition(x_c, precond_params))
     
-    def compile_objectives(self): 
-        self.f = jax.jit(self._f)
-        self.grad = jax.jit(jax.grad(self._f))
+    def _hvp_precond(self, x_c, precond_params, v): 
         
-        x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
-                                            free = True)
-        
-        print('compiling objectives ... ')
-        t0 = time.time()
-        _ = self.f(x).block_until_ready()
-        _ = self.grad(x).block_until_ready()
-        print('done. Elasped: {0:3g}'.format(time.time() - t0))
+        loss = lambda x : self._f_precond(x, precond_params)
+
+        return jax.jvp(jax.grad(loss), (x_c, ), (v, ))[1]
     
     def compile_preconditioned_objectives(self): 
         self.f_precond = jax.jit(self._f_precond)
@@ -77,6 +69,7 @@ class StructurePrecondObjective():
         self.unprecondition = jax.jit(self._unprecondition)
         
         self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        self.hvp_precond = jax.jit(self._hvp_precond)
         
         x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
                                             free = True)
@@ -86,7 +79,9 @@ class StructurePrecondObjective():
         _ = self.f_precond(x, x).block_until_ready()
         _ = self.precondition(x, x).block_until_ready()
         _ = self.unprecondition(x, x).block_until_ready()
+        
         _ = self.grad_precond(x, x).block_until_ready()
+        _ = self.hvp_precond(x, x, x).block_until_ready()
         print('done. Elasped: {0:3g}'.format(time.time() - t0))
         
         
