@@ -18,7 +18,8 @@ import warnings
 ##########################
 
 def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
-                                    use_logitnormal_sticks):
+                                    use_logitnormal_sticks, 
+                                    seed = 0):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
@@ -75,7 +76,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
                                             lb = 0.0)
     vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
     
-    vb_params_dict = vb_params_paragami.random()
+    vb_params_dict = vb_params_paragami.random(key = jax.random.PRNGKey(0))
 
     return vb_params_dict, vb_params_paragami
 

@@ -153,9 +153,63 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     return opt_logitnorm_stick_params, out
 
 #########################
+# Initializes model with some CAVI steps
+#########################
+def initialize_with_cavi(g_obs, 
+                         vb_params_paragami, 
+                         prior_params_dict, 
+                         gh_loc, gh_weights, 
+                         print_every = 20, 
+                         max_iter = 100, 
+                         seed = 0): 
+    
+    # this is just a place-holder
+    vb_params_dict = vb_params_paragami.random()
+    
+    # read off data dimensions
+    n_obs = vb_params_dict['ind_admix_params']['stick_means'].shape[0]
+    n_loci = vb_params_dict['pop_freq_beta_params'].shape[0]
+    k_approx = vb_params_dict['pop_freq_beta_params'].shape[1]
+    
+    # random init: these are beta sticks!
+    vb_params_dict_beta, vb_params_paragami_beta = \
+        structure_model_lib.get_vb_params_paragami_object(n_obs, 
+                                                          n_loci,
+                                                          k_approx,
+                                                          use_logitnormal_sticks = False, 
+                                                          seed = seed)
+    
+    # run cavi
+    vb_params_dict_beta  = run_cavi(g_obs, 
+                                    vb_params_dict_beta,
+                                    vb_params_paragami_beta,
+                                    prior_params_dict, 
+                                    print_every = print_every, 
+                                    max_iter = max_iter)[0]
+    
+    # convert to logitnormal sticks 
+    t0 = time.time()
+    
+    stick_betas = vb_params_dict_beta['ind_admix_params']['stick_beta']
+    lnorm_stick_params_dict = vb_params_dict['ind_admix_params']
+    lnorm_stick_params_paragami = vb_params_paragami['ind_admix_params']
+    
+    stick_params_dict, out = \
+        convert_beta_sticks_to_logitnormal(stick_betas, 
+                                                       lnorm_stick_params_dict,
+                                                       lnorm_stick_params_paragami, 
+                                                       gh_loc, gh_weights)
+    print('Stick conversion time: {:.3f}secs'.format(time.time() - t0))
+    
+    # update vb_params
+    vb_params_dict['pop_freq_beta_params'] = vb_params_dict_beta['pop_freq_beta_params']
+    vb_params_dict['ind_admix_params'] = stick_params_dict
+    
+    return vb_params_dict
+
+#########################
 # The structure objective
 #########################
-
 class StructurePrecondObjective():
     def __init__(self,
                     g_obs, 
@@ -240,76 +294,64 @@ class StructurePrecondObjective():
         print('done. Elasped: {0:3g}'.format(time.time() - t0))
         
         
-# def optimize_structure(g_obs, 
-#                         vb_params_dict, 
-#                         vb_params_paragami,
-#                         prior_params_dict,
-#                         gh_loc, gh_weights, 
-#                         e_log_phi = None, 
-#                         precondition_every = 20, 
-#                         maxiter = 2000, 
-#                         x_tol = 1e-3): 
+def run_preconditioned_lbfgs(g_obs, 
+                            vb_params_dict, 
+                            vb_params_paragami,
+                            prior_params_dict,
+                            gh_loc, gh_weights, 
+                            e_log_phi = None, 
+                            precondition_every = 20, 
+                            maxiter = 2000, 
+                            x_tol = 1e-3): 
     
-#     # preconditioned objective 
-#     precon_objective = StructurePrecondObjective(g_obs, 
-#                                 vb_params_paragami,
-#                                 prior_params_dict,
-#                                 gh_loc = gh_loc, gh_weights = gh_weights,                       
-#                                 e_log_phi = e_log_phi)
+    # preconditioned objective 
+    precon_objective = StructurePrecondObjective(g_obs, 
+                                vb_params_paragami,
+                                prior_params_dict,
+                                gh_loc = gh_loc, gh_weights = gh_weights,                       
+                                e_log_phi = e_log_phi)
     
-#     t0 = time.time()
+    t0 = time.time()
     
-#     # run a few iterations without preconditioning 
-#     print('Run a few iterations without preconditioning ... ')
-#     init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)
-#     out = optimize.minimize(lambda x : onp.array(precon_objective.f(x)),
-#                         x0 = onp.array(init_vb_free),
-#                         jac = lambda x : onp.array(precon_objective.grad(x)),
-#                         method='L-BFGS-B', 
-#                         options = {'maxiter': precondition_every})
-#     iters = out.nit
-#     success = out.success
-#     vb_params_free = out.x
+    vb_params_free = vb_params_paragami.flatten(vb_params_dict, free = True)
+    print('init kl: {:.6f}'.format(precon_objective._f(vb_params_free)))
     
-#     print('iteration [{}]; kl:{}; elapsed: {}secs'.format(iters,
-#                                         np.round(out.fun, 6),
-#                                         round(time.time() - t0, 4)))
-    
-#     # precondition and run
-#     while (iters < maxiter): 
-#         t1 = time.time() 
+    # precondition and run
+    iters = 0
+    while (iters < maxiter): 
+        t1 = time.time() 
         
-#         # transform into preconditioned space
-#         x0 = vb_params_free
-#         x0_c = precon_objective.precondition(x0, vb_params_free)
+        # transform into preconditioned space
+        x0 = vb_params_free
+        x0_c = precon_objective.precondition(x0, vb_params_free)
         
-#         out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
-#                         x0 = onp.array(x0_c),
-#                         jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
-#                         method='L-BFGS-B', 
-#                         options = {'maxiter': precondition_every})
+        out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
+                        x0 = onp.array(x0_c),
+                        jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
+                        method='L-BFGS-B', 
+                        options = {'maxiter': precondition_every})
         
-#         iters += out.nit
+        iters += out.nit
                 
-#         print('iteration [{}]; kl:{}; elapsed: {}secs'.format(iters,
-#                                         np.round(out.fun, 6),
-#                                         round(time.time() - t1, 4)))
-        
-#         # transform to original parameterization
-#         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
+        print('iteration [{}]; kl:{:.6f}; elapsed: {:.3f}secs'.format(iters,
+                                                                      out.fun,
+                                                                      time.time() - t1))
 
-#         x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
-#         if x_tol_success:
-#             print('x-tolerance reached')
-#             break
+        # transform to original parameterization
+        vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
+
+        x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
+        if x_tol_success:
+            print('x-tolerance reached')
+            break
            
-#         if out.success: 
-#             print('lbfgs converged successfully')
-#             break
+        if out.success: 
+            print('lbfgs converged successfully')
+            break
 
-#     vb_opt = vb_params_free
-#     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
+    vb_opt = vb_params_free
+    vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     
-#     print('done. Elapsed {}'.format(round(time.time() - t0, 4)))
+    print('done. Elapsed {}'.format(round(time.time() - t0, 4)))
     
-#     return vb_opt_dict, vb_opt, out, precon_objective
+    return vb_opt_dict, vb_opt, out, precon_objective
