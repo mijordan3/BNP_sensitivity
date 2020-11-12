@@ -302,7 +302,8 @@ def run_preconditioned_lbfgs(g_obs,
                             e_log_phi = None, 
                             precondition_every = 20, 
                             maxiter = 2000, 
-                            x_tol = 1e-3): 
+                            x_tol = 1e-2, 
+                            f_tol = 1e-2): 
     
     # preconditioned objective 
     precon_objective = StructurePrecondObjective(g_obs, 
@@ -318,6 +319,7 @@ def run_preconditioned_lbfgs(g_obs,
     
     # precondition and run
     iters = 0
+    old_kl = 1e16
     while (iters < maxiter): 
         t1 = time.time() 
         
@@ -325,6 +327,7 @@ def run_preconditioned_lbfgs(g_obs,
         x0 = vb_params_free
         x0_c = precon_objective.precondition(x0, vb_params_free)
         
+        # optimize
         out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
                         x0 = onp.array(x0_c),
                         jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
@@ -339,16 +342,24 @@ def run_preconditioned_lbfgs(g_obs,
 
         # transform to original parameterization
         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
+        
+        # check convergence
+        if out.success: 
+            print('lbfgs converged successfully')
+            break
 
         x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
         if x_tol_success:
             print('x-tolerance reached')
             break
-           
-        if out.success: 
-            print('lbfgs converged successfully')
+        
+        f_tol_success = np.abs(old_kl - out.fun) < f_tol
+        if f_tol_success: 
+            print('f-tolerance reached')
             break
-
+        else: 
+            old_kl = out.fun
+            
     vb_opt = vb_params_free
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     
