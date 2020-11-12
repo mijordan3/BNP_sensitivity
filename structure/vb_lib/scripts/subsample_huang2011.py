@@ -1,7 +1,5 @@
 import numpy as np
 
-np.random.seed(23323543)
-
 #################
 # Load data
 #################
@@ -16,9 +14,10 @@ g_obs = np.array(data['g_obs'], dtype = int)
 #################
 # Subsample data
 #################
-n_obs = 200
-n_loci = 500
+n_obs = 250
+n_loci = 600
 
+np.random.seed(23323543)
 indx_ind = np.random.choice(g_obs.shape[0], n_obs, 
                             replace = False)
 

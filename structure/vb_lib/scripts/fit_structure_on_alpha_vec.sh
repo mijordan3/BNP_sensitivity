@@ -17,7 +17,7 @@ seed=453
 data_file=../data/huang2011_subsampled.npz
 out_filename=huang2011_sub_fit
 
-out_folder=../fits/fits_20201111/
+out_folder=../fits/fits_20201112/
 
 python get_structure_fit.py \
   --seed ${seed} \

@@ -18,7 +18,7 @@ out_filename=huang2011_sub_fit
 # data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
 # out_filename=simulated_fit
 
-out_folder=../fits/fits_20201111/
+out_folder=../fits/fits_20201112
 
 python get_structure_fit.py \
   --seed ${seed} \
