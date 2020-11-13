@@ -17,5 +17,6 @@ python get_functional_perturbation_fit.py \
   --epsilon_indx ${epsilon_indx} \
   --data_file ${data_file} \
   --out_folder ${out_folder} \
-  --out_filename ${out_filename}_ws_indx${epsilon_indx} \
-  --init_fit ${out_folder}${out_filename}_alpha3.5.npz 
+  --out_filename ${out_filename}_logphi_indx${epsilon_indx} \
+  --init_fit ${out_folder}${out_filename}_alpha6.0.npz \
+  --use_worst_case False

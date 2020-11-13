@@ -11,6 +11,7 @@ import vb_lib.cavi_lib as cavi_lib
 import vb_lib.structure_optimization_lib as s_optim_lib
 
 from bnpmodeling_runjingdev import influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
 import paragami
 
@@ -37,6 +38,9 @@ parser.add_argument('--out_filename', default='structure_fit', type=str)
 
 # initial fit
 parser.add_argument('--init_fit', type=str)
+
+# whether to use worst-case perturbation
+parser.add_argument('--use_worst_case', type=distutils.util.strtobool, default='True')
 
 args = parser.parse_args()
 
@@ -94,15 +98,37 @@ assert prior_params_dict['dp_prior_alpha'] == saved_influence['alpha0']
 logit_v_grid = np.array(saved_influence['logit_v_grid'])
 influence_grid = np.array(saved_influence['influence_grid'])
 
-worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
-                                                      logit_v_grid = logit_v_grid, 
-                                                      cached_influence_grid = influence_grid)
-
+delta = saved_influence['delta']
 epsilon = epsilon_vec[args.epsilon_indx]
 print('Prior perturbation with epsilon = ', epsilon)
-def get_e_log_perturbation(means, infos): 
-    return epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
-                                                                 infos.flatten())
+print('delta = ', delta)
+
+if args.use_worst_case: 
+    worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                          logit_v_grid = logit_v_grid, 
+                                                          cached_influence_grid = influence_grid, 
+                                                          delta = delta)
+    def get_e_log_perturbation(means, infos): 
+        return epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
+                                                                     infos.flatten())
+
+else: 
+    def log_phi(logit_v):
+        return - sp.stats.norm.pdf(logit_v, loc = -1.5, scale = 0.5)
+        # return((logit_v < -0.55) * (logit_v > -2.56) * delta * -1)
+    
+    logit_v_grid = np.linspace(-5, 5, 200)
+    scale_factor = np.abs(log_phi(logit_v_grid)).max()
+
+    def rescaled_log_phi(logit_v): 
+        return log_phi(logit_v) / scale_factor * delta
+
+    def get_e_log_perturbation(means, infos): 
+        return func_sens_lib.get_e_log_perturbation(rescaled_log_phi,
+                                                    means, infos,
+                                                    epsilon, 
+                                                    gh_loc, gh_weights, 
+                                                    sum_vector=True)
 
 ######################
 # OPTIMIZE
@@ -126,7 +152,7 @@ vb_opt_dict, vb_opt, out, precond_objective = \
 outfile = os.path.join(args.out_folder, args.out_filename)
 print('saving structure model to ', outfile)
 
-optim_time = time.time() 
+optim_time = time.time() - init_optim_time
 
 
 # save final KL

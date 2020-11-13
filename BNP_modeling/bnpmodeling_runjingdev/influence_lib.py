@@ -44,14 +44,16 @@ class InfluenceOperator(object):
                                          self.vb_params_paragami, 
                                          stick_key)
 
-    def get_influence(self, logit_stick, grad_g = None):
+    def get_influence(self,
+                      logit_stick,
+                      grad_g = None):
 
         # this is len(vb_opt) x len(logit_stick)
         grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
 
         # this is (k_approx - 1) x len(logit_stick)
         prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick))
-
+        
         # map each stick to appropriate vb free param
         # this is len(vb_opt) x len(logit_stick)
         prior_ratio_expanded = np.dot(self.stick_params_mapping, prior_ratio)
@@ -129,6 +131,7 @@ class WorstCasePerturbation(object):
     def __init__(self,
                  influence_fun, 
                  logit_v_grid, 
+                 delta = 1.,
                  cached_influence_grid = None):
         
         # influence function is a function that takes logit-sticks
@@ -145,6 +148,8 @@ class WorstCasePerturbation(object):
             self.influence_grid = cached_influence_grid
             
         self.len_grid = len(self.influence_grid)
+        
+        self.delta = delta
 
         self._set_linf_worst_case()
 
@@ -175,4 +180,4 @@ class WorstCasePerturbation(object):
 
         # extra term doenst matter, just for unittesting
         # so constants match
-        return  e_log_pert + self.signs[-1] * len(means)
+        return  (e_log_pert + self.signs[-1] * len(means)) * self.delta
