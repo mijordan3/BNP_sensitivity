@@ -89,6 +89,8 @@ prior_params_dict['allele_prior_beta'] = np.array(meta_data['allele_prior_beta']
 ######################
 epsilon_vec = np.linspace(0, 1, 12)[1:12]**2
 saved_influence = np.load('./influence_grid.npz')
+assert prior_params_dict['dp_prior_alpha'] == saved_influence['alpha0']
+
 logit_v_grid = np.array(saved_influence['logit_v_grid'])
 influence_grid = np.array(saved_influence['influence_grid'])
 

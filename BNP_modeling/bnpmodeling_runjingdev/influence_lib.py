@@ -70,6 +70,7 @@ class InfluenceOperator(object):
             influence = influence.transpose()
         else: 
             assert len(grad_g) == len(self.vb_opt)
+            print('inverting hessian ...')
             influence = self.hessian_solver(grad_g)
             influence = - np.dot(influence, grad_log_q_prior_rat)
 
@@ -125,15 +126,24 @@ def get_log_qk_from_free_params(logit_stick, vb_free_params,
 
 
 class WorstCasePerturbation(object):
-    def __init__(self, influence_fun, logit_v_lb = -10, logit_v_ub = 10, n_logit_v = 500):
+    def __init__(self,
+                 influence_fun, 
+                 logit_v_grid, 
+                 cached_influence_grid = None):
+        
         # influence function is a function that takes logit-sticks
         # and returns a scalar value for the influence
 
-        self.logit_v_grid = np.linspace(logit_v_lb, logit_v_ub, n_logit_v)
+        self.logit_v_grid = logit_v_grid
         self.v_grid = sp.special.expit(self.logit_v_grid)
 
         self.influence_fun = influence_fun
-        self.influence_grid = self.influence_fun(self.logit_v_grid)
+        if cached_influence_grid is None: 
+            self.influence_grid = self.influence_fun(self.logit_v_grid)
+        else: 
+            assert len(cached_influence_grid) == len(logit_v_grid)
+            self.influence_grid = cached_influence_grid
+            
         self.len_grid = len(self.influence_grid)
 
         self._set_linf_worst_case()
