@@ -98,10 +98,10 @@ assert prior_params_dict['dp_prior_alpha'] == saved_influence['alpha0']
 logit_v_grid = np.array(saved_influence['logit_v_grid'])
 influence_grid = np.array(saved_influence['influence_grid'])
 
-delta = saved_influence['delta']
+# delta = saved_influence['delta']
 epsilon = epsilon_vec[args.epsilon_indx]
 print('Prior perturbation with epsilon = ', epsilon)
-print('delta = ', delta)
+# print('delta = ', delta)
 
 if args.use_worst_case: 
     worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
@@ -113,24 +113,11 @@ if args.use_worst_case:
                                                                      infos.flatten())
 
 else: 
-#     def get_e_log_perturbation(means, infos):
-                
-#         loc = means
-#         scale = 1 / np.sqrt(infos)
-        
-#         cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
-#         cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
-
-#         return - (cdf1 - cdf2).sum() * delta * epsilon
-    
-    delta = 5.
+    delta = 1.
     def log_phi(logit_v):
-        return sp.special.expit(logit_v)
-
-        # return - sp.stats.norm.pdf(logit_v, loc = -1.5, scale = 0.5)
-        # return((logit_v < -0.55) * (logit_v > -2.56) * delta * -1)
+        return -sp.special.expit(-(logit_v + 3))
     
-    logit_v_grid = np.linspace(-5, 5, 200)
+    logit_v_grid = np.linspace(-10, 10, 200)
     scale_factor = np.abs(log_phi(logit_v_grid)).max()
     
     def rescaled_log_phi(logit_v): 
@@ -142,6 +129,17 @@ else:
                                                     epsilon, 
                                                     gh_loc, gh_weights, 
                                                     sum_vector=True)
+    
+#     def get_e_log_perturbation(means, infos):
+                
+#         loc = means
+#         scale = 1 / np.sqrt(infos)
+        
+#         cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
+#         cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
+
+#         return - (cdf1 - cdf2).sum() * delta * epsilon
+    
 
 ######################
 # OPTIMIZE
