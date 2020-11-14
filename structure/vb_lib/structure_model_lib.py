@@ -387,9 +387,7 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
     
     n_obs = g_obs.shape[0]
     k_approx = e_log_cluster_probs.shape[-1]
-    
-    
-    
+        
     with loops.Scope() as s:
         s.sampled_counts = np.zeros((n_samples, k_approx))
         
@@ -404,13 +402,23 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
                             reshape((n_obs * 2, k_approx))
 
             # sample counts
-            sampled_counts_l = cluster_quantities_lib.\
-                                sample_ez(e_z_l, n_samples, seed+l).sum(1)
-
+            unif_samples = jax.random.uniform(key = jax.random.PRNGKey(seed + l), 
+                                              shape = (e_z_l.shape[0], n_samples))
+            # this is n_samples x (n_obs * 2)
+            z_samples = cluster_quantities_lib.\
+                                _get_clusters_from_ez_and_unif_samples(e_z_l.cumsum(1), 
+                                                                       unif_samples).\
+                                    transpose((1, 0))
+            
+            # this is n_samples x k_approx
+            sampled_counts_l = jax.nn.one_hot(z_samples,
+                                              num_classes = e_z_l.shape[-1]).sum(1)
+            
             s.sampled_counts += sampled_counts_l
     
     n_clusters_sampled = (s.sampled_counts > threshold).sum(1)
     
+    # return s.sampled_counts
     return n_clusters_sampled.mean()
 
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 

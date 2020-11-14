@@ -197,20 +197,22 @@ def get_e_num_clusters_from_ez_2d(e_z):
     
     return k_approx - (1 - e_z).prod(1).sum(-1)    
 
-def sample_ez(e_z, n_samples, seed): 
+def sample_ez(e_z, n_samples, seed, return_one_hot = True): 
     # e_z is of shape n x k
     # index (n,k) is probability of n-th observation 
     # belonging to cluster k
     
     logits = np.log(e_z)
     
-    
     z_samples = jax.random.categorical(key = jax.random.PRNGKey(seed), 
                                logits = logits, 
                                shape = (n_samples, e_z.shape[0]))
     
-    # shape is n_samples x n x k
-    return jax.nn.one_hot(z_samples, num_classes = e_z.shape[1])
+    if return_one_hot: 
+        # shape is n_samples x n x k
+        return jax.nn.one_hot(z_samples, num_classes = e_z.shape[1])
+    else: 
+        return z_samples
 
 
 ###################

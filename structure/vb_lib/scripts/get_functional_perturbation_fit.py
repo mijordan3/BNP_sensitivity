@@ -113,32 +113,35 @@ if args.use_worst_case:
                                                                      infos.flatten())
 
 else: 
-    def get_e_log_perturbation(means, infos):
+#     def get_e_log_perturbation(means, infos):
                 
-        loc = means
-        scale = 1 / np.sqrt(infos)
+#         loc = means
+#         scale = 1 / np.sqrt(infos)
         
-        cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
-        cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
+#         cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
+#         cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
 
-        return - (cdf1 - cdf2).sum() * delta * epsilon
+#         return - (cdf1 - cdf2).sum() * delta * epsilon
     
-#     def log_phi(logit_v):
-#         return - sp.stats.norm.pdf(logit_v, loc = -1.5, scale = 0.5)
-#         # return((logit_v < -0.55) * (logit_v > -2.56) * delta * -1)
+    delta = 5.
+    def log_phi(logit_v):
+        return sp.special.expit(logit_v)
+
+        # return - sp.stats.norm.pdf(logit_v, loc = -1.5, scale = 0.5)
+        # return((logit_v < -0.55) * (logit_v > -2.56) * delta * -1)
     
-#     logit_v_grid = np.linspace(-5, 5, 200)
-#     scale_factor = np.abs(log_phi(logit_v_grid)).max()
+    logit_v_grid = np.linspace(-5, 5, 200)
+    scale_factor = np.abs(log_phi(logit_v_grid)).max()
+    
+    def rescaled_log_phi(logit_v): 
+        return log_phi(logit_v) / scale_factor * delta
 
-#     def rescaled_log_phi(logit_v): 
-#         return log_phi(logit_v) / scale_factor * delta
-
-#     def get_e_log_perturbation(means, infos): 
-#         return func_sens_lib.get_e_log_perturbation(rescaled_log_phi,
-#                                                     means, infos,
-#                                                     epsilon, 
-#                                                     gh_loc, gh_weights, 
-#                                                     sum_vector=True)
+    def get_e_log_perturbation(means, infos): 
+        return func_sens_lib.get_e_log_perturbation(rescaled_log_phi,
+                                                    means, infos,
+                                                    epsilon, 
+                                                    gh_loc, gh_weights, 
+                                                    sum_vector=True)
 
 ######################
 # OPTIMIZE
