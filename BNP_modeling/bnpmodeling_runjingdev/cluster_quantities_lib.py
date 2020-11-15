@@ -216,9 +216,7 @@ def sample_ez(e_z, n_samples, seed, return_one_hot = True):
 
 
 ###################
-# TODO: 
-# the unform sufficient statistics are unnecessary now
-# with jax.random.PRNG_key 
+# TODO: combine the two functions below 
 ###################
 def _get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
     # returns a n_obs x n_samples binary  matrix encoding the cluster belonging
@@ -235,6 +233,30 @@ def _get_clusters_from_ez_and_unif_samples(e_z_cumsum, unif_samples):
 
     return z_sample
 
+def _get_onehot_clusters_from_ez_and_unif_samples(e_z, unif_samples):
+    # e_z is n_obs x k
+    # unif_sample should be a matrix of shape n_samples x n_obs
+    
+    # returns a n_samples x n_obs x k matrix encoding sampled 
+    # cluster belongings
+    
+    n_obs = e_z.shape[0]
+    k_approx = e_z.shape[1]
+    
+    e_z_cumsum = e_z.cumsum(1)
+    e_z_cumsum0 = np.hstack((np.zeros((n_obs, 1)),
+                             e_z_cumsum[:, 0:(k_approx-1)]))
+    
+    n_obs = e_z_cumsum.shape[0]
+
+    assert len(unif_samples.shape) == 2
+    assert unif_samples.shape[1] == n_obs
+
+    # get which cluster the sample belongs to
+    z_sample = (e_z_cumsum[None, :, :] > unif_samples[:, :, None]) & \
+                (e_z_cumsum0[None, :, :] < unif_samples[:, :, None])
+
+    return z_sample
 
 def get_e_num_large_clusters_from_ez(e_z,
                                     threshold = 0,

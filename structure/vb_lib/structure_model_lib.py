@@ -403,22 +403,22 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
 
             # sample counts
             unif_samples = jax.random.uniform(key = jax.random.PRNGKey(seed + l), 
-                                              shape = (e_z_l.shape[0], n_samples))
-            # this is n_samples x (n_obs * 2)
+                                              shape = (n_samples, e_z_l.shape[0]))
+            
+            # this is n_samples x (n_obs * 2) x k_approx
             z_samples = cluster_quantities_lib.\
-                                _get_clusters_from_ez_and_unif_samples(e_z_l.cumsum(1), 
-                                                                       unif_samples).\
-                                    transpose((1, 0))
+                            _get_onehot_clusters_from_ez_and_unif_samples(e_z_l, 
+                                                                          unif_samples)
             
             # this is n_samples x k_approx
-            sampled_counts_l = jax.nn.one_hot(z_samples,
-                                              num_classes = e_z_l.shape[-1]).sum(1)
+            sampled_counts_l = z_samples.sum(1)
             
             s.sampled_counts += sampled_counts_l
     
     n_clusters_sampled = (s.sampled_counts > threshold).sum(1)
     
     # return s.sampled_counts
+    # return n_clusters_sampled
     return n_clusters_sampled.mean()
 
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
