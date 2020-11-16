@@ -92,16 +92,16 @@ prior_params_dict['allele_prior_beta'] = np.array(meta_data['allele_prior_beta']
 # Get perturbed prior 
 ######################
 epsilon_vec = np.linspace(0, 1, 12)[1:12]**2
-saved_influence = np.load('./influence_grid.npz')
+saved_influence = np.load(args.out_folder + 'influence_grid.npz')
 assert prior_params_dict['dp_prior_alpha'] == saved_influence['alpha0']
 
 logit_v_grid = np.array(saved_influence['logit_v_grid'])
 influence_grid = np.array(saved_influence['influence_grid'])
 
-# delta = saved_influence['delta']
+delta = saved_influence['delta']
 epsilon = epsilon_vec[args.epsilon_indx]
 print('Prior perturbation with epsilon = ', epsilon)
-# print('delta = ', delta)
+print('delta = ', delta)
 
 if args.use_worst_case: 
     worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
@@ -113,32 +113,32 @@ if args.use_worst_case:
                                                                      infos.flatten())
 
 else: 
-#     delta = 1.
-#     def log_phi(logit_v):
-#         return -sp.special.expit(-(logit_v + 3))
+    delta = 1.
+    def log_phi(logit_v):
+        return sp.special.expit(-(logit_v + 3))
     
-#     logit_v_grid = np.linspace(-10, 10, 200)
-#     scale_factor = np.abs(log_phi(logit_v_grid)).max()
+    logit_v_grid = np.linspace(-10, 10, 200)
+    scale_factor = np.abs(log_phi(logit_v_grid)).max()
     
-#     def rescaled_log_phi(logit_v): 
-#         return log_phi(logit_v) / scale_factor * delta
+    def rescaled_log_phi(logit_v): 
+        return log_phi(logit_v) / scale_factor * delta
 
-#     def get_e_log_perturbation(means, infos): 
-#         return func_sens_lib.get_e_log_perturbation(rescaled_log_phi,
-#                                                     means, infos,
-#                                                     epsilon, 
-#                                                     gh_loc, gh_weights, 
-#                                                     sum_vector=True)
-    delta = 1
-    def get_e_log_perturbation(means, infos):
+    def get_e_log_perturbation(means, infos): 
+        return func_sens_lib.get_e_log_perturbation(rescaled_log_phi,
+                                                    means, infos,
+                                                    epsilon, 
+                                                    gh_loc, gh_weights, 
+                                                    sum_vector=True)
+#     delta = 1
+#     def get_e_log_perturbation(means, infos):
 
-        loc = means
-        scale = 1 / np.sqrt(infos)
+#         loc = means
+#         scale = 1 / np.sqrt(infos)
 
-        cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
-        cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
+#         cdf1 = sp.stats.norm.cdf(-0.55, loc, scale)
+#         cdf2 = sp.stats.norm.cdf(-2.56, loc, scale)
 
-        return - (cdf1 - cdf2).sum() * delta * epsilon
+#         return - (cdf1 - cdf2).sum() * delta * epsilon
 
 
 ######################

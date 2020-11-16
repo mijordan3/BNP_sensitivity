@@ -31,7 +31,10 @@ g_obs_sub = g_obs_sub[:, indx_loci]
 # save
 #################
 outfile = '../data/huang2011_subsampled'
+# outfile = '../data/tmp'
 
-np.savez(outfile, g_obs = g_obs_sub)
+np.savez(outfile, g_obs = g_obs_sub, 
+         indx_ind = indx_ind, 
+         indx_loci = indx_loci)
 
 print('saved into ', outfile)
