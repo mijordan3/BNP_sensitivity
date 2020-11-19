@@ -115,7 +115,7 @@ if args.use_worst_case:
 else: 
     delta = 1.
     def log_phi(logit_v):
-        return sp.special.expit(-(logit_v + 3))
+        return - sp.special.expit(-(logit_v))
     
     logit_v_grid = np.linspace(-10, 10, 200)
     scale_factor = np.abs(log_phi(logit_v_grid)).max()

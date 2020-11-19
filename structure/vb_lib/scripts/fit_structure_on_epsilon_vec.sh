@@ -8,7 +8,7 @@ epsilon_indx=$SLURM_ARRAY_TASK_ID
 data_file=../data/huang2011_subsampled.npz
 out_filename=huang2011_sub_fit
 
-out_folder=../fits/f_sens_20201115/
+out_folder=../fits/f_sens_20201116/
 
 python get_functional_perturbation_fit.py \
   --epsilon_indx ${epsilon_indx} \
