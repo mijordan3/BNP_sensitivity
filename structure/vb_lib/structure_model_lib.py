@@ -210,11 +210,11 @@ def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     # log likelihood
     loglik_l = np.sum(loglik_cond_z_l * e_z_l)
 
-    # entropy term: save this because the z's won't be available later
+    # entropy term: add this because the z's won't be available later
     # compute the entropy
     z_entropy_l = (sp.special.entr(e_z_l)).sum()
 
-    return loglik_l, z_entropy_l
+    return loglik_l + z_entropy_l
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
                     e_log_sticks, e_log_1m_sticks,
@@ -227,16 +227,14 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
 
     with loops.Scope() as s:
         s.e_loglik = 0.
-        s.z_entropy = 0.
         for l in s.range(g_obs.shape[1]):
-            e_loglik_l, z_entropy_l = get_e_loglik_l(g_obs[:, l],
+            e_loglik_l = get_e_loglik_l(g_obs[:, l],
                                     e_log_pop_freq[l], e_log_1m_pop_freq[l],
                                     e_log_cluster_probs, detach_ez)
 
             s.e_loglik += e_loglik_l
-            s.z_entropy += z_entropy_l
 
-    return s.e_loglik, s.z_entropy
+    return s.e_loglik
 
 
 def get_e_joint_loglik_from_nat_params(g_obs,
@@ -246,7 +244,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                     allele_prior_beta,
                                     detach_ez = False):
 
-    e_loglik, z_entropy = get_e_loglik(g_obs,
+    e_loglik = get_e_loglik(g_obs,
                                         e_log_pop_freq, e_log_1m_pop_freq, \
                                         e_log_sticks, e_log_1m_sticks,
                                         detach_ez = detach_ez)
@@ -257,7 +255,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
         
-    return e_log_prior + e_loglik, z_entropy
+    return e_log_prior + e_loglik
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
@@ -312,7 +310,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     gh_loc = gh_loc,
                                     gh_weights = gh_weights)
     # joint log likelihood
-    e_loglik, z_entropy = get_e_joint_loglik_from_nat_params(g_obs,
+    e_loglik = get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
@@ -320,7 +318,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     detach_ez = detach_ez)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) + z_entropy
+    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) 
 
     elbo = e_loglik + entropy
 
