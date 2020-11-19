@@ -7,8 +7,8 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 import vb_lib.structure_model_lib as structure_model_lib
-from vb_lib.structure_optimization_lib import set_init_vb_params
-from vb_lib.structure_preconditioned_optimization_lib import optimize_structure
+import vb_lib.cavi_lib as cavi_lib
+import vb_lib.structure_optimization_lib as s_optim_lib
 
 import paragami
 
@@ -36,12 +36,12 @@ parser.add_argument('--out_filename', default='structure_fit', type=str)
 parser.add_argument('--warm_start', type=distutils.util.strtobool, default='False')
 parser.add_argument('--init_fit', type=str)
 
+# whether to initialize with cavi
+parser.add_argument('--init_cavi_steps', type=int, default=100)
+
 # model parameters
 parser.add_argument('--alpha', type=float, default = 4.0)
 parser.add_argument('--k_approx', type = int, default = 15)
-parser.add_argument('--use_logitnormal_sticks', type=distutils.util.strtobool,
-                        default='True')
-
 
 args = parser.parse_args()
 
@@ -81,61 +81,46 @@ print('prior params: ')
 print(prior_params_dict)
 
 ######################
-# GET VB PARAMS
+# GET VB PARAMS AND INITIALIZE
 ######################
 k_approx = args.k_approx
 gh_deg = 8
 gh_loc, gh_weights = hermgauss(gh_deg)
 
-vb_params_dict, vb_params_paragami = \
-    structure_model_lib.get_vb_params_paragami_object(n_obs, n_loci, k_approx,
-                                    args.use_logitnormal_sticks)
+init_optim_time = time.time() 
 
-print('vb params: ')
-print(vb_params_paragami)
-
-######################
-# get init
-######################
-init_optim_time = time.time()
 if args.warm_start:
     print('warm start from ', args.init_fit)
-    vb_params_dict, _, _ = \
+    vb_params_dict, vb_params_paragami, _ = \
         paragami.load_folded(args.init_fit)
-else: 
-    vb_params_dict = set_init_vb_params(g_obs, 
-                                        k_approx, 
-                                        vb_params_dict,
-                                        prior_params_dict,
-                                        gh_loc, gh_weights,
-                                        seed = args.seed)
+else:     
+    vb_params_dict, vb_params_paragami = \
+        structure_model_lib.\
+            get_vb_params_paragami_object(n_obs, 
+                                          n_loci,
+                                          k_approx,
+                                          use_logitnormal_sticks = True, 
+                                          seed = args.seed)
+    
+    if args.init_cavi_steps > 0: 
+        vb_params_dict = \
+            s_optim_lib.initialize_with_cavi(g_obs, 
+                                 vb_params_paragami, 
+                                 prior_params_dict, 
+                                 gh_loc, gh_weights, 
+                                 print_every = 20, 
+                                 max_iter = args.init_cavi_steps, 
+                                 seed = args.seed)
 
+
+print(vb_params_paragami)
 
 ######################
 # OPTIMIZE
 ######################
-# get optimization objective 
-# optim_objective, init_vb_free = \
-#     define_structure_objective(g_obs, vb_params_dict,
-#                         vb_params_paragami,
-#                         prior_params_dict,
-#                         gh_loc = gh_loc,
-#                         gh_weights = gh_weights)
-
-# out = run_lbfgs(optim_objective, init_vb_free)
-
-# vb_opt = out.x
-# vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
-
-# vb_opt_dict, vb_opt, _, _  = \
-#     cavi_lib.run_cavi(g_obs, vb_params_dict,
-#                 vb_params_paragami,
-#                 prior_params_dict, 
-#                 print_every = 20)
-
 # optimize with preconditioner 
 vb_opt_dict, vb_opt, out, precond_objective = \
-    optimize_structure(g_obs, 
+    s_optim_lib.run_preconditioned_lbfgs(g_obs, 
                         vb_params_dict, 
                         vb_params_paragami,
                         prior_params_dict,
@@ -165,7 +150,6 @@ paragami.save_folded(outfile,
                      allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
                      allele_prior_beta = prior_params_dict['allele_prior_beta'],
                      gh_deg = gh_deg,
-                     use_logitnormal_sticks = args.use_logitnormal_sticks,
                      final_kl = final_kl,
                      optim_time = optim_time)
 

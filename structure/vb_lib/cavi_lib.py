@@ -242,9 +242,10 @@ def run_cavi(g_obs, vb_params_dict,
         print('Done. Warning, max iterations reached. ')
 
     vb_opt = flatten_vb_params(vb_params_dict)
-
-    print('Elapsed: {} steps in {} seconds'.format(
-            i, round(time.time() - t0, 2)))
+    
+    print('final KL: {:.6f}'.format(_get_kl(vb_params_dict)))
+    print('Elapsed: {} steps in {:.2f} seconds'.format(i, 
+                                                       time.time() - t0))
 
     return vb_params_dict, vb_opt, np.array(kl_vec), np.array(time_vec) - t0
 

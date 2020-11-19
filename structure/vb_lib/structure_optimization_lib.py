@@ -10,11 +10,12 @@ from sklearn.decomposition import NMF
 import paragami
 
 from vb_lib import structure_model_lib
-from vb_lib.cavi_lib import update_pop_beta
+from vb_lib.cavi_lib import run_cavi
+from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
-from bnpmodeling_runjingdev.optimization_lib import OptimizationObjectiveJaxtoNumpy
+from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 
 import time 
 
@@ -89,300 +90,279 @@ def set_nmf_init_vb_params(g_obs, k_approx, vb_params_dict, seed):
 
     return vb_params_dict
 
-def set_init_vb_params(g_obs, k_approx, vb_params_dict, 
-                       prior_params_dict,
-                       gh_loc = None, gh_weights = None,
-                       seed = 1,
-                       n_iter = 5): 
     
-    # get nmf init
-    t0 = time.time()
-    print('running NMF ...')
-    vb_params_dict = \
-        set_nmf_init_vb_params(g_obs, k_approx, vb_params_dict, seed)
+#########################
+# Function to convert beta sticks to 
+# logitnormal sticks
+#########################
+def convert_beta_sticks_to_logitnormal(stick_betas, 
+                                       logitnorm_stick_params_dict,
+                                       logitnorm_stick_params_paragami, 
+                                       gh_loc, gh_weights): 
     
-    # update population frequency betas 
-    # and implicity the ezs. 
-    # these updates are closed form, and relatively fast
+    # check shapes
+    assert logitnorm_stick_params_dict['stick_means'].shape[0] == \
+                stick_betas.shape[0]
+    assert logitnorm_stick_params_dict['stick_means'].shape[1] == \
+                stick_betas.shape[1]
+    assert stick_betas.shape[2] == 2
     
-    print('running a few cavi steps for pop beta ...')
-    # get initial moments from vb_params
-    e_log_sticks, e_log_1m_sticks, \
-        e_log_pop_freq, e_log_1m_pop_freq = \
-            structure_model_lib.get_moments_from_vb_params_dict(
-                vb_params_dict, gh_loc, gh_weights)
+    # the moments from the beta parameters
+    target_sticks, target_1m_sticks = modeling_lib.get_e_log_beta(stick_betas)
+    
+    # square error loss
+    def _loss(stick_params_free): 
 
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-            e_log_sticks, e_log_1m_sticks)
-    
-    # a few cavi updates
-    for i in range(n_iter): 
-        vb_params_dict['pop_freq_beta_params'],\
-            e_log_pop_freq, e_log_1m_pop_freq = \
-                update_pop_beta(g_obs,
-                                e_log_pop_freq, e_log_1m_pop_freq,
-                                e_log_cluster_probs,
-                                prior_params_dict)
-    print('done. Elapsed: {0:3g}'.format(time.time() - t0))
-    
-    return vb_params_dict
+        logitnorm_stick_params_dict = \
+            logitnorm_stick_params_paragami.fold(stick_params_free, 
+                                                 free = True)
 
+        stick_means = logitnorm_stick_params_dict['stick_means']
+        stick_infos = logitnorm_stick_params_dict['stick_infos']
 
-#################
-# Functions to specificially optmize 
-# the individual admixture stick parameters
-#################
-def get_ind_admix_params_psloss(g_obs, ind_admix_params, 
-                                e_log_pop_freq, e_log_1m_pop_freq, 
-                                prior_params_dict, 
-                                gh_loc, gh_weights,
-                                detach_ez = True): 
-
-    # returns the terms of the KL that depend on the 
-    # individual admixture parameters
-    # Hence the KL is not correct, but its derivatives 
-    # wrt to ind_admix_params are correct
-    
-    # TODO handle log-phi's
-    
-    # data parameters
-    n_obs = g_obs.shape[0]
-    k_approx = e_log_pop_freq.shape[1]
-    
-    # get expecations
-    e_log_sticks, e_log_1m_sticks = \
+        e_log_sticks, e_log_1m_sticks = \
             ef.get_e_log_logitnormal(
-                lognorm_means = ind_admix_params['stick_means'],
-                lognorm_infos = ind_admix_params['stick_infos'],
+                lognorm_means = stick_means,
+                lognorm_infos = stick_infos,
                 gh_loc = gh_loc,
                 gh_weights = gh_weights)
     
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-            e_log_sticks, e_log_1m_sticks)
-    
-    # sum the e_z's over loci
-    body_fun = lambda val, x :\
-                    structure_model_lib.get_optimal_ezl(x[0], x[1], x[2],
-                                        e_log_cluster_probs)[1].sum(-1) + val
-    
-    scan_fun = lambda val, x : (body_fun(val, x), None)
-    
-    init_val = np.zeros((n_obs, k_approx))
-    ez_nxk = jax.lax.scan(scan_fun, init_val,
-                        xs = (g_obs.transpose((1, 0, 2)),
-                                e_log_pop_freq, e_log_1m_pop_freq))[0]
-    if detach_ez:
-        ez_nxk = jax.lax.stop_gradient(ez_nxk)
-
-    # log-likelihood term 
-    loglik_ind = (ez_nxk * e_log_cluster_probs).sum()
-    
-    # entropy term
-    stick_entropy = \
-            modeling_lib.get_stick_breaking_entropy(
-                                    ind_admix_params['stick_means'],
-                                    ind_admix_params['stick_infos'],
-                                    gh_loc, gh_weights)
-    
-    # prior term
-    ind_mix_dp_prior =  (prior_params_dict['dp_prior_alpha'] - 1) * np.sum(e_log_1m_sticks)
-    
-    return - (loglik_ind + ind_mix_dp_prior + stick_entropy).squeeze()
-
-def get_ind_admix_params_loss(g_obs, 
-                            ind_admix_params, 
-                            pop_freq_beta_params, 
-                            prior_params_dict, 
-                            gh_loc, gh_weights, 
-                            detach_ez = True):
-    
-    # used for testing the pseudo-loss above 
+        loss = (e_log_sticks - target_sticks)**2 +\
+                (e_log_1m_sticks - target_1m_sticks)**2
         
-    vb_params_dict = dict({'pop_freq_beta_params':pop_freq_beta_params,
-                           'ind_admix_params': ind_admix_params})
+        return loss.sum()
+    
+    # optimize
+    loss = jax.jit(_loss)
+    loss_grad = jax.jit(jax.grad(_loss))
+    loss_hvp = jax.jit(get_jac_hvp_fun(_loss))
+    
+    stick_params_free = \
+        logitnorm_stick_params_paragami.flatten(logitnorm_stick_params_dict, 
+                                                free = True)
+    
+    out = optimize.minimize(fun = lambda x : onp.array(loss(x)), 
+                                  x0 = stick_params_free, 
+                                  jac = lambda x : onp.array(loss_grad(x)), 
+                                  hessp = lambda x,v : onp.array(loss_hvp(x, v)), 
+                                  method = 'trust-ncg')
+    
+    opt_logitnorm_stick_params = \
+        logitnorm_stick_params_paragami.fold(out.x, free = True)
+    
+    return opt_logitnorm_stick_params, out
 
-    return structure_model_lib.get_kl(g_obs,
-                                        vb_params_dict,
-                                        prior_params_dict,
-                                        gh_loc, gh_weights,
-                                        detach_ez = detach_ez)
+#########################
+# Initializes model with some CAVI steps
+#########################
+def initialize_with_cavi(g_obs, 
+                         vb_params_paragami, 
+                         prior_params_dict, 
+                         gh_loc, gh_weights, 
+                         print_every = 20, 
+                         max_iter = 100, 
+                         seed = 0): 
+    
+    # this is just a place-holder
+    vb_params_dict = vb_params_paragami.random()
+    
+    # read off data dimensions
+    n_obs = vb_params_dict['ind_admix_params']['stick_means'].shape[0]
+    n_loci = vb_params_dict['pop_freq_beta_params'].shape[0]
+    k_approx = vb_params_dict['pop_freq_beta_params'].shape[1]
+    
+    # random init: these are beta sticks!
+    vb_params_dict_beta, vb_params_paragami_beta = \
+        structure_model_lib.get_vb_params_paragami_object(n_obs, 
+                                                          n_loci,
+                                                          k_approx,
+                                                          use_logitnormal_sticks = False, 
+                                                          seed = seed)
+    
+    # run cavi
+    vb_params_dict_beta  = run_cavi(g_obs, 
+                                    vb_params_dict_beta,
+                                    vb_params_paragami_beta,
+                                    prior_params_dict, 
+                                    print_every = print_every, 
+                                    max_iter = max_iter)[0]
+    
+    # convert to logitnormal sticks 
+    t0 = time.time()
+    
+    stick_betas = vb_params_dict_beta['ind_admix_params']['stick_beta']
+    lnorm_stick_params_dict = vb_params_dict['ind_admix_params']
+    lnorm_stick_params_paragami = vb_params_paragami['ind_admix_params']
+    
+    stick_params_dict, out = \
+        convert_beta_sticks_to_logitnormal(stick_betas, 
+                                                       lnorm_stick_params_dict,
+                                                       lnorm_stick_params_paragami, 
+                                                       gh_loc, gh_weights)
+    print('Stick conversion time: {:.3f}secs'.format(time.time() - t0))
+    
+    # update vb_params
+    vb_params_dict['pop_freq_beta_params'] = vb_params_dict_beta['pop_freq_beta_params']
+    vb_params_dict['ind_admix_params'] = stick_params_dict
+    
+    return vb_params_dict
 
-class StickObjective():
-    def __init__(self, g_obs, vb_params_paragami, prior_params_dict, 
-                          gh_loc, gh_weights, 
-                          compute_hess = False): 
-
-        self.vb_params_paragami = vb_params_paragami
+#########################
+# The structure objective
+#########################
+class StructurePrecondObjective():
+    def __init__(self,
+                    g_obs, 
+                    vb_params_paragami,
+                    prior_params_dict, 
+                    gh_loc, gh_weights, 
+                    e_log_phi = None, 
+                    identity_precond = False): 
         
-        self.prior_params_dict = prior_params_dict
+        self.g_obs = g_obs
+        self.vb_params_paragami = vb_params_paragami 
+        self.prior_params_dict = prior_params_dict 
+
         self.gh_loc = gh_loc
-        self.gh_weights = gh_weights
+        self.gh_weights = gh_weights 
+        self.e_log_phi = e_log_phi 
         
-        # objective and gradients
-        self.stick_objective_fun = \
-            paragami.FlattenFunctionInput(
-                original_fun = get_ind_admix_params_psloss,
-                patterns = vb_params_paragami['ind_admix_params'],
-                free = True,
-                argnums = 1)
+        self.identity_precond = identity_precond 
         
-        self._grad_tmp = jax.grad(self.stick_objective_fun, argnums = 1)  
-        self._hess_tmp = jax.hessian(self.stick_objective_fun, argnums = 1)
-        
-        self.compute_hess = compute_hess 
-        
-        self._compile_functions(g_obs)
+        self.compile_preconditioned_objectives()
     
-    def _flatten_ind_admix_params(self, ind_admix_params): 
-        return self.vb_params_paragami['ind_admix_params'].flatten(ind_admix_params, 
-                                                                   free = True)
+    def _f(self, x):
         
-    def _f(self, 
-          g_obs, 
-          ind_admix_params_free, 
-          e_log_pop_freq, 
-          e_log_1m_pop_freq): 
+        vb_params_dict = self.vb_params_paragami.fold(x, free = True)
         
-        return self.stick_objective_fun(g_obs, 
-                                        ind_admix_params_free, 
-                                        e_log_pop_freq, e_log_1m_pop_freq, 
-                                        self.prior_params_dict, 
-                                        self.gh_loc, self.gh_weights)
-    def _grad(self, 
-             g_obs, 
-             ind_admix_params_free, 
-              e_log_pop_freq, 
-              e_log_1m_pop_freq): 
-        
-        return self._grad_tmp(g_obs, 
-                            ind_admix_params_free, 
-                            e_log_pop_freq, e_log_1m_pop_freq, 
-                            self.prior_params_dict, 
-                            self.gh_loc, self.gh_weights)
+        return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
+                                  self.prior_params_dict, 
+                                  self.gh_loc, self.gh_weights, 
+                                  e_log_phi = self.e_log_phi)
+    
+    def _precondition(self, x, precond_params): 
+        if self.identity_precond: 
+            return x
 
-    def _hvp(self, 
-            g_obs, 
-            ind_admix_params_free, 
-            e_log_pop_freq, 
-            e_log_1m_pop_freq, 
-            v): 
+        vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
+        
+        return get_mfvb_cov_matmul(x, vb_params_dict,
+                                self.vb_params_paragami,
+                                return_info = False, 
+                                return_sqrt = True)
+    
+    def _unprecondition(self, x_c, precond_params): 
+        if self.identity_precond: 
+            return x_c
+        
+        vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
+        
+        return get_mfvb_cov_matmul(x_c, vb_params_dict,
+                                self.vb_params_paragami,
+                                return_info = True, 
+                                return_sqrt = True)
+        
+    def _f_precond(self, x_c, precond_params): 
+                    
+        return self._f(self._unprecondition(x_c, precond_params))
+    
+    def _hvp_precond(self, x_c, precond_params, v): 
+        
+        loss = lambda x : self._f_precond(x, precond_params)
 
-        loss = lambda x : self.stick_objective_fun(g_obs, 
-                                    x, 
-                                    e_log_pop_freq, e_log_1m_pop_freq, 
-                                    self.prior_params_dict, 
-                                    self.gh_loc, self.gh_weights)
+        return jax.jvp(jax.grad(loss), (x_c, ), (v, ))[1]
     
-        return jax.jvp(jax.grad(loss), (ind_admix_params_free, ), (v, ))[1]
-    
-    def _hess(self, 
-                g_obs, 
-                ind_admix_params_free, 
-                e_log_pop_freq, 
-                e_log_1m_pop_freq): 
+    def compile_preconditioned_objectives(self): 
+        self.f_precond = jax.jit(self._f_precond)
+        self.precondition = jax.jit(self._precondition)
+        self.unprecondition = jax.jit(self._unprecondition)
         
-        return self._hess_tmp(g_obs, 
-                            ind_admix_params_free, 
-                            e_log_pop_freq, e_log_1m_pop_freq, 
-                            self.prior_params_dict, 
-                            self.gh_loc, self.gh_weights)
-    
-    def _compile_functions(self, g_obs): 
+        self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        self.hvp_precond = jax.jit(self._hvp_precond)
         
-        self.f = jax.jit(self._f)
-        self.grad = jax.jit(self._grad)
-        self.hvp = jax.jit(self._hvp)
-        self.flatten_ind_admix_params = jax.jit(self._flatten_ind_admix_params)
+        x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
+                                            free = True)
         
-        if self.compute_hess: 
-            self.hess = jax.jit(self._hess)
-        else: 
-            self.hess = None
-        
-        # compile 
-        print('compiling stick objective and gradients ...')
+        print('compiling preconditioned objective ... ')
         t0 = time.time()
+        _ = self.f_precond(x, x).block_until_ready()
+        _ = self.precondition(x, x).block_until_ready()
+        _ = self.unprecondition(x, x).block_until_ready()
         
-        # draw random parameters        
-        param_dict = self.vb_params_paragami.random()
-        stick_free_params = self.flatten_ind_admix_params(param_dict['ind_admix_params'])
+        _ = self.grad_precond(x, x).block_until_ready()
+        _ = self.hvp_precond(x, x, x).block_until_ready()
+        print('done. Elasped: {0:3g}'.format(time.time() - t0))
         
-        e_log_pop_freq, e_log_1m_pop_freq = \
-            modeling_lib.get_e_log_beta(param_dict['pop_freq_beta_params'])
         
-        # compile functions
-        _ = self.f(g_obs, stick_free_params, 
-                   e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
-        _ = self.grad(g_obs, stick_free_params, 
-                      e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
-        _ = self.hvp(g_obs, stick_free_params, 
-                     e_log_pop_freq, e_log_1m_pop_freq, 
-                     stick_free_params).block_until_ready()
-        
-        if self.compute_hess: 
-            _ = self.hess(g_obs, stick_free_params, 
-                      e_log_pop_freq, e_log_1m_pop_freq).block_until_ready()
-                
-        print('sticks compile time: {0:.3g}sec'.format(time.time() - t0))
+def run_preconditioned_lbfgs(g_obs, 
+                            vb_params_dict, 
+                            vb_params_paragami,
+                            prior_params_dict,
+                            gh_loc, gh_weights, 
+                            e_log_phi = None, 
+                            precondition_every = 20, 
+                            maxiter = 2000, 
+                            x_tol = 1e-2, 
+                            f_tol = 1e-2): 
     
-    def optimize_sticks(self, 
-                        g_obs, 
-                        ind_admix_params, 
-                        e_log_pop_freq, 
-                        e_log_1m_pop_freq, 
-                        maxiter = 1): 
-        
-        if self.hess is None: 
-            raise NotImplementedError()
-            
-        x0 = self.flatten_ind_admix_params(ind_admix_params)
-        fun = lambda x : onp.array(self.f(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
-        jac = lambda x : onp.array(self.grad(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
-        hess = lambda x : onp.array(self.hess(g_obs, x, e_log_pop_freq, e_log_1m_pop_freq))
-                                   
-        out = optimize.minimize(fun = fun, 
-                              jac = jac, 
-                              hess = hess, 
-                              x0 = x0, 
-                              method = 'trust-exact', 
-                              options = {'maxiter': maxiter})
-                                   
-        ind_admix_params_opt = self.vb_params_paragami['ind_admix_params'].fold(out.x, free = True)
-                                   
-        return ind_admix_params_opt, out
-    
-########################
-# A helper function to get
-# objective functions and gradients
-#################
-def define_structure_objective(g_obs, vb_params_dict,
+    # preconditioned objective 
+    precon_objective = StructurePrecondObjective(g_obs, 
                                 vb_params_paragami,
                                 prior_params_dict,
-                                gh_loc = None, gh_weights = None,
-                                log_phi = None, epsilon = 0., 
-                                compile_hvp = False):
-
-    # set up loss
-    _kl_fun_free = paragami.FlattenFunctionInput(
-                                original_fun=structure_model_lib.get_kl,
-                                patterns = vb_params_paragami,
-                                free = True,
-                                argnums = 1)
-
-    kl_fun_free = lambda x : _kl_fun_free(g_obs, x, prior_params_dict,
-                                                     gh_loc, gh_weights,
-                                                     log_phi, epsilon)
-
-    # initial free parameters
-    init_vb_free = vb_params_paragami.flatten(vb_params_dict, free = True)
+                                gh_loc = gh_loc, gh_weights = gh_weights,                       
+                                e_log_phi = e_log_phi)
     
-    # define objective
-    optim_objective = OptimizationObjectiveJaxtoNumpy(kl_fun_free, 
-                                                     init_vb_free, 
-                                                      compile_hvp = compile_hvp, 
-                                                      print_every = 1,
-                                                      log_every = 0)
+    t0 = time.time()
     
-    return optim_objective, init_vb_free
+    vb_params_free = vb_params_paragami.flatten(vb_params_dict, free = True)
+    print('init kl: {:.6f}'.format(precon_objective._f(vb_params_free)))
+    
+    # precondition and run
+    iters = 0
+    old_kl = 1e16
+    while (iters < maxiter): 
+        t1 = time.time() 
+        
+        # transform into preconditioned space
+        x0 = vb_params_free
+        x0_c = precon_objective.precondition(x0, vb_params_free)
+        
+        # optimize
+        out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
+                        x0 = onp.array(x0_c),
+                        jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
+                        method='L-BFGS-B', 
+                        options = {'maxiter': precondition_every})
+        
+        iters += out.nit
+                
+        print('iteration [{}]; kl:{:.6f}; elapsed: {:.3f}secs'.format(iters,
+                                                                      out.fun,
+                                                                      time.time() - t1))
+
+        # transform to original parameterization
+        vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
+        
+        # check convergence
+        if out.success: 
+            print('lbfgs converged successfully')
+            break
+
+        x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
+        if x_tol_success:
+            print('x-tolerance reached')
+            break
+        
+        f_tol_success = np.abs(old_kl - out.fun) < f_tol
+        if f_tol_success: 
+            print('f-tolerance reached')
+            break
+        else: 
+            old_kl = out.fun
+            
+    vb_opt = vb_params_free
+    vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
+    
+    print('done. Elapsed {}'.format(round(time.time() - t0, 4)))
+    
+    return vb_opt_dict, vb_opt, out, precon_objective
