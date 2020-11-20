@@ -193,7 +193,6 @@ def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 
     # individal x chromosome belongings
     if detach_ez: 
-        print('detaching ez')
         e_z_free = jax.lax.stop_gradient(loglik_cond_z_l)
     else: 
         e_z_free = loglik_cond_z_l
