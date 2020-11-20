@@ -204,7 +204,7 @@ def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     
 def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                     e_log_cluster_probs, 
-                    detach_ez, detach_vb_params):
+                    detach_ez):
     # returns z-optimized log-likelihood for locus-l
     
     loglik_cond_z_l, e_z_l = \
@@ -212,10 +212,6 @@ def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                         e_log_cluster_probs, 
                         detach_ez)
     
-    if detach_vb_params: 
-        print('detaching vb params')
-        loglik_cond_z_l = jax.lax.stop_gradient(loglik_cond_z_l)
-
     # log likelihood
     loglik_l = np.sum(loglik_cond_z_l * e_z_l)
 
@@ -227,7 +223,7 @@ def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
                     e_log_sticks, e_log_1m_sticks,
-                    detach_ez, detach_vb_params):
+                    detach_ez):
 
 
     e_log_cluster_probs = \
@@ -236,8 +232,7 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
     
     body_fun = lambda val, x : get_e_loglik_l(x[0], x[1], x[2],
                                              e_log_cluster_probs,
-                                             detach_ez, 
-                                             detach_vb_params) + val
+                                             detach_ez) + val
     
     scan_fun = lambda val, x : (body_fun(val, x), None)
     
@@ -264,21 +259,18 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                                        e_log_sticks, e_log_1m_sticks,
                                        dp_prior_alpha, allele_prior_alpha,
                                        allele_prior_beta,
-                                       detach_ez = False, 
-                                       detach_vb_params = False):
+                                       detach_ez = False):
 
     e_loglik = get_e_loglik(g_obs,
                             e_log_pop_freq, e_log_1m_pop_freq, \
                             e_log_sticks, e_log_1m_sticks,
-                            detach_ez, detach_vb_params)
+                            detach_ez)
 
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
-    if detach_vb_params: 
-        e_log_prior = jax.lax.stop_gradient(e_log_prior) 
         
     return e_log_prior + e_loglik
 
@@ -286,8 +278,7 @@ def get_e_joint_loglik_from_nat_params(g_obs,
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
            gh_loc = None, gh_weights = None,
            e_log_phi = None,
-           detach_ez = False, 
-           detach_vb_params = False):
+           detach_ez = False):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -341,13 +332,10 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
-                                    detach_ez = detach_ez, 
-                                    detach_vb_params = detach_vb_params)
+                                    detach_ez = detach_ez)
 
     # entropy term
     entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) 
-    if detach_vb_params: 
-        entropy = jax.lax.stop_gradient(entropy)
 
     elbo = e_loglik + entropy
 
