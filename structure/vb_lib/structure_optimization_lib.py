@@ -210,14 +210,14 @@ def initialize_with_cavi(g_obs,
 #########################
 # The structure objective
 #########################
-class StructurePrecondObjective():
+class StructureObjective(): 
     def __init__(self,
-                    g_obs, 
-                    vb_params_paragami,
-                    prior_params_dict, 
-                    gh_loc, gh_weights, 
-                    e_log_phi = None, 
-                    identity_precond = False): 
+                 g_obs, 
+                 vb_params_paragami,
+                 prior_params_dict, 
+                 gh_loc, gh_weights, 
+                 e_log_phi = None, 
+                 jit_functions = True): 
         
         self.g_obs = g_obs
         self.vb_params_paragami = vb_params_paragami 
@@ -227,57 +227,166 @@ class StructurePrecondObjective():
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
         
-        self.identity_precond = identity_precond 
+        self.grad_unjitted = jax.grad(self.f_unjitted)
+
+        self.jit_functions = jit_functions
+        self._jit_functions()
+        if self.jit_functions: 
+            self._compile_functions()
+        
+
+    def f_unjitted(self, vb_free_params):
+        # note that we detach the ez! 
+        # the gradient wrt to self.f_unjitted does not change, and will be faster. 
+        # the hvp with respect to self.f_unjitted will **not** be correct! 
+        # (this will be the hessian of parameters with the e_z fixed). 
+        
+        # See the custom HVP implementation below. 
+        # these adjustments were made so that HVPs for the HGDP data 
+        # do not crash ... 
+        
+        vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
+
+        return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
+                                          self.prior_params_dict, 
+                                          self.gh_loc, self.gh_weights, 
+                                          e_log_phi = self.e_log_phi, 
+                                          detach_ez = True)
+    
+    def hvp_unjitted(self, vb_free_params, v): 
+        # this is my custom hessian vector product implementation. 
+        # note that self.f_unjitted detaches the ez, so the naive hvp on 
+        # self.f_unjitted will the hvp with the ez's **fixed**. 
+        
+        # this is the HVP with z fixed ....
+        kl_theta2_v = jax.jvp(jax.grad(self.f_unjitted), (vb_free_params, ), (v, ))[1]
+        
+        def body_fun(val, l): 
+            fun = lambda x : self._ps_loss_zl(x, l)
+
+            return jax.vjp(fun, vb_free_params)[1](\
+                    jax.jvp(fun, (vb_free_params, ), (v, ))[1])[0] + val
+
+        scan_fun = lambda val, l:  (body_fun(val, l), None)
+        
+        
+        kl_zz_v = jax.lax.scan(scan_fun,
+                            init = np.zeros(len(vb_free_params)),
+                            xs = np.arange(self.g_obs.shape[1]))[0]
+        
+        return kl_theta2_v - kl_zz_v
+
+    def _ps_loss_zl(self, vb_free_params, indx_l): 
+        
+        vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
+
+        # cluster probabilitites
+        e_log_sticks, e_log_1m_sticks = \
+            ef.get_e_log_logitnormal(
+                lognorm_means = vb_params_dict['ind_admix_params']['stick_means'],
+                lognorm_infos = vb_params_dict['ind_admix_params']['stick_infos'],
+                gh_loc = self.gh_loc,
+                gh_weights = self.gh_weights)
+
+        e_log_cluster_probs = \
+            modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                                e_log_sticks, e_log_1m_sticks)
+
+        # stick parameters
+        pop_freq_beta_params = vb_params_dict['pop_freq_beta_params'][indx_l]
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            modeling_lib.get_e_log_beta(pop_freq_beta_params)
+
+        return 2 * np.sqrt(structure_model_lib.\
+                           get_optimal_ezl(self.g_obs[:, indx_l], 
+                                           np.expand_dims(e_log_pop_freq, 0),
+                                           np.expand_dims(e_log_1m_pop_freq, 0),
+                                           e_log_cluster_probs,
+                                           detach_ez = False)[1]).flatten()
+    
+    def _jit_functions(self): 
+        if self.jit_functions: 
+            self.f = jax.jit(self.f_unjitted)
+            self.grad = jax.jit(self.grad_unjitted)
+            self.hvp = jax.jit(self.hvp_unjitted)
+            
+        else: 
+            self.f = self.f_unjitted
+            self.grad = self.grad_unjitted
+            self.hvp = self.hvp_unjitted
+    
+    def _compile_functions(self): 
+        x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
+                                            free = True)
+        
+        print('compiling objective ... ')
+        t0 = time.time()
+        _ = self.f(x).block_until_ready()
+        _ = self.grad(x).block_until_ready()
+        _ = self.hvp(x, x).block_until_ready()
+        print('done. Elasped: {0:3g}'.format(time.time() - t0))
+        
+
+class StructurePrecondObjective(StructureObjective):
+    def __init__(self,
+                    g_obs, 
+                    vb_params_paragami,
+                    prior_params_dict, 
+                    gh_loc, gh_weights, 
+                    e_log_phi = None): 
+        
+        super().__init__(g_obs, 
+                         vb_params_paragami,
+                         prior_params_dict, 
+                         gh_loc, gh_weights, 
+                         e_log_phi = None, 
+                         jit_functions = False)
         
         self.compile_preconditioned_objectives()
-    
-    def _f(self, x):
         
-        vb_params_dict = self.vb_params_paragami.fold(x, free = True)
-        
-        return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
-                                  self.prior_params_dict, 
-                                  self.gh_loc, self.gh_weights, 
-                                  e_log_phi = self.e_log_phi)
-    
     def _precondition(self, x, precond_params): 
-        if self.identity_precond: 
-            return x
 
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
         return get_mfvb_cov_matmul(x, vb_params_dict,
-                                self.vb_params_paragami,
-                                return_info = False, 
-                                return_sqrt = True)
+                                    self.vb_params_paragami,
+                                    return_info = False, 
+                                    return_sqrt = True)
     
     def _unprecondition(self, x_c, precond_params): 
-        if self.identity_precond: 
-            return x_c
         
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
         return get_mfvb_cov_matmul(x_c, vb_params_dict,
-                                self.vb_params_paragami,
-                                return_info = True, 
-                                return_sqrt = True)
+                                    self.vb_params_paragami,
+                                    return_info = True, 
+                                    return_sqrt = True)
         
     def _f_precond(self, x_c, precond_params): 
-                    
-        return self._f(self._unprecondition(x_c, precond_params))
+        return self.f_unjitted(self._unprecondition(x_c, precond_params))
     
-    def _hvp_precond(self, x_c, precond_params, v): 
+    def _grad_precond(self, x_c, precond_params): 
+        x = self._unprecondition(x_c, precond_params)
+        return self._unprecondition(self.grad(x), precond_params)
         
-        loss = lambda x : self._f_precond(x, precond_params)
+    def _hvp_precond(self, x_c, precond_params, v): 
+        # again, can't just use hvp of self.f ... 
+        # it is not correct
+        
+        x = self._unprecondition(x_c, precond_params)
+        v1 = self._unprecondition(v, precond_params)
+        hvp = self.hvp_unjitted(x, v1)
+        hvp = self.unprecondition(hvp, precond_params)
 
-        return jax.jvp(jax.grad(loss), (x_c, ), (v, ))[1]
+        return hvp
     
     def compile_preconditioned_objectives(self): 
         self.f_precond = jax.jit(self._f_precond)
         self.precondition = jax.jit(self._precondition)
         self.unprecondition = jax.jit(self._unprecondition)
         
-        self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        # self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        self.grad_precond = jax.jit(self._grad_precond)
         self.hvp_precond = jax.jit(self._hvp_precond)
         
         x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 

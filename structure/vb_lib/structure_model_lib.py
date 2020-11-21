@@ -183,7 +183,7 @@ def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
     return np.stack((loglik_a, loglik_b), axis = -1)
 
 def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs): 
+                    e_log_cluster_probs, detach_ez): 
     
     # get loglikelihood of observations at loci l
     loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
@@ -192,29 +192,33 @@ def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
 
     # individal x chromosome belongings
-    e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
+    if detach_ez: 
+        e_z_free = jax.lax.stop_gradient(loglik_cond_z_l)
+    else: 
+        e_z_free = loglik_cond_z_l
+        
+    e_z_l = jax.nn.softmax(e_z_free, axis = 1)
     
     return loglik_cond_z_l, e_z_l
     
 def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, detach_ez):
+                    e_log_cluster_probs, 
+                    detach_ez):
     # returns z-optimized log-likelihood for locus-l
     
     loglik_cond_z_l, e_z_l = \
         get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs)
+                        e_log_cluster_probs, 
+                        detach_ez)
     
-    if detach_ez:
-        e_z_l = jax.lax.stop_gradient(e_z_l)
-
     # log likelihood
     loglik_l = np.sum(loglik_cond_z_l * e_z_l)
 
-    # entropy term: save this because the z's won't be available later
+    # entropy term: add this because the z's won't be available later
     # compute the entropy
     z_entropy_l = (sp.special.entr(e_z_l)).sum()
 
-    return loglik_l, z_entropy_l
+    return loglik_l + z_entropy_l
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
                     e_log_sticks, e_log_1m_sticks,
@@ -224,32 +228,42 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
+    
+    body_fun = lambda val, x : get_e_loglik_l(x[0], x[1], x[2],
+                                             e_log_cluster_probs,
+                                             detach_ez) + val
+    
+    scan_fun = lambda val, x : (body_fun(val, x), None)
+    
+    return jax.lax.scan(scan_fun,
+                        init = 0.,
+                        xs = (g_obs.transpose((1, 0, 2)),
+                              e_log_pop_freq, 
+                              e_log_1m_pop_freq))[0]
+    
+#     with loops.Scope() as s:
+#         s.e_loglik = 0.
+#         for l in s.range(g_obs.shape[1]):
+#             e_loglik_l = get_e_loglik_l(g_obs[:, l],
+#                                     e_log_pop_freq[l], e_log_1m_pop_freq[l],
+#                                     e_log_cluster_probs, detach_ez)
 
-    with loops.Scope() as s:
-        s.e_loglik = 0.
-        s.z_entropy = 0.
-        for l in s.range(g_obs.shape[1]):
-            e_loglik_l, z_entropy_l = get_e_loglik_l(g_obs[:, l],
-                                    e_log_pop_freq[l], e_log_1m_pop_freq[l],
-                                    e_log_cluster_probs, detach_ez)
+#             s.e_loglik += e_loglik_l
 
-            s.e_loglik += e_loglik_l
-            s.z_entropy += z_entropy_l
-
-    return s.e_loglik, s.z_entropy
+#     return s.e_loglik
 
 
 def get_e_joint_loglik_from_nat_params(g_obs,
-                                    e_log_pop_freq, e_log_1m_pop_freq,
-                                    e_log_sticks, e_log_1m_sticks,
-                                    dp_prior_alpha, allele_prior_alpha,
-                                    allele_prior_beta,
-                                    detach_ez = False):
+                                       e_log_pop_freq, e_log_1m_pop_freq,
+                                       e_log_sticks, e_log_1m_sticks,
+                                       dp_prior_alpha, allele_prior_alpha,
+                                       allele_prior_beta,
+                                       detach_ez = False):
 
-    e_loglik, z_entropy = get_e_loglik(g_obs,
-                                        e_log_pop_freq, e_log_1m_pop_freq, \
-                                        e_log_sticks, e_log_1m_sticks,
-                                        detach_ez = detach_ez)
+    e_loglik = get_e_loglik(g_obs,
+                            e_log_pop_freq, e_log_1m_pop_freq, \
+                            e_log_sticks, e_log_1m_sticks,
+                            detach_ez)
 
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
@@ -257,13 +271,13 @@ def get_e_joint_loglik_from_nat_params(g_obs,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
         
-    return e_log_prior + e_loglik, z_entropy
+    return e_log_prior + e_loglik
 
 
 def get_kl(g_obs, vb_params_dict, prior_params_dict,
-                    gh_loc = None, gh_weights = None,
-                    e_log_phi = None,
-                    detach_ez = False):
+           gh_loc = None, gh_weights = None,
+           e_log_phi = None,
+           detach_ez = False):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -312,7 +326,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     gh_loc = gh_loc,
                                     gh_weights = gh_weights)
     # joint log likelihood
-    e_loglik, z_entropy = get_e_joint_loglik_from_nat_params(g_obs,
+    e_loglik = get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
@@ -320,7 +334,7 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
                                     detach_ez = detach_ez)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) + z_entropy
+    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) 
 
     elbo = e_loglik + entropy
 
