@@ -326,75 +326,66 @@ class StructureObjective():
         print('done. Elasped: {0:3g}'.format(time.time() - t0))
         
 
-class StructurePrecondObjective():
+class StructurePrecondObjective(StructureObjective):
     def __init__(self,
                     g_obs, 
                     vb_params_paragami,
                     prior_params_dict, 
                     gh_loc, gh_weights, 
-                    e_log_phi = None, 
-                    identity_precond = False): 
+                    e_log_phi = None): 
         
-        self.g_obs = g_obs
-        self.vb_params_paragami = vb_params_paragami 
-        self.prior_params_dict = prior_params_dict 
-
-        self.gh_loc = gh_loc
-        self.gh_weights = gh_weights 
-        self.e_log_phi = e_log_phi 
-        
-        self.identity_precond = identity_precond 
+        super().__init__(g_obs, 
+                         vb_params_paragami,
+                         prior_params_dict, 
+                         gh_loc, gh_weights, 
+                         e_log_phi = None, 
+                         jit_functions = False)
         
         self.compile_preconditioned_objectives()
-    
-    
-    def _f(self, x):
         
-        vb_params_dict = self.vb_params_paragami.fold(x, free = True)
-        
-        return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
-                                  self.prior_params_dict, 
-                                  self.gh_loc, self.gh_weights, 
-                                  e_log_phi = self.e_log_phi)
-    
     def _precondition(self, x, precond_params): 
-        if self.identity_precond: 
-            return x
 
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
         return get_mfvb_cov_matmul(x, vb_params_dict,
-                                self.vb_params_paragami,
-                                return_info = False, 
-                                return_sqrt = True)
+                                    self.vb_params_paragami,
+                                    return_info = False, 
+                                    return_sqrt = True)
     
     def _unprecondition(self, x_c, precond_params): 
-        if self.identity_precond: 
-            return x_c
         
         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
         return get_mfvb_cov_matmul(x_c, vb_params_dict,
-                                self.vb_params_paragami,
-                                return_info = True, 
-                                return_sqrt = True)
+                                    self.vb_params_paragami,
+                                    return_info = True, 
+                                    return_sqrt = True)
         
     def _f_precond(self, x_c, precond_params): 
-                    
-        return self._f(self._unprecondition(x_c, precond_params))
+        return self.f_unjitted(self._unprecondition(x_c, precond_params))
     
-    def _hvp_precond(self, x_c, precond_params, v): 
+    def _grad_precond(self, x_c, precond_params): 
+        x = self._unprecondition(x_c, precond_params)
+        return self._unprecondition(self.grad(x), precond_params)
         
-        loss = lambda x : self._f_precond(x, precond_params)
+    def _hvp_precond(self, x_c, precond_params, v): 
+        # again, can't just use hvp of self.f ... 
+        # it is not correct
+        
+        x = self._unprecondition(x_c, precond_params)
+        v1 = self._unprecondition(v, precond_params)
+        hvp = self.hvp_unjitted(x, v1)
+        hvp = self.unprecondition(hvp, precond_params)
 
-        return jax.jvp(jax.grad(loss), (x_c, ), (v, ))[1]
+        return hvp
     
     def compile_preconditioned_objectives(self): 
         self.f_precond = jax.jit(self._f_precond)
         self.precondition = jax.jit(self._precondition)
         self.unprecondition = jax.jit(self._unprecondition)
         
-        self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        # self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+        self.grad_precond = jax.jit(self._grad_precond)
         self.hvp_precond = jax.jit(self._hvp_precond)
         
         x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
