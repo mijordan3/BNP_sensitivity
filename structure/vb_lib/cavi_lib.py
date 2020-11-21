@@ -19,7 +19,7 @@ from copy import deepcopy
 # using autograd to get natural paramters
 # for testing only 
 joint_loglik = lambda *x : structure_model_lib.\
-                    get_e_joint_loglik_from_nat_params(*x, detach_ez=True)[0]
+                    get_e_joint_loglik_from_nat_params(*x, detach_ez=True)
 
 
 # get natural beta parameters for population frequencies
@@ -38,8 +38,11 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     g_obs_l1 = g_obs_l[:, 1]
     g_obs_l2 = g_obs_l[:, 2]
     
-    _, e_z_l = structure_model_lib.get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                                                    e_log_cluster_probs)
+    _, e_z_l = structure_model_lib.get_optimal_ezl(g_obs_l,
+                                                   e_log_pop_freq_l,
+                                                   e_log_1m_pop_freq_l,
+                                                   e_log_cluster_probs, 
+                                                   detach_ez = True)
     
     beta_param_l1 = (np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
                         np.dot(g_obs_l2, e_z_l[:, :, 1])) * data_weight + \
@@ -91,7 +94,8 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     # sum the e_z's over loci
     body_fun = lambda val, x :\
                     structure_model_lib.get_optimal_ezl(x[0], x[1], x[2],
-                                        e_log_cluster_probs)[1].sum(-1) + val
+                                                        e_log_cluster_probs, 
+                                                        detach_ez = True)[1].sum(-1) + val
     
     scan_fun = lambda val, x : (body_fun(val, x), None)
     
