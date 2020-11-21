@@ -257,7 +257,10 @@ class StructureObjective():
         # this is my custom hessian vector product implementation. 
         # note that self.f_unjitted detaches the ez, so the naive hvp on 
         # self.f_unjitted will the hvp with the ez's **fixed**. 
-    
+        
+        # this is the HVP with z fixed ....
+        kl_theta2_v = jax.jvp(jax.grad(self.f_unjitted), (vb_free_params, ), (v, ))[1]
+        
         def body_fun(val, l): 
             fun = lambda x : self._ps_loss_zl(x, l)
 
@@ -270,8 +273,6 @@ class StructureObjective():
         kl_zz_v = jax.lax.scan(scan_fun,
                             init = np.zeros(len(vb_free_params)),
                             xs = np.arange(self.g_obs.shape[1]))[0]
-        
-        kl_theta2_v = jax.jvp(jax.grad(self.f_unjitted), (vb_free_params, ), (v, ))[1]
         
         return kl_theta2_v - kl_zz_v
 
