@@ -89,6 +89,8 @@ gh_loc, gh_weights = hermgauss(gh_deg)
 
 init_optim_time = time.time() 
 
+cavi_init_time = 0.
+
 if args.warm_start:
     print('warm start from ', args.init_fit)
     vb_params_dict, vb_params_paragami, _ = \
@@ -103,7 +105,7 @@ else:
                                           seed = args.seed)
     
     if args.init_cavi_steps > 0: 
-        vb_params_dict, init_time = \
+        vb_params_dict, cavi_init_time = \
             s_optim_lib.initialize_with_cavi(g_obs, 
                                  vb_params_paragami, 
                                  prior_params_dict, 
@@ -132,7 +134,7 @@ vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
 outfile = os.path.join(args.out_folder, args.out_filename)
 print('saving structure model to ', outfile)
 
-optim_time = init_time + lbfgs_time
+optim_time = cavi_init_time + lbfgs_time
 print('Optim time (ignoring compilation time) {:.3f}secs'.format(optim_time))
 
 # save final KL

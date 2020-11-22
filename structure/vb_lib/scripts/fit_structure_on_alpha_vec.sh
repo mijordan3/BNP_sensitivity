@@ -10,8 +10,11 @@ echo $alpha
 
 seed=453
 
-data_file=/accounts/grad/runjing_liu/BNP/fastStructure/hgdp_data/huang2011_plink_files/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz
-out_filename=huang2011_fit
+data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
+out_filename=simulated_fit
+
+# data_file=/accounts/grad/runjing_liu/BNP/fastStructure/hgdp_data/huang2011_plink_files/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz
+# out_filename=huang2011_fit
 
 
 # data_file=../data/huang2011_subsampled.npz
