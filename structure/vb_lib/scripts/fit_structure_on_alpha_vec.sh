@@ -10,14 +10,14 @@ echo $alpha
 
 seed=453
 
-# data_file=/accounts/grad/runjing_liu/BNP/fastStructure/hgdp_data/huang2011_plink_files/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz
-# out_filename=huang2011_fit
+data_file=/accounts/grad/runjing_liu/BNP/fastStructure/hgdp_data/huang2011_plink_files/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz
+out_filename=huang2011_fit
 
 
-data_file=../data/huang2011_subsampled.npz
-out_filename=huang2011_sub_fit
+# data_file=../data/huang2011_subsampled.npz
+# out_filename=huang2011_sub_fit
 
-out_folder=../fits/fits_20201112/
+out_folder=../fits/fits_20201122/
 
 python get_structure_fit.py \
   --seed ${seed} \
@@ -27,4 +27,4 @@ python get_structure_fit.py \
   --out_filename ${out_filename}_alpha${alpha} \
   --warm_start True \
   --init_fit ${out_folder}${out_filename}_alpha6.0.npz \
-  --k_approx 25
+  --k_approx 20
