@@ -180,12 +180,15 @@ def initialize_with_cavi(g_obs,
                                                           seed = seed)
     
     # run cavi
-    vb_params_dict_beta  = run_cavi(g_obs, 
-                                    vb_params_dict_beta,
-                                    vb_params_paragami_beta,
-                                    prior_params_dict, 
-                                    print_every = print_every, 
-                                    max_iter = max_iter)[0]
+    vb_params_dict_beta, _, _, cavi_time = \
+        run_cavi(g_obs, 
+                 vb_params_dict_beta,
+                 vb_params_paragami_beta,
+                 prior_params_dict, 
+                 print_every = print_every, 
+                 max_iter = max_iter)
+    
+    cavi_time = cavi_time[-1]
     
     # convert to logitnormal sticks 
     t0 = time.time()
@@ -196,16 +199,17 @@ def initialize_with_cavi(g_obs,
     
     stick_params_dict, out = \
         convert_beta_sticks_to_logitnormal(stick_betas, 
-                                                       lnorm_stick_params_dict,
-                                                       lnorm_stick_params_paragami, 
-                                                       gh_loc, gh_weights)
-    print('Stick conversion time: {:.3f}secs'.format(time.time() - t0))
+                                           lnorm_stick_params_dict,
+                                           lnorm_stick_params_paragami, 
+                                           gh_loc, gh_weights)
+    conversion_time = time.time() - t0
+    print('Stick conversion time: {:.3f}secs'.format(conversion_time))
     
     # update vb_params
     vb_params_dict['pop_freq_beta_params'] = vb_params_dict_beta['pop_freq_beta_params']
     vb_params_dict['ind_admix_params'] = stick_params_dict
     
-    return vb_params_dict
+    return vb_params_dict, cavi_time + conversion_time
 
 #########################
 # The structure objective
@@ -424,7 +428,7 @@ def run_preconditioned_lbfgs(g_obs,
     t0 = time.time()
     
     vb_params_free = vb_params_paragami.flatten(vb_params_dict, free = True)
-    print('init kl: {:.6f}'.format(precon_objective._f(vb_params_free)))
+    print('init kl: {:.6f}'.format(precon_objective.f(vb_params_free)))
     
     # precondition and run
     iters = 0
@@ -472,6 +476,7 @@ def run_preconditioned_lbfgs(g_obs,
     vb_opt = vb_params_free
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     
-    print('done. Elapsed {}'.format(round(time.time() - t0, 4)))
+    optim_time = time.time() - t0
+    print('done. Elapsed {}'.format(round(optim_time, 4)))
     
-    return vb_opt_dict, vb_opt, out, precon_objective
+    return vb_opt_dict, vb_opt, out, precon_objective, optim_time

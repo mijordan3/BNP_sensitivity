@@ -247,9 +247,11 @@ def run_cavi(g_obs, vb_params_dict,
 
     vb_opt = flatten_vb_params(vb_params_dict)
     
-    print('final KL: {:.6f}'.format(_get_kl(vb_params_dict)))
-    print('Elapsed: {} steps in {:.2f} seconds'.format(i, 
-                                                       time.time() - t0))
+    final_kl = _get_kl(vb_params_dict)
+    kl_vec.append(final_kl)
+    time_vec.append(time.time())
+    print('final KL: {:.6f}'.format(final_kl))
+    print('Elapsed: {} steps in {:.2f} seconds'.format(i, time.time() - t0))
 
     return vb_params_dict, vb_opt, np.array(kl_vec), np.array(time_vec) - t0
 
