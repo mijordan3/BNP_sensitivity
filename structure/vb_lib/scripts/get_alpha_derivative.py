@@ -165,6 +165,7 @@ print('saving alpha derivative into: ', outfile)
 np.savez(outfile, 
          dinput_dhyper = dinput_dhyper, 
          cross_hessian = cross_hessian,
+         alpha_derivative_time = alpha_derivative_time,
          vb_opt = vb_opt, 
          alpha0 = alpha0, 
          kl = kl) 
