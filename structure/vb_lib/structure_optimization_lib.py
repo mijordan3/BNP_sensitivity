@@ -380,7 +380,7 @@ class StructurePrecondObjective(StructureObjective):
         x = self._unprecondition(x_c, precond_params)
         v1 = self._unprecondition(v, precond_params)
         hvp = self.hvp_unjitted(x, v1)
-        hvp = self.unprecondition(hvp, precond_params)
+        hvp = self._unprecondition(hvp, precond_params)
 
         return hvp
     
