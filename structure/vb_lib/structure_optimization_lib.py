@@ -2,6 +2,8 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+from jax.experimental import loops
+
 from scipy import optimize 
 
 import numpy as onp
@@ -226,7 +228,11 @@ class StructureObjective():
         self.g_obs = g_obs
         self.vb_params_paragami = vb_params_paragami 
         self.prior_params_dict = prior_params_dict 
-
+            
+        self.dim_vb_free = len(vb_params_paragami.flatten(\
+                                vb_params_paragami.random(), \
+                                free = True))
+        
         self.gh_loc = gh_loc
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
@@ -265,24 +271,43 @@ class StructureObjective():
         # this is the HVP with z fixed ....
         kl_theta2_v = jax.jvp(jax.grad(self.f_unjitted), (vb_free_params, ), (v, ))[1]
         
-        def body_fun(val, l): 
-            fun = lambda x : self._ps_loss_zl(x, l)
-
-            return jax.vjp(fun, vb_free_params)[1](\
-                    jax.jvp(fun, (vb_free_params, ), (v, ))[1])[0] + val
-
-        scan_fun = lambda val, l:  (body_fun(val, l), None)
-        
-        
-        kl_zz_v = jax.lax.scan(scan_fun,
-                            init = np.zeros(len(vb_free_params)),
-                            xs = np.arange(self.g_obs.shape[1]))[0]
+        # this is the corection term for the e_zs
+        kl_zz_v = self._kl_zz(vb_free_params, v)
         
         return kl_theta2_v - kl_zz_v
+    
+    def _kl_zz(self, vb_free_params, v): 
+        
+        moments_tuple = \
+            self._get_moments_from_vb_free_params(vb_free_params)
+        
+        moments_jvp = jax.jvp(self._get_moments_from_vb_free_params, \
+                                      (vb_free_params, ), (v, ))[1]
+        
+        moments_vjp = jax.vjp(self._get_moments_from_vb_free_params, 
+                             vb_free_params)[1]
+        
+        with loops.Scope() as s:
+            s.hvp = np.zeros(self.dim_vb_free)
+            for l in s.range(self.g_obs.shape[1]):
 
-    def _ps_loss_zl(self, vb_free_params, indx_l): 
+                fun = lambda x, y, z: self._ps_loss_zl(x, y, z, l)
+                
+                jvp1 = jax.jvp(fun, moments_tuple, moments_jvp)[1]
+                vjp1 = jax.vjp(fun, *moments_tuple)[1](jvp1)
+                
+                s.hvp += moments_vjp(vjp1)[0]
+                
+        return s.hvp
+        
+    
+    def _get_moments_from_vb_free_params(self, vb_free_params): 
         
         vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
+        
+        pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
+        e_log_pop_freq, e_log_1m_pop_freq = \
+            modeling_lib.get_e_log_beta(pop_freq_beta_params)
 
         # cluster probabilitites
         e_log_sticks, e_log_1m_sticks = \
@@ -295,18 +320,22 @@ class StructureObjective():
         e_log_cluster_probs = \
             modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                                 e_log_sticks, e_log_1m_sticks)
-
-        # stick parameters
-        pop_freq_beta_params = vb_params_dict['pop_freq_beta_params'][indx_l]
-        e_log_pop_freq, e_log_1m_pop_freq = \
-            modeling_lib.get_e_log_beta(pop_freq_beta_params)
-
+        
+        return e_log_pop_freq, e_log_1m_pop_freq, e_log_cluster_probs
+    
+    def _ps_loss_zl(self, 
+                    e_log_pop_freq, e_log_1m_pop_freq, 
+                    e_log_cluster_probs, 
+                    l_indx): 
+        
         return 2 * np.sqrt(structure_model_lib.\
-                           get_optimal_ezl(self.g_obs[:, indx_l], 
-                                           np.expand_dims(e_log_pop_freq, 0),
-                                           np.expand_dims(e_log_1m_pop_freq, 0),
+                           get_optimal_ezl(self.g_obs[:, l_indx], 
+                                           np.expand_dims(e_log_pop_freq[l_indx], 0),
+                                           np.expand_dims(e_log_1m_pop_freq[l_indx], 0),
                                            e_log_cluster_probs,
                                            detach_ez = False)[1]).flatten()
+    
+    
     
     def _jit_functions(self): 
         if self.jit_functions: 
