@@ -21,6 +21,7 @@ class HyperparameterSensitivityLinearApproximation(object):
                  hyper_par_value0,
                  obj_fun_hvp = None,
                  hyper_par_objective_fun = None,
+                 cg_maxiter = None,
                  cg_precond = None):
 
         self.objective_fun = objective_fun
@@ -31,6 +32,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             hyper_par_objective_fun = objective_fun
 
         self.cg_precond = cg_precond
+        self.cg_maxiter = cg_maxiter
 
         # hessian vector products
         if obj_fun_hvp is None: 
@@ -57,8 +59,12 @@ class HyperparameterSensitivityLinearApproximation(object):
         print('Compiling cross hessian...')
         t0 = time.time()
         out = self.dobj_dhyper_dinput(self.opt_par_value,
-                                        self.hyper_par_value0).squeeze()
-        assert (len(out.shape) == 1) and (len(out) == len(self.opt_par_value)), 'cross hessian shape: ' + str(out.shape)
+                                      self.hyper_par_value0).squeeze().\
+                                        block_until_ready()
+        
+        assert (len(out.shape) == 1) and (len(out) == len(self.opt_par_value)), \
+                'cross hessian shape: ' + str(out.shape)
+        
         print('Cross-hessian compile time: {0:3g}sec\n'.format(time.time() - t0))
 
         self._set_dinput_dhyper()
@@ -71,20 +77,22 @@ class HyperparameterSensitivityLinearApproximation(object):
 
         self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze()).\
                                     block_until_ready()
-
-        print('LR sensitivity time: {0:3g}sec\n'.format(time.time() - t0))
-
+        
+        # save timing result ... 
+        self.lr_time = time.time() - t0
+        print('LR sensitivity time: {0:3g}sec\n'.format(self.lr_time))
 
     def _set_hessian_solver(self):
 
         self.hessian_solver = \
             jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
                                    b = b,
-                                   M = self.cg_precond)[0])
+                                   M = self.cg_precond, 
+                                   maxiter = self.cg_maxiter)[0])
 
         print('Compiling hessian solver ...')
         t0 = time.time()
-        _ = self.hessian_solver(self.opt_par_value * 0.)
+        _ = self.hessian_solver(self.opt_par_value * 0.).block_until_ready()
         print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
 
 

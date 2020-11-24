@@ -10,6 +10,11 @@ from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 import vb_lib.structure_optimization_lib as s_optim_lib
 
+import bnpmodeling_runjingdev.exponential_families as ef
+
+from bnpmodeling_runjingdev.sensitivity_lib import \
+        HyperparameterSensitivityLinearApproximation
+
 import paragami
 
 from copy import deepcopy
@@ -79,6 +84,7 @@ prior_params_free = prior_params_paragami.flatten(prior_params_dict, free = True
 ###############
 # Define objective and check KL
 ###############
+# this also contains the hvp
 stru_objective = s_optim_lib.StructureObjective(g_obs, 
                                                 vb_params_paragami,
                                                 prior_params_dict, 
@@ -91,39 +97,30 @@ diff = np.abs(kl - meta_data['final_kl'])
 assert diff < 1e-8, diff
 
 ###############
-# the hessian vector product
+# Define preconditioner
 ###############
-stru_hvp = jax.jit(lambda x : stru_objective.hvp(vb_opt, x))
-
-print('compiling hessian vector products ...')
-t0 = time.time()
-_ = stru_hvp(vb_opt).block_until_ready()
-print('Elapsed: {:.3f}'.format(time.time() - t0))
-
-# define preconditioner
-cg_precond = jax.jit(lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
+cg_precond = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
                                             vb_params_paragami,
                                             return_sqrt = False, 
-                                            return_info = True))
-
-print('compiling preconditioner ...')
-_ = cg_precond(vb_opt).block_until_ready()
+                                            return_info = True)
 
 
 ###############
-# cross-hessian
+# Hyper-parameter objective
 ###############
-alpha0 = prior_params_dict['dp_prior_alpha']
-alpha_free = prior_params_paragami['dp_prior_alpha'].flatten(alpha0, 
-                                                              free = True)
 def _hyper_par_objective_fun(vb_params_dict, alpha): 
     
-    _prior_params_dict = deepcopy(prior_params_dict)
-    _prior_params_dict['dp_prior_alpha'] = alpha
-    
-    return structure_model_lib.get_kl(g_obs,
-                                      vb_params_dict, _prior_params_dict,
-                                      gh_loc = gh_loc, gh_weights = gh_weights)
+    means = vb_params_dict['ind_admix_params']['stick_means']
+    infos = vb_params_dict['ind_admix_params']['stick_infos']
+
+    e_log_1m_sticks = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = means,
+            lognorm_infos = infos,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)[1]
+
+    return - (alpha - 1) * np.sum(e_log_1m_sticks)
 
 hyper_par_objective_fun = paragami.FlattenFunctionInput(
                                 original_fun=_hyper_par_objective_fun, 
@@ -132,40 +129,29 @@ hyper_par_objective_fun = paragami.FlattenFunctionInput(
                                 argnums = [0, 1])
 
 
-dobj_dhyper = jax.jacobian(hyper_par_objective_fun, 1)
-dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper), 0)
+###############
+# Sensitivity class
+###############
+alpha0 = prior_params_dict['dp_prior_alpha']
+alpha_free = prior_params_paragami['dp_prior_alpha'].flatten(alpha0, 
+                                                              free = True)
 
-# compiling ... 
-print('compiling cross-hess ...')
-_ = dobj_dhyper_dinput(vb_opt, alpha_free).block_until_ready()
+vb_sens = HyperparameterSensitivityLinearApproximation(
+                    objective_fun = stru_objective.f, 
+                    opt_par_value = vb_opt, 
+                    hyper_par_value0 = alpha_free, 
+                    obj_fun_hvp = stru_objective.hvp, 
+                    hyper_par_objective_fun = hyper_par_objective_fun, 
+                    cg_precond = cg_precond)
 
 ###############
-# Get alpha sensitivity 
+# Save results 
 ###############
-
-print('Computing alpha sensitivity derivative... ')
-
-# actual runtime: 
-t0 = time.time() 
-cross_hessian = dobj_dhyper_dinput(vb_opt, alpha_free)
-
-
-dinput_dhyper = \
-    - cg(A = stru_hvp, 
-         b = cross_hessian.squeeze(),
-         M = cg_precond)[0].block_until_ready()
-
-
-alpha_derivative_time = time.time() - t0
-
-print('Elapsed: {:.3f} secs'.format(alpha_derivative_time))
-
 outfile = re.sub('.npz', '_lralpha', fit_file)
 print('saving alpha derivative into: ', outfile)
 np.savez(outfile, 
-         dinput_dhyper = dinput_dhyper, 
-         cross_hessian = cross_hessian,
-         alpha_derivative_time = alpha_derivative_time,
+         dinput_dhyper = vb_sens.dinput_dhyper, 
+         alpha_derivative_time = vb_sens.lr_time,
          vb_opt = vb_opt, 
          alpha0 = alpha0, 
          kl = kl) 
