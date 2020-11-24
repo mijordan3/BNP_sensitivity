@@ -4,7 +4,8 @@
 import jax
 import jax.numpy as np
 
-from jax.scipy.sparse.linalg import cg
+# from jax.scipy.sparse.linalg import cg
+from scipy.sparse.linalg import cg, LinearOperator
 
 import time
 
@@ -39,6 +40,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             self.obj_fun_hvp = get_jac_hvp_fun(lambda x : 
                                                objective_fun(x, self.hyper_par_value0))
         else: 
+            print('NOTE custom hvp')
             self.obj_fun_hvp = obj_fun_hvp
 
         # compile linear system
@@ -75,25 +77,40 @@ class HyperparameterSensitivityLinearApproximation(object):
         cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
                                                 self.hyper_par_value0)
 
-        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze()).\
-                                    block_until_ready()
+        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze()) #.\
+                                    # block_until_ready()
         
         # save timing result ... 
         self.lr_time = time.time() - t0
         print('LR sensitivity time: {0:3g}sec\n'.format(self.lr_time))
 
     def _set_hessian_solver(self):
-
+        
+        shape = (len(self.opt_par_value), ) * 2
+        
+        A = LinearOperator(shape = shape,
+                           matvec = lambda x : self.obj_fun_hvp(self.opt_par_value, x))
+        
+        M = LinearOperator(shape = shape,
+                           matvec = lambda x : self.cg_precond(x))
+        
         self.hessian_solver = \
-            jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
-                                   b = b,
-                                   M = self.cg_precond, 
-                                   maxiter = self.cg_maxiter)[0])
+            lambda b : cg(A = A,
+                           b = b,
+                           M = M, 
+                           maxiter = self.cg_maxiter)[0]
 
-        print('Compiling hessian solver ...')
-        t0 = time.time()
-        _ = self.hessian_solver(self.opt_par_value * 0.).block_until_ready()
-        print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
+
+#         self.hessian_solver = \
+#             jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
+#                                    b = b,
+#                                    M = self.cg_precond, 
+#                                    maxiter = self.cg_maxiter)[0])
+
+#         print('Compiling hessian solver ...')
+#         t0 = time.time()
+#         _ = self.hessian_solver(self.opt_par_value * 0.).block_until_ready()
+#         print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
 
 
     def predict_opt_par_from_hyper_par(self, hyper_par_value):
