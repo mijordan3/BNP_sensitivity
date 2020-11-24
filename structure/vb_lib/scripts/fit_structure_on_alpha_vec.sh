@@ -2,12 +2,10 @@
 
 source activate bnp_sensitivity_jax
 
-# alpha_vec=(1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 \
-#             6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0 10.5 11.0)
+alpha_vec=(1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 \
+            6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0 10.5 11.0)
 
-# alpha=${alpha_vec[$SLURM_ARRAY_TASK_ID]}
-alpha = 2.0
-echo $alpha 
+alpha=${alpha_vec[$SLURM_ARRAY_TASK_ID]}
 
 seed=453
 
