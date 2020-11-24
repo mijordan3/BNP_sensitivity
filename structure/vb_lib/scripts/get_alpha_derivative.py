@@ -89,7 +89,7 @@ stru_objective = s_optim_lib.StructureObjective(g_obs,
                                                 vb_params_paragami,
                                                 prior_params_dict, 
                                                 gh_loc, gh_weights, 
-                                                jit_functions = True)
+                                                jit_functions = False)
 
 # check KL's match
 kl = stru_objective.f(vb_opt)
@@ -99,10 +99,10 @@ assert diff < 1e-8, diff
 ###############
 # Define preconditioner
 ###############
-cg_precond = jax.jit(lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
+cg_precond = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
                                             vb_params_paragami,
                                             return_sqrt = False, 
-                                            return_info = True))
+                                            return_info = True)
 
 ###############
 # Hyper-parameter objective
