@@ -287,18 +287,29 @@ class StructureObjective():
         moments_vjp = jax.vjp(self._get_moments_from_vb_free_params, 
                              vb_free_params)[1]
         
-        with loops.Scope() as s:
-            s.hvp = np.zeros(self.dim_vb_free)
-            for l in s.range(self.g_obs.shape[1]):
+        def scan_fun(val, x): 
+            # x[0] is g_obs[:, l]
+            # x[1] is e_log_pop
+            # x[2] is e_log_pop jvp
 
-                fun = lambda x, y, z: self._ps_loss_zl(x, y, z, l)
-                
-                jvp1 = jax.jvp(fun, moments_tuple, moments_jvp)[1]
-                vjp1 = jax.vjp(fun, *moments_tuple)[1](jvp1)
-                
-                s.hvp += moments_vjp(vjp1)[0]
-                
-        return s.hvp
+            fun = lambda clust_probs, pop_freq : \
+                    self._ps_loss_zl(x[0], clust_probs, pop_freq)
+
+            jvp1 = jax.jvp(fun, 
+                            (moments_tuple[0], x[1]), 
+                            (moments_jvp[0], x[2]))[1]
+
+            vjp1 = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](jvp1)
+
+            return vjp1[0] + val, vjp1[1]
+        
+        vjp = jax.lax.scan(scan_fun,
+                             init = np.zeros(moments_tuple[0].shape), 
+                             xs = (self.g_obs.transpose((1, 0, 2)), 
+                                   moments_tuple[1], 
+                                   moments_jvp[1]))
+
+        return moments_vjp(vjp)[0]
         
     
     def _get_moments_from_vb_free_params(self, vb_free_params): 
@@ -321,17 +332,21 @@ class StructureObjective():
             modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                                 e_log_sticks, e_log_1m_sticks)
         
-        return e_log_pop_freq, e_log_1m_pop_freq, e_log_cluster_probs
+        return e_log_cluster_probs, \
+                np.dstack((e_log_pop_freq, e_log_1m_pop_freq))
     
-    def _ps_loss_zl(self, 
-                    e_log_pop_freq, e_log_1m_pop_freq, 
+    @staticmethod
+    def _ps_loss_zl(g_obs_l, 
                     e_log_cluster_probs, 
-                    l_indx): 
+                    e_log_pop_freq_l): 
+        
+        e_log_pop = e_log_pop_freq_l[:, 0]
+        e_log_1mpop = e_log_pop_freq_l[:, 1]
         
         return 2 * np.sqrt(structure_model_lib.\
-                           get_optimal_ezl(self.g_obs[:, l_indx], 
-                                           np.expand_dims(e_log_pop_freq[l_indx], 0),
-                                           np.expand_dims(e_log_1m_pop_freq[l_indx], 0),
+                           get_optimal_ezl(g_obs_l, 
+                                           np.expand_dims(e_log_pop, 0),
+                                           np.expand_dims(e_log_1mpop, 0),
                                            e_log_cluster_probs,
                                            detach_ez = False)[1]).flatten()
     
