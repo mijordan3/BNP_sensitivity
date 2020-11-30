@@ -47,6 +47,7 @@ validate_args()
 ##################
 # Load data
 ##################
+print('loading data from ', args.data_file)
 data = np.load(args.data_file)
 g_obs = np.array(data['g_obs'])
 
