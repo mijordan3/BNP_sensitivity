@@ -183,7 +183,7 @@ def get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l):
     return np.stack((loglik_a, loglik_b), axis = -1)
 
 def get_optimal_ez_nl(g_obs_nl,e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                        e_log_cluster_probs_n): 
+                        e_log_cluster_probs_n, detach_ez): 
     
     # get loglikelihood of observations at loci l
     loglik_gene_nl = get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l)
@@ -192,7 +192,13 @@ def get_optimal_ez_nl(g_obs_nl,e_log_pop_freq_l, e_log_1m_pop_freq_l,
     loglik_cond_z_nl = np.expand_dims(e_log_cluster_probs_n, axis = 1) + loglik_gene_nl
 
     # individal x chromosome belongings
-    e_z_nl = jax.nn.softmax(loglik_cond_z_nl, axis = 0)
+    if detach_ez: 
+        e_z_free = jax.lax.stop_gradient(loglik_cond_z_nl)
+    else: 
+        e_z_free = loglik_cond_z_nl
+        
+    e_z_nl = jax.nn.softmax(e_z_free, axis = 0)
+
     
     return loglik_cond_z_nl, e_z_nl
     
@@ -204,11 +210,8 @@ def get_e_loglik_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     
     loglik_cond_z_nl, e_z_nl = \
         get_optimal_ez_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                            e_log_cluster_probs_n)
+                            e_log_cluster_probs_n, detach_ez)
     
-    if detach_ez:
-        e_z_nl = jax.lax.stop_gradient(e_z_nl)
-
     # log likelihood
     loglik_nl = np.sum(loglik_cond_z_nl * e_z_nl)
 
