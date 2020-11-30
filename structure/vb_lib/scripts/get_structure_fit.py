@@ -37,7 +37,7 @@ parser.add_argument('--warm_start', type=distutils.util.strtobool, default='Fals
 parser.add_argument('--init_fit', type=str)
 
 # whether to initialize with cavi
-parser.add_argument('--init_cavi_steps', type=int, default=100)
+parser.add_argument('--init_cavi_steps', type=int, default=200)
 
 # model parameters
 parser.add_argument('--alpha', type=float, default = 4.0)
@@ -89,6 +89,8 @@ gh_loc, gh_weights = hermgauss(gh_deg)
 
 init_optim_time = time.time() 
 
+cavi_init_time = 0.
+
 if args.warm_start:
     print('warm start from ', args.init_fit)
     vb_params_dict, vb_params_paragami, _ = \
@@ -103,7 +105,7 @@ else:
                                           seed = args.seed)
     
     if args.init_cavi_steps > 0: 
-        vb_params_dict = \
+        vb_params_dict, cavi_init_time = \
             s_optim_lib.initialize_with_cavi(g_obs, 
                                  vb_params_paragami, 
                                  prior_params_dict, 
@@ -119,7 +121,7 @@ print(vb_params_paragami)
 # OPTIMIZE
 ######################
 # optimize with preconditioner 
-vb_opt_dict, vb_opt, out, precond_objective = \
+vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
     s_optim_lib.run_preconditioned_lbfgs(g_obs, 
                         vb_params_dict, 
                         vb_params_paragami,
@@ -132,8 +134,8 @@ vb_opt_dict, vb_opt, out, precond_objective = \
 outfile = os.path.join(args.out_folder, args.out_filename)
 print('saving structure model to ', outfile)
 
-optim_time = time.time() - init_optim_time
-
+optim_time = cavi_init_time + lbfgs_time
+print('Optim time (ignoring compilation time) {:.3f}secs'.format(optim_time))
 
 # save final KL
 final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
@@ -153,7 +155,7 @@ paragami.save_folded(outfile,
                      final_kl = final_kl,
                      optim_time = optim_time)
 
-print('Total optimization time: {:03f} secs'.format(optim_time))
+print('Total optim time: {:.3f} secs'.format(time.time() - init_optim_time))
 
 
 print('done. ')
