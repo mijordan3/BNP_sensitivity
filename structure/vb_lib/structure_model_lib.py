@@ -182,9 +182,9 @@ def get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l):
     # returns k_approx x 2 array
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_optimal_ez_nl(g_obs_nl,e_log_pop_freq_l, e_log_1m_pop_freq_l,
+def get_optimal_ez_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                         e_log_cluster_probs_n, detach_ez): 
-    
+        
     # get loglikelihood of observations at loci l
     loglik_gene_nl = get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
