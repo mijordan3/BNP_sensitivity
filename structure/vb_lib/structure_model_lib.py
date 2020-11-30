@@ -165,81 +165,100 @@ def get_entropy(vb_params_dict, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
+def get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
-    g_obs_l0 = g_obs_l[:, 0]
-    g_obs_l1 = g_obs_l[:, 1]
-    g_obs_l2 = g_obs_l[:, 2]
+    g_obs_nl0 = g_obs_nl[0]
+    g_obs_nl1 = g_obs_nl[1]
+    g_obs_nl2 = g_obs_nl[2]
 
     loglik_a = \
-        np.outer(g_obs_l0, e_log_1m_pop_freq_l) + \
-            np.outer(g_obs_l1 + g_obs_l2, e_log_pop_freq_l)
+        g_obs_nl0 * e_log_1m_pop_freq_l + \
+            (g_obs_nl1 + g_obs_nl2) * e_log_pop_freq_l
 
     loglik_b = \
-        np.outer(g_obs_l0 + g_obs_l1, e_log_1m_pop_freq_l) + \
-            np.outer(g_obs_l2, e_log_pop_freq_l)
+        (g_obs_nl0 + g_obs_nl1) * e_log_1m_pop_freq_l + \
+            g_obs_nl2 * e_log_pop_freq_l
 
-
+    # returns k_approx x 2 array
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, detach_ez): 
+def get_optimal_ez_nl(g_obs_nl,e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                        e_log_cluster_probs_n): 
     
     # get loglikelihood of observations at loci l
-    loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
+    loglik_gene_nl = get_e_loglik_gene_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
     # add individual belongings
-    loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
+    loglik_cond_z_nl = np.expand_dims(e_log_cluster_probs_n, axis = 1) + loglik_gene_nl
 
     # individal x chromosome belongings
-    if detach_ez: 
-        e_z_free = jax.lax.stop_gradient(loglik_cond_z_l)
-    else: 
-        e_z_free = loglik_cond_z_l
-        
-    e_z_l = jax.nn.softmax(e_z_free, axis = 1)
+    e_z_nl = jax.nn.softmax(loglik_cond_z_nl, axis = 0)
     
-    return loglik_cond_z_l, e_z_l
+    return loglik_cond_z_nl, e_z_nl
     
-def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, 
-                    detach_ez):
-    # returns z-optimized log-likelihood for locus-l
+def get_e_loglik_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                    e_log_cluster_probs_n, detach_ez):
     
-    loglik_cond_z_l, e_z_l = \
-        get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                        e_log_cluster_probs, 
-                        detach_ez)
+    # returns z-optimized log-likelihood for 
+    # individual-n and locus-l
     
+    loglik_cond_z_nl, e_z_nl = \
+        get_optimal_ez_nl(g_obs_nl, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                            e_log_cluster_probs_n)
+    
+    if detach_ez:
+        e_z_nl = jax.lax.stop_gradient(e_z_nl)
+
     # log likelihood
-    loglik_l = np.sum(loglik_cond_z_l * e_z_l)
+    loglik_nl = np.sum(loglik_cond_z_nl * e_z_nl)
 
-    # entropy term: add this because the z's won't be available later
+    # entropy term: save this because the z's won't be available later
     # compute the entropy
-    z_entropy_l = (sp.special.entr(e_z_l)).sum()
+    z_entropy_nl = (sp.special.entr(e_z_nl)).sum()
 
-    return loglik_l + z_entropy_l
-
-def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
-                    e_log_sticks, e_log_1m_sticks,
-                    detach_ez):
+    return loglik_nl + z_entropy_nl
 
 
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
+def get_e_loglik_n(g_obs_n, e_log_pop_freq, e_log_1m_pop_freq,
+                    e_log_cluster_probs_n, detach_ez):
     
-    body_fun = lambda val, x : get_e_loglik_l(x[0], x[1], x[2],
-                                             e_log_cluster_probs,
+    # inner loop over loci
+    
+    body_fun = lambda val, x : get_e_loglik_nl(x[0], x[1], x[2],
+                                             e_log_cluster_probs_n,
                                              detach_ez) + val
     
     scan_fun = lambda val, x : (body_fun(val, x), None)
     
     return jax.lax.scan(scan_fun,
                         init = 0.,
-                        xs = (g_obs.transpose((1, 0, 2)),
+                        xs = (g_obs_n,
                               e_log_pop_freq, 
                               e_log_1m_pop_freq))[0]
+
+    
+def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
+                    e_log_sticks, e_log_1m_sticks,
+                    detach_ez):
+    
+    # outer loop over individuals 
+    
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
+    
+    body_fun = lambda val, x : get_e_loglik_n(x[0], 
+                                              e_log_pop_freq, 
+                                              e_log_1m_pop_freq,
+                                              x[1],
+                                              detach_ez) + val
+    
+    scan_fun = lambda val, x : (body_fun(val, x), None)
+    
+    return jax.lax.scan(scan_fun,
+                        init = 0.,
+                        xs = (g_obs,
+                              e_log_cluster_probs))[0]
     
 #     with loops.Scope() as s:
 #         s.e_loglik = 0.
