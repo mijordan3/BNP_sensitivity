@@ -295,13 +295,16 @@ class StructureObjective():
             fun = lambda clust_probs, pop_freq : \
                     self._ps_loss_zl(x[0], clust_probs, pop_freq)
 
-            jvp1 = jax.jvp(fun, 
+            ez_free, jvp = jax.jvp(fun, 
                             (moments_tuple[0], x[1]), 
-                            (moments_jvp[0], x[2]))[1]
+                            (moments_jvp[0], x[2]))
+            
+            ez, hess_term = self._constrain_ez_free_jvp(ez_free, jvp)
+            hess_term = self._constrain_ez_free_jvp(ez_free, hess_term / ez)[1]
 
-            vjp1 = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](jvp1)
+            _vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](hess_term)
 
-            return vjp1[0] + val, vjp1[1]
+            return _vjp[0] + val, _vjp[1]
         
         vjp = jax.lax.scan(scan_fun,
                              init = np.zeros(moments_tuple[0].shape), 
@@ -343,14 +346,24 @@ class StructureObjective():
         e_log_pop = e_log_pop_freq_l[:, 0]
         e_log_1mpop = e_log_pop_freq_l[:, 1]
         
-        return 2 * np.sqrt(structure_model_lib.\
+        return structure_model_lib.\
                            get_optimal_ezl(g_obs_l, 
                                            np.expand_dims(e_log_pop, 0),
                                            np.expand_dims(e_log_1mpop, 0),
                                            e_log_cluster_probs,
-                                           detach_ez = False)[1]).flatten()
+                                           detach_ez = True)[0]
     
     
+    
+    @staticmethod
+    def _constrain_ez_free_jvp(ez_free, v): 
+    
+        ez = jax.nn.softmax(ez_free, 1)
+
+        term1 = ez * v
+        term2 = ez * (ez * v).sum(1, keepdims = True)
+
+        return ez, term1 - term2
     
     def _jit_functions(self): 
         if self.jit_functions: 
