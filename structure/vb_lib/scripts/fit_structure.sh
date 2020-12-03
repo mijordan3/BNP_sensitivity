@@ -20,7 +20,7 @@ out_filename=simulated_fit
 
 out_folder=../fits/fits_20201122/
 
-python get_structure_fit.py \
+python fit_structure.py \
   --seed ${seed} \
   --alpha ${alpha} \
   --data_file ${data_file} \

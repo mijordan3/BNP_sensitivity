@@ -55,32 +55,12 @@ g_obs = np.array(data['g_obs'])
 # Load initial fit
 ##################
 print('loading fit from ', fit_file)
-vb_opt_dict, vb_params_paragami, meta_data = \
-    paragami.load_folded(fit_file)
+vb_opt_dict, vb_params_paragami,
+    prior_params_dict, prior_params_paragami, 
+        gh_loc, gh_weights, meta_data = \
+            structure_model_lib.load_structure_fit(fit_file)
 
 vb_opt = vb_params_paragami.flatten(vb_opt_dict, free = True)
-
-k_approx = vb_opt_dict['pop_freq_beta_params'].shape[1]
-
-gh_deg = int(meta_data['gh_deg'])
-gh_loc, gh_weights = hermgauss(gh_deg)
-
-gh_loc = np.array(gh_loc)
-gh_weights = np.array(gh_weights)
-
-###############
-# Get prior
-###############
-prior_params_dict, prior_params_paragami = \
-    structure_model_lib.get_default_prior_params()
-
-prior_params_dict['dp_prior_alpha'] = np.array(meta_data['dp_prior_alpha'])
-prior_params_dict['allele_prior_alpha'] = np.array(meta_data['allele_prior_alpha'])
-prior_params_dict['allele_prior_beta'] = np.array(meta_data['allele_prior_beta'])
-
-print(prior_params_dict)
-
-prior_params_free = prior_params_paragami.flatten(prior_params_dict, free = True)
 
 ###############
 # Define objective and check KL
@@ -108,22 +88,8 @@ cg_precond = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
 ###############
 # Hyper-parameter objective
 ###############
-def _hyper_par_objective_fun(vb_params_dict, alpha): 
-    
-    means = vb_params_dict['ind_admix_params']['stick_means']
-    infos = vb_params_dict['ind_admix_params']['stick_infos']
-
-    e_log_1m_sticks = \
-        ef.get_e_log_logitnormal(
-            lognorm_means = means,
-            lognorm_infos = infos,
-            gh_loc = gh_loc,
-            gh_weights = gh_weights)[1]
-
-    return - (alpha - 1) * np.sum(e_log_1m_sticks)
-
 hyper_par_objective_fun = paragami.FlattenFunctionInput(
-                                original_fun=_hyper_par_objective_fun, 
+                                original_fun=structure_model_lib.alpha_objective_fun, 
                                 patterns = [vb_params_paragami, prior_params_paragami['dp_prior_alpha']],
                                 free = [True, True],
                                 argnums = [0, 1])
