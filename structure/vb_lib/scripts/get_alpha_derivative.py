@@ -2,9 +2,6 @@ import jax
 
 import jax.numpy as np
 import jax.scipy as sp
-from jax.scipy.sparse.linalg import cg
-
-from numpy.polynomial.hermite import hermgauss
 
 from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
@@ -55,8 +52,8 @@ g_obs = np.array(data['g_obs'])
 # Load initial fit
 ##################
 print('loading fit from ', fit_file)
-vb_opt_dict, vb_params_paragami,
-    prior_params_dict, prior_params_paragami, 
+vb_opt_dict, vb_params_paragami, \
+    prior_params_dict, prior_params_paragami, \
         gh_loc, gh_weights, meta_data = \
             structure_model_lib.load_structure_fit(fit_file)
 
@@ -88,8 +85,14 @@ cg_precond = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
 ###############
 # Hyper-parameter objective
 ###############
+_hyper_par_objective_fun = lambda vb_params, prior_params : \
+    structure_model_lib.alpha_objective_fun(vb_params, 
+                                            prior_params, 
+                                            gh_loc, 
+                                            gh_weights)
+    
 hyper_par_objective_fun = paragami.FlattenFunctionInput(
-                                original_fun=structure_model_lib.alpha_objective_fun, 
+                                original_fun=_hyper_par_objective_fun, 
                                 patterns = [vb_params_paragami, prior_params_paragami['dp_prior_alpha']],
                                 free = [True, True],
                                 argnums = [0, 1])

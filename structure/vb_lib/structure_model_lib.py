@@ -11,6 +11,8 @@ import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
+from numpy.polynomial.hermite import hermgauss
+
 import warnings
 
 ##########################
@@ -454,6 +456,18 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
 #####################
 # Function to save / load a structure fit
 #####################
+def save_structure_fit(outfile, vb_params_dict, vb_params_paragami, 
+                       prior_params_dict, gh_deg, **kwargs): 
+    
+    paragami.save_folded(outfile,
+                         vb_params_dict,
+                         vb_params_paragami,
+                         dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
+                         allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
+                         allele_prior_beta = prior_params_dict['allele_prior_beta'],
+                         gh_deg = gh_deg,
+                         **kwargs)
+
 def load_structure_fit(fit_file): 
     
     # load vb params dict and other meta data
@@ -482,7 +496,7 @@ def load_structure_fit(fit_file):
 #####################
 # hyper-parameter objective functions
 #####################
-def alpha_objective_fun(vb_params_dict, alpha): 
+def alpha_objective_fun(vb_params_dict, alpha, gh_loc, gh_weights): 
     
     # term of objective function that depends on 
     # the dp prior alpha
