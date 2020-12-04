@@ -328,7 +328,7 @@ class StructurePrecondObjective(StructureObjective):
                          vb_params_paragami,
                          prior_params_dict, 
                          gh_loc, gh_weights, 
-                         e_log_phi = None, 
+                         e_log_phi = e_log_phi, 
                          jit_functions = False)
         
         self.compile_preconditioned_objectives()

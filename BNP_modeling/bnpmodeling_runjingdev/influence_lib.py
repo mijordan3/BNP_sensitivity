@@ -8,8 +8,11 @@ import jax.scipy as sp
 # the influence function
 ########################
 class InfluenceOperator(object):
-    def __init__(self, vb_opt, vb_params_paragami, 
-                 hessian_solver, alpha0, 
+    def __init__(self, 
+                 vb_opt,
+                 vb_params_paragami, 
+                 hessian_solver,
+                 alpha0, 
                  stick_key = 'stick_params'):
         
         # vb_opt is the vector of optimal vb parameters
