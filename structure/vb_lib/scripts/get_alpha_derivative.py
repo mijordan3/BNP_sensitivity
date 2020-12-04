@@ -41,6 +41,9 @@ def validate_args():
 
 validate_args()
 
+outfile = re.sub('.npz', '_lrderivatives', fit_file)
+print('derivative outfile: ', outfile)
+
 ##################
 # Load data
 ##################
@@ -83,46 +86,55 @@ cg_precond = lambda v : get_mfvb_cov_matmul(v, vb_opt_dict,
                                             return_info = True)
 
 ###############
-# Hyper-parameter objective
+# Derivative wrt to dp prior alpha
 ###############
-_hyper_par_objective_fun = lambda vb_params, prior_params : \
-    structure_model_lib.alpha_objective_fun(vb_params, 
-                                            prior_params, 
-                                            gh_loc, 
-                                            gh_weights)
-    
-hyper_par_objective_fun = paragami.FlattenFunctionInput(
-                                original_fun=_hyper_par_objective_fun, 
-                                patterns = [vb_params_paragami, prior_params_paragami['dp_prior_alpha']],
-                                free = [True, True],
-                                argnums = [0, 1])
+print('###############')
+print('Computing alpha derivative ...')
+print('###############')
 
-
-###############
-# Sensitivity class
-###############
+# the hyper parameter objective function
 alpha0 = prior_params_dict['dp_prior_alpha']
 alpha_free = prior_params_paragami['dp_prior_alpha'].flatten(alpha0, 
                                                               free = True)
 
+def alpha_obj_fun(vb_params_free, epsilon): 
+    
+    # fold free parameters
+    vb_params_dict = vb_params_paragami.fold(vb_params_free, 
+                                                free = True)
+    
+    alpha = prior_params_paragami['dp_prior_alpha'].fold(alpha_free + epsilon, 
+                                                         free = True)
+    
+    # return objective
+    return structure_model_lib.alpha_objective_fun(vb_params_dict, 
+                                                    alpha, 
+                                                    gh_loc, 
+                                                    gh_weights)
+    
+    
+# Define the linear sensitivity class
 vb_sens = HyperparameterSensitivityLinearApproximation(
                     objective_fun = stru_objective.f, 
                     opt_par_value = vb_opt, 
-                    hyper_par_value0 = alpha_free, 
+                    hyper_par_value0 = np.array([0.]), 
                     obj_fun_hvp = stru_objective.hvp, 
-                    hyper_par_objective_fun = hyper_par_objective_fun, 
+                    hyper_par_objective_fun = alpha_obj_fun, 
                     cg_precond = cg_precond)
 
-###############
-# Save results 
-###############
-outfile = re.sub('.npz', '_lralpha', fit_file)
-print('saving alpha derivative into: ', outfile)
-np.savez(outfile, 
-         dinput_dhyper = vb_sens.dinput_dhyper, 
-         alpha_derivative_time = vb_sens.lr_time,
-         vb_opt = vb_opt, 
-         alpha0 = alpha0, 
-         kl = kl) 
-      
+# save what we need
+vars_to_save = dict()
+vars_to_save['dinput_dalpha'] = deepcopy(vb_sens.dinput_dhyper)
+vars_to_save['lr_time_alpha'] = deepcopy(vb_sens.lr_time)
+
+def save_derivatives(vars_to_save): 
+    print('saving into: ', outfile)
+    np.savez(outfile,
+             vb_opt = vb_opt,
+             alpha0 = alpha0,
+             kl= kl,
+             **vars_to_save)
+
+save_derivatives(vars_to_save)
+    
 print('done. ')
