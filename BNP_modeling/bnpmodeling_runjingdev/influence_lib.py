@@ -75,7 +75,6 @@ class InfluenceOperator(object):
             influence = influence.transpose()
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            print('inverting hessian ...')
             influence = self.hessian_solver(grad_g)
             influence = - np.dot(influence, grad_log_q_prior_rat)
 

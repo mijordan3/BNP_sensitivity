@@ -7,6 +7,7 @@ from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 import vb_lib.structure_optimization_lib as s_optim_lib
 
+import bnpmodeling_runjingdev.influence_lib as influence_lib
 import bnpmodeling_runjingdev.exponential_families as ef
 
 from bnpmodeling_runjingdev.sensitivity_lib import \
@@ -137,4 +138,73 @@ def save_derivatives(vars_to_save):
 
 save_derivatives(vars_to_save)
     
+    
+###############
+# Compute worst-case perturbation
+###############
+print('###############')
+print('Computing worst-case derivative ...')
+print('###############')
+
+# posterior expected number of clusters 
+def g(vb_free_params, vb_params_paragami): 
+    
+    # key for random sampling. 
+    # this is fixed! so all standard normal 
+    # samples used in computing the posterior quantity 
+    key = jax.random.PRNGKey(0)
+    
+    vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
+    
+    stick_means = vb_params_dict['ind_admix_params']['stick_means']
+    stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
+    
+    return structure_model_lib.get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
+                                                       key = key,
+                                                       n_samples = 100)
+
+get_grad_g = jax.jacobian(g, argnums = 0)
+grad_g = get_grad_g(vb_opt, vb_params_paragami)
+
+# get influence function
+print('computing influence function...')
+influence_operator = influence_lib.InfluenceOperator(vb_opt, 
+                           vb_params_paragami, 
+                           vb_sens.hessian_solver,
+                           prior_params_dict['dp_prior_alpha'], 
+                           stick_key = 'ind_admix_params')
+
+logit_v_grid = np.linspace(-10, 10, 200)
+influence_grid = influence_operator.get_influence(logit_v_grid, grad_g)
+
+# define worst-case perturbation
+worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                      logit_v_grid = logit_v_grid, 
+                                                      cached_influence_grid = influence_grid)
+
+def wc_obj_hyper(vb_params_free, epsilon): 
+    # fold free parameters
+    vb_params_dict = vb_params_paragami.fold(vb_params_free, 
+                                                free = True)
+    
+    # get means and infos 
+    means = vb_params_dict['ind_admix_params']['stick_means']
+    infos = vb_params_dict['ind_admix_params']['stick_infos']
+
+    # return prior perturbation 
+    return epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
+                                                                 infos.flatten())
+
+# compute derivative 
+print('computing derivative...')
+vb_sens._set_cross_hess_and_solve(wc_obj_hyper)
+
+# save what we need
+vars_to_save['logit_v_grid'] = logit_v_grid
+vars_to_save['influence_grid'] = influence_grid
+vars_to_save['dinput_dfun_wc'] = deepcopy(vb_sens.dinput_dhyper)
+vars_to_save['lr_time_wc'] = deepcopy(vb_sens.lr_time)
+
+save_derivatives(vars_to_save)
+
 print('done. ')
