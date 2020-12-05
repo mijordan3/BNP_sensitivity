@@ -24,8 +24,13 @@ import os
 import argparse
 parser = argparse.ArgumentParser()
 
+# the genome dataset
 parser.add_argument('--data_file', type=str)
+
+# folder where the structure fit was saved
 parser.add_argument('--out_folder', type=str)
+
+# name of the structure fit 
 parser.add_argument('--fit_file', type=str)
 
 args = parser.parse_args()
@@ -183,6 +188,7 @@ worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None,
                                                       cached_influence_grid = influence_grid)
 
 def wc_obj_hyper(vb_params_free, epsilon): 
+    
     # fold free parameters
     vb_params_dict = vb_params_paragami.fold(vb_params_free, 
                                                 free = True)
