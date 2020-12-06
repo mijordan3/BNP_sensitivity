@@ -9,6 +9,7 @@ from numpy.polynomial.hermite import hermgauss
 import vb_lib.structure_model_lib as structure_model_lib
 import vb_lib.cavi_lib as cavi_lib
 import vb_lib.structure_optimization_lib as s_optim_lib
+import vb_lib.functional_perturbation_lib as fpert_lib
 
 import bnpmodeling_runjingdev.influence_lib as influence_lib
 
@@ -37,6 +38,9 @@ parser.add_argument('--init_fit', type=str)
 
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
+
+# which perturbation
+parser.add_argument('--perturbation', type=str, default = 'worst-case')
 
 # file where the influence file is stored
 parser.add_argument('--influence_file', type=str)
@@ -78,31 +82,39 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-print('Refitting with worst-case perturbation')
-print('Loading influence function from ', args.influence_file)
+if args.perturbation = 'worst-case': 
+    # worst case perturbation
+    print('Refitting with worst-case perturbation')
+    print('Loading influence function from ', args.influence_file)
 
-# load influence function
-lr_data = np.load(args.influence_file)
+    # load influence function
+    lr_data = np.load(args.influence_file)
 
-logit_v_grid = np.array(lr_data['logit_v_grid'])
-influence_grid = np.array(lr_data['influence_grid'])
+    logit_v_grid = np.array(lr_data['logit_v_grid'])
+    influence_grid = np.array(lr_data['influence_grid'])
 
-# check model by comparing KLs
-kl = structure_model_lib.get_kl(g_obs, vb_params_dict,
-                                prior_params_dict,
-                                gh_loc = gh_loc,
-                                gh_weights = gh_weights)
-assert np.abs(kl - lr_data['kl']) < 1e-8
+    # check model by comparing KLs
+    kl = structure_model_lib.get_kl(g_obs, vb_params_dict,
+                                    prior_params_dict,
+                                    gh_loc = gh_loc,
+                                    gh_weights = gh_weights)
+    assert np.abs(kl - lr_data['kl']) < 1e-8
 
-# compute worst-case perturbation
-worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
-                                                      logit_v_grid = logit_v_grid, 
-                                                      cached_influence_grid = influence_grid)
+    # compute worst-case perturbation
+    worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                          logit_v_grid = logit_v_grid, 
+                                                          cached_influence_grid = influence_grid)
+    _e_log_phi = lambda means, infos : worst_case_pert.\
+                        get_e_log_linf_perturbation(means.flatten(), 
+                                                    infos.flatten())
 
-def get_e_log_perturbation(means, infos): 
-        return epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
-                                                                     infos.flatten())
-    
+
+# get perturbation
+functional_pert = fpert_lib.FunctionalPerturbation(_e_log_phi, 
+                                                   vb_params_paragami)
+
+e_log_phi = lambda means, infos : functional_pert.e_log_phi_epsilon(means, infos, epsilon)
+
 ######################
 # OPTIMIZE
 ######################
@@ -114,7 +126,7 @@ vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc, gh_weights, 
-                        e_log_phi = get_e_log_perturbation)
+                        e_log_phi = e_log_phi)
 
 ######################
 # save optimization results
@@ -130,7 +142,7 @@ final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
                             prior_params_dict,
                             gh_loc = gh_loc,
                             gh_weights = gh_weights, 
-                            e_log_phi = get_e_log_perturbation)
+                            e_log_phi = e_log_phi)
 
 # save paragami object
 structure_model_lib.save_structure_fit(outfile, 

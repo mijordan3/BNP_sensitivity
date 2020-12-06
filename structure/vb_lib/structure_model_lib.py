@@ -494,7 +494,9 @@ def load_structure_fit(fit_file):
                 gh_loc, gh_weights, meta_data
 
 #####################
-# hyper-parameter objective functions
+# hyper-parameter objective functions: 
+# NOTE these are **added** to the **KL**
+# not the ELBO
 #####################
 def alpha_objective_fun(vb_params_dict, alpha, gh_loc, gh_weights): 
     

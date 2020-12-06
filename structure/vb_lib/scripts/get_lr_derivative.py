@@ -187,6 +187,9 @@ worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None,
                                                       logit_v_grid = logit_v_grid, 
                                                       cached_influence_grid = influence_grid)
 
+e_log_phi = 
+
+
 def wc_obj_hyper(vb_params_free, epsilon): 
     
     # fold free parameters
@@ -198,7 +201,7 @@ def wc_obj_hyper(vb_params_free, epsilon):
     infos = vb_params_dict['ind_admix_params']['stick_infos']
 
     # return prior perturbation 
-    return epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
+    return - epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
                                                                  infos.flatten())
 
 # compute derivative 

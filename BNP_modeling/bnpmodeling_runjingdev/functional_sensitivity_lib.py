@@ -141,7 +141,7 @@ class PriorPerturbation(object):
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
 
-def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
+def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
                            gh_loc, gh_weights, sum_vector=True):
 
     """
@@ -170,13 +170,10 @@ def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
         The expected log perturbation under the variational distribution
 
     """
-
-    perturbation_fun = \
-        lambda logit_v: log_phi(logit_v) * epsilon
-
+    
     e_perturbation_vec = modeling_lib.get_e_func_logit_stick_vec(
-        stick_propn_mean, stick_propn_info,
-        gh_loc, gh_weights, perturbation_fun)
+                                        stick_propn_mean, stick_propn_info,
+                                        gh_loc, gh_weights, log_phi)
 
     if sum_vector:
         return np.sum(e_perturbation_vec)
