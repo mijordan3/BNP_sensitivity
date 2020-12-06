@@ -172,6 +172,12 @@ class WorstCasePerturbation(object):
         self.sign_diffs = self._sign_diffs[self.change_bool]
 
     def get_e_log_linf_perturbation(self, means, infos):
+        
+        # in structure, means are 2d. 
+        # flatten them (shouldn't matter for iris)
+        means = means.flatten()
+        infos = infos.flatten()
+        
         x = np.expand_dims(self.change_points, axis = 0)
         loc = np.expand_dims(means, axis = 1)
         scale = np.expand_dims(1 / np.sqrt(infos), axis = 1)

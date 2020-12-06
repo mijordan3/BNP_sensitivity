@@ -9,7 +9,7 @@ from numpy.polynomial.hermite import hermgauss
 import vb_lib.structure_model_lib as structure_model_lib
 import vb_lib.cavi_lib as cavi_lib
 import vb_lib.structure_optimization_lib as s_optim_lib
-import vb_lib.functional_perturbation_lib as fpert_lib
+import vb_lib.functional_perturbations_lib as fpert_lib
 
 import bnpmodeling_runjingdev.influence_lib as influence_lib
 
@@ -51,6 +51,10 @@ def validate_args():
     assert os.path.exists(args.out_folder), args.out_folder
     assert os.path.isfile(args.init_fit), args.init_fit
     assert os.path.isfile(args.data_file), args.data_file
+    
+    if args.perturbation == 'worst-case': 
+        # check influence file exists
+        os.path.exists(args.influence_file), args.out_folder
 
 validate_args()
 
@@ -82,7 +86,7 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-if args.perturbation = 'worst-case': 
+if args.perturbation == 'worst-case': 
     # worst case perturbation
     print('Refitting with worst-case perturbation')
     print('Loading influence function from ', args.influence_file)
@@ -104,16 +108,15 @@ if args.perturbation = 'worst-case':
     worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
                                                           logit_v_grid = logit_v_grid, 
                                                           cached_influence_grid = influence_grid)
-    _e_log_phi = lambda means, infos : worst_case_pert.\
-                        get_e_log_linf_perturbation(means.flatten(), 
-                                                    infos.flatten())
+    
+    _e_log_phi = worst_case_pert.get_e_log_linf_perturbation
 
 
 # get perturbation
-functional_pert = fpert_lib.FunctionalPerturbation(_e_log_phi, 
+f_obj = fpert_lib.FunctionalPerturbationObjectives(_e_log_phi, 
                                                    vb_params_paragami)
 
-e_log_phi = lambda means, infos : functional_pert.e_log_phi_epsilon(means, infos, epsilon)
+e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
 ######################
 # OPTIMIZE

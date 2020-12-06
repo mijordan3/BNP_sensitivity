@@ -6,6 +6,7 @@ import jax.scipy as sp
 from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 import vb_lib.structure_optimization_lib as s_optim_lib
+import vb_lib.functional_perturbations_lib as fpert_lib
 
 import bnpmodeling_runjingdev.influence_lib as influence_lib
 import bnpmodeling_runjingdev.exponential_families as ef
@@ -187,26 +188,12 @@ worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None,
                                                       logit_v_grid = logit_v_grid, 
                                                       cached_influence_grid = influence_grid)
 
-e_log_phi = 
-
-
-def wc_obj_hyper(vb_params_free, epsilon): 
-    
-    # fold free parameters
-    vb_params_dict = vb_params_paragami.fold(vb_params_free, 
-                                                free = True)
-    
-    # get means and infos 
-    means = vb_params_dict['ind_admix_params']['stick_means']
-    infos = vb_params_dict['ind_admix_params']['stick_infos']
-
-    # return prior perturbation 
-    return - epsilon * worst_case_pert.get_e_log_linf_perturbation(means.flatten(), 
-                                                                 infos.flatten())
+f_obj_wc = fpert_lib.FunctionalPerturbationObjectives(worst_case_pert.get_e_log_linf_perturbation, 
+                                                      vb_params_paragami)
 
 # compute derivative 
 print('computing derivative...')
-vb_sens._set_cross_hess_and_solve(wc_obj_hyper)
+vb_sens._set_cross_hess_and_solve(f_obj_wc.hyper_par_objective_fun)
 
 # save what we need
 vars_to_save['logit_v_grid'] = logit_v_grid
