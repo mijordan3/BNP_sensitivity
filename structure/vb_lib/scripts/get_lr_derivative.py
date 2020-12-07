@@ -203,4 +203,13 @@ vars_to_save['lr_time_wc'] = deepcopy(vb_sens.lr_time)
 
 save_derivatives(vars_to_save)
 
+
+###############
+# Compute worst-case perturbation
+###############
+print('###############')
+print('Derivative wrt sigmoidal log-phi ...')
+print('###############')
+
+
 print('done. ')
