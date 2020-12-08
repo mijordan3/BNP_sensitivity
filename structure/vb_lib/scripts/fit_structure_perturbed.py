@@ -120,7 +120,15 @@ if args.perturbation == 'worst-case':
 else: 
     print('refitting with perturbation = ', args.perturbation)
     # some functional perturbation
-    log_phi = getattr(log_phi_lib, args.perturbation)
+    _log_phi = getattr(log_phi_lib, args.perturbation)
+    
+    # there has to be a better way ... 
+    if (args.perturbation == 'alpha_pert_pos') or \
+        (args.perturbation == 'alpha_pert_neg'): 
+        log_phi = lambda x : _log_phi(x, prior_params_dict['dp_prior_alpha'])
+    else: 
+        log_phi = _log_phi 
+        
     f_obj = func_sens_lib.FunctionalPerturbationObjective(log_phi, 
                                                      vb_params_paragami, 
                                                      gh_loc, 
