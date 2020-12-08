@@ -8,8 +8,11 @@ import jax.scipy as sp
 # the influence function
 ########################
 class InfluenceOperator(object):
-    def __init__(self, vb_opt, vb_params_paragami, 
-                 hessian_solver, alpha0, 
+    def __init__(self, 
+                 vb_opt,
+                 vb_params_paragami, 
+                 hessian_solver,
+                 alpha0, 
                  stick_key = 'stick_params'):
         
         # vb_opt is the vector of optimal vb parameters
@@ -72,7 +75,6 @@ class InfluenceOperator(object):
             influence = influence.transpose()
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            print('inverting hessian ...')
             influence = self.hessian_solver(grad_g)
             influence = - np.dot(influence, grad_log_q_prior_rat)
 
@@ -170,6 +172,12 @@ class WorstCasePerturbation(object):
         self.sign_diffs = self._sign_diffs[self.change_bool]
 
     def get_e_log_linf_perturbation(self, means, infos):
+        
+        # in structure, means are 2d. 
+        # flatten them (shouldn't matter for iris)
+        means = means.flatten()
+        infos = infos.flatten()
+        
         x = np.expand_dims(self.change_points, axis = 0)
         loc = np.expand_dims(means, axis = 1)
         scale = np.expand_dims(1 / np.sqrt(infos), axis = 1)

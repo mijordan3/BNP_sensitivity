@@ -40,7 +40,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             self.obj_fun_hvp = get_jac_hvp_fun(lambda x : 
                                                objective_fun(x, self.hyper_par_value0))
         else: 
-            print('NOTE custom hvp')
+            print('NOTE: using custom hvp')
             self.obj_fun_hvp = obj_fun_hvp
 
         # compile linear system

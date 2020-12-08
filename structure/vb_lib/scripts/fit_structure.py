@@ -12,8 +12,6 @@ import vb_lib.structure_optimization_lib as s_optim_lib
 
 import paragami
 
-from copy import deepcopy
-
 import argparse
 import distutils.util
 
@@ -95,6 +93,7 @@ if args.warm_start:
     print('warm start from ', args.init_fit)
     vb_params_dict, vb_params_paragami, _ = \
         paragami.load_folded(args.init_fit)
+    
 else:     
     vb_params_dict, vb_params_paragami = \
         structure_model_lib.\
@@ -103,7 +102,7 @@ else:
                                           k_approx,
                                           use_logitnormal_sticks = True, 
                                           seed = args.seed)
-    
+    # initialize with some cavi steps
     if args.init_cavi_steps > 0: 
         vb_params_dict, cavi_init_time = \
             s_optim_lib.initialize_with_cavi(g_obs, 
@@ -144,16 +143,14 @@ final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
                             gh_weights = gh_weights)
 
 # save paragami object
-paragami.save_folded(outfile,
-                     vb_opt_dict,
-                     vb_params_paragami,
-                     data_file = args.data_file,
-                     dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
-                     allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
-                     allele_prior_beta = prior_params_dict['allele_prior_beta'],
-                     gh_deg = gh_deg,
-                     final_kl = final_kl,
-                     optim_time = optim_time)
+structure_model_lib.save_structure_fit(outfile, 
+                                       vb_opt_dict,
+                                       vb_params_paragami, 
+                                       prior_params_dict,
+                                       gh_deg, 
+                                       data_file = args.data_file, 
+                                       final_kl = final_kl, 
+                                       optim_time = optim_time)
 
 print('Total optim time: {:.3f} secs'.format(time.time() - init_optim_time))
 

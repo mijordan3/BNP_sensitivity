@@ -36,20 +36,6 @@ class PriorPerturbation(object):
     #################
     # Functions that are used for graphing and the influence function.
 
-    # # The log variational density of stick k at logit_v
-    # # in the logit_stick space.
-    # def get_log_q_logit_stick(self, logit_v, k):
-    #     mean = self.vb_params_dict['stick_propn_mean']
-    #     info = self.vb_params_dict['stick_propn_info']
-    #     return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
-    #
-    # # Return a vector of log variational densities for all sticks at logit_v
-    # # in the logit stick space.
-    # def get_log_q_logit_all_sticks(self, logit_v):
-    #     mean = self.vb_params_dict['stick_propn_mean']
-    #     info = self.vb_params_dict['stick_propn_info']
-    #     return -0.5 * (info * (logit_v - mean) ** 2 - np.log(info))
-
     def get_log_p0(self, v):
         alpha = self.alpha0
         return (alpha - 1) * np.log1p(-v) - self.log_norm_p0
@@ -141,7 +127,7 @@ class PriorPerturbation(object):
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
 
-def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
+def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
                            gh_loc, gh_weights, sum_vector=True):
 
     """
@@ -170,15 +156,83 @@ def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info, epsilon,
         The expected log perturbation under the variational distribution
 
     """
-
-    perturbation_fun = \
-        lambda logit_v: log_phi(logit_v) * epsilon
-
+    
     e_perturbation_vec = modeling_lib.get_e_func_logit_stick_vec(
-        stick_propn_mean, stick_propn_info,
-        gh_loc, gh_weights, perturbation_fun)
+                                        stick_propn_mean, stick_propn_info,
+                                        gh_loc, gh_weights, log_phi)
 
     if sum_vector:
         return np.sum(e_perturbation_vec)
     else:
         return e_perturbation_vec
+
+
+class FunctionalPerturbationObjective(): 
+    def __init__(self, 
+                 log_phi, 
+                 vb_params_paragami, 
+                 gh_loc, gh_weights,
+                 e_log_phi = None, 
+                 stick_key = 'stick_params'): 
+
+        # log_phi (or e_log_phi) returns the additve
+        # perturbation to the **ELBO** 
+        
+        # log_phi takes input as logit-stick and returns the 
+        # perturbation. 
+        # e_log_phi (optional) takes input means and infos 
+        # and returns the expectation of log-phi under the 
+        # logit-normal variational distribution
+        # if e_log_phi is not provided, we compute the expectation 
+        # using gauss-hermite quadrature
+        
+        self.vb_params_paragami = vb_params_paragami
+        self.stick_key = stick_key 
+        
+        self.gh_loc = gh_loc
+        self.gh_weights = gh_weights
+        
+        self.log_phi = log_phi
+        
+        if e_log_phi is None: 
+            # set the expected log-perturbation 
+            # using gauss-hermite quadrature
+            self._set_e_log_phi_with_gh()
+        else: 
+            # a pre-computed expectation. 
+            # this takes 
+            self.e_log_phi = e_log_phi
+        
+    def _set_e_log_phi_with_gh(self): 
+        
+        self.e_log_phi = lambda means, infos : \
+                            get_e_log_perturbation(self.log_phi, 
+                                                   means, 
+                                                   infos,  
+                                                   self.gh_loc,
+                                                   self.gh_weights, 
+                                                   sum_vector=True)
+
+    def e_log_phi_epsilon(self, means, infos, epsilon): 
+        # with epsilon fixed this is the input to the optimizer
+        # (this is added to the ELBO)
+        
+        return epsilon * self.e_log_phi(means, infos)
+    
+    def hyper_par_objective_fun(self,
+                                vb_params_free, 
+                                epsilon): 
+        # NOTE THE NEGATIVE SIGN
+        # this is passed into the HyperparameterSensitivity class
+        # and is added to the **KL** 
+
+        vb_params_dict = self.vb_params_paragami.fold(vb_params_free, 
+                                                free = True)
+    
+        # get means and infos 
+        means = vb_params_dict[self.stick_key]['stick_means']
+        infos = vb_params_dict[self.stick_key]['stick_infos']
+        
+        return - self.e_log_phi_epsilon(means, infos, epsilon)
+
+    

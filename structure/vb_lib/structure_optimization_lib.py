@@ -20,78 +20,6 @@ from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 
 import time 
-
-###############
-# functions for initializing
-###############
-def cluster_and_get_init(g_obs, k, seed):
-    # g_obs should be n_obs x n_loci x 3,
-    # a one-hot encoding of genotypes
-    assert len(g_obs.shape) == 3
-
-    # convert one-hot encoding to probability of A genotype, {0, 0.5, 1}
-    x = g_obs.argmax(axis = 2) / 2
-
-    # run NMF
-    model = NMF(n_components=k, init='random', random_state = seed)
-    init_ind_admix_propn_unscaled = model.fit_transform(onp.array(x))
-    init_pop_allele_freq_unscaled = model.components_.T
-
-    # divide by largest allele frequency, so all numbers between 0 and 1
-    denom_pop_allele_freq = np.max(init_pop_allele_freq_unscaled)
-    init_pop_allele_freq = init_pop_allele_freq_unscaled / \
-                                denom_pop_allele_freq
-
-    # normalize rows
-    denom_ind_admix_propn = \
-        init_ind_admix_propn_unscaled.sum(axis = 1, keepdims = True)
-    init_ind_admix_propn = \
-        init_ind_admix_propn_unscaled / denom_ind_admix_propn
-    # clip again and renormalize
-    init_ind_admix_propn = init_ind_admix_propn.clip(0.05, 0.95)
-    init_ind_admix_propn = init_ind_admix_propn / \
-                            init_ind_admix_propn.sum(axis = 1, keepdims = True)
-
-    return np.array(init_ind_admix_propn), \
-            np.array(init_pop_allele_freq.clip(0.05, 0.95))
-
-def set_nmf_init_vb_params(g_obs, k_approx, vb_params_dict, seed):
-    # set the vb parameters at the NMF results 
-    
-    # get initial admixtures, and population frequencies
-    init_ind_admix_propn, init_pop_allele_freq = \
-            cluster_and_get_init(g_obs, k_approx, seed = seed)
-
-    # set bnp parameters for individual admixture
-    # set mean to be logit(stick_breaking_propn), info to be 1
-    stick_break_propn = \
-        cluster_quantities_lib.get_stick_break_propns_from_mixture_weights(init_ind_admix_propn)
-
-    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
-    if use_logitnormal_sticks:
-        ind_mix_stick_propn_mean = np.log(stick_break_propn) - np.log(1 - stick_break_propn)
-        ind_mix_stick_propn_info = np.ones(stick_break_propn.shape)
-        vb_params_dict['ind_admix_params']['stick_means'] = ind_mix_stick_propn_mean
-        vb_params_dict['ind_admix_params']['stick_infos'] = ind_mix_stick_propn_info
-    else:
-        ind_mix_stick_beta_param1 = np.ones(stick_break_propn.shape) 
-        ind_mix_stick_beta_param2 = (1 - stick_break_propn) / stick_break_propn
-        vb_params_dict['ind_admix_params']['stick_beta'] = \
-            np.concatenate((ind_mix_stick_beta_param1[:, :, None],
-                            ind_mix_stick_beta_param2[:, :, None]), axis = 2)
-
-    # set beta paramters for population paramters
-    # set beta = 1, alpha to have the correct mean
-    beta0 = 1
-    pop_freq_beta_params1 = beta0 * init_pop_allele_freq / (1 - init_pop_allele_freq)
-    pop_freq_beta_params2 = np.ones(init_pop_allele_freq.shape) * beta0
-    pop_freq_beta_params = np.concatenate((pop_freq_beta_params1[:, :, None],
-                                       pop_freq_beta_params2[:, :, None]), axis = 2)
-
-    vb_params_dict['pop_freq_beta_params'] = pop_freq_beta_params
-
-    return vb_params_dict
-
     
 #########################
 # Function to convert beta sticks to 
@@ -295,13 +223,16 @@ class StructureObjective():
             fun = lambda clust_probs, pop_freq : \
                     self._ps_loss_zl(x[0], clust_probs, pop_freq)
 
-            jvp1 = jax.jvp(fun, 
+            ez_free, jvp = jax.jvp(fun, 
                             (moments_tuple[0], x[1]), 
-                            (moments_jvp[0], x[2]))[1]
+                            (moments_jvp[0], x[2]))
+            
+            ez, hess_term = self._constrain_ez_free_jvp(ez_free, jvp)
+            hess_term = self._constrain_ez_free_jvp(ez_free, hess_term / ez)[1]
 
-            vjp1 = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](jvp1)
+            _vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](hess_term)
 
-            return vjp1[0] + val, vjp1[1]
+            return _vjp[0] + val, _vjp[1]
         
         vjp = jax.lax.scan(scan_fun,
                              init = np.zeros(moments_tuple[0].shape), 
@@ -343,14 +274,24 @@ class StructureObjective():
         e_log_pop = e_log_pop_freq_l[:, 0]
         e_log_1mpop = e_log_pop_freq_l[:, 1]
         
-        return 2 * np.sqrt(structure_model_lib.\
+        return structure_model_lib.\
                            get_optimal_ezl(g_obs_l, 
                                            np.expand_dims(e_log_pop, 0),
                                            np.expand_dims(e_log_1mpop, 0),
                                            e_log_cluster_probs,
-                                           detach_ez = False)[1]).flatten()
+                                           detach_ez = True)[0]
     
     
+    
+    @staticmethod
+    def _constrain_ez_free_jvp(ez_free, v): 
+    
+        ez = jax.nn.softmax(ez_free, 1)
+
+        term1 = ez * v
+        term2 = ez * (ez * v).sum(1, keepdims = True)
+
+        return ez, term1 - term2
     
     def _jit_functions(self): 
         if self.jit_functions: 
@@ -387,7 +328,7 @@ class StructurePrecondObjective(StructureObjective):
                          vb_params_paragami,
                          prior_params_dict, 
                          gh_loc, gh_weights, 
-                         e_log_phi = None, 
+                         e_log_phi = e_log_phi, 
                          jit_functions = False)
         
         self.compile_preconditioned_objectives()

@@ -11,6 +11,8 @@ import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
+from numpy.polynomial.hermite import hermgauss
+
 import warnings
 
 ##########################
@@ -240,18 +242,6 @@ def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
                         xs = (g_obs.transpose((1, 0, 2)),
                               e_log_pop_freq, 
                               e_log_1m_pop_freq))[0]
-    
-#     with loops.Scope() as s:
-#         s.e_loglik = 0.
-#         for l in s.range(g_obs.shape[1]):
-#             e_loglik_l = get_e_loglik_l(g_obs[:, l],
-#                                     e_log_pop_freq[l], e_log_1m_pop_freq[l],
-#                                     e_log_cluster_probs, detach_ez)
-
-#             s.e_loglik += e_loglik_l
-
-#     return s.e_loglik
-
 
 def get_e_joint_loglik_from_nat_params(g_obs,
                                        e_log_pop_freq, e_log_1m_pop_freq,
@@ -461,3 +451,67 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
             get_e_num_clusters_from_ez_2d(ind_admix_sampled)
     
     return e_num_clusters_sampled.mean()
+
+
+#####################
+# Function to save / load a structure fit
+#####################
+def save_structure_fit(outfile, vb_params_dict, vb_params_paragami, 
+                       prior_params_dict, gh_deg, **kwargs): 
+    
+    paragami.save_folded(outfile,
+                         vb_params_dict,
+                         vb_params_paragami,
+                         dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
+                         allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
+                         allele_prior_beta = prior_params_dict['allele_prior_beta'],
+                         gh_deg = gh_deg,
+                         **kwargs)
+
+def load_structure_fit(fit_file): 
+    
+    # load vb params dict and other meta data
+    vb_params_dict, vb_params_paragami, meta_data = \
+        paragami.load_folded(fit_file)
+    
+    # gauss-hermite parameters
+    gh_deg = int(meta_data['gh_deg'])
+    gh_loc, gh_weights = hermgauss(gh_deg)
+
+    gh_loc = np.array(gh_loc)
+    gh_weights = np.array(gh_weights)
+    
+    # load prior parameters
+    prior_params_dict, prior_params_paragami = \
+        get_default_prior_params()
+
+    prior_params_dict['dp_prior_alpha'] = np.array(meta_data['dp_prior_alpha'])
+    prior_params_dict['allele_prior_alpha'] = np.array(meta_data['allele_prior_alpha'])
+    prior_params_dict['allele_prior_beta'] = np.array(meta_data['allele_prior_beta'])
+
+    return vb_params_dict, vb_params_paragami, \
+            prior_params_dict, prior_params_paragami, \
+                gh_loc, gh_weights, meta_data
+
+#####################
+# hyper-parameter objective functions: 
+# NOTE these are **added** to the **KL**
+# not the ELBO
+#####################
+def alpha_objective_fun(vb_params_dict, alpha, gh_loc, gh_weights): 
+    
+    # term of objective function that depends on 
+    # the dp prior alpha
+    
+    means = vb_params_dict['ind_admix_params']['stick_means']
+    infos = vb_params_dict['ind_admix_params']['stick_infos']
+
+    e_log_1m_sticks = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = means,
+            lognorm_infos = infos,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)[1]
+
+    return - (alpha - 1) * np.sum(e_log_1m_sticks)
+

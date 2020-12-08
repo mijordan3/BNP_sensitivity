@@ -40,21 +40,48 @@ def plot_admixture(admixture, ax, colors = None):
 def plot_top_clusters(e_ind_admix, axarr, n_top_clusters = 5): 
     # plot only the top clusters    
     
+    top_n = min(n_top_clusters, e_ind_admix.shape[1])
+    
     # find top clusters
-    top_clusters = np.argsort(- e_ind_admix.sum(0))
-    top_clusters = top_clusters[0:n_top_clusters]
-    e_ind_admix = e_ind_admix[:, top_clusters]
+    top_clusters_indx = np.argsort(- e_ind_admix.sum(0))
+    top_clusters_indx = np.sort(top_clusters_indx[0:top_n])
+    e_ind_admix = e_ind_admix[:, top_clusters_indx]
     
     # append remaining probability
     remaining_probs = 1 - e_ind_admix.sum(1, keepdims = True)
     e_ind_admix = np.hstack((e_ind_admix, remaining_probs))
     
     # get colors: last color is grey
-    colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,n_top_clusters+1)[:-1]]
+    colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,top_n+1)[:-1]]
     colors += ['grey']
     
     # plot
     plot_admixture(e_ind_admix, axarr, colors)
+    
+    return e_ind_admix, top_clusters_indx
+
+    
+def draw_region_separation(population_vec, axarr): 
+
+    # draw lines between different groups in plotting
+
+    unique_groups = np.sort(np.unique(population_vec))
+    
+    xint = 0.
+    xticks = []
+    for i in range(len(unique_groups)): 
+        incr = (population_vec == unique_groups[i]).mean()
+
+        xticks.append(xint + incr*0.5)
+        xint += incr
+        axarr.axvline(xint, color = 'white', linewidth = 2)
+
+    axarr.set_xticks(xticks)
+    axarr.set_xticklabels(unique_groups,
+                          rotation=45, ha='left', 
+                          fontsize = 12);
+
+    axarr.xaxis.tick_top()
 
     
 def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
