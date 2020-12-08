@@ -40,7 +40,7 @@ parser.add_argument('--init_fit', type=str)
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
 # which perturbation
-parser.add_argument('--perturbation', type=str, default = 'worst-case')
+parser.add_argument('--perturbation', type=str, default = 'worst_case')
 
 # file where the influence file is stored
 parser.add_argument('--influence_file', type=str)
@@ -86,55 +86,32 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-if args.perturbation == 'worst-case': 
+print('refitting with perturbation = ', args.perturbation)
+if args.perturbation == 'worst_case': 
     # worst case perturbation
-    print('Refitting with worst-case perturbation')
     print('Loading influence function from ', args.influence_file)
 
     # load influence function
     lr_data = np.load(args.influence_file)
-
+    
+    # check KL's match
+    assert np.abs(fit_meta_data['final_kl'] - lr_data['kl']) < 1e-8
+    
     logit_v_grid = np.array(lr_data['logit_v_grid'])
     influence_grid = np.array(lr_data['influence_grid'])
-
-    # check model by comparing KLs
-    kl = structure_model_lib.get_kl(g_obs, vb_params_dict,
-                                    prior_params_dict,
-                                    gh_loc = gh_loc,
-                                    gh_weights = gh_weights)
-    assert np.abs(kl - lr_data['kl']) < 1e-8
-
-    # compute worst-case perturbation
-    worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
-                                                          logit_v_grid = logit_v_grid, 
-                                                          cached_influence_grid = influence_grid)
-    
-    f_obj = func_sens_lib.FunctionalPerturbationObjective(None, 
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
-                                                     stick_key = 'ind_admix_params')
-
-
 else: 
-    print('refitting with perturbation = ', args.perturbation)
-    # some functional perturbation
-    _log_phi = getattr(log_phi_lib, args.perturbation)
-    
-    # there has to be a better way ... 
-    if (args.perturbation == 'alpha_pert_pos') or \
-        (args.perturbation == 'alpha_pert_neg'): 
-        log_phi = lambda x : _log_phi(x, prior_params_dict['dp_prior_alpha'])
-    else: 
-        log_phi = _log_phi 
-        
-    f_obj = func_sens_lib.FunctionalPerturbationObjective(log_phi, 
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     stick_key = 'ind_admix_params')
-    
+    logit_v_grid = None
+    influence_grid = None
+
+f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
+                                                 prior_params_dict['dp_prior_alpha'],
+                                                 gh_loc, 
+                                                 gh_weights,
+                                                 logit_v_grid = logit_v_grid, 
+                                                 influence_grid = influence_grid, 
+                                                 stick_key = 'ind_admix_params')
+
+f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
 e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
 ######################
