@@ -171,7 +171,7 @@ class FunctionalPerturbationObjective():
     def __init__(self, 
                  log_phi, 
                  vb_params_paragami, 
-                 gh_log, gh_weights,
+                 gh_loc, gh_weights,
                  e_log_phi = None, 
                  stick_key = 'stick_params'): 
 
@@ -194,7 +194,7 @@ class FunctionalPerturbationObjective():
         
         self.log_phi = log_phi
         
-        if self.e_log_phi is None: 
+        if e_log_phi is None: 
             # set the expected log-perturbation 
             # using gauss-hermite quadrature
             self._set_e_log_phi_with_gh()
@@ -205,12 +205,12 @@ class FunctionalPerturbationObjective():
         
     def _set_e_log_phi_with_gh(self): 
         
-        self.e_log_phi = lambda means, infos : 
+        self.e_log_phi = lambda means, infos : \
                             get_e_log_perturbation(self.log_phi, 
                                                    means, 
                                                    infos,  
-                                                   gh_loc,
-                                                   gh_weights, 
+                                                   self.gh_loc,
+                                                   self.gh_weights, 
                                                    sum_vector=True)
 
     def e_log_phi_epsilon(self, means, infos, epsilon): 

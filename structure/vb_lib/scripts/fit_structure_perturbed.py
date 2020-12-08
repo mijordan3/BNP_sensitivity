@@ -9,9 +9,9 @@ from numpy.polynomial.hermite import hermgauss
 import vb_lib.structure_model_lib as structure_model_lib
 import vb_lib.cavi_lib as cavi_lib
 import vb_lib.structure_optimization_lib as s_optim_lib
-import vb_lib.functional_perturbations_lib as fpert_lib
 
-import bnpmodeling_runjingdev.influence_lib as influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
+from bnpmodeling_runjingdev import influence_lib, log_phi_lib
 
 import paragami
 
@@ -109,13 +109,24 @@ if args.perturbation == 'worst-case':
                                                           logit_v_grid = logit_v_grid, 
                                                           cached_influence_grid = influence_grid)
     
-    _e_log_phi = worst_case_pert.get_e_log_linf_perturbation
+    f_obj = func_sens_lib.FunctionalPerturbationObjective(None, 
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
+                                                     stick_key = 'ind_admix_params')
 
 
-# get perturbation
-f_obj = fpert_lib.FunctionalPerturbationObjectives(_e_log_phi, 
-                                                   vb_params_paragami)
-
+else: 
+    print('refitting with perturbation = ', args.perturbation)
+    # some functional perturbation
+    log_phi = getattr(log_phi_lib, args.perturbation)
+    f_obj = func_sens_lib.FunctionalPerturbationObjective(log_phi, 
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     stick_key = 'ind_admix_params')
+    
 e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
 ######################

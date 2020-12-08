@@ -6,10 +6,10 @@ import jax.scipy as sp
 from vb_lib import structure_model_lib
 from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 import vb_lib.structure_optimization_lib as s_optim_lib
-import vb_lib.functional_perturbations_lib as fpert_lib
 
-import bnpmodeling_runjingdev.influence_lib as influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev import influence_lib, log_phi_lib
 
 from bnpmodeling_runjingdev.sensitivity_lib import \
         HyperparameterSensitivityLinearApproximation
@@ -188,8 +188,12 @@ worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None,
                                                       logit_v_grid = logit_v_grid, 
                                                       cached_influence_grid = influence_grid)
 
-f_obj_wc = fpert_lib.FunctionalPerturbationObjectives(worst_case_pert.get_e_log_linf_perturbation, 
-                                                      vb_params_paragami)
+f_obj_wc = func_sens_lib.FunctionalPerturbationObjective(None, 
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
+                                                     stick_key = 'ind_admix_params')
 
 # compute derivative 
 print('computing derivative...')
@@ -198,18 +202,37 @@ vb_sens._set_cross_hess_and_solve(f_obj_wc.hyper_par_objective_fun)
 # save what we need
 vars_to_save['logit_v_grid'] = logit_v_grid
 vars_to_save['influence_grid'] = influence_grid
-vars_to_save['dinput_dfun_wc'] = deepcopy(vb_sens.dinput_dhyper)
-vars_to_save['lr_time_wc'] = deepcopy(vb_sens.lr_time)
+vars_to_save['dinput_dfun_worst-case'] = deepcopy(vb_sens.dinput_dhyper)
+vars_to_save['lr_time_worst-case'] = deepcopy(vb_sens.lr_time)
 
 save_derivatives(vars_to_save)
 
 
 ###############
-# Compute worst-case perturbation
+# Derivative wrt other perturbations
 ###############
-print('###############')
-print('Derivative wrt sigmoidal log-phi ...')
-print('###############')
+def compute_derivatives_and_save(log_phi, pert_name): 
+    # get hyper parameter objective function
+    f_obj = func_sens_lib.FunctionalPerturbationObjective(log_phi, 
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     stick_key = 'ind_admix_params')
+    
+    # compute derivative 
+    print('computing derivative...')
+    vb_sens._set_cross_hess_and_solve(f_obj.hyper_par_objective_fun)
+    
+    # save what we need
+    vars_to_save['dinput_dfun_' + pert_name] = deepcopy(vb_sens.dinput_dhyper)
+    vars_to_save['lr_time_' + pert_name] = deepcopy(vb_sens.lr_time)
+    save_derivatives(vars_to_save)
 
+
+
+compute_derivatives_and_save(log_phi_lib.sigmoidal, 'sigmoidal')
+compute_derivatives_and_save(log_phi_lib.sigmoidal_neg, 'sigmoidal_neg')
+compute_derivatives_and_save(lambda x : log_phi_lib.alpha_pert_pos(x, alpha0), 'alpha_pert_pos')
+compute_derivatives_and_save(lambda x : log_phi_lib.alpha_pert_neg(x, alpha0), 'alpha_pert_neg')
 
 print('done. ')
