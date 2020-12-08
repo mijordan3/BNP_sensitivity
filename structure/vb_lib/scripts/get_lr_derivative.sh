@@ -5,6 +5,7 @@ source activate bnp_sensitivity_jax
 alpha_vec=(3.0 6.0 9.0)
 
 alpha=${alpha_vec[$job_indx]}
+echo $alpha
 
 # data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
 # out_filename=simulated_fit
