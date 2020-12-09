@@ -146,10 +146,10 @@ save_derivatives(vars_to_save)
     
     
 ###############
-# Compute worst-case perturbation
+# Compute influence function
 ###############
 print('###############')
-print('Computing worst-case derivative ...')
+print('Computing influence function ...')
 print('###############')
 
 # posterior expected number of clusters 
@@ -183,41 +183,32 @@ influence_operator = influence_lib.InfluenceOperator(vb_opt,
 logit_v_grid = np.linspace(-10, 10, 200)
 influence_grid = influence_operator.get_influence(logit_v_grid, grad_g)
 
-# define worst-case perturbation
-worst_case_pert = influence_lib.WorstCasePerturbation(influence_fun = None, 
-                                                      logit_v_grid = logit_v_grid, 
-                                                      cached_influence_grid = influence_grid)
-
-f_obj_wc = func_sens_lib.FunctionalPerturbationObjective(None, 
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
-                                                     stick_key = 'ind_admix_params')
-
-# compute derivative 
-print('computing derivative...')
-vb_sens._set_cross_hess_and_solve(f_obj_wc.hyper_par_objective_fun)
-
 # save what we need
 vars_to_save['logit_v_grid'] = logit_v_grid
 vars_to_save['influence_grid'] = influence_grid
-vars_to_save['dinput_dfun_worst-case'] = deepcopy(vb_sens.dinput_dhyper)
-vars_to_save['lr_time_worst-case'] = deepcopy(vb_sens.lr_time)
-
 save_derivatives(vars_to_save)
 
 
 ###############
-# Derivative wrt other perturbations
+# Derivative wrt to functional perturbations
 ###############
-def compute_derivatives_and_save(log_phi, pert_name): 
+f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
+                                            prior_params_dict['dp_prior_alpha'],
+                                            gh_loc, 
+                                            gh_weights,
+                                            logit_v_grid = logit_v_grid, 
+                                            influence_grid = influence_grid, 
+                                            stick_key = 'ind_admix_params')
+
+def compute_derivatives_and_save(pert_name):
+    
+    print('###############')
+    print('Computing derviative for ' + pert_name + ' functional perturbation ...')
+    print('###############')
+
+    
     # get hyper parameter objective function
-    f_obj = func_sens_lib.FunctionalPerturbationObjective(log_phi, 
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     stick_key = 'ind_admix_params')
+    f_obj = getattr(f_obj_all, 'f_obj_' + pert_name)
     
     # compute derivative 
     print('computing derivative...')
@@ -229,10 +220,10 @@ def compute_derivatives_and_save(log_phi, pert_name):
     save_derivatives(vars_to_save)
 
 
-
-compute_derivatives_and_save(log_phi_lib.sigmoidal, 'sigmoidal')
-compute_derivatives_and_save(log_phi_lib.sigmoidal_neg, 'sigmoidal_neg')
-compute_derivatives_and_save(lambda x : log_phi_lib.alpha_pert_pos(x, alpha0), 'alpha_pert_pos')
-compute_derivatives_and_save(lambda x : log_phi_lib.alpha_pert_neg(x, alpha0), 'alpha_pert_neg')
+compute_derivatives_and_save('worst_case')
+compute_derivatives_and_save('sigmoidal')
+compute_derivatives_and_save('sigmoidal_neg')
+compute_derivatives_and_save('alpha_pert_pos')
+compute_derivatives_and_save('alpha_pert_neg')
 
 print('done. ')
