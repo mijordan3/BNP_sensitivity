@@ -3,6 +3,9 @@
 *__pycache__
 *.pyc
 
+*.so
+*.c
+
 *.aux
 *.fdb_latexmk
 *.fls
