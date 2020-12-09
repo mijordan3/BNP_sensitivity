@@ -1,13 +1,10 @@
 import jax
 
 import jax.numpy as np
-import jax.scipy as sp
-
-from numpy.polynomial.hermite import hermgauss
 
 from bnpmodeling_runjingdev import modeling_lib
 
-from vb_lib import structure_model_lib, data_utils, cavi_lib, testutils
+from vb_lib import structure_model_lib, cavi_lib, testutils
 
 import unittest
 
