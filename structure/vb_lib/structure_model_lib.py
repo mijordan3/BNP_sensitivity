@@ -70,7 +70,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
             paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
         ind_admix_params_paragami['stick_infos'] = \
             paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
-                                            lb = 1e-4)
+                                            lb = 0.0)
     else:
         # else they are beta distributed
         ind_admix_params_paragami['stick_beta'] = \
