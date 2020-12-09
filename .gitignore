@@ -27,6 +27,18 @@
 
 *deleteme* 
 
+# structure data files 
+*.bed
+*.bim
+*.fam
+*.hh
+*.log
+*.map
+*.missing
+*.npz
+*.ped
+*.stru
+
 # Distribution / packaging
 .Python
 build/
