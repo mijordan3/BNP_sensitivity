@@ -3,6 +3,9 @@
 *__pycache__
 *.pyc
 
+*.so
+*.c
+
 *.aux
 *.fdb_latexmk
 *.fls
@@ -23,6 +26,18 @@
 *.npz
 
 *deleteme* 
+
+# structure data files 
+*.bed
+*.bim
+*.fam
+*.hh
+*.log
+*.map
+*.missing
+*.npz
+*.ped
+*.stru
 
 # Distribution / packaging
 .Python
