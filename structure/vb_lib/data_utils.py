@@ -115,9 +115,7 @@ def draw_data(n_obs, n_loci, n_pop,
     for i in range(n_batches):
         indx0 = batchsize * i
         indx1 = batchsize * (i+1) 
-        
-        print('Generating datapoints ', indx0, ' to ', indx1)
-        
+                
         g_obs[indx0:indx1] = \
             draw_data_from_popfreq_and_admix(true_pop_allele_freq,
                                              true_ind_admix_propn[indx0:indx1])
