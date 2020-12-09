@@ -27,7 +27,7 @@ allele_prior_alpha = prior_params_dict['allele_prior_alpha']
 allele_prior_beta = prior_params_dict['allele_prior_beta']
 
 # vb params
-k_approx = 12
+k_approx = 7
 gh_deg = 8
 gh_loc, gh_weights = hermgauss(gh_deg)
 use_logitnormal_sticks = False
