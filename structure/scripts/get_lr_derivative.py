@@ -128,6 +128,7 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     obj_fun_hvp = stru_objective.hvp, 
                     hyper_par_objective_fun = alpha_obj_fun, 
                     cg_precond = cg_precond)
+print(vb_sens.cg_tol)
 
 # save what we need
 vars_to_save = dict()
