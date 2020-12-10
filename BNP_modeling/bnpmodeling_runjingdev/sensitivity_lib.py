@@ -22,7 +22,6 @@ class HyperparameterSensitivityLinearApproximation(object):
                  hyper_par_value0,
                  obj_fun_hvp = None,
                  hyper_par_objective_fun = None,
-                 cg_maxiter = None,
                  cg_precond = None):
 
         self.objective_fun = objective_fun
@@ -33,7 +32,6 @@ class HyperparameterSensitivityLinearApproximation(object):
             hyper_par_objective_fun = objective_fun
 
         self.cg_precond = cg_precond
-        self.cg_maxiter = cg_maxiter
 
         # hessian vector products
         if obj_fun_hvp is None: 
@@ -90,7 +88,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
                                    b = b,
                                    M = self.cg_precond, 
-                                   maxiter = self.cg_maxiter)[0])
+                                   tol = 1e-3)[0])
 
         print('Compiling hessian solver ...')
         t0 = time.time()
