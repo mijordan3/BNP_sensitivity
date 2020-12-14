@@ -1,5 +1,8 @@
-These scripts run the STRUCTURE optimzation routine. 
+These scripts our structure experiments
 
-See `get_structure_fit.py` and `get_structure_fit.sh` to get a single fit. 
-
-To get a suite of fits for sensitivity analysis, see `get_alpha_perturbation_fit.sh`
+```
+./fit_structure.sh # gets initial fit
+./fit_structure_on_alpha_vec.sh # fits on range of alphas
+./fit_lr_derivative_vec.sh # fits lr derivative at a few alphas
+./fit_structure_on_epsilon_vec.sh # refit at functional perturbations
+```

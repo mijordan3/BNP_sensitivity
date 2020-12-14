@@ -4,10 +4,14 @@
 import jax
 import jax.numpy as np
 
+import numpy as onp
 from jax.scipy.sparse.linalg import cg
-# from scipy.sparse.linalg import cg, LinearOperator
+
+import scipy.sparse.linalg as sparse_linalg
 
 import time
+
+import inspect
 
 # wrapper to get hessian vector products in jax
 def get_jac_hvp_fun(f):
@@ -22,8 +26,8 @@ class HyperparameterSensitivityLinearApproximation(object):
                  hyper_par_value0,
                  obj_fun_hvp = None,
                  hyper_par_objective_fun = None,
-                 cg_maxiter = None,
-                 cg_precond = None):
+                 cg_precond = None, 
+                 use_scipy_cgsolve = False):
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value
@@ -33,7 +37,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             hyper_par_objective_fun = objective_fun
 
         self.cg_precond = cg_precond
-        self.cg_maxiter = cg_maxiter
+        self.use_scipy_cgsolve = use_scipy_cgsolve
 
         # hessian vector products
         if obj_fun_hvp is None: 
@@ -85,17 +89,24 @@ class HyperparameterSensitivityLinearApproximation(object):
         print('LR sensitivity time: {0:3g}sec\n'.format(self.lr_time))
 
     def _set_hessian_solver(self):
-
-        self.hessian_solver = \
-            jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
-                                   b = b,
-                                   M = self.cg_precond, 
-                                   maxiter = self.cg_maxiter)[0])
-
-        print('Compiling hessian solver ...')
-        t0 = time.time()
-        _ = self.hessian_solver(self.opt_par_value * 0.).block_until_ready()
-        print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
+        
+        if self.use_scipy_cgsolve: 
+            self.cg_solver = ScipyCgSolver(self.obj_fun_hvp, 
+                                           self.opt_par_value, 
+                                           self.cg_precond)
+            
+            self.hessian_solver = lambda b : self.cg_solver.hessian_solver(b)
+            
+        else: 
+            self.hessian_solver = \
+                jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
+                                       b = b,
+                                       M = self.cg_precond)[0])
+            
+            print('Compiling hessian solver ...')
+            t0 = time.time()
+            _ = self.hessian_solver(self.opt_par_value * 0.).block_until_ready()
+            print('Hessian solver compile time: {0:3g}sec\n'.format(time.time() - t0))
 
 
     def predict_opt_par_from_hyper_par(self, hyper_par_value):
@@ -105,3 +116,58 @@ class HyperparameterSensitivityLinearApproximation(object):
             self.dinput_dhyper = np.expand_dims(self.dinput_dhyper, 1)
 
         return np.dot(self.dinput_dhyper, delta) + self.opt_par_value
+
+class ScipyCgSolver(): 
+    def __init__(self, obj_fun_hvp, opt_par_value, cg_precond): 
+        
+        self.vb_dim = len(opt_par_value)
+        self.hvp = jax.jit(lambda x : obj_fun_hvp(opt_par_value, x))
+        
+        print('Compiling hvp ...')
+        t0 = time.time()
+        _ = self.hvp(opt_par_value).block_until_ready()
+        print('hvp compile time: {0:3g}sec\n'.format(time.time() - t0))
+        
+        if cg_precond is not None: 
+            self.cg_precond = jax.jit(cg_precond)
+            print('Compiling preconditioner ...')
+            t0 = time.time()
+            _ = self.cg_precond(opt_par_value).block_until_ready()
+            print('preconditioner compile time: {0:3g}sec\n'.format(time.time() - t0))
+            
+            self.M = sparse_linalg.LinearOperator(matvec = self.cg_precond, 
+                                              shape = (self.vb_dim, ) * 2)
+        else: 
+            self.M = None
+            
+        self.A = sparse_linalg.LinearOperator(matvec = self.hvp, 
+                                              shape = (self.vb_dim, ) * 2)
+
+    def callback(self, xk): 
+        
+        if self.iter > 0: 
+            
+            # this gets the residuals. adapted from 
+            # https://stackoverflow.com/questions/14243579/ \
+            # print-current-residual-from-callback-in-scipy-sparse-linalg-cg
+            frame = inspect.currentframe().f_back
+            res = frame.f_locals['resid']
+            
+            elapsed = time.time() - self.t0
+            print('Iter [{}]; elapsed {}sec; diff: {}'.format(self.iter,
+                                                              np.round(elapsed, 3), 
+                                                              res))
+            
+        self.t0 = time.time()
+        self.iter += 1
+        
+    def hessian_solver(self, b): 
+        self.iter = 0
+        out = sparse_linalg.cg(A = self.A, 
+                                b = b, 
+                                M = self.M, 
+                                callback = self.callback)
+        
+        return np.array(out[0])
+                                
+        

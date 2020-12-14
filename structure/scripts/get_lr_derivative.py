@@ -143,7 +143,7 @@ def save_derivatives(vars_to_save):
              **vars_to_save)
 
 save_derivatives(vars_to_save)
-    
+
     
 ###############
 # Compute influence function
