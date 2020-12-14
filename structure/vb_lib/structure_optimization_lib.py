@@ -90,6 +90,7 @@ def initialize_with_cavi(g_obs,
                          prior_params_dict, 
                          gh_loc, gh_weights, 
                          print_every = 20, 
+                         debug_cavi = False,
                          max_iter = 100, 
                          seed = 0): 
     
@@ -116,6 +117,7 @@ def initialize_with_cavi(g_obs,
                  vb_params_paragami_beta,
                  prior_params_dict, 
                  print_every = print_every, 
+                 debug = debug_cavi,
                  max_iter = max_iter)
     
     cavi_time = cavi_time[-1]

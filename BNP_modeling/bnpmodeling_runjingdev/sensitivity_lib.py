@@ -95,7 +95,7 @@ class HyperparameterSensitivityLinearApproximation(object):
                                            self.opt_par_value, 
                                            self.cg_precond)
             
-            self.hessian_solver = lambda b : self.cg_solver.hessian_solver(b)[0]
+            self.hessian_solver = lambda b : self.cg_solver.hessian_solver(b)
             
         else: 
             self.hessian_solver = \
@@ -134,16 +134,15 @@ class ScipyCgSolver():
             t0 = time.time()
             _ = self.cg_precond(opt_par_value).block_until_ready()
             print('preconditioner compile time: {0:3g}sec\n'.format(time.time() - t0))
+            
+            self.M = sparse_linalg.LinearOperator(matvec = self.cg_precond, 
+                                              shape = (self.vb_dim, ) * 2)
         else: 
-            self.cg_precond = None
+            self.M = None
             
         self.A = sparse_linalg.LinearOperator(matvec = self.hvp, 
                                               shape = (self.vb_dim, ) * 2)
-        self.M = sparse_linalg.LinearOperator(matvec = self.cg_precond, 
-                                              shape = (self.vb_dim, ) * 2)
-        
-        self.iter = 0
-        
+
     def callback(self, xk): 
         
         if self.iter > 0: 
@@ -163,7 +162,7 @@ class ScipyCgSolver():
         self.iter += 1
         
     def hessian_solver(self, b): 
-        
+        self.iter = 0
         out = sparse_linalg.cg(A = self.A, 
                                 b = b, 
                                 M = self.M, 

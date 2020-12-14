@@ -127,8 +127,7 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     hyper_par_value0 = np.array([0.]), 
                     obj_fun_hvp = stru_objective.hvp, 
                     hyper_par_objective_fun = alpha_obj_fun, 
-                    cg_precond = cg_precond, 
-                    use_scipy_cgsolve = True)
+                    cg_precond = cg_precond)
 
 # save what we need
 vars_to_save = dict()

@@ -142,28 +142,10 @@ class TestStructurePreconditionedObjective(unittest.TestCase):
 
 class TestStructureOptimization(unittest.TestCase):
     def test_optimization(self): 
+        
         # this just checks that all the optimization 
         # functions run without error 
-        
-        # define model
-        g_obs, _, vb_params_paragami, prior_params_dict, gh_loc, gh_weights = \
-            testutils.draw_data_and_construct_model()
-        
-        # cavi init
-        vb_params_dict, _ = \
-            s_optim_lib.initialize_with_cavi(g_obs, 
-                                             vb_params_paragami, 
-                                             prior_params_dict, 
-                                             gh_loc, gh_weights, 
-                                             print_every = 1, 
-                                             seed = 34142)
-        
-        # run lbfgs
-        _ = s_optim_lib.run_preconditioned_lbfgs(g_obs, 
-                        vb_params_dict, 
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc, gh_weights)
+        _ = testutils.construct_model_and_optimize()
         
 if __name__ == '__main__':
     unittest.main()
