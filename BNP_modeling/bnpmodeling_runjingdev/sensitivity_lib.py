@@ -11,6 +11,8 @@ import scipy.sparse.linalg as sparse_linalg
 
 import time
 
+import inspect
+
 # wrapper to get hessian vector products in jax
 def get_jac_hvp_fun(f):
     def hvp(x, v):
@@ -137,27 +139,36 @@ class ScipyCgSolver():
             
         self.A = sparse_linalg.LinearOperator(matvec = self.hvp, 
                                               shape = (self.vb_dim, ) * 2)
+        self.M = sparse_linalg.LinearOperator(matvec = self.cg_precond, 
+                                              shape = (self.vb_dim, ) * 2)
         
         self.iter = 0
         
     def callback(self, xk): 
         
         if self.iter > 0: 
-            diff = np.abs(xk - self.xk).max()
+            
+            # this gets the residuals. adapted from 
+            # https://stackoverflow.com/questions/14243579/ \
+            # print-current-residual-from-callback-in-scipy-sparse-linalg-cg
+            frame = inspect.currentframe().f_back
+            res = frame.f_locals['resid']
+            
             elapsed = time.time() - self.t0
-            print('Iter [{}]; elapsed {0:3g}sec; diff: {:6g}'.format(self.iter,
-                                                                     elapsed, 
-                                                                     diff))
+            print('Iter [{}]; elapsed {}sec; diff: {}'.format(self.iter,
+                                                              np.round(elapsed, 3), 
+                                                              res))
             
         self.t0 = time.time()
-        self.xk = xk
         self.iter += 1
         
     def hessian_solver(self, b): 
         
-        return sparse_linalg.cg(A = self.A, 
+        out = sparse_linalg.cg(A = self.A, 
                                 b = b, 
-                                M = self.cg_precond, 
+                                M = self.M, 
                                 callback = self.callback)
+        
+        return np.array(out[0])
                                 
         
