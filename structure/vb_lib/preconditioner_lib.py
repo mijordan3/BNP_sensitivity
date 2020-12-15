@@ -7,7 +7,7 @@ import paragami
 from paragami.optimization_lib import _get_sym_matrix_inv_sqrt_funcs, \
                                         _get_matrix_from_operator
 
-def get_log_beta_covariance(alpha, beta, return_info, return_sqrt, v):
+def _get_log_beta_covariance(alpha, beta, return_info, return_sqrt, v):
     # returns the covariance of the score function
     # of the beta distribution
 
@@ -43,7 +43,7 @@ def _eval_popbeta_cov_matmul(vb_params_pop_params, return_info, return_sqrt, v):
 
     def f(x):
 
-        cov = get_log_beta_covariance(x[0], x[1], return_info, return_sqrt, x[2:4])
+        cov = _get_log_beta_covariance(x[0], x[1], return_info, return_sqrt, x[2:4])
 
         return cov
 
@@ -55,8 +55,38 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
                         vb_params_paragami,
                         return_info = False, 
                         return_sqrt = False):
-
-    # compute preconditioner from MFVB covariances
+    """
+    Function that returns the (square root) MFVB covariance (information)
+    times a vector `v`. 
+    
+    The argument `M` to jax.scipy.sparse.linalg.cg should be:
+    
+    M = lambda v : get_mfvb_cov_matmul(v, 
+                                        vb_params_dict,
+                                        vb_params_paragami,
+                                        return_sqrt = False, 
+                                        return_info = True)
+    
+    Parameters
+    ----------
+    v : vector 
+        vector to be pre-mutiplied by the (square root) covariance (information). 
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    return_info : boolean
+        If `True`, returns the information matrix. If `False`, returns 
+        the covariance. The input to the cg solver should be `True`. 
+    return_sqrt : boolean
+        Whether to take the square root of the covariance (information). 
+        The input to the cg solver should be `False`. 
+    
+    Returns
+    -------
+    the (square root) MFVB covariance (information)
+        times `v`.  
+    """
 
     block_mfvb_cov = ()
 

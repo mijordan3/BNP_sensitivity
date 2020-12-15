@@ -20,6 +20,9 @@ def get_jac_hvp_fun(f):
     return hvp
 
 class HyperparameterSensitivityLinearApproximation(object):
+    # sensitivity class adapted from 
+    # https://github.com/rgiordan/vittles/blob/master/vittles/sensitivity_lib.py
+    
     def __init__(self,
                  objective_fun,
                  opt_par_value,
@@ -28,6 +31,39 @@ class HyperparameterSensitivityLinearApproximation(object):
                  hyper_par_objective_fun = None,
                  cg_precond = None, 
                  use_scipy_cgsolve = False):
+        """
+        Parameters
+        ----------
+        objective_fun : callable
+            Objective as function of vb parameters (in flattened space)
+            and prior parameter. 
+        opt_par_value : array
+            the value that optimizes `objective_fun` at `hyper_par_value0`
+        hyper_par_value0 : array
+            the prior parameter for which 'opt_var_value` optimizes 
+            `objective_fun`. 
+        obj_fun_hvp : callable, optional
+            Function that takes in a vector of same length as `opt_par_value`
+            and returns the hessian vector product at `opt_par_value`. 
+            If none, this is computed automatically using jax derivatives.
+        hyper_par_objective_fun : callable, optional
+            The part of ``objective_fun`` depending on both ``opt_par`` and
+            ``hyper_par``. If not specified,
+            ``objective_fun`` is used.
+        cg_precond : callable, optional
+            Function that takes in a vector `v` of same length as `opt_par_value`
+            and returns a preconditioner times `v` for the cg solver
+            (this is the argument `M`)
+        use_scipy_cgsolve : boolean
+            If `True`, we compile HVPs and use the scipy solver (which 
+            has richer callback functions we can use for printing values
+            and debugging). 
+            If `False`, the entire hessian solver is compiled. 
+            That is, we compile the mapping from (vb_opt, cross_hess) to dinput/dhyper
+            is jitted. Initial compile time will be slow, but the 
+            subsequent evaluations will be fast. 
+        """
+        
 
         self.objective_fun = objective_fun
         self.opt_par_value = opt_par_value

@@ -41,14 +41,6 @@ def get_vb_params_paragami_object(n_obs, n_loci, k_approx,
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
-        The beta parameters are for population frequencies are
-        stored in 'pop_freq_beta_params'.
-        If use_logitnormal_sticks = True, then we model the sticks
-        for the individual admixtures using logitnormals,
-        whose means and infos are stored in 'ind_mix_stick_propn_mean'
-        and 'ind_mix_stick_propn_info'.
-        Else, we use a beta approximation to the sticks, and
-        these are stored in 'ind_mix_stick_beta_params'
 
     vb_params_paragami : paragami patterned dictionary
         A paragami patterned dictionary that contains the variational parameters.
@@ -264,8 +256,11 @@ def get_e_joint_loglik_from_nat_params(g_obs,
     return e_log_prior + e_loglik
 
 
-def get_kl(g_obs, vb_params_dict, prior_params_dict,
-           gh_loc = None, gh_weights = None,
+def get_kl(g_obs, 
+           vb_params_dict, 
+           prior_params_dict,
+           gh_loc = None, 
+           gh_weights = None,
            e_log_phi = None,
            detach_ez = False):
 
@@ -281,24 +276,25 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
         Dictionary of variational parameters.
     prior_params_dict : dictionary
         Dictionary of prior parameters.
-    use_logitnormal_sticks : boolean
-        Whether to use a logitnormal approximation to infer the sticks.
     gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
+        Locations for gauss-hermite quadrature.
+        Required if sticks are modeled using a logit-normal.
     gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    e_z : ndarray (optional)
-        The optimal cluster belongings as a function of the variational
-        parameters, stored in an array whose (n, l, k, i)th entry is the probability
-        of the nth datapoint at locus l and chromosome i belonging to cluster k.
-        If ``None``, we set the optimal z.
-    obs_weights: ndarray
-        weights for the individual observations
-    loci_weights: ndarray
-        weights for the loci
-
+        Weights for gauss-hermite quadrature. 
+        Required if sticks are modeled using a logit-normal.
+    e_log_phi : callable
+        Function with arguments stick_means and stick_infos 
+        and returns the expected log-multiplicative perturbation.
+        If not None, sticks must be modeled using a logit-normal.
+    detach_ez : boolean
+        Does not affect the KL but will affect derivatives.
+        If True, derivatives are computed with 
+        the expected cluster belongings
+        (in unconstrained space) fixed. 
+        Otherwise, the resulting derivative will be 
+        the total derivative (differentiating through 
+        the optimality of the cluster belongings). 
+        
     Returns
     -------
     kl : float
@@ -342,7 +338,6 @@ def get_kl(g_obs, vb_params_dict, prior_params_dict,
 ######################
 # Some helpful functions to get posterior moments
 ######################
-
 def get_moments_from_vb_params_dict(vb_params_dict,
                                     gh_loc = None,
                                     gh_weights = None):
@@ -454,7 +449,7 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
 
 
 #####################
-# Function to save / load a structure fit
+# Functions to save / load a structure fit
 #####################
 def save_structure_fit(outfile, vb_params_dict, vb_params_paragami, 
                        prior_params_dict, gh_deg, **kwargs): 
@@ -496,7 +491,6 @@ def load_structure_fit(fit_file):
 #####################
 # hyper-parameter objective functions: 
 # NOTE these are **added** to the **KL**
-# not the ELBO
 #####################
 def alpha_objective_fun(vb_params_dict, alpha, gh_loc, gh_weights): 
     
