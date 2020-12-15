@@ -282,10 +282,10 @@ def get_kl(g_obs,
     gh_weights : vector
         Weights for gauss-hermite quadrature. 
         Required if sticks are modeled using a logit-normal.
-    e_log_phi : function
+    e_log_phi : callable
         Function with arguments stick_means and stick_infos 
         and returns the expected log-multiplicative perturbation.
-        If not None, sticks must be modeled using a logt-normal.
+        If not None, sticks must be modeled using a logit-normal.
     detach_ez : boolean
         Does not affect the KL but will affect derivatives.
         If True, derivatives are computed with 

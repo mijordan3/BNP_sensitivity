@@ -59,7 +59,7 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
     Function that returns the (square root) MFVB covariance (information)
     times a vector `v`. 
     
-    The argument `M` shoudld be to jax.scipy.sparse.linalg.cg
+    The argument `M` to jax.scipy.sparse.linalg.cg should be:
     
     M = lambda v : get_mfvb_cov_matmul(v, 
                                         vb_params_dict,

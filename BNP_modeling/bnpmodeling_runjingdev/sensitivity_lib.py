@@ -34,7 +34,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         """
         Parameters
         ----------
-        objective_fun : function
+        objective_fun : callable
             Objective as function of vb parameters (in flattened space)
             and prior parameter. 
         opt_par_value : array
@@ -42,15 +42,15 @@ class HyperparameterSensitivityLinearApproximation(object):
         hyper_par_value0 : array
             the prior parameter for which 'opt_var_value` optimizes 
             `objective_fun`. 
-        obj_fun_hvp : function (optional)
+        obj_fun_hvp : callable, optional
             Function that takes in a vector of same length as `opt_par_value`
             and returns the hessian vector product at `opt_par_value`. 
             If none, this is computed automatically using jax derivatives.
-        hyper_par_objective_fun : function, optional
+        hyper_par_objective_fun : callable, optional
             The part of ``objective_fun`` depending on both ``opt_par`` and
             ``hyper_par``. If not specified,
             ``objective_fun`` is used.
-        cg_precond : function (optional)
+        cg_precond : callable, optional
             Function that takes in a vector `v` of same length as `opt_par_value`
             and returns a preconditioner times `v` for the cg solver
             (this is the argument `M`)
@@ -60,7 +60,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             and debugging). 
             If `False`, the entire hessian solver is compiled. 
             That is, we compile the mapping from (vb_opt, cross_hess) to dinput/dhyper
-            is jitted). Initial compile time will be slow, but the 
+            is jitted. Initial compile time will be slow, but the 
             subsequent evaluations will be fast. 
         """
         

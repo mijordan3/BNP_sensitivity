@@ -39,7 +39,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     stick_betas : array
         array (n_obs x (k_approx - 1) x 2) of beta parameters 
         on individual admixture stick-breaking proportions.
-    logitnorm_stick_params_dict : integer
+    logitnorm_stick_params_dict : dictionary
         parameter dictionary of logitnormal parameters
         (stick_means, stick_infos) for individual admixture
         stick-breaking proportions
