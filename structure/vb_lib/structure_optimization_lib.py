@@ -29,6 +29,37 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
                                        logitnorm_stick_params_dict,
                                        logitnorm_stick_params_paragami, 
                                        gh_loc, gh_weights): 
+    """
+    Given a set of beta parameters for stick-breaking proportions, 
+    return the logitnormal stick parameters that have the same
+    expected log(stick) and expected log(1 - stick). 
+    
+    Parameters
+    ----------
+    stick_betas : array
+        array (n_obs x (k_approx - 1) x 2) of beta parameters 
+        on individual admixture stick-breaking proportions.
+    logitnorm_stick_params_dict : integer
+        parameter dictionary of logitnormal parameters
+        (stick_means, stick_infos) for individual admixture
+        stick-breaking proportions
+    logitnorm_stick_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational
+        parameters
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. 
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+        
+    Returns
+    -------
+    opt_logitnorm_stick_params : dictionary
+        A dictionary that contains the variational parameters
+        for individual admixture stick-breaking
+        proportions. 
+    out : scipy.optimize.minimize output
+    """
+
     
     # check shapes
     assert logitnorm_stick_params_dict['stick_means'].shape[0] == \
@@ -93,7 +124,38 @@ def initialize_with_cavi(g_obs,
                          debug_cavi = False,
                          max_iter = 100, 
                          seed = 0): 
+    """
+    Initializes model with by running CAVI steps on the model 
+    using on beta-sticks. Then, convert beta sticks to logit-normal sticks. 
+    The returned parameter dictionary contains the logit-normal sticks. 
     
+    Parameters
+    ----------
+    g_obs : ndarray
+        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, 3)
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+        parameters
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. 
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    debug_cavi : boolean
+        whether to check the KL after every cavi step to assert
+        the KL decreased. 
+        (Only used for testing. Computing the KL may be expensive). 
+        
+    Returns
+    -------
+    vb_params_dict : dictionary
+        A dictionary that contains the variational parameters
+        after cavi optimization. 
+    cavi_time : float
+        Optimization time (excluding compiling). 
+    """
+
     # this is just a place-holder
     vb_params_dict = vb_params_paragami.random()
     
@@ -146,7 +208,16 @@ def initialize_with_cavi(g_obs,
 #########################
 # The structure objective
 #########################
-class StructureObjective(): 
+class StructureObjective():
+    """
+    This class contains the structure objective. 
+    The method self.f returns the KL objective 
+    as a function of vb parameters in flattened space. 
+    
+    The methods self.grad and self.hvp return the 
+    gradient and hessian vector product, respectively. 
+    """
+    
     def __init__(self,
                  g_obs, 
                  vb_params_paragami,
@@ -154,7 +225,28 @@ class StructureObjective():
                  gh_loc, gh_weights, 
                  e_log_phi = None, 
                  jit_functions = True): 
-        
+        """
+        Parameters
+        ----------
+        g_obs : ndarray
+            The array of one-hot encoded genotypes, of shape (n_obs, n_loci, 3)
+        vb_params_paragami : paragami patterned dictionary
+            A paragami patterned dictionary that contains the variational parameters.
+        prior_params_dict : dictionary
+            Dictionary of prior parameters.
+            parameters
+        gh_loc : vector
+            Locations for gauss-hermite quadrature. 
+        gh_weights : vector
+            Weights for gauss-hermite quadrature. 
+        e_log_phi : function
+            Function with arguments stick_means and stick_infos 
+            and returns the expected log-multiplicative perturbation.
+        jit_functions : boolean
+            Whether or not to call jax.jit on the function and 
+            gradients
+        """
+
         self.g_obs = g_obs
         self.vb_params_paragami = vb_params_paragami 
         self.prior_params_dict = prior_params_dict 
@@ -167,7 +259,7 @@ class StructureObjective():
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
         
-        self.grad_unjitted = jax.grad(self.f_unjitted)
+        self._grad = jax.grad(self._f)
 
         self.jit_functions = jit_functions
         self._jit_functions()
@@ -175,15 +267,15 @@ class StructureObjective():
             self._compile_functions()
         
 
-    def f_unjitted(self, vb_free_params):
+    def _f(self, vb_free_params):
         # note that we detach the ez! 
-        # the gradient wrt to self.f_unjitted does not change, and will be faster. 
-        # the hvp with respect to self.f_unjitted will **not** be correct! 
+        # the gradient wrt to self.f does not change, and will be faster. 
+        # the hvp with respect to self.f will **not** be correct! 
         # (this will be the hessian of parameters with the e_z fixed). 
         
         # See the custom HVP implementation below. 
-        # these adjustments were made so that HVPs for the HGDP data 
-        # do not crash ... 
+        # these adjustments were made so that HVPs are faster
+        # do not crash on HGDP data ... 
         
         vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
 
@@ -193,15 +285,15 @@ class StructureObjective():
                                           e_log_phi = self.e_log_phi, 
                                           detach_ez = True)
     
-    def hvp_unjitted(self, vb_free_params, v): 
+    def _hvp(self, vb_free_params, v): 
         # this is my custom hessian vector product implementation. 
-        # note that self.f_unjitted detaches the ez, so the naive hvp on 
-        # self.f_unjitted will the hvp with the ez's **fixed**. 
+        # note that self.f detaches the ez, so the naive hvp on 
+        # self.f will the hvp with the ez's **fixed**. 
         
         # this is the HVP with z fixed ....
-        kl_theta2_v = jax.jvp(jax.grad(self.f_unjitted), (vb_free_params, ), (v, ))[1]
+        kl_theta2_v = jax.jvp(jax.grad(self._f), (vb_free_params, ), (v, ))[1]
         
-        # this is the corection term for the e_zs
+        # this is the corection term taking into account e_zs
         kl_zz_v = self._kl_zz(vb_free_params, v)
         
         return kl_theta2_v - kl_zz_v
@@ -246,7 +338,9 @@ class StructureObjective():
         
     
     def _get_moments_from_vb_free_params(self, vb_free_params): 
-        
+        # returns moments (expected log cluster belongings, 
+        # expected log population frequencies) 
+        # as a function of vb free parameters
         vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
         
         pop_freq_beta_params = vb_params_dict['pop_freq_beta_params']
@@ -272,6 +366,8 @@ class StructureObjective():
     def _ps_loss_zl(g_obs_l, 
                     e_log_cluster_probs, 
                     e_log_pop_freq_l): 
+        # returns the ez (in its free parameterization)
+        # as a function of the necessary moments
         
         e_log_pop = e_log_pop_freq_l[:, 0]
         e_log_1mpop = e_log_pop_freq_l[:, 1]
@@ -287,7 +383,10 @@ class StructureObjective():
     
     @staticmethod
     def _constrain_ez_free_jvp(ez_free, v): 
-    
+        # jvp of the softmax function 
+        # specifically, this is the jacobian of 
+        # jax.nn.softmax(ez_free, 1)
+        
         ez = jax.nn.softmax(ez_free, 1)
 
         term1 = ez * v
@@ -297,14 +396,14 @@ class StructureObjective():
     
     def _jit_functions(self): 
         if self.jit_functions: 
-            self.f = jax.jit(self.f_unjitted)
-            self.grad = jax.jit(self.grad_unjitted)
-            self.hvp = jax.jit(self.hvp_unjitted)
+            self.f = jax.jit(self._f)
+            self.grad = jax.jit(self._grad)
+            self.hvp = jax.jit(self._hvp)
             
         else: 
-            self.f = self.f_unjitted
-            self.grad = self.grad_unjitted
-            self.hvp = self.hvp_unjitted
+            self.f = self._f
+            self.grad = self._grad
+            self.hvp = self._hvp
     
     def _compile_functions(self): 
         x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
@@ -319,13 +418,55 @@ class StructureObjective():
         
 
 class StructurePrecondObjective(StructureObjective):
+    """
+    This class contains the structure objective. 
+    the method self.f returns the KL objective 
+    as a function of vb parameters in free space. 
+    
+    The methods self.grad and self.hvp return the 
+    gradient and hessian vector product, respectively. 
+    
+    The corresponding methods self.f_precond, 
+    self.grad_precond, self.hvp_precond are 
+    preconditioned functions, using the MFVB covariance 
+    as a preconditioner.
+    
+    The preconditioned functions take two arguments: the 
+    parameters at which to evaluate the function 
+    (in preconditioned space), 
+    and the vb parameters at which the preconditioner is 
+    precomputed. (This is so that we do not need to 
+    re-compile everything
+    when we want to update the preconditioner).
+    """
+    
     def __init__(self,
-                    g_obs, 
-                    vb_params_paragami,
-                    prior_params_dict, 
-                    gh_loc, gh_weights, 
-                    e_log_phi = None): 
+                 g_obs, 
+                 vb_params_paragami,
+                 prior_params_dict, 
+                 gh_loc, gh_weights, 
+                 compile_hvp = True,
+                 e_log_phi = None): 
         
+        """
+        Parameters
+        ----------
+        g_obs : ndarray
+            The array of one-hot encoded genotypes, of shape (n_obs, n_loci, 3)
+        vb_params_paragami : paragami patterned dictionary
+            A paragami patterned dictionary that contains the variational parameters.
+        prior_params_dict : dictionary
+            Dictionary of prior parameters.
+            parameters
+        gh_loc : vector
+            Locations for gauss-hermite quadrature. 
+        gh_weights : vector
+            Weights for gauss-hermite quadrature. 
+        e_log_phi : function
+            Function with arguments stick_means and stick_infos 
+            and returns the expected log-multiplicative perturbation.
+        """
+
         super().__init__(g_obs, 
                          vb_params_paragami,
                          prior_params_dict, 
@@ -333,7 +474,7 @@ class StructurePrecondObjective(StructureObjective):
                          e_log_phi = e_log_phi, 
                          jit_functions = False)
         
-        self.compile_preconditioned_objectives()
+        self.compile_preconditioned_objectives(compile_hvp)
         
     def _precondition(self, x, precond_params): 
 
@@ -354,7 +495,7 @@ class StructurePrecondObjective(StructureObjective):
                                     return_sqrt = True)
         
     def _f_precond(self, x_c, precond_params): 
-        return self.f_unjitted(self._unprecondition(x_c, precond_params))
+        return self.f(self._unprecondition(x_c, precond_params))
     
     def _grad_precond(self, x_c, precond_params): 
         x = self._unprecondition(x_c, precond_params)
@@ -366,19 +507,22 @@ class StructurePrecondObjective(StructureObjective):
         
         x = self._unprecondition(x_c, precond_params)
         v1 = self._unprecondition(v, precond_params)
-        hvp = self.hvp_unjitted(x, v1)
+        hvp = self.hvp(x, v1)
         hvp = self._unprecondition(hvp, precond_params)
 
         return hvp
     
-    def compile_preconditioned_objectives(self): 
+    def compile_preconditioned_objectives(self, compile_hvp): 
         self.f_precond = jax.jit(self._f_precond)
         self.precondition = jax.jit(self._precondition)
         self.unprecondition = jax.jit(self._unprecondition)
-        
-        # self.grad_precond = jax.jit(jax.grad(self._f_precond, argnums = 0))
+
         self.grad_precond = jax.jit(self._grad_precond)
-        self.hvp_precond = jax.jit(self._hvp_precond)
+        
+        if compile_hvp: 
+            self.hvp_precond = jax.jit(self._hvp_precond)
+        else: 
+            self.hvp_precond = self._hvp_precond
         
         x = self.vb_params_paragami.flatten(self.vb_params_paragami.random(), 
                                             free = True)
@@ -404,13 +548,38 @@ def run_preconditioned_lbfgs(g_obs,
                             maxiter = 2000, 
                             x_tol = 1e-2, 
                             f_tol = 1e-2): 
-    
+    """
+    Parameters
+    ----------
+    g_obs : ndarray
+        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, 3)
+    vb_params_dict : dictionary
+        A dictionary that contains the initial variational parameters.
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+        parameters
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. 
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    e_log_phi : function
+        Function with arguments stick_means and stick_infos 
+        and returns the expected log-multiplicative perturbation.
+    precondition_every : integer
+        We re-compute the preconditioner after `precondition_every` steps. 
+    """
+
     # preconditioned objective 
     precon_objective = StructurePrecondObjective(g_obs, 
                                 vb_params_paragami,
                                 prior_params_dict,
-                                gh_loc = gh_loc, gh_weights = gh_weights,                       
-                                e_log_phi = e_log_phi)
+                                gh_loc = gh_loc, 
+                                gh_weights = gh_weights,                       
+                                e_log_phi = e_log_phi, 
+                                # we don't need hessian-vector-products
+                                compile_hvp = False)
     
     t0 = time.time()
     

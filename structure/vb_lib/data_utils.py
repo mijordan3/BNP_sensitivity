@@ -7,6 +7,11 @@ import scipy.cluster.hierarchy as sch
 
 from itertools import permutations
 
+
+###################
+# Functions to simulate data
+###################
+
 def get_one_hot(targets, nb_classes):
     res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
     return res.reshape(list(targets.shape)+[nb_classes])
@@ -62,7 +67,6 @@ def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
     return g_obs
 
 def draw_data(n_obs, n_loci, n_pop, 
-              mem_saver = False, 
               save_as_jnp = False):
     """
     Draws data for structure
@@ -87,9 +91,7 @@ def draw_data(n_obs, n_loci, n_pop,
     true_ind_admix_propn : ndarray
         The true individual admixtures from which g_obs was drawn,
         in a (n_obs x n_population) array.
-    mem_saver : boolean
-        Whether to compute g_obs in a for-loop, to save memory.
-        Needed for simulating particularly large datasets ...
+    
     """
 
 
@@ -103,25 +105,13 @@ def draw_data(n_obs, n_loci, n_pop,
     # cluster the individuals (just for better plotting)
     clustering_indx = cluster_admix_get_indx(true_ind_admix_propn)
     true_ind_admix_propn = true_ind_admix_propn[clustering_indx, :]
-
-    # draw data in batches (useful for simulating large datasets)
-    if mem_saver:
-        batchsize = 10
-    else:
-        batchsize = n_obs
-
-    n_batches = int(np.ceil(n_obs / batchsize))
-    g_obs = np.zeros((n_batches * batchsize, n_loci, 3))
-    for i in range(n_batches):
-        indx0 = batchsize * i
-        indx1 = batchsize * (i+1) 
-                
-        g_obs[indx0:indx1] = \
-            draw_data_from_popfreq_and_admix(true_pop_allele_freq,
-                                             true_ind_admix_propn[indx0:indx1])
-    g_obs = g_obs[0:n_obs]
+    
+    # draw data
+    g_obs = draw_data_from_popfreq_and_admix(true_pop_allele_freq,
+                                             true_ind_admix_propn)
     
     if save_as_jnp: 
+        # save as jax numpy object
         g_obs = jnp.array(g_obs) 
         true_pop_allele_freq = jnp.array(true_pop_allele_freq)
         true_ind_admix_propn = jnp.array(true_ind_admix_propn)
