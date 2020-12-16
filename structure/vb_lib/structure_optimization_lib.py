@@ -321,8 +321,9 @@ class StructureObjective():
                             (moments_tuple[0], x[1]), 
                             (moments_jvp[0], x[2]))
             
-            ez, hess_term = self._constrain_ez_free_jvp(ez_free, jvp)
-            hess_term = self._constrain_ez_free_jvp(ez_free, hess_term / ez)[1]
+            ez = jax.nn.softmax(ez_free, 1)
+            hess_term = self._constrain_ez_free_jvp(ez, jvp)
+            hess_term = self._constrain_ez_free_jvp(ez, hess_term / ez)
 
             _vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](hess_term)
 
@@ -382,17 +383,15 @@ class StructureObjective():
     
     
     @staticmethod
-    def _constrain_ez_free_jvp(ez_free, v): 
+    def _constrain_ez_free_jvp(ez, v): 
         # jvp of the softmax function 
         # specifically, this is the jacobian of 
         # jax.nn.softmax(ez_free, 1)
         
-        ez = jax.nn.softmax(ez_free, 1)
-
         term1 = ez * v
         term2 = ez * (ez * v).sum(1, keepdims = True)
 
-        return ez, term1 - term2
+        return term1 - term2
     
     def _jit_functions(self): 
         if self.jit_functions: 
