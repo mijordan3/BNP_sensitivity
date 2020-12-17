@@ -312,54 +312,30 @@ class StructureObjective():
         # [f_zz][dz/dzeta][dzeta/dmoments][dmoments/dtheta]
         
         
-        # returns [dmoments/dtheta] v
-        moments_tuple, moments_jvp = jax.jvp(self._get_moments_from_vb_free_params, \
+        # returns [dzeta/dtheta] v
+        ez_free, zeta_jvp = jax.jvp(self._get_zeta_from_vb_free_params, \
                                              (vb_free_params, ), (v, ))
         
-        # function that returns [dmoments/dtheta]^T v
-        moments_vjp = jax.vjp(self._get_moments_from_vb_free_params, 
+        # function that returns [dzeta/dtheta]^T v
+        zeta_vjp = jax.vjp(self._get_zeta_from_vb_free_params, 
                               vb_free_params)[1]
-        
-        def scan_fun(val, x): 
-            # x[0] is g_obs[:, l]
-            # x[1] is e_log_pop
-            # x[2] is e_log_pop jvp
+                    
+        ez = jax.nn.softmax(ez_free, 2)
+            
+        # multiply by [dz/dzeta]
+        dz_jvp = self._constrain_ez_free_jvp(ez, zeta_jvp)
 
-            fun = lambda clust_probs, pop_freq : \
-                    self._get_ez_free_from_moments(x[0], clust_probs, pop_freq)
-            
-            # multiply by [dzeta/dmoments] 
-            ez_free, zeta_jvp = jax.jvp(fun, 
-                            (moments_tuple[0], x[1]), 
-                            (moments_jvp[0], x[2]))
-            
-            ez = jax.nn.softmax(ez_free, 1)
-            
-            # multiply by [dz/dzeta]
-            dz_jvp = self._constrain_ez_free_jvp(ez, zeta_jvp)
-            
-            # mutliply by f_zz
-            fzz_jvp = dz_jvp / ez
-            
-            # multiply by [dz/dzeta]^T (same bc it is symmetric)     
-            ez_vjp = self._constrain_ez_free_jvp(ez, fzz_jvp)
-            
-            # multiply by [dzeta/dmoments]^T
-            _zeta_vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](ez_vjp)
+        # mutliply by f_zz
+        fzz_jvp = dz_jvp / ez
 
-            return _zeta_vjp[0] + val, _zeta_vjp[1]
-        
-        zeta_vjp = jax.lax.scan(scan_fun,
-                             init = np.zeros(moments_tuple[0].shape), 
-                             xs = (self.g_obs.transpose((1, 0, 2)), 
-                                   moments_tuple[1], 
-                                   moments_jvp[1]))
-        
+        # multiply by [dz/dzeta]^T (same bc it is symmetric)     
+        ez_vjp = self._constrain_ez_free_jvp(ez, fzz_jvp)
+                    
         # finally return [dmoments/dtheta]^T
-        return moments_vjp(zeta_vjp)[0]
+        return zeta_vjp(ez_vjp)[0]
         
     
-    def _get_moments_from_vb_free_params(self, vb_free_params): 
+    def _get_zeta_from_vb_free_params(self, vb_free_params): 
         # returns moments (expected log cluster belongings, 
         # expected log population frequencies) 
         # as a function of vb free parameters
@@ -381,36 +357,20 @@ class StructureObjective():
             modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                                 e_log_sticks, e_log_1m_sticks)
         
-        return e_log_cluster_probs, \
-                np.dstack((e_log_pop_freq, e_log_1m_pop_freq))
-    
-    @staticmethod
-    def _get_ez_free_from_moments(g_obs_l, 
-                                  e_log_cluster_probs, 
-                                  e_log_pop_freq_l): 
-        # returns the ez (in its free parameterization)
-        # as a function of the necessary moments
-        
-        e_log_pop = e_log_pop_freq_l[:, 0]
-        e_log_1mpop = e_log_pop_freq_l[:, 1]
-        
-        return structure_model_lib.\
-                           get_optimal_ezl(g_obs_l, 
-                                           np.expand_dims(e_log_pop, 0),
-                                           np.expand_dims(e_log_1mpop, 0),
-                                           e_log_cluster_probs,
-                                           detach_ez = True)[0]
-    
+        return structure_model_lib.get_loglik_cond_z(self.g_obs,
+                                                     e_log_pop_freq, 
+                                                     e_log_1m_pop_freq,
+                                                     e_log_cluster_probs)    
     
     
     @staticmethod
     def _constrain_ez_free_jvp(ez, v): 
         # jvp of the softmax function 
         # specifically, this is the jacobian of 
-        # jax.nn.softmax(ez_free, 1)
+        # jax.nn.softmax(ez_free, 2)
         
         term1 = ez * v
-        term2 = ez * (ez * v).sum(1, keepdims = True)
+        term2 = ez * term1.sum(2, keepdims = True)
 
         return term1 - term2
     
