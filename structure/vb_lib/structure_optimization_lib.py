@@ -395,11 +395,10 @@ class StructureObjective():
         e_log_1mpop = e_log_pop_freq_l[:, 1]
         
         return structure_model_lib.\
-                           get_optimal_ezl(g_obs_l, 
+                           get_loglik_cond_z_l(g_obs_l, 
                                            np.expand_dims(e_log_pop, 0),
                                            np.expand_dims(e_log_1mpop, 0),
-                                           e_log_cluster_probs,
-                                           detach_ez = True)[0]
+                                           e_log_cluster_probs)
     
     
     
@@ -410,7 +409,7 @@ class StructureObjective():
         # jax.nn.softmax(ez_free, 1)
         
         term1 = ez * v
-        term2 = ez * (ez * v).sum(1, keepdims = True)
+        term2 = ez * term1.sum(1, keepdims = True)
 
         return term1 - term2
     
