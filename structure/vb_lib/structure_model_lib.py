@@ -159,101 +159,71 @@ def get_entropy(vb_params_dict, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
+def get_loglik_gene_nlk(g_obs, e_log_pop_freq, e_log_1m_pop_freq):
 
-    g_obs_l0 = g_obs_l[:, 0]
-    g_obs_l1 = g_obs_l[:, 1]
-    g_obs_l2 = g_obs_l[:, 2]
+    genom_loglik_nlk_a = \
+        np.einsum('nl, lk -> nlk', g_obs[:, :, 0], e_log_1m_pop_freq) + \
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 1] + \
+                                        g_obs[:, :, 2], e_log_pop_freq)
 
-    loglik_a = \
-        np.outer(g_obs_l0, e_log_1m_pop_freq_l) + \
-            np.outer(g_obs_l1 + g_obs_l2, e_log_pop_freq_l)
-
-    loglik_b = \
-        np.outer(g_obs_l0 + g_obs_l1, e_log_1m_pop_freq_l) + \
-            np.outer(g_obs_l2, e_log_pop_freq_l)
-
-
-    return np.stack((loglik_a, loglik_b), axis = -1)
-
-def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, detach_ez): 
+    genom_loglik_nlk_b = \
+        np.einsum('nl, lk -> nlk', g_obs[:, :, 0] + \
+                                    g_obs[:, :, 1], e_log_1m_pop_freq) + \
+            np.einsum('nl, lk -> nlk', g_obs[:, :, 2], e_log_pop_freq)
     
-    # get loglikelihood of observations at loci l
-    loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
+    # this is n_obs x n_loci x k_aprox x 2
+    return np.stack((genom_loglik_nlk_a, genom_loglik_nlk_b), axis = -1)
 
-    # add individual belongings
-    loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
+def get_loglik_cond_z(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
+                        e_log_cluster_probs):
 
-    # individal x chromosome belongings
-    if detach_ez: 
-        e_z_free = jax.lax.stop_gradient(loglik_cond_z_l)
-    else: 
-        e_z_free = loglik_cond_z_l
-        
-    e_z_l = jax.nn.softmax(e_z_free, axis = 1)
-    
-    return loglik_cond_z_l, e_z_l
-    
-def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, 
-                    detach_ez):
-    # returns z-optimized log-likelihood for locus-l
-    
-    loglik_cond_z_l, e_z_l = \
-        get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                        e_log_cluster_probs, 
-                        detach_ez)
-    
-    # log likelihood
-    loglik_l = np.sum(loglik_cond_z_l * e_z_l)
+    # get likelihood of genes
+    loglik_gene_nlk = get_loglik_gene_nlk(g_obs, e_log_pop_freq, \
+                                            e_log_1m_pop_freq)
 
-    # entropy term: add this because the z's won't be available later
-    # compute the entropy
-    z_entropy_l = (sp.special.entr(e_z_l)).sum()
+    # log likelihood of population belongings
+    n = e_log_cluster_probs.shape[0]
+    k = e_log_cluster_probs.shape[1]
 
-    return loglik_l + z_entropy_l
+    # loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
+    loglik_cond_z = loglik_gene_nlk + e_log_cluster_probs.reshape(n, 1, k, 1)
 
-def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
-                    e_log_sticks, e_log_1m_sticks,
-                    detach_ez):
+    return loglik_cond_z
 
+def get_z_opt_from_loglik_cond_z(loglik_cond_z):
+    # 2nd axis dimension is k
+    # recall that loglik_obs_by_nlk2 is n_obs x n_loci x k_approx x 2
 
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
-    
-    body_fun = lambda val, x : get_e_loglik_l(x[0], x[1], x[2],
-                                             e_log_cluster_probs,
-                                             detach_ez) + val
-    
-    scan_fun = lambda val, x : (body_fun(val, x), None)
-    
-    return jax.lax.scan(scan_fun,
-                        init = 0.,
-                        xs = (g_obs.transpose((1, 0, 2)),
-                              e_log_pop_freq, 
-                              e_log_1m_pop_freq))[0]
+    return jax.nn.softmax(loglik_cond_z, axis = 2)
+
 
 def get_e_joint_loglik_from_nat_params(g_obs,
                                        e_log_pop_freq, e_log_1m_pop_freq,
                                        e_log_sticks, e_log_1m_sticks,
                                        dp_prior_alpha, allele_prior_alpha,
                                        allele_prior_beta,
-                                       detach_ez = False):
-
-    e_loglik = get_e_loglik(g_obs,
-                            e_log_pop_freq, e_log_1m_pop_freq, \
-                            e_log_sticks, e_log_1m_sticks,
-                            detach_ez)
-
+                                       ez = None):
+    
+    e_log_cluster_probs = \
+        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
+                            e_log_sticks, e_log_1m_sticks)
+    
+    loglik_cond_z = get_loglik_cond_z(g_obs, 
+                                      e_log_pop_freq,
+                                      e_log_1m_pop_freq,
+                                      e_log_cluster_probs)
+    if ez is None: 
+        ez = get_z_opt_from_loglik_cond_z(loglik_cond_z)
+    
+    e_loglik = (loglik_cond_z * ez).sum()
+    
     # prior term
     e_log_prior = get_e_log_prior(e_log_1m_sticks,
                             e_log_pop_freq, e_log_1m_pop_freq,
                             dp_prior_alpha, allele_prior_alpha,
                             allele_prior_beta).squeeze()
         
-    return e_log_prior + e_loglik
+    return e_log_prior + e_loglik, ez
 
 
 def get_kl(g_obs, 
@@ -261,8 +231,8 @@ def get_kl(g_obs,
            prior_params_dict,
            gh_loc = None, 
            gh_weights = None,
-           e_log_phi = None,
-           detach_ez = False):
+           ez = None,
+           e_log_phi = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -312,16 +282,18 @@ def get_kl(g_obs,
                                     gh_loc = gh_loc,
                                     gh_weights = gh_weights)
     # joint log likelihood
-    e_loglik = get_e_joint_loglik_from_nat_params(g_obs,
+    e_loglik, ez = get_e_joint_loglik_from_nat_params(g_obs,
                                     e_log_pop_freq, e_log_1m_pop_freq,
                                     e_log_sticks, e_log_1m_sticks,
                                     dp_prior_alpha, allele_prior_alpha,
                                     allele_prior_beta,
-                                    detach_ez = detach_ez)
+                                    ez = ez)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) 
-
+    entropy = get_entropy(vb_params_dict, gh_loc, gh_weights) + \
+                sp.special.entr(ez).sum()
+    
+    
     elbo = e_loglik + entropy
 
     # prior perturbation
