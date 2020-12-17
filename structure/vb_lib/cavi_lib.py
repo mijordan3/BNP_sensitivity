@@ -30,6 +30,18 @@ get_pop_beta_update2_ag = jax.jacobian(joint_loglik, argnums=2)
 get_stick_update1_ag = jax.jacobian(joint_loglik, argnums=3)
 get_stick_update2_ag = jax.jacobian(joint_loglik, argnums=4)
 
+def _get_ez_l_from_moments(g_obs_l,
+                           e_log_pop_freq_l,
+                           e_log_1m_pop_freq_l,
+                           e_log_cluster_probs): 
+    
+    e_z_l_free = structure_model_lib.get_loglik_cond_z_l(g_obs_l,
+                                                   e_log_pop_freq_l,
+                                                   e_log_1m_pop_freq_l,
+                                                   e_log_cluster_probs)
+    
+    return structure_model_lib.get_ez_from_ezfree(e_z_l_free, detach_ez = True)[0]
+    
 def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l, 
                        e_log_cluster_probs, allele_prior_alpha, allele_prior_beta, 
                        data_weight): 
@@ -38,11 +50,10 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     g_obs_l1 = g_obs_l[:, 1]
     g_obs_l2 = g_obs_l[:, 2]
     
-    _, e_z_l = structure_model_lib.get_optimal_ezl(g_obs_l,
-                                                   e_log_pop_freq_l,
-                                                   e_log_1m_pop_freq_l,
-                                                   e_log_cluster_probs, 
-                                                   detach_ez = True)
+    e_z_l = _get_ez_l_from_moments(g_obs_l,
+                                   e_log_pop_freq_l,
+                                   e_log_1m_pop_freq_l,
+                                   e_log_cluster_probs)
     
     beta_param_l1 = (np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
                         np.dot(g_obs_l2, e_z_l[:, :, 1])) * data_weight + \
@@ -93,9 +104,8 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
         
     # sum the e_z's over loci
     body_fun = lambda val, x :\
-                    structure_model_lib.get_optimal_ezl(x[0], x[1], x[2],
-                                                        e_log_cluster_probs, 
-                                                        detach_ez = True)[1].sum(-1) + val
+                    _get_ez_l_from_moments(x[0], x[1], x[2],
+                                           e_log_cluster_probs).sum(-1) + val
     
     scan_fun = lambda val, x : (body_fun(val, x), None)
     
