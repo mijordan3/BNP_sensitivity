@@ -176,42 +176,43 @@ def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
 
     return np.stack((loglik_a, loglik_b), axis = -1)
 
-def get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                    e_log_cluster_probs, detach_ez): 
+def get_loglik_cond_z_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                        e_log_cluster_probs): 
     
     # get loglikelihood of observations at loci l
     loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
     # add individual belongings
-    loglik_cond_z_l = np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
+    return np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
 
-    # individal x chromosome belongings
+def get_ez_from_ezfree(loglik_cond_z_l, detach_ez): 
     if detach_ez: 
-        e_z_free = jax.lax.stop_gradient(loglik_cond_z_l)
+        e_z_l = jax.nn.softmax(jax.lax.stop_gradient(loglik_cond_z_l), 
+                              axis = 1)
+        z_entropy_l = 0.
     else: 
-        e_z_free = loglik_cond_z_l
-        
-    e_z_l = jax.nn.softmax(e_z_free, axis = 1)
+        e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
+        z_entropy_l = (sp.special.entr(e_z_l)).sum()
     
-    return loglik_cond_z_l, e_z_l
-    
+    return e_z_l, z_entropy_l
+
 def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                     e_log_cluster_probs, 
                     detach_ez):
     # returns z-optimized log-likelihood for locus-l
     
-    loglik_cond_z_l, e_z_l = \
-        get_optimal_ezl(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
-                        e_log_cluster_probs, 
-                        detach_ez)
+    # loglikelihood conditional on z
+    loglik_cond_z_l = \
+        get_loglik_cond_z_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
+                           e_log_cluster_probs)
     
-    # log likelihood
-    loglik_l = np.sum(loglik_cond_z_l * e_z_l)
+    # e_zs
+    e_z_l, z_entropy_l = get_ez_from_ezfree(loglik_cond_z_l, detach_ez)
+    
+    # loglik summed over z
+    loglik_l = (loglik_cond_z_l * e_z_l).sum()
 
-    # entropy term: add this because the z's won't be available later
-    # compute the entropy
-    z_entropy_l = (sp.special.entr(e_z_l)).sum()
-
+    # add entropy term because the z's won't be available later
     return loglik_l + z_entropy_l
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \
