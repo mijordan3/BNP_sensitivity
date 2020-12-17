@@ -187,11 +187,15 @@ def get_loglik_cond_z_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
 
 def get_ez_from_ezfree(loglik_cond_z_l, detach_ez): 
     if detach_ez: 
-        return jax.nn.softmax(jax.lax.stop_gradient(loglik_cond_z_l), 
+        e_z_l = jax.nn.softmax(jax.lax.stop_gradient(loglik_cond_z_l), 
                               axis = 1)
+        z_entropy_l = 0.
     else: 
-        return jax.nn.softmax(loglik_cond_z_l, axis = 1)
+        e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
+        z_entropy_l = (sp.special.entr(e_z_l)).sum()
     
+    return e_z_l, z_entropy_l
+
 def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                     e_log_cluster_probs, 
                     detach_ez):
@@ -203,15 +207,12 @@ def get_e_loglik_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                            e_log_cluster_probs)
     
     # e_zs
-    e_z_l = get_ez_from_ezfree(loglik_cond_z_l, detach_ez)
+    e_z_l, z_entropy_l = get_ez_from_ezfree(loglik_cond_z_l, detach_ez)
     
     # loglik summed over z
     loglik_l = (loglik_cond_z_l * e_z_l).sum()
 
-    # entropy term: add this because the z's won't be available later
-    # compute the entropy
-    z_entropy_l = (sp.special.entr(e_z_l)).sum()
-
+    # add entropy term because the z's won't be available later
     return loglik_l + z_entropy_l
 
 def get_e_loglik(g_obs, e_log_pop_freq, e_log_1m_pop_freq, \

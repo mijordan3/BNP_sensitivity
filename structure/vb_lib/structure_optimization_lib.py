@@ -259,7 +259,7 @@ class StructureObjective():
         self.gh_weights = gh_weights 
         self.e_log_phi = e_log_phi 
         
-        self._grad = jax.grad(self._f)
+        self._grad = jax.grad(self._kl_ps_loss)
 
         self.jit_functions = jit_functions
         self._jit_functions()
@@ -268,14 +268,29 @@ class StructureObjective():
         
 
     def _f(self, vb_free_params):
-        # note that we detach the ez! 
-        # the gradient wrt to self.f does not change, and will be faster. 
-        # the hvp with respect to self.f will **not** be correct! 
-        # (this will be the hessian of parameters with the e_z fixed). 
+        # this is the objective function 
         
-        # See the custom HVP implementation below. 
-        # these adjustments were made so that HVPs are faster
-        # do not crash on HGDP data ... 
+        vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
+
+        return structure_model_lib.get_kl(self.g_obs, vb_params_dict, 
+                                          self.prior_params_dict, 
+                                          self.gh_loc, self.gh_weights, 
+                                          e_log_phi = self.e_log_phi, 
+                                          detach_ez = False)
+    
+    def _kl_ps_loss(self, vb_free_params): 
+        # this returns the KL **without** the z-entropy, and 
+        # prevents gradients from backpropagating through the z's
+        # (detach_ez = True). 
+        
+        # gradients of this ``pseudo-loss" are gradients of the KL 
+        # with ez's **fixed**. 
+        
+        # it turns out that gradients of `_kl_ps_loss` is equivalent 
+        # to gradients of `._f` (by optimality of the ez's).
+        
+        # however! hessians of this function does not equal 
+        # hessians of `._f`. See our custom HVP method below
         
         vb_params_dict = self.vb_params_paragami.fold(vb_free_params, free = True)
 
@@ -291,7 +306,9 @@ class StructureObjective():
         # self.f will the hvp with the ez's **fixed**. 
         
         # this is the HVP with z fixed ....
-        kl_theta2_v = jax.jvp(jax.grad(self._f), (vb_free_params, ), (v, ))[1]
+        kl_theta2_v = jax.jvp(jax.grad(self._kl_ps_loss), 
+                              (vb_free_params, ),
+                              (v, ))[1]
         
         # this is the corection term taking into account e_zs
         kl_z2_v = self._kl_z2(vb_free_params, v)
