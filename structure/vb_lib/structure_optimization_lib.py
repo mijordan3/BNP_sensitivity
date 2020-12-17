@@ -294,20 +294,31 @@ class StructureObjective():
         kl_theta2_v = jax.jvp(jax.grad(self._f), (vb_free_params, ), (v, ))[1]
         
         # this is the corection term taking into account e_zs
-        kl_zz_v = self._kl_zz(vb_free_params, v)
+        kl_z2_v = self._kl_z2(vb_free_params, v)
         
-        return kl_theta2_v - kl_zz_v
+        return kl_theta2_v - kl_z2_v
     
-    def _kl_zz(self, vb_free_params, v): 
+    def _kl_z2(self, vb_free_params, v): 
         
-        moments_tuple = \
-            self._get_moments_from_vb_free_params(vb_free_params)
+        # let "theta" be the vb free parameters
+        # "moments" are the sufficient statistics of the vb params
+        # "zeta" are **unconstrained** cluster belongings
+        # "z" are **constrained** cluster belongings
         
-        moments_jvp = jax.jvp(self._get_moments_from_vb_free_params, \
-                                      (vb_free_params, ), (v, ))[1]
+        # "f_zz" is the hessian wrt to the z's
         
+        # this method returns the second term of the schur complement: 
+        # [dmoments/dtheta]^T[dzeta/dmoments]^T[dz/dzeta]^T ... 
+        # [f_zz][dz/dzeta][dzeta/dmoments][dmoments/dtheta]
+        
+        
+        # returns [dmoments/dtheta] v
+        moments_tuple, moments_jvp = jax.jvp(self._get_moments_from_vb_free_params, \
+                                             (vb_free_params, ), (v, ))
+        
+        # function that returns [dmoments/dtheta]^T v
         moments_vjp = jax.vjp(self._get_moments_from_vb_free_params, 
-                             vb_free_params)[1]
+                              vb_free_params)[1]
         
         def scan_fun(val, x): 
             # x[0] is g_obs[:, l]
@@ -315,27 +326,37 @@ class StructureObjective():
             # x[2] is e_log_pop jvp
 
             fun = lambda clust_probs, pop_freq : \
-                    self._ps_loss_zl(x[0], clust_probs, pop_freq)
-
-            ez_free, jvp = jax.jvp(fun, 
+                    self._get_ez_free_from_moments(x[0], clust_probs, pop_freq)
+            
+            # multiply by [dzeta/dmoments] 
+            ez_free, zeta_jvp = jax.jvp(fun, 
                             (moments_tuple[0], x[1]), 
                             (moments_jvp[0], x[2]))
             
             ez = jax.nn.softmax(ez_free, 1)
-            hess_term = self._constrain_ez_free_jvp(ez, jvp)
-            hess_term = self._constrain_ez_free_jvp(ez, hess_term / ez)
+            
+            # multiply by [dz/dzeta]
+            dz_jvp = self._constrain_ez_free_jvp(ez, zeta_jvp)
+            
+            # mutliply by f_zz
+            fzz_jvp = dz_jvp / ez
+            
+            # multiply by [dz/dzeta]^T (same bc it is symmetric)     
+            ez_vjp = self._constrain_ez_free_jvp(ez, fzz_jvp)
+            
+            # multiply by [dzeta/dmoments]^T
+            _zeta_vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](ez_vjp)
 
-            _vjp = jax.vjp(fun, *(moments_tuple[0], x[1]))[1](hess_term)
-
-            return _vjp[0] + val, _vjp[1]
+            return _zeta_vjp[0] + val, _zeta_vjp[1]
         
-        vjp = jax.lax.scan(scan_fun,
+        zeta_vjp = jax.lax.scan(scan_fun,
                              init = np.zeros(moments_tuple[0].shape), 
                              xs = (self.g_obs.transpose((1, 0, 2)), 
                                    moments_tuple[1], 
                                    moments_jvp[1]))
-
-        return moments_vjp(vjp)[0]
+        
+        # finally return [dmoments/dtheta]^T
+        return moments_vjp(zeta_vjp)[0]
         
     
     def _get_moments_from_vb_free_params(self, vb_free_params): 
@@ -364,9 +385,9 @@ class StructureObjective():
                 np.dstack((e_log_pop_freq, e_log_1m_pop_freq))
     
     @staticmethod
-    def _ps_loss_zl(g_obs_l, 
-                    e_log_cluster_probs, 
-                    e_log_pop_freq_l): 
+    def _get_ez_free_from_moments(g_obs_l, 
+                                  e_log_cluster_probs, 
+                                  e_log_pop_freq_l): 
         # returns the ez (in its free parameterization)
         # as a function of the necessary moments
         
