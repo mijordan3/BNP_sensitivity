@@ -29,27 +29,18 @@ class TestStructureObjective(unittest.TestCase):
                                            self.gh_weights)
         
         # get the autograd gradients and hessians 
-        self.get_grad = jax.grad(self.get_kl)
-        self.get_hessian = jax.hessian(self.get_kl)
-        
-    def get_kl(self, x): 
-        # we test against the ordinary gradients and hessians
-        # from jax
-        vb_params_dict = self.vb_params_paragami.fold(x, free = True)
-
-        return structure_model_lib.get_kl(self.g_obs,
-                                          vb_params_dict, 
-                                          self.prior_params_dict, 
-                                          self.gh_loc,
-                                          self.gh_weights, 
-                                          detach_ez = False)
+        self.get_grad = jax.grad(self.stru_objective.f)
+        self.get_hessian = jax.hessian(self.stru_objective.f)
 
     def test_custom_derivatives(self):
         
         # check gradients 
-        # in computing the gradient in stru_objective,
-        # we had detach_ez = True for a speed-up. 
+        # in stru_objective.grad,
+        # we had called detach_ez = True, and did not compute 
+        # z-entropies for a speed-up. 
+        
         # check that it matches with detach_ez = False. 
+        
         grad1 = self.stru_objective.grad(self.vb_params_free)
         grad2 = self.get_grad(self.vb_params_free)
         assert np.abs(grad1 - grad2).max() < 1e-8
@@ -94,29 +85,20 @@ class TestStructurePreconditionedObjective(unittest.TestCase):
                                            self.gh_weights)
         
         # get the autograd gradients and hessians 
-        self.get_grad = jax.grad(self.get_kl_precond)
-        self.get_hessian = jax.hessian(self.get_kl_precond)
+        precond_kl = lambda x_c : \
+            self.stru_precond_objective.f_precond(x_c, 
+                                                  self.precond_params)
         
-    def get_kl_precond(self, x_c): 
-        # we test against the ordinary gradients and hessians
-        # from jax
+        self.get_grad = jax.grad(precond_kl)
+        self.get_hessian = jax.hessian(precond_kl)
         
-        x = self.stru_precond_objective._unprecondition(x_c, self.precond_params)
-        
-        vb_params_dict = self.vb_params_paragami.fold(x, free = True)
-
-        return structure_model_lib.get_kl(self.g_obs,
-                                          vb_params_dict, 
-                                          self.prior_params_dict, 
-                                          self.gh_loc,
-                                          self.gh_weights, 
-                                          detach_ez = False)
-
     def test_custom_derivatives(self):
         
         # check gradients 
-        # in computing the gradient in stru_objective,
-        # we had detach_ez = True for a speed-up. 
+        # in stru_objective.grad,
+        # we had called detach_ez = True, and did not compute 
+        # z-entropies for a speed-up. 
+        
         # check that it matches with detach_ez = False. 
         grad1 = self.stru_precond_objective.grad_precond(self.vb_params_free, 
                                                          self.precond_params)

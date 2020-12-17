@@ -190,7 +190,7 @@ class ScipyCgSolver():
             res = frame.f_locals['resid']
             
             elapsed = time.time() - self.t0
-            print('Iter [{}]; elapsed {}sec; diff: {}'.format(self.iter,
+            print('Iter [{}]; elapsed {}sec; residual: {}'.format(self.iter,
                                                               np.round(elapsed, 3), 
                                                               res))
             
