@@ -127,10 +127,12 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     hyper_par_value0 = np.array([0.]), 
                     obj_fun_hvp = stru_objective.hvp, 
                     hyper_par_objective_fun = alpha_obj_fun, 
-                    cg_precond = cg_precond)
+                    cg_precond = cg_precond, 
+                    cg_maxiter = 300)
 
 print('cg tol: ')
 print(vb_sens.cg_tol)
+print(vb_sens.cg_maxiter)
 
 # save what we need
 vars_to_save = dict()

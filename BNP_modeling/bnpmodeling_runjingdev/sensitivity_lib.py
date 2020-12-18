@@ -31,6 +31,7 @@ class HyperparameterSensitivityLinearApproximation(object):
                  hyper_par_objective_fun = None,
                  cg_precond = None, 
                  cg_tol = 1e-3,
+                 cg_maxiter = None,
                  use_scipy_cgsolve = False):
         """
         Parameters
@@ -77,6 +78,7 @@ class HyperparameterSensitivityLinearApproximation(object):
 
         self.cg_precond = cg_precond
         self.cg_tol = cg_tol
+        self.cg_maxiter = cg_maxiter
         self.use_scipy_cgsolve = use_scipy_cgsolve
 
         # hessian vector products
@@ -134,7 +136,8 @@ class HyperparameterSensitivityLinearApproximation(object):
             self.cg_solver = ScipyCgSolver(self.obj_fun_hvp, 
                                            self.opt_par_value, 
                                            self.cg_precond, 
-                                           self.cg_tol)
+                                           cg_tol = self.cg_tol, 
+                                           cg_maxiter = self.cg_maxiter)
             
             self.hessian_solver = lambda b : self.cg_solver.hessian_solver(b)
             
@@ -143,7 +146,8 @@ class HyperparameterSensitivityLinearApproximation(object):
                 jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
                                        b = b,
                                        M = self.cg_precond, 
-                                       tol = self.cg_tol)[0])
+                                       tol = self.cg_tol, 
+                                       maxiter = self.cg_maxiter)[0])
             
             print('Compiling hessian solver ...')
             t0 = time.time()
@@ -164,7 +168,8 @@ class ScipyCgSolver():
                  obj_fun_hvp, 
                  opt_par_value, 
                  cg_precond, 
-                 cg_tol = 1e-3): 
+                 cg_tol = 1e-3, 
+                 cg_maxiter = None): 
         
         self.vb_dim = len(opt_par_value)
         self.hvp = jax.jit(lambda x : obj_fun_hvp(opt_par_value, x))
@@ -190,6 +195,7 @@ class ScipyCgSolver():
                                               shape = (self.vb_dim, ) * 2)
         
         self.cg_tol = cg_tol 
+        self.cg_maxiter = cg_maxiter 
         
     def callback(self, xk): 
         
@@ -215,7 +221,8 @@ class ScipyCgSolver():
                                 b = b, 
                                 M = self.M, 
                                 callback = self.callback, 
-                                tol = self.cg_tol)
+                                tol = self.cg_tol, 
+                                maxiter = self.cg_maxiter)
         
         return np.array(out[0])
                                 
