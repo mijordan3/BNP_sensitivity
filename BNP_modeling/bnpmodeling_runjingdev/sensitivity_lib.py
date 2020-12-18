@@ -30,6 +30,7 @@ class HyperparameterSensitivityLinearApproximation(object):
                  obj_fun_hvp = None,
                  hyper_par_objective_fun = None,
                  cg_precond = None, 
+                 cg_tol = 1e-3,
                  use_scipy_cgsolve = False):
         """
         Parameters
@@ -54,6 +55,8 @@ class HyperparameterSensitivityLinearApproximation(object):
             Function that takes in a vector `v` of same length as `opt_par_value`
             and returns a preconditioner times `v` for the cg solver
             (this is the argument `M`)
+        cg_tol : float
+            The input to the `tol` argument in jax.sparse.linalg.cg
         use_scipy_cgsolve : boolean
             If `True`, we compile HVPs and use the scipy solver (which 
             has richer callback functions we can use for printing values
@@ -73,6 +76,7 @@ class HyperparameterSensitivityLinearApproximation(object):
             hyper_par_objective_fun = objective_fun
 
         self.cg_precond = cg_precond
+        self.cg_tol = cg_tol
         self.use_scipy_cgsolve = use_scipy_cgsolve
 
         # hessian vector products
@@ -129,7 +133,8 @@ class HyperparameterSensitivityLinearApproximation(object):
         if self.use_scipy_cgsolve: 
             self.cg_solver = ScipyCgSolver(self.obj_fun_hvp, 
                                            self.opt_par_value, 
-                                           self.cg_precond)
+                                           self.cg_precond, 
+                                           self.cg_tol)
             
             self.hessian_solver = lambda b : self.cg_solver.hessian_solver(b)
             
@@ -137,7 +142,8 @@ class HyperparameterSensitivityLinearApproximation(object):
             self.hessian_solver = \
                 jax.jit(lambda b : cg(A = lambda x : self.obj_fun_hvp(self.opt_par_value, x),
                                        b = b,
-                                       M = self.cg_precond)[0])
+                                       M = self.cg_precond, 
+                                       tol = self.cg_tol)[0])
             
             print('Compiling hessian solver ...')
             t0 = time.time()
@@ -154,7 +160,11 @@ class HyperparameterSensitivityLinearApproximation(object):
         return np.dot(self.dinput_dhyper, delta) + self.opt_par_value
 
 class ScipyCgSolver(): 
-    def __init__(self, obj_fun_hvp, opt_par_value, cg_precond): 
+    def __init__(self, 
+                 obj_fun_hvp, 
+                 opt_par_value, 
+                 cg_precond, 
+                 cg_tol = 1e-3): 
         
         self.vb_dim = len(opt_par_value)
         self.hvp = jax.jit(lambda x : obj_fun_hvp(opt_par_value, x))
@@ -178,7 +188,9 @@ class ScipyCgSolver():
             
         self.A = sparse_linalg.LinearOperator(matvec = self.hvp, 
                                               shape = (self.vb_dim, ) * 2)
-
+        
+        self.cg_tol = cg_tol 
+        
     def callback(self, xk): 
         
         if self.iter > 0: 
@@ -202,7 +214,8 @@ class ScipyCgSolver():
         out = sparse_linalg.cg(A = self.A, 
                                 b = b, 
                                 M = self.M, 
-                                callback = self.callback)
+                                callback = self.callback, 
+                                tol = self.cg_tol)
         
         return np.array(out[0])
                                 
