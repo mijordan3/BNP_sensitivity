@@ -128,7 +128,8 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     obj_fun_hvp = stru_objective.hvp, 
                     hyper_par_objective_fun = alpha_obj_fun, 
                     cg_precond = cg_precond, 
-                    cg_maxiter = 300)
+                    cg_tol = 1e-2,
+                    cg_maxiter = None)
 
 print('cg tol: ')
 print(vb_sens.cg_tol)
