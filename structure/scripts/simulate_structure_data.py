@@ -12,7 +12,6 @@ parser.add_argument('--seed', type=int, default=4143122)
 parser.add_argument('--n_obs', type=int)
 parser.add_argument('--n_loci', type=int)
 parser.add_argument('--n_pop', type=int)
-parser.add_argument('--mem_saver', type=distutils.util.strtobool, default='False')
 
 # where to save the structure fit
 parser.add_argument('--outfolder', type=str,
@@ -36,14 +35,11 @@ print('outfile: ', outfile)
 
 print('generating data ...')
 g_obs, true_pop_allele_freq, true_ind_admix_propn = \
-        data_utils.draw_data(n_obs, n_loci, n_pop, mem_saver=args.mem_saver)
+        data_utils.draw_data(n_obs, n_loci, n_pop)
 
-if args.mem_saver: 
-    # to save memory, save only g_obs
-    np.savez(outfile, g_obs = g_obs)
-else: 
-    np.savez(outfile, 
-                g_obs = g_obs,
-                true_pop_allele_freq = true_pop_allele_freq,
-                true_ind_admix_propn = true_ind_admix_propn)
+np.savez(outfile, 
+            g_obs = g_obs,
+            true_pop_allele_freq = true_pop_allele_freq,
+            true_ind_admix_propn = true_ind_admix_propn)
+
 print('done. ')
