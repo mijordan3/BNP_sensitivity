@@ -113,6 +113,15 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
 f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
 e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
+
+
+# # warm start w linear response 
+# vb_opt = vb_params_paragami.flatten(vb_params_dict, 
+#                                     free = True)
+# vb_opt_pert = vb_opt + lr_data['dinput_dfun_' + args.perturbation] * epsilon
+# vb_params_dict = vb_params_paragami.fold(vb_opt_pert, 
+#                                          free = True)
+
 ######################
 # OPTIMIZE
 ######################
