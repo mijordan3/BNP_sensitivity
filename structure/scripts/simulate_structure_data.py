@@ -34,11 +34,12 @@ outfile = os.path.join(args.outfolder, data_file)
 print('outfile: ', outfile)
 
 print('generating data ...')
-g_obs, true_pop_allele_freq, true_ind_admix_propn = \
+g_obs, true_z, true_pop_allele_freq, true_ind_admix_propn = \
         data_utils.draw_data(n_obs, n_loci, n_pop)
 
 np.savez(outfile, 
             g_obs = g_obs,
+            true_z = true_z,
             true_pop_allele_freq = true_pop_allele_freq,
             true_ind_admix_propn = true_ind_admix_propn)
 
