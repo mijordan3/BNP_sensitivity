@@ -102,5 +102,5 @@ class LogPhiPerturbations():
                                                          gh_loc, 
                                                          gh_weights, 
                                                          e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
-                                                     delta = delta,
+                                                         delta = delta,
                                                          stick_key = stick_key)
