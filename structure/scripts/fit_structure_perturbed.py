@@ -162,7 +162,7 @@ structure_model_lib.save_structure_fit(outfile,
                                        prior_params_dict,
                                        fit_meta_data['gh_deg'], 
                                        epsilon = epsilon,
-                                       delta = delta,
+                                       delta = args.delta,
                                        data_file = args.data_file, 
                                        final_kl = final_kl, 
                                        optim_time = lbfgs_time)
