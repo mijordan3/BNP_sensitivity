@@ -173,6 +173,7 @@ class FunctionalPerturbationObjective():
                  vb_params_paragami, 
                  gh_loc, gh_weights,
                  e_log_phi = None, 
+                 delta = 1.0,
                  stick_key = 'stick_params'): 
 
         # log_phi (or e_log_phi) returns the additve
@@ -192,7 +193,9 @@ class FunctionalPerturbationObjective():
         self.gh_loc = gh_loc
         self.gh_weights = gh_weights
         
-        self.log_phi = log_phi
+        self.delta = delta
+        
+        self.log_phi = lambda x : log_phi(x) * self.delta
         
         if e_log_phi is None: 
             # set the expected log-perturbation 
@@ -201,7 +204,9 @@ class FunctionalPerturbationObjective():
         else: 
             # a pre-computed expectation. 
             # this takes 
-            self.e_log_phi = e_log_phi
+            self.e_log_phi = \
+                lambda means, infos : e_log_phi(means, infos) * \
+                                        self.delta
         
     def _set_e_log_phi_with_gh(self): 
         
@@ -217,11 +222,12 @@ class FunctionalPerturbationObjective():
         # with epsilon fixed this is the input to the optimizer
         # (this is added to the ELBO)
         
-        return epsilon * self.e_log_phi(means, infos)
+        return epsilon * self.e_log_phi(means, infos) 
     
     def hyper_par_objective_fun(self,
                                 vb_params_free, 
                                 epsilon): 
+        
         # NOTE THE NEGATIVE SIGN
         # this is passed into the HyperparameterSensitivity class
         # and is added to the **KL** 

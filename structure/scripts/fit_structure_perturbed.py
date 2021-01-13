@@ -39,6 +39,9 @@ parser.add_argument('--init_fit', type=str)
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
+# delta 
+parser.add_argument('--delta', type=float, default = 1.0)
+
 # which perturbation
 parser.add_argument('--perturbation', type=str, default = 'worst_case')
 
@@ -107,7 +110,8 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                                  gh_loc, 
                                                  gh_weights,
                                                  logit_v_grid = logit_v_grid, 
-                                                 influence_grid = influence_grid, 
+                                                 influence_grid = influence_grid,
+                                                 delta = args.delta, 
                                                  stick_key = 'ind_admix_params')
 
 f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
@@ -157,7 +161,8 @@ structure_model_lib.save_structure_fit(outfile,
                                        vb_params_paragami, 
                                        prior_params_dict,
                                        fit_meta_data['gh_deg'], 
-                                       epsilon=epsilon,
+                                       epsilon = epsilon,
+                                       delta = delta,
                                        data_file = args.data_file, 
                                        final_kl = final_kl, 
                                        optim_time = lbfgs_time)

@@ -32,6 +32,7 @@ class LogPhiPerturbations():
                  alpha0,
                  gh_loc, 
                  gh_weights,
+                 delta=1.0,
                  logit_v_grid = None, 
                  influence_grid = None, 
                  stick_key = 'stick_params'): 
@@ -43,12 +44,14 @@ class LogPhiPerturbations():
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
+                                                     delta = delta,
                                                      stick_key = stick_key)
         
         self.f_obj_sigmoidal_neg = func_sens_lib.FunctionalPerturbationObjective(sigmoidal_neg, 
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
+                                                     delta = delta,
                                                      stick_key = stick_key)
         
         ##############
@@ -59,6 +62,7 @@ class LogPhiPerturbations():
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
+                                                     delta = delta,
                                                      stick_key = stick_key)
         
         self.f_obj_alpha_pert_neg = \
@@ -66,6 +70,7 @@ class LogPhiPerturbations():
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
+                                                     delta = delta,
                                                      stick_key = stick_key)
         
         ##############
@@ -97,4 +102,5 @@ class LogPhiPerturbations():
                                                          gh_loc, 
                                                          gh_weights, 
                                                          e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
+                                                     delta = delta,
                                                          stick_key = stick_key)
