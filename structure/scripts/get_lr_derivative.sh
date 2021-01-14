@@ -17,7 +17,7 @@ echo $alpha
 
 data_file=../data/huang2011_sub_nobs25_nloci75.npz
 out_filename=huang2011_fit_sub
-out_folder=../fits/tmp/
+out_folder=../fits/tmp2/
 
 python get_lr_derivative.py \
   --data_file ${data_file} \

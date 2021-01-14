@@ -14,7 +14,7 @@ epsilon_indx=$SLURM_ARRAY_TASK_ID
 
 data_file=../data/huang2011_sub_nobs25_nloci75.npz
 out_filename=huang2011_fit_sub
-out_folder=../fits/tmp/
+out_folder=../fits/tmp2/
 
 python fit_structure_perturbed.py \
   --perturbation ${perturbation} \
