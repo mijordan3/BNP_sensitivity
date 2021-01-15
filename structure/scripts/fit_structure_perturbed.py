@@ -83,7 +83,7 @@ vb_params_dict, vb_params_paragami, \
 # Define perturbation
 ##################
 # set epsilon 
-epsilon_vec = np.linspace(0, 1, 12)[1:]**2 
+epsilon_vec = np.linspace(0, 1, 20)[1:]**2 
 epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
