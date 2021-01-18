@@ -1,4 +1,4 @@
-# BNP_sensitivity
+# BNP sensitivity
 
 Install packages with 
 
