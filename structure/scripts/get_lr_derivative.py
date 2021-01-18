@@ -34,6 +34,9 @@ parser.add_argument('--out_folder', type=str)
 # name of the structure fit 
 parser.add_argument('--fit_file', type=str)
 
+# tolerance of CG solver
+parser.add_argument('--cg_tol', type=float, default=1e-2)
+
 args = parser.parse_args()
 
 fit_file = os.path.join(args.out_folder, args.fit_file)
@@ -119,7 +122,7 @@ def alpha_obj_fun(vb_params_free, epsilon):
                                                     gh_loc, 
                                                     gh_weights)
     
-    
+
 # Define the linear sensitivity class
 vb_sens = HyperparameterSensitivityLinearApproximation(
                     objective_fun = stru_objective.f, 
@@ -127,7 +130,13 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     hyper_par_value0 = np.array([0.]), 
                     obj_fun_hvp = stru_objective.hvp, 
                     hyper_par_objective_fun = alpha_obj_fun, 
-                    cg_precond = cg_precond)
+                    cg_precond = cg_precond, 
+                    cg_tol = args.cg_tol,
+                    cg_maxiter = None)
+
+print('cg tol: ')
+print(vb_sens.cg_tol)
+print(vb_sens.cg_maxiter)
 
 # save what we need
 vars_to_save = dict()
@@ -140,6 +149,8 @@ def save_derivatives(vars_to_save):
              vb_opt = vb_opt,
              alpha0 = alpha0,
              kl= kl,
+             cg_tol = vb_sens.cg_tol,
+             cg_maxiter = vb_sens.cg_maxiter,
              **vars_to_save)
 
 save_derivatives(vars_to_save)

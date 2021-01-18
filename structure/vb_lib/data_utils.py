@@ -64,7 +64,7 @@ def draw_data_from_popfreq_and_admix(pop_allele_freq, ind_admix_propn):
     g_obs = genotype_a + genotype_b
     g_obs = get_one_hot(g_obs, nb_classes=3)
 
-    return g_obs
+    return g_obs, np.stack((z_a_onehot, z_b_onehot), axis = -1)
 
 def draw_data(n_obs, n_loci, n_pop, 
               save_as_jnp = False):
@@ -107,8 +107,8 @@ def draw_data(n_obs, n_loci, n_pop,
     true_ind_admix_propn = true_ind_admix_propn[clustering_indx, :]
     
     # draw data
-    g_obs = draw_data_from_popfreq_and_admix(true_pop_allele_freq,
-                                             true_ind_admix_propn)
+    g_obs, true_z = draw_data_from_popfreq_and_admix(true_pop_allele_freq,
+                                                     true_ind_admix_propn)
     
     if save_as_jnp: 
         # save as jax numpy object
@@ -116,7 +116,7 @@ def draw_data(n_obs, n_loci, n_pop,
         true_pop_allele_freq = jnp.array(true_pop_allele_freq)
         true_ind_admix_propn = jnp.array(true_ind_admix_propn)
         
-    return g_obs, true_pop_allele_freq, true_ind_admix_propn
+    return g_obs, true_z, true_pop_allele_freq, true_ind_admix_propn
 
 
 ####################

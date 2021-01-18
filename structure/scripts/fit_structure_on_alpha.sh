@@ -17,7 +17,7 @@ seed=453
 # out_folder=../fits/hgdp_fits/
 
 data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
-out_filename=simulated_fit
+out_filename=testing
 out_folder=../fits/tmp/
 
 python fit_structure.py \

@@ -288,6 +288,7 @@ class StructureObjective():
         
         # it turns out that gradients of `_kl_ps_loss` is equivalent 
         # to gradients of `._f` (by optimality of the ez's).
+        # (we save some computation by note evaluating the z-entropy)
         
         # however! hessians of this function does not equal 
         # hessians of `._f`. See our custom HVP method below
@@ -302,8 +303,8 @@ class StructureObjective():
     
     def _hvp(self, vb_free_params, v): 
         # this is my custom hessian vector product implementation. 
-        # note that self.f detaches the ez, so the naive hvp on 
-        # self.f will the hvp with the ez's **fixed**. 
+        # note that self._kl_ps_loss detaches the ez, so the naive hvp on 
+        # self._kl_ps_loss will the hvp with the ez's **fixed**. 
         
         # this is the HVP with z fixed ....
         kl_theta2_v = jax.jvp(jax.grad(self._kl_ps_loss), 
@@ -538,8 +539,6 @@ class StructurePrecondObjective(StructureObjective):
         return self._unprecondition(self.grad(x), precond_params)
         
     def _hvp_precond(self, x_c, precond_params, v): 
-        # again, can't just use hvp of self.f ... 
-        # it is not correct
         
         x = self._unprecondition(x_c, precond_params)
         v1 = self._unprecondition(v, precond_params)

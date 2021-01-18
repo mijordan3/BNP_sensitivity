@@ -3,10 +3,8 @@ import numpy as np
 #################
 # Load data
 #################
-fastStructure_dir = './../../../../fastStructure/'
-data_file = fastStructure_dir +  \
-                'hgdp_data/huang2011_plink_files/' + \
-                'phased_HGDP+India+Africa_2810SNPs-regions1to36.npz'
+data_dir = '../data/'
+data_file = data_dir + 'phased_HGDP+India+Africa_2810SNPs-regions1to36.npz'
 
 data = np.load(data_file)
 g_obs = np.array(data['g_obs'], dtype = int)
@@ -14,8 +12,8 @@ g_obs = np.array(data['g_obs'], dtype = int)
 #################
 # Subsample data
 #################
-n_obs = 250
-n_loci = 600
+n_obs = 25
+n_loci = 75
 
 np.random.seed(23323543)
 indx_ind = np.random.choice(g_obs.shape[0], n_obs, 
@@ -30,7 +28,7 @@ g_obs_sub = g_obs_sub[:, indx_loci]
 #################
 # save
 #################
-outfile = '../data/huang2011_subsampled'
+outfile = '../data/huang2011_sub_nobs{}'.format(n_obs) + '_nloci{}'.format(n_loci)
 # outfile = '../data/tmp'
 
 np.savez(outfile, g_obs = g_obs_sub, 

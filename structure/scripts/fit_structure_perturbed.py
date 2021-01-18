@@ -39,6 +39,9 @@ parser.add_argument('--init_fit', type=str)
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
+# delta 
+parser.add_argument('--delta', type=float, default = 1.0)
+
 # which perturbation
 parser.add_argument('--perturbation', type=str, default = 'worst_case')
 
@@ -79,9 +82,8 @@ vb_params_dict, vb_params_paragami, \
 ##################
 # Define perturbation
 ##################
-
 # set epsilon 
-epsilon_vec = np.linspace(0, 1, 12)[1:]**2
+epsilon_vec = np.linspace(0, 1, 20)[1:]**2 
 epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
@@ -108,11 +110,21 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                                  gh_loc, 
                                                  gh_weights,
                                                  logit_v_grid = logit_v_grid, 
-                                                 influence_grid = influence_grid, 
+                                                 influence_grid = influence_grid,
+                                                 delta = args.delta, 
                                                  stick_key = 'ind_admix_params')
 
 f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
 e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
+
+
+
+# # warm start w linear response 
+# vb_opt = vb_params_paragami.flatten(vb_params_dict, 
+#                                     free = True)
+# vb_opt_pert = vb_opt + lr_data['dinput_dfun_' + args.perturbation] * epsilon
+# vb_params_dict = vb_params_paragami.fold(vb_opt_pert, 
+#                                          free = True)
 
 ######################
 # OPTIMIZE
@@ -149,7 +161,8 @@ structure_model_lib.save_structure_fit(outfile,
                                        vb_params_paragami, 
                                        prior_params_dict,
                                        fit_meta_data['gh_deg'], 
-                                       epsilon=epsilon,
+                                       epsilon = epsilon,
+                                       delta = args.delta,
                                        data_file = args.data_file, 
                                        final_kl = final_kl, 
                                        optim_time = lbfgs_time)
