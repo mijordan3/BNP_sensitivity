@@ -230,6 +230,8 @@ def compute_derivatives_and_save(pert_name):
     vars_to_save['lr_time_' + pert_name] = deepcopy(vb_sens.lr_time)
     save_derivatives(vars_to_save)
 
+compute_derivatives_and_save('gauss_pert_pos')
+compute_derivatives_and_save('gauss_pert_neg')
 
 compute_derivatives_and_save('worst_case')
 compute_derivatives_and_save('sigmoidal')
