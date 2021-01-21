@@ -180,7 +180,8 @@ class TestStructurePreconditioner(unittest.TestCase):
                       hyper_par_objective_fun = lambda x, y : 0.,
                       # this lets ust track the progress of the solver
                       use_scipy_cgsolve = True, 
-                      cg_precond = None)
+                      cg_precond = None, 
+		      cg_tol = 1e-8)
         
         # solver without preconditioner
         vb_sens = HyperparameterSensitivityLinearApproximation(**kwargs)
