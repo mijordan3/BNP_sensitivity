@@ -4,7 +4,7 @@ import jax.numpy as np
 
 from bnpmodeling_runjingdev import modeling_lib
 
-from vb_lib import structure_model_lib, cavi_lib, testutils
+from structure_vb_lib import structure_model_lib, cavi_lib, testutils
 
 import unittest
 

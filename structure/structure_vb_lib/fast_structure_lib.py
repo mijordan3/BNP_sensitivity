@@ -3,7 +3,7 @@
 import jax.numpy as np
 import numpy as onp
 
-from vb_lib.structure_model_lib import get_vb_params_paragami_object
+from structure_vb_lib.structure_model_lib import get_vb_params_paragami_object
 
 def load_fs_file_into_numpy(filename): 
     handle = open(filename)

@@ -2,8 +2,8 @@ import jax
 
 from numpy.polynomial.hermite import hermgauss
 
-from vb_lib import structure_model_lib, data_utils
-import vb_lib.structure_optimization_lib as s_optim_lib
+from structure_vb_lib import structure_model_lib, data_utils
+import structure_vb_lib.structure_optimization_lib as s_optim_lib
 
 def draw_data_and_construct_model(n_obs = 5, 
                                   n_loci = 10, 

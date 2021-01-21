@@ -5,7 +5,7 @@ import jax.scipy as sp
 
 import scipy as osp
 
-from vb_lib import structure_model_lib, preconditioner_lib, testutils
+from structure_vb_lib import structure_model_lib, preconditioner_lib, testutils
 
 from bnpmodeling_runjingdev.sensitivity_lib import HyperparameterSensitivityLinearApproximation
 
