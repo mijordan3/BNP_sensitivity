@@ -97,7 +97,7 @@ def get_stick_break_propns_from_mixture_weights(mixture_weights):
 def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
                                             n_obs, threshold = 0,
                                             n_samples = None,
-                                            rng_key = None,
+                                            seed = 0,
                                             unv_norm_samples = None):
     """
     Computes the expected number of clusters with at least t observations
@@ -142,7 +142,8 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
 
     if unv_norm_samples is None:
         unif_samples_shape = (n_samples, ) + stick_propn_mean.shape
-        unv_norm_samples = random.normal(rng_key, unif_samples_shape)
+        unv_norm_samples = random.normal(key = jax.random.PRNGKey(seed), 
+                                         shape = unif_samples_shape)
     if n_samples is None:
         assert unv_norm_samples.shape[1:] == stick_propn_mean.shape
 
@@ -204,7 +205,7 @@ def sample_ez(e_z, n_samples, seed, return_one_hot = True):
     
     logits = np.log(e_z)
     
-    z_samples = jax.random.categorical(key = jax.random.PRNGKey(seed), 
+    z_samples = random.categorical(key = random.PRNGKey(seed), 
                                logits = logits, 
                                shape = (n_samples, e_z.shape[0]))
     
@@ -261,7 +262,7 @@ def _get_onehot_clusters_from_ez_and_unif_samples(e_z, unif_samples):
 def get_e_num_large_clusters_from_ez(e_z,
                                     threshold = 0,
                                     n_samples = None,
-                                    rng_key = None,
+                                    seed = 0,
                                     unif_samples = None):
     """
     Computes the expected number of clusters with at least t
@@ -293,7 +294,8 @@ def get_e_num_large_clusters_from_ez(e_z,
     # draw uniform samples
     if unif_samples is None:
         assert n_samples is not None
-        unif_samples = random.uniform(rng_key, (n_obs, n_samples))
+        unif_samples = random.uniform(key = random.PRNGKey(seed), 
+                                      shape = (n_obs, n_samples))
 
     else:
         assert unif_samples is not None

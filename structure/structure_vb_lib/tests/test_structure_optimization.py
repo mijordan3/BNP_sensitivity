@@ -2,8 +2,8 @@ import jax
 import jax.numpy as np
 import numpy as onp
 
-from vb_lib import structure_model_lib, testutils
-import vb_lib.structure_optimization_lib as s_optim_lib
+from structure_vb_lib import structure_model_lib, testutils
+import structure_vb_lib.structure_optimization_lib as s_optim_lib
 
 import unittest
 

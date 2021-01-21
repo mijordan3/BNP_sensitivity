@@ -3,7 +3,7 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
-from vb_lib import structure_model_lib
+from structure_vb_lib import structure_model_lib
 
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 from bnpmodeling_runjingdev.functional_sensitivity_lib import get_e_log_perturbation

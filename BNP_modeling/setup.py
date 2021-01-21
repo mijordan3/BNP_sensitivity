@@ -21,6 +21,7 @@ with open(path.join(here, 'requirements.txt')) as requirements_file:
 requirements = [line for line in requirements_lines
                 if not (line.startswith('#')) ]
 
+
 setup(
     name='bnpmodeling_runjingdev',
     version='0.1',

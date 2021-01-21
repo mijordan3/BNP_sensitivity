@@ -11,9 +11,9 @@ from sklearn.decomposition import NMF
 
 import paragami
 
-from vb_lib import structure_model_lib
-from vb_lib.cavi_lib import run_cavi
-from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
+from structure_vb_lib import structure_model_lib
+from structure_vb_lib.cavi_lib import run_cavi
+from structure_vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
