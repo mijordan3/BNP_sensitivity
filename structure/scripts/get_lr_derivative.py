@@ -3,9 +3,9 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
-from vb_lib import structure_model_lib
-from vb_lib.preconditioner_lib import get_mfvb_cov_matmul
-import vb_lib.structure_optimization_lib as s_optim_lib
+from structure_vb_lib import structure_model_lib
+from structure_vb_lib.preconditioner_lib import get_mfvb_cov_matmul
+import structure_vb_lib.structure_optimization_lib as s_optim_lib
 
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 import bnpmodeling_runjingdev.exponential_families as ef
@@ -230,13 +230,19 @@ def compute_derivatives_and_save(pert_name):
     vars_to_save['lr_time_' + pert_name] = deepcopy(vb_sens.lr_time)
     save_derivatives(vars_to_save)
 
+compute_derivatives_and_save('worst_case')
+
+compute_derivatives_and_save('sigmoidal')
+compute_derivatives_and_save('sigmoidal_neg')
+
+compute_derivatives_and_save('alpha_pert_pos')
+compute_derivatives_and_save('alpha_pert_neg')
+
 compute_derivatives_and_save('gauss_pert_pos')
 compute_derivatives_and_save('gauss_pert_neg')
 
-compute_derivatives_and_save('worst_case')
-compute_derivatives_and_save('sigmoidal')
-compute_derivatives_and_save('sigmoidal_neg')
-compute_derivatives_and_save('alpha_pert_pos')
-compute_derivatives_and_save('alpha_pert_neg')
+compute_derivatives_and_save('alpha_pert_pos_xflip')
+compute_derivatives_and_save('alpha_pert_neg_xflip')
+
 
 print('done. ')

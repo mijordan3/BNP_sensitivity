@@ -82,7 +82,7 @@ class LogPhiPerturbations():
         ##############
         # Flip alpha-perturbation along x-axis
         ##############
-        self.f_obj_h = \
+        self.f_obj_alpha_pert_pos_xflip = \
             func_sens_lib.FunctionalPerturbationObjective(lambda x : alpha_pert_pos(-x, alpha0),
                                                      vb_params_paragami, 
                                                      gh_loc, 
@@ -90,7 +90,7 @@ class LogPhiPerturbations():
                                                      delta = delta,
                                                      stick_key = stick_key)
         
-        self.f_obj_alpha_pert_neg_flip = \
+        self.f_obj_alpha_pert_neg_xflip = \
             func_sens_lib.FunctionalPerturbationObjective(lambda x : alpha_pert_neg(-x, alpha0),
                                                      vb_params_paragami, 
                                                      gh_loc, 
