@@ -238,11 +238,14 @@ compute_derivatives_and_save('sigmoidal_neg')
 compute_derivatives_and_save('alpha_pert_pos')
 compute_derivatives_and_save('alpha_pert_neg')
 
-compute_derivatives_and_save('gauss_pert_pos')
-compute_derivatives_and_save('gauss_pert_neg')
-
 compute_derivatives_and_save('alpha_pert_pos_xflip')
 compute_derivatives_and_save('alpha_pert_neg_xflip')
+
+compute_derivatives_and_save('gauss_pert1_pos')
+compute_derivatives_and_save('gauss_pert1_neg')
+
+compute_derivatives_and_save('gauss_pert2_pos')
+compute_derivatives_and_save('gauss_pert2_neg')
 
 
 print('done. ')

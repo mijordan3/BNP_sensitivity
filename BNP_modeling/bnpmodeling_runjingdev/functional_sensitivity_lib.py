@@ -126,6 +126,10 @@ class PriorPerturbation(object):
         assert norm_pc_logit > 0
         self.log_norm_pc_logit = np.log(norm_pc_logit)
 
+        
+def log_jac_term(logit_v):
+    v = sp.special.expit(logit_v)
+    return - np.log(v) - np.log(1 - v)
 
 def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
                            gh_loc, gh_weights, sum_vector=True):
