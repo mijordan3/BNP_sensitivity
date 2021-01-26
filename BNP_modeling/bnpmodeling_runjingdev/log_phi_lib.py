@@ -26,10 +26,10 @@ def alpha_pert_neg(logit_v, alpha0):
 
     return sp.stats.beta.logpdf(v, a = 1, b = alpha1) - sp.stats.beta.logpdf(v, a = 1, b = alpha0)
 
-def gauss_pert_pos(logit_v): 
+def gauss_pert1(logit_v): 
     return sp.stats.norm.pdf(logit_v, loc = 0)  * np.sqrt(2 * np.pi)
 
-def gauss_pert_neg(logit_v): 
+def gauss_pert2(logit_v): 
     return sp.stats.norm.pdf(logit_v, loc = -3)  * np.sqrt(2 * np.pi)
 
 class LogPhiPerturbations(): 
@@ -79,20 +79,55 @@ class LogPhiPerturbations():
                                                      delta = delta,
                                                      stick_key = stick_key)
         
-        
         ##############
-        # gaussian perturbation
+        # Flip alpha-perturbation along x-axis
         ##############
-        self.f_obj_gauss_pert_pos = \
-            func_sens_lib.FunctionalPerturbationObjective(gauss_pert_pos,
+        self.f_obj_alpha_pert_pos_xflip = \
+            func_sens_lib.FunctionalPerturbationObjective(lambda x : alpha_pert_pos(-x, alpha0),
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
                                                      delta = delta,
                                                      stick_key = stick_key)
         
-        self.f_obj_gauss_pert_neg = \
-            func_sens_lib.FunctionalPerturbationObjective(gauss_pert_neg,
+        self.f_obj_alpha_pert_neg_xflip = \
+            func_sens_lib.FunctionalPerturbationObjective(lambda x : alpha_pert_neg(-x, alpha0),
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     delta = delta,
+                                                     stick_key = stick_key)
+        
+        
+        ##############
+        # gaussian perturbations
+        ##############
+        self.f_obj_gauss_pert1_pos = \
+            func_sens_lib.FunctionalPerturbationObjective(gauss_pert1,
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     delta = delta,
+                                                     stick_key = stick_key)
+        
+        self.f_obj_gauss_pert1_neg = \
+            func_sens_lib.FunctionalPerturbationObjective(lambda x : - gauss_pert1(x),
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     delta = delta,
+                                                     stick_key = stick_key)
+        
+        self.f_obj_gauss_pert2_pos = \
+            func_sens_lib.FunctionalPerturbationObjective(gauss_pert2,
+                                                     vb_params_paragami, 
+                                                     gh_loc, 
+                                                     gh_weights, 
+                                                     delta = delta,
+                                                     stick_key = stick_key)
+        
+        self.f_obj_gauss_pert2_neg = \
+            func_sens_lib.FunctionalPerturbationObjective(lambda x : - gauss_pert2(x),
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 

@@ -6,9 +6,9 @@ import jax.scipy as sp
 import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
-import vb_lib.structure_model_lib as structure_model_lib
-import vb_lib.cavi_lib as cavi_lib
-import vb_lib.structure_optimization_lib as s_optim_lib
+import structure_vb_lib.structure_model_lib as structure_model_lib
+import structure_vb_lib.cavi_lib as cavi_lib
+import structure_vb_lib.structure_optimization_lib as s_optim_lib
 
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 from bnpmodeling_runjingdev import influence_lib, log_phi_lib

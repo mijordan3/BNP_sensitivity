@@ -5,6 +5,8 @@ import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 import scipy as osp
 
+import matplotlib.pyplot as plt
+
 from copy import deepcopy
 
 
@@ -125,6 +127,64 @@ class PriorPerturbation(object):
             self.logit_v_lb, self.logit_v_ub, maxiter = self.quad_maxiter)
         assert norm_pc_logit > 0
         self.log_norm_pc_logit = np.log(norm_pc_logit)
+     
+    # Plot the log-phi and priors
+    def plot_perturbation(self): 
+    
+        fig, ax = plt.subplots(1, 4, figsize = (18, 4)) 
+
+        # get x-axis
+        logit_v_grid = np.linspace(self.logit_v_lb, 
+                                   self.logit_v_ub,
+                                   100)
+
+        v_grid = sp.special.expit(logit_v_grid)
+
+        # plot log-phi
+        ax[0].plot(logit_v_grid, 
+                   self.log_phi(logit_v_grid), 
+                   color = 'grey', 
+                   label = 'log-phi')
+        ax[0].set_title('log phi in logit space')
+
+        # plot priors
+        ax[1].set_title('log-priors in logit space')
+        ax[1].plot(logit_v_grid, 
+                   self.get_log_p0_logit(logit_v_grid), 
+                   color = 'lightblue', 
+                   label = 'p0')
+        ax[1].plot(logit_v_grid, 
+                   self.get_log_pc_logit(logit_v_grid), 
+                   color = 'blue', 
+                   label = 'p1')
+
+
+        ax[2].set_title('priors in logit space')
+        ax[2].plot(logit_v_grid,
+                   np.exp(self.get_log_p0_logit(logit_v_grid)), 
+                   color = 'lightblue', 
+                   label = 'p0')
+        ax[2].plot(logit_v_grid, 
+                   np.exp(self.get_log_pc_logit(logit_v_grid)), 
+                   color = 'blue', 
+                   label = 'p1')
+
+
+        ax[3].set_title('priors in constrained space')
+        ax[3].plot(v_grid, 
+                   np.exp(self.get_log_p0(v_grid)),
+                   color = 'lightblue', 
+                   label = 'p0')
+        ax[3].plot(v_grid, 
+                   np.exp(self.get_log_pc(v_grid)), 
+                   color = 'blue', 
+                   label = 'p1')
+
+        ax[3].legend()
+
+        fig.tight_layout()
+        
+        return fig, ax
 
 
 def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
