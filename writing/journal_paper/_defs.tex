@@ -1,0 +1,13 @@
+% Paper-specific math macros (not in the appendix).
+
+% General math terms
+\def\mbe{\mathbb{E}}%
+\def\cov{\mathrm{Cov}}%
+\def\var{\mathrm{Var}}%
+\def\evalat#1#2{\left.#1\right|_{#2}}
+\def\norm#1{\left\Vert #1\right\Vert }
+\def\derivat#1#2#3{\left.\frac{d#1}{d#2}\right\vert_{#3}}
+\def\partialat#1#2#3{\left.\frac{\partial#1}{\partial#2}\right\vert_{#3}}
+
+% Problem definition
+\newcommandx\Gk[1][usedefault, 1=k]{d^{#1}_\theta G}

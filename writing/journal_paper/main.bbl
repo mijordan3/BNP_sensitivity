@@ -1,0 +1,184 @@
+\begin{thebibliography}{29}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Barnard(1974)]{barnard:1974:cvchoicediscussion}
+G.~Barnard.
+\newblock Discussion of ``{C}ross-validatory choice and assessment of
+  statistical predictions''.
+\newblock \emph{Journal of the Royal Statistical Society: Series B
+  (Methodological)}, 36\penalty0 (2):\penalty0 133--135, 1974.
+
+\bibitem[Beirami et~al.(2017)Beirami, Razaviyayn, Shahrampour, and
+  Tarokh]{beirami:2017:optimalgeneralizability}
+A.~Beirami, M.~Razaviyayn, S.~Shahrampour, and V.~Tarokh.
+\newblock On optimal generalizability in parametric learning.
+\newblock In \emph{Advances in Neural Information Processing Systems (NIPS)},
+  pages 3458--3468, 2017.
+
+\bibitem[Christmann and Messem(2008)]{christmann:2008:bouligand}
+A.~Christmann and A.~Messem.
+\newblock Bouligand derivatives and robustness of support vector machines for
+  regression.
+\newblock \emph{Journal of Machine Learning Research}, 9\penalty0
+  (May):\penalty0 915--936, 2008.
+
+\bibitem[Clarke(1983)]{clarke:1983:uniqueness}
+B.~Clarke.
+\newblock Uniqueness and {Fr{\'e}chet} differentiability of functional
+  solutions to maximum likelihood type equations.
+\newblock \emph{The Annals of Statistics}, 11\penalty0 (4):\penalty0
+  1196--1205, 1983.
+
+\bibitem[Debruyne et~al.(2008)Debruyne, Hubert, and
+  Suykens]{debruyne:2008:model}
+M.~Debruyne, M.~Hubert, and J.~Suykens.
+\newblock Model selection in kernel based regression using the influence
+  function.
+\newblock \emph{Journal of Machine Learning Research}, 9\penalty0
+  (Oct):\penalty0 2377--2400, 2008.
+
+\bibitem[Dudley(2018)]{dudley:2018:analysis}
+R.~Dudley.
+\newblock \emph{Real analysis and probability}.
+\newblock Chapman and Hall/CRC, 2018.
+
+\bibitem[Efron(2004)]{efron:2004:estimation}
+B.~Efron.
+\newblock The estimation of prediction error: Covariance penalties and
+  cross-validation.
+\newblock \emph{Journal of the American Statistical Association}, 99\penalty0
+  (467):\penalty0 619--632, 2004.
+
+\bibitem[Efron and Tibshirani(1994)]{efron:1994:bootstrap}
+B.~Efron and R.~Tibshirani.
+\newblock \emph{An Introduction to the Bootstrap}.
+\newblock CRC press, 1994.
+
+\bibitem[Fernholz(1983)]{fernholz:1983:mises}
+L.~Fernholz.
+\newblock \emph{{Von Mises} Calculus for Statistical Functionals}, volume~19.
+\newblock Springer Science \& Business Media, 1983.
+
+\bibitem[Giordano et~al.(2019)Giordano, Stephenson, Liu, Jordan, and
+  Broderick]{giordano:2019:ij}
+R.~Giordano, W.~Stephenson, R.~Liu, M.~I. Jordan, and T.~Broderick.
+\newblock A {S}wiss army infinitesimal jackknife.
+\newblock In \emph{The 22nd International Conference on Artificial Intelligence
+  and Statistics}, pages 1139--1147, 2019.
+
+\bibitem[Huber(1964)]{huber:1964:robust}
+P.~Huber.
+\newblock Robust estimation of a location parameter.
+\newblock \emph{The Annals of Mathematical Statistics}, pages 73--101, 1964.
+
+\bibitem[Jaeckel(1972)]{jaeckel:1972:infinitesimal}
+L.~Jaeckel.
+\newblock The infinitesimal jackknife, memorandum.
+\newblock Technical report, MM 72-1215-11, Bell Lab. Murray Hill, NJ, 1972.
+
+\bibitem[Koh and Liang(2017)]{koh:2017:blackbox}
+P.~W. Koh and P.~Liang.
+\newblock Understanding black-box predictions via influence functions.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2017.
+
+\bibitem[Krantz and Parks(2012)]{krantz:2012:implicit}
+S.~Krantz and H.~Parks.
+\newblock \emph{The Implicit Function Theorem: History, Theory, and
+  Applications}.
+\newblock Springer Science \& Business Media, 2012.
+
+\bibitem[Liu et~al.(2014)Liu, Jiang, and Liao]{liu:2014:efficient}
+Y.~Liu, S.~Jiang, and S.~Liao.
+\newblock Efficient approximation of cross-validation for kernel methods using
+  bouligand influence function.
+\newblock In \emph{International Conference on Machine Learning}, pages
+  324--332, 2014.
+
+\bibitem[Maclaurin et~al.(2015)Maclaurin, Duvenaud, and
+  Adams]{maclaurin:2015:autograd}
+D.~Maclaurin, D.~Duvenaud, and R.~P. Adams.
+\newblock Autograd: Effortless gradients in numpy.
+\newblock In \emph{International Conference on Machine Learning (ICML) AutoML
+  Workshop}, 2015.
+
+\bibitem[Mises(1947)]{mises:1947:asymptotic}
+R.~Mises.
+\newblock On the asymptotic distribution of differentiable statistical
+  functions.
+\newblock \emph{The Annals of Mathematical Statistics}, 18\penalty0
+  (3):\penalty0 309--348, 1947.
+
+\bibitem[Rad and Maleki(2018)]{rad:2018:scalableloo}
+K.~Rad and A.~Maleki.
+\newblock A scalable estimate of the extra-sample prediction error via
+  approximate leave-one-out.
+\newblock \emph{arXiv Preprint}, January 2018.
+
+\bibitem[Reeds(1976)]{reeds:1976:thesis}
+J.~Reeds.
+\newblock \emph{Ill (1976). On the definition of von {Mises} functionals}.
+\newblock PhD thesis, Ph. D. Thesis, Statistics, Harvard University, 1976.
+
+\bibitem[Rosset and Tibshirani(2018)]{rosset:2018:fixed}
+S.~Rosset and R.~J. Tibshirani.
+\newblock From fixed-{X} to random-{X} regression: Bias-variance
+  decompositions, covariance penalties, and prediction error estimation.
+\newblock \emph{Journal of the American Statistical Association}, 2018.
+
+\bibitem[Sandberg(1980)]{sandberg:1980:globalinverse}
+I~Sandberg.
+\newblock Global inverse function theorems.
+\newblock \emph{IEEE Transactions on Circuits and Systems}, 27\penalty0
+  (11):\penalty0 998--1004, 1980.
+
+\bibitem[Schott(2016)]{schott:2016:matrix}
+J.~Schott.
+\newblock \emph{Matrix Analysis for Statistics}.
+\newblock John Wiley \& Sons, 2016.
+
+\bibitem[Schulam and Saria(2019)]{schulam:2019:trust}
+P.~Schulam and S.~Saria.
+\newblock Can you trust this prediction? {A}uditing pointwise reliability after
+  learning.
+\newblock In \emph{The 22nd International Conference on Artificial Intelligence
+  and Statistics}, pages 1022--1031, 2019.
+
+\bibitem[Shao(1993)]{shao:1993:jackknifemestimator}
+J.~Shao.
+\newblock Differentiability of statistical functionals and consistency of the
+  jackknife.
+\newblock \emph{The Annals of Statistics}, pages 61--75, 1993.
+
+\bibitem[Shao and Tu(2012)]{shao:2012:jackknife}
+J.~Shao and D.~Tu.
+\newblock \emph{The Jackknife and Bootstrap}.
+\newblock Springer Series in Statistics, 2012.
+
+\bibitem[Stefanski and Boos(2002)]{stefanski:2002:mestimation}
+L.~Stefanski and D.~Boos.
+\newblock The calculus of {M}-estimation.
+\newblock \emph{The American Statistician}, 56\penalty0 (1):\penalty0 29--38,
+  2002.
+
+\bibitem[Van~der Vaart(2000{\natexlab{a}})]{vaardt:2000:asymptotic}
+A.~Van~der Vaart.
+\newblock \emph{Asymptotic statistics}, volume~3.
+\newblock Cambridge university press, 2000{\natexlab{a}}.
+
+\bibitem[Van~der Vaart(2000{\natexlab{b}})]{van:2000:asymptotic}
+A.~Van~der Vaart.
+\newblock \emph{Asymptotic statistics}, volume~3.
+\newblock Cambridge university press, 2000{\natexlab{b}}.
+
+\bibitem[Wager et~al.(2014)Wager, Hastie, and Efron]{wager:2014:confidence}
+S.~Wager, T.~Hastie, and B.~Efron.
+\newblock Confidence intervals for random forests: The jackknife and the
+  infinitesimal jackknife.
+\newblock \emph{The Journal of Machine Learning Research}, 15\penalty0
+  (1):\penalty0 1625--1651, 2014.
+
+\end{thebibliography}

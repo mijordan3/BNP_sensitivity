@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\usepackage{etoolbox}
+
+% Set this toggle true to compile a version for the arxiv, and
+% false to compile for the currently configured conference.
+\newtoggle{for_arxiv}
+
+\toggletrue{for_arxiv}
+%\togglefalse{for_arxiv}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+\usepackage{xcolor}
+\usepackage[hidelinks=True]{hyperref}
+\usepackage{xargs}[2008/03/08]
+
+% Documentation
+% http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
+\usepackage{refstyle}
+\usepackage{varioref} % Use refstyle instead of varioref directly.
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs} % For mathscr
+\usepackage{mathtools}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{pdfpages}
+
+% % Define things needed to incorporate the LyX appendix.
+% % We can define things redundantly if necessary, but please don't modify
+% % this file -- if there's a name clash for a function you want to define,
+% % please just pick a new name.
+% \input{lyx_commands.tex}
+
+% This picks up the knitr boilerplate, allowing us to \input partial knitr
+% documents.
+\input{_knitr_header.tex}
+
+\input{_defs.tex}
+\input{_theorem_defs.tex}
+
+\title{Evaluating Prior Sensitivity for VB BNP Models or Something}
+
+\author{
+  Runjing Liu$^*$%\\ \texttt{runjing_liu@berkeley.edu}
+  \and
+  Ryan Giordano$^*$ %\\ \texttt{rgiordano@berkeley.edu}
+  \and
+  Michael I.~Jordan %\\ \texttt{jordan@cs.berkeley.edu}
+  \and
+  Tamara Broderick %\\ \texttt{tbroderick@csail.mit.edu}
+}
+
+\begin{document}
+
+% Shortcuts for repeatedly used assumptions.
+
+
+\maketitle
+
+\begin{abstract}
+%
+\input{abstract.tex}
+%
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+\input{introduction.tex}
+
+\newpage
+
+\section{Acknowledgements}\label{sec:ack}
+\input{acknowledgements.tex}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\newpage
+\onecolumn
+\appendix
+
+\section{Notation index}
+\input{symbol_index.tex}
+\newpage
+
+\end{document}

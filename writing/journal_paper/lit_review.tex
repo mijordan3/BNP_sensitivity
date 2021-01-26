@@ -1,0 +1,68 @@
+The idea of approximating $\thetaw[w]$ with a Taylor series for the purpose of
+CV and the bootstrap has occurred many times in the statistics and machine
+learning literature, and we will not attempt a complete survey here.  The
+contributions of the present paper are a general treatment of higher-order
+expansions of $\thetaw[w]$ with finite-sample bounds that are computable in
+principle, together with a description of a practically efficient method for
+computing such expansions. Our work builds on \citet{giordano:2019:ij}, which
+is restricted to first-order approximations.
+
+Locally linear approximations to CV have attracted much recent interest.
+\citet{koh:2017:blackbox} derive a first-order approximation and provide
+supporting experiments but little theory.
+\citet{beirami:2017:optimalgeneralizability} provide an asymptotic analysis of a
+local approximation that is closely related to ours with the notable exception
+that they base their approximation on the Hessian matrix $H(\thetaone, w)$
+rather than $H(\thetaone, \onevec)$.  Repeatedly calculating $H(\thetaone,
+w)^{-1}$ for different weights can incur considerable computational expense
+except in special cases.  \citet{beirami:2017:optimalgeneralizability} assumes
+that the data domain is bounded (our \condref{supterms_bounded}) and, under this
+assumption, derive asymptotic rates that match ours (our
+\propref{cv_complexity_uniform}), despite the additional computation cost.
+\citet{rad:2018:scalableloo} consider a linear approximation to the optima of
+objectives that depend on $\theta$ only through a linear index $\theta^T x_n$
+with IID Gaussian data $x_n$.
+
+Some authors have also considered higher-order approximations in special cases.
+For example, \citet{liu:2014:efficient, debruyne:2008:model} derive higher-order
+expansions for the special case of linear models. \citet{liu:2014:efficient} use
+the ``Bouligand derivative'' to consider the robustness of support vector
+machines (SVMs) with non-differentiable objectives by
+\citet{christmann:2008:bouligand}.  The Bouligand derivative coincides with the
+classical Gateaux (directional) derivative when the objective function is
+differentiable, and so, when the SVM loss and regularizer are continuous, their
+results are a special case of ours.
+
+Forming a local approximation to the bootstrap has been considered by
+\citet{schulam:2019:trust} and mentioned by
+\citet{beirami:2017:optimalgeneralizability}.  It seems that the importance of
+using higher-order approximations for the bootstrap was not recognized by these
+authors.  For the purpose of deriving asymptotic results, the connection
+between linearity of statistical functionals of empirical distributions and
+asymptotic normality is well-known in statistics \citep{mises:1947:asymptotic,
+fernholz:1983:mises}.
+
+Our work reposes on the general framework of the differentiability of
+statistical functionals of an empirical distribution.  This framework has been
+employed in the statistical literature, though typically from an asymptotic
+perspective \citep[Chapter 20]{reeds:1976:thesis, fernholz:1983:mises,
+van:2000:asymptotic}.  Like the machine learning literature cited above, most
+classical theoretical treatments of the functional differentiability of
+optimization problems require the objective function to have bounded derivatives
+\citep{clarke:1983:uniqueness, shao:2012:jackknife} in order for the functionals
+to be Fr{\'e}chet differentiable in a space large enough to contain the
+asymptotic limit of empirical processes. Additionally, first-order derivatives
+of statistical functionals with respect to an empirical distribution are often
+used as a theoretical tool for analyzing other estimators rather than as a
+practical computational tool in their own right \citep{mises:1947:asymptotic,
+huber:1964:robust, shao:1993:jackknifemestimator} (though exceptions exist,
+e.g., \citet{wager:2014:confidence}).  These first-order derivatives are closely
+related to both the classical infinitesimal jackknife and the influence
+function, differing only in formalities of definition and regularity
+assumptions.
+
+Finally, we observe that CV is not the best method for evaluating
+out-of-sample error in all cases.  Linear models, in particular,
+have a rich literature of alternative methods with better theoretical and
+practical properties.  See \citet{efron:2004:estimation, rosset:2018:fixed}
+for recent work.
