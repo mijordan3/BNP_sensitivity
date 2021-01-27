@@ -46,7 +46,7 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
     return mixture_weights
 
 def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
-                                        gh_loc, gh_weights):
+                                gh_loc, gh_weights):
     """
     Computes the expected number of cluster weights from logit-normal 
     parameters. 
@@ -74,18 +74,108 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
     return get_mixture_weights_from_stick_break_propns(e_stick_lengths)
 
 
+def sample_weights_from_logitnormal_sticks(stick_propn_mean,
+                                           stick_propn_info,
+                                           n_samples = 1,
+                                           seed = 0): 
+    """
+    Samples mixture weights from 
+    from logitnormal stick-breaking parameters,
+    ``stick_propn_mean`` and ``stick_propn_info``.
 
-def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
+    Parameters
+    ----------
+    stick_propn_mean : ndarray
+        Mean parameters for the logit of the
+        stick-breaking proportions, of length (k_approx - 1)
+    stick_propn_info : ndarray
+        parameters for the logit of the
+        stick-breaking proportions, of length (k_approx - 1)
+    n_samples : int
+        number of samples.
+    seed : int
+        random seed
+        
+    Returns
+    -------
+    ndarray
+        a n_samples x k_approx array of mixture weights.
+    """
+    
+    assert stick_propn_mean.shape == stick_propn_info.shape
+    assert len(stick_propn_mean.shape) == 1
+    k_approx = len(stick_propn_mean) + 1
+    
+    stick_propn_mean = stick_propn_mean[None, :]
+    stick_propn_info = stick_propn_info[None, :]
+    
+    # univariate normal samples
+    unif_samples_shape = (n_samples, k_approx - 1)
+    unv_norm_samples = random.normal(key = jax.random.PRNGKey(seed), 
+                                     shape = unif_samples_shape)
+
+    # sample sticks proportions from logitnormal
+    # this is n_samples x ... x (k_approx - 1)
+    stick_propn_samples = sp.special.expit(unv_norm_samples * \
+                            1 / np.sqrt(stick_propn_info) + \
+                                        stick_propn_mean)
+
+    # get sampled mixture weights weights
+    # this is n_samples x k_approx
+    weight_samples = \
+        get_mixture_weights_from_stick_break_propns(stick_propn_samples)
+
+    return weight_samples
+    
+def get_e_num_pred_clusters_from_mixture_weights(mixture_weights, 
+                                                 n_obs, 
+                                                 threshold): 
+    
+    """ 
+    Given a ... x k_approx array of mixture weights, 
+    computes the expected number of clusters 
+    in a new dataset of size `n_obs`. 
+    
+    Parameters
+    ----------
+    mixture_weights : ndarray
+        mixture weights of shape ... x k_approx
+    n_obs : int
+        Number of observations in a dataset
+    threshold : int
+        Miniumum number of observations for a cluster to be counted.
+    
+    Returns
+    ----------
+    ndarray 
+        expected number of predicted clusters with at least 
+        ``theshold`` observations, one for each row of 
+        ``mixture_weights``. 
+    """
+    
+    assert isinstance(threshold, int)
+    
+    # probability cluster has no observations
+    subtr_weight = (1 - mixture_weights)**(n_obs)
+    
+    # probability that each cluster has i observations
+    for i in range(1, threshold):
+        subtr_weight += \
+            osp.special.comb(n_obs, i) * \
+                mixture_weights**i * (1 - mixture_weights)**(n_obs - i)
+
+    return np.sum(1 - subtr_weight, axis = -1)
+    
+
+def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean, 
+                                            stick_propn_info,
                                             n_obs, 
                                             threshold = 0,
-                                            n_samples = None,
-                                            seed = 0,
-                                            unv_norm_samples = None):
+                                            n_samples = 1,
+                                            seed = 0):
     """
-    Computes the expected number of clusters with at least t observations
-    from logitnormal stick-breaking parameters,
-    ``stick_propn_mean`` and ``stick_propn_info``,
-    using Monte Carlo.
+    Computes, using Monte Carlo, the expected number of predicted clusters 
+    with at least t observations in a new sample of size n_obs. 
 
     Parameters
     ----------
@@ -102,10 +192,8 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
     n_samples : int
         Number of Monte Carlo samples used to compute the expected
         number of clusters.
-    unv_norm_samples : ndarray, optional
-        The user may pass in a precomputed array of uniform random variables
-        on which the reparameterization trick is applied to compute the
-        expected number of clusters.
+    seed : int
+        random seed
 
     Returns
     -------
@@ -114,43 +202,16 @@ def get_e_number_clusters_from_logit_sticks(stick_propn_mean, stick_propn_info,
         in a dataset of size n_obs
     """
 
-    assert stick_propn_mean.shape == stick_propn_info.shape
-    assert len(stick_propn_mean.shape) == 1
-    k_approx = len(stick_propn_mean)
+    weight_samples = sample_weights_from_logitnormal_sticks(stick_propn_mean,
+                                                            stick_propn_info,
+                                                            n_samples = n_samples,
+                                                            seed = seed)
     
-    stick_propn_mean = stick_propn_mean[None, :]
-    stick_propn_info = stick_propn_info[None, :]
+    n_clusters_sampled = get_e_num_pred_clusters_from_mixture_weights(weight_samples, 
+                                                                      n_obs = n_obs, 
+                                                                      threshold = threshold)
 
-    assert (n_samples is not None) or (unv_norm_samples is not None), \
-        'both n_samples and unv_norm_samples cannot be None'
-
-    if unv_norm_samples is None:
-        unif_samples_shape = (n_samples, k_approx - 1)
-        unv_norm_samples = random.normal(key = jax.random.PRNGKey(seed), 
-                                         shape = unif_samples_shape)
-    if n_samples is None:
-        assert unv_norm_samples.shape[1] == (k_approx - 1)
-
-    # sample sticks proportions from logitnormal
-    # this is n_samples x ... x (k_approx - 1)
-    stick_propn_samples = sp.special.expit(unv_norm_samples * \
-                            1 / np.sqrt(stick_propn_info) + \
-                                        stick_propn_mean)
-
-    # get sampled posterior weights
-    # this is n_samples x _approx
-    weight_samples = \
-        get_mixture_weights_from_stick_break_propns(stick_propn_samples)
-
-    # compute expected number of clusters with at least threshold datapoints
-    subtr_weight = (1 - weight_samples)**(n_obs)
-    assert isinstance(threshold, int)
-    for i in range(1, threshold):
-        subtr_weight += \
-            osp.special.comb(n_obs, i) * \
-            weight_samples**i * (1 - weight_samples)**(n_obs - i)
-
-    return np.mean(np.sum(1 - subtr_weight, axis = -1), axis = 0).squeeze()
+    return np.mean(n_clusters_sampled)
 
 def get_e_num_clusters_from_ez(e_z):
     """
@@ -202,8 +263,25 @@ def _sample_ez_from_unif_samples(e_z, unif_samples):
 
 def sample_ez(e_z, 
               n_samples = 1, 
-              seed = 0, 
-              unif_samples = None): 
+              seed = 0): 
+    """
+    Samples cluster belongings from ez
+    ----------
+    e_z : ndarray
+        Array whose (n, k)th entry is the probability of the nth
+        datapoint belonging to cluster k
+    n_samples : int
+        Number of samples 
+    seed : int 
+        random seed
+        
+    Returns
+    -------
+    ndarray
+        a n_samples x n_obs x k_approx array of 
+        cluster belongings. 
+    """
+
  
     # e_z is of shape n x k
     # index (n,k) is probability of n-th observation 
@@ -212,14 +290,10 @@ def sample_ez(e_z,
     n_obs = e_z.shape[0]
     
     # draw uniform samples
-    if unif_samples is None:
-        unif_samples = random.uniform(key = random.PRNGKey(seed), 
-                                      shape = (n_samples, n_obs))
+    unif_samples = random.uniform(key = random.PRNGKey(seed), 
+                                  shape = (n_samples, n_obs))
 
-    else:
-        assert unif_samples.shape[1] == n_obs
-    
-    # one-hot encoding of zs
+    # one-hot encoding of zs from uniform samples
     z_samples_one_hot = _sample_ez_from_unif_samples(e_z, unif_samples)
     
     # shape is n_samples x n x k
@@ -228,37 +302,34 @@ def sample_ez(e_z,
 def get_e_num_large_clusters_from_ez(e_z,
                                     threshold = 0,
                                     n_samples = 1,
-                                    seed = 0,
-                                    unif_samples = None):
+                                    seed = 0):
     """
-    Computes the expected number of clusters with at least t
+    Computes the expected number of clusters with at least ```threshold``
     observations from cluster belongings e_z.
     Parameters
     ----------
     e_z : ndarray
         Array whose (n, k)th entry is the probability of the nth
         datapoint belonging to cluster k
-    n_obs : int
-        Number of observations in a dataset.
+    threshold : int
+        Miniumum number of observations for a cluster to be counted.
     n_samples : int
         Number of Monte Carlo samples used to compute the expected
         number of clusters.
-    unv_norm_samples : ndarray, optional
-        The user may pass in a precomputed array of uniform random variables
-        on which the reparameterization trick is applied to compute the
-        expected number of clusters.
+    seed : int 
+        random seed
+        
     Returns
     -------
     float
-        The expected number of clusters with at least ``threshold`` observations
-        in a dataset the same size as e_z
+        The expected number of clusters with at least 
+        ``threshold`` observations
     """
 
     # z_sample is a n_samples x n_obs x k_approx matrix of cluster belongings
     z_sample = sample_ez(e_z, 
                          n_samples = n_samples, 
-                         seed = seed,
-                         unif_samples = unif_samples)
+                         seed = seed)
     
     # this is n_samples x k_approx: 
     # for each sample, the number of individuals in each cluster
