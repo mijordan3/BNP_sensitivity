@@ -8,11 +8,6 @@ from jax import random
 import bnpmodeling_runjingdev.exponential_families as ef
 
 
-def _cumprod_through_log(x, axis = None):
-    # a replacement for np.cumprod since
-    # Autograd doesn't work with the original cumprod.
-    return np.exp(np.cumsum(np.log(x), axis = axis))
-
 def get_mixture_weights_from_stick_break_propns(stick_break_propns):
     """
     Computes stick lengths (i.e. mixture weights) from stick breaking
@@ -43,7 +38,7 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
 
     stick_break_propns_1m = 1 - stick_break_propns
     stick_remain = np.concatenate((np.ones(ones_shape),
-                        _cumprod_through_log(stick_break_propns_1m, axis = -1)), axis = -1)
+                                   np.cumprod(stick_break_propns_1m, axis = -1)), axis = -1)
     stick_add = np.concatenate((stick_break_propns,
                                 np.ones(ones_shape)), axis = -1)
 
