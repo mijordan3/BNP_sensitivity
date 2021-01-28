@@ -240,14 +240,16 @@ def _sample_ez_from_unif_samples(e_z, unif_samples):
     # returns a n_samples x n_obs x k matrix encoding sampled 
     # cluster belongings
     
-    assert np.all(e_z >= 0.)
-    assert np.all(e_z <= 1.)
+    
+    # these assertions mess up if we use jit ... 
+#     assert np.all(e_z >= 0.)
+#     assert np.all(e_z <= 1.)
     
     n_obs = e_z.shape[0]
     k_approx = e_z.shape[1]
     
     e_z_cumsum = e_z.cumsum(1)
-    assert np.all(np.abs(e_z_cumsum[:, -1] - 1.) < 1e-8)
+#     assert np.all(np.abs(e_z_cumsum[:, -1] - 1.) < 1e-8)
         
     e_z_cumsum0 = np.hstack((np.zeros((n_obs, 1)),
                              e_z_cumsum[:, 0:(k_approx-1)]))

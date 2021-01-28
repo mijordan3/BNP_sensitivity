@@ -347,35 +347,36 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
 
 
 def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
-                                                    vb_params_free,
-                                                    n_obs,
-                                                    threshold = 0,
-                                                    n_samples = 10000,
-                                                    rng_key = None,
-                                                    unv_norm_samples = None):
+                                                vb_params_free,
+                                                n_obs,
+                                                threshold = 0,
+                                                n_samples = 10000,
+                                                seed = 0):
+    
     # get posterior predicted number of clusters
 
     vb_params_dict = \
         vb_params_paragami.fold(vb_params_free, free = True)
 
-    mu = vb_params_dict['stick_params']['stick_means']
-    sigma = 1 / np.sqrt(vb_params_dict['stick_params']['stick_infos'])
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
 
-    return cluster_lib.get_e_number_clusters_from_logit_sticks(mu, sigma,
-                                                        n_obs,
-                                                        threshold = threshold,
-                                                        n_samples = n_samples,
-                                                        rng_key = rng_key,
-                                                        unv_norm_samples = unv_norm_samples)
+    return cluster_lib.get_e_num_pred_clusters_from_logit_sticks(stick_means,
+                                                                 stick_infos,
+                                                                 n_obs,
+                                                                 threshold = threshold,
+                                                                 n_samples = n_samples,
+                                                                 seed = seed)
 
 
 # Get the expected posterior number of distinct clusters.
-def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
-                                        gh_loc, gh_weights,
-                                        threshold = 0,
-                                        n_samples = 10000,
-                                        rng_key = None,
-                                        unif_samples = None):
+def get_e_num_clusters_from_free_par(y, 
+                                     vb_params_paragami,
+                                     vb_params_free,
+                                     gh_loc, gh_weights,
+                                     threshold = 0,
+                                     n_samples = 10000,
+                                     seed = 0):
 
     vb_params_dict = \
         vb_params_paragami.fold(vb_params_free, free = True)
@@ -384,7 +385,6 @@ def get_e_num_clusters_from_free_par(y, vb_params_paragami, vb_params_free,
                                             use_bnp_prior = True)
 
     return cluster_lib.get_e_num_large_clusters_from_ez(e_z,
-                                        threshold = threshold,
-                                        n_samples = n_samples,
-                                        rng_key = rng_key,
-                                        unif_samples = unif_samples)
+                                                        threshold = threshold,
+                                                        n_samples = n_samples,
+                                                        seed = seed)
