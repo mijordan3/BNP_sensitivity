@@ -66,7 +66,7 @@ class TestEzSamples(unittest.TestCase):
         n_samples = 100000        
         z_samples = cluster_quantities_lib.sample_ez(e_z, 
                                                      n_samples = n_samples, 
-                                                     seed = 342)
+                                                     prng_key = jax.random.PRNGKey(33))
         
                 
         empirical_propns = z_samples.mean(0)
@@ -100,7 +100,7 @@ class TestExpectedNumClusters(unittest.TestCase):
             cluster_quantities_lib.\
                 get_e_num_clusters_from_ez(e_z,
                                            n_samples = n_samples,
-                                           seed = 1342342,
+                                           prng_key = jax.random.PRNGKey(89),
                                            threshold = 0, 
                                            return_samples = True)
         
