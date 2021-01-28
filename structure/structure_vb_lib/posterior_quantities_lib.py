@@ -95,6 +95,7 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
     # If I sample one more loci for every individual in my dataset, 
     # how many clusters would I expect to see?
     
+    # sample sticks: shape is n_samples x n_obs x (k_approx - 1)
     sticks_sampled = cluster_quantities_lib.sample_stick_propn(stick_means, 
                                                                stick_infos, 
                                                                n_samples, 
@@ -110,7 +111,7 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
     get_sampled_n_clusters = jax.vmap(cluster_quantities_lib.\
                                       get_e_num_clusters_from_ez_analytic)
     sampled_n_clusters = get_sampled_n_clusters(ind_admix_sampled)
-    
+
     return sampled_n_clusters.mean()
 
 def get_ez_all(g_obs, vb_params_dict, gh_loc, gh_weights): 
