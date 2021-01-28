@@ -14,12 +14,6 @@ if pip_version_match:
 else:
     sys.exit('There was an error getting the pip version number.')
 
-# Parse requirements.txt, ignoring any commented-out or git lines.
-with open(path.join(here, 'requirements.txt')) as requirements_file:
-    requirements_lines = requirements_file.read().splitlines()
-
-requirements = [line for line in requirements_lines
-                if not (line.startswith('#')) ]
 
 setup(
     name='bnpgmm_runjingdev',
@@ -28,7 +22,7 @@ setup(
     author='Runjing Liu, Ryan Giordano',
     author_email='runjing_liu@berkeley.edu',
     packages=find_packages(exclude=['docs', 'tests']),
-    install_requires=requirements,
+    install_requires=['sklearn'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'Natural Language :: English',
