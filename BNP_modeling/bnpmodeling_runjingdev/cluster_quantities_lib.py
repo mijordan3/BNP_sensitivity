@@ -73,10 +73,11 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # are independent 
     return get_mixture_weights_from_stick_break_propns(e_stick_lengths)
 
-def sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, seed): 
+def sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, 
+                       prng_key = jax.random.PRNGKey(0)): 
     
     shape = (n_samples, ) + stick_propn_mean.shape 
-    normal_samples = jax.random.normal(key = jax.random.PRNGKey(seed),
+    normal_samples = jax.random.normal(key = prng_key,
                                        shape = shape)
     
     # sample sticks: shape is n_samples x n_obs x (k_approx - 1) 
@@ -89,7 +90,7 @@ def sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, seed):
 def sample_weights_from_logitnormal_sticks(stick_propn_mean,
                                            stick_propn_info,
                                            n_samples = 1,
-                                           seed = 0): 
+                                           prng_key = jax.random.PRNGKey(0)): 
     """
     Samples mixture weights from 
     from logitnormal stick-breaking parameters,
@@ -119,7 +120,10 @@ def sample_weights_from_logitnormal_sticks(stick_propn_mean,
     
     # sample sticks proportions from logitnormal
     # this is n_samples x (k_approx - 1)
-    stick_propn_samples = sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, seed)
+    stick_propn_samples = sample_stick_propn(stick_propn_mean,
+                                             stick_propn_info,
+                                             n_samples, 
+                                             prng_key)
                                         
 
     # get sampled mixture weights weights
@@ -174,7 +178,7 @@ def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean,
                                             n_obs, 
                                             threshold = 0,
                                             n_samples = 1,
-                                            seed = 0, 
+                                            prng_key = jax.random.PRNGKey(0),
                                             return_samples = False):
     """
     Computes, using Monte Carlo, the expected number of predicted clusters 
@@ -208,7 +212,7 @@ def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean,
     weight_samples = sample_weights_from_logitnormal_sticks(stick_propn_mean,
                                                             stick_propn_info,
                                                             n_samples = n_samples,
-                                                            seed = seed)
+                                                            prng_key = prng_key)
     
     n_clusters_sampled = get_e_num_pred_clusters_from_mixture_weights(weight_samples, 
                                                                       n_obs = n_obs, 
@@ -273,7 +277,7 @@ def _sample_ez_from_unif_samples(e_z, unif_samples):
 
 def sample_ez(e_z, 
               n_samples = 1, 
-              seed = 0): 
+              prng_key = random.PRNGKey(0)): 
     """
     Samples cluster belongings from ez
     ----------
@@ -300,7 +304,7 @@ def sample_ez(e_z,
     n_obs = e_z.shape[0]
     
     # draw uniform samples
-    unif_samples = random.uniform(key = random.PRNGKey(seed), 
+    unif_samples = random.uniform(key = prng_key, 
                                   shape = (n_samples, n_obs))
 
     # one-hot encoding of zs from uniform samples
@@ -312,7 +316,7 @@ def sample_ez(e_z,
 def get_e_num_clusters_from_ez(e_z,
                                threshold = 0,
                                n_samples = 1,
-                               seed = 0, 
+                               prng_key = random.PRNGKey(0),
                                return_samples = False):
     """
     Computes the expected number of clusters with at least ```threshold``
@@ -340,7 +344,7 @@ def get_e_num_clusters_from_ez(e_z,
     # z_sample is a n_samples x n_obs x k_approx matrix of cluster belongings
     z_sample = sample_ez(e_z, 
                          n_samples = n_samples, 
-                         seed = seed)
+                         prng_key = prng_key)
     
     # this is n_samples x k_approx: 
     # for each sample, the number of individuals in each cluster
