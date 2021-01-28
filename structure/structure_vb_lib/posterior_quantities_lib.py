@@ -86,7 +86,7 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
     # the number of clusters above some threshold
     n_clusters_sampled = (sampled_counts > threshold).sum(1)
     
-    return n_clusters_sampled.mean()
+    return n_clusters_sampled.mean(), n_clusters_sampled
 
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
                             n_samples = 1000,
