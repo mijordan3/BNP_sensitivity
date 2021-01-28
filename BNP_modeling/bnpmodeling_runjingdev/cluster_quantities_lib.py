@@ -245,23 +245,33 @@ def get_e_num_clusters_from_ez_analytic(e_z):
 
 
 
-def _sample_ez_from_unif_samples(e_z, unif_samples):
+def _sample_ez_from_gumbel_samples(e_z, gumbel_samples):
     # e_z is n_obs x k
-    # unif_sample should be a matrix of shape n_samples x n_obs
+    # gumbel_samples should be a matrix of shape n_samples x n_obs x k
+    # of samples from the Gumbel distribution
     
     # returns a n_samples x n_obs x k matrix encoding sampled 
     # cluster belongings
     
     
     # these assertions mess up if we use jit ... 
-#     assert np.all(e_z >= 0.)
-#     assert np.all(e_z <= 1.)
+    # assert np.all(e_z >= 0.)
+    #  assert np.all(e_z <= 1.)
     
     n_obs = e_z.shape[0]
     k_approx = e_z.shape[1]
     
+    assert gumbel_samples.shape[1] == n_obs
+    assert gumbel_samples.shape[2] == n_obs
+    
+    logits = np.log(e_z)
+    ez = np.argmax(gumbel_samples + logits[None, :, :], axis=axis)
+    
+    ez_onehot = jax.nn.one_hot(ez
+
+
     e_z_cumsum = e_z.cumsum(1)
-#     assert np.all(np.abs(e_z_cumsum[:, -1] - 1.) < 1e-8)
+    # assert np.all(np.abs(e_z_cumsum[:, -1] - 1.) < 1e-8)
         
     e_z_cumsum0 = np.hstack((np.zeros((n_obs, 1)),
                              e_z_cumsum[:, 0:(k_approx-1)]))
