@@ -73,6 +73,18 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # are independent 
     return get_mixture_weights_from_stick_break_propns(e_stick_lengths)
 
+def sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, seed): 
+    
+    shape = (n_samples, ) + stick_propn_mean.shape 
+    normal_samples = jax.random.normal(key = jax.random.PRNGKey(seed),
+                                       shape = shape)
+    
+    # sample sticks: shape is n_samples x n_obs x (k_approx - 1) 
+    sds = np.expand_dims((1 / np.sqrt(stick_propn_info)), axis = 0)
+    means = np.expand_dims(stick_propn_mean, axis = 0)
+    
+    return sp.special.expit(normal_samples * sds + means)
+    
 
 def sample_weights_from_logitnormal_sticks(stick_propn_mean,
                                            stick_propn_info,
@@ -104,21 +116,11 @@ def sample_weights_from_logitnormal_sticks(stick_propn_mean,
     
     assert stick_propn_mean.shape == stick_propn_info.shape
     assert len(stick_propn_mean.shape) == 1
-    k_approx = len(stick_propn_mean) + 1
     
-    stick_propn_mean = stick_propn_mean[None, :]
-    stick_propn_info = stick_propn_info[None, :]
-    
-    # univariate normal samples
-    unif_samples_shape = (n_samples, k_approx - 1)
-    unv_norm_samples = random.normal(key = jax.random.PRNGKey(seed), 
-                                     shape = unif_samples_shape)
-
     # sample sticks proportions from logitnormal
-    # this is n_samples x ... x (k_approx - 1)
-    stick_propn_samples = sp.special.expit(unv_norm_samples * \
-                            1 / np.sqrt(stick_propn_info) + \
-                                        stick_propn_mean)
+    # this is n_samples x (k_approx - 1)
+    stick_propn_samples = sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, seed)
+                                        
 
     # get sampled mixture weights weights
     # this is n_samples x k_approx
@@ -213,7 +215,7 @@ def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean,
 
     return np.mean(n_clusters_sampled)
 
-def get_e_num_clusters_from_ez(e_z):
+def get_e_num_clusters_from_ez_analytic(e_z):
     """
     Analytically computes the expected number of clusters from cluster
     belongings e_z.
@@ -301,10 +303,10 @@ def sample_ez(e_z,
     # shape is n_samples x n x k
     return z_samples_one_hot
     
-def get_e_num_large_clusters_from_ez(e_z,
-                                    threshold = 0,
-                                    n_samples = 1,
-                                    seed = 0):
+def get_e_num_clusters_from_ez(e_z,
+                               threshold = 0,
+                               n_samples = 1,
+                               seed = 0):
     """
     Computes the expected number of clusters with at least ```threshold``
     observations from cluster belongings e_z.

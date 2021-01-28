@@ -2,18 +2,12 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
-from jax.experimental import loops
-
 import paragami
 
-import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
-
+from bnpmodeling_runjingdev import modeling_lib
 import bnpmodeling_runjingdev.exponential_families as ef
-from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
 from numpy.polynomial.hermite import hermgauss
-
-import warnings
 
 ##########################
 # Set up vb parameters
@@ -335,9 +329,8 @@ def get_kl(g_obs,
         
     return -1 * elbo
 
-
 ######################
-# Some helpful functions to get posterior moments
+# a useful function to get posterior moments
 ######################
 def get_moments_from_vb_params_dict(vb_params_dict,
                                     gh_loc = None,
@@ -370,83 +363,6 @@ def get_moments_from_vb_params_dict(vb_params_dict,
 
     return e_log_sticks, e_log_1m_sticks, \
                 e_log_pop_freq, e_log_1m_pop_freq
-
-def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights, 
-                        threshold = 0,
-                        n_samples = 1000,
-                        seed = 2342): 
-    
-    e_log_sticks, e_log_1m_sticks, \
-        e_log_pop_freq, e_log_1m_pop_freq = \
-            get_moments_from_vb_params_dict(vb_params_dict,
-                                    gh_loc = gh_loc,
-                                    gh_weights = gh_weights)
-    e_log_cluster_probs = \
-        modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
-                            e_log_sticks, e_log_1m_sticks)
-    
-    n_obs = g_obs.shape[0]
-    k_approx = e_log_cluster_probs.shape[-1]
-        
-    with loops.Scope() as s:
-        s.sampled_counts = np.zeros((n_samples, k_approx))
-        
-        for l in s.range(g_obs.shape[1]):
-            # e_z_l is shaped as n_obs x k_approx x 2
-            _, e_z_l = get_optimal_ezl(g_obs[:, l],
-                                    e_log_pop_freq[l], e_log_1m_pop_freq[l],
-                                    e_log_cluster_probs)
-            
-            # combine first and last dimension
-            e_z_l = e_z_l.transpose((0, 2, 1)).\
-                            reshape((n_obs * 2, k_approx))
-
-            # sample counts
-            unif_samples = jax.random.uniform(key = jax.random.PRNGKey(seed + l), 
-                                              shape = (n_samples, e_z_l.shape[0]))
-            
-            # this is n_samples x (n_obs * 2) x k_approx
-            z_samples = cluster_quantities_lib.\
-                            _get_onehot_clusters_from_ez_and_unif_samples(e_z_l, 
-                                                                          unif_samples)
-            
-            # this is n_samples x k_approx
-            sampled_counts_l = z_samples.sum(1)
-            
-            s.sampled_counts += sampled_counts_l
-    
-    n_clusters_sampled = (s.sampled_counts > threshold).sum(1)
-    
-    # return s.sampled_counts
-    # return n_clusters_sampled
-    return n_clusters_sampled.mean()
-
-def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
-                            n_samples = 1000,
-                            key = jax.random.PRNGKey(0)): 
-    
-    # If I sample one more loci for every individual in my dataset, 
-    # how many clusters would I expect to see?
-    
-    # sample standard normal
-    shape = (n_samples, ) + stick_means.shape 
-    normal_samples = jax.random.normal(key, shape)
-    
-    # sample sticks: shape is n_samples x n_obs x k_approx 
-    sds = np.expand_dims((1 / np.sqrt(stick_infos)), axis = 0)
-    means = np.expand_dims(stick_means, axis = 0)
-    sticks_sampled = sp.special.expit(normal_samples * sds + means)
-    
-    # get mixture weights
-    ind_admix_sampled = \
-        cluster_quantities_lib.\
-            get_mixture_weights_from_stick_break_propns(sticks_sampled)
-        
-    # get expected number of clusters 
-    e_num_clusters_sampled = cluster_quantities_lib.\
-            get_e_num_clusters_from_ez_2d(ind_admix_sampled)
-    
-    return e_num_clusters_sampled.mean()
 
 
 #####################

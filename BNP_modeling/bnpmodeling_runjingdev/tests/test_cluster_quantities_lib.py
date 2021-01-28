@@ -98,14 +98,14 @@ class TestExpectedNumClusters(unittest.TestCase):
         n_samples = 10000
         e_num_clusters_sampled, var_num_clusters_sampled = \
             cluster_quantities_lib.\
-                get_e_num_large_clusters_from_ez(e_z,
-                                                 n_samples = n_samples,
-                                                 seed = 1342342,
-                                                 threshold = 0)
+                get_e_num_clusters_from_ez(e_z,
+                                           n_samples = n_samples,
+                                           seed = 1342342,
+                                           threshold = 0)
         
         # get analytic expected nubmer of clusters
         e_num_clusters_analytic = \
-            cluster_quantities_lib.get_e_num_clusters_from_ez(e_z)
+            cluster_quantities_lib.get_e_num_clusters_from_ez_analytic(e_z)
         
         tol =  np.sqrt(var_num_clusters_sampled / n_samples) * 3
 
