@@ -11,7 +11,7 @@ from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 ######################
 # function to return ez's for the l-th locus
 ######################
-def get_optimal_ezl(g_obs_l, 
+def get_optimal_ezl_free(g_obs_l, 
                     e_log_pop_freq_l,
                     e_log_1m_pop_freq_l,
                     e_log_cluster_probs): 
@@ -22,11 +22,7 @@ def get_optimal_ezl(g_obs_l,
                                                 e_log_1m_pop_freq_l,
                                                 e_log_cluster_probs)
 
-    # e_zs
-    e_z_l, _ = structure_model_lib.get_ez_from_ezfree(loglik_cond_z_l, 
-                                                      detach_ez = False)
-    
-    return e_z_l
+    return loglik_cond_z_l
 
 ######################
 # expected number of clusters
@@ -60,16 +56,17 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
         # x[3] is a sequence of subkeys
         
         # e_z_l is shaped as n_obs x k_approx x 2
-        e_z_l = get_optimal_ezl(x[0], x[1], x[2], e_log_cluster_probs)
+        e_z_l_free = get_optimal_ezl_free(x[0], x[1], x[2], e_log_cluster_probs)
             
         # combine first and last dimension
-        e_z_l = e_z_l.transpose((0, 2, 1)).\
+        e_z_l_free = e_z_l_free.transpose((0, 2, 1)).\
                             reshape((n_obs * 2, k_approx))
             
         # this is n_samples x (n_obs * 2) x k_approx
-        z_samples = cluster_quantities_lib.sample_ez(e_z_l, 
+        z_samples = cluster_quantities_lib.sample_ez(e_z_l_free, 
                                                      n_samples = n_samples, 
-                                                     prng_key = x[3])
+                                                     prng_key = x[3], 
+                                                     e_z_is_free = True)
         
         # this is n_samples x k_approx
         sampled_counts_l = z_samples.sum(1)
@@ -153,8 +150,8 @@ def get_e_num_loci_per_cluster(g_obs, vb_params_dict, gh_loc, gh_weights):
         # x[2] is e_log_1m_pop_freq[:, l]
         
         # e_z_l is shaped as n_obs x k_approx x 2
-        e_z_l = get_optimal_ezl(x[0], x[1], x[2], e_log_cluster_probs)
-            
+        e_z_l_free = get_optimal_ezl_free(x[0], x[1], x[2], e_log_cluster_probs)
+        e_z_l = jax.nn.softmax(e_z_l_free, 1)
         # sum all dimensions except for k_approx
         counts_per_cluster = e_z_l.sum(0).sum(-1)
         

@@ -245,47 +245,42 @@ def get_e_num_clusters_from_ez_analytic(e_z):
 
 
 
-def _sample_ez_from_gumbel_samples(e_z, gumbel_samples):
+def _sample_ez_from_gumbel_samples(e_z,
+                                   gumbel_samples, 
+                                   e_z_is_free = False):
     # e_z is n_obs x k
     # gumbel_samples should be a matrix of shape n_samples x n_obs x k
     # of samples from the Gumbel distribution
     
+    # ez_is_free = True if e_z is unn-normalized
+    
     # returns a n_samples x n_obs x k matrix encoding sampled 
     # cluster belongings
     
-    
-    # these assertions mess up if we use jit ... 
-    # assert np.all(e_z >= 0.)
-    #  assert np.all(e_z <= 1.)
-    
+        
     n_obs = e_z.shape[0]
     k_approx = e_z.shape[1]
     
     assert gumbel_samples.shape[1] == n_obs
-    assert gumbel_samples.shape[2] == n_obs
+    assert gumbel_samples.shape[2] == k_approx
     
-    logits = np.log(e_z)
-    ez = np.argmax(gumbel_samples + logits[None, :, :], axis=axis)
+    if e_z_is_free: 
+        # else, the `ez` are really logits
+        logits = e_z
+    else:    
+        # if e_z has already been passed through 
+        # the softmax function
+        logits = np.log(e_z)
     
-    ez_onehot = jax.nn.one_hot(ez
-
-
-    e_z_cumsum = e_z.cumsum(1)
-    # assert np.all(np.abs(e_z_cumsum[:, -1] - 1.) < 1e-8)
         
-    e_z_cumsum0 = np.hstack((np.zeros((n_obs, 1)),
-                             e_z_cumsum[:, 0:(k_approx-1)]))
+    z_samples = np.argmax(gumbel_samples + logits[None, :, :], axis=-1)
     
-    assert len(unif_samples.shape) == 2
-    assert unif_samples.shape[1] == n_obs
+    z_samples_one_hot = jax.nn.one_hot(z_samples, k_approx)
 
-    # get which cluster the sample belongs to
-    z_sample = (e_z_cumsum[None, :, :] > unif_samples[:, :, None]) & \
-                (e_z_cumsum0[None, :, :] < unif_samples[:, :, None])
-
-    return z_sample
+    return z_samples_one_hot
 
 def sample_ez(e_z, 
+              e_z_is_free = False, 
               n_samples = 1, 
               prng_key = random.PRNGKey(0)): 
     """
@@ -312,13 +307,16 @@ def sample_ez(e_z,
     # belonging to cluster k
     
     n_obs = e_z.shape[0]
+    k_approx = e_z.shape[1]
     
     # draw uniform samples
-    unif_samples = random.uniform(key = prng_key, 
-                                  shape = (n_samples, n_obs))
+    gumbel_samples = random.gumbel(key = prng_key, 
+                                  shape = (n_samples, n_obs, k_approx))
 
     # one-hot encoding of zs from uniform samples
-    z_samples_one_hot = _sample_ez_from_unif_samples(e_z, unif_samples)
+    z_samples_one_hot = _sample_ez_from_gumbel_samples(e_z,
+                                                       gumbel_samples,
+                                                       e_z_is_free = e_z_is_free)
     
     # shape is n_samples x n x k
     return z_samples_one_hot
