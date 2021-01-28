@@ -96,12 +96,16 @@ class TestExpectedNumClusters(unittest.TestCase):
         
         # get expected number of clusters via sampling
         n_samples = 10000
-        e_num_clusters_sampled, var_num_clusters_sampled = \
+        num_clusters_sampled = \
             cluster_quantities_lib.\
                 get_e_num_clusters_from_ez(e_z,
                                            n_samples = n_samples,
                                            seed = 1342342,
-                                           threshold = 0)
+                                           threshold = 0, 
+                                           return_samples = True)
+        
+        e_num_clusters_sampled = num_clusters_sampled.mean()
+        var_num_clusters_sampled = num_clusters_sampled.var()
         
         # get analytic expected nubmer of clusters
         e_num_clusters_analytic = \

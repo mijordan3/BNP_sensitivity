@@ -36,14 +36,18 @@ class TestCaviUpdate(unittest.TestCase):
         
         # sampled expected number of clusters
         n_samples = 10000
-        e_num_clusters_emp, e_num_clusters_sampled = \
+        n_clusters_sampled = \
             posterior_quantities_lib.get_e_num_clusters(g_obs, 
                                                         vb_params_dict,
                                                         gh_loc,
                                                         gh_weights, 
-                                                        n_samples = n_samples)
+                                                        n_samples = n_samples, 
+                                                        return_samples = True)
         
-        tol = 3 * np.sqrt(e_num_clusters_sampled.var() / n_samples)
+        # monte-carlo estimate
+        e_num_clusters_emp = n_clusters_sampled.mean()
+        
+        tol = 3 * np.sqrt(n_clusters_sampled.var() / n_samples)
         
         testing.assert_allclose(e_num_clusters_emp, 
                                 e_num_clusters_analytic, 

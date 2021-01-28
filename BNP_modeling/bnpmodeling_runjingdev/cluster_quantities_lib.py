@@ -174,7 +174,8 @@ def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean,
                                             n_obs, 
                                             threshold = 0,
                                             n_samples = 1,
-                                            seed = 0):
+                                            seed = 0, 
+                                            return_samples = False):
     """
     Computes, using Monte Carlo, the expected number of predicted clusters 
     with at least t observations in a new sample of size n_obs. 
@@ -213,7 +214,12 @@ def get_e_num_pred_clusters_from_logit_sticks(stick_propn_mean,
                                                                       n_obs = n_obs, 
                                                                       threshold = threshold)
 
-    return np.mean(n_clusters_sampled)
+    if return_samples: 
+        return n_clusters_sampled
+    else: 
+        return np.mean(n_clusters_sampled)
+
+
 
 def get_e_num_clusters_from_ez_analytic(e_z):
     """
@@ -306,7 +312,8 @@ def sample_ez(e_z,
 def get_e_num_clusters_from_ez(e_z,
                                threshold = 0,
                                n_samples = 1,
-                               seed = 0):
+                               seed = 0, 
+                               return_samples = False):
     """
     Computes the expected number of clusters with at least ```threshold``
     observations from cluster belongings e_z.
@@ -342,6 +349,9 @@ def get_e_num_clusters_from_ez(e_z,
     # for each sample, the number of clusters above some threshold
     n_clusters_sampled = (counts_sampled > threshold).sum(1)
     
-    return np.mean(n_clusters_sampled), np.var(n_clusters_sampled)
+    if return_samples: 
+        return n_clusters_sampled
+    else: 
+        return np.mean(n_clusters_sampled)
 
 

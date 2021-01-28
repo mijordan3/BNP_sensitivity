@@ -34,7 +34,8 @@ def get_optimal_ezl(g_obs_l,
 def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights, 
                         threshold = 0,
                         n_samples = 1000,
-                        seed = 2342): 
+                        seed = 2342, 
+                        return_samples = True): 
     
     # expected number of clusters within the observed loci
     
@@ -86,11 +87,16 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
     # the number of clusters above some threshold
     n_clusters_sampled = (sampled_counts > threshold).sum(1)
     
-    return n_clusters_sampled.mean(), n_clusters_sampled
+    if return_samples: 
+        return n_clusters_sampled
+    else: 
+        # just return the monte carlo estimate
+        return n_clusters_sampled.mean(), 
 
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
                             n_samples = 1000,
-                            seed = 0): 
+                            seed = 0, 
+                            return_samples = False): 
     
     # If I sample one more loci for every individual in my dataset, 
     # how many clusters would I expect to see?
@@ -110,9 +116,12 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
     # and compute number of clusters
     get_sampled_n_clusters = jax.vmap(cluster_quantities_lib.\
                                       get_e_num_clusters_from_ez_analytic)
-    sampled_n_clusters = get_sampled_n_clusters(ind_admix_sampled)
-
-    return sampled_n_clusters.mean()
+    n_clusters_sampled = get_sampled_n_clusters(ind_admix_sampled)
+    
+    if return_samples: 
+        return n_clusters_sampled
+    else: 
+        return n_clusters_sampled.mean()
 
 def get_ez_all(g_obs, vb_params_dict, gh_loc, gh_weights): 
     
