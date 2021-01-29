@@ -98,7 +98,7 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
 
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
                             n_samples = 1000,
-                            seed = 0, 
+                            prng_key = jax.random.PRNGKey(0), 
                             return_samples = False): 
     
     # If I sample one more loci for every individual in my dataset, 
@@ -108,7 +108,7 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
     sticks_sampled = cluster_quantities_lib.sample_stick_propn(stick_means, 
                                                                stick_infos, 
                                                                n_samples, 
-                                                               seed)
+                                                               prng_key)
     
     # get mixture weights: shape is n_samples x n_obs x k_approx 
     ind_admix_sampled = \
