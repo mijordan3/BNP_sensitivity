@@ -23,7 +23,7 @@ def get_optimal_ezl(g_obs_l,
                                                 e_log_cluster_probs)
 
     # e_zs
-    e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
+    e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = -1)
     
     return e_z_l
 
@@ -58,12 +58,11 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
         # x[2] is e_log_1m_pop_freq[:, l]
         # x[3] is a sequence of subkeys
         
-        # e_z_l is shaped as n_obs x k_approx x 2
+        # e_z_l is shaped as n_obs x 2 k_approx 
         e_z_l = get_optimal_ezl(x[0], x[1], x[2], e_log_cluster_probs)
             
         # combine first and last dimension
-        e_z_l = e_z_l.transpose((0, 2, 1)).\
-                            reshape((n_obs * 2, k_approx))
+        e_z_l = e_z_l.reshape((n_obs * 2, k_approx))
             
         # this is n_samples x (n_obs * 2) x k_approx
         z_samples = cluster_quantities_lib.sample_ez(e_z_l, 
@@ -151,11 +150,11 @@ def get_e_num_loci_per_cluster(g_obs, vb_params_dict, gh_loc, gh_weights):
         # x[1] is e_log_pop_freq[:, l]
         # x[2] is e_log_1m_pop_freq[:, l]
         
-        # e_z_l is shaped as n_obs x k_approx x 2
+        # e_z_l is shaped as n_obs x 2 x k_approx
         e_z_l = get_optimal_ezl(x[0], x[1], x[2], e_log_cluster_probs)
             
         # sum all dimensions except for k_approx
-        counts_per_cluster = e_z_l.sum(0).sum(-1)
+        counts_per_cluster = e_z_l.sum(0).sum(0)
         
         return counts_per_cluster + val, None
     
