@@ -351,7 +351,7 @@ class StructureObjective():
                             (moments_tuple[0], x[1]), 
                             (moments_jvp[0], x[2]))
             
-            ez = jax.nn.softmax(ez_free, 1)
+            ez = jax.nn.softmax(ez_free, -1)
             
             # multiply by [dz/dzeta]
             dz_jvp = self._constrain_ez_free_jvp(ez, zeta_jvp)
@@ -427,7 +427,7 @@ class StructureObjective():
         # jax.nn.softmax(ez_free, 1)
         
         term1 = ez * v
-        term2 = ez * term1.sum(1, keepdims = True)
+        term2 = ez * term1.sum(-1, keepdims = True)
 
         return term1 - term2
     
