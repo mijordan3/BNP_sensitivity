@@ -168,7 +168,7 @@ def get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l):
             np.outer(g_obs_l2, e_log_pop_freq_l)
 
 
-    return np.stack((loglik_a, loglik_b), axis = -1)
+    return np.stack((loglik_a, loglik_b), axis = 1)
 
 def get_loglik_cond_z_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                         e_log_cluster_probs): 
@@ -177,15 +177,15 @@ def get_loglik_cond_z_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
     loglik_gene_l = get_e_loglik_gene_nk(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l)
 
     # add individual belongings
-    return np.expand_dims(e_log_cluster_probs, axis = 2) + loglik_gene_l
+    return np.expand_dims(e_log_cluster_probs, axis = 1) + loglik_gene_l
 
 def get_ez_from_ezfree(loglik_cond_z_l, detach_ez): 
     if detach_ez: 
         e_z_l = jax.nn.softmax(jax.lax.stop_gradient(loglik_cond_z_l), 
-                              axis = 1)
+                              axis = -1)
         z_entropy_l = 0.
     else: 
-        e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = 1)
+        e_z_l = jax.nn.softmax(loglik_cond_z_l, axis = -1)
         z_entropy_l = (sp.special.entr(e_z_l)).sum()
     
     return e_z_l, z_entropy_l

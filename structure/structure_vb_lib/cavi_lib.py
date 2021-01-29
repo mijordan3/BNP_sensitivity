@@ -55,12 +55,12 @@ def _update_pop_beta_l(g_obs_l, e_log_pop_freq_l, e_log_1m_pop_freq_l,
                                    e_log_1m_pop_freq_l,
                                    e_log_cluster_probs)
     
-    beta_param_l1 = (np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, :, 0]) + \
-                        np.dot(g_obs_l2, e_z_l[:, :, 1])) * data_weight + \
+    beta_param_l1 = (np.dot(g_obs_l1 + g_obs_l2, e_z_l[:, 0, :]) + \
+                        np.dot(g_obs_l2, e_z_l[:, 1, :])) * data_weight + \
                         (allele_prior_alpha - 1) 
     
-    beta_param_l2 = (np.dot(g_obs_l0, e_z_l[:, :, 0]) + \
-                        np.dot(g_obs_l0 + g_obs_l1, e_z_l[:, :, 1])) * data_weight + \
+    beta_param_l2 = (np.dot(g_obs_l0, e_z_l[:, 0, :]) + \
+                        np.dot(g_obs_l0 + g_obs_l1, e_z_l[:, 1, :])) * data_weight + \
                             (allele_prior_beta - 1) 
     
     return np.stack([beta_param_l1, beta_param_l2]).transpose((1, 0))
@@ -105,7 +105,7 @@ def update_ind_admix_beta(g_obs, e_log_pop_freq, e_log_1m_pop_freq,
     # sum the e_z's over loci
     body_fun = lambda val, x :\
                     _get_ez_l_from_moments(x[0], x[1], x[2],
-                                           e_log_cluster_probs).sum(-1) + val
+                                           e_log_cluster_probs).sum(1) + val
     
     scan_fun = lambda val, x : (body_fun(val, x), None)
     

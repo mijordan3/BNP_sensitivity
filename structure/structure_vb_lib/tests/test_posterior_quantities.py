@@ -30,8 +30,7 @@ class TestCaviUpdate(unittest.TestCase):
         ez = posterior_quantities_lib.get_ez_all(g_obs, vb_params_dict, gh_loc, gh_weights)
         
         e_num_clusters_analytic = cluster_quantities_lib.\
-            get_e_num_clusters_from_ez_analytic(ez.transpose((0, 1, 3, 2)).\
-                                                    reshape(-1, k_approx))
+            get_e_num_clusters_from_ez_analytic(ez.reshape(-1, k_approx))
                 
         
         # sampled expected number of clusters
