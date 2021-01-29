@@ -34,7 +34,7 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
                         threshold = 0,
                         n_samples = 1000,
                         prng_key = jax.random.PRNGKey(0), 
-                        return_samples = True): 
+                        return_samples = False): 
     
     # expected number of clusters within the observed loci
     

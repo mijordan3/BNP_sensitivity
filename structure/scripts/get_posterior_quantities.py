@@ -6,7 +6,6 @@ import jax.scipy as sp
 import paragami
 
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 from bnpmodeling_runjingdev import modeling_lib, cluster_quantities_lib
 
@@ -15,11 +14,22 @@ from structure_vb_lib import posterior_quantities_lib
 
 import re
 
+import argparse
+parser = argparse.ArgumentParser()
+
 # data file
 parser.add_argument('--data_file', type=str)
 
 # name of the structure fit file
 parser.add_argument('--fit_file', type=str)
+
+# name of lr file 
+parser.add_argument('--lr_file', type=str)
+
+# TODO with latest change, this should be necessary ... 
+parser.add_argument('--perturbation', type = str)
+
+args = parser.parse_args()
 
 
 ######################
@@ -34,50 +44,86 @@ n_loci = g_obs.shape[1]
 
 print('g_obs.shape', g_obs.shape)
 
-
 ######################
 # Load fit
 ######################
-vb_opt_dict, vb_params_paragami, _, _, \
-    gh_loc, gh_weights, _ = \
+print('loading fit from ', args.fit_file)
+vb_refit_dict, vb_params_paragami, prior_params_dict, _, \
+    gh_loc, gh_weights, meta_data = \
         structure_model_lib.load_structure_fit(args.fit_file)
+
+epsilon = meta_data['epsilon']
+delta = meta_data['delta']
+
+print('epsilon = ', epsilon)
+
+######################
+# Load linear response prediction for this fit
+######################
+print('loading derivatives from: ', args.lr_file)
+lr_data = np.load(args.lr_file)
+
+dinput_dhyper = lr_data['dinput_dfun_' + args.perturbation]
+
+lr_vb_params = lr_data['vb_opt'] + dinput_dhyper * epsilon * delta
+vb_lr_dict = vb_params_paragami.fold(lr_vb_params, free = True)
 
 ######################
 # Number of clusters in loci
 ######################
-n_clusters_sampled = \
-    posterior_quantities_lib.\
+threshold1 = g_obs.shape[0] * g_obs.shape[1] * 0.001
+
+def get_e_n_clusters(vb_params_dict):
+
+    return posterior_quantities_lib.\
         get_e_num_clusters(g_obs, 
                             vb_params_dict,
                             gh_loc,
                             gh_weights, 
-                            threshold = 1000,
+                            threshold = threshold1,
                             n_samples = 500,
-                            prng_key = jax.random.PRNGKey(2342), 
-                            return_samples = True)
+                            prng_key = jax.random.PRNGKey(2342))
+
+
+e_n_clusters_refit = get_e_n_clusters(vb_refit_dict)
+e_n_clusters_lr = get_e_n_clusters(vb_lr_dict)
 
 
 ######################
 # Number of clusters in individuals
 ######################
-stick_means = vb_opt_dict['ind_admix_params']['stick_means']
-stick_infos = vb_opt_dict['ind_admix_params']['stick_infos']
+
+def get_e_n_pred_clusters(vb_params_dict):
+    stick_means = vb_params_dict['ind_admix_params']['stick_means']
+    stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
+
+
+    return posterior_quantities_lib.\
+            get_e_num_pred_clusters(stick_means, 
+                                    stick_infos,
+                                    gh_loc,
+                                    gh_weights, 
+                                    n_samples = 500, 
+                                    prng_key = jax.random.PRNGKey(331))
+
     
-
-n_pred_clusters_sampled = \
-    posterior_quantities_lib.\
-        get_e_num_pred_clusters(stick_means, 
-                                stick_infos,
-                                gh_loc,
-                                gh_weights, 
-                                n_samples = 500, 
-                                prng_key = jax.random.PRNGKey(331))
-
-outfile = re.sub('.npz', '_poststats.npz', args.init_fit)
+e_n_pred_clusters_refit = get_e_n_pred_clusters(vb_refit_dict)
+e_n_pred_clusters_lr = get_e_n_pred_clusters(vb_lr_dict)
+    
+    
+outfile = re.sub('.npz', '_poststats.npz', args.fit_file)
 print('saving posterior statistics into: ')
 print(outfile)
 
 np.savez(outfile, 
-         n_clusters_sampled = n_clusters_sampled, 
-         n_pred_clusters_sampled = n_pred_clusters_sampled)
+         e_n_clusters_refit = e_n_clusters_refit, 
+         e_n_clusters_lr = e_n_clusters_lr,
+         threshold1 = threshold1,
+         e_n_pred_clusters_refit = e_n_pred_clusters_refit, 
+         e_n_pred_clusters_lr = e_n_pred_clusters_lr, 
+         epsilon = epsilon, 
+         delta = delta, 
+         dp_prior_alpha = meta_data['dp_prior_alpha'])
+
+
 print('done. ')
