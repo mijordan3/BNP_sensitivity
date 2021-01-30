@@ -96,8 +96,10 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
         # just return the monte carlo estimate
         return n_clusters_sampled.mean()
 
+
 def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
                             n_samples = 1000,
+                            threshold = 0, 
                             prng_key = jax.random.PRNGKey(0), 
                             return_samples = False): 
     
@@ -117,16 +119,39 @@ def get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights,
         
     # for each mixture weight -- pretend these are e_zs 
     # and compute number of clusters
-    get_sampled_n_clusters = jax.vmap(cluster_quantities_lib.\
-                                      get_e_num_clusters_from_ez_analytic)
-    n_clusters_sampled = get_sampled_n_clusters(ind_admix_sampled)
-    
+    if threshold == 0: 
+        get_sampled_n_clusters = jax.vmap(cluster_quantities_lib.\
+                                          get_e_num_clusters_from_ez_analytic)
+        n_clusters_sampled = get_sampled_n_clusters(ind_admix_sampled)
+    else: 
+        
+        # sample one z from each individual admixture
+        sample_one_z = lambda *x : \
+            cluster_quantities_lib.sample_ez(x[0],
+                                             n_samples = 1,
+                                             prng_key = x[1]).squeeze(0)
+        
+        sample_all_zs = jax.vmap(sample_one_z)
+        
+        keys = jax.random.split(prng_key, n_samples)
+        
+        # this is shape n_samples x n_obs x k_approx
+        z_samples = sample_all_zs(ind_admix_sampled, keys)
+        
+        # sum over observations
+        counts_per_clusters_sampled = z_samples.sum(1)
+        
+        # get number of clusters above threshold
+        n_clusters_sampled = (counts_per_clusters_sampled >= threshold).sum(-1)
+        
     if return_samples: 
         return n_clusters_sampled
     else: 
         return n_clusters_sampled.mean()
 
-    
+######################
+# expected cluster weights
+######################    
 def get_e_num_loci_per_cluster(g_obs, vb_params_dict, gh_loc, gh_weights): 
     
     # expected number of clusters within the observed loci

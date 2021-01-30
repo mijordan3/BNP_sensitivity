@@ -13,6 +13,7 @@ from structure_vb_lib import structure_model_lib
 from structure_vb_lib import posterior_quantities_lib
 
 import re
+import time
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -31,6 +32,11 @@ parser.add_argument('--perturbation', type = str)
 
 args = parser.parse_args()
 
+t0 = time.time()
+
+
+threshold1 = 0
+threshold2 = 1
 
 ######################
 # Load Data
@@ -71,29 +77,29 @@ vb_lr_dict = vb_params_paragami.fold(lr_vb_params, free = True)
 ######################
 # Number of clusters in loci
 ######################
-threshold1 = g_obs.shape[0] * g_obs.shape[1] * 0.001
+# @jax.jit
+# def get_e_n_clusters(vb_params_dict):
 
-def get_e_n_clusters(vb_params_dict):
-
-    return posterior_quantities_lib.\
-        get_e_num_clusters(g_obs, 
-                            vb_params_dict,
-                            gh_loc,
-                            gh_weights, 
-                            threshold = threshold1,
-                            n_samples = 500,
-                            prng_key = jax.random.PRNGKey(2342))
+#     return posterior_quantities_lib.\
+#         get_e_num_clusters(g_obs, 
+#                             vb_params_dict,
+#                             gh_loc,
+#                             gh_weights, 
+#                             threshold = threshold1,
+#                             n_samples = 200,
+#                             prng_key = jax.random.PRNGKey(2342))
 
 
-e_n_clusters_refit = get_e_n_clusters(vb_refit_dict)
-e_n_clusters_lr = get_e_n_clusters(vb_lr_dict)
+# e_n_clusters_refit = get_e_n_clusters(vb_refit_dict)
+# e_n_clusters_lr = get_e_n_clusters(vb_lr_dict)
 
+e_n_clusters_refit = 0
+e_n_clusters_lr = 0
 
 ######################
 # Number of clusters in individuals
 ######################
-
-def get_e_n_pred_clusters(vb_params_dict):
+def get_e_n_pred_clusters(vb_params_dict, threshold):
     stick_means = vb_params_dict['ind_admix_params']['stick_means']
     stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
 
@@ -103,13 +109,17 @@ def get_e_n_pred_clusters(vb_params_dict):
                                     stick_infos,
                                     gh_loc,
                                     gh_weights, 
-                                    n_samples = 500, 
+                                    threshold = threshold,
+                                    n_samples = 1000, 
                                     prng_key = jax.random.PRNGKey(331))
 
     
-e_n_pred_clusters_refit = get_e_n_pred_clusters(vb_refit_dict)
-e_n_pred_clusters_lr = get_e_n_pred_clusters(vb_lr_dict)
-    
+e_n_pred_clusters_refit = get_e_n_pred_clusters(vb_refit_dict, threshold = 0)
+e_n_pred_clusters_lr = get_e_n_pred_clusters(vb_lr_dict, threshold = 0)
+
+e_n_pred_clusters_refit_thresh = get_e_n_pred_clusters(vb_refit_dict, threshold = threshold2)
+e_n_pred_clusters_lr_thresh = get_e_n_pred_clusters(vb_lr_dict, threshold = threshold2)
+
     
 outfile = re.sub('.npz', '_poststats.npz', args.fit_file)
 print('saving posterior statistics into: ')
@@ -121,9 +131,13 @@ np.savez(outfile,
          threshold1 = threshold1,
          e_n_pred_clusters_refit = e_n_pred_clusters_refit, 
          e_n_pred_clusters_lr = e_n_pred_clusters_lr, 
+         e_n_pred_clusters_refit_thresh = e_n_pred_clusters_refit_thresh, 
+         e_n_pred_clusters_lr_thresh = e_n_pred_clusters_lr_thresh, 
+         threshold2 = threshold2,
          epsilon = epsilon, 
          delta = delta, 
          dp_prior_alpha = meta_data['dp_prior_alpha'])
 
 
 print('done. ')
+print('elapsed: ', np.round(time.time() - t0, 3), 'secs')
