@@ -35,7 +35,7 @@ args = parser.parse_args()
 t0 = time.time()
 
 
-threshold1 = 0
+threshold1 = 1000
 threshold2 = 1
 
 ######################
@@ -77,21 +77,21 @@ vb_lr_dict = vb_params_paragami.fold(lr_vb_params, free = True)
 ######################
 # Number of clusters in loci
 ######################
-# @jax.jit
-# def get_e_n_clusters(vb_params_dict):
+@jax.jit
+def get_e_n_clusters(vb_params_dict):
 
-#     return posterior_quantities_lib.\
-#         get_e_num_clusters(g_obs, 
-#                             vb_params_dict,
-#                             gh_loc,
-#                             gh_weights, 
-#                             threshold = threshold1,
-#                             n_samples = 200,
-#                             prng_key = jax.random.PRNGKey(2342))
+    return posterior_quantities_lib.\
+        get_e_num_clusters(g_obs, 
+                            vb_params_dict,
+                            gh_loc,
+                            gh_weights, 
+                            threshold = threshold1,
+                            n_samples = 500,
+                            prng_key = jax.random.PRNGKey(2342))
 
 
-# e_n_clusters_refit = get_e_n_clusters(vb_refit_dict)
-# e_n_clusters_lr = get_e_n_clusters(vb_lr_dict)
+e_n_clusters_refit = get_e_n_clusters(vb_refit_dict)
+e_n_clusters_lr = get_e_n_clusters(vb_lr_dict)
 
 e_n_clusters_refit = 0
 e_n_clusters_lr = 0
