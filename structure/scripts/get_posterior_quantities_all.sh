@@ -2,7 +2,6 @@
 
 sbatch --array 0-18 --export=perturbation='worst_case' get_posterior_quantities_epsilon.sh
 
-sbatch --array 0-18 --export=perturbation='worst_case' get_posterior_quantities_epsilon.sh
 sbatch --array 0-18 --export=perturbation='sigmoidal' get_posterior_quantities_epsilon.sh
 sbatch --array 0-18 --export=perturbation='sigmoidal_neg' get_posterior_quantities_epsilon.sh
 
