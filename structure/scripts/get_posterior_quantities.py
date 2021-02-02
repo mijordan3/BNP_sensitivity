@@ -35,8 +35,9 @@ args = parser.parse_args()
 t0 = time.time()
 
 
-threshold1 = 1000
-threshold2 = 3
+threshold_insamp = 1000
+threshold_insamp2 = 500
+threshold_pred = 3
 
 ######################
 # Load Data
@@ -110,22 +111,28 @@ saved_results['e_n_ind_lr'] = \
 ######################
 
 # this one is super slow ... 
-@jax.jit
-def get_e_n_clusters(vb_params_dict):
+def get_e_n_clusters(vb_params_dict, threshold):
 
     return posterior_quantities_lib.\
         get_e_num_clusters(g_obs, 
                             vb_params_dict,
                             gh_loc,
                             gh_weights, 
-                            threshold = threshold1,
+                            threshold = threshold,
                             n_samples = 500,
                             prng_key = jax.random.PRNGKey(2342))
 
+get_e_n_clusters1 = jax.jit(lambda x : get_e_n_clusters(x, threshold_insamp))
 
-saved_results['e_n_clusters_refit'] = get_e_n_clusters(vb_refit_dict)
-saved_results['e_n_clusters_lr'] = get_e_n_clusters(vb_lr_dict)
-saved_results['threshold1'] = threshold1
+saved_results['e_n_clusters_refit'] = get_e_n_clusters1(vb_refit_dict)
+saved_results['e_n_clusters_lr'] = get_e_n_clusters1(vb_lr_dict)
+saved_results['threshold_insamp'] = threshold_insamp
+
+get_e_n_clusters2 = jax.jit(lambda x : get_e_n_clusters(x, threshold_insamp2))
+
+saved_results['e_n_clusters_refit2'] = get_e_n_clusters2(vb_refit_dict)
+saved_results['e_n_clusters_lr2'] = get_e_n_clusters2(vb_lr_dict)
+saved_results['threshold_insamp2'] = threshold_insamp2
 
 ######################
 # Number of clusters in individuals
@@ -149,11 +156,11 @@ saved_results['e_n_pred_clusters_lr'] = \
 
 # thresholded
 saved_results['e_n_pred_clusters_refit_thresh'] = \
-    get_e_n_pred_clusters(vb_refit_dict, threshold = threshold2)
+    get_e_n_pred_clusters(vb_refit_dict, threshold = threshold_pred)
 saved_results['e_n_pred_clusters_lr_thresh'] = \
-    get_e_n_pred_clusters(vb_lr_dict, threshold = threshold2)
+    get_e_n_pred_clusters(vb_lr_dict, threshold = threshold_pred)
 
-saved_results['threshold2'] = threshold2
+saved_results['threshold_pred'] = threshold_pred
 
 
 ##################
