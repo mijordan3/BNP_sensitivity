@@ -131,7 +131,7 @@ class PriorPerturbation(object):
     # Plot the log-phi and priors
     def plot_perturbation(self): 
     
-        fig, ax = plt.subplots(1, 4, figsize = (18, 4)) 
+        fig, ax = plt.subplots(1, 4, figsize = (14, 3.5)) 
 
         # get x-axis
         logit_v_grid = np.linspace(self.logit_v_lb, 
@@ -146,6 +146,8 @@ class PriorPerturbation(object):
                    color = 'grey', 
                    label = 'log-phi')
         ax[0].set_title('log phi in logit space')
+        ax[0].set_xlabel(r'$\nu_k$')
+        ax[0].set_ylabel(r'log $\phi$')
 
         # plot priors
         ax[1].set_title('log-priors in logit space')
@@ -157,6 +159,8 @@ class PriorPerturbation(object):
                    self.get_log_pc_logit(logit_v_grid), 
                    color = 'blue', 
                    label = 'p1')
+        ax[1].set_xlabel(r'logit-$\nu_k$')
+        ax[1].set_ylabel(r'log p')
 
 
         ax[2].set_title('priors in logit space')
@@ -168,6 +172,9 @@ class PriorPerturbation(object):
                    np.exp(self.get_log_pc_logit(logit_v_grid)), 
                    color = 'blue', 
                    label = 'p1')
+        ax[2].set_xlabel(r'logit-$\nu_k$')
+        ax[2].set_ylabel(r'p')
+
 
 
         ax[3].set_title('priors in constrained space')
@@ -179,6 +186,9 @@ class PriorPerturbation(object):
                    np.exp(self.get_log_pc(v_grid)), 
                    color = 'blue', 
                    label = 'p1')
+        ax[3].set_xlabel(r'$\nu_k$')
+        ax[3].set_ylabel(r'p')
+
 
         ax[3].legend()
 
