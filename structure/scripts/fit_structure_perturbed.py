@@ -165,7 +165,8 @@ structure_model_lib.save_structure_fit(outfile,
                                        delta = args.delta,
                                        data_file = args.data_file, 
                                        final_kl = final_kl, 
-                                       optim_time = lbfgs_time)
+                                       optim_time = lbfgs_time, 
+                                       perturbation = args.perturbation)
 
 print('Total optim time: {:.3f} secs'.format(time.time() - t0))
 
