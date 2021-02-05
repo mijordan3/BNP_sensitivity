@@ -27,9 +27,6 @@ parser.add_argument('--fit_file', type=str)
 # name of lr file 
 parser.add_argument('--lr_file', type=str)
 
-# TODO with latest change, this should be necessary ... 
-parser.add_argument('--perturbation', type = str)
-
 args = parser.parse_args()
 
 t0 = time.time()
@@ -63,6 +60,8 @@ epsilon = meta_data['epsilon']
 delta = meta_data['delta']
 
 print('epsilon = ', epsilon)
+print('delta = ', delta)
+print(meta_data['perturbation'])
 
 ######################
 # Load linear response prediction for this fit
@@ -70,7 +69,8 @@ print('epsilon = ', epsilon)
 print('loading derivatives from: ', args.lr_file)
 lr_data = np.load(args.lr_file)
 
-dinput_dhyper = lr_data['dinput_dfun_' + args.perturbation]
+dinput_dhyper = lr_data['dinput_dfun_' + \
+                        str(meta_data['perturbation'])]
 
 lr_vb_params = lr_data['vb_opt'] + dinput_dhyper * epsilon * delta
 vb_lr_dict = vb_params_paragami.fold(lr_vb_params, free = True)

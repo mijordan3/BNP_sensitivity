@@ -16,8 +16,12 @@ seed=453
 # out_filename=huang2011_fit
 # out_folder=../fits/hgdp_fits/
 
-data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
-out_filename=testing
+# data_file=../simulated_data/simulated_structure_data_nobs20_nloci50_npop4.npz
+# out_filename=testing
+# out_folder=../fits/tmp/
+
+data_file=../data/huang2011_sub_nobs25_nloci75.npz
+out_filename=huang2011_fit_sub
 out_folder=../fits/tmp/
 
 python fit_structure.py \
