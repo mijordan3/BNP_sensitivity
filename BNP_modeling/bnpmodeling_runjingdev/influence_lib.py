@@ -73,12 +73,15 @@ class InfluenceOperator(object):
                 - np.stack([self.hessian_solver(x) \
                             for x in grad_log_q_prior_rat.transpose()])
             influence = influence.transpose()
+            
+            return influence
+            
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            influence = self.hessian_solver(grad_g)
-            influence = - np.dot(influence, grad_log_q_prior_rat)
+            grad_g_hess_inv = - self.hessian_solver(grad_g)
+            influence = np.dot(grad_g_hess_inv, grad_log_q_prior_rat)
 
-        return influence
+            return influence, grad_g_hess_inv
 
     def get_q_prior_log_ratio(self, logit_stick):
         # this is log q(logit_stick)  - log p_0(logit_stick)

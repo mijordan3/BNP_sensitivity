@@ -120,10 +120,10 @@ class HyperparameterSensitivityLinearApproximation(object):
     def _set_dinput_dhyper(self):
 
         t0 = time.time()
-        cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
-                                                self.hyper_par_value0)
+        self.cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
+                                                  self.hyper_par_value0)
 
-        self.dinput_dhyper = -self.hessian_solver(cross_hess.squeeze()).\
+        self.dinput_dhyper = -self.hessian_solver(self.cross_hess.squeeze()).\
                                     block_until_ready()
         
         # save timing result ... 
