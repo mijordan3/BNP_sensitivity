@@ -101,7 +101,7 @@ class LogPhiPerturbations():
                                                      stick_key = stick_key)
         
         self.f_obj_gauss_pert2 = \
-            func_sens_lib.FunctionalPerturbationObjective(lambda x : - gauss_pert1(x),
+            func_sens_lib.FunctionalPerturbationObjective(gauss_pert2,
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
