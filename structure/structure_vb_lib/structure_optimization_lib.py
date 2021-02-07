@@ -579,7 +579,7 @@ def run_preconditioned_lbfgs(g_obs,
                             prior_params_dict,
                             gh_loc, gh_weights, 
                             e_log_phi = None, 
-                            precondition_every = 20, 
+                            precondition_every = 10, 
                             maxiter = 2000, 
                             x_tol = 1e-2, 
                             f_tol = 1e-2): 
@@ -648,9 +648,9 @@ def run_preconditioned_lbfgs(g_obs,
         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
         
         # check convergence
-        if out.success: 
-            print('lbfgs converged successfully')
-            break
+#         if out.success: 
+#             print('lbfgs converged successfully')
+#             break
 
         x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
         if x_tol_success:
