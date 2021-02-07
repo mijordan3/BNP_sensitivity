@@ -647,6 +647,7 @@ def run_preconditioned_lbfgs(g_obs,
         # transform to original parameterization
         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
         
+        print(out.message)
         # check convergence
 #         if out.success: 
 #             print('lbfgs converged successfully')
