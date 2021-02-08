@@ -102,7 +102,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         # without re-compiling the linear system (which is expensive)
 
         dobj_dhyper = jax.jacobian(hyper_par_objective_fun, 1)
-        self.dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper), 0)
+        self.dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper, 0))
 
         print('Compiling cross hessian...')
         t0 = time.time()

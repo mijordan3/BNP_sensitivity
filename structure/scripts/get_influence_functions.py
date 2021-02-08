@@ -164,6 +164,7 @@ def get_influence_and_save(g, post_stat_name):
              kl= kl,
              cg_tol = vb_sens.cg_tol,
              cg_maxiter = vb_sens.cg_maxiter,
+             logit_v_grid = logit_v_grid,
              **vars_to_save)
 
 
@@ -172,7 +173,7 @@ def get_influence_and_save(g, post_stat_name):
 def get_e_num_ind(vb_free, k): 
     vb_params_dict = vb_params_paragami.fold(vb_free, free = True)
     return posterior_quantities_lib.get_e_num_ind_per_cluster(vb_params_dict, 
-                                                              gh_loc, gh_weights).sum(0)
+                                                              gh_loc, gh_weights)[k]
 
 for k in range(8): 
     print('###############')
