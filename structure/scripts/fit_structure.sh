@@ -6,17 +6,17 @@ alpha=6.0
 
 seed=45319801
 
-data_file=../data/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz 
-out_filename=huang2011_fit
-out_folder=../fits/hgdp_fits/
+# data_file=../data/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz 
+# out_filename=huang2011_fit
+# out_folder=../fits/hgdp_fits/
 
 # data_file=../simulated_data/simulated_structure_data_nobs1107_nloci2810_npop6.npz
 # out_filename=simulated_fit
 # out_folder=../fits/simulated_hgdp_fits/
 
-# data_file=../data/huang2011_sub_nobs25_nloci75.npz
-# out_filename=huang2011_fit_sub
-# out_folder=../fits/tmp/
+data_file=../data/huang2011_sub_nobs25_nloci75.npz
+out_filename=huang2011_fit_sub
+out_folder=../fits/tmp/
 
 python fit_structure.py \
   --seed ${seed} \
@@ -24,4 +24,5 @@ python fit_structure.py \
   --data_file ${data_file} \
   --out_folder ${out_folder} \
   --out_filename ${out_filename}_alpha${alpha} \
-  --k_approx 20
+  --k_approx 20 \
+  

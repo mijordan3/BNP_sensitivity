@@ -582,7 +582,7 @@ def run_preconditioned_lbfgs(g_obs,
                             precondition_every = 10, 
                             maxiter = 2000, 
                             x_tol = 1e-2, 
-                            f_tol = 1e-2): 
+                            f_tol = 1e-8): 
     """
     Parameters
     ----------
@@ -658,7 +658,7 @@ def run_preconditioned_lbfgs(g_obs,
             print('x-tolerance reached')
             break
         
-        f_tol_success = np.abs(old_kl - out.fun) < f_tol
+        f_tol_success = np.abs(old_kl - out.fun) < np.abs(f_tol * out.fun)
         if f_tol_success: 
             print('f-tolerance reached')
             break
