@@ -7,7 +7,7 @@ import scipy as osp
 
 import paragami
 
-from bnpmodeling_runjingdev import influence_lib
+from bnpmodeling_runjingdev import influence_lib, cluster_quantities_lib
 from bnpmodeling_runjingdev.sensitivity_lib import \
         HyperparameterSensitivityLinearApproximation
 
@@ -112,7 +112,6 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
 print('cg tol: ')
 print(vb_sens.cg_tol)
 print(vb_sens.cg_maxiter)
-hessian_solver = vb_sens.hessian_solver
 
 ###############
 # compute grad(g)H^{-1} for various posterior statistics g
@@ -134,14 +133,13 @@ def get_influence(g):
     t0 = time.time()
     influence_operator = influence_lib.InfluenceOperator(vb_opt, 
                                vb_params_paragami, 
-                               hessian_solver,
+                               vb_sens.hessian_solver,
                                prior_params_dict['dp_prior_alpha'], 
                                stick_key = 'ind_admix_params')
     
     influence_grid, grad_g_hess_inv = influence_operator.get_influence(logit_v_grid, 
                                                                        grad_g)
     # to not mess up timing results
-    _ = grad_g_hess_inv.block_until_ready()
     hess_inv_time = time.time() - t0
     print('Elapsed: {:.03f}sec'.format(hess_inv_time))
           
@@ -170,10 +168,30 @@ def get_influence_and_save(g, post_stat_name):
 
 
 # get influence on cluster weights 
-def get_e_num_ind(vb_free, k): 
+# the below function instantiates the whole matrix of individual admixtures
+# before summing and subsetting
+# throws a memory error on hgdp data ... 
+# def get_e_num_ind(vb_free, k): 
+#     vb_params_dict = vb_params_paragami.fold(vb_free, free = True)
+#     return posterior_quantities_lib.get_e_num_ind_per_cluster(vb_params_dict, 
+#                                                               gh_loc, gh_weights)[k]
+
+# try this instead: 
+def get_e_num_ind(vb_free, k = 0): 
     vb_params_dict = vb_params_paragami.fold(vb_free, free = True)
-    return posterior_quantities_lib.get_e_num_ind_per_cluster(vb_params_dict, 
-                                                              gh_loc, gh_weights)[k]
+    
+    stick_means = vb_params_dict['ind_admix_params']['stick_means']
+    stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
+    
+    e_ind_admix = cluster_quantities_lib.get_e_cluster_probabilities(stick_means, 
+                                                                     stick_infos, 
+                                                                     gh_loc, 
+                                                                     gh_weights)
+    
+    # select a 'k' before summing ... 
+    # this is probably more efficient
+    return e_ind_admix[:, k].sum()
+
 
 for k in range(8): 
     print('###############')
