@@ -150,7 +150,6 @@ def get_influence(g):
     
     influence_grid, grad_g_hess_inv = influence_operator.get_influence(logit_v_grid, 
                                                                        grad_g)
-    # to not mess up timing results
     hess_inv_time = time.time() - t0
     print('Elapsed: {:.03f}sec'.format(hess_inv_time))
           
