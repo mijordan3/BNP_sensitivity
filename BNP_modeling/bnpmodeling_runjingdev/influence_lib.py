@@ -70,7 +70,7 @@ class InfluenceOperator(object):
             # somehow jax.lax.map is super slow?
             # jut using python for loop here ...
             influence = \
-                - np.stack([self.hessian_solver(x) \
+                np.stack([self.hessian_solver(x) \
                             for x in grad_log_q_prior_rat.transpose()])
             influence = influence.transpose()
             
@@ -78,7 +78,7 @@ class InfluenceOperator(object):
             
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            grad_g_hess_inv = - self.hessian_solver(grad_g).block_until_ready()
+            grad_g_hess_inv = self.hessian_solver(grad_g).block_until_ready()
             influence = np.dot(grad_g_hess_inv, grad_log_q_prior_rat)
 
             return influence, grad_g_hess_inv
