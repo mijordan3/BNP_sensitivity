@@ -113,12 +113,28 @@ print('cg tol: ')
 print(vb_sens.cg_tol)
 print(vb_sens.cg_maxiter)
 
+# class VBSens(object):
+#     def __init__(self): 
+#         self.cg_tol = 1e-2
+#         self.cg_maxiter = 100
+#         self.hessian_solver = lambda x : np.zeros(len(x))
+
+# vb_sens = VBSens()
+
 ###############
 # compute grad(g)H^{-1} for various posterior statistics g
 ###############
 vars_to_save = dict()
 
-logit_v_grid = np.linspace(-10, 10, 200)
+# class to get influence functions
+influence_operator = influence_lib.InfluenceOperator(vb_opt, 
+                           vb_params_paragami, 
+                           vb_sens.hessian_solver,
+                           prior_params_dict['dp_prior_alpha'], 
+                           stick_key = 'ind_admix_params')
+
+
+logit_v_grid = np.linspace(-6, 6, 100)
 
 def get_influence(g): 
     print('computing gradient ...')
@@ -127,15 +143,10 @@ def get_influence(g):
     grad_g = get_grad_g(vb_opt).block_until_ready()
     grad_g_time = time.time() - t0  
     print('Elapsed: {:.03f}sec'.format(grad_g_time))
-        
+    
     # get influence function
     print('inverting Hessian ...')
     t0 = time.time()
-    influence_operator = influence_lib.InfluenceOperator(vb_opt, 
-                               vb_params_paragami, 
-                               vb_sens.hessian_solver,
-                               prior_params_dict['dp_prior_alpha'], 
-                               stick_key = 'ind_admix_params')
     
     influence_grid, grad_g_hess_inv = influence_operator.get_influence(logit_v_grid, 
                                                                        grad_g)
