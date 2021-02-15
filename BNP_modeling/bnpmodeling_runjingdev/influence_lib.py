@@ -2,6 +2,7 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+import numpy as onp
 
 ########################
 # Functions to evaluate
@@ -43,8 +44,7 @@ class InfluenceOperator(object):
         # a len(vb_opt) x (k_approx - 1) binary matrix
         # with 1 if the ith vb free parameter affects the jth stick distribution.
         self.stick_params_mapping = \
-                get_stick_params_mapping(self.vb_opt,
-                                         self.vb_params_paragami, 
+                get_stick_params_mapping(self.vb_params_paragami, 
                                          stick_key)
 
     def get_influence(self,
@@ -78,7 +78,7 @@ class InfluenceOperator(object):
             
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            grad_g_hess_inv = - self.hessian_solver(grad_g)
+            grad_g_hess_inv = - self.hessian_solver(grad_g).block_until_ready()
             influence = np.dot(grad_g_hess_inv, grad_log_q_prior_rat)
 
             return influence, grad_g_hess_inv
@@ -93,17 +93,32 @@ class InfluenceOperator(object):
 
         return log_ratio
 
-def stick_params_mapping_obj(vb_free_params, vb_params_paragami, stick_key):
-    vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
-    return (vb_params_dict[stick_key]['stick_means'] + \
-                vb_params_dict[stick_key]['stick_infos']).flatten()
+# TODO implemented for structure model (with 2d sticks)
+# needs to be tested for 1d sticks
+def get_stick_params_mapping(vb_params_paragami, stick_key): 
 
-stick_params_mapping_jac = jax.jacobian(stick_params_mapping_obj, argnums = 0)
-
-def get_stick_params_mapping(vb_free_params, vb_params_paragami, stick_key):
-    return stick_params_mapping_jac(vb_free_params,
-                                    vb_params_paragami, 
-                                    stick_key).transpose() != 0
+    vb_bool_dict = vb_params_paragami.empty_bool(False)    
+    
+    stick_shape = vb_bool_dict[stick_key]['stick_means'].shape
+    n_sticks = len(vb_bool_dict[stick_key]['stick_means'].flatten())
+    
+    stick_params_mapping = onp.zeros((vb_params_paragami.flat_length(free = True), 
+                                     n_sticks), 
+                                     dtype = bool)
+    
+    for k in range(n_sticks): 
+        
+        stick_bool = onp.zeros(n_sticks, dtype = bool)
+        stick_bool[k] = True
+        
+        vb_bool_dict[stick_key]['stick_means'] = stick_bool.reshape(stick_shape)
+        vb_bool_dict[stick_key]['stick_infos'] = stick_bool.reshape(stick_shape)
+        
+        flat_indices = vb_params_paragami.flat_indices(vb_bool_dict, free = True)
+        
+        stick_params_mapping[flat_indices, k] = True
+        
+    return stick_params_mapping
 
 # get explicit density (not expectations) for logit-sticks
 # log p_0
