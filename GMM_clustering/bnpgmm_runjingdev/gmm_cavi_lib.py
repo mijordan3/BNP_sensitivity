@@ -11,7 +11,7 @@ import time
 from copy import deepcopy
 
 
-update_z = jax.jit(gmm_lib.get_optimal_z_from_vb_params_dict)
+update_z = jax.jit(gmm_lib.get_optimal_z_from_vb_dict)
 
 @jax.jit
 def update_centroids(y, e_z, prior_params_dict):
