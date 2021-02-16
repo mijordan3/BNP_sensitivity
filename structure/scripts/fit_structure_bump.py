@@ -75,29 +75,18 @@ vb_params_dict, vb_params_paragami, \
 epsilon_vec = np.linspace(0, 1, 12)**2
 epsilon = epsilon_vec[args.epsilon_indx]
 
-mu_vec = np.linspace(1, 5, 6)
-mu = mu_vec[args.mu_indx]
-
 print('epsilon = ', epsilon)
-print('mu = ', mu)
 
-def gauss_bump(x, mu): 
-    scale = 0.2
-    pdf = sp.stats.norm.pdf(x, 
-                            loc = mu, 
-                            scale = scale)
-    # normalize so max is 1
-    pdf *= np.sqrt(2 * np.pi * scale ** 2)
+mu_vec = np.linspace(1, 5, 7)
+
+
+def e_step_bump(means, infos, mu_indx): 
+    cdf1 = sp.stats.norm.cdf(mu_vec[mu_indx+1], loc = means, scale = 1 / np.sqrt(infos))
+    cdf2 = sp.stats.norm.cdf(mu_vec[mu_indx], loc = means, scale = 1 / np.sqrt(infos))
     
-    return pdf
+    return (cdf1 - cdf2).sum()
 
-f_obj = func_sens_lib.FunctionalPerturbationObjective(lambda x : gauss_bump(x, mu), 
-                                                          vb_params_paragami, 
-                                                          gh_loc = gh_loc, 
-                                                          gh_weights = gh_weights, 
-                                                          stick_key = 'ind_admix_params')
-
-e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
+e_log_phi = lambda means, infos : e_step_bump(means, infos, args.mu_indx) * epsilon
 
 
 ######################
@@ -137,7 +126,7 @@ structure_model_lib.save_structure_fit(outfile,
                                        prior_params_dict,
                                        fit_meta_data['gh_deg'], 
                                        epsilon = epsilon,
-                                       mu = mu,
+                                       mu = mu_vec[args.mu_indx],
                                        data_file = args.data_file, 
                                        final_kl = final_kl, 
                                        optim_time = lbfgs_time)
