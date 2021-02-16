@@ -579,10 +579,10 @@ def run_preconditioned_lbfgs(g_obs,
                             prior_params_dict,
                             gh_loc, gh_weights, 
                             e_log_phi = None, 
-                            precondition_every = 20, 
+                            precondition_every = 10, 
                             maxiter = 2000, 
                             x_tol = 1e-2, 
-                            f_tol = 1e-2): 
+                            f_tol = 1e-8): 
     """
     Parameters
     ----------
@@ -647,17 +647,18 @@ def run_preconditioned_lbfgs(g_obs,
         # transform to original parameterization
         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
         
+        print(out.message)
         # check convergence
-        if out.success: 
-            print('lbfgs converged successfully')
-            break
+#         if out.success: 
+#             print('lbfgs converged successfully')
+#             break
 
         x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
         if x_tol_success:
             print('x-tolerance reached')
             break
         
-        f_tol_success = np.abs(old_kl - out.fun) < f_tol
+        f_tol_success = np.abs(old_kl - out.fun) < np.abs(f_tol * out.fun)
         if f_tol_success: 
             print('f-tolerance reached')
             break

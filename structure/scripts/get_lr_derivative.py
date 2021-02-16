@@ -159,45 +159,45 @@ save_derivatives(vars_to_save)
 ###############
 # Compute influence function
 ###############
-print('###############')
-print('Computing influence function ...')
-print('###############')
+# print('###############')
+# print('Computing influence function ...')
+# print('###############')
 
-# posterior expected number of clusters 
-def g(vb_free_params, vb_params_paragami): 
+# # posterior expected number of clusters 
+# def g(vb_free_params, vb_params_paragami): 
     
-    # key for random sampling. 
-    # this is fixed! so all standard normal 
-    # samples used in computing the posterior quantity 
-    key = jax.random.PRNGKey(0)
+#     # key for random sampling. 
+#     # this is fixed! so all standard normal 
+#     # samples used in computing the posterior quantity 
+#     key = jax.random.PRNGKey(0)
     
-    vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
+#     vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
     
-    stick_means = vb_params_dict['ind_admix_params']['stick_means']
-    stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
+#     stick_means = vb_params_dict['ind_admix_params']['stick_means']
+#     stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
     
-    return structure_model_lib.get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
-                                                       key = key,
-                                                       n_samples = 100)
+#     return structure_model_lib.get_e_num_pred_clusters(stick_means, stick_infos, gh_loc, gh_weights, 
+#                                                        key = key,
+#                                                        n_samples = 100)
 
-get_grad_g = jax.jacobian(g, argnums = 0)
-grad_g = get_grad_g(vb_opt, vb_params_paragami)
+# get_grad_g = jax.jacobian(g, argnums = 0)
+# grad_g = get_grad_g(vb_opt, vb_params_paragami)
 
-# get influence function
-print('computing influence function...')
-influence_operator = influence_lib.InfluenceOperator(vb_opt, 
-                           vb_params_paragami, 
-                           vb_sens.hessian_solver,
-                           prior_params_dict['dp_prior_alpha'], 
-                           stick_key = 'ind_admix_params')
+# # get influence function
+# print('computing influence function...')
+# influence_operator = influence_lib.InfluenceOperator(vb_opt, 
+#                            vb_params_paragami, 
+#                            vb_sens.hessian_solver,
+#                            prior_params_dict['dp_prior_alpha'], 
+#                            stick_key = 'ind_admix_params')
 
-logit_v_grid = np.linspace(-10, 10, 200)
-influence_grid = influence_operator.get_influence(logit_v_grid, grad_g)
+# logit_v_grid = np.linspace(-10, 10, 200)
+# influence_grid = influence_operator.get_influence(logit_v_grid, grad_g)
 
-# save what we need
-vars_to_save['logit_v_grid'] = logit_v_grid
-vars_to_save['influence_grid'] = influence_grid
-save_derivatives(vars_to_save)
+# # save what we need
+# vars_to_save['logit_v_grid'] = logit_v_grid
+# vars_to_save['influence_grid'] = influence_grid
+# save_derivatives(vars_to_save)
 
 
 ###############
@@ -207,8 +207,8 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                             prior_params_dict['dp_prior_alpha'],
                                             gh_loc, 
                                             gh_weights,
-                                            logit_v_grid = logit_v_grid, 
-                                            influence_grid = influence_grid, 
+                                            # logit_v_grid = logit_v_grid, 
+                                            # influence_grid = influence_grid, 
                                             stick_key = 'ind_admix_params')
 
 def compute_derivatives_and_save(pert_name):
@@ -230,10 +230,9 @@ def compute_derivatives_and_save(pert_name):
     vars_to_save['lr_time_' + pert_name] = deepcopy(vb_sens.lr_time)
     save_derivatives(vars_to_save)
 
-compute_derivatives_and_save('worst_case')
+# compute_derivatives_and_save('worst_case')
 
 compute_derivatives_and_save('sigmoidal')
-compute_derivatives_and_save('sigmoidal_neg')
 
 compute_derivatives_and_save('alpha_pert_pos')
 compute_derivatives_and_save('alpha_pert_neg')
@@ -241,11 +240,8 @@ compute_derivatives_and_save('alpha_pert_neg')
 compute_derivatives_and_save('alpha_pert_pos_xflip')
 compute_derivatives_and_save('alpha_pert_neg_xflip')
 
-compute_derivatives_and_save('gauss_pert1_pos')
-compute_derivatives_and_save('gauss_pert1_neg')
-
-compute_derivatives_and_save('gauss_pert2_pos')
-compute_derivatives_and_save('gauss_pert2_neg')
+compute_derivatives_and_save('gauss_pert1')
+compute_derivatives_and_save('gauss_pert2')
 
 
 print('done. ')

@@ -9,9 +9,6 @@ from bnpmodeling_runjingdev import influence_lib
 def sigmoidal(logit_v): 
         return (sp.special.expit(logit_v) * 2 - 1.) 
 
-def sigmoidal_neg(logit_v): 
-    return (sp.special.expit(-logit_v) * 2 - 1.) 
-
 def alpha_pert_pos(logit_v, alpha0): 
     v = sp.special.expit(logit_v)
 
@@ -52,14 +49,7 @@ class LogPhiPerturbations():
                                                      gh_weights, 
                                                      delta = delta,
                                                      stick_key = stick_key)
-        
-        self.f_obj_sigmoidal_neg = func_sens_lib.FunctionalPerturbationObjective(sigmoidal_neg, 
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     delta = delta,
-                                                     stick_key = stick_key)
-        
+                
         ##############
         # alpha-type perturbations
         ##############
@@ -102,7 +92,7 @@ class LogPhiPerturbations():
         ##############
         # gaussian perturbations
         ##############
-        self.f_obj_gauss_pert1_pos = \
+        self.f_obj_gauss_pert1 = \
             func_sens_lib.FunctionalPerturbationObjective(gauss_pert1,
                                                      vb_params_paragami, 
                                                      gh_loc, 
@@ -110,30 +100,13 @@ class LogPhiPerturbations():
                                                      delta = delta,
                                                      stick_key = stick_key)
         
-        self.f_obj_gauss_pert1_neg = \
-            func_sens_lib.FunctionalPerturbationObjective(lambda x : - gauss_pert1(x),
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     delta = delta,
-                                                     stick_key = stick_key)
-        
-        self.f_obj_gauss_pert2_pos = \
+        self.f_obj_gauss_pert2 = \
             func_sens_lib.FunctionalPerturbationObjective(gauss_pert2,
                                                      vb_params_paragami, 
                                                      gh_loc, 
                                                      gh_weights, 
                                                      delta = delta,
                                                      stick_key = stick_key)
-        
-        self.f_obj_gauss_pert2_neg = \
-            func_sens_lib.FunctionalPerturbationObjective(lambda x : - gauss_pert2(x),
-                                                     vb_params_paragami, 
-                                                     gh_loc, 
-                                                     gh_weights, 
-                                                     delta = delta,
-                                                     stick_key = stick_key)
-        
         ##############
         # Worst-case perturbation
         ##############
@@ -154,7 +127,7 @@ class LogPhiPerturbations():
 
             # define log phi
             def log_phi(logit_v):
-                return(np.sign(influence_fun_interp(logit_v)) * worst_case_pert.delta)
+                return np.sign(influence_fun_interp(logit_v))
 
         
             self.f_obj_worst_case = \
