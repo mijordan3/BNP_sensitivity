@@ -83,8 +83,9 @@ gh_weights = np.array(gh_weights)
 prior_params_dict, prior_params_paragami = gmm_lib.get_default_prior_params(dim)
 
 # set initial alpha
-prior_params_dict['alpha'] = meta_data['alpha']
-print(prior_params_dict)
+alpha0 = meta_data['alpha']
+prior_params_dict['alpha'] = alpha0
+print('alpha: ', prior_params_dict['alpha'])
 
 ###############
 # Define objective and check KL
@@ -123,15 +124,6 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
                     # will set appropriately later
                     hyper_par_objective_fun = lambda x, y : 0., 
                     cg_tol = args.cg_tol)
-
-def save_derivatives(vars_to_save): 
-    print('saving into: ', outfile)
-    np.savez(outfile,
-             vb_opt = vb_opt,
-             alpha0 = alpha0,
-             kl= kl,
-             **vars_to_save)
-
     
 ###############
 # Derivative wrt to functional perturbations
@@ -141,6 +133,17 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                             gh_loc, 
                                             gh_weights,
                                             stick_key = 'stick_params')
+
+vars_to_save = dict()
+
+def save_derivatives(vars_to_save): 
+    print('saving into: ', outfile)
+    np.savez(outfile,
+             vb_opt = vb_opt,
+             alpha0 = alpha0,
+             kl= kl,
+             **vars_to_save)
+
 
 def compute_derivatives_and_save(pert_name):
     
