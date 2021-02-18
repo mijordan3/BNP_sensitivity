@@ -22,7 +22,7 @@ setup(
     author='Runjing Liu, Ryan Giordano',
     author_email='runjing_liu@berkeley.edu',
     packages=find_packages(exclude=['docs', 'tests']),
-    install_requires=['sklearn'],
+    install_requires=['sklearn', 'pandas'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'Natural Language :: English',
