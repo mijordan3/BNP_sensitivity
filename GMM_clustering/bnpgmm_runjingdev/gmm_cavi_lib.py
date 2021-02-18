@@ -11,7 +11,7 @@ import time
 from copy import deepcopy
 
 
-update_z = jax.jit(gmm_lib.get_optimal_z_from_vb_params_dict)
+update_z = jax.jit(gmm_lib.get_optimal_z_from_vb_dict)
 
 @jax.jit
 def update_centroids(y, e_z, prior_params_dict):
@@ -241,15 +241,16 @@ def run_cavi(y, vb_params_dict,
         print('warning, maximum iterations reached')
 
     # get e_z optima
-    e_z = update_z(y, vb_params_dict,
-                                                    gh_loc, gh_weights)
+    # block for timing results
+    e_z = update_z(y, vb_params_dict, gh_loc, gh_weights).block_until_ready()
 
     print('stick_time: {0:.3g}sec'.format(stick_time))
     print('cluster_time: {0:.3g}sec'.format(cluster_time))
     print('e_z_time: {0:.3g}sec'.format(e_z_time))
-    print('**CAVI time: {0:.3g}sec**'.format(time.time() - time0))
+    cavi_time = time.time() - time0
+    print('**CAVI time: {0:.3g}sec**'.format(cavi_time))
 
-    return vb_params_dict, e_z
+    return vb_params_dict, e_z, cavi_time
 
 def compile_cav_updates(stick_obj_fun, stick_grad_fun, flatten_vb_params,
                             y, vb_params_dict, prior_params_dict, stick_free_params,

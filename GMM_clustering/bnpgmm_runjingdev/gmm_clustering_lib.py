@@ -300,8 +300,8 @@ def get_kl(y, vb_params_dict, prior_params_dict,
 ########################
 # Posterior quantities of interest
 #######################
-def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
-                                        use_bnp_prior = True):
+def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
+                               use_bnp_prior = True):
 
     """
     Returns the optimal cluster belonging probabilities, given the
@@ -345,18 +345,26 @@ def get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
 
     return e_z
 
+def get_e_mixture_weights_from_vb_dict(vb_params_dict, gh_loc, gh_weights): 
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
+    
+    weights = cluster_lib.get_e_cluster_probabilities(stick_means, 
+                                                      stick_infos,
+                                                      gh_loc,
+                                                      gh_weights)
+    
+    return weights
 
-def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
-                                                vb_params_free,
-                                                n_obs,
-                                                threshold = 0,
-                                                n_samples = 10000,
-                                                seed = 0):
+
+
+def get_e_num_pred_clusters_from_vb_dict(vb_params_dict,
+                                         n_obs,
+                                         threshold = 0,
+                                         n_samples = 10000,
+                                         prng_key = jax.random.PRNGKey(0)):
     
     # get posterior predicted number of clusters
-
-    vb_params_dict = \
-        vb_params_paragami.fold(vb_params_free, free = True)
 
     stick_means = vb_params_dict['stick_params']['stick_means']
     stick_infos = vb_params_dict['stick_params']['stick_infos']
@@ -366,25 +374,24 @@ def get_e_num_pred_clusters_from_vb_free_params(vb_params_paragami,
                                                                  n_obs,
                                                                  threshold = threshold,
                                                                  n_samples = n_samples,
-                                                                 seed = seed)
+                                                                 prng_key = prng_key)
 
 
 # Get the expected posterior number of distinct clusters.
-def get_e_num_clusters_from_free_par(y, 
-                                     vb_params_paragami,
-                                     vb_params_free,
-                                     gh_loc, gh_weights,
-                                     threshold = 0,
-                                     n_samples = 10000,
-                                     seed = 0):
+def get_e_num_clusters_from_vb_dict(y, 
+                                    vb_params_dict,
+                                    gh_loc, gh_weights,
+                                    threshold = 0,
+                                    n_samples = 10000,
+                                    prng_key = jax.random.PRNGKey(0)):
 
-    vb_params_dict = \
-        vb_params_paragami.fold(vb_params_free, free = True)
+    e_z  = get_optimal_z_from_vb_dict(y, 
+                                      vb_params_dict,
+                                      gh_loc,
+                                      gh_weights,
+                                      use_bnp_prior = True)
 
-    e_z  = get_optimal_z_from_vb_params_dict(y, vb_params_dict, gh_loc, gh_weights,
-                                            use_bnp_prior = True)
-
-    return cluster_lib.get_e_num_large_clusters_from_ez(e_z,
-                                                        threshold = threshold,
-                                                        n_samples = n_samples,
-                                                        seed = seed)
+    return cluster_lib.get_e_num_clusters_from_ez(e_z,
+                                                  threshold = threshold,
+                                                  n_samples = n_samples,
+                                                  prng_key = prng_key)

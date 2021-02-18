@@ -189,3 +189,4 @@ def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
                 bool_dict[k][j] = (vb_params_dict[k][j] != vb_params_dict[k][j])
 
     return vb_params_paragami.flat_indices(bool_dict, free = True)
+

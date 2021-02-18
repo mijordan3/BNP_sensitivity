@@ -5,6 +5,8 @@ import jax.scipy as sp
 
 from jax import random
 
+import scipy as osp
+
 import bnpmodeling_runjingdev.exponential_families as ef
 
 
@@ -165,7 +167,7 @@ def get_e_num_pred_clusters_from_mixture_weights(mixture_weights,
     subtr_weight = (1 - mixture_weights)**(n_obs)
     
     # probability that each cluster has i observations
-    for i in range(1, threshold):
+    for i in range(1, threshold+1):
         subtr_weight += \
             osp.special.comb(n_obs, i) * \
                 mixture_weights**i * (1 - mixture_weights)**(n_obs - i)
