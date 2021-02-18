@@ -12,6 +12,9 @@ import paragami
 from bnpmodeling_runjingdev import log_phi_lib
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
+lr_color = '#d95f02'
+refit_color = '#1b9e77'
+
 class GMMResultsLoader(object):
 
     def __init__(self,
@@ -245,32 +248,38 @@ def print_diff_plot(refit, lr, init, ax, title = '', alpha = 0.05):
 ########################
 # useful for plotting coclustering matrices
 ########################
-def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax): 
-    # plot initial 
-    ax[0].set_title('initial')
-    im0 = ax[0].matshow(init_matr, 
-                        cmap = plt.get_cmap('Blues'))
-    fig.colorbar(im0, ax = ax[0])
+def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax, 
+                   plot_initial = True): 
     
+    i = 0
+    if plot_initial:
+        # plot initial 
+        ax[i].set_title('initial')
+        im0 = ax[i].matshow(init_matr, 
+                            cmap = plt.get_cmap('Blues'))
+        fig.colorbar(im0, ax = ax[i])
+        i+=1
+
     # plot refit - initial 
     diff_refit = refit_matr - init_matr
     vmax = np.abs(diff_refit).max()
-    ax[1].set_title('refit - init')
-    im1 = ax[1].matshow(diff_refit, 
+    ax[i].set_title('refit - init')
+    im1 = ax[i].matshow(diff_refit, 
                         vmax = vmax,
                         vmin = -vmax, 
                         cmap = plt.get_cmap('bwr'))
-    fig.colorbar(im1, ax = ax[1])
+    fig.colorbar(im1, ax = ax[i])
+    i+=1 
     
     # plot lr - initial
-    ax[2].set_title('lr - init')
+    ax[i].set_title('lr - init')
     diff_lr = lr_matr - init_matr
     vmax = np.abs(diff_lr).max()
-    im2 = ax[2].matshow(diff_lr,
+    im2 = ax[i].matshow(diff_lr,
                         vmax = vmax,
                         vmin = -vmax,
                         cmap = plt.get_cmap('bwr'))
-    fig.colorbar(im2, ax = ax[2])
+    fig.colorbar(im2, ax = ax[i])
 
 ######################
 # function to make trace plots
@@ -290,13 +299,46 @@ def plot_post_stat_per_epsilon(g, refit_vb_list, lr_list, epsilon_vec, ax):
     ax.plot(epsilon_vec,
             post_vec_refit, 
             'o-', 
-            color = '#1b9e77',
+            color = refit_color,
             label = 'refit')
     
     # plot refit
     ax.plot(epsilon_vec,
             post_vec_lr, 
             'o-', 
-            color = '#d95f02',
+            color = lr_color,
             label = 'lr')
     ax.set_xlabel('epsilon')
+    
+    
+###################
+# function to plot mixture weights
+###################
+
+def _plot_weights(weights, ax, jitter = 0., color = 'blue', label = ''): 
+    x = np.arange(len(weights)) + jitter
+    ax.scatter(x, weights, color = color, label = label)
+    ax.bar(x, weights, width = 0.1, color = color)
+
+def plot_mixture_weights(weights_refit, weights_lr, weights_init, ax): 
+    
+    # initial 
+    _plot_weights(weights_init, 
+                  ax,
+                  jitter = -0.3,
+                  color = 'lightblue', 
+                  label = 'init')
+    
+    # linear response
+    _plot_weights(weights_lr, 
+                  ax,
+                  jitter = 0.3,
+                  color = lr_color,
+                  label = 'lr')
+    
+    # refit
+    _plot_weights(weights_refit,
+                  ax,
+                  color = refit_color,
+                  label = 'refit')
+    
