@@ -51,7 +51,7 @@ assert os.path.isfile(args.init_fit), args.init_fit
 # load iris data
 ########################
 dataset_name = 'iris'
-iris_obs, iris_species = utils_lib.load_data()
+iris_obs, iris_species = utils_lib.load_iris_data()
 dim = iris_obs.shape[1]
 n_obs = len(iris_species)
 
