@@ -57,7 +57,7 @@ print('derivative outfile: ', outfile)
 # Load data
 ##################
 dataset_name = 'iris'
-iris_obs, iris_species = utils_lib.load_data()
+iris_obs, iris_species = utils_lib.load_iris_data()
 dim = iris_obs.shape[1]
 n_obs = len(iris_species)
 
