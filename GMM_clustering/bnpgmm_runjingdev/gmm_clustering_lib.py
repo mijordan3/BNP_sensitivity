@@ -209,7 +209,7 @@ def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
 
-    z_nat_param, loglik_obs_by_nk= \
+    z_nat_param, loglik_obs_by_nk = \
         get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                                     gh_loc, gh_weights,
                                     use_bnp_prior)

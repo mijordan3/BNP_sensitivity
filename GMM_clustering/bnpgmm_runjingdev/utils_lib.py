@@ -14,7 +14,7 @@ import paragami
 
 from copy import deepcopy
 
-def load_data(demean=True):
+def load_iris_data(demean=True):
     iris = datasets.load_iris(return_X_y= True)
     iris_features = iris[0]
     demean = True
