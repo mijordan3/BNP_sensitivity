@@ -22,6 +22,9 @@ import pandas as pd
 
 import warnings
 
+from bnpgmm_runjingdev.genomics_utils import \
+    spline_bases_lib, regression_lib, transform_regression_lib
+
 def _load_raw_data(
         condition="C",
         dataset_filename="data/shoemaker2015reprocessed/mice_data.txt",
@@ -209,3 +212,36 @@ def load_genomics_data(genomic_time_series_dir,
     else:
         train_indx = np.arange(y.shape[0])
         return y, None, train_indx, timepoints
+    
+
+# Wrapper to load the data and tranformed regression 
+# coefficients that we will cluster. 
+# This effectively returns the result of the first-stage optimization. 
+def load_and_tranform_data(genomic_time_series_dir, 
+                           df=7, 
+                           degree=3): 
+    
+    # load raw data and time-points
+    y, _, _, timepoints = load_genomics_data(genomic_time_series_dir, 
+                                             split_test_train = False)
+    
+    # get regressors
+    regressors = spline_bases_lib.get_genomics_spline_basis(timepoints,
+                                                            df=df,
+                                                            degree=degree)
+    
+    # fit regression coefficients
+    beta, beta_infos, y_infos = regression_lib.run_regressions(y, regressors)
+    
+    # Get the matrix that does the transformation.
+    transform_mat, regressors_transformed = \
+        transform_regression_lib.get_reversible_predict_and_demean_matrix(regressors)
+    
+    # tranform beta coefficients
+    beta_transformed, beta_infos_transformed = \
+        transform_regression_lib.multiply_regression_by_matrix(beta, 
+                                                               beta_infos,
+                                                               transform_mat)
+    
+    return y, timepoints, beta_transformed, beta_infos_transformed, regressors_transformed
+    
