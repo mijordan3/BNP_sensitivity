@@ -39,6 +39,9 @@ def get_vb_params_paragami_object(dim, k_approx):
     # cluster parameters
     # centroids
     cluster_params_paragami = paragami.PatternDict()
+    
+    # TODO: make the first dimension k_approx 
+    # this matches w regression_lib, and is just more natural ... 
     cluster_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(dim, k_approx))
     # inverse covariances
