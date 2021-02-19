@@ -140,7 +140,7 @@ class TestCaviUpdates(unittest.TestCase):
         centroids = vb_params_dict['cluster_params']['centroids']
         cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
-        z_nat_param, _ = \
+        z_nat_param = \
             gmm_lib.get_z_nat_params(y, 
                                      stick_propn_mean, stick_propn_info, 
                                      centroids, cluster_info,

@@ -203,13 +203,13 @@ def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
 
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
-    return z_nat_param, loglik_obs_by_nk
+    return z_nat_param
 
 def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
 
-    z_nat_param, loglik_obs_by_nk = \
+    z_nat_param = \
         get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                                     gh_loc, gh_weights,
                                     use_bnp_prior)
@@ -217,7 +217,7 @@ def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
     log_const = sp.special.logsumexp(z_nat_param, axis=1)
     e_z = np.exp(z_nat_param - np.expand_dims(log_const, axis = 1))
 
-    return e_z, loglik_obs_by_nk
+    return e_z, z_nat_param
 
 
 def get_kl(y, vb_params_dict, prior_params_dict,
@@ -265,22 +265,13 @@ def get_kl(y, vb_params_dict, prior_params_dict,
     cluster_info = vb_params_dict['cluster_params']['cluster_info']
 
     # get optimal cluster belongings
-    e_z_opt, loglik_obs_by_nk = \
+    e_z_opt, z_nat_param = \
             get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
                             gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
     if e_z is None:
         e_z = e_z_opt
 
-    e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
-
-    # likelihood of z
-    if use_bnp_prior:
-        e_loglik_ind = modeling_lib.loglik_ind(stick_means, stick_infos, e_z,
-                            gh_loc, gh_weights)
-    else:
-        e_loglik_ind = 0.
-
-    e_loglik = e_loglik_ind + e_loglik_obs
+    e_loglik = np.sum(e_z * z_nat_param)
 
     # entropy term
     entropy = get_entropy(stick_means, stick_infos, e_z,
