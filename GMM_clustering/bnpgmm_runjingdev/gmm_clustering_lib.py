@@ -94,6 +94,7 @@ def get_default_prior_params(dim):
     prior_params_paragami = paragami.PatternDict()
 
     # DP prior parameter
+    # TODO to be consistent change 'alpha' to 'dp_prior_alpha'
     prior_params_dict['alpha'] = np.array([3.0])
     prior_params_paragami['alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
