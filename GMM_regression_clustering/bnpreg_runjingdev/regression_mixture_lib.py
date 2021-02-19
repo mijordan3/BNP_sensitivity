@@ -129,138 +129,141 @@ def get_e_log_prior(stick_means, stick_infos,
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, centroids, cluster_info):
+def get_loglik_obs_by_nk(gamma, gamma_info, centroids):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
     # belonging to the kth cluster
+    
+    loglik_nk = \
+        -0.5 * (-2 * np.einsum('ni,kj,nij->nk', gamma, centroids, gamma_infos) + \
+                    np.einsum('ki,kj,nij->nk', centroids, centroids, gamma_infos))
+    
+    return loglik_nk
 
-    dim = np.shape(y)[1]
+##########################
+# Optimization over e_z
+##########################
+def get_z_nat_params(gamma, gamma_info, 
+                     stick_means, stick_infos,
+                     centroids,
+                     gh_loc, gh_weights,
+                     use_bnp_prior = True):
 
-    assert np.shape(y)[1] == np.shape(centroids)[0]
-    assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
-    assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
+    # get likelihood term
+    loglik_obs_by_nk = get_loglik_obs_by_nk(gamma, gamma_info, centroids)
 
-    data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
-    cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
-    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
+    # get weight term
+    operand = (stick_means, stick_infos, gh_loc, gh_weights)
+    e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
+                    operand,
+                    lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
+                    operand,
+                    lambda x : np.zeros(len(operand[0]) + 1))
 
-    squared_term = data2_term - 2 * cross_term + \
-                    np.expand_dims(centroid2_term, axis = 0)
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
-    return - 0.5 * squared_term + 0.5 * np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
+    return z_nat_param, loglik_obs_by_nk
 
-# ##########################
-# # Optimization over e_z
-# ##########################
-# def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
-#                         gh_loc, gh_weights,
-#                         use_bnp_prior = True):
+def get_optimal_z(gamma, gamma_info, 
+                  stick_means, stick_infos,
+                  centroids,
+                  gh_loc, gh_weights,
+                  use_bnp_prior = True):
 
-#     # get likelihood term
-#     loglik_obs_by_nk = get_loglik_obs_by_nk(y, centroids, cluster_info)
+    z_nat_param, loglik_obs_by_nk= \
+        get_z_nat_params(gamma, gamma_info, 
+                         stick_means, stick_infos,
+                         centroids,
+                         gh_loc, gh_weights,
+                         use_bnp_prior)
 
-#     # get weight term
-#     operand = (stick_means, stick_infos, gh_loc, gh_weights)
-#     e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
-#                     operand,
-#                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
-#                     operand,
-#                     lambda x : np.zeros(len(operand[0]) + 1))
+    log_const = sp.special.logsumexp(z_nat_param, axis=1)
+    e_z = np.exp(z_nat_param - np.expand_dims(log_const, axis = 1))
 
-#     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
-
-#     return z_nat_param, loglik_obs_by_nk
-
-# def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
-#                     gh_loc, gh_weights,
-#                     use_bnp_prior = True):
-
-#     z_nat_param, loglik_obs_by_nk= \
-#         get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
-#                                     gh_loc, gh_weights,
-#                                     use_bnp_prior)
-
-#     log_const = sp.special.logsumexp(z_nat_param, axis=1)
-#     e_z = np.exp(z_nat_param - np.expand_dims(log_const, axis = 1))
-
-#     return e_z, loglik_obs_by_nk
+    return e_z, loglik_obs_by_nk
 
 
-# def get_kl(y, vb_params_dict, prior_params_dict,
-#             gh_loc, gh_weights,
-#             e_z = None,
-#             use_bnp_prior = True):
+def get_kl(gamma, gamma_info,
+           vb_params_dict, prior_params_dict,
+           gh_loc, gh_weights,
+           e_z = None,
+           use_bnp_prior = True):
 
-#     """
-#     Computes the negative ELBO using the data y, at the current variational
-#     parameters and at the current prior parameters
+    """
+    Computes the negative ELBO using the data y, at the current variational
+    parameters and at the current prior parameters
 
-#     Parameters
-#     ----------
-#     y : ndarray
-#         The array of datapoints, one observation per row.
-#     vb_params_dict : dictionary
-#         Dictionary of variational parameters.
-#     prior_params_dict : dictionary
-#         Dictionary of prior parameters.
-#     gh_loc : vector
-#         Locations for gauss-hermite quadrature. We need this compute the
-#         expected prior terms.
-#     gh_weights : vector
-#         Weights for gauss-hermite quadrature. We need this compute the
-#         expected prior terms.
-#     e_z : ndarray (optional)
-#         The optimal cluster belongings as a function of the variational
-#         parameters, stored in an array whose (n, k)th entry is the probability
-#         of the nth datapoint belonging to cluster k.
-#         If ``None``, we set the optimal z.
-#     use_bnp_prior : boolean
-#         Whether or not to use a prior on the cluster mixture weights.
-#         If True, a DP prior is used.
+    Parameters
+    ----------
+    gamma : ndarray
+        The array of regression coefficients (N, d). 
+    gamma_info : ndarray 
+        The array of information matrices of regression coefficients, 
+        shape = (N, d, d).
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    e_z : ndarray (optional)
+        The optimal cluster belongings as a function of the variational
+        parameters, stored in an array whose (n, k)th entry is the probability
+        of the nth datapoint belonging to cluster k.
+        If ``None``, we set the optimal z.
+    use_bnp_prior : boolean
+        Whether or not to use a prior on the cluster mixture weights.
+        If True, a DP prior is used.
 
-#     Returns
-#     -------
-#     kl : float
-#         The negative elbo.
-#     """
+    Returns
+    -------
+    kl : float
+        The negative elbo.
+    """
 
-#     # get vb parameters
-#     stick_means = vb_params_dict['stick_params']['stick_means']
-#     stick_infos = vb_params_dict['stick_params']['stick_infos']
-#     centroids = vb_params_dict['cluster_params']['centroids']
-#     cluster_info = vb_params_dict['cluster_params']['cluster_info']
+    # get vb parameters
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
+    centroids = vb_params_dict['centroids']
+    
+    # get optimal cluster belongings
+    e_z_opt, loglik_obs_by_nk = \
+            get_optimal_z(gamma, gamma_info, 
+                          stick_means, stick_infos,
+                          centroids,
+                          gh_loc, gh_weights,
+                          use_bnp_prior = use_bnp_prior)
+    if e_z is None:
+        e_z = e_z_opt
 
-#     # get optimal cluster belongings
-#     e_z_opt, loglik_obs_by_nk = \
-#             get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
-#                             gh_loc, gh_weights, use_bnp_prior = use_bnp_prior)
-#     if e_z is None:
-#         e_z = e_z_opt
+    e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
 
-#     e_loglik_obs = np.sum(e_z * loglik_obs_by_nk)
+    # likelihood of z
+    if use_bnp_prior:
+        e_loglik_ind = modeling_lib.loglik_ind(stick_means, stick_infos, e_z,
+                                               gh_loc, gh_weights)
+    else:
+        e_loglik_ind = 0.
 
-#     # likelihood of z
-#     if use_bnp_prior:
-#         e_loglik_ind = modeling_lib.loglik_ind(stick_means, stick_infos, e_z,
-#                             gh_loc, gh_weights)
-#     else:
-#         e_loglik_ind = 0.
+    e_loglik = e_loglik_ind + e_loglik_obs
 
-#     e_loglik = e_loglik_ind + e_loglik_obs
+    # entropy term
+    entropy = get_entropy(stick_means, stick_infos, e_z,
+                                        gh_loc, gh_weights)
 
-#     # entropy term
-#     entropy = get_entropy(stick_means, stick_infos, e_z,
-#                                         gh_loc, gh_weights)
+    # prior term
+    e_log_prior = get_e_log_prior(stick_means, stick_infos,
+                            centroids, cluster_info,
+                            prior_params_dict,
+                            gh_loc, gh_weights)
 
-#     # prior term
-#     e_log_prior = get_e_log_prior(stick_means, stick_infos,
-#                             centroids, cluster_info,
-#                             prior_params_dict,
-#                             gh_loc, gh_weights)
+    elbo = e_log_prior + entropy + e_loglik
 
-#     elbo = e_log_prior + entropy + e_loglik
-
-#     return -1 * elbo.squeeze()
+    return -1 * elbo.squeeze()
 
 
 
