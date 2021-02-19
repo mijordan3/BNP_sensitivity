@@ -119,3 +119,5 @@ class GMMResultsLoader(object):
                                           delta)
 
         return vb_refit_list, lr_list, epsilon_vec
+
+
