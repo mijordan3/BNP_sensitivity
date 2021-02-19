@@ -126,28 +126,28 @@ def get_e_log_prior(stick_means, stick_infos,
 
     return e_centroid_prior + dp_prior
 
-# ##########################
-# # Likelihood term
-# ##########################
-# def get_loglik_obs_by_nk(y, centroids, cluster_info):
-#     # returns a n x k matrix whose nkth entry is
-#     # the likelihood for the nth observation
-#     # belonging to the kth cluster
+##########################
+# Likelihood term
+##########################
+def get_loglik_obs_by_nk(y, centroids, cluster_info):
+    # returns a n x k matrix whose nkth entry is
+    # the likelihood for the nth observation
+    # belonging to the kth cluster
 
-#     dim = np.shape(y)[1]
+    dim = np.shape(y)[1]
 
-#     assert np.shape(y)[1] == np.shape(centroids)[0]
-#     assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
-#     assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
+    assert np.shape(y)[1] == np.shape(centroids)[0]
+    assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
+    assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
 
-#     data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
-#     cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
-#     centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
+    data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
+    cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
+    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
 
-#     squared_term = data2_term - 2 * cross_term + \
-#                     np.expand_dims(centroid2_term, axis = 0)
+    squared_term = data2_term - 2 * cross_term + \
+                    np.expand_dims(centroid2_term, axis = 0)
 
-#     return - 0.5 * squared_term + 0.5 * np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
+    return - 0.5 * squared_term + 0.5 * np.expand_dims(np.linalg.slogdet(cluster_info)[1], 0)
 
 # ##########################
 # # Optimization over e_z
