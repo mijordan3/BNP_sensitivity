@@ -186,7 +186,8 @@ def get_kl(gamma, gamma_info,
            vb_params_dict, prior_params_dict,
            gh_loc, gh_weights,
            e_z = None,
-           use_bnp_prior = True):
+           use_bnp_prior = True, 
+           e_log_phi = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -253,7 +254,14 @@ def get_kl(gamma, gamma_info,
                                   gh_loc, gh_weights)
 
     elbo = e_log_prior + entropy + e_loglik
+    
+    if e_log_phi is not None:
 
+        e_log_pert = e_log_phi(vb_params_dict['stick_params']['stick_means'],
+                               vb_params_dict['stick_params']['stick_infos'])
+                                                            
+        elbo = elbo + e_log_pert
+        
     return -1 * elbo.squeeze()
 
 
