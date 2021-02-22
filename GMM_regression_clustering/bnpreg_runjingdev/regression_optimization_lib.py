@@ -17,7 +17,8 @@ def optimize_regression_mixture(gamma, gamma_info,
                                 vb_params_paragami,
                                 prior_params_dict, 
                                 gh_loc, gh_weights, 
-                                e_log_phi = None): 
+                                e_log_phi = None, 
+                                run_newton = True): 
     
     ###################
     # Define loss
@@ -56,7 +57,7 @@ def optimize_regression_mixture(gamma, gamma_info,
     ################
     print('Running L-BFGS-B ...')
     t0 = time.time() 
-    lbfgs_out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+    out = minimize(fun = lambda x : onp.array(get_loss(x)), 
                          x0 = x0, 
                          method = 'L-BFGS-B', 
                          jac = lambda x : onp.array(get_grad(x)))    
@@ -65,18 +66,20 @@ def optimize_regression_mixture(gamma, gamma_info,
     ################
     # run a few more newton steps
     ################
-    t1 = time.time() 
-    print('Running trust-ncg ... ')
-    out = minimize(fun = lambda x : onp.array(get_loss(x)), 
-               x0 = lbfgs_out.x, 
-               method = 'trust-ncg', 
-               jac = lambda x : onp.array(get_grad(x)), 
-               hessp = lambda x,v : onp.array(get_hvp(x, v)))    
-    
+    if run_newton: 
+        t1 = time.time() 
+        print('Running trust-ncg ... ')
+        out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+                   x0 = out.x, 
+                   method = 'trust-ncg', 
+                   jac = lambda x : onp.array(get_grad(x)), 
+                   hessp = lambda x,v : onp.array(get_hvp(x, v)))
+        print('Newton time: {:.03f}sec'.format(time.time() - t1))
+
     vb_opt = out.x
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     print(out.message)
-    print('Newton time: {:.03f}sec'.format(time.time() - t1))
+    
     print('done. ')
     
     optim_time = time.time() - t0
