@@ -46,7 +46,7 @@ def update_cluster_info(y, e_z, centroids, prior_params_dict):
 
     return 0.5 * (info_update.transpose((0, 2, 1)) + info_update)
 
-def _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
+def _get_sticks_psloss(stick_free_params, stick_params_paragmi,
                      e_z, prior_params_dict,
                      gh_loc, gh_weights,
                      e_log_phi = None):
@@ -144,7 +144,7 @@ def run_cavi(y, vb_params_dict,
     # used to update the logitnormal sticks
     stick_params_paragmi = vb_params_paragami['stick_params']
     stick_obj_fun = lambda stick_free_params, e_z : \
-                        _get_sticks_psloss(y, stick_free_params, stick_params_paragmi,
+                        _get_sticks_psloss(stick_free_params, stick_params_paragmi,
                                              e_z, prior_params_dict,
                                              gh_loc, gh_weights,
                                              e_log_phi)
