@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-
 import numpy as onp
 onp.random.seed(453453)
 

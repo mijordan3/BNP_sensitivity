@@ -97,9 +97,9 @@ class TestCaviUpdates(unittest.TestCase):
         # the stick pseudo-loss
 
         # grad of stick pseudo-loss
-        get_stick_psgrad = jax.grad(cavi_lib._get_sticks_psloss, 1)
+        get_stick_psgrad = jax.grad(cavi_lib._get_sticks_psloss, 0)
         
-        stick_grad = get_stick_psgrad(y, stick_free_param, 
+        stick_grad = get_stick_psgrad(stick_free_param, 
                                         vb_params_paragami['stick_params'], 
                                         e_z,
                                         prior_params_dict,
