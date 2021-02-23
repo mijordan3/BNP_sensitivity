@@ -4,7 +4,6 @@ import jax.scipy as sp
 
 import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
-import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
 import paragami
 
@@ -37,13 +36,11 @@ def get_vb_params_paragami_object(dim, k_approx):
     vb_params_paragami = paragami.PatternDict()
 
     # cluster parameters
-    # centroids
     cluster_params_paragami = paragami.PatternDict()
     
-    # TODO: make the first dimension k_approx 
-    # this matches w regression_lib, and is just more natural ... 
+    # centroids
     cluster_params_paragami['centroids'] = \
-        paragami.NumericArrayPattern(shape=(dim, k_approx))
+        paragami.NumericArrayPattern(shape=(k_approx, dim))
     # inverse covariances
     cluster_params_paragami['cluster_info'] = \
         paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
@@ -97,9 +94,8 @@ def get_default_prior_params(dim):
     prior_params_paragami = paragami.PatternDict()
 
     # DP prior parameter
-    # TODO to be consistent change 'alpha' to 'dp_prior_alpha'
-    prior_params_dict['alpha'] = np.array([3.0])
-    prior_params_paragami['alpha'] = \
+    prior_params_dict['dp_prior_alpha'] = np.array([3.0])
+    prior_params_paragami['dp_prior_alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
     # normal-wishart prior on the centroids and cluster info
@@ -130,7 +126,7 @@ def get_e_log_prior(stick_means, stick_infos, centroids, cluster_info,
     # get expected prior term
 
     # dp prior
-    alpha = prior_params_dict['alpha']
+    alpha = prior_params_dict['dp_prior_alpha']
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                             alpha, gh_loc, gh_weights)
@@ -146,7 +142,7 @@ def get_e_log_prior(stick_means, stick_infos, centroids, cluster_info,
 
     diff = centroids - prior_mean
     prior_info = cluster_info * prior_lambda
-    e_centroid_prior = -0.5 * np.einsum('ji, ijk, ki', diff, prior_info, diff)
+    e_centroid_prior = -0.5 * np.einsum('ki, kij, kj', diff, prior_info, diff)
 
     return e_cluster_info_prior + e_centroid_prior + dp_prior
 
@@ -173,13 +169,13 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
 
     dim = np.shape(y)[1]
 
-    assert np.shape(y)[1] == np.shape(centroids)[0]
-    assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
-    assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
+    assert np.shape(y)[1] == np.shape(centroids)[1]
+    assert np.shape(cluster_info)[0] == np.shape(centroids)[0]
+    assert np.shape(cluster_info)[1] == np.shape(centroids)[1]
 
     data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
-    cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
-    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
+    cross_term = np.einsum('ni, kij, kj -> nk', y, cluster_info, centroids)
+    centroid2_term = np.einsum('ki, kij, kj -> k', centroids, cluster_info, centroids)
 
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
@@ -203,7 +199,7 @@ def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
                     operand,
                     lambda x : np.zeros(len(operand[0]) + 1))
-
+    
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param
@@ -226,7 +222,8 @@ def get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
 def get_kl(y, vb_params_dict, prior_params_dict,
             gh_loc, gh_weights,
             e_z = None,
-            use_bnp_prior = True):
+            use_bnp_prior = True, 
+            e_log_phi = None):
 
     """
     Computes the negative ELBO using the data y, at the current variational
@@ -287,106 +284,16 @@ def get_kl(y, vb_params_dict, prior_params_dict,
                             gh_loc, gh_weights)
 
     elbo = e_log_prior + entropy + e_loglik
+    
+    if e_log_phi is not None:
+
+        e_log_pert = e_log_phi(vb_params_dict['stick_params']['stick_means'],
+                               vb_params_dict['stick_params']['stick_infos'])
+                                                            
+        elbo = elbo + e_log_pert
+
 
     return -1 * elbo.squeeze()
 
 
 
-########################
-# Posterior quantities of interest
-#######################
-def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
-                               use_bnp_prior = True):
-
-    """
-    Returns the optimal cluster belonging probabilities, given the
-    variational parameters.
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_dict : dictionary
-        Dictionary of variational parameters.
-    gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
-    use_bnp_prior : boolean
-        Whether or not to use a prior on the cluster mixture weights.
-        If True, a DP prior is used.
-
-    Returns
-    -------
-    e_z : ndarray
-        The optimal cluster belongings as a function of the variational
-        parameters, stored in an array whose (n, k)th entry is the probability
-        of the nth datapoint belonging to cluster k
-
-    """
-
-    # get global vb parameters
-    stick_means = vb_params_dict['stick_params']['stick_means']
-    stick_infos = vb_params_dict['stick_params']['stick_infos']
-    centroids = vb_params_dict['cluster_params']['centroids']
-    cluster_info = vb_params_dict['cluster_params']['cluster_info']
-
-    # compute optimal e_z from vb global parameters
-    e_z, _ = get_optimal_z(y, stick_means, stick_infos, centroids, cluster_info,
-                        gh_loc, gh_weights,
-                        use_bnp_prior = use_bnp_prior)
-
-    return e_z
-
-def get_e_mixture_weights_from_vb_dict(vb_params_dict, gh_loc, gh_weights): 
-    stick_means = vb_params_dict['stick_params']['stick_means']
-    stick_infos = vb_params_dict['stick_params']['stick_infos']
-    
-    weights = cluster_lib.get_e_cluster_probabilities(stick_means, 
-                                                      stick_infos,
-                                                      gh_loc,
-                                                      gh_weights)
-    
-    return weights
-
-
-
-def get_e_num_pred_clusters_from_vb_dict(vb_params_dict,
-                                         n_obs,
-                                         threshold = 0,
-                                         n_samples = 10000,
-                                         prng_key = jax.random.PRNGKey(0)):
-    
-    # get posterior predicted number of clusters
-
-    stick_means = vb_params_dict['stick_params']['stick_means']
-    stick_infos = vb_params_dict['stick_params']['stick_infos']
-
-    return cluster_lib.get_e_num_pred_clusters_from_logit_sticks(stick_means,
-                                                                 stick_infos,
-                                                                 n_obs,
-                                                                 threshold = threshold,
-                                                                 n_samples = n_samples,
-                                                                 prng_key = prng_key)
-
-
-# Get the expected posterior number of distinct clusters.
-def get_e_num_clusters_from_vb_dict(y, 
-                                    vb_params_dict,
-                                    gh_loc, gh_weights,
-                                    threshold = 0,
-                                    n_samples = 10000,
-                                    prng_key = jax.random.PRNGKey(0)):
-
-    e_z  = get_optimal_z_from_vb_dict(y, 
-                                      vb_params_dict,
-                                      gh_loc,
-                                      gh_weights,
-                                      use_bnp_prior = True)
-
-    return cluster_lib.get_e_num_clusters_from_ez(e_z,
-                                                  threshold = threshold,
-                                                  n_samples = n_samples,
-                                                  prng_key = prng_key)

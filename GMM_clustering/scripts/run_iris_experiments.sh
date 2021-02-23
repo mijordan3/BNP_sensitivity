@@ -1,6 +1,6 @@
 #!/bin/bash
 
-seed=8901
+seed=789970
 alpha=6.0
 
 out_folder='../fits/'

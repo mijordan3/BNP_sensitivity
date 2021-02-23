@@ -18,7 +18,7 @@ from bnpmodeling_runjingdev import log_phi_lib
 
 # BNP gmm libraries
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-import bnpgmm_runjingdev.gmm_cavi_lib as cavi_lib
+from bnpgmm_runjingdev.gmm_optimization_lib import optimize_gmm
 import bnpgmm_runjingdev.utils_lib as utils_lib
 
 
@@ -76,9 +76,9 @@ gh_weights = np.array(gh_weights)
 prior_params_dict, prior_params_paragami = \
     gmm_lib.get_default_prior_params(dim)
 
-# set initial alpha
-alpha0 = meta_data['alpha']
-prior_params_dict['alpha'] = alpha0
+# set alpha
+dp_prior_alpha = meta_data['dp_prior_alpha']
+prior_params_dict['dp_prior_alpha'] = dp_prior_alpha
 
 ########################
 # Functional perturbation 
@@ -91,7 +91,7 @@ print('epsilon_indx = ', args.epsilon_indx)
 
 # define perturbation
 f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
-                                            alpha0,
+                                            dp_prior_alpha,
                                             gh_loc, 
                                             gh_weights,
                                             logit_v_grid = None, 
@@ -105,16 +105,16 @@ e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 ########################
 # Optimize
 ########################
-x_tol = 1e-3
-vb_opt_dict, e_z_opt, cavi_time = \
-    cavi_lib.run_cavi(iris_obs,
-                     vb_init_dict,
-                     vb_params_paragami,
-                     prior_params_dict,
-                     gh_loc, gh_weights,
-                     e_log_phi = e_log_phi,
-                     debug = False, 
-                     x_tol = x_tol)
+
+vb_opt_dict, _, e_z_opt, _, optim_time = \
+    optimize_gmm(iris_obs,
+                 vb_init_dict,
+                 vb_params_paragami,
+                 prior_params_dict,
+                 gh_loc, gh_weights,
+                 e_log_phi = e_log_phi, 
+                 # just directly run Newton steps
+                 run_lbfgs = False)
 
 final_kl = gmm_lib.get_kl(iris_obs,
                           vb_opt_dict,
@@ -133,9 +133,9 @@ paragami.save_folded(outfile,
                      vb_opt_dict,
                      vb_params_paragami, 
                      final_kl = final_kl, 
-                     optim_time = cavi_time, 
+                     optim_time = optim_time, 
                      gh_deg = gh_deg, 
-                     alpha = alpha0, 
+                     dp_prior_alpha = dp_prior_alpha, 
                      epsilon = epsilon, 
                      delta = args.delta, 
                      perturbation = args.perturbation)

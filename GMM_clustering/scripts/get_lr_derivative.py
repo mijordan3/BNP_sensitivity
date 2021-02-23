@@ -7,7 +7,6 @@ from numpy.polynomial.hermite import hermgauss
 
 # BNP gmm libraries
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-import bnpgmm_runjingdev.gmm_cavi_lib as cavi_lib
 import bnpgmm_runjingdev.utils_lib as utils_lib
 
 import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
@@ -83,9 +82,9 @@ gh_weights = np.array(gh_weights)
 prior_params_dict, prior_params_paragami = gmm_lib.get_default_prior_params(dim)
 
 # set initial alpha
-alpha0 = meta_data['alpha']
-prior_params_dict['alpha'] = alpha0
-print('alpha: ', prior_params_dict['alpha'])
+dp_prior_alpha = meta_data['dp_prior_alpha']
+prior_params_dict['dp_prior_alpha'] = dp_prior_alpha
+print('alpha: ', prior_params_dict['dp_prior_alpha'])
 
 ###############
 # Define objective and check KL
@@ -129,7 +128,7 @@ vb_sens = HyperparameterSensitivityLinearApproximation(
 # Derivative wrt to functional perturbations
 ###############
 f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
-                                            prior_params_dict['alpha'],
+                                            prior_params_dict['dp_prior_alpha'],
                                             gh_loc, 
                                             gh_weights,
                                             stick_key = 'stick_params')
@@ -140,7 +139,7 @@ def save_derivatives(vars_to_save):
     print('saving into: ', outfile)
     np.savez(outfile,
              vb_opt = vb_opt,
-             alpha0 = alpha0,
+             dp_prior_alpha = dp_prior_alpha,
              kl= kl,
              **vars_to_save)
 
