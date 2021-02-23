@@ -52,7 +52,7 @@ class GMMResultsLoader(object):
         print('loading lr derivatives from: ', lr_file)
         
         lr_data = np.load(lr_file)
-        assert lr_data['alpha0'] == self.alpha0
+        assert lr_data['dp_prior_alpha'] == self.alpha0
         assert np.abs(lr_data['vb_opt'] - self.vb_init_free).max() < 1e-12
         assert np.abs(lr_data['kl'] - self.init_fit_meta_data['final_kl']) < 1e-8
         self.lr_data = lr_data
@@ -71,7 +71,7 @@ class GMMResultsLoader(object):
         # check some model parameters 
         assert np.all(result_loading_utils.\
                   _load_meta_data_from_list(meta_data_list, 
-                                            'alpha') == \
+                                            'dp_prior_alpha') == \
                   self.alpha0)
         assert np.all(result_loading_utils.\
                           _load_meta_data_from_list(meta_data_list, 

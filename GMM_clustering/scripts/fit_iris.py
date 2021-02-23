@@ -9,7 +9,7 @@ import paragami
 
 # BNP gmm libraries
 import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-import bnpgmm_runjingdev.gmm_cavi_lib as cavi_lib
+from bnpgmm_runjingdev.gmm_optimization_lib import optimize_gmm, cluster_and_get_k_means_inits
 import bnpgmm_runjingdev.utils_lib as utils_lib
 
 import time
@@ -50,7 +50,7 @@ iris_obs = np.array(iris_obs)
 prior_params_dict, prior_params_paragami = gmm_lib.get_default_prior_params(dim)
 
 # set initial alpha
-prior_params_dict['alpha'] = args.alpha
+prior_params_dict['dp_prior_alpha'] = args.alpha
 print(prior_params_dict)
 
 ########################
@@ -69,25 +69,23 @@ _, vb_params_paragami = gmm_lib.get_vb_params_paragami_object(dim, args.k_approx
 
 # run a kmeans init
 print('initializing with k-means ...')
-n_kmeans_init = 50
+n_kmeans_init = 10
 _, init_vb_params_dict, init_ez = \
-    utils_lib.cluster_and_get_k_means_inits(iris_obs,
-                                            vb_params_paragami, 
-                                            n_kmeans_init = n_kmeans_init, 
-                                            seed = args.seed)
+    cluster_and_get_k_means_inits(iris_obs,
+                                  vb_params_paragami, 
+                                  n_kmeans_init = n_kmeans_init, 
+                                  seed = args.seed)
 
 ########################
 # Optimize
 ########################
-x_tol = 1e-3
-vb_opt_dict, e_z_opt, cavi_time = \
-    cavi_lib.run_cavi(iris_obs,
-                     init_vb_params_dict,
-                     vb_params_paragami,
-                     prior_params_dict,
-                     gh_loc, gh_weights,
-                     debug = False, 
-                     x_tol = x_tol)
+
+vb_opt_dict, _, e_z_opt, _, optim_time = \
+    optimize_gmm(iris_obs,
+                 init_vb_params_dict,
+                 vb_params_paragami,
+                 prior_params_dict,
+                 gh_loc, gh_weights)
 
 final_kl = gmm_lib.get_kl(iris_obs,
                           vb_opt_dict,
@@ -106,8 +104,8 @@ paragami.save_folded(outfile,
                      vb_opt_dict,
                      vb_params_paragami, 
                      final_kl = final_kl, 
-                     optim_time = cavi_time, 
+                     optim_time = optim_time, 
                      gh_deg = gh_deg, 
-                     alpha = args.alpha)
+                     dp_prior_alpha = args.alpha)
 
                      

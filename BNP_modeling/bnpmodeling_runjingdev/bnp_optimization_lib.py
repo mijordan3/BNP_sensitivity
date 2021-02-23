@@ -132,6 +132,9 @@ def optimize_kl(get_kl_loss,
                run_lbfgs = True,
                run_newton = True): 
     
+    # at least one should be true
+    assert run_lbfgs or run_newton
+    
     get_loss = jax.jit(get_kl_loss)
     
     if get_grad is None: 
