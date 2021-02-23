@@ -160,9 +160,9 @@ def optimize_kl(get_kl_loss,
     ################
     # initialize with L-BFGS-B
     ################
+    t0 = time.time() 
     if run_lbfgs: 
         print('Running L-BFGS-B ...')
-        t0 = time.time() 
         out = minimize(fun = lambda x : onp.array(get_loss(x)), 
                              x0 = x0, 
                              method = 'L-BFGS-B', 

@@ -105,14 +105,16 @@ e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 ########################
 # Optimize
 ########################
-x_tol = 1e-3
+
 vb_opt_dict, _, e_z_opt, _, optim_time = \
     optimize_gmm(iris_obs,
                  vb_init_dict,
                  vb_params_paragami,
                  prior_params_dict,
                  gh_loc, gh_weights,
-                 e_log_phi = e_log_phi)
+                 e_log_phi = e_log_phi, 
+                 # just directly run Newton steps
+                 run_lbfgs = False)
 
 final_kl = gmm_lib.get_kl(iris_obs,
                           vb_opt_dict,
