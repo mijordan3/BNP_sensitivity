@@ -253,9 +253,6 @@ def get_kl(gamma, gamma_info,
                                   gh_loc, gh_weights)
 
     elbo = e_log_prior + entropy + e_loglik
-    print(e_loglik)
-    print(e_log_prior)
-    print(entropy)
         
     if e_log_phi is not None:
 
