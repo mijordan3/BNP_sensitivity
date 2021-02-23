@@ -112,6 +112,7 @@ def get_e_log_prior(stick_means, stick_infos,
 
     # dp prior
     alpha = prior_params_dict['dp_prior_alpha']
+
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                               alpha, gh_loc, gh_weights)
@@ -138,7 +139,7 @@ def get_loglik_obs_by_nk(gamma, gamma_info, centroids):
         -0.5 * (-2 * np.einsum('ni,kj,nij->nk', gamma, centroids, gamma_info) + \
                     np.einsum('ki,kj,nij->nk', centroids, centroids, gamma_info))
     
-    return loglik_nk
+    return loglik_nk 
 
 ##########################
 # Optimization over e_z
@@ -159,7 +160,7 @@ def get_z_nat_params(gamma, gamma_info,
                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
                     operand,
                     lambda x : np.zeros(len(operand[0]) + 1))
-
+    
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param
@@ -177,9 +178,8 @@ def get_optimal_z(gamma, gamma_info,
                          gh_loc, gh_weights,
                          use_bnp_prior)
 
-    log_const = sp.special.logsumexp(z_nat_param, axis=1)
-    e_z = np.exp(z_nat_param - np.expand_dims(log_const, axis = 1))
-
+    e_z = jax.nn.softmax(z_nat_param, axis = 1)
+    
     return e_z, z_nat_param
 
 def get_kl(gamma, gamma_info,
@@ -242,7 +242,6 @@ def get_kl(gamma, gamma_info,
     
     e_loglik = np.sum(e_z * z_nat_param) 
 
-
     # entropy term
     entropy = get_entropy(stick_means, stick_infos, e_z,
                           gh_loc, gh_weights)
@@ -254,7 +253,10 @@ def get_kl(gamma, gamma_info,
                                   gh_loc, gh_weights)
 
     elbo = e_log_prior + entropy + e_loglik
-    
+    print(e_loglik)
+    print(e_log_prior)
+    print(entropy)
+        
     if e_log_phi is not None:
 
         e_log_pert = e_log_phi(vb_params_dict['stick_params']['stick_means'],

@@ -48,11 +48,6 @@ def plot_prediction_line_and_sample(timepoints, x, beta, beta_info,
     assert beta_info.shape[1] == len(beta)
     
     beta_cov = np.linalg.inv(beta_info)
-            
-    plot_prediction_line(timepoints, x, beta, ax, 
-                         color = 'grey',
-                         linewidth = 5, 
-                         alpha = alpha1)
 
     # draw from the variational distribution, to plot uncertainties
     for j in range(num_draws):
@@ -62,3 +57,9 @@ def plot_prediction_line_and_sample(timepoints, x, beta, beta_info,
                              color = 'red',
                              linewidth = 1, 
                              alpha = alpha2)
+    
+    # plot means
+    plot_prediction_line(timepoints, x, beta, ax, 
+                         color = 'grey',
+                         linewidth = 5, 
+                         alpha = alpha1)
