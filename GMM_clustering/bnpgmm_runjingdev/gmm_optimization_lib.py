@@ -49,7 +49,7 @@ def cluster_and_get_k_means_inits(y,
     onp.random.seed(seed)
 
     # data parameters
-    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[1]
+    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[0]
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
 
@@ -69,7 +69,7 @@ def cluster_and_get_k_means_inits(y,
         e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
     e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-    vb_params_dict['cluster_params']['centroids'] = np.array(km_best.cluster_centers_.T)
+    vb_params_dict['cluster_params']['centroids'] = np.array(km_best.cluster_centers_)
     
     vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
     vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)

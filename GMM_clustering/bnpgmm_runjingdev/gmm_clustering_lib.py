@@ -36,13 +36,11 @@ def get_vb_params_paragami_object(dim, k_approx):
     vb_params_paragami = paragami.PatternDict()
 
     # cluster parameters
-    # centroids
     cluster_params_paragami = paragami.PatternDict()
     
-    # TODO: make the first dimension k_approx 
-    # this matches w regression_lib, and is just more natural ... 
+    # centroids
     cluster_params_paragami['centroids'] = \
-        paragami.NumericArrayPattern(shape=(dim, k_approx))
+        paragami.NumericArrayPattern(shape=(k_approx, dim))
     # inverse covariances
     cluster_params_paragami['cluster_info'] = \
         paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
@@ -96,9 +94,8 @@ def get_default_prior_params(dim):
     prior_params_paragami = paragami.PatternDict()
 
     # DP prior parameter
-    # TODO to be consistent change 'alpha' to 'dp_prior_alpha'
-    prior_params_dict['alpha'] = np.array([3.0])
-    prior_params_paragami['alpha'] = \
+    prior_params_dict['dp_prior_alpha'] = np.array([3.0])
+    prior_params_paragami['dp_prior_alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
     # normal-wishart prior on the centroids and cluster info
@@ -129,7 +126,7 @@ def get_e_log_prior(stick_means, stick_infos, centroids, cluster_info,
     # get expected prior term
 
     # dp prior
-    alpha = prior_params_dict['alpha']
+    alpha = prior_params_dict['dp_prior_alpha']
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                             alpha, gh_loc, gh_weights)
@@ -145,7 +142,7 @@ def get_e_log_prior(stick_means, stick_infos, centroids, cluster_info,
 
     diff = centroids - prior_mean
     prior_info = cluster_info * prior_lambda
-    e_centroid_prior = -0.5 * np.einsum('ji, ijk, ki', diff, prior_info, diff)
+    e_centroid_prior = -0.5 * np.einsum('ki, kij, kj', diff, prior_info, diff)
 
     return e_cluster_info_prior + e_centroid_prior + dp_prior
 
@@ -172,13 +169,13 @@ def get_loglik_obs_by_nk(y, centroids, cluster_info):
 
     dim = np.shape(y)[1]
 
-    assert np.shape(y)[1] == np.shape(centroids)[0]
-    assert np.shape(cluster_info)[0] == np.shape(centroids)[1]
-    assert np.shape(cluster_info)[1] == np.shape(centroids)[0]
+    assert np.shape(y)[1] == np.shape(centroids)[1]
+    assert np.shape(cluster_info)[0] == np.shape(centroids)[0]
+    assert np.shape(cluster_info)[1] == np.shape(centroids)[1]
 
     data2_term = np.einsum('ni, kij, nj -> nk', y, cluster_info, y)
-    cross_term = np.einsum('ni, kij, jk -> nk', y, cluster_info, centroids)
-    centroid2_term = np.einsum('ik, kij, jk -> k', centroids, cluster_info, centroids)
+    cross_term = np.einsum('ni, kij, kj -> nk', y, cluster_info, centroids)
+    centroid2_term = np.einsum('ki, kij, kj -> k', centroids, cluster_info, centroids)
 
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(centroid2_term, axis = 0)
@@ -202,7 +199,8 @@ def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                     lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
                     operand,
                     lambda x : np.zeros(len(operand[0]) + 1))
-
+    
+    print(loglik_obs_by_nk.shape)
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param
