@@ -122,7 +122,7 @@ def optimize_gmm(y,
     ###################
     # optimize
     ###################
-    vb_opt_dict, vb_opt, out, optim_time = optimze_kl(get_kl_loss,
+    vb_opt_dict, vb_opt, out, optim_time = optimize_kl(get_kl_loss,
                                                        vb_params_dict, 
                                                        vb_params_paragami, 
                                                        run_newton = run_newton)

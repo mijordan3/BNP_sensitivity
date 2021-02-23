@@ -124,14 +124,21 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
 #################
 # A generic optimizer
 #################
-def optimze_kl(get_kl_loss,
+def optimize_kl(get_kl_loss,
                vb_params_dict, 
-               vb_params_paragami, 
+               vb_params_paragami,
+               get_grad = None,
+               get_hvp = None,
+               run_lbfgs = True,
                run_newton = True): 
     
     get_loss = jax.jit(get_kl_loss)
-    get_grad = jax.jit(jax.grad(get_kl_loss))
-    get_hvp = jax.jit(get_jac_hvp_fun(get_kl_loss))
+    
+    if get_grad is None: 
+        get_grad = jax.jit(jax.grad(get_kl_loss))
+
+    if get_hvp is None: 
+        get_hvp = jax.jit(get_jac_hvp_fun(get_kl_loss))
     
     ################
     # compile objective functions
@@ -150,14 +157,18 @@ def optimze_kl(get_kl_loss,
     ################
     # initialize with L-BFGS-B
     ################
-    print('Running L-BFGS-B ...')
-    t0 = time.time() 
-    out = minimize(fun = lambda x : onp.array(get_loss(x)), 
-                         x0 = x0, 
-                         method = 'L-BFGS-B', 
-                         jac = lambda x : onp.array(get_grad(x)))    
-    print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
-    
+    if run_lbfgs: 
+        print('Running L-BFGS-B ...')
+        t0 = time.time() 
+        out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+                             x0 = x0, 
+                             method = 'L-BFGS-B', 
+                             jac = lambda x : onp.array(get_grad(x)))    
+        print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
+        lbfgs_opt = out.x
+    else: 
+        lbfgs_opt = x0
+        
     ################
     # run a few more newton steps
     ################
@@ -165,7 +176,7 @@ def optimze_kl(get_kl_loss,
         t1 = time.time() 
         print('Running trust-ncg ... ')
         out = minimize(fun = lambda x : onp.array(get_loss(x)), 
-                   x0 = out.x, 
+                   x0 = lbfgs_opt, 
                    method = 'trust-ncg', 
                    jac = lambda x : onp.array(get_grad(x)), 
                    hessp = lambda x,v : onp.array(get_hvp(x, v)))
