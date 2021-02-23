@@ -7,7 +7,7 @@ from copy import deepcopy
 
 from sklearn.cluster import KMeans
 
-from bnpmodeling_runjingdev.bnp_optimization_lib import optimze_kl
+from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl
 
 from bnpgmm_runjingdev.gmm_clustering_lib import get_kl
 from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_optimal_z_from_vb_dict
@@ -103,6 +103,7 @@ def optimize_gmm(y,
                  prior_params_dict, 
                  gh_loc, gh_weights, 
                  e_log_phi = None, 
+                 run_lbfgs = True,
                  run_newton = True): 
     
     ###################
@@ -125,6 +126,7 @@ def optimize_gmm(y,
     vb_opt_dict, vb_opt, out, optim_time = optimize_kl(get_kl_loss,
                                                        vb_params_dict, 
                                                        vb_params_paragami, 
+                                                       run_lbfgs = run_lbfgs,
                                                        run_newton = run_newton)
     
     ez_opt = get_optimal_z_from_vb_dict(y, vb_opt_dict, gh_loc, gh_weights)

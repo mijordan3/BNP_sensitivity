@@ -28,7 +28,7 @@ def plot_clusters(x, y, cluster_labels, colors, fig, centroids = None, cov = Non
     if np.all(cov != None):
         assert len(np.unique(cluster_labels)) == np.shape(cov)[0]
     if np.all(centroids != None):
-        assert len(np.unique(cluster_labels)) == np.shape(centroids)[1]
+        assert len(np.unique(cluster_labels)) == np.shape(centroids)[0]
 
     unique_cluster_labels = np.unique(cluster_labels)
     n_clusters = len(unique_cluster_labels)
@@ -44,12 +44,12 @@ def plot_clusters(x, y, cluster_labels, colors, fig, centroids = None, cov = Non
 
     if np.all(centroids != None):
         for k in range(n_clusters):
-            fig.scatter(centroids[0, k], centroids[1, k], marker = '+', color = 'black')
+            fig.scatter(centroids[k, 0], centroids[k, 1], marker = '+', color = 'black')
 
     if np.all(cov != None):
         for k in range(n_clusters):
             eig, v = np.linalg.eig(cov[k, :, :])
-            ell = Ellipse(xy=(centroids[0, k], centroids[1, k]),
+            ell = Ellipse(xy=(centroids[k, 0], centroids[k, 1]),
                   width=np.sqrt(eig[0]) * 6, height=np.sqrt(eig[1]) * 6,
                   angle=np.rad2deg(np.arctan(v[1, 0] / v[0, 0])))
             ell.set_facecolor('none')
@@ -62,12 +62,12 @@ def transform_params_to_pc_space(pca_fit, centroids, cov):
     # pca_fit = PCA()
     # pca_fit.fit(iris_features)
 
-    # centroids is dim x k_approx
+    # centroids is k_approx x dim
     # infos is k_approx x dim x dim
 
-    assert pca_fit.components_.shape[1] == centroids.shape[0]
+    assert pca_fit.components_.shape[1] == centroids.shape[1]
 
-    centroids_pc = pca_fit.transform(centroids.T)
+    centroids_pc = pca_fit.transform(centroids)
 
     cov_pc = np.zeros(cov.shape)
     for k in range(cov.shape[0]):
@@ -75,7 +75,7 @@ def transform_params_to_pc_space(pca_fit, centroids, cov):
 
     # cov_pc = np.einsum('di, kij, ej -> kde', pca_fit.components_, cov, pca_fit.components_)
 
-    return centroids_pc.T, cov_pc
+    return centroids_pc, cov_pc
 
 
 def get_plotting_data(iris_features):

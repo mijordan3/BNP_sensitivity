@@ -200,7 +200,6 @@ def get_z_nat_params(y, stick_means, stick_infos, centroids, cluster_info,
                     operand,
                     lambda x : np.zeros(len(operand[0]) + 1))
     
-    print(loglik_obs_by_nk.shape)
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param
