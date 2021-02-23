@@ -1,4 +1,10 @@
-TODO
+import jax
+import jax.numpy as np
+
+from bnpgmm_runjingdev.gmm_clustering_lib import get_optimal_z
+
+import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
+import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 ########################
 # Posterior quantities of interest

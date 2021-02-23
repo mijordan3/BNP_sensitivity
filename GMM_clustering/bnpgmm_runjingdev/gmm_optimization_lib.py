@@ -3,11 +3,13 @@ import jax.numpy as np
 
 import numpy as onp
 
+from copy import deepcopy
+
 from sklearn.cluster import KMeans
 
 from bnpmodeling_runjingdev.bnp_optimization_lib import optimze_kl
 
-from bnpgmm_runjingdev.gmm_kl_lib import get_kl
+from bnpgmm_runjingdev.gmm_clustering_lib import get_kl
 from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_optimal_z_from_vb_dict
 
 def cluster_and_get_k_means_inits(y, 
@@ -62,25 +64,25 @@ def cluster_and_get_k_means_inits(y,
             enertia_best = enertia
             km_best = deepcopy(km)
 
-    e_z_init = np.full((n_obs, k_approx), z_init_eps)
+    e_z_init = onp.full((n_obs, k_approx), z_init_eps)
     for n in range(len(km_best.labels_)):
         e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
     e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
 
-    vb_params_dict['cluster_params']['centroids'] = jnp.array(km_best.cluster_centers_.T)
-
-    vb_params_dict['stick_params']['stick_propn_mean'] = jnp.ones(k_approx - 1)
-    vb_params_dict['stick_params']['stick_propn_info'] = jnp.ones(k_approx - 1)
+    vb_params_dict['cluster_params']['centroids'] = np.array(km_best.cluster_centers_.T)
+    
+    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
 
     # Set inital inv. covariances
-    cluster_info_init = np.zeros((k_approx, dim, dim))
+    cluster_info_init = onp.zeros((k_approx, dim, dim))
     for k in range(k_approx):
-        indx = np.argwhere(km_best.labels_ == k).flatten()
+        indx = onp.argwhere(km_best.labels_ == k).flatten()
 
         if len(indx) <= (y.shape[1] + 1):
             # if there's less than one datapoint in the cluster,
             # the covariance is not defined.
-            cluster_info_init[k, :, :] = np.eye(dim)
+            cluster_info_init[k, :, :] = onp.eye(dim)
         else:
             resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
             cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
@@ -88,7 +90,7 @@ def cluster_and_get_k_means_inits(y,
             # symmetrize ... there might be some numerical issues otherwise
             cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
 
-    vb_params_dict['cluster_params']['cluster_info'] = jnp.array(cluster_info_init)
+    vb_params_dict['cluster_params']['cluster_info'] = np.array(cluster_info_init)
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
@@ -106,7 +108,7 @@ def optimize_gmm(y,
     ###################
     # Define loss
     ###################
-    def _get_loss(vb_params_free): 
+    def get_kl_loss(vb_params_free): 
         
         vb_params_dict = vb_params_paragami.fold(vb_params_free, free = True)
     

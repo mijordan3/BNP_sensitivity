@@ -7,7 +7,6 @@ from matplotlib.patches import Ellipse
 import matplotlib.cm as cm
 
 from sklearn import datasets
-from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 
 import paragami
@@ -79,7 +78,7 @@ def transform_params_to_pc_space(pca_fit, centroids, cov):
     return centroids_pc.T, cov_pc
 
 
-def get_plot_data(iris_features):
+def get_plotting_data(iris_features):
     # Define some things that will be useful for plotting.
 
     # define colors that will be used for plotting later
@@ -95,88 +94,6 @@ def get_plot_data(iris_features):
     colors2 = [cmap(k * 25) for k in range(12)]
     return pca_fit, pc_features, colors1, colors2
 
-def cluster_and_get_k_means_inits(y, vb_params_paragami,
-                                n_kmeans_init = 1,
-                                z_init_eps=0.05,
-                                seed = 1):
-    """
-    Runs k-means to initialize the variational parameters.
-
-    Parameters
-    ----------
-    y : ndarray
-        The array of datapoints, one observation per row.
-    vb_params_paragami : paragami Patterned Dictionary
-        A paragami patterned dictionary that contains the variational parameters.
-    n_kmeans_init : int
-        The number of re-initializations for K-means.
-    z_init_eps : float
-        The weight given to the clusters a data does not belong to
-        after running K-means
-
-    Returns
-    -------
-    vb_params_dict : dictionary
-        Dictionary of variational parameters.
-    init_free_par : vector
-        Vector of the free variational parameters
-    e_z_init : ndarray
-        Array encoding cluster belongings as found by kmeans
-    """
-
-    # get dictionary of vb parameters
-    vb_params_dict = vb_params_paragami.random()
-
-    # set seed
-    np.random.seed(seed)
-
-    # data parameters
-    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[1]
-    n_obs = np.shape(y)[0]
-    dim = np.shape(y)[1]
-
-    # K means init.
-    for i in range(n_kmeans_init):
-        km = KMeans(n_clusters = k_approx).fit(y)
-        enertia = km.inertia_
-        if (i == 0):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-        elif (enertia < enertia_best):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-
-    e_z_init = np.full((n_obs, k_approx), z_init_eps)
-    for n in range(len(km_best.labels_)):
-        e_z_init[n, km_best.labels_[n]] = 1.0 - z_init_eps
-    e_z_init /= np.expand_dims(np.sum(e_z_init, axis = 1), axis = 1)
-
-    vb_params_dict['cluster_params']['centroids'] = jnp.array(km_best.cluster_centers_.T)
-
-    vb_params_dict['stick_params']['stick_propn_mean'] = jnp.ones(k_approx - 1)
-    vb_params_dict['stick_params']['stick_propn_info'] = jnp.ones(k_approx - 1)
-
-    # Set inital inv. covariances
-    cluster_info_init = np.zeros((k_approx, dim, dim))
-    for k in range(k_approx):
-        indx = np.argwhere(km_best.labels_ == k).flatten()
-
-        if len(indx) <= (y.shape[1] + 1):
-            # if there's less than one datapoint in the cluster,
-            # the covariance is not defined.
-            cluster_info_init[k, :, :] = np.eye(dim)
-        else:
-            resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
-            cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
-                                    np.eye(dim) * 1e-4)
-            # symmetrize ... there might be some numerical issues otherwise
-            cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
-
-    vb_params_dict['cluster_params']['cluster_info'] = jnp.array(cluster_info_init)
-
-    init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
-
-    return init_free_par, vb_params_dict, e_z_init
 
 
 def get_param_indices(param_str, vb_params_dict, vb_params_paragami):

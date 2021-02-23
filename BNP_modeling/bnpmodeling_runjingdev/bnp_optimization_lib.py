@@ -2,7 +2,9 @@ import jax
 import jax.numpy as np
 
 import numpy as onp
-from scipy import optimize 
+from scipy.optimize import minimize
+
+import time
 
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import modeling_lib
@@ -107,7 +109,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
         logitnorm_stick_params_paragami.flatten(logitnorm_stick_params_dict, 
                                                 free = True)
     
-    out = optimize.minimize(fun = lambda x : onp.array(loss(x)), 
+    out = minimize(fun = lambda x : onp.array(loss(x)), 
                                   x0 = stick_params_free, 
                                   jac = lambda x : onp.array(loss_grad(x)), 
                                   hessp = lambda x,v : onp.array(loss_hvp(x, v)), 
@@ -117,3 +119,64 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
         logitnorm_stick_params_paragami.fold(out.x, free = True)
     
     return opt_logitnorm_stick_params, out
+
+
+#################
+# A generic optimizer
+#################
+def optimze_kl(get_kl_loss,
+               vb_params_dict, 
+               vb_params_paragami, 
+               run_newton = True): 
+    
+    get_loss = jax.jit(get_kl_loss)
+    get_grad = jax.jit(jax.grad(get_kl_loss))
+    get_hvp = jax.jit(get_jac_hvp_fun(get_kl_loss))
+    
+    ################
+    # compile objective functions
+    ################
+    # intial point
+    x0 = vb_params_paragami.flatten(vb_params_dict, free = True)
+    
+    print('compiling objective and derivatives ... ')
+    t0 = time.time()
+    _ = get_loss(x0).block_until_ready()
+    _ = get_grad(x0).block_until_ready()
+    if run_newton: 
+        _ = get_hvp(x0, x0).block_until_ready()
+    print('done. Compile time: {0:.03f}sec'.format(time.time() - t0))
+    
+    ################
+    # initialize with L-BFGS-B
+    ################
+    print('Running L-BFGS-B ...')
+    t0 = time.time() 
+    out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+                         x0 = x0, 
+                         method = 'L-BFGS-B', 
+                         jac = lambda x : onp.array(get_grad(x)))    
+    print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
+    
+    ################
+    # run a few more newton steps
+    ################
+    if run_newton: 
+        t1 = time.time() 
+        print('Running trust-ncg ... ')
+        out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+                   x0 = out.x, 
+                   method = 'trust-ncg', 
+                   jac = lambda x : onp.array(get_grad(x)), 
+                   hessp = lambda x,v : onp.array(get_hvp(x, v)))
+        print('Newton time: {:.03f}sec'.format(time.time() - t1))
+
+    vb_opt = out.x
+    vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
+    print(out.message)
+    
+    print('done. ')
+    
+    optim_time = time.time() - t0
+    
+    return vb_opt_dict, vb_opt, out, optim_time
