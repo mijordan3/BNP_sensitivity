@@ -110,7 +110,72 @@ def get_default_prior_params():
     
     return prior_params_dict, prior_params_paragami
 
+##########################
+# entropy term
+##########################
+def get_shift_entropy(e_b, e_b2): 
+    
+    shift_var = e_b2 - e_b**2
+    
+    return 0.2 * np.log(shift_var)
 
+def get_entropy(stick_means, stick_infos, e_z,
+                e_b, e_b2, 
+                gh_loc, gh_weights):
+    
+    # this contains the stick and z entropys
+    entropy = gmm_lib.get_entropy(stick_means, stick_infos, e_z, 
+                                  gh_loc, gh_weights)
+
+    # add entropy on shifts 
+    stick_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
+    
+    return entropy + stick_entropy
+
+##########################
+# prior term 
+##########################
+def get_stick_prior(e_b, e_b2, prior_mean, prior_info): 
+    return prior_info * prior_mean * e_b - 0.5 * prior_info * e_b2
+
+def get_e_log_prior(stick_means, stick_infos, 
+                    data_info, centroids,
+                    e_b, e_b2, e_z,
+                    prior_params_dict,
+                    gh_loc, gh_weights):
+    
+    # get expected prior term
+
+    # dp prior
+    alpha = prior_params_dict['dp_prior_alpha']
+
+    dp_prior = \
+        modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
+                                              alpha, gh_loc, gh_weights)
+
+    # centroid prior
+    prior_mean = prior_params_dict['prior_centroid_mean']
+    prior_info = prior_params_dict['prior_centroid_info']
+
+    e_centroid_prior = sp.stats.norm.logpdf(centroids, 
+                                            loc = prior_mean, 
+                                            scale = 1 / np.sqrt(prior_info)).sum()
+    
+    # prior on shifts 
+    prior_shift_mean = prior_params_dict['prior_shift_mean']
+    prior_shift_info = prior_params_dict['prior_shift_info']
+    shift_prior = (get_stick_prior(e_b, e_b2, prior_shift_mean, prior_shift_info) * e_z).sum()
+    
+    # prior on data info 
+    shape = prior_params_dict['prior_data_info_shape']
+    rate = prior_params_dict['prior_data_info_rate']
+    data_info_prior = sp.stats.gamma.logpdf(data_info, 
+                                            shape, 
+                                            scale = 1 / rate)
+    
+    return dp_prior + e_centroid_prior + shift_prior + data_info_prior
+    
+    
 ##########################
 # Likelihood term
 ##########################
@@ -172,8 +237,12 @@ def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict):
     
     prior_diff = prior_params_dict['prior_shift_info'] * prior_params_dict['prior_shift_mean']
     
+    # mean and variance of optimal shift
     e_b = (ydiff + prior_diff) / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
-    e_b2 = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    var_b = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    
+    # second moment
+    e_b2 = var_b + e_b**2
     
     return e_b, e_b2
 
@@ -181,49 +250,46 @@ def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict):
 ##########################
 # Optimization over e_z
 ##########################
-def get_z_nat_params(gamma, gamma_info, 
+def get_z_nat_params(y, x, 
                      stick_means, stick_infos,
-                     centroids,
-                     gh_loc, gh_weights,
-                     use_bnp_prior = True):
+                     data_info, centroids, 
+                     e_b, e_b2, 
+                     gh_loc, gh_weights):
 
     # get likelihood term
-    loglik_obs_by_nk = get_loglik_obs_by_nk(gamma, gamma_info, centroids) 
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2) 
 
-    # get weight term
-    operand = (stick_means, stick_infos, gh_loc, gh_weights)
-    e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
-                    operand,
-                    lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
-                    operand,
-                    lambda x : np.zeros(len(operand[0]) + 1))
-    
+    # get weight term    
+    e_log_cluster_probs = modeling_lib.\
+        get_e_log_cluster_probabilities(stick_means, stick_infos,
+                                        gh_loc, gh_weights)
+                    
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
 
     return z_nat_param
 
-def get_optimal_z(gamma, gamma_info, 
+def get_optimal_z(y, x, 
                   stick_means, stick_infos,
-                  centroids,
-                  gh_loc, gh_weights,
-                  use_bnp_prior = True):
+                  data_info, centroids,
+                  e_b, e_b2, 
+                  gh_loc, gh_weights):
 
     z_nat_param = \
-        get_z_nat_params(gamma, gamma_info, 
+        get_z_nat_params(y, x, 
                          stick_means, stick_infos,
-                         centroids,
-                         gh_loc, gh_weights,
-                         use_bnp_prior)
+                         data_info, centroids,
+                         e_b, e_b2, 
+                         gh_loc, gh_weights)
 
     e_z = jax.nn.softmax(z_nat_param, axis = 1)
     
     return e_z, z_nat_param
 
-def get_kl(gamma, gamma_info,
+
+def get_kl(y, x,
            vb_params_dict, prior_params_dict,
            gh_loc, gh_weights,
            e_z = None,
-           use_bnp_prior = True, 
            e_log_phi = None):
 
     """
@@ -233,10 +299,9 @@ def get_kl(gamma, gamma_info,
     Parameters
     ----------
     gamma : ndarray
-        The array of regression coefficients (N, d). 
-    gamma_info : ndarray 
-        The array of information matrices of regression coefficients, 
-        shape = (N, d, d).
+        The array of observations (num_genes x n_timepoints) 
+    x : ndarray 
+        The b-spline regression matrix, shape = (n_timepoints, n_basis).
     vb_params_dict : dictionary
         Dictionary of variational parameters.
     prior_params_dict : dictionary
@@ -266,14 +331,18 @@ def get_kl(gamma, gamma_info,
     stick_means = vb_params_dict['stick_params']['stick_means']
     stick_infos = vb_params_dict['stick_params']['stick_infos']
     centroids = vb_params_dict['centroids']
+    data_info = vb_params_dict['data_info']
+    
+    # get optimal shifts
+    e_b, e_b2 = get_optimal_shifts(y, x, centroids, data_info, prior_params_dict)
     
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
-            get_optimal_z(gamma, gamma_info, 
+            get_optimal_z(y, x, 
                           stick_means, stick_infos,
-                          centroids,
-                          gh_loc, gh_weights,
-                          use_bnp_prior = use_bnp_prior)
+                          data_info, centroids,
+                          e_b, e_b2, 
+                          gh_loc, gh_weights)
     if e_z is None:
         e_z = e_z_opt
     
@@ -281,14 +350,16 @@ def get_kl(gamma, gamma_info,
 
     # entropy term
     entropy = get_entropy(stick_means, stick_infos, e_z,
+                          e_b, e_b2, 
                           gh_loc, gh_weights)
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_means, stick_infos,
-                                  centroids,
-                                  prior_params_dict,
-                                  gh_loc, gh_weights)
-
+    e_log_prior = get_e_log_prior(stick_means, stick_infos, 
+                                    data_info, centroids,
+                                    e_b, e_b2, e_z,
+                                    prior_params_dict,
+                                    gh_loc, gh_weights)
+    
     elbo = e_log_prior + entropy + e_loglik
         
     if e_log_phi is not None:
