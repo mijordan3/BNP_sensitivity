@@ -121,9 +121,9 @@ def get_e_log_prior(stick_means, stick_infos,
     prior_mean = prior_params_dict['prior_centroid_mean']
     prior_info = prior_params_dict['prior_centroid_info']
 
-    e_centroid_prior = sp.stats.norm.pdf(centroids, 
-                                         loc = prior_mean, 
-                                         scale = 1 / np.sqrt(prior_info)).sum()
+    e_centroid_prior = sp.stats.norm.logpdf(centroids, 
+                                            loc = prior_mean, 
+                                            scale = 1 / np.sqrt(prior_info)).sum()
 
     return e_centroid_prior + dp_prior
 

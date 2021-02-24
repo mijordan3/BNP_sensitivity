@@ -219,7 +219,8 @@ def load_genomics_data(genomic_time_series_dir,
 # This effectively returns the result of the first-stage optimization. 
 def load_and_tranform_data(genomic_time_series_dir, 
                            df=7, 
-                           degree=3): 
+                           degree=3, 
+                           cov_lb = 0.): 
     
     # load raw data and time-points
     y, _, _, timepoints = load_genomics_data(genomic_time_series_dir, 
@@ -242,7 +243,7 @@ def load_and_tranform_data(genomic_time_series_dir,
         transform_regression_lib.multiply_regression_by_matrix(beta, 
                                                                beta_infos,
                                                                transform_mat, 
-                                                               epsilon = 0.1)
+                                                               epsilon = cov_lb)
     
     return y, timepoints, beta_transformed, beta_infos_transformed, regressors_transformed
     
