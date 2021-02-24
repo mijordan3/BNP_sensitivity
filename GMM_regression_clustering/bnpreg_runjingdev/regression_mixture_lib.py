@@ -61,10 +61,6 @@ def get_default_prior_params():
     Returns a paragami patterned dictionary
     that stores the prior parameters.
     
-    Parameters
-    ----------
-    dim : int
-        Dimension of the datapoints.
     Returns
     -------
     prior_params_dict : dictionary
@@ -117,7 +113,7 @@ def get_shift_entropy(e_b, e_b2):
     
     shift_var = e_b2 - e_b**2
     
-    return 0.2 * np.log(shift_var)
+    return 0.5 * np.log(shift_var)
 
 def get_entropy(stick_means, stick_infos, e_z,
                 e_b, e_b2, 
@@ -128,19 +124,18 @@ def get_entropy(stick_means, stick_infos, e_z,
                                   gh_loc, gh_weights)
 
     # add entropy on shifts 
-    stick_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
+    shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
     
-    return entropy + stick_entropy
+    return entropy + shift_entropy
 
 ##########################
 # prior term 
 ##########################
-def get_stick_prior(e_b, e_b2, prior_mean, prior_info): 
-    return prior_info * prior_mean * e_b - 0.5 * prior_info * e_b2
+def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
+    return prior_info * (prior_mean * e_b - 0.5 * e_b2)
 
 def get_e_log_prior(stick_means, stick_infos, 
                     data_info, centroids,
-                    e_b, e_b2, e_z,
                     prior_params_dict,
                     gh_loc, gh_weights):
     
@@ -160,12 +155,7 @@ def get_e_log_prior(stick_means, stick_infos,
     e_centroid_prior = sp.stats.norm.logpdf(centroids, 
                                             loc = prior_mean, 
                                             scale = 1 / np.sqrt(prior_info)).sum()
-    
-    # prior on shifts 
-    prior_shift_mean = prior_params_dict['prior_shift_mean']
-    prior_shift_info = prior_params_dict['prior_shift_info']
-    shift_prior = (get_stick_prior(e_b, e_b2, prior_shift_mean, prior_shift_info) * e_z).sum()
-    
+        
     # prior on data info 
     shape = prior_params_dict['prior_data_info_shape']
     rate = prior_params_dict['prior_data_info_rate']
@@ -173,7 +163,7 @@ def get_e_log_prior(stick_means, stick_infos,
                                             shape, 
                                             scale = 1 / rate)
     
-    return dp_prior + e_centroid_prior + shift_prior + data_info_prior
+    return dp_prior + e_centroid_prior + data_info_prior
     
     
 ##########################
@@ -188,7 +178,7 @@ def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
 
     # y is (obs x time points) = (n x t)
     # x is (time points x basis vectors) = (t x b)
-    # beta is (clusters x basis vectors) = (k x b)
+    # centroids is (clusters x basis vectors) = (k x b)
     x_times_beta = np.einsum('tb,kb->tk', x, centroids)
     
     # mu_nkt = beta_k^T x_t + b_nk
@@ -224,6 +214,7 @@ def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
     return  square_term + log_info_term
 
 def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict): 
+    
     num_time_points = x.shape[0]
 
     # y is (obs x time points) = (n x t)
@@ -254,7 +245,8 @@ def get_z_nat_params(y, x,
                      stick_means, stick_infos,
                      data_info, centroids, 
                      e_b, e_b2, 
-                     gh_loc, gh_weights):
+                     gh_loc, gh_weights, 
+                     prior_params_dict):
 
     # get likelihood term
     loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2) 
@@ -263,8 +255,13 @@ def get_z_nat_params(y, x,
     e_log_cluster_probs = modeling_lib.\
         get_e_log_cluster_probabilities(stick_means, stick_infos,
                                         gh_loc, gh_weights)
-                    
-    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
+    
+    # prior on shifts 
+    prior_shift_mean = prior_params_dict['prior_shift_mean']
+    prior_shift_info = prior_params_dict['prior_shift_info']
+    shift_prior = get_shift_prior(e_b, e_b2, prior_shift_mean, prior_shift_info)
+
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior
 
     return z_nat_param
 
@@ -272,14 +269,16 @@ def get_optimal_z(y, x,
                   stick_means, stick_infos,
                   data_info, centroids,
                   e_b, e_b2, 
-                  gh_loc, gh_weights):
+                  gh_loc, gh_weights, 
+                  prior_params_dict):
 
     z_nat_param = \
         get_z_nat_params(y, x, 
                          stick_means, stick_infos,
                          data_info, centroids,
                          e_b, e_b2, 
-                         gh_loc, gh_weights)
+                         gh_loc, gh_weights, 
+                         prior_params_dict)
 
     e_z = jax.nn.softmax(z_nat_param, axis = 1)
     
@@ -342,7 +341,8 @@ def get_kl(y, x,
                           stick_means, stick_infos,
                           data_info, centroids,
                           e_b, e_b2, 
-                          gh_loc, gh_weights)
+                          gh_loc, gh_weights, 
+                          prior_params_dict)
     if e_z is None:
         e_z = e_z_opt
     
@@ -356,7 +356,6 @@ def get_kl(y, x,
     # prior term
     e_log_prior = get_e_log_prior(stick_means, stick_infos, 
                                     data_info, centroids,
-                                    e_b, e_b2, e_z,
                                     prior_params_dict,
                                     gh_loc, gh_weights)
     
