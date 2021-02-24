@@ -241,7 +241,8 @@ def load_and_tranform_data(genomic_time_series_dir,
     beta_transformed, beta_infos_transformed = \
         transform_regression_lib.multiply_regression_by_matrix(beta, 
                                                                beta_infos,
-                                                               transform_mat)
+                                                               transform_mat, 
+                                                               epsilon = 0.1)
     
     return y, timepoints, beta_transformed, beta_infos_transformed, regressors_transformed
     
