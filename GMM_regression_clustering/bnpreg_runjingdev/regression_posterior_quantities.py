@@ -6,7 +6,7 @@ import jax.numpy as np
 
 from bnpreg_runjingdev import regression_mixture_lib
 
-from bnpgmm_runjingdev.gmm_clustering_lib import get_e_mixture_weights_from_vb_dict
+from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_e_mixture_weights_from_vb_dict
 
 def get_optimal_z_from_vb_dict(gamma, gamma_info, vb_params_dict,
                                gh_loc, gh_weights,

@@ -19,10 +19,12 @@ def make_matrix_full_row_rank(x, min_ev=1e-8):
     return new_x
 
 
-def multiply_regression_by_matrix(old_beta, old_beta_info, transform_mat):
+def multiply_regression_by_matrix(old_beta, old_beta_info, transform_mat, 
+                                  epsilon = 0):
     """Means and infos of regression parameters after matrix multiplication.
     
     """
+    
     n_obs = old_beta.shape[0]
 
     beta_transformed = old_beta @ transform_mat.T
@@ -32,8 +34,10 @@ def multiply_regression_by_matrix(old_beta, old_beta_info, transform_mat):
         for n in range(n_obs) ])
     new_beta_cov = np.einsum(
         'ia,nab,bj->nij', transform_mat, beta_cov, transform_mat.T)
+    
+    dim = new_beta_cov.shape[-1]
     beta_info_transformed = np.array([
-        np.linalg.inv(new_beta_cov[n, :, :])
+        np.linalg.inv(new_beta_cov[n, :, :] + np.eye(dim) * epsilon)
         for n in range(n_obs) ])
 
     return beta_transformed, beta_info_transformed
