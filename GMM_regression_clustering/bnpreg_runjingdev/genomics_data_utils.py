@@ -214,12 +214,10 @@ def load_genomics_data(genomic_time_series_dir,
         return y, None, train_indx, timepoints
     
 
-# Wrapper to load the data and tranformed regression 
-# coefficients that we will cluster. 
-# This effectively returns the result of the first-stage optimization. 
-def load_and_tranform_data(genomic_time_series_dir, 
-                           df=7, 
-                           degree=3): 
+# Wrapper to load the data, regressors, and initial regression coefficients
+def load_data_and_run_regressions(genomic_time_series_dir, 
+                                 df=7, 
+                                 degree=3): 
     
     # load raw data and time-points
     y, _, _, timepoints = load_genomics_data(genomic_time_series_dir, 
@@ -230,19 +228,9 @@ def load_and_tranform_data(genomic_time_series_dir,
                                                             df=df,
                                                             degree=degree)
     
-    # fit regression coefficients
-    beta, beta_infos, y_infos = regression_lib.run_regressions(y, regressors)
+    # get initial coefficients 
+    beta, beta_infos, y_infos = \
+        regression_lib.run_regressions(y - np.mean(y, axis = 1, keepdims = True),
+                                       regressors)
     
-    # Get the matrix that does the transformation.
-    transform_mat, regressors_transformed = \
-        transform_regression_lib.get_reversible_predict_and_demean_matrix(regressors)
-    
-    # tranform beta coefficients
-    beta_transformed, beta_infos_transformed = \
-        transform_regression_lib.multiply_regression_by_matrix(beta, 
-                                                               beta_infos,
-                                                               transform_mat, 
-                                                               epsilon = 0.1)
-    
-    return y, timepoints, beta_transformed, beta_infos_transformed, regressors_transformed
-    
+    return y, timepoints, regressors, beta, beta_infos, y_infos
