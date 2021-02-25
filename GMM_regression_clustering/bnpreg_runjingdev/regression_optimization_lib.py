@@ -89,6 +89,10 @@ def set_params_w_kmeans(y, regressors,
                                                                         vb_params_dict['stick_params'],
                                                                         vb_params_paragami['stick_params'], 
                                                                         gh_loc, gh_weights)[0]
+
+#     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
+#     vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
+#     vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)
     
     return vb_params_dict
 
