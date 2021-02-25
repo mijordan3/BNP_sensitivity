@@ -100,8 +100,8 @@ def get_default_prior_params():
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_rate'] = np.array([10.0])
-    prior_params_paragami['prior_data_info_rate'] = \
+    prior_params_dict['prior_data_info_scale'] = np.array([10.0])
+    prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
     return prior_params_dict, prior_params_paragami
@@ -158,10 +158,10 @@ def get_e_log_prior(stick_means, stick_infos,
         
     # prior on data info 
     shape = prior_params_dict['prior_data_info_shape']
-    rate = prior_params_dict['prior_data_info_rate']
+    scale = prior_params_dict['prior_data_info_scale']
     data_info_prior = sp.stats.gamma.logpdf(data_info, 
                                             shape, 
-                                            scale = 1 / rate)
+                                            scale = scale)
     
     return dp_prior + e_centroid_prior + data_info_prior
     
@@ -260,7 +260,7 @@ def get_z_nat_params(y, x,
     prior_shift_mean = prior_params_dict['prior_shift_mean']
     prior_shift_info = prior_params_dict['prior_shift_info']
     shift_prior = get_shift_prior(e_b, e_b2, prior_shift_mean, prior_shift_info)
-
+    
     z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior
 
     return z_nat_param

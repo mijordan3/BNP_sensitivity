@@ -56,22 +56,30 @@ def set_params_w_kmeans(y, regressors,
     k_approx = vb_params_dict['centroids'].shape[0]
     
     print('running k-means ... ')
-    init_centroids = init_centroids_w_kmeans(beta, k_approx, n_kmeans_init = 10)
-    vb_params_dict['centroids'] = init_centroids
-    
+    vb_params_dict['centroids'] = \
+        init_centroids_w_kmeans(beta, k_approx, n_kmeans_init = 10)
+
     # intialize shifts
     _data_info = 100. # set to be large to weight the data more than the prior in the init
     e_b_init, e_b2_init = \
-        regression_mixture_lib.get_optimal_shifts(y, regressors, init_centroids, _data_info, prior_params_dict)
+        regression_mixture_lib.get_optimal_shifts(y, regressors,
+                                                  vb_params_dict['centroids'],
+                                                  _data_info,
+                                                  prior_params_dict)
     
     # intialize ez -- disregard prior
     loglik_nk = regression_mixture_lib.get_loglik_obs_by_nk(y, 
                                                             regressors,
-                                                            init_centroids, 
+                                                            vb_params_dict['centroids'], 
                                                             _data_info,
                                                             e_b_init, e_b2_init)
     ez_init = jax.nn.softmax(loglik_nk)
     
+    # sort z's from largest to smallest
+    perm = np.argsort(-ez_init.sum(0))
+    ez_init = ez_init[:, perm]
+    vb_params_dict['centroids'] = vb_params_dict['centroids'][perm]    
+
     # initialize sticks
     print('initializing sticks ...')
     stick_beta1, stick_beta2 = update_stick_beta_params(ez_init, prior_params_dict['dp_prior_alpha'])
@@ -84,6 +92,10 @@ def set_params_w_kmeans(y, regressors,
     
     return vb_params_dict
 
+
+#     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
+#     vb_params_dict['stick_params']['stick_means'] = np.zeros(stick_shape)
+#     vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)
 
 ################
 # Functions to optimize
