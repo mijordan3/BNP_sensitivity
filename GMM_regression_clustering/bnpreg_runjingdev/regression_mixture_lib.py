@@ -61,16 +61,11 @@ def get_vb_params_paragami_object(dim, k_approx):
 ##########################
 # Set up prior parameters
 ##########################
-def get_default_prior_params(dim):
+def get_default_prior_params():
     """
     Returns a paragami patterned dictionary
     that stores the prior parameters.
     
-    Parameters
-    ----------
-    dim : int
-        Dimension of the datapoints.
-
     Returns
     -------
     prior_params_dict : dictionary

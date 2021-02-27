@@ -43,24 +43,13 @@ def set_params_w_kmeans(gamma, gamma_info, vb_params_dict, vb_params_paragami,
     
     k_approx = vb_params_dict['centroids'].shape[0]
     
-    print('running k-means ... ')
     init_centroids = init_centroids_w_kmeans(gamma, k_approx, n_kmeans_init = 10)
     vb_params_dict['centroids'] = init_centroids
     
-    # intialize ez -- disregard prior
-    loglik_nk = regression_mixture_lib.get_loglik_obs_by_nk(gamma, gamma_info, init_centroids)
-    ez_init = jax.nn.softmax(loglik_nk)
     
-    # initialize sticks
-    print('initializing sticks ...')
-    stick_beta1, stick_beta2 = update_stick_beta_params(ez_init, dp_prior_alpha)
-    beta_params = np.stack((stick_beta1, stick_beta2), axis = -1)
-    print(beta_params.shape)
-    
-    vb_params_dict['stick_params'] = convert_beta_sticks_to_logitnormal(beta_params, 
-                                                                        vb_params_dict['stick_params'],
-                                                                        vb_params_paragami['stick_params'], 
-                                                                        gh_loc, gh_weights)[0]
+    stick_shape = vb_params_dict['stick_params']['stick_means'].shape
+    vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
+    vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)
     
     return vb_params_dict
 
