@@ -9,6 +9,8 @@ from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, \
     update_stick_beta_params, convert_beta_sticks_to_logitnormal
 
+from bnpgmm_runjingdev.gmm_optimization_lib import init_centroids_w_kmeans
+
 from bnpreg_runjingdev import regression_mixture_lib 
 from bnpreg_runjingdev.regression_posterior_quantities import get_optimal_local_params_from_vb_dict
 from bnpreg_runjingdev.genomics_utils import regression_lib
@@ -25,13 +27,12 @@ from copy import deepcopy
 # The GMM init
 
 def set_params_w_kmeans(y, regressors,
-                        vb_params_dict, vb_params_paragami, 
+                        vb_params_dict, 
+                        vb_params_paragami, 
                         prior_params_dict,
                         gh_loc, gh_weights, 
                         seed = 4353): 
-    
-    onp.random.seed(seed)
-    
+        
     # run initial regressions
     print('running initial regressions ...')
     beta, _, y_infos = \
@@ -42,8 +43,10 @@ def set_params_w_kmeans(y, regressors,
     k_approx = vb_params_dict['centroids'].shape[0]
     
     print('running k-means ... ')
-    vb_params_dict['centroids'] = \
-        init_centroids_w_kmeans(beta, k_approx, n_kmeans_init = 10)
+    vb_params_dict['centroids'], _ = \
+        init_centroids_w_kmeans(beta, k_approx, 
+                                n_kmeans_init = 10, 
+                                seed = seed)
 
     # intialize shifts
     _data_info = 100. # set to be large to weight the data more than the prior in the init
