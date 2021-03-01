@@ -64,6 +64,10 @@ print(prior_params_dict)
 # Variational parameters
 ########################
 
+# get vb parameters
+vb_params_dict, vb_params_paragami = \
+    regression_mixture_lib.get_vb_params_paragami_object(reg_dim, args.k_approx)
+
 # Gauss-Hermite points for integrating logitnormal stick-breaking prior
 gh_deg = 8
 gh_loc, gh_weights = hermgauss(gh_deg)
@@ -71,20 +75,17 @@ gh_loc, gh_weights = hermgauss(gh_deg)
 # convert to jax arrays
 gh_loc, gh_weights = np.array(gh_loc), np.array(gh_weights)
 
-# get vb parameters
-vb_params_dict, vb_params_paragami = \
-    regression_mixture_lib.get_vb_params_paragami_object(reg_dim, args.k_approx)
-
 ########################
 # Optimize
 ########################
+print(args.seed)
 vb_params_dict = set_params_w_kmeans(genome_data,
                                      regressors,
                                      vb_params_dict, 
                                      vb_params_paragami, 
                                      prior_params_dict,
                                      gh_loc, gh_weights, 
-                                     seed = args.seed)
+                                     seed = args.seed)                     
 
 vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
     optimize_regression_mixture(genome_data, regressors, 
@@ -96,11 +97,11 @@ vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
 
 final_kl = out.fun
 
-#####################
-# Save results
-#####################
+# #####################
+# # Save results
+# #####################
 outfile = os.path.join(args.out_folder, args.out_filename)
-print('saving iris fit to ', outfile)
+print('saving gmm regression fit to ', outfile)
 
 paragami.save_folded(outfile, 
                      vb_opt_dict,
@@ -110,4 +111,13 @@ paragami.save_folded(outfile,
                      gh_deg = gh_deg, 
                      dp_prior_alpha = args.alpha)
 
-                     
+
+# paragami.save_folded(outfile, 
+#                      vb_opt_dict,
+#                      vb_params_paragami, 
+#                      genome_data = genome_data, 
+#                      regressors = regressors, 
+#                      gh_loc = gh_loc, 
+#                      gh_weights = gh_weights,
+#                      prior_free = prior_params_paragami.flatten(prior_params_dict, free = True), 
+#                      init_free = vb_params_paragami.flatten(vb_params_init, free = True))

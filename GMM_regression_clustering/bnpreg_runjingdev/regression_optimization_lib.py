@@ -115,7 +115,7 @@ def optimize_regression_mixture(y, regressors,
                                 e_log_phi = None, 
                                 run_lbfgs = True,
                                 run_newton = True): 
-    
+        
     ###################
     # Define loss
     ###################
