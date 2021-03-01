@@ -2,13 +2,12 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
-import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
-import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
-from bnpgmm_runjingdev.gmm_clustering_lib import get_entropy
+import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
 
 import paragami
+
 
 ##########################
 # Set up vb parameters
@@ -18,67 +17,56 @@ def get_vb_params_paragami_object(dim, k_approx):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
-
     Parameters
     ----------
     dim : int
         Dimension of the datapoints.
     k_approx : int
         Number of components in the model.
-
     Returns
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
-
     vb_params_paragami : paragami patterned dictionary
         A paragami patterned dictionary that contains the variational parameters.
-
     """
 
-    vb_params_paragami = paragami.PatternDict()
-
-    # cluster parameters
+    _, vb_params_paragami = \
+        gmm_lib.get_vb_params_paragami_object(dim, k_approx)
+    
+    # don't need cluster infos's
+    # delete cluster params and add only centroids
+    vb_params_paragami.__delitem__('cluster_params')
+    
+    
     # centroids
     vb_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(k_approx, dim))
-
-    # BNP sticks
-    # variational distribution for each stick is logitnormal
-    stick_params_paragami = paragami.PatternDict()
-    stick_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    stick_params_paragami['stick_infos'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
-
-    # add the vb_params
-    vb_params_paragami['stick_params'] = stick_params_paragami
+    
+    # info of data 
+    vb_params_paragami['data_info'] = \
+        paragami.NumericArrayPattern(shape=(1,), lb = 0.)
 
     vb_params_dict = vb_params_paragami.random()
 
     return vb_params_dict, vb_params_paragami
 
+
+
 ##########################
 # Set up prior parameters
 ##########################
-def get_default_prior_params(dim):
+def get_default_prior_params():
     """
     Returns a paragami patterned dictionary
     that stores the prior parameters.
     
-    Parameters
-    ----------
-    dim : int
-        Dimension of the datapoints.
-
     Returns
     -------
     prior_params_dict : dictionary
         A dictionary that contains the prior parameters.
-
     prior_params_paragami : paragami Patterned Dictionary
         A paragami patterned dictionary that contains the prior parameters.
-
     """
 
     prior_params_dict = dict()
@@ -94,17 +82,60 @@ def get_default_prior_params(dim):
     prior_params_paragami['prior_centroid_mean'] = \
         paragami.NumericArrayPattern(shape=(1, ))
 
-    prior_params_dict['prior_centroid_info'] = np.array([0.001])
+    prior_params_dict['prior_centroid_info'] = np.array([0.1])
     prior_params_paragami['prior_centroid_info'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
+    
+    # normal prior on shifts
+    prior_params_dict['prior_shift_mean'] = np.array([0.0])
+    prior_params_paragami['prior_shift_mean'] = \
+        paragami.NumericArrayPattern(shape=(1, ))
 
+    prior_params_dict['prior_shift_info'] = np.array([0.1])
+    prior_params_paragami['prior_shift_info'] = \
+        paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
+    
+    # gamma prior on data info
+    prior_params_dict['prior_data_info_shape'] = np.array([10.])
+    prior_params_paragami['prior_data_info_shape'] = \
+        paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
+
+    prior_params_dict['prior_data_info_scale'] = np.array([0.1])
+    prior_params_paragami['prior_data_info_scale'] = \
+        paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
+    
     return prior_params_dict, prior_params_paragami
 
 ##########################
-# Expected prior term
+# entropy term
 ##########################
+def get_shift_entropy(e_b, e_b2): 
+    
+    shift_var = e_b2 - e_b**2
+    
+    return 0.5 * np.log(shift_var)
+
+def get_entropy(stick_means, stick_infos, e_z,
+                e_b, e_b2, 
+                gh_loc, gh_weights):
+    
+    # this contains the stick and z entropys
+    entropy = gmm_lib.get_entropy(stick_means, stick_infos, e_z, 
+                                  gh_loc, gh_weights)
+
+    # add entropy on shifts 
+    shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
+    
+    return entropy + shift_entropy
+
+##########################
+# prior term 
+##########################
+def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
+    return prior_info * (prior_mean * e_b - 0.5 * e_b2)
+
 def get_e_log_prior(stick_means, stick_infos, 
-                    centroids,
+                    data_info, centroids,
                     prior_params_dict,
                     gh_loc, gh_weights):
     
@@ -121,72 +152,143 @@ def get_e_log_prior(stick_means, stick_infos,
     prior_mean = prior_params_dict['prior_centroid_mean']
     prior_info = prior_params_dict['prior_centroid_info']
 
-    e_centroid_prior = sp.stats.norm.pdf(centroids, 
-                                         loc = prior_mean, 
-                                         scale = 1 / np.sqrt(prior_info)).sum()
-
-    return e_centroid_prior + dp_prior
-
+    e_centroid_prior = sp.stats.norm.logpdf(centroids, 
+                                            loc = prior_mean, 
+                                            scale = 1 / np.sqrt(prior_info)).sum()
+        
+    # prior on data info 
+    shape = prior_params_dict['prior_data_info_shape']
+    scale = prior_params_dict['prior_data_info_scale']
+    data_info_prior = sp.stats.gamma.logpdf(data_info, 
+                                            shape, 
+                                            scale = scale)
+    
+    return dp_prior + e_centroid_prior + data_info_prior
+    
+    
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(gamma, gamma_info, centroids):
-    # returns a n x k matrix whose nkth entry is
-    # the likelihood for the nth observation
-    # belonging to the kth cluster
+def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
+    # returns a N by k_approx matrix where the (n,k)th entry is the
+    # expected log likelihood of the nth observation when it belongs to
+    # component k.
+
+    num_time_points = x.shape[0]
+
+    # y is (obs x time points) = (n x t)
+    # x is (time points x basis vectors) = (t x b)
+    # centroids is (clusters x basis vectors) = (k x b)
+    x_times_beta = np.einsum('tb,kb->tk', x, centroids)
     
-    loglik_nk = \
-        -0.5 * (-2 * np.einsum('ni,kj,nij->nk', gamma, centroids, gamma_info) + \
-                    np.einsum('ki,kj,nij->nk', centroids, centroids, gamma_info))
+    # mu_nkt = beta_k^T x_t + b_nk
+
+    # \sum_t (y_nt - mu_nkt) ^ 2 =
+    #   \sum_t (y_nt^2 - 2 * y_nt * mu_nkt + mu_nkt ^ 2) =
+    #   \sum_t (linear_term +                quad_term)
+
+    # \sum_t E(y^2 - 2 * y * mu) =
+    #        E(sum(y_t^2) - 2 * sum(y) * beta_k^T x - 2 * sum(y_t) * b_nk):
+    linear_term = \
+        np.sum(y ** 2, axis=1, keepdims=True) + \
+        -2 * np.einsum('nt,tk->nk', y, x_times_beta) + \
+        -2 * np.sum(y, axis = 1, keepdims = True) * e_b
+
+    # This is E(mu^2) =
+    #         E[(beta_k^T x)^2 +
+    #           2 * b_n * beta_k^T x +
+    #           b_n^2]
+    quad_term = np.sum(x_times_beta ** 2, axis=0, keepdims=True) + \
+                2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
+                e_b2 * num_time_points
+
+    square_term = -0.5 * data_info * (linear_term + quad_term)
+
+    # We have already summed the (y - mu)^2 terms over time points,so
+    # we need to multiply the e_log_info_y by the number of points we've
+    # summed over.
+    log_info_term = \
+        0.5 * np.log(data_info) * \
+        num_time_points
     
-    return loglik_nk 
+    return  square_term + log_info_term
+
+def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict): 
+    
+    num_time_points = x.shape[0]
+
+    # y is (obs x time points) = (n x t)
+    # x is (time points x basis vectors) = (t x b)
+    # centroids is (clusters x basis vectors) = (k x b)
+    x_times_beta = np.einsum('tb,kb->tk', x, centroids)
+    
+    # ydiff is (y - xbeta), but summed over time 
+    ydiff = (np.expand_dims(y, axis = -1) - \
+             np.expand_dims(x_times_beta, axis = 0)).sum(1) * data_info
+    
+    prior_diff = prior_params_dict['prior_shift_info'] * prior_params_dict['prior_shift_mean']
+    
+    # mean and variance of optimal shift
+    e_b = (ydiff + prior_diff) / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    var_b = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    
+    # second moment
+    e_b2 = var_b + e_b**2
+    
+    return e_b, e_b2
+
 
 ##########################
 # Optimization over e_z
 ##########################
-def get_z_nat_params(gamma, gamma_info, 
+def get_z_nat_params(y, x, 
                      stick_means, stick_infos,
-                     centroids,
-                     gh_loc, gh_weights,
-                     use_bnp_prior = True):
+                     data_info, centroids, 
+                     e_b, e_b2, 
+                     gh_loc, gh_weights, 
+                     prior_params_dict):
 
     # get likelihood term
-    loglik_obs_by_nk = get_loglik_obs_by_nk(gamma, gamma_info, centroids) 
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2) 
 
-    # get weight term
-    operand = (stick_means, stick_infos, gh_loc, gh_weights)
-    e_log_cluster_probs = jax.lax.cond(use_bnp_prior,
-                    operand,
-                    lambda x : modeling_lib.get_e_log_cluster_probabilities(*x),
-                    operand,
-                    lambda x : np.zeros(len(operand[0]) + 1))
+    # get weight term    
+    e_log_cluster_probs = modeling_lib.\
+        get_e_log_cluster_probabilities(stick_means, stick_infos,
+                                        gh_loc, gh_weights)
     
-    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs
+    # prior on shifts 
+    prior_shift_mean = prior_params_dict['prior_shift_mean']
+    prior_shift_info = prior_params_dict['prior_shift_info']
+    shift_prior = get_shift_prior(e_b, e_b2, prior_shift_mean, prior_shift_info)
+    
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior
 
     return z_nat_param
 
-def get_optimal_z(gamma, gamma_info, 
+def get_optimal_z(y, x, 
                   stick_means, stick_infos,
-                  centroids,
-                  gh_loc, gh_weights,
-                  use_bnp_prior = True):
+                  data_info, centroids,
+                  e_b, e_b2, 
+                  gh_loc, gh_weights, 
+                  prior_params_dict):
 
     z_nat_param = \
-        get_z_nat_params(gamma, gamma_info, 
+        get_z_nat_params(y, x, 
                          stick_means, stick_infos,
-                         centroids,
-                         gh_loc, gh_weights,
-                         use_bnp_prior)
+                         data_info, centroids,
+                         e_b, e_b2, 
+                         gh_loc, gh_weights, 
+                         prior_params_dict)
 
     e_z = jax.nn.softmax(z_nat_param, axis = 1)
     
     return e_z, z_nat_param
 
-def get_kl(gamma, gamma_info,
+
+def get_kl(y, x,
            vb_params_dict, prior_params_dict,
            gh_loc, gh_weights,
            e_z = None,
-           use_bnp_prior = True, 
            e_log_phi = None):
 
     """
@@ -196,10 +298,9 @@ def get_kl(gamma, gamma_info,
     Parameters
     ----------
     gamma : ndarray
-        The array of regression coefficients (N, d). 
-    gamma_info : ndarray 
-        The array of information matrices of regression coefficients, 
-        shape = (N, d, d).
+        The array of observations (num_genes x n_timepoints) 
+    x : ndarray 
+        The b-spline regression matrix, shape = (n_timepoints, n_basis).
     vb_params_dict : dictionary
         Dictionary of variational parameters.
     prior_params_dict : dictionary
@@ -229,14 +330,19 @@ def get_kl(gamma, gamma_info,
     stick_means = vb_params_dict['stick_params']['stick_means']
     stick_infos = vb_params_dict['stick_params']['stick_infos']
     centroids = vb_params_dict['centroids']
+    data_info = vb_params_dict['data_info']
+    
+    # get optimal shifts
+    e_b, e_b2 = get_optimal_shifts(y, x, centroids, data_info, prior_params_dict)
     
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
-            get_optimal_z(gamma, gamma_info, 
+            get_optimal_z(y, x, 
                           stick_means, stick_infos,
-                          centroids,
-                          gh_loc, gh_weights,
-                          use_bnp_prior = use_bnp_prior)
+                          data_info, centroids,
+                          e_b, e_b2, 
+                          gh_loc, gh_weights, 
+                          prior_params_dict)
     if e_z is None:
         e_z = e_z_opt
     
@@ -244,14 +350,15 @@ def get_kl(gamma, gamma_info,
 
     # entropy term
     entropy = get_entropy(stick_means, stick_infos, e_z,
+                          e_b, e_b2, 
                           gh_loc, gh_weights)
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_means, stick_infos,
-                                  centroids,
-                                  prior_params_dict,
-                                  gh_loc, gh_weights)
-
+    e_log_prior = get_e_log_prior(stick_means, stick_infos, 
+                                    data_info, centroids,
+                                    prior_params_dict,
+                                    gh_loc, gh_weights)
+    
     elbo = e_log_prior + entropy + e_loglik
         
     if e_log_phi is not None:
