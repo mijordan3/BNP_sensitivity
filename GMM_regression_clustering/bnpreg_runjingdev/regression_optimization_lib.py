@@ -23,26 +23,6 @@ from copy import deepcopy
 
 # TODO make this function shared with 
 # The GMM init
-def init_centroids_w_kmeans(beta, k_approx, n_kmeans_init = 10): 
-    
-    
-    n_obs = np.shape(beta)[0]
-    dim = np.shape(beta)[1]
-
-    # K means init.
-    for i in range(n_kmeans_init):
-        km = KMeans(n_clusters = k_approx).fit(beta)
-        enertia = km.inertia_
-        if (i == 0):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-        elif (enertia < enertia_best):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-    
-    init_centroids = np.array(km_best.cluster_centers_)
-    
-    return init_centroids
 
 def set_params_w_kmeans(y, regressors,
                         vb_params_dict, vb_params_paragami, 
