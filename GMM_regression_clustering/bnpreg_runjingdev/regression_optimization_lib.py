@@ -22,10 +22,6 @@ from copy import deepcopy
 #####################
 # functions to initialize 
 #####################
-
-# TODO make this function shared with 
-# The GMM init
-
 def set_params_w_kmeans(y, regressors,
                         vb_params_dict, 
                         vb_params_paragami, 

@@ -78,7 +78,6 @@ gh_loc, gh_weights = np.array(gh_loc), np.array(gh_weights)
 ########################
 # Optimize
 ########################
-print(args.seed)
 vb_params_dict = set_params_w_kmeans(genome_data,
                                      regressors,
                                      vb_params_dict, 
