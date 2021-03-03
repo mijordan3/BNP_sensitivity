@@ -87,7 +87,7 @@ print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
 # set mu 
-mu_vec = np.arange(-3, 6)
+mu_vec = np.arange(-6, 7)
 mu = mu_vec[args.mu_indx]
 
 print('mu = ', mu)

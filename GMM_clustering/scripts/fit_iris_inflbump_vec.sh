@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in {0..8}
+for mu_indx in {0..11}
 do
-   sbatch --array 0-8 --export=mu_indx=$i fit_iris_inflbump.sh
+   sbatch --array 0-8 --export=mu_indx=$mu_indx fit_iris_inflbump.sh
 done
