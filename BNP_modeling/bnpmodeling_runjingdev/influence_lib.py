@@ -49,13 +49,14 @@ class InfluenceOperator(object):
 
     def get_influence(self,
                       logit_stick,
-                      grad_g = None):
+                      grad_g = None, 
+                      normalize_by_prior = True):
 
         # this is len(vb_opt) x len(logit_stick)
         grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
 
         # this is (k_approx - 1) x len(logit_stick)
-        prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick))
+        prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick, normalize_by_prior))
         
         # map each stick to appropriate vb free param
         # this is len(vb_opt) x len(logit_stick)
@@ -83,13 +84,17 @@ class InfluenceOperator(object):
 
             return influence, grad_g_hess_inv
 
-    def get_q_prior_log_ratio(self, logit_stick):
+    def get_q_prior_log_ratio(self, logit_stick, normalize_by_prior = True):
         # this is log q(logit_stick)  - log p_0(logit_stick)
         # returns a matrix of (k_approx - 1) x length(logit_stick)
-
-        log_beta_prior = get_log_logitstick_prior(logit_stick, self.alpha0)
-        log_ratio = self.get_log_qk(logit_stick, self.vb_opt) \
-                        - np.expand_dims(log_beta_prior, 0)
+        
+        if normalize_by_prior: 
+            log_beta_prior = get_log_logitstick_prior(logit_stick, self.alpha0)
+            log_beta_prior = np.expand_dims(log_beta_prior, 0)
+        else: 
+            log_beta_prior = 0.
+            
+        log_ratio = self.get_log_qk(logit_stick, self.vb_opt) - log_beta_prior
 
         return log_ratio
 
