@@ -19,6 +19,12 @@ def get_jac_hvp_fun(f):
         return jax.jvp(jax.grad(f), (x, ), (v, ))[1]
     return hvp
 
+# wrapper to compute our cross-hessian
+def get_cross_hess(f): 
+    df1 = jax.jacobian(f, 1)
+    return jax.jacobian(df1, 0)
+
+
 class HyperparameterSensitivityLinearApproximation(object):
     # sensitivity class adapted from 
     # https://github.com/rgiordan/vittles/blob/master/vittles/sensitivity_lib.py
@@ -101,8 +107,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         # this method can be called to reset the functional perturbation 
         # without re-compiling the linear system (which is expensive)
 
-        dobj_dhyper = jax.jacobian(hyper_par_objective_fun, 1)
-        self.dobj_dhyper_dinput = jax.jit(jax.jacobian(dobj_dhyper, 0))
+        self.dobj_dhyper_dinput = jax.jit(get_cross_hess(hyper_par_objective_fun))
 
         print('Compiling cross hessian...')
         t0 = time.time()
