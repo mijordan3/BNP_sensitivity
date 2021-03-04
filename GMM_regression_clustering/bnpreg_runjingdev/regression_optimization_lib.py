@@ -58,7 +58,7 @@ def set_params_w_kmeans(y, regressors,
                                                             vb_params_dict['centroids'], 
                                                             _data_info,
                                                             e_b_init, e_b2_init)
-    ez_init = jax.nn.softmax(loglik_nk)
+    ez_init = jax.nn.softmax(loglik_nk, axis = 1)
     
     # sort z's from largest to smallest
     perm = np.argsort(-ez_init.sum(0))
@@ -74,7 +74,12 @@ def set_params_w_kmeans(y, regressors,
                                                                         vb_params_dict['stick_params'],
                                                                         vb_params_paragami['stick_params'], 
                                                                         gh_loc, gh_weights)[0]
-
+    
+    # initialze at prior mean
+    vb_params_dict['data_info'] = \
+        prior_params_dict['prior_data_info_scale'] * \
+        prior_params_dict['prior_data_info_shape']
+    
 #     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
 #     vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
 #     vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)

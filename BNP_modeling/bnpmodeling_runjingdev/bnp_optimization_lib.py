@@ -169,6 +169,7 @@ def optimize_kl(get_kl_loss,
                              jac = lambda x : onp.array(get_grad(x)))    
         print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
         lbfgs_opt = out.x
+        print(out.message)
     else: 
         lbfgs_opt = x0
         
