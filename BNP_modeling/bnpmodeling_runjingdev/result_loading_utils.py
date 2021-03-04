@@ -402,7 +402,7 @@ def plot_centroids(centroids_array_refit, centroids_array_lr, axarr):
 # Wrapper to plot a perturbation
 # given a perturbation name and delta
 ################
-def plot_perturbation(perturbation, delta, alpha0): 
+def plot_perturbation(perturbation, delta, alpha0, stick_key = 'stick_params'): 
 
     # get functional perturbation objectives
     # a lot of arguments are "none" because we just 
@@ -411,11 +411,8 @@ def plot_perturbation(perturbation, delta, alpha0):
                                                  alpha0 = alpha0,
                                                  gh_loc = None, 
                                                  gh_weights = None,
-                                                 logit_v_grid = None, 
-                                                 influence_grid = None, 
                                                  delta = delta,
-                                                 # doesn't matter ... 
-                                                 stick_key = 'stick_params')
+                                                 stick_key = stick_key)
 
     f_obj = getattr(f_obj_all, 'f_obj_' + perturbation)
 
