@@ -36,8 +36,6 @@ class LogPhiPerturbations():
                  gh_loc, 
                  gh_weights,
                  delta=1.0,
-                 logit_v_grid = None, 
-                 influence_grid = None, 
                  stick_key = 'stick_params'): 
         
         ##############
@@ -107,34 +105,3 @@ class LogPhiPerturbations():
                                                      gh_weights, 
                                                      delta = delta,
                                                      stick_key = stick_key)
-        ##############
-        # Worst-case perturbation
-        ##############
-        if influence_grid is not None: 
-            worst_case_pert = \
-                influence_lib.WorstCasePerturbation(influence_fun = None, 
-                                                    logit_v_grid = logit_v_grid, 
-                                                    cached_influence_grid = influence_grid)
-            
-            # interpolate influence function w step functions
-            def influence_fun_interp(logit_v): 
-                # find index of logit_v_grid 
-                # closest (on the left) to logit_v
-                indx = np.searchsorted(worst_case_pert.logit_v_grid, logit_v)
-
-                # return the influence function at those points
-                return worst_case_pert.influence_grid[indx]
-
-            # define log phi
-            def log_phi(logit_v):
-                return np.sign(influence_fun_interp(logit_v))
-
-        
-            self.f_obj_worst_case = \
-                func_sens_lib.FunctionalPerturbationObjective(log_phi, 
-                                                         vb_params_paragami, 
-                                                         gh_loc, 
-                                                         gh_weights, 
-                                                         e_log_phi = worst_case_pert.get_e_log_linf_perturbation, 
-                                                         delta = delta,
-                                                         stick_key = stick_key)

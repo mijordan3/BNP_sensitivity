@@ -195,6 +195,7 @@ class WorstCasePerturbation(object):
         self.sign_diffs = self._sign_diffs[self.change_bool]
 
     def get_e_log_linf_perturbation(self, means, infos):
+        # the expectation of the worst case perturbation
         
         # in structure, means are 2d. 
         # flatten them (shouldn't matter for iris)
@@ -212,3 +213,22 @@ class WorstCasePerturbation(object):
         # extra term doenst matter, just for unittesting
         # so constants match
         return  (e_log_pert + self.signs[-1] * len(means)) * self.delta
+    
+    def influence_fun_interp(self, logit_v): 
+        # interpolated influence function. 
+        # for plotting only!
+        
+        # find index of logit_v_grid 
+        # closest (on the left) to logit_v
+        indx = np.searchsorted(self.logit_v_grid, logit_v)
+
+        # return the influence function at those points
+        return self.influence_grid[indx]
+    
+    def log_phi(self, logit_v):
+        # the worst case perturbation. 
+        # for plotting only!
+        
+        return np.sign(self.influence_fun_interp(logit_v))
+
+
