@@ -24,8 +24,8 @@ python get_lr_derivative.py \
   --fit_file ${out_filename}_alpha${alpha}.npz \
 
 #################
-# Refits
-#################
+# Refits for functional perturbations
+################# 
 
 # sigmoidal perturbations
 sbatch \
@@ -65,3 +65,8 @@ sbatch \
     --array 0-18 \
     --export=alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename,perturbation='gauss_pert2',delta=-2 \
     fit_iris_perturbed.sh
+
+#################
+# Refits for step function perturbations
+################# 
+./fit_iris_inflbump_vec.sh
