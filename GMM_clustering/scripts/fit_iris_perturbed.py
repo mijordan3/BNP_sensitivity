@@ -94,8 +94,6 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                             dp_prior_alpha,
                                             gh_loc, 
                                             gh_weights,
-                                            logit_v_grid = None, 
-                                            influence_grid = None,
                                             delta = args.delta, 
                                             stick_key = 'stick_params')
 
