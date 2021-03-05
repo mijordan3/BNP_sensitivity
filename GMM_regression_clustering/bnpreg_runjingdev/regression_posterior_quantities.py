@@ -50,8 +50,12 @@ def get_e_num_clusters_from_vb_dict(y, x,
                                                 prior_params_dict,
                                                 gh_loc,
                                                 gh_weights)[0]
-
-    return cluster_lib.get_e_num_clusters_from_ez(e_z,
-                                                  threshold = threshold,
-                                                  n_samples = n_samples,
-                                                  prng_key = prng_key)
+    
+    if threshold == 0: 
+        # if threshold is zero, we can return the analytic expectation
+        return cluster_lib.get_e_num_clusters_from_ez_analytic(e_z)
+    else: 
+        return cluster_lib.get_e_num_clusters_from_ez(e_z,
+                                                      threshold = threshold,
+                                                      n_samples = n_samples,
+                                                      prng_key = prng_key)

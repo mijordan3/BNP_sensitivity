@@ -27,7 +27,7 @@ python get_lr_derivative.py \
 # Refits
 #################
 
-# # sigmoidal perturbations
+# sigmoidal perturbations
 sbatch \
     --array 0-18 \
     --export=alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename,perturbation='sigmoidal',delta=5 \

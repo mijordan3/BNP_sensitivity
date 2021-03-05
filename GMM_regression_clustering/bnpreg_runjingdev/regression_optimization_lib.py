@@ -28,7 +28,9 @@ def set_params_w_kmeans(y, regressors,
                         prior_params_dict,
                         gh_loc, gh_weights, 
                         seed = 4353): 
-        
+    
+    onp.random.seed(seed)
+    
     # run initial regressions
     print('running initial regressions ...')
     beta, _, y_infos = \

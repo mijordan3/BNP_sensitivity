@@ -169,7 +169,7 @@ def optimize_kl(get_kl_loss,
                              jac = lambda x : onp.array(get_grad(x)))    
         print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
         lbfgs_opt = out.x
-        print(out.message)
+        print('BFGS out: ', out.message)
     else: 
         lbfgs_opt = x0
         
@@ -188,7 +188,7 @@ def optimize_kl(get_kl_loss,
 
     vb_opt = out.x
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
-    print(out.message)
+    print('Newton out: ', out.message)
     
     print('done. ')
     
