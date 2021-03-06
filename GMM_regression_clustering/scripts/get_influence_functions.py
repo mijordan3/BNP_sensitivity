@@ -12,9 +12,10 @@ from bnpreg_runjingdev import regression_posterior_quantities as reg_posterior_q
 
 # bnp libraries
 from bnpmodeling_runjingdev import influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
 from bnpmodeling_runjingdev.sensitivity_lib import \
-        HyperparameterSensitivityLinearApproximation
+        HyperparameterSensitivityLinearApproximation, get_cross_hess
 
 import paragami
 
@@ -211,6 +212,25 @@ def get_influence(g):
 
     return influence_grid, influence_grid_x_prior, grad_g_hess_inv
 
+# function to get worst-case cross-hessian
+def get_worst_cross_hess(influence_grid): 
+    worst_case = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                 logit_v_grid = logit_v_grid, 
+                                                 delta = 1.0,
+                                                 cached_influence_grid = influence_grid)
+    
+    f_obj = func_sens_lib.FunctionalPerturbationObjective(worst_case.log_phi, 
+                                                      vb_params_paragami, 
+                                                      e_log_phi = lambda x,y : worst_case.get_e_log_linf_perturbation(x,y), 
+                                                      gh_loc = gh_loc, 
+                                                      gh_weights = gh_weights, 
+                                                      stick_key = 'stick_params')
+    
+    cross_hess = get_cross_hess(f_obj.hyper_par_objective_fun)(vb_opt, 0.)
+    
+    return cross_hess
+
+
 ###############
 # compute influence function and save
 ###############
@@ -218,6 +238,7 @@ def get_influence(g):
 vars_to_save = dict()
 
 def get_influence_and_save(g, g_name): 
+    print('##################')
     
     influence_grid, influence_grid_x_prior, grad_g_hess_inv = \
         get_influence(g)
@@ -225,6 +246,9 @@ def get_influence_and_save(g, g_name):
     vars_to_save[g_name + '_infl'] = influence_grid
     vars_to_save[g_name + '_infl_x_prior'] = influence_grid_x_prior
     vars_to_save[g_name + '_ghess'] = grad_g_hess_inv
+    
+    print('computing cross-hessian ...')
+    vars_to_save[g_name + '_wc_cross_hess'] = get_worst_cross_hess(influence_grid)
     
     print('saving into: ', outfile)
     np.savez(outfile,

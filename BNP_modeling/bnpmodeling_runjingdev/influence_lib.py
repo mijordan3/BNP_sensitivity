@@ -172,6 +172,10 @@ class WorstCasePerturbation(object):
             assert len(cached_influence_grid) == len(logit_v_grid)
             self.influence_grid = cached_influence_grid
             
+            # make sure this is a jax array: 
+            # some indexing error if its onp array?
+            self.influence_grid = np.array(cached_influence_grid)
+            
         self.len_grid = len(self.influence_grid)
         
         self.delta = delta

@@ -69,12 +69,16 @@ out_filename='mice_genomics_fit'
 #################
 # compute influence functions
 #################
-# python get_influence_functions.py \
-#   --out_folder ${out_folder} \
-#   --fit_file ${out_filename}_alpha${alpha}.npz \
+python get_influence_functions.py \
+  --out_folder ${out_folder} \
+  --fit_file ${out_filename}_alpha${alpha}.npz \
 
 # refit at step functions
-for mu_indx in {0..12}
-do
-   sbatch --array 0-8 --export=mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename fit_gmmreg_inflbump.sh
-done
+# for mu_indx in {0..12}
+# do
+#    sbatch --array 0-8 --export=mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename fit_gmmreg_inflbump.sh
+# done
+
+# refit for worst-case
+# sbatch --array 0-8 --export=g_name='num_clust',out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha fit_gmmreg_worst_case.sh
+# sbatch --array 0-8 --export=g_name='num_clust_pred',out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha fit_gmmreg_worst_case.sh

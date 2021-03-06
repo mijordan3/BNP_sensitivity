@@ -13,6 +13,10 @@ import distutils.util
 
 import paragami
 
+# functional sensitivity library
+from bnpmodeling_runjingdev import influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
+
 # BNP gmm libraries
 # BNP regression mixture libraries
 from bnpreg_runjingdev import genomics_data_utils
@@ -37,16 +41,24 @@ parser.add_argument('--out_filename', type=str)
 # the initial fit
 parser.add_argument('--init_fit', type=str)
 
+# file with influence function
+parser.add_argument('--influence_file', type=str)
+
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
-# which mu (index of bump location)
-parser.add_argument('--mu_indx', type=int, default = 0)
+# delta 
+parser.add_argument('--delta', type=float, default = 1.0)
+
+# which perturbation
+# get worst case for which perturbation
+parser.add_argument('--g_name', type=str, default = 'number of clsuters')
 
 args = parser.parse_args()
 
 assert os.path.exists(args.out_folder), args.out_folder
 assert os.path.isfile(args.init_fit), args.init_fit
+assert os.path.isfile(args.influence_file), args.influence_file
 
 ########################
 # load mice regression data
@@ -62,10 +74,11 @@ n_timepoints = len(np.unique(timepoints))
 ########################
 # Variational parameters
 ########################
-print("initial fit: ")
+print('loading init fit from: ')
 print(args.init_fit)
 vb_init_dict, vb_params_paragami, meta_data = \
         paragami.load_folded(args.init_fit)
+vb_init_free = vb_params_paragami.flatten(vb_init_dict, free = True)
 
 # gauss-hermite parameters
 gh_deg = int(meta_data['gh_deg'])
@@ -85,6 +98,30 @@ dp_prior_alpha = meta_data['dp_prior_alpha']
 prior_params_dict['dp_prior_alpha'] = dp_prior_alpha
 
 ########################
+# load influence function  
+########################
+print("loading influence file from: ")
+print(args.influence_file)
+influence_results = np.load(args.influence_file)
+
+# check that things in the influence file match things in my fit file
+assert np.all(influence_results['vb_opt'] == vb_init_free)
+assert np.all(influence_results['kl'] == meta_data['final_kl'])
+
+# the influence function for the posterior statistic "g_name"
+influence_grid = influence_results[args.g_name + '_infl']
+logit_v_grid = influence_results['logit_v_grid']
+
+########################
+# define worst-case perturbation
+########################
+worst_case = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                 logit_v_grid = logit_v_grid, 
+                                                 delta = args.delta,
+                                                 cached_influence_grid = influence_grid)
+
+
+########################
 # Functional perturbation 
 ########################
 # set epsilon
@@ -93,27 +130,12 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-# set mu 
-mu_vec = np.arange(-10, 4)
-mu = mu_vec[args.mu_indx]
-
-print('mu = ', mu)
-print('mu_indx = ', args.mu_indx)
-
-assert args.epsilon_indx < len(epsilon_vec)
-assert args.mu_indx < (len(mu_vec) - 1)
-
-def e_step_bump(means, infos, mu_indx): 
-    cdf1 = sp.stats.norm.cdf(mu_vec[mu_indx+1], loc = means, scale = 1 / np.sqrt(infos))
-    cdf2 = sp.stats.norm.cdf(mu_vec[mu_indx], loc = means, scale = 1 / np.sqrt(infos))
-    
-    return (cdf1 - cdf2).sum()
-
-e_log_phi = lambda means, infos : e_step_bump(means, infos, args.mu_indx) * epsilon
+e_log_phi = lambda means, infos : worst_case.get_e_log_linf_perturbation(means, infos) * epsilon
 
 ########################
 # Optimize
 ########################
+
 vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
     optimize_regression_mixture(genome_data,
                                 regressors, 
@@ -132,7 +154,7 @@ final_kl = out.fun
 # Save results
 #####################
 outfile = os.path.join(args.out_folder, args.out_filename)
-print('saving mice fit to ', outfile)
+print('saving iris fit to ', outfile)
 
 paragami.save_folded(outfile, 
                      vb_opt_dict,
@@ -142,4 +164,7 @@ paragami.save_folded(outfile,
                      gh_deg = gh_deg, 
                      dp_prior_alpha = dp_prior_alpha, 
                      epsilon = epsilon, 
-                     mu = mu)
+                     delta = args.delta, 
+                     g_name = args.g_name)
+
+                     
