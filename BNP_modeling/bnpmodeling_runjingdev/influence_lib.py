@@ -187,7 +187,7 @@ class WorstCasePerturbation(object):
 
         # the points at which the influence changes sign
         self.change_bool = self._sign_diffs != 0
-        self.change_points = self.logit_v_grid[self.change_bool]
+        self.change_points = self.logit_v_grid[0:(self.len_grid - 1)][self.change_bool]
 
         # the signs
         self.signs = s_influence2[self.change_bool]
