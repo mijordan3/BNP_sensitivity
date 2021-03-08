@@ -121,7 +121,7 @@ print(vb_params_paragami)
 ######################
 # optimize with preconditioner 
 vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
-    s_optim_lib.run_preconditioned_lbfgs(g_obs, 
+    s_optim_lib.optimize_structure(g_obs, 
                         vb_params_dict, 
                         vb_params_paragami,
                         prior_params_dict,

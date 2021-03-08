@@ -16,6 +16,7 @@ from structure_vb_lib.cavi_lib import run_cavi
 from structure_vb_lib.preconditioner_lib import get_mfvb_cov_matmul
 
 import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev.bnp_optimization_lib import convert_beta_sticks_to_logitnormal, optimize_kl
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 
@@ -482,16 +483,16 @@ class StructurePrecondObjective(StructureObjective):
         print('done. Elasped: {0:3g}'.format(time.time() - t0))
         
         
-def run_preconditioned_lbfgs(g_obs, 
-                            vb_params_dict, 
-                            vb_params_paragami,
-                            prior_params_dict,
-                            gh_loc, gh_weights, 
-                            e_log_phi = None, 
-                            precondition_every = 10, 
-                            maxiter = 2000, 
-                            x_tol = 1e-2, 
-                            f_tol = 1e-8): 
+def optimize_structure(g_obs, 
+                       vb_params_dict, 
+                       vb_params_paragami,
+                       prior_params_dict,
+                       gh_loc, gh_weights, 
+                       e_log_phi = None, 
+                       precondition_every = 10, 
+                       maxiter = 2000, 
+                       x_tol = 1e-2, 
+                       f_tol = 1e-8): 
     """
     Parameters
     ----------
@@ -516,14 +517,14 @@ def run_preconditioned_lbfgs(g_obs,
     """
 
     # preconditioned objective 
+    print('RUNNING NEWTON')
     precon_objective = StructurePrecondObjective(g_obs, 
                                 vb_params_paragami,
                                 prior_params_dict,
                                 gh_loc = gh_loc, 
                                 gh_weights = gh_weights,                       
                                 e_log_phi = e_log_phi, 
-                                # we don't need hessian-vector-products
-                                compile_hvp = False)
+                                compile_hvp = True)
     
     t0 = time.time()
     
@@ -544,7 +545,8 @@ def run_preconditioned_lbfgs(g_obs,
         out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
                         x0 = onp.array(x0_c),
                         jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
-                        method='L-BFGS-B', 
+                        hessp = lambda x, v: onp.array(precon_objective.hvp_precond(x, vb_params_free, v)),
+                        method='trust-ncg', 
                         options = {'maxiter': precondition_every})
         
         iters += out.nit

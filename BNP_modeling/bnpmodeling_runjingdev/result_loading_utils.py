@@ -34,13 +34,17 @@ def load_refit_files(out_folder, match_crit):
     
     for i in range(len(refit_files)): 
         
-        vb_params_dict, vb_params_paragami, meta_data = \
-            paragami.load_folded(out_folder + refit_files[i])
+        try: 
+            vb_params_dict, vb_params_paragami, meta_data = \
+                paragami.load_folded(out_folder + refit_files[i])
 
-        vb_refit_list.append(vb_params_paragami.flatten(vb_params_dict, free = True))
+            vb_refit_list.append(vb_params_paragami.flatten(vb_params_dict, free = True))
 
-        meta_data_list.append(meta_data)
-    
+            meta_data_list.append(meta_data)
+        
+        except: 
+            print('unable to load file: ', refit_files[i])
+            
     return onp.array(vb_refit_list), meta_data_list
 
 

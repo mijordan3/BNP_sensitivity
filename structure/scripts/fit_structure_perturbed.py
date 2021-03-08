@@ -45,9 +45,6 @@ parser.add_argument('--delta', type=float, default = 1.0)
 # which perturbation
 parser.add_argument('--perturbation', type=str, default = 'worst_case')
 
-# file where the influence file is stored
-parser.add_argument('--influence_file', type=str)
-
 args = parser.parse_args()
 
 def validate_args():
@@ -88,29 +85,10 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-print('refitting with perturbation = ', args.perturbation)
-if args.perturbation == 'worst_case': 
-    # worst case perturbation
-    print('Loading influence function from ', args.influence_file)
-
-    # load influence function
-    lr_data = np.load(args.influence_file)
-    
-    # check KL's match
-    assert np.abs(fit_meta_data['final_kl'] - lr_data['kl']) < 1e-8
-    
-    logit_v_grid = np.array(lr_data['logit_v_grid'])
-    influence_grid = np.array(lr_data['influence_grid'])
-else: 
-    logit_v_grid = None
-    influence_grid = None
-
 f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
                                                  prior_params_dict['dp_prior_alpha'],
                                                  gh_loc, 
                                                  gh_weights,
-                                                 logit_v_grid = logit_v_grid, 
-                                                 influence_grid = influence_grid,
                                                  delta = args.delta, 
                                                  stick_key = 'ind_admix_params')
 
@@ -132,7 +110,7 @@ e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 t0 = time.time() 
 # optimize with preconditioner 
 vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
-    s_optim_lib.run_preconditioned_lbfgs(g_obs, 
+    s_optim_lib.optimize_structure(g_obs, 
                         vb_params_dict, 
                         vb_params_paragami,
                         prior_params_dict,

@@ -19,5 +19,4 @@ python fit_structure_perturbed.py \
   --out_folder ${out_folder} \
   --out_filename ${out_filename}_${perturbation}_delta${delta}_eps${epsilon_indx} \
   --init_fit ${out_folder}${out_filename}_alpha6.0.npz \
-  --influence_file ${out_folder}${out_filename}_alpha6.0_lrderivatives.npz \
   --delta ${delta}

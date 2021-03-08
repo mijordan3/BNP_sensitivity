@@ -147,7 +147,7 @@ def save_derivatives(vars_to_save):
     print('saving into: ', outfile)
     np.savez(outfile,
              vb_opt = vb_opt,
-             alpha0 = alpha0,
+             dp_prior_alpha = alpha0,
              kl= kl,
              cg_tol = vb_sens.cg_tol,
              cg_maxiter = vb_sens.cg_maxiter,
