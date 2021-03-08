@@ -14,7 +14,8 @@ import distutils.util
 import paragami
 
 # functional sensitivity library
-from bnpmodeling_runjingdev import log_phi_lib
+from bnpmodeling_runjingdev import influence_lib
+import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
 
 # BNP gmm libraries
 # BNP regression mixture libraries
@@ -40,6 +41,9 @@ parser.add_argument('--out_filename', type=str)
 # the initial fit
 parser.add_argument('--init_fit', type=str)
 
+# file with influence function
+parser.add_argument('--influence_file', type=str)
+
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
@@ -47,12 +51,14 @@ parser.add_argument('--epsilon_indx', type=int, default = 0)
 parser.add_argument('--delta', type=float, default = 1.0)
 
 # which perturbation
-parser.add_argument('--perturbation', type=str, default = 'sigmoidal')
+# get worst case for which perturbation
+parser.add_argument('--g_name', type=str, default = 'number of clsuters')
 
 args = parser.parse_args()
 
 assert os.path.exists(args.out_folder), args.out_folder
 assert os.path.isfile(args.init_fit), args.init_fit
+assert os.path.isfile(args.influence_file), args.influence_file
 
 ########################
 # load mice regression data
@@ -68,8 +74,11 @@ n_timepoints = len(np.unique(timepoints))
 ########################
 # Variational parameters
 ########################
+print('loading init fit from: ')
+print(args.init_fit)
 vb_init_dict, vb_params_paragami, meta_data = \
         paragami.load_folded(args.init_fit)
+vb_init_free = vb_params_paragami.flatten(vb_init_dict, free = True)
 
 # gauss-hermite parameters
 gh_deg = int(meta_data['gh_deg'])
@@ -89,24 +98,39 @@ dp_prior_alpha = meta_data['dp_prior_alpha']
 prior_params_dict['dp_prior_alpha'] = dp_prior_alpha
 
 ########################
+# load influence function  
+########################
+print("loading influence file from: ")
+print(args.influence_file)
+influence_results = np.load(args.influence_file)
+
+# check that things in the influence file match things in my fit file
+assert np.all(influence_results['vb_opt'] == vb_init_free)
+assert np.all(influence_results['kl'] == meta_data['final_kl'])
+
+# the influence function for the posterior statistic "g_name"
+influence_grid = influence_results[args.g_name + '_infl']
+logit_v_grid = influence_results['logit_v_grid']
+
+########################
+# define worst-case perturbation
+########################
+worst_case = influence_lib.WorstCasePerturbation(influence_fun = None, 
+                                                 logit_v_grid = logit_v_grid, 
+                                                 delta = args.delta,
+                                                 cached_influence_grid = influence_grid)
+
+
+########################
 # Functional perturbation 
 ########################
 # set epsilon
-epsilon_vec = np.linspace(0, 1, 20)[1:]**2 
+epsilon_vec = np.linspace(0, 1, 8)[1:]**2 
 epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-# define perturbation
-f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
-                                            dp_prior_alpha,
-                                            gh_loc, 
-                                            gh_weights,
-                                            delta = args.delta, 
-                                            stick_key = 'stick_params')
-
-f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
-e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
+e_log_phi = lambda means, infos : worst_case.get_e_log_linf_perturbation(means, infos) * epsilon
 
 ########################
 # Optimize
@@ -141,6 +165,6 @@ paragami.save_folded(outfile,
                      dp_prior_alpha = dp_prior_alpha, 
                      epsilon = epsilon, 
                      delta = args.delta, 
-                     perturbation = args.perturbation)
+                     g_name = args.g_name)
 
                      

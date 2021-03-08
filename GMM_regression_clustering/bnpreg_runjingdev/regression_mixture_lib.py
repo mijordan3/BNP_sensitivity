@@ -96,11 +96,11 @@ def get_default_prior_params():
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
     # gamma prior on data info
-    prior_params_dict['prior_data_info_shape'] = np.array([10.])
+    prior_params_dict['prior_data_info_shape'] = np.array([1.])
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_scale'] = np.array([0.1])
+    prior_params_dict['prior_data_info_scale'] = np.array([0.0001])
     prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
@@ -162,7 +162,7 @@ def get_e_log_prior(stick_means, stick_infos,
     data_info_prior = sp.stats.gamma.logpdf(data_info, 
                                             shape, 
                                             scale = scale)
-    
+
     return dp_prior + e_centroid_prior + data_info_prior
     
     
@@ -229,7 +229,7 @@ def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict):
     prior_diff = prior_params_dict['prior_shift_info'] * prior_params_dict['prior_shift_mean']
     
     # mean and variance of optimal shift
-    e_b = (ydiff + prior_diff) / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    e_b = (ydiff + prior_diff) / (num_time_points * data_info + prior_params_dict['prior_shift_info'])
     var_b = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
     
     # second moment

@@ -13,9 +13,6 @@ import distutils.util
 
 import paragami
 
-# functional sensitivity library
-from bnpmodeling_runjingdev import log_phi_lib
-
 # BNP gmm libraries
 # BNP regression mixture libraries
 from bnpreg_runjingdev import genomics_data_utils
@@ -43,11 +40,8 @@ parser.add_argument('--init_fit', type=str)
 # which epsilon 
 parser.add_argument('--epsilon_indx', type=int, default = 0)
 
-# delta 
-parser.add_argument('--delta', type=float, default = 1.0)
-
-# which perturbation
-parser.add_argument('--perturbation', type=str, default = 'sigmoidal')
+# which mu (index of bump location)
+parser.add_argument('--mu_indx', type=int, default = 0)
 
 args = parser.parse_args()
 
@@ -68,6 +62,8 @@ n_timepoints = len(np.unique(timepoints))
 ########################
 # Variational parameters
 ########################
+print("initial fit: ")
+print(args.init_fit)
 vb_init_dict, vb_params_paragami, meta_data = \
         paragami.load_folded(args.init_fit)
 
@@ -92,26 +88,32 @@ prior_params_dict['dp_prior_alpha'] = dp_prior_alpha
 # Functional perturbation 
 ########################
 # set epsilon
-epsilon_vec = np.linspace(0, 1, 20)[1:]**2 
+epsilon_vec = np.linspace(0, 1, 8)[1:]**2 
 epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
-# define perturbation
-f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
-                                            dp_prior_alpha,
-                                            gh_loc, 
-                                            gh_weights,
-                                            delta = args.delta, 
-                                            stick_key = 'stick_params')
+# set mu 
+mu_vec = np.arange(-10, 4)
+mu = mu_vec[args.mu_indx]
 
-f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
-e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
+print('mu = ', mu)
+print('mu_indx = ', args.mu_indx)
+
+assert args.epsilon_indx < len(epsilon_vec)
+assert args.mu_indx < (len(mu_vec) - 1)
+
+def e_step_bump(means, infos, mu_indx): 
+    cdf1 = sp.stats.norm.cdf(mu_vec[mu_indx+1], loc = means, scale = 1 / np.sqrt(infos))
+    cdf2 = sp.stats.norm.cdf(mu_vec[mu_indx], loc = means, scale = 1 / np.sqrt(infos))
+    
+    return (cdf1 - cdf2).sum()
+
+e_log_phi = lambda means, infos : e_step_bump(means, infos, args.mu_indx) * epsilon
 
 ########################
 # Optimize
 ########################
-
 vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
     optimize_regression_mixture(genome_data,
                                 regressors, 
@@ -130,7 +132,7 @@ final_kl = out.fun
 # Save results
 #####################
 outfile = os.path.join(args.out_folder, args.out_filename)
-print('saving iris fit to ', outfile)
+print('saving mice fit to ', outfile)
 
 paragami.save_folded(outfile, 
                      vb_opt_dict,
@@ -140,7 +142,4 @@ paragami.save_folded(outfile,
                      gh_deg = gh_deg, 
                      dp_prior_alpha = dp_prior_alpha, 
                      epsilon = epsilon, 
-                     delta = args.delta, 
-                     perturbation = args.perturbation)
-
-                     
+                     mu = mu)

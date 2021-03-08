@@ -172,6 +172,10 @@ class WorstCasePerturbation(object):
             assert len(cached_influence_grid) == len(logit_v_grid)
             self.influence_grid = cached_influence_grid
             
+            # make sure this is a jax array: 
+            # some indexing error if its onp array?
+            self.influence_grid = np.array(cached_influence_grid)
+            
         self.len_grid = len(self.influence_grid)
         
         self.delta = delta
@@ -187,7 +191,7 @@ class WorstCasePerturbation(object):
 
         # the points at which the influence changes sign
         self.change_bool = self._sign_diffs != 0
-        self.change_points = self.logit_v_grid[self.change_bool]
+        self.change_points = self.logit_v_grid[0:(self.len_grid - 1)][self.change_bool]
 
         # the signs
         self.signs = s_influence2[self.change_bool]
