@@ -489,6 +489,7 @@ def optimize_structure(g_obs,
                        prior_params_dict,
                        gh_loc, gh_weights, 
                        e_log_phi = None, 
+                       use_newton = False,
                        precondition_every = 10, 
                        maxiter = 2000, 
                        x_tol = 1e-2, 
@@ -517,14 +518,15 @@ def optimize_structure(g_obs,
     """
 
     # preconditioned objective 
-    print('RUNNING NEWTON')
     precon_objective = StructurePrecondObjective(g_obs, 
                                 vb_params_paragami,
                                 prior_params_dict,
                                 gh_loc = gh_loc, 
                                 gh_weights = gh_weights,                       
                                 e_log_phi = e_log_phi, 
-                                compile_hvp = True)
+                                # only compile the HVP if we are 
+                                # are using newton
+                                compile_hvp = use_newton)
     
     t0 = time.time()
     
@@ -534,6 +536,16 @@ def optimize_structure(g_obs,
     # precondition and run
     iters = 0
     old_kl = 1e16
+    
+    if use_newton: 
+        method = 'trust-ncg'
+        hessp = lambda x, v: onp.array(precon_objective.hvp_precond(x, vb_params_free, v))
+    else: 
+        method = 'L-BFGS-B'
+        hessp = None
+    
+    print('running ', method)
+    
     while (iters < maxiter): 
         t1 = time.time() 
         
@@ -545,8 +557,8 @@ def optimize_structure(g_obs,
         out = optimize.minimize(lambda x : onp.array(precon_objective.f_precond(x, vb_params_free)),
                         x0 = onp.array(x0_c),
                         jac = lambda x : onp.array(precon_objective.grad_precond(x, vb_params_free)),
-                        hessp = lambda x, v: onp.array(precon_objective.hvp_precond(x, vb_params_free, v)),
-                        method='trust-ncg', 
+                        hessp = hessp,
+                        method=method, 
                         options = {'maxiter': precondition_every})
         
         iters += out.nit
@@ -558,11 +570,7 @@ def optimize_structure(g_obs,
         # transform to original parameterization
         vb_params_free = precon_objective.unprecondition(out.x, vb_params_free)
         
-        print(out.message)
-        # check convergence
-#         if out.success: 
-#             print('lbfgs converged successfully')
-#             break
+        print('   ', out.message)
 
         x_tol_success = np.abs(vb_params_free - x0).max() < x_tol
         if x_tol_success:

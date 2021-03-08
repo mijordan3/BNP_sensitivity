@@ -43,7 +43,7 @@ parser.add_argument('--epsilon_indx', type=int, default = 0)
 parser.add_argument('--delta', type=float, default = 1.0)
 
 # which perturbation
-parser.add_argument('--perturbation', type=str, default = 'worst_case')
+parser.add_argument('--perturbation', type=str, default = 'sigmoidal')
 
 args = parser.parse_args()
 
@@ -51,10 +51,6 @@ def validate_args():
     assert os.path.exists(args.out_folder), args.out_folder
     assert os.path.isfile(args.init_fit), args.init_fit
     assert os.path.isfile(args.data_file), args.data_file
-    
-    if args.perturbation == 'worst-case': 
-        # check influence file exists
-        os.path.exists(args.influence_file), args.out_folder
 
 validate_args()
 
@@ -80,7 +76,9 @@ vb_params_dict, vb_params_paragami, \
 # Define perturbation
 ##################
 # set epsilon 
-epsilon_vec = np.linspace(0, 1, 20)[1:]**2 
+epsilon_vec = np.linspace(0, 1, 10)[1:]**2 
+assert args.epsilon_indx < len(epsilon_vec)
+
 epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
@@ -115,7 +113,8 @@ vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
                         vb_params_paragami,
                         prior_params_dict,
                         gh_loc, gh_weights, 
-                        e_log_phi = e_log_phi)
+                        e_log_phi = e_log_phi, 
+                        use_newton = False)
 
 ######################
 # save optimization results
