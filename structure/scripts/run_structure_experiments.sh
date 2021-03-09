@@ -15,26 +15,26 @@ alpha=6.0
 
 data_file=../data/huang2011_sub_nobs25_nloci75.npz
 out_filename=huang2011_fit_sub
-out_folder=../fits/tmp/
+out_folder=../fits/hgdp_sub_fits_newton/
 
 ############################
 # get initial fit
 ############################
-# ./fit_structure.sh $data_file $alpha $out_folder $out_filename  
+./fit_structure.sh $data_file $alpha $out_folder $out_filename  
 
 ############################
 # get linear response derivatives
 ############################
-# ./get_lr_derivative.sh $data_file $alpha $out_folder $out_filename  
+./get_lr_derivative.sh $data_file $alpha $out_folder $out_filename  
 
 ############################
 # get parametric sensitivity refits
 ############################
-# sbatch \
-#     --array 0-20 \
-#     --export=data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename\
-#     -p high \
-#     fit_structure_on_alpha.sh
+sbatch \
+    --array 0-20 \
+    --export=data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename\
+    -p high \
+    fit_structure_on_alpha.sh
     
 ############################
 # get functional sensitivity refits

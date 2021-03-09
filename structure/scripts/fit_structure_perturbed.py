@@ -114,7 +114,7 @@ vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
                         prior_params_dict,
                         gh_loc, gh_weights, 
                         e_log_phi = e_log_phi, 
-                        use_newton = False)
+                        use_newton = True)
 
 ######################
 # save optimization results
