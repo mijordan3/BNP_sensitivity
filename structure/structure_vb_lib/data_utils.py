@@ -174,6 +174,14 @@ def load_thrush_data(data_filename = '../data/thrush_data/thrush-data.str'):
     assert np.all(labels[:, 0] == labels[:, 1])
     labels = labels[:, 0]
     
+    # change population (1, 2, 3, 4) 
+    # to their actual names 
+    labels = labels.astype('str')
+    labels[labels == '1.0'] = 'Chawia'
+    labels[labels == '2.0'] = 'Mbololo'
+    labels[labels == '3.0'] = 'Ngangao'
+    labels[labels == '4.0'] = 'Yale'
+    
     # the genotypes
     genotypes = data_raw2d[:, 2:, :]
     n_loci = genotypes.shape[1]

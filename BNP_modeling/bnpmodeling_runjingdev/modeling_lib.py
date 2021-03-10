@@ -206,6 +206,15 @@ def get_e_log_beta(tau):
     return digamma_alpha - digamma_alpha_beta, digamma_beta - digamma_alpha_beta
 
 
+def get_e_dirichlet(tau):
+    # tau should have shape (..., k). The last dimensions are the 
+    # dirichlet parameters
+    
+    digamma_sum = sp.special.digamma(np.sum(tau, axis = -1, keepdims=True))
+
+    return tau - np.sum(tau, axis = -1, keepdims=True)
+
+
 def get_e_log_dirichlet(tau):
     # tau should have shape (..., k). The last dimensions are the 
     # dirichlet parameters
