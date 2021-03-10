@@ -180,8 +180,8 @@ def get_optimal_z(g_obs, e_log_pop_freq, e_log_cluster_probs):
 def get_kl(g_obs, 
            vb_params_dict, 
            prior_params_dict,
-           gh_loc = None, 
-           gh_weights = None,
+           gh_loc, 
+           gh_weights,
            e_log_phi = None,
            e_z = None):
 

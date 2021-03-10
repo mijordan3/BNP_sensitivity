@@ -130,7 +130,8 @@ def get_e_num_loci_per_cluster(g_obs, vb_params_dict, gh_loc, gh_weights):
     # expected number of clusters within the observed loci
     
     e_z = get_optimal_z_from_vb_dict(g_obs, vb_params_dict, gh_loc, gh_weights)
-                                  
+            
+    k_approx = e_z.shape[-1]
     return e_z.reshape(-1, k_approx).sum(0)
 
 def get_e_num_ind_per_cluster(vb_params_dict, gh_loc, gh_weights): 
