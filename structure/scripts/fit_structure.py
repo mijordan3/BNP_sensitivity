@@ -121,11 +121,12 @@ print(vb_params_paragami)
 ######################
 # optimize with preconditioner 
 vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
-    s_optim_lib.run_preconditioned_lbfgs(g_obs, 
-                        vb_params_dict, 
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc, gh_weights)
+    s_optim_lib.optimize_structure(g_obs, 
+                                   vb_params_dict, 
+                                   vb_params_paragami,
+                                   prior_params_dict,
+                                   gh_loc, gh_weights,  
+                                   use_newton = False)
 
 ######################
 # save optimizaiton results
@@ -137,10 +138,7 @@ optim_time = cavi_init_time + lbfgs_time
 print('Optim time (ignoring compilation time) {:.3f}secs'.format(optim_time))
 
 # save final KL
-final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
-                            prior_params_dict,
-                            gh_loc = gh_loc,
-                            gh_weights = gh_weights)
+final_kl = out.fun
 
 # save paragami object
 structure_model_lib.save_structure_fit(outfile, 

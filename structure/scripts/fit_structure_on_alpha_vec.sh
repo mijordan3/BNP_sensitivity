@@ -1,1 +1,0 @@
-sbatch --array 0-20 fit_structure_on_alpha.sh
