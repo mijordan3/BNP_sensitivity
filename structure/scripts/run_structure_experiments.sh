@@ -9,9 +9,9 @@ alpha=6.0
 # file paths and file names 
 ############################
 
-data_file=../data/phased_HGDP+India+Africa_2810SNPs-regions1to36.npz 
-out_filename=huang2011_fit
-out_folder=../fits/hgdp_fits_20210308/
+data_file=../data/thrush_data/thrush-data.str
+out_filename=thrush_fit
+out_folder=../fits/thrush_fits/
 
 # data_file=../data/huang2011_sub_nobs25_nloci75.npz
 # out_filename=huang2011_fit_sub
@@ -20,12 +20,12 @@ out_folder=../fits/hgdp_fits_20210308/
 ############################
 # get initial fit
 ############################
-# ./fit_structure.sh $data_file $alpha $out_folder $out_filename  
+./fit_structure.sh $data_file $alpha $out_folder $out_filename  
 
 ############################
 # get linear response derivatives
 ############################
-./get_lr_derivative.sh $data_file $alpha $out_folder $out_filename  
+# ./get_lr_derivative.sh $data_file $alpha $out_folder $out_filename  
 
 ############################
 # get parametric sensitivity refits

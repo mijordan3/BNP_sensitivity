@@ -157,6 +157,9 @@ def cluster_admix_get_indx(ind_admix_propn):
 # Function to load thrush data
 ################
 def load_thrush_data(data_filename = '../data/thrush_data/thrush-data.str'): 
+    print('loading thrush data from : ')
+    print(data_filename)
+    
     data_raw = np.loadtxt(data_filename)
     
     # rows are individuals x chromosome: 
