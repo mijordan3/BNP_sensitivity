@@ -151,3 +151,45 @@ def cluster_admix_get_indx(ind_admix_propn):
     indx = sch.dendrogram(y, no_plot=True)["leaves"]
 
     return indx
+
+
+################
+# Function to load thrush data
+################
+def load_thrush_data(data_filename = '../data/thrush_data/thrush-data.str'): 
+    data_raw = np.loadtxt(data_filename)
+    
+    # rows are individuals x chromosome: 
+    # so number of rows should be divisible by 2
+    assert (data_raw.shape[0] % 2) == 0
+    
+    # number of individuals
+    n_ind = int(data_raw.shape[0] / 2)
+
+    # this n ind x n_columns x 2
+    data_raw2d = np.array([data_raw[(2*i):(2*i+2)].transpose() for i in range(n_ind)])
+    
+    # the population
+    labels = data_raw2d[:, 1, :]
+    assert np.all(labels[:, 0] == labels[:, 1])
+    labels = labels[:, 0]
+    
+    # the genotypes
+    genotypes = data_raw2d[:, 2:, :]
+    n_loci = genotypes.shape[1]
+
+    # sort by population
+    perm = np.argsort(labels)
+    labels = labels[perm]
+    genotypes = genotypes[perm]
+    
+    # get one-hot encoding
+    unique_alleles = np.unique(genotypes)
+    unique_alleles = unique_alleles[unique_alleles != -9]
+    
+    genotypes_one_hot = np.zeros((n_ind, n_loci, 2, len(unique_alleles)))
+    
+    for i in range(len(unique_alleles)): 
+        genotypes_one_hot[:, :, :, i] = (genotypes == unique_alleles[i])
+        
+    return jnp.array(genotypes_one_hot), jnp.array(genotypes), labels, unique_alleles
