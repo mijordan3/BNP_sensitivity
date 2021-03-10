@@ -14,8 +14,7 @@ from numpy.polynomial.hermite import hermgauss
 ##########################
 
 def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
-                                  use_logitnormal_sticks, 
-                                  seed = 0):
+                                  prng_key = jax.random.PRNGKey(0)):
     """
     Returns a paragami patterned dictionary
     that stores the variational parameters.
@@ -28,8 +27,6 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
         The number of loci per observation
     k_approx : integer
         The number of components in the model
-    use_logitnormal_sticks : boolean
-        Whether to use a logitnormal approximation to infer the sticks.
 
     Returns
     -------
@@ -50,21 +47,16 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
 
     # BNP sticks
     ind_admix_params_paragami = paragami.PatternDict()
-    if use_logitnormal_sticks:
-        # variational distribution for each stick is logitnormal
-        ind_admix_params_paragami['stick_means'] = \
-            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
-        ind_admix_params_paragami['stick_infos'] = \
-            paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
-                                            lb = 0.0)
-    else:
-        # else they are beta distributed
-        ind_admix_params_paragami['stick_beta'] = \
-            paragami.NumericArrayPattern(shape=(n_obs, k_approx - 1, 2),
-                                            lb = 0.0)
+    
+    # variational distribution for each stick is logitnormal
+    ind_admix_params_paragami['stick_means'] = \
+        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
+    ind_admix_params_paragami['stick_infos'] = \
+        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
+                                        lb = 0.0)
     vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
     
-    vb_params_dict = vb_params_paragami.random(key = jax.random.PRNGKey(0))
+    vb_params_dict = vb_params_paragami.random(key = prng_key)
 
     return vb_params_dict, vb_params_paragami
 
@@ -91,7 +83,7 @@ def get_default_prior_params(n_allele):
     prior_params_paragami = paragami.PatternDict()
 
     # DP prior parameter for the individual admixtures
-    prior_params_dict['dp_prior_alpha'] = np.array([3.0])
+    prior_params_dict['dp_prior_alpha'] = np.array([6.0])
     prior_params_paragami['dp_prior_alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
@@ -115,7 +107,10 @@ def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq,
     ind_mix_dp_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
 
     # allele frequency prior
-    allele_freq_beta_prior = ((allele_prior_lambda_vec - 1) * e_log_pop_freq.sum(0).sum(0)).sum()
+    # sum over k_approx and n_loci
+    # this is len(n_allele)
+    _e_log_pop_freq_allele = e_log_pop_freq.sum(0).sum(0)
+    allele_freq_beta_prior = ((allele_prior_lambda_vec - 1) * _e_log_pop_freq_allele).sum()
 
     return ind_mix_dp_prior + allele_freq_beta_prior
 
@@ -123,22 +118,14 @@ def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq,
 # Entropy
 ##########################
 def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
-
-    # entropy of individual admixtures
-    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
-    if use_logitnormal_sticks:
-        stick_entropy = \
-            modeling_lib.get_stick_breaking_entropy(
-                                    vb_params_dict['ind_admix_params']['stick_means'],
-                                    vb_params_dict['ind_admix_params']['stick_infos'],
-                                    gh_loc, gh_weights)
-    else:
-        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
-        nk = ind_mix_stick_beta_params.shape[0] * \
-                ind_mix_stick_beta_params.shape[1]
-        stick_entropy = \
-            ef.beta_entropy(tau = ind_mix_stick_beta_params.reshape((nk, 2)))
-
+    
+    # entropy of stick-breaking distribution
+    stick_entropy = \
+        modeling_lib.get_stick_breaking_entropy(
+                                vb_params_dict['ind_admix_params']['stick_means'],
+                                vb_params_dict['ind_admix_params']['stick_infos'],
+                                gh_loc, gh_weights)
+    
     # dirichlet entropy term
     pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
     dir_entropy = ef.dirichlet_entropy(pop_freq_dir_params.transpose((2, 0, 1))).sum()
@@ -163,6 +150,7 @@ def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq):
     # this is n_obs x n_loci x 2 x n_allele x k_approx
     outer_prod = np.expand_dims(g_obs, -1) * e_log_pop_freq_t
     
+    # sum over n_allele
     # return something that is n_obs x n_loci x 2 x k_approx
     return outer_prod.sum(3)
 
@@ -271,45 +259,35 @@ def get_kl(g_obs,
 # a useful function to get posterior moments
 ######################
 def get_moments_from_vb_params_dict(vb_params_dict,
-                                    gh_loc = None,
-                                    gh_weights = None):
+                                    gh_loc,
+                                    gh_weights):
 
-    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
+    ind_mix_stick_propn_mean = vb_params_dict['ind_admix_params']['stick_means']
+    ind_mix_stick_propn_info = vb_params_dict['ind_admix_params']['stick_infos']
     
-    # get expected sticks
-    if use_logitnormal_sticks:
-        assert gh_loc is not None
-        assert gh_weights is not None
-
-        ind_mix_stick_propn_mean = vb_params_dict['ind_admix_params']['stick_means']
-        ind_mix_stick_propn_info = vb_params_dict['ind_admix_params']['stick_infos']
-
-        e_log_sticks, e_log_1m_sticks = \
-            ef.get_e_log_logitnormal(
-                lognorm_means = ind_mix_stick_propn_mean,
-                lognorm_infos = ind_mix_stick_propn_info,
-                gh_loc = gh_loc,
-                gh_weights = gh_weights)
-    else:
-        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
-        e_log_sticks, e_log_1m_sticks = \
-            modeling_lib.get_e_log_beta(ind_mix_stick_beta_params)
+    # expected log stick lengths
+    e_log_sticks, e_log_1m_sticks = \
+        ef.get_e_log_logitnormal(
+            lognorm_means = ind_mix_stick_propn_mean,
+            lognorm_infos = ind_mix_stick_propn_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
     
-                                            
+    # expected log mixture weights
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
                                             
-    # population beta parameters
+    # population dirichlet parameters
     pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
     e_log_pop_freq = \
         modeling_lib.get_e_log_dirichlet(pop_freq_dir_params)
-
+    
     return e_log_sticks, e_log_1m_sticks, e_log_cluster_probs, e_log_pop_freq
 
 
 #####################
-# Functions to save / load a structure fit
+# Functions to save a structure fit
 #####################
 def save_structure_fit(outfile, vb_params_dict, vb_params_paragami, 
                        prior_params_dict, gh_deg, **kwargs): 
@@ -318,54 +296,7 @@ def save_structure_fit(outfile, vb_params_dict, vb_params_paragami,
                          vb_params_dict,
                          vb_params_paragami,
                          dp_prior_alpha = prior_params_dict['dp_prior_alpha'],
-                         allele_prior_alpha = prior_params_dict['allele_prior_alpha'],
-                         allele_prior_beta = prior_params_dict['allele_prior_beta'],
+                         allele_prior_lambda_vec = prior_params_dict['allele_prior_lambda_vec'],
                          gh_deg = gh_deg,
                          **kwargs)
-
-def load_structure_fit(fit_file): 
-    
-    # load vb params dict and other meta data
-    vb_params_dict, vb_params_paragami, meta_data = \
-        paragami.load_folded(fit_file)
-    
-    # gauss-hermite parameters
-    gh_deg = int(meta_data['gh_deg'])
-    gh_loc, gh_weights = hermgauss(gh_deg)
-
-    gh_loc = np.array(gh_loc)
-    gh_weights = np.array(gh_weights)
-    
-    # load prior parameters
-    prior_params_dict, prior_params_paragami = \
-        get_default_prior_params()
-
-    prior_params_dict['dp_prior_alpha'] = np.array(meta_data['dp_prior_alpha'])
-    prior_params_dict['allele_prior_alpha'] = np.array(meta_data['allele_prior_alpha'])
-    prior_params_dict['allele_prior_beta'] = np.array(meta_data['allele_prior_beta'])
-
-    return vb_params_dict, vb_params_paragami, \
-            prior_params_dict, prior_params_paragami, \
-                gh_loc, gh_weights, meta_data
-
-#####################
-# hyper-parameter objective functions: 
-# NOTE these are **added** to the **KL**
-#####################
-def alpha_objective_fun(vb_params_dict, alpha, gh_loc, gh_weights): 
-    
-    # term of objective function that depends on 
-    # the dp prior alpha
-    
-    means = vb_params_dict['ind_admix_params']['stick_means']
-    infos = vb_params_dict['ind_admix_params']['stick_infos']
-
-    e_log_1m_sticks = \
-        ef.get_e_log_logitnormal(
-            lognorm_means = means,
-            lognorm_infos = infos,
-            gh_loc = gh_loc,
-            gh_weights = gh_weights)[1]
-
-    return - (alpha - 1) * np.sum(e_log_1m_sticks)
 
