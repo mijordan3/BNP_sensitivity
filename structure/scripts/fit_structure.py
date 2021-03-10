@@ -54,7 +54,7 @@ onp.random.seed(args.seed)
 ######################
 # Load Data
 ######################
-g_obs, _, labels, _ = data_utils.load_thrush_data(args.data_file)
+g_obs = data_utils.load_thrush_data(args.data_file)[0]
 
 print(g_obs.shape)
 

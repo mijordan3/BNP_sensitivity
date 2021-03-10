@@ -300,3 +300,29 @@ def save_structure_fit(outfile, vb_params_dict, vb_params_paragami,
                          gh_deg = gh_deg,
                          **kwargs)
 
+
+def load_structure_fit(fit_file): 
+    
+    # load vb params dict and other meta data
+    vb_params_dict, vb_params_paragami, meta_data = \
+        paragami.load_folded(fit_file)
+    
+    n_alleles = vb_params_dict['pop_freq_dirichlet_params'].shape[-1]
+    
+    # gauss-hermite parameters
+    gh_deg = int(meta_data['gh_deg'])
+    gh_loc, gh_weights = hermgauss(gh_deg)
+
+    gh_loc = np.array(gh_loc)
+    gh_weights = np.array(gh_weights)
+    
+    # load prior parameters
+    prior_params_dict, prior_params_paragami = \
+        get_default_prior_params(n_alleles)
+
+    prior_params_dict['dp_prior_alpha'] = np.array(meta_data['dp_prior_alpha'])
+    prior_params_dict['allele_prior_lambda_vec'] = np.array(meta_data['allele_prior_lambda_vec'])
+
+    return vb_params_dict, vb_params_paragami, \
+            prior_params_dict, prior_params_paragami, \
+                gh_loc, gh_weights, meta_data

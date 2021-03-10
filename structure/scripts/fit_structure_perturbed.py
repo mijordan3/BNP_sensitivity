@@ -7,11 +7,10 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 import structure_vb_lib.structure_model_lib as structure_model_lib
-import structure_vb_lib.cavi_lib as cavi_lib
 import structure_vb_lib.structure_optimization_lib as s_optim_lib
+from structure_vb_lib import data_utils
 
-import bnpmodeling_runjingdev.functional_sensitivity_lib as func_sens_lib
-from bnpmodeling_runjingdev import influence_lib, log_phi_lib
+from bnpmodeling_runjingdev import log_phi_lib
 
 import paragami
 
@@ -59,9 +58,13 @@ onp.random.seed(args.seed)
 ##################
 # Load data
 ##################
-print('loading data from ', args.data_file)
-data = np.load(args.data_file)
-g_obs = np.array(data['g_obs'])
+g_obs = data_utils.load_thrush_data(args.data_file)[0]
+
+print(g_obs.shape)
+
+n_obs = g_obs.shape[0]
+n_loci = g_obs.shape[1]
+n_allele = g_obs.shape[-1]
 
 ##################
 # Load initial fit
@@ -71,6 +74,8 @@ vb_params_dict, vb_params_paragami, \
     prior_params_dict, prior_params_paragami, \
         gh_loc, gh_weights, fit_meta_data = \
             structure_model_lib.load_structure_fit(args.init_fit)
+
+print(prior_params_dict)
 
 ##################
 # Define perturbation
@@ -93,8 +98,6 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
 f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
 e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
-
-
 # # warm start w linear response 
 # vb_opt = vb_params_paragami.flatten(vb_params_dict, 
 #                                     free = True)
@@ -106,15 +109,14 @@ e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 # OPTIMIZE
 ######################
 t0 = time.time() 
-# optimize with preconditioner 
-vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
+
+vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
     s_optim_lib.optimize_structure(g_obs, 
-                        vb_params_dict, 
-                        vb_params_paragami,
-                        prior_params_dict,
-                        gh_loc, gh_weights, 
-                        e_log_phi = e_log_phi, 
-                        use_newton = False)
+                                   vb_params_dict, 
+                                   vb_params_paragami,
+                                   prior_params_dict,
+                                   gh_loc, gh_weights, 
+                                   e_log_phi = e_log_phi)
 
 ######################
 # save optimization results
@@ -123,14 +125,7 @@ outfile = os.path.join(args.out_folder, args.out_filename)
 
 print('saving structure model to ', outfile)
 
-print('Optim time (ignoring compilation time) {:.3f}secs'.format(lbfgs_time))
-
-# save final KL
-final_kl = structure_model_lib.get_kl(g_obs, vb_opt_dict,
-                            prior_params_dict,
-                            gh_loc = gh_loc,
-                            gh_weights = gh_weights, 
-                            e_log_phi = e_log_phi)
+print('Optim time (ignoring compilation time) {:.3f}secs'.format(optim_time))
 
 # save paragami object
 structure_model_lib.save_structure_fit(outfile, 
@@ -141,8 +136,8 @@ structure_model_lib.save_structure_fit(outfile,
                                        epsilon = epsilon,
                                        delta = args.delta,
                                        data_file = args.data_file, 
-                                       final_kl = final_kl, 
-                                       optim_time = lbfgs_time, 
+                                       final_kl = out.fun, 
+                                       optim_time = optim_time, 
                                        perturbation = args.perturbation)
 
 print('Total optim time: {:.3f} secs'.format(time.time() - t0))
