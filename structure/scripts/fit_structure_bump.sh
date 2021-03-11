@@ -5,6 +5,7 @@ source activate bnp_sensitivity_jax
 epsilon_indx=$SLURM_ARRAY_TASK_ID
 
 python fit_structure_perturbed.py \
+  --perturbation 'step_bump' \
   --epsilon_indx ${epsilon_indx} \
   --mu_indx ${mu_indx} \
   --data_file ${data_file} \
