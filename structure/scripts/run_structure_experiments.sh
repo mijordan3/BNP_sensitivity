@@ -40,42 +40,65 @@ out_folder=../fits/thrush_fits/
 ############################
 # get functional sensitivity refits
 ############################
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='sigmoidal',delta=5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='sigmoidal',delta=5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
     
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='sigmoidal',delta=-5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='sigmoidal',delta=-5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
 
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='alpha_pert_pos',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='alpha_pert_pos',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
 
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='gauss_pert1',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='gauss_pert1',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='gauss_pert1',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='gauss_pert1',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
 
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='gauss_pert2',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=perturbation='gauss_pert2',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+#     fit_structure_on_epsilon.sh
+
+#####################
+# Refit at step functions
+#####################
+for mu_indx in {0..9}
+do
 sbatch \
     -p high \
     --array 0-9 \
-    --export=perturbation='gauss_pert2',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=perturbation='gauss_pert2',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-    fit_structure_on_epsilon.sh
+    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha \
+    fit_structure_bump.sh
+done
+
+
+############################
+# compute influence functions
+############################
+# python get_influence_functions.py \
+#   --seed 4353453 \
+#   --data_file ${data_file} \
+#   --out_folder ${out_folder} \
+#   --fit_file ${out_filename}_alpha${alpha}.npz \
+#   --cg_tol 1e-8

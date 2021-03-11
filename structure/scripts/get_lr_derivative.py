@@ -77,7 +77,7 @@ vb_opt = vb_params_paragami.flatten(vb_opt_dict, free = True)
 ###############
 # Define objective and check KL
 ###############
-# this also contains the hvp
+
 def objective_fun(vb_params_free, epsilon): 
     
     # this actually does not depend on epsilon! 
