@@ -32,7 +32,7 @@ parser.add_argument('--out_folder', type=str)
 parser.add_argument('--fit_file', type=str)
 
 # tolerance of CG solver
-parser.add_argument('--cg_tol', type=float, default=1e-2)
+parser.add_argument('--cg_tol', type=float, default=1e-3)
 
 args = parser.parse_args()
 

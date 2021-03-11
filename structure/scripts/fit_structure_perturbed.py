@@ -41,6 +41,10 @@ parser.add_argument('--epsilon_indx', type=int, default = 0)
 # delta 
 parser.add_argument('--delta', type=float, default = 1.0)
 
+# mu: location of the step bump
+# (only needed if perturbation = step bump)
+parser.add_argument('--mu_indx', type=int, default = 0)
+
 # which perturbation
 parser.add_argument('--perturbation', type=str, default = 'sigmoidal')
 
@@ -80,6 +84,7 @@ print(prior_params_dict)
 ##################
 # Define perturbation
 ##################
+
 # set epsilon 
 epsilon_vec = np.linspace(0, 1, 10)[1:]**2 
 assert args.epsilon_indx < len(epsilon_vec)
@@ -88,6 +93,7 @@ epsilon = epsilon_vec[args.epsilon_indx]
 print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
+# a class containing a catalog of perturbations
 f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami, 
                                                  prior_params_dict['dp_prior_alpha'],
                                                  gh_loc, 
@@ -95,8 +101,22 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
                                                  delta = args.delta, 
                                                  stick_key = 'ind_admix_params')
 
-f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
-e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
+if args.perturbation == 'step_bump': 
+    # refit with a step bump
+    mu_vec = np.linspace(-5, 5, 11)
+    assert args.mu_indx < (len(mu_vec) - 1)
+    mu = mu_vec[args.mu_indx]
+    print('mu = ', mu)
+
+    step_bumps = log_phi_lib.StepPerturbations(mu_vec)
+    
+    e_log_phi = lambda means, infos : step_bumps.e_step_bump(means, infos, args.mu_indx) * epsilon * args.delta
+
+else: 
+    mu = np.nan
+    # else fit with some named perturbation
+    f_obj = getattr(f_obj_all, 'f_obj_' + args.perturbation)
+    e_log_phi = lambda means, infos : f_obj.e_log_phi_epsilon(means, infos, epsilon)
 
 # # warm start w linear response 
 # vb_opt = vb_params_paragami.flatten(vb_params_dict, 
@@ -135,6 +155,7 @@ structure_model_lib.save_structure_fit(outfile,
                                        fit_meta_data['gh_deg'], 
                                        epsilon = epsilon,
                                        delta = args.delta,
+                                       mu = mu, 
                                        data_file = args.data_file, 
                                        final_kl = out.fun, 
                                        optim_time = optim_time, 

@@ -152,6 +152,34 @@ def cluster_admix_get_indx(ind_admix_propn):
 
     return indx
 
+def cluster_admix_get_indx_within_labels(e_ind_admix, labels): 
+    
+    # does the clustering and permutes for better plotting
+    # but keeps the observations within their labels
+    
+    # TODO: assumes labels are already in order ... 
+    # so all of labels = A are first, then labels = B are second ... 
+    # make this more general?
+    
+    assert e_ind_admix.shape[0] == len(labels)
+    
+    unique_labels = np.unique(labels)
+    
+    perm = []
+    label_counts = 0
+    for i in range(len(unique_labels)): 
+        
+        # get observations with this label 
+        e_ind_admix_sub = e_ind_admix[labels == unique_labels[i]]
+        
+        perm_sub = np.array(cluster_admix_get_indx(e_ind_admix_sub))
+        
+        perm.append(perm_sub + label_counts)
+        
+        label_counts += e_ind_admix_sub.shape[0]
+        
+    return np.concatenate(perm)
+
 
 ################
 # Function to load thrush data

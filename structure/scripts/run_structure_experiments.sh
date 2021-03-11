@@ -1,8 +1,6 @@
 #!/bin/bash
 
-source activate bnp_sensitivity_jax
-
-seed=234234
+seed=98765
 
 ############################
 # initial value of alpha
@@ -40,45 +38,45 @@ out_folder=../fits/thrush_fits/
 ############################
 # get functional sensitivity refits
 ############################
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='sigmoidal',delta=5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='sigmoidal',delta=5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
     
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='sigmoidal',delta=-5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='sigmoidal',delta=-5,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
 
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='alpha_pert_pos',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='alpha_pert_pos',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
 
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='gauss_pert1',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='gauss_pert1',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='gauss_pert1',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='gauss_pert1',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
 
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='gauss_pert2',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
-# sbatch \
-#     -p high \
-#     --array 0-9 \
-#     --export=perturbation='gauss_pert2',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
-#     fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='gauss_pert2',delta=1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
+sbatch \
+    -p high \
+    --array 0-8 \
+    --export=perturbation='gauss_pert2',delta=-1,data_file=$data_file,alpha=$alpha,out_folder=$out_folder,out_filename=$out_filename \
+    fit_structure_on_epsilon.sh
 
 #####################
 # Refit at step functions
@@ -106,14 +104,14 @@ out_folder=../fits/thrush_fits/
 #####################
 # Refit at worst-case
 #####################
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust' \
-    fit_structure_worst_case.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust' \
+#     fit_structure_worst_case.sh
     
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust_pred' \
-    fit_structure_worst_case.sh
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust_pred' \
+#     fit_structure_worst_case.sh

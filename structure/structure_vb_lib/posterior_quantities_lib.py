@@ -64,7 +64,6 @@ def get_e_num_clusters(g_obs, vb_params_dict, gh_loc, gh_weights,
                                                                  prng_key = prng_key)
 
 
-
 def get_e_num_pred_clusters(vb_params_dict,
                             gh_loc, gh_weights, 
                             n_samples = 1000,
@@ -72,12 +71,11 @@ def get_e_num_pred_clusters(vb_params_dict,
                             prng_key = jax.random.PRNGKey(0), 
                             return_samples = False): 
     
+    # If I sample one more loci for every individual in my dataset, 
+    # how many clusters would I expect to see?
     
     stick_means = vb_params_dict['ind_admix_params']['stick_means']
     stick_infos = vb_params_dict['ind_admix_params']['stick_infos']
-
-    # If I sample one more loci for every individual in my dataset, 
-    # how many clusters would I expect to see?
     
     # sample sticks: shape is n_samples x n_obs x (k_approx - 1)
     sticks_sampled = cluster_quantities_lib.sample_stick_propn(stick_means, 
@@ -147,7 +145,3 @@ def get_e_num_ind_per_cluster(vb_params_dict, gh_loc, gh_weights):
     return e_ind_admix.sum(0)
 
 
-
-###############
-# Function to return cluster belongings for all loci
-###############
