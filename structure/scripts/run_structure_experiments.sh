@@ -83,14 +83,14 @@ out_folder=../fits/thrush_fits/
 #####################
 # Refit at step functions
 #####################
-for mu_indx in {0..9}
-do
-sbatch \
-    -p high \
-    --array 0-9 \
-    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha \
-    fit_structure_bump.sh
-done
+# for mu_indx in {0..9}
+# do
+# sbatch \
+#     -p high \
+#     --array 0-9 \
+#     --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha \
+#     fit_structure_bump.sh
+# done
 
 
 ############################
@@ -102,3 +102,18 @@ done
 #   --out_folder ${out_folder} \
 #   --fit_file ${out_filename}_alpha${alpha}.npz \
 #   --cg_tol 1e-8
+
+#####################
+# Refit at worst-case
+#####################
+sbatch \
+    -p high \
+    --array 0-9 \
+    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust' \
+    fit_structure_worst_case.sh
+    
+sbatch \
+    -p high \
+    --array 0-9 \
+    --export=data_file=$data_file,mu_indx=$mu_indx,out_folder=$out_folder,out_filename=$out_filename,alpha=$alpha,g_name='num_clust_pred' \
+    fit_structure_worst_case.sh
