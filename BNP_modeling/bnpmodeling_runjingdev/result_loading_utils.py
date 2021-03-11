@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import jax.numpy as np
 
 import numpy as onp
+import scipy as osp
 
 import paragami
 
@@ -230,7 +231,11 @@ def print_metrics(refit, lr, init, ax):
 ########################
 # lr vs refit scatter plot
 ########################
-def print_diff_plot(refit, lr, init, ax, title = '', alpha = 0.05): 
+def print_diff_plot(refit, lr, init, ax, 
+                    title = '', 
+                    alpha = 0.05, 
+                    plot_contours = False, 
+                    levels = [0.001, 0.01, 0.1]): 
     
     diff_refit = refit - init
     diff_lr = lr - init
@@ -239,25 +244,26 @@ def print_diff_plot(refit, lr, init, ax, title = '', alpha = 0.05):
     ax.scatter(diff_refit, 
                diff_lr, 
                marker = 'o', 
-               color = 'red', 
+               color = 'grey', 
                alpha = alpha)   
     ax.set_xlabel('refit - init')
     ax.set_ylabel('lr - init')
     
     # x = y line
-    ax.plot(diff_refit, diff_refit, '-', color = 'blue')
+    ax.plot(diff_refit, diff_refit, '-', color = 'darkgreen')
     ax.set_title(title)
     
-    # Draw contours
-#     nbins = 20
-#     x, y = diff_refit, diff_lr
-#     gauss_kde = kde.gaussian_kde(np.array([x, y]))
-#     xi, yi = onp.mgrid[x.min():x.max():nbins*1j, y.min():y.max():nbins*1j]
-#     zi = gauss_kde(np.vstack([xi.flatten(), yi.flatten()]))
-#     zi = (zi - zi.min()) / (zi.max() - zi.min())
-#     ax[0].contour(xi, yi, zi.reshape(xi.shape), 
-#                   levels = [0.001, 0.01, 0.1], 
-#                 colors = 'grey')
+    # contouns
+    if plot_contours: 
+        nbins = 20
+        x, y = diff_refit, diff_lr
+        gauss_kde = osp.stats.gaussian_kde(np.array([x, y]))
+        xi, yi = onp.mgrid[x.min():x.max():nbins*1j, y.min():y.max():nbins*1j]
+        zi = gauss_kde(np.vstack([xi.flatten(), yi.flatten()]))
+        zi = (zi - zi.min()) / (zi.max() - zi.min())
+        ax[0].contour(xi, yi, zi.reshape(xi.shape), 
+                      levels = levels, 
+                      colors = 'grey')
 
 
 
@@ -276,9 +282,12 @@ def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax,
         fig.colorbar(im0, ax = ax[i])
         i+=1
 
-    # plot refit - initial 
+    # compute differences
     diff_refit = refit_matr - init_matr
-    vmax = np.abs(diff_refit).max()
+    diff_lr = lr_matr - init_matr
+    vmax = max(np.abs(diff_refit).max(), np.abs(diff_lr).max())
+    
+    # plot refit - initial 
     ax[i].set_title('refit - init')
     im1 = ax[i].matshow(diff_refit, 
                         vmax = vmax,
@@ -289,8 +298,6 @@ def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax,
     
     # plot lr - initial
     ax[i].set_title('lr - init')
-    diff_lr = lr_matr - init_matr
-    vmax = np.abs(diff_lr).max()
     im2 = ax[i].matshow(diff_lr,
                         vmax = vmax,
                         vmin = -vmax,
