@@ -103,7 +103,7 @@ f_obj_all = log_phi_lib.LogPhiPerturbations(vb_params_paragami,
 
 if args.perturbation == 'step_bump': 
     # refit with a step bump
-    mu_vec = np.linspace(-5, 5, 11)
+    mu_vec = np.linspace(-6, 6, 7)
     assert args.mu_indx < (len(mu_vec) - 1)
     mu = mu_vec[args.mu_indx]
     print('mu = ', mu)

@@ -221,9 +221,10 @@ class PriorPerturbation(object):
 
     
     # convenient wrapper to plot everything
-    def plot_perturbation(self): 
+    def plot_perturbation(self, ax = None): 
     
-        fig, ax = plt.subplots(1, 4, figsize = (14, 3.5)) 
+        if ax is None:
+            fig, ax = plt.subplots(1, 4, figsize = (14, 3.5)) 
 
         self._plot_log_phi(ax[0])
         self._plot_log_priors(ax[1])
@@ -231,11 +232,7 @@ class PriorPerturbation(object):
         self._plot_priors_constrained(ax[3])
 
         ax[3].legend()
-
-        fig.tight_layout()
         
-        return fig, ax
-
 
 def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
                            gh_loc, gh_weights, sum_vector=True):

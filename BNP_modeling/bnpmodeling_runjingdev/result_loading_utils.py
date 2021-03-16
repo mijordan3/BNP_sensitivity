@@ -235,7 +235,7 @@ def print_diff_plot(refit, lr, init, ax,
                     title = '', 
                     alpha = 0.05, 
                     plot_contours = False, 
-                    levels = [0.001, 0.01, 0.1]): 
+                    levels = [0.1, 0.2, 0.5]): 
     
     diff_refit = refit - init
     diff_lr = lr - init
@@ -261,9 +261,9 @@ def print_diff_plot(refit, lr, init, ax,
         xi, yi = onp.mgrid[x.min():x.max():nbins*1j, y.min():y.max():nbins*1j]
         zi = gauss_kde(np.vstack([xi.flatten(), yi.flatten()]))
         zi = (zi - zi.min()) / (zi.max() - zi.min())
-        ax[0].contour(xi, yi, zi.reshape(xi.shape), 
+        ax.contour(xi, yi, zi.reshape(xi.shape), 
                       levels = levels, 
-                      colors = 'grey')
+                      colors = 'black')
 
 
 
@@ -413,7 +413,9 @@ def plot_centroids(centroids_array_refit, centroids_array_lr, axarr):
 # Wrapper to plot a perturbation
 # given a perturbation name and delta
 ################
-def plot_perturbation(perturbation, delta, alpha0, stick_key = 'stick_params'): 
+def plot_perturbation(perturbation, delta, alpha0,
+                      ax = None,
+                      stick_key = 'stick_params'): 
 
     # get functional perturbation objectives
     # a lot of arguments are "none" because we just 
@@ -434,7 +436,7 @@ def plot_perturbation(perturbation, delta, alpha0, stick_key = 'stick_params'):
                                     logit_v_ub = 10, 
                                     logit_v_lb = -10)
 
-    prior_perturbation.plot_perturbation();
+    prior_perturbation.plot_perturbation(ax);
 
     return prior_perturbation
 
