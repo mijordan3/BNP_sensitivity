@@ -135,9 +135,8 @@ def get_e_log_prior(vb_params_dict, moments_dict, prior_params_dict):
     allele_freq_beta_prior = ((prior_params_dict['allele_prior_lambda_vec'] - 1) * _e_log_pop_freq_allele).sum()
     
     # prior on individual level multinomial
-    ind_multi_prior = np.einsum('ijk, k -> ij', 
-                                vb_params_dict['pop_indx_multinom_params'], 
-                                moments_dict['e_log_pop_cluster_probs']).sum()
+    ind_multi_prior = (vb_params_dict['pop_indx_multinom_params'].sum(0).sum(0) * \
+                       moments_dict['e_log_pop_cluster_probs']).sum()
     
     return ind_mix_dp_prior + pop_mix_dp_prior + allele_freq_beta_prior + ind_multi_prior
 
@@ -259,10 +258,7 @@ def get_kl(g_obs,
         The negative elbo.
     """
 
-    # get prior parameters
-    dp_prior_alpha = prior_params_dict['dp_prior_alpha']
-    allele_prior_lambda_vec = prior_params_dict['allele_prior_lambda_vec']
-    
+    # get moments
     moments_dict = get_moments_from_vb_params_dict(vb_params_dict,
                                                    gh_loc = gh_loc,
                                                    gh_weights = gh_weights)
@@ -279,8 +275,6 @@ def get_kl(g_obs,
         e_z = e_z_opt
     
     e_loglik = np.sum(e_z * z_nat_param)
-    
-    
     
     # entropy term
     entropy = get_entropy(vb_params_dict, e_z, gh_loc, gh_weights) 

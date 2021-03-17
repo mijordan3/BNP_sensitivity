@@ -27,15 +27,19 @@ def get_vb_expectations(vb_params_dict, gh_loc, gh_weights):
 ######################
 def get_optimal_z_from_vb_dict(g_obs, vb_params_dict, gh_loc, gh_weights): 
         
-    e_log_sticks, e_log_1m_sticks, \
-        e_log_cluster_probs, e_log_pop_freq = \
-            structure_model_lib.get_moments_from_vb_params_dict(vb_params_dict,
-                                    gh_loc = gh_loc,
-                                    gh_weights = gh_weights)
+    moments_dict = structure_model_lib.get_moments_from_vb_params_dict(vb_params_dict,
+                                                   gh_loc = gh_loc,
+                                                   gh_weights = gh_weights)
+                                            
     
-    return structure_model_lib.get_optimal_z(g_obs,
-                                             e_log_pop_freq,
-                                             e_log_cluster_probs)[0]
+    # joint log likelihood
+    e_z_opt, _ = \
+        structure_model_lib.get_optimal_z(g_obs, 
+                                          moments_dict['e_log_pop_freq'], 
+                                          vb_params_dict['pop_indx_multinom_params'], 
+                                          moments_dict['e_log_ind_cluster_probs'])
+    
+    return e_z_opt
 
 ######################
 # expected number of clusters
