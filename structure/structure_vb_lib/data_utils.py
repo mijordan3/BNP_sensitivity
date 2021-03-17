@@ -151,3 +151,84 @@ def cluster_admix_get_indx(ind_admix_propn):
     indx = sch.dendrogram(y, no_plot=True)["leaves"]
 
     return indx
+
+def cluster_admix_get_indx_within_labels(e_ind_admix, labels): 
+    
+    # does the clustering and permutes for better plotting
+    # but keeps the observations within their labels
+    
+    # TODO: assumes labels are already in order ... 
+    # so all of labels = A are first, then labels = B are second ... 
+    # make this more general?
+    
+    assert e_ind_admix.shape[0] == len(labels)
+    
+    unique_labels = np.unique(labels)
+    
+    perm = []
+    label_counts = 0
+    for i in range(len(unique_labels)): 
+        
+        # get observations with this label 
+        e_ind_admix_sub = e_ind_admix[labels == unique_labels[i]]
+        
+        perm_sub = np.array(cluster_admix_get_indx(e_ind_admix_sub))
+        
+        perm.append(perm_sub + label_counts)
+        
+        label_counts += e_ind_admix_sub.shape[0]
+        
+    return np.concatenate(perm)
+
+
+################
+# Function to load thrush data
+################
+def load_thrush_data(data_filename = '../data/thrush_data/thrush-data.str'): 
+    print('loading thrush data from : ')
+    print(data_filename)
+    
+    data_raw = np.loadtxt(data_filename)
+    
+    # rows are individuals x chromosome: 
+    # so number of rows should be divisible by 2
+    assert (data_raw.shape[0] % 2) == 0
+    
+    # number of individuals
+    n_ind = int(data_raw.shape[0] / 2)
+
+    # this n ind x n_columns x 2
+    data_raw2d = np.array([data_raw[(2*i):(2*i+2)].transpose() for i in range(n_ind)])
+    
+    # the population
+    labels = data_raw2d[:, 1, :]
+    assert np.all(labels[:, 0] == labels[:, 1])
+    labels = labels[:, 0]
+    
+    # change population (1, 2, 3, 4) 
+    # to their actual names 
+    labels = labels.astype('str')
+    labels[labels == '1.0'] = 'Chawia'
+    labels[labels == '2.0'] = 'Mbololo'
+    labels[labels == '3.0'] = 'Ngangao'
+    labels[labels == '4.0'] = 'Yale'
+    
+    # the genotypes
+    genotypes = data_raw2d[:, 2:, :]
+    n_loci = genotypes.shape[1]
+
+    # sort by population
+    perm = np.argsort(labels)
+    labels = labels[perm]
+    genotypes = genotypes[perm]
+    
+    # get one-hot encoding
+    unique_alleles = np.unique(genotypes)
+    unique_alleles = unique_alleles[unique_alleles != -9]
+    
+    genotypes_one_hot = np.zeros((n_ind, n_loci, 2, len(unique_alleles)))
+    
+    for i in range(len(unique_alleles)): 
+        genotypes_one_hot[:, :, :, i] = (genotypes == unique_alleles[i])
+        
+    return jnp.array(genotypes_one_hot), jnp.array(genotypes), labels, unique_alleles

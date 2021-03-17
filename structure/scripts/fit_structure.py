@@ -7,8 +7,8 @@ import numpy as onp
 from numpy.polynomial.hermite import hermgauss
 
 import structure_vb_lib.structure_model_lib as structure_model_lib
-import structure_vb_lib.cavi_lib as cavi_lib
 import structure_vb_lib.structure_optimization_lib as s_optim_lib
+from structure_vb_lib import data_utils
 
 import paragami
 
@@ -23,34 +23,23 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--seed', type=int, default=42)
 
-# data file
+# the genome dataset
 parser.add_argument('--data_file', type=str)
 
 # where to save the structure fit
 parser.add_argument('--out_folder', default='../fits/')
 parser.add_argument('--out_filename', default='structure_fit', type=str)
 
-# whether to use a warm start
-parser.add_argument('--warm_start', type=distutils.util.strtobool, default='False')
-parser.add_argument('--init_fit', type=str)
-
-# whether to initialize with cavi
-parser.add_argument('--init_cavi_steps', type=int, default=200)
-
 # model parameters
-parser.add_argument('--alpha', type=float, default = 4.0)
-parser.add_argument('--k_approx', type = int, default = 15)
+parser.add_argument('--alpha', type=float, default = 3.0)
+parser.add_argument('--k_approx', type = int, default = 20)
 
 args = parser.parse_args()
 
 def validate_args():
-    assert os.path.exists(args.out_folder), args.out_folder
-
-    if args.warm_start:
-        assert os.path.isfile(args.init_fit), args.init_fit
-
-    assert os.path.isfile(args.data_file), args.data_file
-
+    assert os.path.exists(args.out_folder), args.out_folder    
+    assert os.path.isfile(args.data_file)
+    
 validate_args()
 
 onp.random.seed(args.seed)
@@ -58,60 +47,39 @@ onp.random.seed(args.seed)
 ######################
 # Load Data
 ######################
-print('loading data from ', args.data_file)
-data = np.load(args.data_file)
-g_obs = np.array(data['g_obs'], dtype = int)
+g_obs = data_utils.load_thrush_data(args.data_file)[0]
+
+print(g_obs.shape)
 
 n_obs = g_obs.shape[0]
 n_loci = g_obs.shape[1]
-
-print('g_obs.shape', g_obs.shape)
+n_allele = g_obs.shape[-1]
 
 ######################
 # GET PRIOR
 ######################
 prior_params_dict, prior_params_paragami = \
-    structure_model_lib.get_default_prior_params()
+    structure_model_lib.get_default_prior_params(n_allele)
 
-prior_params_dict['dp_prior_alpha'] = np.array([args.alpha])
+prior_params_dict['dp_prior_alpha'] = args.alpha
 
 print('prior params: ')
 print(prior_params_dict)
 
 ######################
-# GET VB PARAMS AND INITIALIZE
+# GET VB PARAMS 
 ######################
 k_approx = args.k_approx
 gh_deg = 8
 gh_loc, gh_weights = hermgauss(gh_deg)
 
-init_optim_time = time.time() 
-
-cavi_init_time = 0.
-
-if args.warm_start:
-    print('warm start from ', args.init_fit)
-    vb_params_dict, vb_params_paragami, _ = \
-        paragami.load_folded(args.init_fit)
+vb_params_dict, vb_params_paragami = \
+    structure_model_lib.get_vb_params_paragami_object(n_obs = n_obs,
+                                                      n_loci = n_loci,
+                                                      n_allele = n_allele, 
+                                                      k_approx = k_approx, 
+                                                      prng_key = jax.random.PRNGKey(args.seed))
     
-else:     
-    vb_params_dict, vb_params_paragami = \
-        structure_model_lib.\
-            get_vb_params_paragami_object(n_obs, 
-                                          n_loci,
-                                          k_approx,
-                                          use_logitnormal_sticks = True, 
-                                          seed = args.seed)
-    # initialize with some cavi steps
-    if args.init_cavi_steps > 0: 
-        vb_params_dict, cavi_init_time = \
-            s_optim_lib.initialize_with_cavi(g_obs, 
-                                 vb_params_paragami, 
-                                 prior_params_dict, 
-                                 gh_loc, gh_weights, 
-                                 print_every = 20, 
-                                 max_iter = args.init_cavi_steps, 
-                                 seed = args.seed)
 
 
 print(vb_params_paragami)
@@ -119,14 +87,16 @@ print(vb_params_paragami)
 ######################
 # OPTIMIZE
 ######################
-# optimize with preconditioner 
-vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
+init_optim_time = time.time()
+
+# optimize with lbfgs and newton 
+vb_opt_dict, vb_opt, ez_opt, out, optim_time = \
     s_optim_lib.optimize_structure(g_obs, 
                                    vb_params_dict, 
                                    vb_params_paragami,
                                    prior_params_dict,
-                                   gh_loc, gh_weights,  
-                                   use_newton = False)
+                                   gh_loc, 
+                                   gh_weights)
 
 ######################
 # save optimizaiton results
@@ -134,7 +104,6 @@ vb_opt_dict, vb_opt, out, precond_objective, lbfgs_time = \
 outfile = os.path.join(args.out_folder, args.out_filename)
 print('saving structure model to ', outfile)
 
-optim_time = cavi_init_time + lbfgs_time
 print('Optim time (ignoring compilation time) {:.3f}secs'.format(optim_time))
 
 # save final KL

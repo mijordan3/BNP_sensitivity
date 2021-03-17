@@ -105,3 +105,21 @@ class LogPhiPerturbations():
                                                      gh_weights, 
                                                      delta = delta,
                                                      stick_key = stick_key)
+
+class StepPerturbations(): 
+    def __init__(self, mu_vec): 
+        # grid of locations for the step functions
+        self.mu_vec = mu_vec
+    
+    def step_bump(self, x, mu_indx): 
+        return (x > self.mu_vec[mu_indx]) & (x <= self.mu_vec[mu_indx+1])
+    
+    def e_step_bump(self, means, infos, mu_indx): 
+        loc = means
+        scale = 1 / np.sqrt(infos)
+        
+        cdf1 = sp.stats.norm.cdf(self.mu_vec[mu_indx+1], loc = loc, scale = scale)
+        cdf2 = sp.stats.norm.cdf(self.mu_vec[mu_indx], loc = loc, scale = scale)
+        
+        return (cdf1 - cdf2).sum() 
+

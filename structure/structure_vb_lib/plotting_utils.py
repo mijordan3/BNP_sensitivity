@@ -37,10 +37,13 @@ def plot_admixture(admixture, ax, colors = None):
     
     return colors
 
-def plot_top_clusters(e_ind_admix, axarr, n_top_clusters = 5): 
+def plot_top_clusters(e_ind_admix, axarr,
+                      n_top_clusters = 5, 
+                      cmap_colors = plt.get_cmap('Set2').colors): 
     # plot only the top clusters    
     
     top_n = min(n_top_clusters, e_ind_admix.shape[1])
+    assert top_n <= len(cmap_colors)
     
     # find top clusters
     top_clusters_indx = np.argsort(- e_ind_admix.sum(0))
@@ -52,7 +55,8 @@ def plot_top_clusters(e_ind_admix, axarr, n_top_clusters = 5):
     e_ind_admix = np.hstack((e_ind_admix, remaining_probs))
     
     # get colors: last color is grey
-    colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,top_n+1)[:-1]]
+    # colors = [colorsys.hsv_to_rgb(h,0.9,0.7) for h in np.linspace(0,1,top_n+1)[:-1]]
+    colors = [color for color in cmap_colors[0:top_n]]
     colors += ['grey']
     
     # plot
@@ -60,46 +64,70 @@ def plot_top_clusters(e_ind_admix, axarr, n_top_clusters = 5):
     
     return e_ind_admix, top_clusters_indx
 
+def get_unique_labels(labels): 
+    # np.unique sorts things alphabetically, 
+    # we don't want that
+    unique_labels = [labels[0]]
     
-def draw_region_separation(population_vec, axarr): 
+    for i in range(1, len(labels)): 
+        if labels[i] != labels[i-1]: 
+            unique_labels.append(labels[i])
+            
+    return unique_labels
+    
+def draw_region_separation(labels, axarr): 
 
     # draw lines between different groups in plotting
-
-    unique_groups = np.sort(np.unique(population_vec))
     
+    # get unique labels
+    unique_labels = get_unique_labels(labels)
+            
     xint = 0.
     xticks = []
-    for i in range(len(unique_groups)): 
-        incr = (population_vec == unique_groups[i]).mean()
+    for i in range(len(unique_labels)): 
+        incr = (labels == unique_labels[i]).mean()
 
         xticks.append(xint + incr*0.5)
         xint += incr
-        axarr.axvline(xint, color = 'white', linewidth = 2)
+        axarr.axvline(xint,
+                      linestyle = ':', 
+                      color = 'black',
+                      linewidth = 2)
 
     axarr.set_xticks(xticks)
-    axarr.set_xticklabels(unique_groups,
+    axarr.set_xticklabels(unique_labels,
                           rotation=45, ha='left', 
                           fontsize = 12);
 
     axarr.xaxis.tick_top()
 
+def draw_regions_on_coclust(labels, ax, draw_lines = True): 
     
-def get_vb_expectations(vb_params_dict, gh_loc = None, gh_weights = None): 
+    unique_labels = get_unique_labels(labels)
     
-    use_logitnormal_sticks = 'stick_means' in vb_params_dict['ind_admix_params'].keys()
+    xint = 0.
+    xticks = []
     
-    if use_logitnormal_sticks: 
-        e_ind_admix = cluster_quantities_lib.get_e_cluster_probabilities(
-                            vb_params_dict['ind_admix_params']['stick_means'], 
-                            vb_params_dict['ind_admix_params']['stick_infos'],
-                            gh_loc, gh_weights)
+    for i in range(len(unique_labels)): 
+        incr = (labels == unique_labels[i]).sum()
 
-    else: 
-        ind_mix_stick_beta_params = vb_params_dict['ind_admix_params']['stick_beta']
-        e_stick_lengths = \
-                modeling_lib.get_e_beta(ind_mix_stick_beta_params)
-        e_ind_admix = cluster_quantities_lib.get_mixture_weights_from_stick_break_propns(e_stick_lengths)
-
-    e_pop_freq = modeling_lib.get_e_beta(vb_params_dict['pop_freq_beta_params'])
+        xticks.append(xint + incr * 0.5)
     
-    return e_ind_admix, e_pop_freq
+        xint += incr
+        
+        if draw_lines:
+            ax.axvline(xint, color = 'grey', linestyle = ':', linewidth = 2)
+            ax.axhline(xint, color = 'grey', linestyle = ':', linewidth = 2)
+    
+    ax.set_xticks(xticks)
+    ax.set_xticklabels([x for x in unique_labels],
+                       rotation=45, ha='left', 
+                       fontsize = 12);
+    ax.set_yticks(xticks)
+    ax.set_yticklabels([x for x in unique_labels],
+                       rotation=45, ha='right', 
+                       fontsize = 12);
+
+    ax.set_xlim(0, len(labels))
+    ax.set_ylim(len(labels), 0)
+
