@@ -44,8 +44,23 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     vb_params_paragami['pop_freq_dirichlet_params'] = \
         paragami.NumericArrayPattern(shape=(k_approx, n_loci, n_allele), 
                                      lb = 0.0)
+    
+    # population-breaking stick parameters
+    pop_stick_params_paragami = paragami.PatternDict()
+    pop_stick_params_paragami['stick_means'] = \
+        paragami.NumericArrayPattern(shape = (k_approx - 1, ))
+    pop_stick_params_paragami['stick_infos'] = \
+        paragami.NumericArrayPattern(shape = (k_approx - 1,),
+                                        lb = 0.0)
+    vb_params_paragami['pop_stick_params'] = pop_stick_params_paragami
+    
+    # variational multinomial parameters for the individual-level 
+    # population indices
+    vb_params_paragami['pop_indx_multinom_params'] = \
+        paragami.SimplexArrayPattern(simplex_size = k_approx, 
+                                     array_shape = (n_obs, k_approx))
 
-    # BNP sticks
+    # individual stick-breaking
     ind_admix_params_paragami = paragami.PatternDict()
     
     # variational distribution for each stick is logitnormal
@@ -82,9 +97,14 @@ def get_default_prior_params(n_allele):
     prior_params_dict = dict()
     prior_params_paragami = paragami.PatternDict()
 
-    # DP prior parameter for the individual admixtures
+    # DP prior parameter population-breaking proportions
     prior_params_dict['dp_prior_alpha'] = np.array([6.0])
     prior_params_paragami['dp_prior_alpha'] = \
+        paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
+    
+    # DP prior parameter on individual-breaking proportions
+    prior_params_dict['ind_dp_prior_alpha'] = np.array([6.0])
+    prior_params_paragami['ind_dp_prior_alpha'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
     # prior on the allele frequencies
@@ -98,32 +118,45 @@ def get_default_prior_params(n_allele):
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(e_log_1m_sticks, e_log_pop_freq,
-                    dp_prior_alpha, allele_prior_lambda_vec):
+def get_e_log_prior(vb_params_dict, moments_dict, prior_params_dict):
     
     # get expected prior term
 
-    # dp prior on individual mixtures
-    ind_mix_dp_prior =  (dp_prior_alpha - 1) * np.sum(e_log_1m_sticks)
+    # dp prior on stick-breaking
+    ind_mix_dp_prior =  (prior_params_dict['ind_dp_prior_alpha'] - 1) * \
+                            np.sum(moments_dict['e_log_1m_ind_sticks'])
+    pop_mix_dp_prior =  (prior_params_dict['dp_prior_alpha'] - 1) * \
+                            np.sum(moments_dict['e_log_1m_pop_sticks'])
 
     # allele frequency prior
     # sum over k_approx and n_loci
     # this is len(n_allele)
-    _e_log_pop_freq_allele = e_log_pop_freq.sum(0).sum(0)
-    allele_freq_beta_prior = ((allele_prior_lambda_vec - 1) * _e_log_pop_freq_allele).sum()
-
-    return ind_mix_dp_prior + allele_freq_beta_prior
+    _e_log_pop_freq_allele = moments_dict['e_log_pop_freq'].sum(0).sum(0)
+    allele_freq_beta_prior = ((prior_params_dict['allele_prior_lambda_vec'] - 1) * _e_log_pop_freq_allele).sum()
+    
+    # prior on individual level multinomial
+    ind_multi_prior = np.einsum('ijk, k -> ij', 
+                                vb_params_dict['pop_indx_multinom_params'], 
+                                moments_dict['e_log_pop_cluster_probs']).sum()
+    
+    return ind_mix_dp_prior + pop_mix_dp_prior + allele_freq_beta_prior + ind_multi_prior
 
 ##########################
 # Entropy
 ##########################
 def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     
-    # entropy of stick-breaking distribution
-    stick_entropy = \
+    # entropy of stick-breaking distributions
+    ind_stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(
                                 vb_params_dict['ind_admix_params']['stick_means'],
                                 vb_params_dict['ind_admix_params']['stick_infos'],
+                                gh_loc, gh_weights)
+    
+    pop_stick_entropy = \
+        modeling_lib.get_stick_breaking_entropy(
+                                vb_params_dict['pop_stick_params']['stick_means'],
+                                vb_params_dict['pop_stick_params']['stick_infos'],
                                 gh_loc, gh_weights)
     
     # dirichlet entropy term
@@ -133,18 +166,29 @@ def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     # z entropy 
     z_entropy = modeling_lib.multinom_entropy(e_z)
     
-    return stick_entropy + dir_entropy + z_entropy
+    # individual level multinomial entropy 
+    ind_multinom_entropy = modeling_lib.multinom_entropy(vb_params_dict['pop_indx_multinom_params'])
+    
+    return ind_stick_entropy + pop_stick_entropy + dir_entropy + z_entropy + ind_multinom_entropy
 
 ##########################
 # Likelihood term
 ##########################
-def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq):
+def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq, pop_indx_multinom_params):
     
-    # this is n_loci x n_allele x k_approx
-    e_log_pop_freq_t = e_log_pop_freq.transpose((1, 2, 0))
+    # e_log_pop_freq is k_approx x n_loci x n_allele
+    # pop_indx_multinom_params is n_obs x k_approx x k_approx, 
+    # where the last dimension sums to one
     
-    # this is 1 x n_loci x 1 x n_allele x k_approx
-    e_log_pop_freq_t = np.expand_dims(e_log_pop_freq_t, 0)
+    # this is n_obs x k_approx x n_loci x n_allele
+    e_log_pop_freq_innerprod = np.einsum('ijk, klm -> ijlm',
+                                         pop_indx_multinom_params,
+                                         e_log_pop_freq)
+    
+    # this is n_obs x n_loci x n_allele x k_approx
+    e_log_pop_freq_t = e_log_pop_freq_innerprod.transpose((0, 2, 3, 1))
+    
+    # this is n_obs x n_loci x 1 x n_allele x k_approx
     e_log_pop_freq_t = np.expand_dims(e_log_pop_freq_t, 2)
     
     # this is n_obs x n_loci x 2 x n_allele x k_approx
@@ -154,27 +198,28 @@ def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq):
     # return something that is n_obs x n_loci x 2 x k_approx
     return outer_prod.sum(3)
 
-def get_z_nat_params(g_obs, e_log_pop_freq, e_log_cluster_probs): 
+def get_z_nat_params(g_obs, e_log_pop_freq, pop_indx_multinom_params, e_log_ind_cluster_probs): 
     
     # this is n_obs x n_loci x 2 x k_approx
-    loglik_gene_nlk = get_e_loglik_gene_nlk(g_obs, e_log_pop_freq)
+    loglik_gene_nlk = get_e_loglik_gene_nlk(g_obs, 
+                                            e_log_pop_freq,
+                                            pop_indx_multinom_params)
 
     # make this this is n_obs x 1 x 1 x k_approx
-    _e_log_cluster_probs = np.expand_dims(e_log_cluster_probs, axis = 1)
-    _e_log_cluster_probs = np.expand_dims(_e_log_cluster_probs, axis = 1)
+    _e_log_ind_cluster_probs = np.expand_dims(e_log_ind_cluster_probs, axis = 1)
+    _e_log_ind_cluster_probs = np.expand_dims(_e_log_ind_cluster_probs, axis = 1)
                                             
     # add individual belongings
-    return _e_log_cluster_probs + loglik_gene_nlk
+    return _e_log_ind_cluster_probs + loglik_gene_nlk
 
-def get_optimal_z(g_obs, e_log_pop_freq, e_log_cluster_probs):
+def get_optimal_z(g_obs, e_log_pop_freq, pop_indx_multinom_params, e_log_ind_cluster_probs):
 
     z_nat_param = \
-        get_z_nat_params(g_obs, e_log_pop_freq, e_log_cluster_probs)
+        get_z_nat_params(g_obs, e_log_pop_freq, pop_indx_multinom_params, e_log_ind_cluster_probs)
 
     e_z = jax.nn.softmax(z_nat_param, -1)
 
     return e_z, z_nat_param
-
 
 
 def get_kl(g_obs, 
@@ -218,30 +263,32 @@ def get_kl(g_obs,
     dp_prior_alpha = prior_params_dict['dp_prior_alpha']
     allele_prior_lambda_vec = prior_params_dict['allele_prior_lambda_vec']
     
-    e_log_sticks, e_log_1m_sticks, \
-        e_log_cluster_probs, e_log_pop_freq = \
-            get_moments_from_vb_params_dict(vb_params_dict,
-                                            gh_loc = gh_loc,
-                                            gh_weights = gh_weights)
+    moments_dict = get_moments_from_vb_params_dict(vb_params_dict,
+                                                   gh_loc = gh_loc,
+                                                   gh_weights = gh_weights)
                                             
     
     # joint log likelihood
     e_z_opt, z_nat_param = \
-        get_optimal_z(g_obs, e_log_pop_freq, e_log_cluster_probs)
+        get_optimal_z(g_obs, 
+                      moments_dict['e_log_pop_freq'], 
+                      vb_params_dict['pop_indx_multinom_params'], 
+                      moments_dict['e_log_ind_cluster_probs'])
     
     if e_z is None:
         e_z = e_z_opt
     
     e_loglik = np.sum(e_z * z_nat_param)
     
+    
+    
     # entropy term
     entropy = get_entropy(vb_params_dict, e_z, gh_loc, gh_weights) 
     
     # prior term 
-    e_log_prior = get_e_log_prior(e_log_1m_sticks,
-                                  e_log_pop_freq,
-                                  dp_prior_alpha,
-                                  allele_prior_lambda_vec)
+    e_log_prior = get_e_log_prior(vb_params_dict, 
+                                  moments_dict,
+                                  prior_params_dict)
     
     elbo = e_loglik + entropy + e_log_prior
 
@@ -258,32 +305,55 @@ def get_kl(g_obs,
 ######################
 # a useful function to get posterior moments
 ######################
-def get_moments_from_vb_params_dict(vb_params_dict,
-                                    gh_loc,
-                                    gh_weights):
 
-    ind_mix_stick_propn_mean = vb_params_dict['ind_admix_params']['stick_means']
-    ind_mix_stick_propn_info = vb_params_dict['ind_admix_params']['stick_infos']
+def _get_stick_moments_from_dict(stick_params_dict, gh_loc, gh_weights): 
+    stick_means = stick_params_dict['stick_means']
+    stick_infos = stick_params_dict['stick_infos']
     
-    # expected log stick lengths
     e_log_sticks, e_log_1m_sticks = \
         ef.get_e_log_logitnormal(
-            lognorm_means = ind_mix_stick_propn_mean,
-            lognorm_infos = ind_mix_stick_propn_info,
+            lognorm_means = stick_means,
+            lognorm_infos = stick_infos,
             gh_loc = gh_loc,
             gh_weights = gh_weights)
     
-    # expected log mixture weights
     e_log_cluster_probs = \
         modeling_lib.get_e_log_cluster_probabilities_from_e_log_stick(
                             e_log_sticks, e_log_1m_sticks)
+    
+    return e_log_sticks, e_log_1m_sticks, e_log_cluster_probs
                                             
-    # population dirichlet parameters
+
+def get_moments_from_vb_params_dict(vb_params_dict,
+                                    gh_loc,
+                                    gh_weights):
+    
+    # expected log individual stick lengths
+    e_log_ind_sticks, e_log_1m_ind_sticks, e_log_ind_cluster_probs = \
+        _get_stick_moments_from_dict(vb_params_dict['ind_admix_params'], 
+                                     gh_loc, 
+                                     gh_weights)
+                                            
+    # population dirichlet moments
     pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
     e_log_pop_freq = \
         modeling_lib.get_e_log_dirichlet(pop_freq_dir_params)
     
-    return e_log_sticks, e_log_1m_sticks, e_log_cluster_probs, e_log_pop_freq
+    # population stick-breaking moments
+    e_log_pop_sticks, e_log_1m_pop_sticks, e_log_pop_cluster_probs = \
+        _get_stick_moments_from_dict(vb_params_dict['pop_stick_params'], 
+                                     gh_loc, 
+                                     gh_weights)
+    
+    moments_dict = dict({'e_log_ind_sticks' : e_log_ind_sticks, 
+                         'e_log_1m_ind_sticks' : e_log_1m_ind_sticks,
+                         'e_log_ind_cluster_probs' : e_log_ind_cluster_probs, 
+                         'e_log_pop_sticks' : e_log_pop_sticks, 
+                         'e_log_1m_pop_sticks' : e_log_1m_pop_sticks,
+                         'e_log_pop_cluster_probs' : e_log_pop_cluster_probs, 
+                         'e_log_pop_freq': e_log_pop_freq})    
+    
+    return moments_dict
 
 
 #####################
