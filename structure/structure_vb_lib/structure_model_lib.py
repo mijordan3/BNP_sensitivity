@@ -48,7 +48,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     # population-breaking stick parameters
     pop_stick_params_paragami = paragami.PatternDict()
     pop_stick_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1, ))
+        paragami.NumericArrayPattern(shape = (k_approx - 1,))
     pop_stick_params_paragami['stick_infos'] = \
         paragami.NumericArrayPattern(shape = (k_approx - 1,),
                                         lb = 0.0)
@@ -125,6 +125,7 @@ def get_e_log_prior(vb_params_dict, moments_dict, prior_params_dict):
     # dp prior on stick-breaking
     ind_mix_dp_prior =  (prior_params_dict['ind_dp_prior_alpha'] - 1) * \
                             np.sum(moments_dict['e_log_1m_ind_sticks'])
+    
     pop_mix_dp_prior =  (prior_params_dict['dp_prior_alpha'] - 1) * \
                             np.sum(moments_dict['e_log_1m_pop_sticks'])
 
@@ -179,11 +180,17 @@ def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq, pop_indx_multinom_params):
     # pop_indx_multinom_params is n_obs x k_approx x k_approx, 
     # where the last dimension sums to one
     
+#     n_obs = pop_indx_multinom_params.shape[0]
+#     k_approx = pop_indx_multinom_params.shape[-1]
+    
+#     print('setting cs')
+#     pop_indx_multinom_params = np.stack((np.eye(k_approx), ) * n_obs)
+    
     # this is n_obs x k_approx x n_loci x n_allele
     e_log_pop_freq_innerprod = np.einsum('ijk, klm -> ijlm',
                                          pop_indx_multinom_params,
                                          e_log_pop_freq)
-    
+        
     # this is n_obs x n_loci x n_allele x k_approx
     e_log_pop_freq_t = e_log_pop_freq_innerprod.transpose((0, 2, 3, 1))
     
@@ -196,6 +203,12 @@ def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq, pop_indx_multinom_params):
     # sum over n_allele
     # return something that is n_obs x n_loci x 2 x k_approx
     return outer_prod.sum(3)
+
+#     # g_obs is n_obs x n_loci x 2 x n_allele
+#     return np.einsum('nlij, nklj -> nlik', 
+#                      g_obs, 
+#                      e_log_pop_freq_innerprod)
+    
 
 def get_z_nat_params(g_obs, e_log_pop_freq, pop_indx_multinom_params, e_log_ind_cluster_probs): 
     
