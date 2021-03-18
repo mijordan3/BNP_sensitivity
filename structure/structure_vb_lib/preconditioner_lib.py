@@ -47,7 +47,10 @@ def _eval_dirichlet_cov_matmul(dirichlet_params, return_info, return_sqrt, v):
 
     def f(x):
 
-        cov = _get_log_dirichlet_covariance(x[0:param_dim], return_info, return_sqrt, x[param_dim:])
+        cov = _get_log_dirichlet_covariance(x[0:param_dim], 
+                                            return_info,
+                                            return_sqrt,
+                                            x[param_dim:])
 
         return cov
             
@@ -66,6 +69,11 @@ def _get_multinomial_covariance(multinom_params, return_info, return_sqrt, v):
     # mulitply by jacobian 
     jac = paragami.simplex_patterns._constrain_simplex_jacobian(multinom_params)
     out = np.dot(np.dot(jac.transpose(), cov), jac)
+    
+    out = out + np.eye(out.shape[0]) * 1e-6
+    
+    # symmetrize for stability?
+    out = 0.5 * (out + out.transpose())
     
     if return_sqrt: 
         matmul_funs = _get_sym_matrix_inv_sqrt_funcs(out)
@@ -118,6 +126,10 @@ def _eval_normal_cov_matmul(infos, return_info, return_sqrt, v):
         
     return matmul_v
 
+###################
+# combine everything
+###################
+
 def get_mfvb_cov_matmul(v, vb_params_dict,
                         vb_params_paragami,
                         return_info = False, 
@@ -168,7 +180,8 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
     # blocks for population stick-breaking 
     block2_dim = vb_params_paragami['pop_stick_params'].flat_length(free = True)
     block2 = _eval_normal_cov_matmul(vb_params_dict['pop_stick_params']['stick_infos'],
-                                     return_info, return_sqrt, 
+                                     return_info,
+                                     return_sqrt, 
                                      v[d0:(d0 + block2_dim)])
     
     d0 = d0 + block2_dim
@@ -186,7 +199,8 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
     # blocks for population stick-breaking 
     block4_dim = vb_params_paragami['ind_admix_params'].flat_length(free = True)
     block4 = _eval_normal_cov_matmul(vb_params_dict['ind_admix_params']['stick_infos'],
-                                     return_info, return_sqrt, 
+                                     return_info, 
+                                     return_sqrt, 
                                      v[d0:(d0 + block4_dim)])
     
 

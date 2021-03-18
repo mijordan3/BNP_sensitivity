@@ -129,7 +129,7 @@ def optimize_kl(get_kl_loss,
                vb_params_paragami,
                get_grad = None,
                get_hvp = None,
-               lbfgs_maxiter = None, 
+               lbfgs_maxiter = 5000, 
                run_lbfgs = True,
                run_newton = True): 
     
