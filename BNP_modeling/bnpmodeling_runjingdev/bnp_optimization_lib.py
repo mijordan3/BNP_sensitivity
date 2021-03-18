@@ -129,6 +129,7 @@ def optimize_kl(get_kl_loss,
                vb_params_paragami,
                get_grad = None,
                get_hvp = None,
+               lbfgs_maxiter = None, 
                run_lbfgs = True,
                run_newton = True): 
     
@@ -164,9 +165,11 @@ def optimize_kl(get_kl_loss,
     if run_lbfgs: 
         print('Running L-BFGS-B ...')
         out = minimize(fun = lambda x : onp.array(get_loss(x)), 
-                             x0 = x0, 
-                             method = 'L-BFGS-B', 
-                             jac = lambda x : onp.array(get_grad(x)))    
+                       x0 = x0, 
+                       method = 'L-BFGS-B', 
+                       jac = lambda x : onp.array(get_grad(x)), 
+                       options = {'maxiter': lbfgs_maxiter})    
+        
         print('L-BFGS-B time: {:.03f}sec'.format(time.time() - t0))
         lbfgs_opt = out.x
         print('BFGS out: ', out.message)
@@ -179,16 +182,22 @@ def optimize_kl(get_kl_loss,
     if run_newton: 
         t1 = time.time() 
         print('Running trust-ncg ... ')
-        out = minimize(fun = lambda x : onp.array(get_loss(x)), 
+        
+        def fun(x): 
+            loss = onp.array(get_loss(x))
+            print(loss)
+            return loss
+        
+        out = minimize(fun = fun, 
                    x0 = lbfgs_opt, 
                    method = 'trust-ncg', 
                    jac = lambda x : onp.array(get_grad(x)), 
                    hessp = lambda x,v : onp.array(get_hvp(x, v)))
         print('Newton time: {:.03f}sec'.format(time.time() - t1))
+        print('Newton out: ', out.message)
 
     vb_opt = out.x
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
-    print('Newton out: ', out.message)
     
     print('done. ')
     
