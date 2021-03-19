@@ -65,8 +65,10 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
         _get_stick_params((k_approx - 1, ))
     
     # individual stick-breaking
+    print("setting K-approx of individuals to 5")
+    k_approx2 = 5
     vb_global_params['ind_admix_params'] = \
-        _get_stick_params((n_obs, k_approx - 1,))
+        _get_stick_params((n_obs, k_approx2 - 1))
     
     vb_params_paragami['global_params'] = vb_global_params
     
@@ -74,7 +76,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     # population indices
     vb_params_paragami['pop_indx_multinom_params'] = \
         paragami.SimplexArrayPattern(simplex_size = k_approx, 
-                                     array_shape = (n_obs, k_approx))
+                                     array_shape = (n_obs, k_approx2))
 
     vb_params_dict = vb_params_paragami.random(key = prng_key)
 

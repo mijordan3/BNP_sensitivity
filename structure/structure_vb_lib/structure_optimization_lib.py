@@ -165,26 +165,23 @@ class StructurePrecondObjective(StructureObjective):
         self.compile_preconditioned_objectives(compile_hvp)
         
     def _precondition(self, x, precond_params): 
-        print('not actually precoditioned')
-        return x
 
-#         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
+        vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
-#         return preconditioner_lib.get_mfvb_cov_matmul(x,
-#                                                       vb_params_dict,
-#                                                       self.vb_params_paragami,
-#                                                       return_info = False, 
-#                                                       return_sqrt = True)
+        return preconditioner_lib.get_mfvb_cov_matmul(x,
+                                                      vb_params_dict,
+                                                      self.vb_params_paragami,
+                                                      return_info = False, 
+                                                      return_sqrt = True)
     
     def _unprecondition(self, x_c, precond_params):
-        return x_c
         
-#         vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
+        vb_params_dict = self.vb_params_paragami.fold(precond_params, free = True)
         
-#         return preconditioner_lib.get_mfvb_cov_matmul(x_c, vb_params_dict,
-#                                                       self.vb_params_paragami,
-#                                                       return_info = True, 
-#                                                       return_sqrt = True)
+        return preconditioner_lib.get_mfvb_cov_matmul(x_c, vb_params_dict,
+                                                      self.vb_params_paragami,
+                                                      return_info = True, 
+                                                      return_sqrt = True)
         
     def _f_precond(self, x_c, precond_params): 
         return self._f(self._unprecondition(x_c, precond_params))

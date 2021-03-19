@@ -169,8 +169,8 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
 
     ##############
     # blocks for the population frequency
-    block1_dim = vb_params_paragami['pop_freq_dirichlet_params'].flat_length(free = True)
-    block1 = _eval_dirichlet_cov_matmul(vb_params_dict['pop_freq_dirichlet_params'], 
+    block1_dim = vb_params_paragami['global_params']['pop_freq_dirichlet_params'].flat_length(free = True)
+    block1 = _eval_dirichlet_cov_matmul(vb_params_dict['global_params']['pop_freq_dirichlet_params'], 
                                         return_info, 
                                         return_sqrt,
                                         v[0:block1_dim])
@@ -178,30 +178,28 @@ def get_mfvb_cov_matmul(v, vb_params_dict,
     
     #############
     # blocks for population stick-breaking 
-    block2_dim = vb_params_paragami['pop_stick_params'].flat_length(free = True)
-    block2 = _eval_normal_cov_matmul(vb_params_dict['pop_stick_params']['stick_infos'],
+    block2_dim = vb_params_paragami['global_params']['pop_stick_params'].flat_length(free = True)
+    block2 = _eval_normal_cov_matmul(vb_params_dict['global_params']['pop_stick_params']['stick_infos'],
                                      return_info,
                                      return_sqrt, 
                                      v[d0:(d0 + block2_dim)])
-    
     d0 = d0 + block2_dim
-    
+        
     #############
-    # blocks for multinomial topics
-    block3_dim = vb_params_paragami['pop_indx_multinom_params'].flat_length(free = True)
-    block3 = _eval_multinomial_cov_matmul(vb_params_dict['pop_indx_multinom_params'],
-                                          return_info,
-                                          return_sqrt, 
-                                          v[d0:(d0 + block3_dim)])
+    # blocks for population stick-breaking 
+    block3_dim = vb_params_paragami['global_params']['ind_admix_params'].flat_length(free = True)
+    block3 = _eval_normal_cov_matmul(vb_params_dict['global_params']['ind_admix_params']['stick_infos'],
+                                     return_info, 
+                                     return_sqrt, 
+                                     v[d0:(d0 + block3_dim)])
     d0 = d0 + block3_dim 
     
     #############
-    # blocks for population stick-breaking 
-    block4_dim = vb_params_paragami['ind_admix_params'].flat_length(free = True)
-    block4 = _eval_normal_cov_matmul(vb_params_dict['ind_admix_params']['stick_infos'],
-                                     return_info, 
-                                     return_sqrt, 
-                                     v[d0:(d0 + block4_dim)])
-    
+    # blocks for multinomial topics
+    block4_dim = vb_params_paragami['pop_indx_multinom_params'].flat_length(free = True)
+    block4 = _eval_multinomial_cov_matmul(vb_params_dict['pop_indx_multinom_params'],
+                                          return_info,
+                                          return_sqrt, 
+                                          v[d0:(d0 + block4_dim)])
 
     return np.concatenate((block1, block2, block3, block4))
