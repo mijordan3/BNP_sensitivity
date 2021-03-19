@@ -13,6 +13,17 @@ from numpy.polynomial.hermite import hermgauss
 # Set up vb parameters
 ##########################
 
+def _get_stick_params(shape): 
+    # TODO put this in the shared BNP folder
+    
+    stick_params_paragami = paragami.PatternDict()
+    stick_params_paragami['stick_means'] = \
+        paragami.NumericArrayPattern(shape = shape)
+    stick_params_paragami['stick_infos'] = \
+        paragami.NumericArrayPattern(shape = shape, lb = 0.0)
+    
+    return stick_params_paragami
+
 def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
                                   prng_key = jax.random.PRNGKey(0)):
     """
@@ -39,20 +50,25 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     """
 
     vb_params_paragami = paragami.PatternDict()
-
+    
+    # kinda a misnomer ... this includes individual admixtures 
+    # which isn't really global ... 
+    vb_global_params = paragami.PatternDict()
+    
     # variational beta parameters for population allele frequencies
-    vb_params_paragami['pop_freq_dirichlet_params'] = \
+    vb_global_params['pop_freq_dirichlet_params'] = \
         paragami.NumericArrayPattern(shape=(k_approx, n_loci, n_allele), 
                                      lb = 0.0)
     
     # population-breaking stick parameters
-    pop_stick_params_paragami = paragami.PatternDict()
-    pop_stick_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    pop_stick_params_paragami['stick_infos'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,),
-                                        lb = 0.0)
-    vb_params_paragami['pop_stick_params'] = pop_stick_params_paragami
+    vb_global_params['pop_stick_params'] = \
+        _get_stick_params((k_approx - 1, ))
+    
+    # individual stick-breaking
+    vb_global_params['ind_admix_params'] = \
+        _get_stick_params((n_obs, k_approx - 1,))
+    
+    vb_params_paragami['global_params'] = vb_global_params
     
     # variational multinomial parameters for the individual-level 
     # population indices
@@ -60,17 +76,6 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
         paragami.SimplexArrayPattern(simplex_size = k_approx, 
                                      array_shape = (n_obs, k_approx))
 
-    # individual stick-breaking
-    ind_admix_params_paragami = paragami.PatternDict()
-    
-    # variational distribution for each stick is logitnormal
-    ind_admix_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
-    ind_admix_params_paragami['stick_infos'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
-                                        lb = 0.0)
-    vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
-    
     vb_params_dict = vb_params_paragami.random(key = prng_key)
 
     return vb_params_dict, vb_params_paragami
@@ -118,7 +123,7 @@ def get_default_prior_params(n_allele):
 ##########################
 # Expected prior term
 ##########################
-def get_e_log_prior(vb_params_dict, moments_dict, prior_params_dict):
+def get_e_log_prior(vb_params_dict, e_c, moments_dict, prior_params_dict):
     
     # get expected prior term
 
@@ -136,15 +141,14 @@ def get_e_log_prior(vb_params_dict, moments_dict, prior_params_dict):
     allele_freq_beta_prior = ((prior_params_dict['allele_prior_lambda_vec'] - 1) * _e_log_pop_freq_allele).sum()
     
     # prior on individual level multinomial
-    ind_multi_prior = (vb_params_dict['pop_indx_multinom_params'].sum(0).sum(0) * \
-                       moments_dict['e_log_pop_cluster_probs']).sum()
+    ind_multi_prior = (e_c.sum(0).sum(0) * moments_dict['e_log_pop_cluster_probs']).sum()
     
     return ind_mix_dp_prior + pop_mix_dp_prior + allele_freq_beta_prior + ind_multi_prior
 
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
+def get_entropy(vb_params_dict, e_z, e_c, gh_loc, gh_weights):
     
     # entropy of stick-breaking distributions
     ind_stick_entropy = \
@@ -167,7 +171,7 @@ def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     z_entropy = modeling_lib.multinom_entropy(e_z)
     
     # individual level multinomial entropy 
-    ind_multinom_entropy = modeling_lib.multinom_entropy(vb_params_dict['pop_indx_multinom_params'])
+    ind_multinom_entropy = modeling_lib.multinom_entropy(e_c)
     
     return ind_stick_entropy + pop_stick_entropy + dir_entropy + z_entropy + ind_multinom_entropy
 
@@ -240,6 +244,7 @@ def get_kl(g_obs,
            gh_loc, 
            gh_weights,
            e_log_phi = None,
+           e_c = None, 
            e_z = None):
 
     """
@@ -272,28 +277,37 @@ def get_kl(g_obs,
     """
 
     # get moments
-    moments_dict = get_moments_from_vb_params_dict(vb_params_dict,
-                                                   gh_loc = gh_loc,
-                                                   gh_weights = gh_weights)
+    moments_dict = get_global_moments(vb_params_dict['global_params'],
+                                      gh_loc = gh_loc,
+                                      gh_weights = gh_weights)
+    
+    if e_c is None: 
+        e_c = vb_params_dict['pop_indx_multinom_params']
+
                                             
     
     # joint log likelihood
     e_z_opt, z_nat_param = \
         get_optimal_z(g_obs, 
                       moments_dict['e_log_pop_freq'], 
-                      vb_params_dict['pop_indx_multinom_params'], 
+                      e_c, 
                       moments_dict['e_log_ind_cluster_probs'])
     
     if e_z is None:
-        e_z = e_z_opt
+        e_z = e_z_opt        
     
     e_loglik = np.sum(e_z * z_nat_param)
     
     # entropy term
-    entropy = get_entropy(vb_params_dict, e_z, gh_loc, gh_weights) 
+    entropy = get_entropy(vb_params_dict['global_params'],
+                          e_c,
+                          e_z,
+                          gh_loc,
+                          gh_weights) 
     
     # prior term 
-    e_log_prior = get_e_log_prior(vb_params_dict, 
+    e_log_prior = get_e_log_prior(vb_params_dict['global_params'],
+                                  e_c, 
                                   moments_dict,
                                   prior_params_dict)
     
@@ -331,24 +345,24 @@ def _get_stick_moments_from_dict(stick_params_dict, gh_loc, gh_weights):
     return e_log_sticks, e_log_1m_sticks, e_log_cluster_probs
                                             
 
-def get_moments_from_vb_params_dict(vb_params_dict,
-                                    gh_loc,
-                                    gh_weights):
+def get_global_moments(vb_global_params,
+                       gh_loc,
+                       gh_weights):
     
     # expected log individual stick lengths
     e_log_ind_sticks, e_log_1m_ind_sticks, e_log_ind_cluster_probs = \
-        _get_stick_moments_from_dict(vb_params_dict['ind_admix_params'], 
+        _get_stick_moments_from_dict(vb_global_params['ind_admix_params'], 
                                      gh_loc, 
                                      gh_weights)
                                             
     # population dirichlet moments
-    pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
+    pop_freq_dir_params = vb_global_params['pop_freq_dirichlet_params']
     e_log_pop_freq = \
         modeling_lib.get_e_log_dirichlet(pop_freq_dir_params)
     
     # population stick-breaking moments
     e_log_pop_sticks, e_log_1m_pop_sticks, e_log_pop_cluster_probs = \
-        _get_stick_moments_from_dict(vb_params_dict['pop_stick_params'], 
+        _get_stick_moments_from_dict(vb_global_params['pop_stick_params'], 
                                      gh_loc, 
                                      gh_weights)
     

@@ -16,7 +16,7 @@ def assert_positive(x):
 # define entropies
 def multinom_entropy(e_z):
     # returns the entropy of the cluster belongings
-    return -1 * np.sum(e_z * np.log(e_z + 1e-8))
+    return -1 * np.sum(e_z * np.log(e_z))
 
 def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
                                 gh_loc, gh_weights):
