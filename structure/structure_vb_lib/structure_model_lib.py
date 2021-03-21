@@ -24,7 +24,8 @@ def _get_stick_params(shape):
     
     return stick_params_paragami
 
-def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
+def get_vb_params_paragami_object(n_obs, n_loci, n_allele, 
+                                  k_approx, k_approx_ind,
                                   prng_key = jax.random.PRNGKey(0)):
     """
     Returns a paragami patterned dictionary
@@ -51,7 +52,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
 
     vb_params_paragami = paragami.PatternDict()
     
-    # kinda a misnomer ... this includes individual admixtures 
+    # kinda a misnomer: this includes individual admixtures 
     # which isn't really global ... 
     vb_global_params = paragami.PatternDict()
     
@@ -65,10 +66,8 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
         _get_stick_params((k_approx - 1, ))
     
     # individual stick-breaking
-    print("setting K-approx of individuals to 5")
-    k_approx2 = 5
     vb_global_params['ind_admix_params'] = \
-        _get_stick_params((n_obs, k_approx2 - 1))
+        _get_stick_params((n_obs, k_approx_ind - 1))
     
     vb_params_paragami['global_params'] = vb_global_params
     
@@ -76,7 +75,7 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     # population indices
     vb_params_paragami['pop_indx_multinom_params'] = \
         paragami.SimplexArrayPattern(simplex_size = k_approx, 
-                                     array_shape = (n_obs, k_approx2))
+                                     array_shape = (n_obs, k_approx_ind))
 
     vb_params_dict = vb_params_paragami.random(key = prng_key)
 
@@ -183,15 +182,9 @@ def get_entropy(vb_params_dict, e_z, e_c, gh_loc, gh_weights):
 def get_e_loglik_gene_nlk(g_obs, e_log_pop_freq, pop_indx_multinom_params):
     
     # e_log_pop_freq is k_approx x n_loci x n_allele
-    # pop_indx_multinom_params is n_obs x k_approx x k_approx, 
+    # pop_indx_multinom_params is n_obs x k_approx_ind x k_approx, 
     # where the last dimension sums to one
-    
-#     n_obs = pop_indx_multinom_params.shape[0]
-#     k_approx = pop_indx_multinom_params.shape[-1]
-    
-#     print('setting cs')
-#     pop_indx_multinom_params = np.stack((np.eye(k_approx), ) * n_obs)
-    
+        
     # this is n_obs x k_approx x n_loci x n_allele
     e_log_pop_freq_innerprod = np.einsum('ijk, klm -> ijlm',
                                          pop_indx_multinom_params,
@@ -286,8 +279,6 @@ def get_kl(g_obs,
     if e_c is None: 
         e_c = vb_params_dict['pop_indx_multinom_params']
 
-                                            
-    
     # joint log likelihood
     e_z_opt, z_nat_param = \
         get_optimal_z(g_obs, 
