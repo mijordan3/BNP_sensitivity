@@ -3,39 +3,10 @@ import jax.numpy as np
 
 import numpy as onp
 
-from copy import deepcopy
-
-from sklearn.cluster import KMeans
-
-from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl
+from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, init_centroids_with_kmeans
 
 from bnpgmm_runjingdev.gmm_clustering_lib import get_kl
 from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_optimal_z_from_vb_dict
-
-def init_centroids_w_kmeans(y, 
-                            k_approx,
-                            n_kmeans_init = 10, 
-                            seed = 1): 
-    
-    
-    n_obs = np.shape(y)[0]
-    dim = np.shape(y)[1]
-
-    # K means init.
-    for i in range(n_kmeans_init):
-        km = KMeans(n_clusters = k_approx, 
-                    random_state = seed).fit(y)
-        enertia = km.inertia_
-        if (i == 0):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-        elif (enertia < enertia_best):
-            enertia_best = enertia
-            km_best = deepcopy(km)
-    
-    init_centroids = np.array(km_best.cluster_centers_)
-    
-    return init_centroids, km_best
 
 def cluster_and_get_k_means_inits(y, 
                                   vb_params_paragami,
