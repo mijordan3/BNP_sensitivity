@@ -1,0 +1,34 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+<<set_single_column, echo=FALSE>>=
+# We can't use the for_arxiv toggle because knitr processes before main is
+# run.  So set the appropriate variable here.
+single_column <- TRUE       # for the arxiv
+#single_column <- FALSE      # for a two-column conference paper.
+@
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+source("R_scripts/initialize.R", echo=FALSE)
+@
+
+Here are results, and a figure. See\fig{testfig}
+%
+<<graph_fig_cap1>>=
+figcap1 <- paste(
+    "A test figure. ")
+@
+<<testfig, cache=simple_cache, fig.show='hold', fig.cap=figcap1>>=
+ggplot() + 
+  geom_point(aes(x = 1:10, y = 1:10))
+# source("R_scripts/mice/test_figures.R", echo=knitr_debug, print.eval=TRUE)
+@
+%

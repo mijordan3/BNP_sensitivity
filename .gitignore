@@ -6,6 +6,8 @@
 *.so
 *.c
 
+*.blg
+*.bbl
 *.aux
 *.fdb_latexmk
 *.fls
