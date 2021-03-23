@@ -271,6 +271,7 @@ def print_diff_plot(refit, lr, init, ax,
 # useful for plotting co-clustering matrices
 ########################
 def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax, 
+                   diff_vmax = None,
                    plot_initial = True): 
     
     i = 0
@@ -286,6 +287,12 @@ def plot_colormaps(refit_matr, lr_matr, init_matr, fig, ax,
     diff_refit = refit_matr - init_matr
     diff_lr = lr_matr - init_matr
     vmax = max(np.abs(diff_refit).max(), np.abs(diff_lr).max())
+    
+    if diff_vmax is not None: 
+        if vmax > diff_vmax: 
+            print('warning: setting manual vmax. some values were clipped')
+            
+        vmax = diff_vmax
     
     # plot refit - initial 
     ax[i].set_title('refit - init')
