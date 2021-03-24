@@ -1,5 +1,6 @@
 # Initialize R for knitr.
 
+library(tidyverse)
 library(knitr)
 library(dplyr)
 library(reshape2)
@@ -7,6 +8,9 @@ library(ggplot2)
 library(xtable)
 library(gridExtra)
 library(latex2exp)
+library(reticulate)
+np <- import("numpy")
+
 
 # This must be run from within the git repo, obviously.
 git_repo_loc <- system("git rev-parse --show-toplevel", intern=TRUE)
