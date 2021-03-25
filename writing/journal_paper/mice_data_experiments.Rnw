@@ -18,27 +18,63 @@ single_column <- TRUE       # for the arxiv
 knitr_debug <- FALSE # Set to true to see error output
 simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
+source("R_scripts/mice/mice_plotting_utils.R")
 @
 
-Here are results, and a figure. See\fig{testfig}
+Here are results, and a figure. See \fig{example_genes}.
 %
-<<example_fig_cap>>=
-example_fig_cap <- paste(
+<<example_genes_cap>>=
+example_genes_cap <- paste(
     "An example gene and regressors. ")
 SetImageSize(aspect_ratio=0.5 * base_aspect_ratio)
 @
-<<example_fig, cache=simple_cache, fig.show='hold', fig.cap=example_fig_cap>>=
+<<example_genes, cache=simple_cache, fig.show='hold', fig.cap=example_genes_cap>>=
 source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
 
-<<centroids_fig_cap>>=
-centroids_fig_cap <- paste(
+<<gene_centroids_cap>>=
+gene_centroids_cap <- paste(
     "Inferred centroids. ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.8)
 @
-<<centroids_fig, cache=simple_cache, fig.show='hold', fig.cap=centroids_fig_cap>>=
+<<gene_centroids, cache=simple_cache, fig.show='hold', fig.cap=gene_centroids_cap>>=
 source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 @
 
+
+<<gene_initial_coclustering_cap>>=
+gene_initial_coclustering_cap <- paste(
+    "initial co-clustering matrix ")
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.8)
+@
+<<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
+alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha1.0.npz')
+
+coclust_init <- load_coclust_file(alpha1_coclust_file, 'coclust_init')
+plot_coclustering(coclust_init) + 
+  xlab('gene') + 
+  ylab('gene')
+@
+
+<<gene_alpha_coclustering_cap>>=
+gene_alpha_coclustering_cap <- paste(
+    "co-clustering matrix alpha sensitivity")
+SetImageSize(aspect_ratio=base_aspect_ratio)
+@
+<<gene_alpha_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_alpha_coclustering_cap>>=
+source("R_scripts/mice/alpha_coclustering_matrix.R",
+       echo=knitr_debug, print.eval=TRUE)
+@
+
+
+<<gene_alpha_coclustering_scatter_cap>>=
+gene_alpha_coclustering_scatter_cap <- paste(
+    "co-clustering matrix alpha sensitivity, scatter plot")
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.8)
+@
+<<gene_alpha_coclustering_scatter, cache=simple_cache, fig.show='hold', fig.cap=gene_alpha_coclustering_scatter_cap>>=
+source("R_scripts/mice/alpha_coclustering_scatter.R",
+       echo=knitr_debug, print.eval=TRUE)
+@
