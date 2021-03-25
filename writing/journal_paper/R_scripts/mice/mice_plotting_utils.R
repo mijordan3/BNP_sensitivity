@@ -43,7 +43,9 @@ plot_coclustering <- function(coclustering_df,
                     ylim = c(0, n_obs2), 
                     expand = FALSE) + 
     theme_bw() + 
-    theme(legend.title = element_blank())
+    theme(legend.title = element_blank(), 
+          legend.key.width = unit(0.2,"cm"))
+  
   return(p)
 }
 
@@ -148,11 +150,54 @@ compare_coclust_lr_and_refit_scatter <-
               ymin = -min_keep, ymax = min_keep, 
               fill = 'grey', color = 'black') + 
     # identity line
-    geom_abline(slope = 1, intercept = 0) +
+    geom_abline(slope = 1, intercept = 0, color = 'red') +
     # the points
-    geom_point(alpha = 0.1) +
+    geom_point(alpha = 0.1, shape = 'o', size = 1) +
     # 2d density
-    geom_density_2d(breaks = breaks) +
-    scale_fill_brewer(palette = 'PuBu') 
+    # geom_density_2d(breaks = breaks) +
+    # scale_fill_brewer(palette = 'PuBu') + 
+    ylab('lr - init') + 
+    xlab('refit - init')
+  
   return(p)
+  }
+
+compare_coclust_lr_and_refit <- function(coclust_refit, 
+                                 coclust_lr, 
+                                 coclust_init, 
+                                 limits, 
+                                 limit_labels = NULL, 
+                                 min_keep = 1e-3, 
+                                 breaks = c(1e3, 1e4, 1e5, Inf)){
+  
+  # make scatter plot
+  p_scatter <- compare_coclust_lr_and_refit_scatter(coclust_refit, 
+                                                    coclust_lr,
+                                                    coclust_init, 
+                                                    min_keep, 
+                                                    breaks) + 
+    fontsize_theme 
+  
+  # make coclustering matrix 
+  p_coclust <- compare_coclust_lr_and_refit_matr(coclust_refit,
+                                                 coclust_lr,
+                                                 coclust_init,
+                                                 limits,
+                                                 limit_labels) + 
+    fontsize_theme + 
+    # remove axis labels
+    theme(axis.text.y = element_blank(), 
+          axis.title.y = element_blank(), 
+          # make it white so it doesnt show up
+          # but not "removed" so that the spacing works out
+          axis.title.x = element_text(color = 'white'),
+          axis.text.x = element_text(color = 'white'),
+          legend.key.width = unit(0.2,"cm"))
+  
+  return(list(p_scatter = p_scatter,
+              p_coclust = p_coclust))
+}
+
+sigmoid <- function(x){
+  return(1 / (1 + exp(-x)))
 }

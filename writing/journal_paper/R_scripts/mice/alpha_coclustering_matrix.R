@@ -1,65 +1,67 @@
 ###################
-# Load co-clustering files
+# results at alpha = 1
 ###################
 alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha1.0.npz')
 
-alpha11_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha11.0.npz')
-
-###################
-# results at alpha = 1
-###################
 coclust_refit1 <- 
-  load_coclust_file(alpha1_coclust_file, 'coclust_refit') %>% 
-  # compute differences
-  get_coclust_diff(coclust_init) %>% 
-  # label appropriately 
-  mutate(method = 'refit', alpha = 1)
+  load_coclust_file(alpha1_coclust_file, 'coclust_refit') 
 
 
 coclust_lr1 <-
-  load_coclust_file(alpha1_coclust_file, 'coclust_lr') %>% 
-  # compute differences
-  get_coclust_diff(coclust_init) %>% 
-  # label appropriately 
-  mutate(method = 'lr', alpha = 1)
+  load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
+
+# bins for the co-clustering matrix
+limits <- c(5e-5, 1e-4, 5e-3, Inf)
+labels <- c('< -5e-3', '(-5e-3, -1e-4]', '(-1e-4, -5e-5]',
+            '(-5e-5, 5e-5]', '(5e-5, 1e-4]', '(1e-4, 5e-3]', '> 5e-3')
+
+min_keep = 1e-4 # in the scatter-plot, grey out these values
+breaks = c(1e3, 1e4, 1e5, Inf) # breaks for the contours
+
+plots <- compare_coclust_lr_and_refit(coclust_refit1, 
+                                      coclust_lr1,
+                                      coclust_init, 
+                                      limits,
+                                      labels,
+                                      min_keep,
+                                      breaks)
+
+plots$p_scatter <- plots$p_scatter + ggtitle('alpha = 1')
+plots$p_coclust <- plots$p_coclust + ggtitle('')
 
 ###################
 # results at alpha = 11
 ###################
+alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha11.0.npz')
+
 coclust_refit11 <- 
-  load_coclust_file(alpha11_coclust_file, 'coclust_refit') %>% 
-  # compute differences
-  get_coclust_diff(coclust_init) %>% 
-  # label appropriately 
-  mutate(method = 'refit', alpha = 11)
-
-coclust_lr11 <- 
-  load_coclust_file(alpha11_coclust_file, 'coclust_lr') %>% 
-  # compute differences
-  get_coclust_diff(coclust_init) %>% 
-  # label appropriately 
-  mutate(method = 'lr', alpha = 11)
+  load_coclust_file(alpha1_coclust_file, 'coclust_refit') 
 
 
-# combine: 
-coclust_diff <- rbind(coclust_refit1, 
-                      coclust_lr1, 
-                      coclust_refit11, 
-                      coclust_lr11)
+coclust_lr11 <-
+  load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
 
-# plot
-limits <- c(1e-4, 1e-3, 1e-2, Inf)
-labels <- c('< -1e-2', '(-1e-2, -1e-3]', '(-1e-3, -1e-4]',
-            '(-1e-4, 1e-4]', '(1e-4, 1e-3]', '(1e-3, 1e-2]', '> 1e-2')
+plots11 <- compare_coclust_lr_and_refit(coclust_refit11, 
+                                      coclust_lr11,
+                                      coclust_init, 
+                                      limits,
+                                      labels,
+                                      min_keep,
+                                      breaks)
 
-p <- coclust_diff %>% 
-  # to make the labels look good
-  mutate(alpha = paste0('alpha = ', alpha)) %>% 
-  plot_coclust_diff(limits = limits,
-                    limit_labels = labels) +
-  facet_grid(cols = vars(alpha), 
-             rows = vars(method)) + 
-  theme(axis.title = element_blank(), 
-        axis.text = element_blank())
+plots11$p_scatter <- plots11$p_scatter + ggtitle('alpha = 11')
+plots11$p_coclust <- plots11$p_coclust + ggtitle('')
 
-p
+
+layout_matrix <- matrix(c(1, 3, 2, 4, 2, 4), ncol = 3)
+
+# grid.arrange(plots$p_scatter, plots$p_coclust, 
+#               plots11$p_scatter, plots11$p_coclust, 
+#               layout_matrix = layout_matrix)
+
+g <- arrangeGrob(plots$p_scatter, plots$p_coclust, 
+                 plots11$p_scatter, plots11$p_coclust,
+                 layout_matrix = layout_matrix)
+
+ggsave('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png', 
+       g, width = 6, height = 4.5)
