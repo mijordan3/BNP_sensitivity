@@ -25,6 +25,13 @@ opts_chunk$set(echo=knitr_debug, message=knitr_debug, warning=knitr_debug)
 # Set the default ggplot theme
 theme_set(theme_bw())
 
+# set fontsizes 
+fontsize_theme <- theme(axis.text.x = element_text(size = 6),
+                        axis.text.y = element_text(size = 6),  
+                        axis.title.x = element_text(size = 8),
+                        axis.title.y = element_text(size = 8), 
+                        legend.text=element_text(size=6))
+
 # Load into an environment rather than the global space
 LoadIntoEnvironment <- function(filename) {
   my_env <- environment()
@@ -40,17 +47,8 @@ DefineMacro <- function(macro_name, value, digits=3) {
   cat("\\newcommand{\\", macro_name, "}{", value_string, "}\n", sep="")
 }
 
-# aspect ratio refers to height / width.
-if (single_column) {
-  # This is for the arxiv (single-column) version.
-  #base_aspect_ratio <- 3.5 / (5 * 2)
-  base_aspect_ratio <- 8 / (5 * 2)
-  base_image_width <- 5.5
-} else {
-  # This is for the AISTATS (two-column) submission.
-  base_aspect_ratio <- 8 / (5 * 2)
-  base_image_width <- 4.
-}
+base_aspect_ratio <- 8 / (5 * 2)
+base_image_width <- 4.
 
 SetImageSize <- function(aspect_ratio, image_width=base_image_width) {
   ow <- "0.98\\linewidth"

@@ -62,5 +62,6 @@ expression_data %>%
   theme(strip.background = element_blank(),
         strip.text.x = element_blank()) + 
   xlab('time (hours)') + 
-  ylab('gene expr. (shifted)')
+  ylab('gene expr. (shifted)') + 
+  fontsize_theme
 

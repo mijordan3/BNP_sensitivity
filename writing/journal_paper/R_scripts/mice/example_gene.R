@@ -17,7 +17,8 @@ p1 <- example_data %>%
              size = 2) + 
   ylab('gene expr. (de-meaned)') + 
   xlab('time (hours)') + 
-  theme_bw()
+  theme_bw() + 
+  fontsize_theme
 
 # load regressor matrix
 regr_df <- data.frame(example_genes_file[['regressors']])
@@ -29,11 +30,12 @@ p2 <-
          value = 'regressor', 
          -time) %>% 
   ggplot() + 
-  geom_point(aes(x = time, y = regressor, color = basis_id)) + 
+  geom_point(aes(x = time, y = regressor, color = basis_id), size = 0.5) + 
   geom_line(aes(x = time, y = regressor, color = basis_id)) + 
   ylab('B-spline basis value') + 
   xlab('time (hours)') + 
   theme_bw() + 
-  theme(legend.position = 'none')
+  theme(legend.position = 'none') + 
+  fontsize_theme
 
 grid.arrange(p1, p2, nrow = 1)
