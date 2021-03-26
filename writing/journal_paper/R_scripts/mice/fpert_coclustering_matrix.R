@@ -5,40 +5,9 @@ fpert_coclust_file <-
 # Plot priors
 ######################
 
-infl_fun <- infl_data['influence_grid_x_prior']
-infl_norm <- max(abs(infl_fun))
-
-log_phi <- fpert_coclust_file['log_phi']
-log_phi_norm = max(abs(log_phi))
-
-# scale the infl so it matches the log phi
-scale <- log_phi_norm / infl_norm
-
-p_logphi <- 
-  ggplot() + 
-  # plot influnce function
-  geom_line(aes(x = infl_data['logit_v_grid'], 
-                y = infl_fun * scale), 
-            color = 'purple') + 
-  # plot functional perturbation 
-  geom_area(aes(x = fpert_coclust_file['logit_v_grid'], 
-                y = log_phi), 
-            fill = 'grey', color = 'black', alpha = 0.5) + 
-  scale_y_continuous(  
-    # Features of the first axis
-    name = "log phi",
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(~.*1/scale, name="influence x p0")
-  ) + 
-  geom_hline(yintercept = 0., alpha = 0.5) + 
-  ylab('influence x p0') + 
-  xlab('logit-stick') + 
-  ggtitle('log-phi') +
-  theme(axis.title.y.right = element_text(color = 'purple', 
-                                          size = axis_title_size), 
-        axis.text.y.right = element_text(color = 'purple', 
-                                         size = axis_ticksize)) + 
-  fontsize_theme
+p_logphi <- plot_influence_and_logphi(logit_v_grid, 
+                                      infl_data['influence_grid_x_prior'], 
+                                      fpert_coclust_file['log_phi'])
 
 p_priors <- 
   data.frame(logit_v_grid = fpert_coclust_file['logit_v_grid'], 

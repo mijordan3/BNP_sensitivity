@@ -32,33 +32,34 @@ plot_initial_fit <- function(){
   labels <- c('Mbololo', 'Ngangao', 'Yale', 'Chawia')  
   
   # plot
-  ind_admix_df %>% 
-    ggplot() + 
-    geom_col(aes(x = obs_id,
-                 y = admix, 
-                 fill = cluster, 
-                 color = cluster)) + 
-    scale_fill_brewer(palette = 'Set2') + 
-    scale_color_brewer(palette = 'Set2') + 
-    # flip y-axis and get rid of grey space
-    ylim(c(1, 0)) + 
-    coord_cartesian(xlim = c(0, n_obs), 
-                    ylim = c(1, 0), 
-                    expand = FALSE) + 
-    # add separators for the ture populations
-    geom_vline(xintercept = intercepts, 
-               linetype = 'dashed') +
-    # add labels
-    scale_x_continuous(breaks=ticks_loc,
-                       labels = labels) + 
-    scale_y_continuous(breaks=NULL) + 
-    theme(axis.title = element_blank(), 
-          axis.text.y = element_blank(), 
-          legend.position = 'none', 
-          axis.text.x = element_text(angle = 45, 
-                                     hjust = 1, 
-                                     size = axis_ticksize)) 
-  
+  p <- ind_admix_df %>% 
+        ggplot() + 
+        geom_col(aes(x = obs_id,
+                     y = admix, 
+                     fill = cluster, 
+                     color = cluster)) + 
+        scale_fill_brewer(palette = 'Set2') + 
+        scale_color_brewer(palette = 'Set2') + 
+        # flip y-axis and get rid of grey space
+        ylim(c(1, 0)) + 
+        coord_cartesian(xlim = c(0, n_obs), 
+                        ylim = c(1, 0), 
+                        expand = FALSE) + 
+        # add separators for the ture populations
+        geom_vline(xintercept = intercepts, 
+                   linetype = 'dashed') +
+        # add labels
+        scale_x_continuous(breaks=ticks_loc,
+                           labels = labels) + 
+        scale_y_continuous(breaks=NULL) + 
+        theme(axis.title = element_blank(), 
+              axis.text.y = element_blank(), 
+              legend.position = 'none', 
+              axis.text.x = element_text(angle = 45, 
+                                         hjust = 1, 
+                                         size = axis_ticksize)) 
+  return(list(ind_admix_df = ind_admix_df, 
+              p = p))
 }
 
 

@@ -198,6 +198,3 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
               p_coclust = p_coclust))
 }
 
-sigmoid <- function(x){
-  return(1 / (1 + exp(-x)))
-}
