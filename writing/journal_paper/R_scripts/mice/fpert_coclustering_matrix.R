@@ -1,42 +1,24 @@
 fpert_coclust_file <-
-  np$load('./R_scripts/mice/data/functional_coclustering_pert.npz')
+  np$load('./R_scripts/mice/data/functional_coclustering_gauss_pert1.npz')
 
 ######################
 # Plot priors
 ######################
 
-p_logphi <- plot_influence_and_logphi(logit_v_grid, 
+p_logphi <- plot_influence_and_logphi(fpert_coclust_file['logit_v_grid'], 
                                       infl_data['influence_grid_x_prior'], 
                                       fpert_coclust_file['log_phi'])
 
 p_priors <- 
-  data.frame(logit_v_grid = fpert_coclust_file['logit_v_grid'], 
-             p0 = fpert_coclust_file['p0_logit'], 
-             p1 = fpert_coclust_file['pc_logit']) %>%
-  gather(key = prior, value = p, -logit_v_grid) %>% 
-  ggplot() + 
-  geom_line(aes(x = logit_v_grid, 
-                y = p, 
-                color = prior)) + 
-  scale_color_manual(values = c('lightblue', 'blue')) + 
-  xlab('logit stick') + 
-  ggtitle('priors in logit space') + 
-  fontsize_theme + 
+  plot_priors(fpert_coclust_file['logit_v_grid'], 
+              p0 = fpert_coclust_file['p0_logit'], 
+              pc = fpert_coclust_file['pc_logit']) + 
   theme(legend.position = 'none')
 
 p_priors_contr <- 
-  data.frame(logit_v_grid = sigmoid(fpert_coclust_file['logit_v_grid']), 
+  plot_priors(sigmoid(fpert_coclust_file['logit_v_grid']), 
              p0 = fpert_coclust_file['p0_constrained'], 
-             p1 = fpert_coclust_file['pc_constrained']) %>%
-  gather(key = prior, value = p, -logit_v_grid) %>% 
-  ggplot() + 
-  geom_line(aes(x = logit_v_grid, 
-                y = p, 
-                color = prior)) + 
-  scale_color_manual(values = c('lightblue', 'blue')) + 
-  xlab('stick') + 
-  ggtitle('priors in constrained space') + 
-  fontsize_theme + 
+             pc = fpert_coclust_file['pc_constrained']) + 
   theme(legend.title = element_blank(), 
         legend.position = c(0.85, 0.75))
 

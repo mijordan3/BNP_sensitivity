@@ -26,15 +26,24 @@ opts_chunk$set(echo=knitr_debug, message=knitr_debug, warning=knitr_debug)
 theme_set(theme_bw())
 
 # set fontsizes 
-axis_ticksize = 6
+axis_ticksize = 6 
 axis_title_size = 8
-title_size = 10
-fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
-                        axis.text.y = element_text(size = axis_ticksize),  
-                        axis.title.x = element_text(size = axis_title_size),
-                        axis.title.y = element_text(size = axis_title_size), 
-                        legend.text = element_text(size=axis_ticksize), 
-                        plot.title = element_text(size = title_size))
+title_size = 10 
+
+get_fontsizes <- function(scaling = 1){
+  axis_ticksize = axis_ticksize * scaling
+  axis_title_size = axis_title_size * scaling
+  title_size = title_size * scaling
+  
+  fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
+                          axis.text.y = element_text(size = axis_ticksize),  
+                          axis.title.x = element_text(size = axis_title_size),
+                          axis.title.y = element_text(size = axis_title_size), 
+                          legend.text = element_text(size=axis_ticksize), 
+                          plot.title = element_text(size = title_size))
+  
+  return(fontsize_theme)
+}
 
 # Load into an environment rather than the global space
 LoadIntoEnvironment <- function(filename) {

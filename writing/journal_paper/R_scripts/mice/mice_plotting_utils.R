@@ -176,7 +176,7 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
                                                     coclust_init, 
                                                     min_keep, 
                                                     breaks) + 
-    fontsize_theme 
+    get_fontsizes()
   
   # make coclustering matrix 
   p_coclust <- compare_coclust_lr_and_refit_matr(coclust_refit,
@@ -184,7 +184,7 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
                                                  coclust_init,
                                                  limits,
                                                  limit_labels) + 
-    fontsize_theme + 
+    get_fontsizes() + 
     # remove axis labels
     theme(axis.text.y = element_blank(), 
           axis.title.y = element_blank(), 

@@ -15,7 +15,7 @@ plot_post_stat_trace_plot <- function(alpha_list,
     geom_point() + 
     geom_line() + 
     scale_color_brewer(palette = 'Dark2') + 
-    fontsize_theme
+    get_fontsizes()
   return(p)
 }
 
@@ -51,12 +51,12 @@ plot_influence_and_logphi <- function(logit_v_grid,
     geom_hline(yintercept = 0., alpha = 0.5) + 
     ylab('influence x p0') + 
     xlab('logit-stick') + 
-    ggtitle('log-phi') +
+    ggtitle('log phi') +
     theme(axis.title.y.right = element_text(color = 'purple', 
                                             size = axis_title_size), 
           axis.text.y.right = element_text(color = 'purple', 
                                            size = axis_ticksize)) + 
-    fontsize_theme
+    get_fontsizes()
   
   return(p_logphi)
 }
@@ -77,7 +77,7 @@ plot_priors <- function(logit_v_grid, p0, pc){
     scale_color_manual(values = c('lightblue', 'blue')) + 
     xlab('logit stick') + 
     ggtitle('priors in logit space') + 
-    fontsize_theme 
+    get_fontsizes() 
   
   return(p_priors)
 }

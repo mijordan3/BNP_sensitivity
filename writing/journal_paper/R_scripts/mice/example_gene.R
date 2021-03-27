@@ -18,7 +18,7 @@ p1 <- example_data %>%
   ylab('gene expr. (de-meaned)') + 
   xlab('time (hours)') + 
   theme_bw() + 
-  fontsize_theme
+  get_fontsizes()
 
 # load regressor matrix
 regr_df <- data.frame(example_genes_file[['regressors']])
@@ -36,6 +36,6 @@ p2 <-
   xlab('time (hours)') + 
   theme_bw() + 
   theme(legend.position = 'none') + 
-  fontsize_theme
+  get_fontsizes()
 
 grid.arrange(p1, p2, nrow = 1)
