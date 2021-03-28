@@ -11,7 +11,7 @@ plot_post_stat_trace_plot <- function(alpha_list,
     gather(key = method, value = value, -alpha)
   
   p <- trace_df %>%
-    ggplot(aes(x = alpha, y = value, color = method)) + 
+    ggplot(aes(x = alpha, y = value, color = method, shape = method)) + 
     geom_point() + 
     geom_line() + 
     scale_color_brewer(palette = 'Dark2') + 

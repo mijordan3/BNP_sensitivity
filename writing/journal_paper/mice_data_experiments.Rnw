@@ -98,7 +98,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.75,
 # just save what I want and re-load it. 
 # this runs the scripts and saves output to a png
 # we then reload it with "include_graphics"
-# source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
+source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
 
 include_graphics('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png')
 @

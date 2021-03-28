@@ -18,7 +18,10 @@
 
 <<stru_init_fit_cap>>=
   stru_init_fit_cap <- paste(
-    "structure initial fit ")
+    "The inferred individual admixtures at alpha = 3. 
+    Each vertical strip is an individual and each color
+an ancestral population.
+Lengths of colored segments represent the inferred mixture proportions.")
 SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
 @
   <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
@@ -30,7 +33,11 @@ out$p
     
 <<stru_alpha_nclusters_cap>>=
   stru_alpha_nclusters_cap <- paste(
-    "structure alpha sensitivity: number of clusters ")
+    "The expected number of clusters as alpha varies.  
+    We compute the linear approximation at alpha = 3 and
+    extrapolate the expected number of clusters from the linear approximation
+(green).
+We compare against refitting the STRUCTURE model at each alpha (orange).")
 SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
 @
   <<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
@@ -42,7 +49,9 @@ source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug,
 
 <<stru_alpha_cluster_weights_cap>>=
   stru_alpha_cluster_weights_cap <- paste(
-    "structure alpha sensitivity: cluster weights ")
+    "The expected number of loci per cluster as alpha varies. 
+     The horizontal blue line corresponds to the threshold in computing the 
+    expected number of clusters in TODO REF. ")
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.1)
 @
   <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
@@ -53,7 +62,7 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
 <<stru_func_sens_cap>>=
   stru_func_sens_cap <- paste(
     "structure functional sensitivity ")
-SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.2)
 @
   <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
 source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)

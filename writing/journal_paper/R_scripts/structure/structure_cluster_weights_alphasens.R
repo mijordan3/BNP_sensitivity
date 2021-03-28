@@ -32,7 +32,7 @@ weights_df %>%
   geom_vline(xintercept = alpha0, color = 'red', linetype = 'dashed') + 
   facet_wrap(~cluster, nrow = 3, scales = 'free_y') + 
   ylab('E[# loci]') + 
-  fontsize_theme + 
+  get_fontsizes() + 
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
         strip.text = element_text(size = axis_ticksize, 
