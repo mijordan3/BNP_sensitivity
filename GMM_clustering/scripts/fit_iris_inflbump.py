@@ -87,7 +87,10 @@ print('epsilon = ', epsilon)
 print('epsilon_indx = ', args.epsilon_indx)
 
 # set mu 
-mu_vec = np.arange(-6, 7)
+# mu_vec = np.arange(-6, 7)
+# mu_vec = np.linspace(-6, 6, 7)
+# TODO: compute worst case and save these numbers!
+mu_vec = np.array([-5., -3.15831663, -0.30460922,  1.04208417,  2.22845691, 5])
 mu = mu_vec[args.mu_indx]
 
 print('mu = ', mu)
