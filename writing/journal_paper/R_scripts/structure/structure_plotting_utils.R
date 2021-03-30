@@ -51,13 +51,13 @@ plot_initial_fit <- function(){
         # add labels
         scale_x_continuous(breaks=ticks_loc,
                            labels = labels) + 
-        scale_y_continuous(breaks=NULL) + 
+        scale_y_continuous(breaks=NULL) +
         theme(axis.title = element_blank(), 
               axis.text.y = element_blank(), 
               legend.position = 'none', 
               axis.text.x = element_text(angle = 45, 
                                          hjust = 1, 
-                                         size = axis_ticksize)) 
+                                         size = axis_title_size)) 
   return(list(ind_admix_df = ind_admix_df, 
               p = p))
 }

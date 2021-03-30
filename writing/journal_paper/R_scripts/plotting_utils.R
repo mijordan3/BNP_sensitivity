@@ -43,10 +43,10 @@ plot_influence_and_logphi <- function(logit_v_grid,
                   y = log_phi), 
               fill = 'grey', color = 'black', alpha = 0.5) + 
     scale_y_continuous(  
-      # Features of the first axis
+      # label for log phi
       name = "log phi",
-      # Add a second axis and specify its features
-      sec.axis = sec_axis(~.*1/scale, name="influence x p0")
+      # Add a second axis for the influence function
+      # sec.axis = sec_axis(~.*1/scale, name="influence x p0")
     ) + 
     geom_hline(yintercept = 0., alpha = 0.5) + 
     ylab('influence x p0') + 

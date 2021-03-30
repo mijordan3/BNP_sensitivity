@@ -14,14 +14,14 @@
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{figure/stru_init_fit-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.588\linewidth]{figure/stru_init_fit-1} 
 
 }
 
-\caption[The inferred individual admixtures at alpha = 3]{The inferred individual admixtures at alpha = 3. 
+\caption[The inferred individual admixtures at $\alpha = 3$]{The inferred individual admixtures at $\alpha = 3$. 
     Each vertical strip is an individual and each color
-an ancestral population.
-Lengths of colored segments represent the inferred mixture proportions.}\label{fig:stru_init_fit}
+    an ancestral population.
+    Lengths of colored segments represent the inferred mixture proportions.}\label{fig:stru_init_fit}
 \end{figure}
 
 
@@ -33,15 +33,13 @@ Lengths of colored segments represent the inferred mixture proportions.}\label{f
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.392\linewidth]{figure/stru_alpha_nclusters-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.392\linewidth]{figure/stru_alpha_nclusters-1} 
 
 }
 
-\caption[The expected number of clusters as alpha varies]{The expected number of clusters as alpha varies.  
-    We compute the linear approximation at alpha = 3 and
-    extrapolate the expected number of clusters from the linear approximation
-(green).
-We compare against refitting the STRUCTURE model at each alpha (orange).}\label{fig:stru_alpha_nclusters}
+\caption[The expected number of clusters in the thrush data as $\alpha$ varies.
+    We compute the linear approximation at $\alpha = 3$]{The expected number of clusters in the thrush data as $\alpha$ varies.
+    We compute the linear approximation at $\alpha = 3$. In the right plot, the threshold is set at $t = 20$ (approximately $1\%$ of loci). }\label{fig:stru_alpha_nclusters}
 \end{figure}
 
 
@@ -53,13 +51,14 @@ We compare against refitting the STRUCTURE model at each alpha (orange).}\label{
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.862\linewidth]{figure/stru_alpha_cluster_weights-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.862\linewidth]{figure/stru_alpha_cluster_weights-1} 
 
 }
 
-\caption[The expected number of loci per cluster as alpha varies]{The expected number of loci per cluster as alpha varies. 
+\caption[The expected number of loci per cluster as $\alpha$ varies]{The expected number of loci per cluster as $\alpha$ varies. 
+     We compute the linear approximation at $\alpha = 3$. 
      The horizontal blue line corresponds to the threshold in computing the 
-    expected number of clusters in TODO REF. }\label{fig:stru_alpha_cluster_weights}
+    expected number of thresholded clusters in \fig{stru_alpha_nclusters} }\label{fig:stru_alpha_cluster_weights}
 \end{figure}
 
 
@@ -70,11 +69,21 @@ We compare against refitting the STRUCTURE model at each alpha (orange).}\label{
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.98\linewidth,height=0.941\linewidth]{./R_scripts/structure/figures_tmp/fsens_structure} 
+{\centering \includegraphics[width=0.980\linewidth,height=1.019\linewidth]{figure/stru_func_sens-1} 
 
 }
 
-\caption[structure functional sensitivity ]{structure functional sensitivity }\label{fig:stru_func_sens}
+\caption[Sensitivity of inferred admixtures for several outlying individuals]{Sensitivity of inferred admixtures for several outlying individuals. 
+     For individual A from the Mbololo region, 
+     we examine the sensitivity of the inferred mixture proportion of the purple
+     population.
+    For four individuals from the Ngangao region (B), we examine the inferred green proportion.
+    For the all individuals from the Chawia region (C), we examine the inferred purple proportion.
+    (Left column) The worst-case $L_\infty$ negative perturbation in grey, 
+    plotted against the 
+    influence function times the prior (scaled to have $L_\infty$ norm equal to 1). 
+    (Middle column) The effect of this perturbation on the prior density. 
+    (Right column) Effects on the inferred admixture. }\label{fig:stru_func_sens}
 \end{figure}
 
 

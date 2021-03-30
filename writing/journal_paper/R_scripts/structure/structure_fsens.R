@@ -28,8 +28,9 @@ intercepts <- c(mbololo_outliers$obs_id - 1,
                 max(chawia_outliers$obs_id) - 0.5)
 
 rect_alpha = 0.1
-linesize = 1
-text_height = 0.08
+linesize = 0.5
+text_height = 0.1
+text_size = 3
 p_admix <- out$p + 
   # grey out everything we don't want
   geom_rect(aes(xmin = 0, xmax = intercepts[1], 
@@ -52,10 +53,13 @@ p_admix <- out$p +
   geom_vline(xintercept = c(intercepts[5], intercepts[6]),
              size = linesize) +
   # add letter labels 
-  geom_text(aes(x = intercepts[1] - 5, y = text_height, label = 'A')) + 
-  geom_text(aes(x = intercepts[3] - 5, y = text_height, label = 'B')) + 
+  geom_text(aes(x = intercepts[1] - 5, y = text_height, label = 'A'), 
+            size = text_size) + 
+  geom_text(aes(x = intercepts[3] - 5, y = text_height, label = 'B'), 
+            size = text_size) + 
   geom_text(aes(x = (intercepts[5] + intercepts[6]) / 2,
-                y = text_height, label = 'C')) + 
+                y = text_height, label = 'C'), 
+            size = text_size) + 
   theme(axis.ticks = element_blank(), 
         axis.title.x = element_blank(),
         axis.text.x = element_blank())
@@ -73,30 +77,29 @@ plot_struct_fsens_results <- function(input_file){
   
   scale <- max(abs(log_phi)) / max(abs(infl_function))
   
-  p1 <- plot_post_stat_trace_plot(fsens_results['epsilon_vec'], 
-                                  fsens_results['refit_vec'], 
-                                  fsens_results['lr_vec']) + 
-    ggtitle(' ') + 
-    xlab('epsilon') + 
-    theme(legend.title = element_blank(), 
-          legend.position = c(0.8, 0.8), 
-          legend.key.size = unit(0.25, 'cm'))
-  
-  p2 <- plot_influence_and_logphi(logit_v, 
+  p_logphi <- plot_influence_and_logphi(logit_v, 
                                   infl_function, 
                                   log_phi) 
-  p3 <- plot_priors(sigmoid(logit_v), 
+  p_priors <- plot_priors(sigmoid(logit_v), 
                     exp(fsens_results['log_p0']), 
                     exp(fsens_results['log_pc'])) + 
     xlab('stick') + 
     ggtitle('Priors') + 
     theme(legend.title = element_blank(), 
-          legend.position = c(0.8, 0.8), 
-          legend.key.size = unit(0.25, 'cm'))
+          legend.position = 'bottom')
   
-  return(list(p1 = p1, 
-              p2 = p2, 
-              p3 = p3))
+  
+  p_sens <- plot_post_stat_trace_plot(fsens_results['epsilon_vec'], 
+                                  fsens_results['refit_vec'], 
+                                  fsens_results['lr_vec']) + 
+    ggtitle(' ') + 
+    xlab('epsilon') + 
+    theme(legend.title = element_blank(), 
+          legend.position = 'bottom')
+  
+  return(list(p_logphi = p_logphi, 
+              p_priors = p_priors, 
+              p_sens = p_sens))
 }
 
 ##########
@@ -104,74 +107,104 @@ plot_struct_fsens_results <- function(input_file){
 ##########
 x_axis_remover <- 
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(), 
+        legend.position = 'none') 
 
+title_remover <- ggtitle(NULL)
 
 mbololo_plots <- 
   plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_mbololo.npz')
 
-mbololo_plots$p1 <-
-  mbololo_plots$p1 + 
-  ylab('Propn. purple') + 
-  x_axis_remover + 
-  ggtitle('Sensitivity of A') 
+mbololo_plots$p_logphi <- 
+  mbololo_plots$p_logphi + 
+  ggtitle('Worst-case pert. of A') + 
+  get_fontsizes() + 
+  x_axis_remover
 
-mbololo_plots$p2 <- mbololo_plots$p2 + x_axis_remover
+mbololo_plots$p_priors <- 
+  mbololo_plots$p_priors + 
+  get_fontsizes() + 
+  x_axis_remover 
 
-mbololo_plots$p3 <- 
-  mbololo_plots$p3 + x_axis_remover 
+mbololo_plots$p_sens <-
+  mbololo_plots$p_sens + 
+  ylab('propn. purple') + 
+  x_axis_remover 
+
+mbololo_plots_sum <- 
+  mbololo_plots$p_logphi + 
+  mbololo_plots$p_priors + 
+  mbololo_plots$p_sens
+
 
 ##########
 # plots for ngangao outliers
 ##########
 ngangao_plots <- 
   plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_ngangao.npz')
-ngangao_plots$p1 <- ngangao_plots$p1 + 
-  x_axis_remover + 
-  ylab('Propn. green') + 
-  theme(legend.position = 'none') + 
-  ggtitle('Sensitivity of B') 
 
-ngangao_plots$p2 <- ngangao_plots$p2 + 
-  ggtitle('') + 
+ngangao_plots$p_logphi <- 
+  ngangao_plots$p_logphi + 
+  ggtitle('Worst-case pert. of B') + 
+  get_fontsizes() + 
+  x_axis_remover
+
+ngangao_plots$p_priors <- 
+  ngangao_plots$p_priors + 
+  get_fontsizes() + 
+  title_remover + 
   x_axis_remover 
 
-ngangao_plots$p3 <- ngangao_plots$p3 +
-  ggtitle('') + 
-  x_axis_remover + 
-  theme(legend.position = 'none') 
+ngangao_plots$p_sens <-
+  ngangao_plots$p_sens + 
+  ylab('propn. green') + 
+  title_remover + 
+  x_axis_remover 
+
+ngangao_plots_sum <- 
+  ngangao_plots$p_logphi + 
+  ngangao_plots$p_priors + 
+  ngangao_plots$p_sens
+
 
 ##########
 # plots for chawia outliers
 ##########
 chawia_plots <- 
   plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_chawia.npz')
-chawia_plots$p1 <- chawia_plots$p1 + 
-  ylab('Propn. purple') + 
-  theme(legend.position = 'none') + 
-  ggtitle('Sensitivity of C')
 
-chawia_plots$p2 <- chawia_plots$p2 + 
-  ggtitle('') 
+chawia_plots$p_logphi <- chawia_plots$p_logphi + 
+  ggtitle('Worst-case pert. of C')
 
-chawia_plots$p3 <- chawia_plots$p3 + 
-  ggtitle('') + 
-  theme(legend.position = 'none')
+chawia_plots$p_priors <- chawia_plots$p_priors + 
+  title_remover
 
-layout_matrix <- matrix(c(1, 1, 1, 2:10), 
-                        nrow = 4, 
-                        byrow = TRUE)
+chawia_plots$p_sens <- chawia_plots$p_sens + 
+  title_remover + 
+  ylab('propn. purple')
+
+chawia_plots_sum <- 
+  chawia_plots$p_logphi + 
+  chawia_plots$p_priors + 
+  chawia_plots$p_sens
+
+
+p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum
+
+# layout_matrix <- matrix(c(1, 1, 1, 2:10), 
+#                         nrow = 4, 
+#                         byrow = TRUE)
 # grid.arrange(p_admix, 
 #              mbololo_plots$p1, mbololo_plots$p2, mbololo_plots$p3,
 #              ngangao_plots$p1, ngangao_plots$p2, ngangao_plots$p3,
 #              chawia_plots$p1, chawia_plots$p2, chawia_plots$p3,
 #              layout_matrix = layout_matrix)
 
-g <- arrangeGrob(p_admix, 
-                 mbololo_plots$p1, mbololo_plots$p2, mbololo_plots$p3,
-                 ngangao_plots$p1, ngangao_plots$p2, ngangao_plots$p3,
-                 chawia_plots$p1, chawia_plots$p2, chawia_plots$p3,
-                 layout_matrix = layout_matrix)
-
-ggsave('./R_scripts/structure/figures_tmp/fsens_structure.png', g,
-       width = 7, height = 6)
+# g <- arrangeGrob(p_admix, 
+#                  mbololo_plots$p1, mbololo_plots$p2, mbololo_plots$p3,
+#                  ngangao_plots$p1, ngangao_plots$p2, ngangao_plots$p3,
+#                  chawia_plots$p1, chawia_plots$p2, chawia_plots$p3,
+#                  layout_matrix = layout_matrix)
+# 
+# ggsave('./R_scripts/structure/figures_tmp/fsens_structure.png', g,
+#        width = 7, height = 6)
