@@ -7,7 +7,11 @@ library(reshape2)
 library(ggplot2)
 library(ggforce)
 library(xtable)
-library(gridExtra)
+
+# library(gridExtra)
+# this replaces gridExtra ...
+library(patchwork) 
+
 library(latex2exp)
 library(reticulate)
 np <- import("numpy")
@@ -27,9 +31,9 @@ opts_chunk$set(echo=knitr_debug, message=knitr_debug, warning=knitr_debug)
 theme_set(theme_bw())
 
 # set fontsizes 
-axis_ticksize = 6 
-axis_title_size = 8
-title_size = 10 
+axis_ticksize = 4 
+axis_title_size = 7
+title_size = 7 
 
 get_fontsizes <- function(scaling = 1){
   axis_ticksize = axis_ticksize * scaling
@@ -40,8 +44,9 @@ get_fontsizes <- function(scaling = 1){
                           axis.text.y = element_text(size = axis_ticksize),  
                           axis.title.x = element_text(size = axis_title_size),
                           axis.title.y = element_text(size = axis_title_size), 
-                          legend.text = element_text(size=axis_ticksize), 
-                          plot.title = element_text(size = title_size))
+                          legend.text = element_text(size=axis_title_size), 
+                          plot.title = element_text(size = title_size), 
+                          legend.margin=margin(-10,-10,-10,-10))
   
   return(fontsize_theme)
 }
