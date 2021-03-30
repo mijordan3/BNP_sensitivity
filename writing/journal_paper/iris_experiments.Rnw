@@ -34,7 +34,7 @@ source('./R_scripts/iris/iris_init_fit.R',
 We compute the linear approximation at $\\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). 
+We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). The threshold is set at $t = 1$. 
 ")
 
 SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
@@ -45,9 +45,18 @@ source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
 
 
 <<iris_fsens_cap>>=
-      iris_fsens_cap <- paste(
-        "iris functional sensitivity ")
-    SetImageSize(aspect_ratio = 1.5 * base_aspect_ratio)
+iris_fsens_cap <- paste(
+        "Demonstration of the influence function on 
+        the expected number of clusters in the iris dataset. 
+        (Left) The influence function $I(x)$ 
+        times the initial prior $p_0(x)$ at $\\alpha = 6$. 
+        We perturb $p_0$ with $\\log \\phi$ set to a step
+        function with value one within the grey strips, and zero otherwise. 
+        (Middle) The original prior density $p_0$ and the perturbed prior density $p_0\\times \\phi$. 
+        (Right) The effect of the perturbation 
+        on the change in expected number of clusters as $\\epsilon \\rightarrow 1$. ")
+
+SetImageSize(aspect_ratio = 1.5 * base_aspect_ratio)
 @
 <<iris_fsens, cache=simple_cache, fig.show='hold', fig.cap=iris_fsens_cap>>=
 

@@ -1,3 +1,7 @@
+
+# TODO this is set manually at the moment 
+ymax <- 0.26
+
 plot_step_pert_results <- function(input_file,
                                    remove_legend = FALSE, 
                                    remove_xlab = FALSE, 
@@ -10,7 +14,7 @@ plot_step_pert_results <- function(input_file,
                   y = stepfun_file['influence_x_prior_grid']), 
               color = 'purple') + 
     geom_hline(yintercept = 0., alpha = 0.5) + 
-    ylab('influence x p0') + 
+    ylab('infl x p0') + 
     xlab('logit-stick') + 
     ggtitle('log-phi') + 
     geom_rect(aes(xmin=stepfun_file['mu1'],
@@ -31,11 +35,14 @@ plot_step_pert_results <- function(input_file,
   p3 <- plot_post_stat_trace_plot(stepfun_file['epsilon_vec'], 
                                   stepfun_file['refit'], 
                                   stepfun_file['lr']) + 
-    ylab('g(pert) - g(init)') + 
+    # ylab('g(pert) - g(init)') + 
+    ylab(expression(Delta*'E[# clusters]')) + 
     xlab('epsilon') + 
     ggtitle('Sensitivity') + 
+    geom_hline(yintercept = 0., color = 'black') + 
     theme(legend.position = 'bottom', 
-          legend.title = element_blank())
+          legend.title = element_blank()) + 
+    ylim(c(-ymax, ymax))
   
   if(remove_legend){
     p2 <- p2 + theme(legend.position = 'none')
