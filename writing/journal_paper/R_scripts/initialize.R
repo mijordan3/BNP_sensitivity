@@ -64,11 +64,14 @@ DefineMacro <- function(macro_name, value, digits=3) {
 base_aspect_ratio <- 8 / (5 * 2)
 base_image_width <- 4.
 
-SetImageSize <- function(aspect_ratio, image_width=base_image_width) {
-  ow <- "0.98\\linewidth"
-  oh <- sprintf("%0.3f\\linewidth", aspect_ratio * 0.98)
-  fw <- image_width
-  fh <- image_width * aspect_ratio
+SetImageSize <- function(aspect_ratio, image_width=1.0) {
+  
+  ow <- sprintf("%0.3f\\linewidth", image_width * 0.98)
+  oh <- sprintf("%0.3f\\linewidth", aspect_ratio * image_width * 0.98)
+  
+  fw <- base_image_width * image_width
+  fh <- fw * aspect_ratio
+  
   opts_chunk$set(out.width=ow,
                  out.height=oh,
                  fig.width=fw,
