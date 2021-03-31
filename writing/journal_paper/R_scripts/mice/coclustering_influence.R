@@ -18,7 +18,7 @@ p_prior <-
   geom_hline(yintercept = 0., alpha = 0.5) + 
   ylab('p') + 
   xlab('logit-stick') + 
-  ggtitle(expression(paste("priors in logit space (", alpha, " = 3)"))) + 
+  ggtitle("prior in logit space") + 
   get_fontsizes()
 
 p_infl_x_prior <- 

@@ -11,9 +11,8 @@ coclust_lr1 <-
   load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
 
 # bins for the co-clustering matrix
-limits <- c(5e-5, 1e-4, 5e-3, Inf)
-limit_labels <- c('< -5e-3', '(-5e-3, -1e-4]', '(-1e-4, -5e-5]',
-            '(-5e-5, 5e-5]', '(5e-5, 1e-4]', '(1e-4, 5e-3]', '> 5e-3')
+limits <- c(1e-5, 1e-4, 1e-3, Inf)
+limit_labels <- construct_limit_labels(limits)
 
 min_keep = 1e-4 # in the scatter-plot, grey out these values
 breaks = c(1e3, 1e4, 1e5, Inf) # breaks for the contours

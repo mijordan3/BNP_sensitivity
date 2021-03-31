@@ -81,7 +81,8 @@ plot_coclust_diff <- function(coclust_diff,
   
   p <- coclust_diff %>%
     plot_coclustering(value = 'diff_bins') + 
-    scale_fill_brewer(type = "div", palette = 'RdBu', direction = -1)
+    scale_fill_brewer(type = "div", palette = 'RdBu', direction = -1, 
+                      drop=FALSE)
   
   return(p)
 }
@@ -181,10 +182,6 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
   # make coclustering matrix 
   p_coclust_refit <-
     get_coclust_diff(coclust_refit, coclust_init) %>% 
-    # sometimes missing the top bin 
-    # this is hacky ... fix this
-    select(gene1, gene2, diff) %>%
-    rbind(data.frame(gene1 = 1001, gene2 = 1001, diff = 1e16)) %>%
     plot_coclust_diff(limits = limits, 
                       limit_labels = limit_labels) + 
     ggtitle('refit - init') + 
@@ -196,10 +193,6 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
   
   p_coclust_lr <-
     get_coclust_diff(coclust_lr, coclust_init) %>% 
-    # sometimes missing the top bin 
-    # this is hacky ... fix this
-    select(gene1, gene2, diff) %>%
-    rbind(data.frame(gene1 = 1001, gene2 = 1001, diff = 1e16)) %>%
     plot_coclust_diff(limits = limits, 
                       limit_labels = limit_labels) + 
     ggtitle('lr - init') + 
@@ -232,3 +225,19 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
               p_coclust_lr = p_coclust_lr))
 }
 
+construct_limit_labels <- function(limits){
+  
+  n_bins <- length(limits)
+  
+  limit_labels <- limits[1:(n_bins - 1)]
+  limit_labels <- c(sprintf("%.0e", sort(-limit_labels)), 
+                    0, 
+                    sprintf("%.0e", limit_labels))
+  
+  limit_labels[1] <- paste0('<', limit_labels[1])
+  
+  n_bins_sym <- length(limit_labels) 
+  limit_labels[n_bins_sym] <- paste0('>', limit_labels[n_bins_sym])
+  
+  return(limit_labels)
+}

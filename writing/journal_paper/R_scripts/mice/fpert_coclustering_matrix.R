@@ -20,7 +20,8 @@ p_priors_contr <-
              p0 = fpert_coclust_file['p0_constrained'], 
              pc = fpert_coclust_file['pc_constrained']) + 
   theme(legend.title = element_blank(), 
-        legend.position = c(0.85, 0.75))
+        legend.position = c(0.75, 0.85), 
+        legend.key.size = unit(0.2, "cm"))
 
 top_row <- p_logphi + p_priors + p_priors_contr
 
@@ -39,19 +40,16 @@ coclust_lr_fpert <-
 
 # bins for the co-clustering matrix
 limits <- c(1e-3, 1e-2, 1e-1, Inf)
-labels <- c('<-1e-1', '(-1e-1, -1e-2]', '(-1e-2, -1e-3]', 
-            '(-1e-3, 1e-3]', '(1e-3, 1e-2]', '(1e-2, 1e-1]', '>1e-1')
-
-min_keep = 1e-3 # in the scatter-plot, grey out these values
-breaks = c(1e0, 1e2) # breaks for the contours
+limit_labels <- construct_limit_labels(limits)
 
 plots <- compare_coclust_lr_and_refit(coclust_refit_fpert, 
                                       coclust_lr_fpert,
                                       coclust_init, 
                                       limits,
-                                      labels,
+                                      limit_labels,
                                       min_keep,
                                       breaks)
+
 bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr
 
 top_row / bottom_row
