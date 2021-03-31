@@ -14,11 +14,11 @@ source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
 @
 
-Here are results, and a figure. See \fig{example_genes}.
+Here are results, and a figure. See \figref{example_genes}.
 %
 <<example_genes_cap>>=
 example_genes_cap <- paste(
-    "(Left) An example gene and its expression over time. 
+    "(Left) An example gene and its expression over time.
      (Right) The cubic B-spline with 7 degrees of freedom. ")
 SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
 @
@@ -33,8 +33,8 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 
 <<gene_centroids_cap>>=
 gene_centroids_cap <- paste(
-    "In blue, inferred centroids from the twelve most occupied clusters. 
-    In grey, gene expressions averaged over replicates and 
+    "In blue, inferred centroids from the twelve most occupied clusters.
+    In grey, gene expressions averaged over replicates and
     shifted by their inferred intercepts. ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.8)
 @
@@ -62,7 +62,6 @@ p <- plot_coclustering(coclust_init) +
         axis.text = element_blank(), 
         axis.ticks = element_blank(), 
         legend.text = element_text(size = axis_ticksize))  
-
 p
 @
 
@@ -110,8 +109,8 @@ source("R_scripts/mice/coclustering_influence.R",
 
 <<gene_fpert_coclustering_cap>>=
 gene_fpert_coclustering_cap <- paste(
-    "Effect on the co-clustering matrix after a functional perturbation. 
-     log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two. 
+    "Effect on the co-clustering matrix after a functional perturbation.
+     log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two.
     The chosen log-phi roughly corresponds to a positive bump in the influence function of $g_{ev}$.")
 SetImageSize(aspect_ratio=base_aspect_ratio)
 @
@@ -119,5 +118,3 @@ SetImageSize(aspect_ratio=base_aspect_ratio)
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)
 
 @
-
-

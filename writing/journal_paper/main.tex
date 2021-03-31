@@ -8,7 +8,7 @@
 % natbib citation styles, see the natbib documentation, a copy of which
 % is archived at http://www.jmlr.org/format/natbib.pdf
 
-\usepackage{jmlr2e}
+%\usepackage{jmlr2e}
 
 % my added packages: copied from the swiss IJ paper
 \usepackage{microtype}
@@ -19,16 +19,19 @@
 \usepackage{hyperref}
 \usepackage{xargs}[2008/03/08]
 
-% Attempt to make hyperref and algorithmic work together better:
-\newcommand{\theHalgorithm}{\arabic{algorithm}}
-
-\usepackage{prettyref}
+% Documentation
+% http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
 \usepackage{refstyle}
+\usepackage{varioref} % Use refstyle instead of varioref directly.
+\usepackage[authoryear]{natbib}
+
+% \usepackage{prettyref}
+% \usepackage{refstyle}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
-% \usepackage{amsthm} % this throws and error
+\usepackage{amsthm}
 \usepackage{mathrsfs}
 \usepackage{mathtools}
 \usepackage{colonequals}
@@ -37,72 +40,43 @@
 \usepackage{listings}
 \usepackage{pdfpages}
 
-% Definitions of handy macros can go here
-
-\newcommand{\dataset}{{\cal D}}
-\newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
-
-% my added macros
-\newcommand{\eq}[1]{Eq.~\ref{eq:#1}}
-\newcommand{\fig}[1]{Fig.~\ref{fig:#1}}
-\newcommand{\rthm}[1]{Theorem~\ref{thm:#1}}
-\newcommand{\sect}[1]{Section~\ref{sec:#1}}
-\newcommand{\subsect}[1]{Section~\ref{subsec:#1}}
-\newcommand{\assum}[1]{Assumption~\ref{assum:#1}}
-\newcommand{\app}[1]{Appendix~\ref{app:#1}}
-\newcommand{\appsect}[1]{Appendix~\ref{sec:#1}}
-
-\newcommand{\coreassum}{Assumptions \ref{assu:paper_smoothness}--\ref{assu:paper_lipschitz} }
-\newcommand{\paperallcoreassum}{Assumptions \ref{assu:paper_smoothness}--\ref{assu:paper_weight_bounded} }
-
 % This picks up the knitr boilerplate, allowing us to \input partial knitr
 % documents.
-\input{knitr_header.tex}
+\input{_knitr_header.tex}
+
+% This defines math macros.
+\input{_math_defs.tex}
+
+% This specifies the formatting for references (sections, theorems, etc.)
+\input{_reference_defs.tex}
 
 % Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
 
-\jmlrheading{1}{2000}{1-48}{4/00}{10/00}{giordano21}{Ryan Giordano and Runjing Liu and Michael I. Jordan and Tamara Broderick}
+%\jmlrheading{1}{2000}{1-48}{4/00}{10/00}{giordano21}{Ryan Giordano and Runjing Liu and Michael I. Jordan and Tamara Broderick}
 
 % Short headings should be running head and authors last names
 
-\ShortHeadings{BNP sensitivity}{Giordano et al.}
-\firstpageno{1}
+%\ShortHeadings{BNP sensitivity}{Giordano et al.}
+%\firstpageno{1}
 
 \begin{document}
 
 \title{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}
 
-\author{\name Ryan Giordano \email rgiordan@mit.edu \\
-        \addr Computer Science \& Artificial Intelligence Lab\\
-        Massachusetts Institute of Technology \\
-        Cambridge, MA 02139, USA \\
-        \AND
-        \name Runjing Liu \email runjing\_liu@berkeley.edu \\
-        \addr Department of Statistics\\
-        University of California\\
-        Berkeley, CA 94720, USA \\
-        \AND
-        \name Michael I.\ Jordan \email jordan@cs.berkeley.edu \\
-        \addr Division of Computer Science and Department of Statistics\\
-        University of California\\
-        Berkeley, CA 94720-1776, USA \\
-        \AND
-        \name Tamara Broderick \email tbroderick@csail.mit.edu \\
-        \addr Computer Science \& Artificial Intelligence Lab\\
-        Massachusetts Institute of Technology \\
-        Cambridge, MA 02139, USA}
-
-\editor{editors }
+\author{Ryan Giordano \texttt{rgiordan@mit.edu} \\
+        \and
+        Runjing Liu \texttt{runjing\_liu@berkeley.edu} \\
+        \and
+        Michael I.\ Jordan \texttt{jordan@cs.berkeley.edu} \\
+        \and
+        Tamara Broderick \texttt{tbroderick@csail.mit.edu }
+        }
 
 \maketitle
 
 \begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
 This is an abstract
 \end{abstract}
-
-\begin{keywords}
-  some keywords
-\end{keywords}
 
 \section{Introduction}\label{sec:introduction}
 \input{introduction.tex}
@@ -112,6 +86,7 @@ This is an abstract
 
 
 \section{Local sensitivity}
+\input{local_sensitivity.tex}
 
 
 \section{Results}
@@ -128,12 +103,16 @@ This is an abstract
 \section{Conclusion}
 This concludes.
 
-% Acknowledgements should go at the end, before appendices and references
 
-\acks{Thanks to everyone }
+\section{Acknowledgements}
+Thanks to everyone.
 
 % Manual newpage inserted to improve layout of sample file - not
 % needed in general before appendices/bibliography.
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
 
 \newpage
 
@@ -142,8 +121,5 @@ This concludes.
 \label{app:theorem}
 
 Supplemental results
-
-\vskip 0.2in
-\bibliography{references}
 
 \end{document}

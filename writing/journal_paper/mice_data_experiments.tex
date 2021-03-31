@@ -8,7 +8,7 @@
 
 
 
-Here are results, and a figure. See \fig{example_genes}.
+Here are results, and a figure. See \figref{example_genes}.
 %
 
 \begin{knitrout}
@@ -18,7 +18,8 @@ Here are results, and a figure. See \fig{example_genes}.
 
 }
 
-\caption[(Left) An example gene and its expression over time]{(Left) An example gene and its expression over time. 
+\caption[(Left) An example gene and its expression over time.
+     (Right) The cubic B-spline with 7 degrees of freedom]{(Left) An example gene and its expression over time.
      (Right) The cubic B-spline with 7 degrees of freedom. }\label{fig:example_genes}
 \end{figure}
 
@@ -38,8 +39,10 @@ Here are results, and a figure. See \fig{example_genes}.
 
 }
 
-\caption[In blue, inferred centroids from the twelve most occupied clusters]{In blue, inferred centroids from the twelve most occupied clusters. 
-    In grey, gene expressions averaged over replicates and 
+\caption[In blue, inferred centroids from the twelve most occupied clusters.
+    In grey, gene expressions averaged over replicates and
+    shifted by their inferred intercepts]{In blue, inferred centroids from the twelve most occupied clusters.
+    In grey, gene expressions averaged over replicates and
     shifted by their inferred intercepts. }\label{fig:gene_centroids}
 \end{figure}
 
@@ -127,12 +130,11 @@ Here are results, and a figure. See \fig{example_genes}.
 
 }
 
-\caption[Effect on the co-clustering matrix after a functional perturbation]{Effect on the co-clustering matrix after a functional perturbation. 
-     log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two. 
+\caption[Effect on the co-clustering matrix after a functional perturbation.
+     log-phi (top left, in grey) is set to a Gaussian p.d.f]{Effect on the co-clustering matrix after a functional perturbation.
+     log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two.
     The chosen log-phi roughly corresponds to a positive bump in the influence function of $g_{ev}$.}\label{fig:gene_fpert_coclustering}
 \end{figure}
 
 
 \end{knitrout}
-
-

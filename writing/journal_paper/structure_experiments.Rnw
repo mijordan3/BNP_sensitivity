@@ -51,7 +51,7 @@ source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug,
     "The expected number of loci per cluster as $\\alpha$ varies. 
      We compute the linear approximation at $\\alpha = 3$. 
      The horizontal blue line corresponds to the threshold in computing the 
-    expected number of thresholded clusters in \\fig{stru_alpha_nclusters} ")
+    expected number of thresholded clusters in Figure REF ")
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.1)
 @
   <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
