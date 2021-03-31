@@ -1,7 +1,3 @@
-alpha_sens_file <- np$load(paste0(data_dir, "iris_alpha_sens.npz"))
-
-alpha0 <- alpha_sens_file['alpha0']
-
 p1 <- plot_post_stat_trace_plot(alpha_sens_df$alpha,
                                 alpha_sens_df$n_clusters_refit,
                                 alpha_sens_df$n_clusters_lr) + 

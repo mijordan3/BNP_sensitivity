@@ -14,7 +14,7 @@ source("R_scripts/plotting_utils.R")
 source("R_scripts/structure/structure_plotting_utils.R")
 
 # load data
-source("R_scripts/structure/postprocess_structure.R")
+load('./R_scripts/data_processed/structure.RData')
 @
       
 

@@ -13,8 +13,8 @@ source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
 
-# loads in data
-source("R_scripts/mice/postprocess_mice.R")
+# load data
+load('./R_scripts/data_processed/mice.RData')
 @
 
 Here are results, and a figure. See \figref{example_genes}.

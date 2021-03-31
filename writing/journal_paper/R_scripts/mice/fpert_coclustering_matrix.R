@@ -13,9 +13,9 @@ p_priors <-
   theme(legend.position = 'none')
 
 p_priors_contr <- 
-  plot_priors(sigmoid(fpert_coclust_file['logit_v_grid']), 
-             p0 = fpert_coclust_file['p0_constrained'], 
-             pc = fpert_coclust_file['pc_constrained']) + 
+  plot_priors(sigmoid(prior_pert_df$logit_v), 
+             p0 = prior_pert_df$p0_constr, 
+             pc = prior_pert_df$pc_constr) + 
   theme(legend.title = element_blank(), 
         legend.position = c(0.75, 0.85), 
         legend.key.size = unit(0.2, "cm"))

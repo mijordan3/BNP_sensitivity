@@ -1,6 +1,3 @@
-infl_data <- 
-  np$load('./R_scripts/mice/data/coclustering_worstcase.npz')
-
 p_infl <- 
   influence_df %>% 
   ggplot() + 

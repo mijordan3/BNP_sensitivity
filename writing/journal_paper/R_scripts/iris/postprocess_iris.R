@@ -1,3 +1,7 @@
+library(tidyverse)
+library(reticulate)
+np <- import("numpy")
+
 data_dir <- './R_scripts/data_raw/iris/'
 
 ####################

@@ -9,12 +9,9 @@ library(ggforce)
 library(xtable)
 
 library(gridExtra)
-# this replaces gridExtra ...
 library(patchwork) 
 
 library(latex2exp)
-library(reticulate)
-np <- import("numpy")
 
 
 # This must be run from within the git repo, obviously.

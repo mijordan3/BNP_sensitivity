@@ -1,3 +1,7 @@
+library(tidyverse)
+library(reticulate)
+np <- import("numpy")
+
 data_dir = './R_scripts/data_raw/mice/'
 
 ######################
@@ -138,7 +142,9 @@ prior_pert_df <-
   data.frame(logit_v = fpert_coclust_file['logit_v_grid'],
              log_phi = fpert_coclust_file['log_phi'], 
              p0_logit = fpert_coclust_file['p0_logit'], 
-             pc_logit = fpert_coclust_file['pc_logit'])
+             pc_logit = fpert_coclust_file['pc_logit'], 
+             p0_constr = fpert_coclust_file['p0_constrained'], 
+             pc_constr = fpert_coclust_file['pc_constrained'])
 
 # the coclustering matrices
 coclust_refit_fpert <- 
