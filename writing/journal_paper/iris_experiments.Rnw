@@ -1,0 +1,68 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  <<setup, include=FALSE, cache=FALSE>>=
+    knitr_debug <- FALSE # Set to true to see error output
+    simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+    source("R_scripts/initialize.R", echo=FALSE)
+    source("R_scripts/plotting_utils.R")
+@
+      
+      
+      
+<<iris_fit_cap>>=
+iris_fit_cap <- paste("The iris data in principal component space. 
+                      Colors denote inferred memberships and
+                      ellipses are estimated covariances 
+                      at $\\alpha=6$.")
+SetImageSize(aspect_ratio = base_aspect_ratio, 
+             image_width = 0.6)
+@
+<<iris_fit, cache=simple_cache, fig.show='hold', fig.cap=iris_fit_cap>>=
+source('./R_scripts/iris/iris_init_fit.R', 
+       echo=knitr_debug, print.eval=TRUE)
+@
+
+<<iris_alpha_sens_cap>>=
+      iris_alpha_sens_cap <- paste(
+"The expected number of clusters in the iris data as $\\alpha$ varies. 
+We compute the linear approximation at $\\alpha=6$ and
+extrapolate the expected number of clusters using the
+linear approximation (green).
+We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). In the right plot, the threshold is set at $t = 1$. 
+")
+
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+@
+<<iris_alpha_sens, cache=simple_cache, fig.show='hold', fig.cap=iris_alpha_sens_cap>>=
+source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+<<iris_fsens_cap>>=
+iris_fsens_cap <- paste(
+        "Demonstration of the influence function on 
+        the expected number of clusters in the iris dataset. 
+        (Left) The influence function $I(x)$ 
+        times the initial prior $p_0(x)$ at $\\alpha = 6$. 
+        We perturb $p_0$ with $\\log \\phi$ set to a step
+        function with value one within the grey strips, and zero otherwise. 
+        (Middle) The original prior density $p_0$ and the perturbed prior density $p_0\\times \\phi$. 
+        (Right) The effect of the perturbation 
+        on the change in expected number of clusters as $\\epsilon \\rightarrow 1$. ")
+
+SetImageSize(aspect_ratio = 1.5 * base_aspect_ratio)
+@
+<<iris_fsens, cache=simple_cache, fig.show='hold', fig.cap=iris_fsens_cap>>=
+
+source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
+
+# include_graphics('./R_scripts/iris/figures_tmp/iris_func_pert.png')
+@
+
+

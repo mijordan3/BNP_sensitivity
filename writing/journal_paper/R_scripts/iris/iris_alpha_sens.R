@@ -7,8 +7,8 @@ p1 <- plot_post_stat_trace_plot(alpha_sens_file['alpha_list'],
                                 alpha_sens_file['n_clusters_lr']) + 
   geom_vline(xintercept = alpha0, color = 'red', linetype = 'dashed') + 
   ylab('E[# clusters]') + 
-  theme(legend.key.size = unit(0.5, 'cm'), 
-        legend.position = c(0.2, 0.7), 
+  theme(legend.position = 'top', 
+        legend.justification="left",
         legend.title = element_blank()) 
 
 p2 <- plot_post_stat_trace_plot(alpha_sens_file['alpha_list'],
@@ -18,5 +18,5 @@ p2 <- plot_post_stat_trace_plot(alpha_sens_file['alpha_list'],
   ylab('E[# clusters thresh.]') + 
   theme(legend.position = 'none') 
 
-
-grid.arrange(p1, p2, nrow = 1)
+p1 + p2
+# grid.arrange(p1, p2, nrow = 1)

@@ -12,7 +12,8 @@ weights_lr_df <-
 
 weights_df <- rbind(weights_refit_df, weights_lr_df) %>% 
   gather(key = cluster, value = weight, -c('alpha', 'method')) %>% 
-  mutate(cluster = sub('X', 'cluster ', cluster))
+  mutate(cluster = sub('X', 'cluster ', cluster)) %>% 
+  filter(alpha <= 10)
 
 # for these clusters, we add a horizontal line corresponding to the threshold
 thresh_df <- 
@@ -26,7 +27,7 @@ weights_df %>%
   geom_line(aes(x = alpha, y = thresh), 
             color = 'blue', alpha = 0.3) + 
   # the actual results
-  geom_point(aes(x = alpha, y = weight, color = method), size = 0.8) + 
+  geom_point(aes(x = alpha, y = weight, color = method, shape = method)) + 
   geom_line(aes(x = alpha, y = weight, color = method)) + 
   scale_color_brewer(palette = 'Dark2') + 
   geom_vline(xintercept = alpha0, color = 'red', linetype = 'dashed') + 
@@ -35,5 +36,5 @@ weights_df %>%
   get_fontsizes() + 
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
-        strip.text = element_text(size = axis_ticksize, 
+        strip.text = element_text(size = axis_title_size, 
                                   margin = margin(.05, 0, .05, 0, "cm"))) 

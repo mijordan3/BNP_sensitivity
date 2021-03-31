@@ -12,10 +12,18 @@ Here are results, and a figure. See \figref{example_genes}.
 %
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.980\linewidth,height=0.392\linewidth]{figure/example_genes-1} 
+
+}
+
+\caption[(Left) An example gene and its expression over time.
+     (Right) The cubic B-spline with 7 degrees of freedom]{(Left) An example gene and its expression over time.
+     (Right) The cubic B-spline with 7 degrees of freedom. }\label{fig:example_genes}
+\end{figure}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/example\_genes.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}\end{kframe}
 \end{knitrout}
 %
 
@@ -25,10 +33,20 @@ Here are results, and a figure. See \figref{example_genes}.
 
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.980\linewidth,height=0.627\linewidth]{figure/gene_centroids-1} 
+
+}
+
+\caption[In blue, inferred centroids from the twelve most occupied clusters.
+    In grey, gene expressions averaged over replicates and
+    shifted by their inferred intercepts]{In blue, inferred centroids from the twelve most occupied clusters.
+    In grey, gene expressions averaged over replicates and
+    shifted by their inferred intercepts. }\label{fig:gene_centroids}
+\end{figure}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/fitted\_centroids.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}\end{kframe}
 \end{knitrout}
 
 
@@ -38,20 +56,13 @@ Here are results, and a figure. See \figref{example_genes}.
 
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/coclustering\_alpha1.0.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in as.data.frame(file[[key]]): object 'alpha1\_coclust\_file' not found}}
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in plot\_coclustering(coclust\_init): object 'coclust\_init' not found}}\end{kframe}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.98\linewidth,height=0.666\linewidth]{./R_scripts/mice/figures_tmp/init_coclustering} 
+{\centering \includegraphics[width=0.588\linewidth,height=0.400\linewidth]{figure/gene_initial_coclustering-1} 
 
 }
 
-\caption[The inferred co-clustering matrix at alpha = 3]{The inferred co-clustering matrix at alpha = 3. }\label{fig:gene_initial_coclustering}
+\caption[The inferred co-clustering of gene expressions at $\alpha = 3.$ ]{The inferred co-clustering of gene expressions at $\alpha = 3.$ }\label{fig:gene_initial_coclustering}
 \end{figure}
 
 
@@ -67,31 +78,24 @@ Here are results, and a figure. See \figref{example_genes}.
 
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/coclustering\_alpha1.0.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}\end{kframe}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.98\linewidth,height=0.588\linewidth]{./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.784\linewidth]{figure/gene_alpha_coclustering-1} 
 
 }
 
 \caption[Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
      relative to the co-clustering matrix at alpha = 3.
-     The left column plots differences predicted by the
-     linear approximation against differences from a model refit.
-     Each point represents an entry of the co-clusteirng matrix.
-     The middle and right columns display
-     changes in the co-clustering matrix as obtained by the
-     linear approximation and the model refit, respectively]{Changes in the co-clustering matrix at alpha = 1 (top row)
+     The left column plots differences predicted by the 
+     linear approximation against differences from a model refit]{Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
      relative to the co-clustering matrix at alpha = 3.
-     The left column plots differences predicted by the
-     linear approximation against differences from a model refit.
-     Each point represents an entry of the co-clusteirng matrix.
-     The middle and right columns display
-     changes in the co-clustering matrix as obtained by the
+     The left column plots differences predicted by the 
+     linear approximation against differences from a model refit. 
+     Each point represents an entry of the co-coclustering matrix. 
+     The middle and right columns display 
+     changes in the co-clustering matrix as obtained by the 
      linear approximation and the model refit, respectively.}\label{fig:gene_alpha_coclustering}
 \end{figure}
 
@@ -103,10 +107,16 @@ Here are results, and a figure. See \figref{example_genes}.
 
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.980\linewidth,height=0.314\linewidth]{figure/gene_alpha_coclustering_influence-1} 
+
+}
+
+\caption[The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix]{The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix. }\label{fig:gene_alpha_coclustering_influence}
+\end{figure}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/coclustering\_worstcase.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}\end{kframe}
 \end{knitrout}
 
 
@@ -114,12 +124,9 @@ Here are results, and a figure. See \figref{example_genes}.
 
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in py\_call\_impl(callable, dots\$args, dots\$keywords): FileNotFoundError: [Errno 2] No such file or directory: './R\_scripts/mice/data/functional\_coclustering\_gauss\_pert1.npz'\\\#\# \\\#\# Detailed traceback: \\\#\#\ \  File "{}/home/rgiordan/.local/lib/python3.8/site-packages/numpy/lib/npyio.py"{}, line 416, in load\\\#\#\ \ \ \  fid = stack.enter\_context(open(os\_fspath(file), "{}rb"{}))}}\end{kframe}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.98\linewidth,height=0.627\linewidth]{./R_scripts/mice/figures_tmp/fpert_coclust_sensitivity} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.784\linewidth]{figure/gene_fpert_coclustering-1} 
 
 }
 

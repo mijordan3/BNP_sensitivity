@@ -1,4 +1,11 @@
-plot_step_pert_results <- function(input_file, remove_legend = TRUE){
+
+# TODO this is set manually at the moment 
+ymax <- 0.26
+
+plot_step_pert_results <- function(input_file,
+                                   remove_legend = FALSE, 
+                                   remove_xlab = FALSE, 
+                                   remove_title = FALSE){
   stepfun_file <- np$load(input_file)
   logit_v_grid <- stepfun_file['logit_v_grid']
   
@@ -7,7 +14,7 @@ plot_step_pert_results <- function(input_file, remove_legend = TRUE){
                   y = stepfun_file['influence_x_prior_grid']), 
               color = 'purple') + 
     geom_hline(yintercept = 0., alpha = 0.5) + 
-    ylab('influence x p0') + 
+    ylab('infl x p0') + 
     xlab('logit-stick') + 
     ggtitle('log-phi') + 
     geom_rect(aes(xmin=stepfun_file['mu1'],
@@ -22,39 +29,80 @@ plot_step_pert_results <- function(input_file, remove_legend = TRUE){
   p2 <- plot_priors(logit_v_grid,
                     p0 = stepfun_file['p0'],
                     pc = stepfun_file['p1']) + 
-    theme(legend.position = c(0.8, 0.7), 
-          legend.title = element_blank(), 
-          legend.key.size = unit(0.3, 'cm'))
+    theme(legend.position = 'bottom', 
+          legend.title = element_blank())
   
   p3 <- plot_post_stat_trace_plot(stepfun_file['epsilon_vec'], 
                                   stepfun_file['refit'], 
                                   stepfun_file['lr']) + 
-    ylab('g(pert) - g(init)') + 
+    # ylab('g(pert) - g(init)') + 
+    ylab(expression(Delta*'E[# clusters]')) + 
     xlab('epsilon') + 
-    ggtitle(' ') + 
-    theme(legend.position = c(0.2, 0.3), 
-          legend.title = element_blank(), 
-          legend.key.size = unit(0.4, 'cm'))
+    ggtitle('Sensitivity') + 
+    geom_hline(yintercept = 0., color = 'black') + 
+    theme(legend.position = 'bottom', 
+          legend.title = element_blank()) + 
+    ylim(c(-ymax, ymax))
   
   if(remove_legend){
     p2 <- p2 + theme(legend.position = 'none')
     p3 <- p3 + theme(legend.position = 'none')
   }
   
-  g <- arrangeGrob(p1, p2, p3, nrow = 1)
+  if(remove_xlab){
+    p1 <- p1 + theme(axis.title.x = element_blank(), 
+                     axis.text.x = element_blank())
+    p2 <- p2 + theme(axis.title.x = element_blank(), 
+                     axis.text.x = element_blank())
+    p3 <- p3 + theme(axis.title.x = element_blank(), 
+                     axis.text.x = element_blank())
+  }
   
+  if(remove_title){
+    p1 <- p1 + ggtitle(NULL)
+    p2 <- p2 + ggtitle(NULL)
+    p3 <- p3 + ggtitle(NULL)
+  }
+  
+  # g <- arrangeGrob(p1, p2, p3, nrow = 1)
+  g = p1 + p2 +p3
   return(g)
 }
 
 g0 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx0.npz', 
-                             remove_legend = FALSE)
-g1 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx1.npz')
-g2 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx2.npz')
-g3 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx3.npz')
-g4 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx4.npz')
+                             remove_legend = TRUE, 
+                             remove_xlab = TRUE, 
+                             remove_title = FALSE)
 
-g_all <- arrangeGrob(g0, g1, g2, g3, g4, ncol = 1)
+g1 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx1.npz', 
+                             remove_legend = TRUE, 
+                             remove_xlab = TRUE, 
+                             remove_title = TRUE)
 
-ggsave('./R_scripts/iris/figures_tmp/iris_func_pert.png', 
-       g_all, 
-       width = 6, height = 8)
+g2 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx2.npz', 
+                             remove_legend = TRUE, 
+                             remove_xlab = TRUE, 
+                             remove_title = TRUE)
+
+g3 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx3.npz', 
+                             remove_legend = TRUE, 
+                             remove_xlab = TRUE, 
+                             remove_title = TRUE)
+
+g4 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx4.npz', 
+                             remove_legend = FALSE, 
+                             remove_xlab = FALSE, 
+                             remove_title = TRUE)
+
+
+
+g0 / g1 / g2 / g3 / g4
+
+
+# grid.arrange(g0, g1, g2, g3, g4, ncol = 1)
+
+# g_all <- arrangeGrob(g0, g1, g2, g3, g4, ncol = 1)
+# 
+# ggsave('./R_scripts/iris/figures_tmp/iris_func_pert.png', 
+#        g_all, 
+#        width = 6, height = 8)
