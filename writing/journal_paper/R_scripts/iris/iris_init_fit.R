@@ -1,19 +1,14 @@
-iris_fit_file <- np$load('./R_scripts/iris/data/iris_fit.npz')
-
 ##################
 # plot iris data (has already been transformed into PC space)
 ##################
-iris_obs <- as.data.frame(iris_fit_file['pc_iris_obs']) %>%
-  mutate(est_z = iris_fit_file['cluster_memberships']) %>%
-  mutate(est_z = as.factor(est_z))
 
 # colors: this is 3-class Set2 from colorbrewer
 # didn't just use scale_color_brewer bc we will manually label 
 # the covariances with these colors, later
 colors <- c('#66c2a5','#fc8d62','#8da0cb')
 p <- ggplot() + 
-  geom_point(data = iris_obs, 
-             aes(x = V1, y = V2, 
+  geom_point(data = mutate(iris_obs, est_z = as.factor(est_z)), 
+             aes(x = PC1, y = PC2, 
                  shape = est_z, 
                  color = est_z), 
              size = 0.75) + 
@@ -22,11 +17,7 @@ p <- ggplot() +
 ##################
 # plot centroids / covariances
 ##################
-# these are are also already in pc space
-est_centroids <- iris_fit_file['pc_centroids']
-est_covariances <- iris_fit_file['pc_cov']
-
-unique_clusters = unique(iris_fit_file['cluster_memberships'])
+unique_clusters = unique(iris_obs$est_z)
 n_unique_clusters = length(unique_clusters)
 for(i in 1:n_unique_clusters){
   
@@ -48,7 +39,5 @@ for(i in 1:n_unique_clusters){
 }
 
 p + 
-  xlab('PC1') + 
-  ylab('PC2') + 
   theme(legend.position = 'none') + 
   get_fontsizes()

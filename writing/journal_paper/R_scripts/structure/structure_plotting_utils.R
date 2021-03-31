@@ -1,11 +1,10 @@
 plot_initial_fit <- function(){
-  stru_init_file <- np$load('./R_scripts/structure/data/init_fit.npz')
-  
+
   # we plot the top 7 clusters
   clusters_keep <- 7
   
   # get inferred admixtures
-  ind_admix_matr <- stru_init_file['e_ind_admix'][, 1:clusters_keep]
+  ind_admix_matr <- e_ind_admix_init[, 1:clusters_keep]
   
   # number of observations
   n_obs <- dim(ind_admix_matr)[1]
@@ -15,7 +14,7 @@ plot_initial_fit <- function(){
   ind_admix_df <- 
     data.frame(ind_admix_matr) %>% 
     mutate(obs_id = 1:n(), 
-           label = stru_init_file['labels'], 
+           label = geographic_labels, 
            # the is the weight of "other" clusters
            # start w z so its the last factor ... 
            z_other = 1 - rowSums(ind_admix_matr)) %>% 

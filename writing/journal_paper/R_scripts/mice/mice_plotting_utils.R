@@ -1,21 +1,3 @@
-load_coclust_file <- function(file, key){
-  # expects a coclustering matrix
-  # converts the matrix to a long data frame
-  
-  coclust_wide <- as.data.frame(file[[key]])
-  
-  coclust <- coclust_wide %>% 
-    mutate(gene1 = colnames(coclust_wide)) %>% 
-    # make it a long data frame
-    gather(key = gene2, value = coclustering, -gene1) %>%
-    # clean up the gene names
-    mutate(gene1 = sub('.', '', gene1), 
-           gene2 = sub('.', '', gene2)) %>% 
-    mutate(gene1 = as.numeric(gene1), 
-           gene2 = as.numeric(gene2))
-  return(coclust)
-}
-
 ################
 # Plotting co-clustering matrix
 ################
