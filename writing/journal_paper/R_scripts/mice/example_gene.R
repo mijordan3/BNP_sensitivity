@@ -1,10 +1,3 @@
-# load example gene observations
-example_genes_file <- np$load('./R_scripts/mice/data/example_genes.npz')
-timepoints <- example_genes_file[['timepoints']]
-example_data <- data.frame(time = timepoints,
-                           y = example_genes_file[['obs']], 
-                           fitted = example_genes_file[['fitted']])
-
 # plot example gene
 p1 <- example_data %>% 
   mutate(y_demean = y - mean(y)) %>% 
@@ -20,9 +13,7 @@ p1 <- example_data %>%
   theme_bw() + 
   get_fontsizes()
 
-# load regressor matrix
-regr_df <- data.frame(example_genes_file[['regressors']])
-regr_df$time <- example_genes_file[['timepoints']]
+# plot regressor matrix
 p2 <- 
   regr_df %>%
   distinct() %>% 
@@ -38,4 +29,4 @@ p2 <-
   theme(legend.position = 'none') + 
   get_fontsizes()
 
-grid.arrange(p1, p2, nrow = 1)
+p1 + p2

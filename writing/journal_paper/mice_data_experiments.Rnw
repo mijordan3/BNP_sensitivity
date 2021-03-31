@@ -12,6 +12,9 @@ simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
+
+# loads in data
+source("R_scripts/mice/postprocess_mice.R")
 @
 
 Here are results, and a figure. See \figref{example_genes}.
@@ -54,9 +57,6 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
              image_width = 0.6)
 @
 <<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
-alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha1.0.npz')
-
-coclust_init <- load_coclust_file(alpha1_coclust_file, 'coclust_init')
 p <- plot_coclustering(coclust_init) + 
   theme(axis.title = element_blank(), 
         axis.text = element_blank(), 
