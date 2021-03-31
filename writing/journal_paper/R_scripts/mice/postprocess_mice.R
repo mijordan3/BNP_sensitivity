@@ -1,4 +1,4 @@
-data_dir = './R_scripts/data/mice/'
+data_dir = './R_scripts/data_raw/mice/'
 
 ######################
 # load example gene observations
@@ -146,3 +146,5 @@ coclust_refit_fpert <-
 
 coclust_lr_fpert <-
   load_coclust_file(fpert_coclust_file, 'coclust_lr') 
+
+save.image('./R_scripts/data_processed/mice.RData') 

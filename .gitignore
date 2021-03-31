@@ -26,6 +26,7 @@
 *-concordance.tex
 
 *.npz
+*.RData
 
 *deleteme* 
 

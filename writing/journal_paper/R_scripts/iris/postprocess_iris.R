@@ -1,4 +1,4 @@
-data_dir <- './R_scripts/data/iris/'
+data_dir <- './R_scripts/data_raw/iris/'
 
 ####################
 # Load data for initial fit
@@ -29,3 +29,5 @@ alpha_sens_df <-
     n_clusters_lr = alpha_sens_file['n_clusters_lr'], 
     n_clusters_thresh_refit = alpha_sens_file['n_clusters_thresh_refit'],
     n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr'])
+
+save.image('./R_scripts/data_processed/iris.RData') 
