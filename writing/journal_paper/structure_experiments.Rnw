@@ -21,7 +21,9 @@
     "The inferred individual admixtures at $\\alpha = 3$. 
     Each vertical strip is an individual and each color
     an ancestral population.
-    Lengths of colored segments represent the inferred mixture proportions.")
+    Lengths of colored segments represent the inferred mixture proportions.
+    Mbololo, Ngangao, Yale, and Chawia refer to
+    geographic regions from which each individual was collected. ")
 SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
 @
   <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=

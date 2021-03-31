@@ -22,6 +22,8 @@ p_priors_contr <-
   theme(legend.title = element_blank(), 
         legend.position = c(0.85, 0.75))
 
+top_row <- p_logphi + p_priors + p_priors_contr
+
 ######################
 # Plot co-clustering results
 ######################
@@ -50,11 +52,15 @@ plots <- compare_coclust_lr_and_refit(coclust_refit_fpert,
                                       labels,
                                       min_keep,
                                       breaks)
+bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr
 
-layout_matrix <- matrix(c(1, 2, 3, 4, 5, 5), 
-                        nrow = 2, byrow = TRUE)
-g <- arrangeGrob(p_logphi, p_priors, p_priors_contr, 
-                 plots$p_scatter, plots$p_coclust, 
-                 layout_matrix = layout_matrix)
-ggsave('./R_scripts/mice/figures_tmp/fpert_coclust_sensitivity.png', 
-       g, width = 8, height = 5.)
+top_row / bottom_row
+
+
+# layout_matrix <- matrix(c(1, 2, 3, 4, 5, 5), 
+#                         nrow = 2, byrow = TRUE)
+# g <- arrangeGrob(p_logphi, p_priors, p_priors_contr, 
+#                  plots$p_scatter, plots$p_coclust, 
+#                  layout_matrix = layout_matrix)
+# ggsave('./R_scripts/mice/figures_tmp/fpert_coclust_sensitivity.png', 
+#        g, width = 8, height = 5.)

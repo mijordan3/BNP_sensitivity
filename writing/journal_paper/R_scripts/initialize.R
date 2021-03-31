@@ -8,7 +8,7 @@ library(ggplot2)
 library(ggforce)
 library(xtable)
 
-# library(gridExtra)
+library(gridExtra)
 # this replaces gridExtra ...
 library(patchwork) 
 

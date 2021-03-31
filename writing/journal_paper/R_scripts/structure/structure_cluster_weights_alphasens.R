@@ -12,7 +12,8 @@ weights_lr_df <-
 
 weights_df <- rbind(weights_refit_df, weights_lr_df) %>% 
   gather(key = cluster, value = weight, -c('alpha', 'method')) %>% 
-  mutate(cluster = sub('X', 'cluster ', cluster))
+  mutate(cluster = sub('X', 'cluster ', cluster)) %>% 
+  filter(alpha <= 10)
 
 # for these clusters, we add a horizontal line corresponding to the threshold
 thresh_df <- 

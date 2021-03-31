@@ -9,7 +9,7 @@ p_infl <-
   ylab('influence') + 
   xlab('logit-stick') + 
   ggtitle('influnce function') + 
-  get_fontsizes(fontsize_scale)
+  get_fontsizes()
 
 p_prior <-
   ggplot() + 
@@ -19,7 +19,7 @@ p_prior <-
   ylab('p') + 
   xlab('logit-stick') + 
   ggtitle(expression(paste("priors in logit space (", alpha, " = 3)"))) + 
-  get_fontsizes(fontsize_scale)
+  get_fontsizes()
 
 p_infl_x_prior <- 
   ggplot() + 
@@ -29,12 +29,9 @@ p_infl_x_prior <-
   ylab('influence x p0') + 
   xlab('logit-stick') + 
   ggtitle('influence x prior') + 
-  get_fontsizes(fontsize_scale)
+  get_fontsizes()
 
-grid.arrange(p_infl, 
-             p_prior, 
-             p_infl_x_prior,
-             nrow = 1)
+p_infl + p_prior + p_infl_x_prior
 
 # ggsave('./R_scripts/mice/figures_tmp/coclustering_influence.png', 
 #        g,
