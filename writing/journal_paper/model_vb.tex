@@ -95,9 +95,9 @@ sufficient statistics $\log \nu_\k$ and $\log(1 - \nu_\k)$ and so in the
 Beta family.  However, for a generic $\pstick(\cdot)$, the posterior
 $p(\nu_{\k} \vert \x, \theta, \z)$ does not have a standard form.
 
-In order to optimize the variational objective \eqref{vb_optimization} we
-see from \eqref{stick_log_post} that we need to evaluate expectations of
-the form
+In order to optimize the variational objective \eqref{vb_optimization} we see
+from \eqref{stick_log_post} that we need to evaluate or approximate expectations
+of the form
 %
 \begin{align*}
 %
@@ -106,6 +106,60 @@ the form
 \expect{\q(\nu_\k \vert \eta)}{\log (1 - \nu_\k)}
 \textrm{,}\quad\textrm{and}\quad
 \expect{\q(\nu_\k \vert \eta)}{\log \pstick(\nu_\k)}.
+%
+\end{align*}
+
+Each of the expecations are univariate integrals, and so can be efficiently
+approximated numerically.  A particularly easy way to do so is with
+Gauss-Hermite quadrature, as we now describe.
+
+First, define a version of $\nu_\k$ that is not constrained to $(0,1)$:
+%
+\begin{align*}
+%
+\lnu_\k :={} \log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+\quad\Leftrightarrow\quad
+\nu_\k :={} \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
+%\fracat{d \lnu_\k}{ d\nu_\k}{\nu_\k} ={}&
+%     \frac{1-\nu_\k}{\nu_\k}
+%     \left(\frac{1}{1 - \nu_\k} + \frac{\nu_\k}{(1 - \nu_\k)^2} \right)
+% \\={}& \frac{1}{\nu_\k} + \frac{1}{1 - \nu_\k}
+% \\={}&
+%\frac{1}{\nu_\k (1 - \nu_\k)}.
+%
+\end{align*}
+%
+We wish to let $\lnu_\k$ be distributed normally under the variational
+distribution, which we write
+%
+\begin{align*}
+%
+\q(\lnu_\k \vert \eta) ={}& \norm{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
+\Rightarrow \\
+\q(\nu_\k \vert \eta) ={}&
+    \norm{\log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+        \vert \lnumean_\k, \lnusd_\k}
+    \left|\fracat{d \lnu_\k}{ d\nu_\k}{\nu_\k}\right|
+\\={}&
+\norm{\log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+        \vert \lnumean_\k, \lnusd_\k}
+    \left|\frac{1}{\nu_\k (1 - \nu_\k)}\right|.
+%
+\end{align*}
+%
+Given this, we can approximate expectations of smooth functions
+$f(\nu_\k)$ using Gauss-Hermite quadrature.
+
+%
+\begin{align*}
+%
+\expect{\q(\nu_\k \vert \eta)}{f(\nu_\k)} ={}&
+\expect{\q(\lnu_\k \vert \eta)}
+       {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
+\\\approx{}&
+    \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
+ \\=:{}&
+\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}.
 %
 \end{align*}
 %
