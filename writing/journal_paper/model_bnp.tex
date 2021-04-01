@@ -1,0 +1,82 @@
+We will consider discrete Bayesian nonparametric (BNP) generative models which
+draw data points $\x_n$ from one of a potentially infinite number of clusters
+indexed by $\k = 1, 2, \ldots$.  Each cluster is characterized by a vector
+$\theta_\k \in \thetadom \subseteq \mathbb{R}^{\thetadim}$, with $p(\x_n \vert
+\theta_\k)$ denoting the distribution of data arising from  cluster $\k$. We
+will model the $\theta_\k$ as arising IID from a known prior $\theta_\k \iid
+p(\theta_\k)$, and write $\theta = (\theta_1, \theta_2, \ldots)$.
+
+The cluster assignments are represented by indicator variables $\z_{\n\k} \in
+\{0, 1\}$, where $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise.  Let
+$\z_\n$ with a single index denote all the cluster indicators for a given
+datapoint, $\z_\n = (\z_{\n1}, \z_{\n2}, \ldots)$, and let $\z$ with no index
+denote the collection $\z = (\z_1, \ldots, \z_\N)$.  With $\z$ defined
+in this way, we can write
+%
+\begin{align*}
+%
+p(\x_n \vert \z_\n, \theta) =
+    \prod_{k=1}^\infty p(\x_n \vert \theta_\k)^{\z_{\n\k}}.
+%
+\end{align*}
+%
+
+The cluster assignments $\z_{\n}$ will be drawn according to the following
+``stick-breaking process.''  Fix a density $\pstick(\cdot)$, with respect to the
+Lebesgue measure, over stick lengths $\nu_\k \in (0, 1)$ and draw $\nu_\k \iid
+\pstick(\nu_\k)$ for $\k=1,2,\ldots$.  Given these stick lengths, we compute
+indicator probabilities by
+%
+\begin{align*}
+%
+\pi_\k := \nu_\k \prod_{\k' < \k} (1 - \nu_{\k'}),
+%
+\end{align*}
+%
+where the empty product is taken to be equal to $1$. Write $\nu := (\nu_1,
+\nu_2, \ldots)$ for the vector of all stick lengths and $\pi := (\pi_1, \pi_2,
+\ldots)$ for the corresponding vector of proabilities. By construction,
+$\sum_{\k=1}^{\infty} \pi_\k = 1$, and we draw $\z_\n$ according to
+%
+\begin{align*}
+%
+p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \Rightarrow \\
+p(\z_\n \vert \pi) ={}& \prod_{k=1}^{\infty} \pi_\k^{\z_{\n\k}}.
+%
+\end{align*}
+%
+Since $\pi$ is a deterministic function of $\nu$, we can also write
+$p(\z_\n \vert \nu)$ with no ambiguity.
+
+The stick-breaking process can be though of as a map from  the stick
+distibution, $\pstick(\cdot)$, to a vector of probabilities, $\pi$. Different
+stick distributions will give different indicator probabilities, with different
+implied degrees of concentration.  A particularly common choice for
+$\pstick(\cdot)$ is the $\mathrm{Beta}(\nu_\k \vert 1, \alpha)$ distribution,
+%
+\begin{align*}
+%
+\mathrm{Beta}(\nu_\k \vert 1, \alpha) =
+    \frac{\Gamma(1 + \alpha) (1 - \nu_\k)^{\alpha - 1})}
+         {\Gamma(\alpha)}
+%
+\end{align*}
+%
+since this choice is equivalent to drawing $\pi$ from a Dirichlet process.
+
+For a fixed $\pstick(\cdot)$, we can thus write the joint distribution of
+the data and parameters as:
+%
+\begin{align}\eqlabel{bnp_model}
+%
+\logp(\x, \theta, \z, \nu) ={}&
+    \sum_{n=1}^N \sum_{k=1}^{\infty}
+        \z_{\n\k} \left(
+            \logp(\x_n \vert \theta_\k) + \log \pi_\k
+        \right) +
+    \sum_{k=1}^{\infty} \left(
+        \log \pstick(\nu_\k) + \logp(\theta_\k)
+    \right).
+%
+\end{align}
+%

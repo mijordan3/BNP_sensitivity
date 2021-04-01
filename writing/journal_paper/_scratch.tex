@@ -1,0 +1,101 @@
+% This file is for tex not in the paper but which I don't want to delete
+% just yet in case we want it later.%
+We consider a few cases, depending on how $\KL{\eta, \t}$ is evaluated.
+For illustration, we consider the following simple example.
+
+\begin{ex}\exlabel{q_normal}
+%
+Let $\x \in \mathbb{R}$, $\theta \in \mathbb{R}$, $p(\x \vert \theta) = \norm{\x
+\vert \theta, 1}$, and $p(\theta \vert \t) = \norm(\theta \vert \t, 1)$.  Then
+%
+\begin{align*}
+%
+\logp(\x \vert \theta) ={}&
+    -\frac{1}{2} \left(\theta^2 - 2 \theta \x \right) + \const
+    & \constdesc{\theta} \\
+\logp(\theta \vert \t)={}&
+    -\frac{1}{2} \left(\theta^2 - 2 \theta \t \right) + \const
+    & \constdesc{\theta} \Rightarrow  \\
+\logp(\x \vert \theta) + \logp(\theta \vert \t)={}&
+    \theta(\x - \t) - \theta^2 + \const.
+    & \constdesc{\theta}.
+%
+\end{align*}
+%
+Let $\eta = (\mu, \sigma)^T$ and $\q(\theta \vert \eta) = \norm{\theta \vert \mu,
+\sigma^2}$, so that
+%
+\begin{align*}
+%
+\log \q(\theta \vert \eta) &=
+    -\frac{1}{2} \sigma^{-2} (\theta - \mu)^2 -\frac{1}{2} \log \sigma^2 +
+    \const.&\constdesc{\theta, \eta}
+%
+\end{align*}
+%
+\end{ex}
+
+In the simplest case, we can evaluate $\expect{\q(\theta \vert \eta)}{ f(\theta,
+\t) }$ explicitly as a funciton of $\eta$, in which case we can compute
+the needed derivatives exactly.
+
+\begin{ex}\exlabel{q_normal_exact}
+%
+In \exref{q_normal}, we can compute
+TODO(fix this)
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}
+       {-\logp(\x \vert \theta) - \logp(\theta \vert \t)} ={}&
+\expect{\q(\theta \vert \eta)}{\theta(\t - \x) + \theta^2 + \const}
+    %& \constdesc{\theta}
+\\={}&
+\mu (\x - \t) - \mu^2 - \sigma^2  + \const %& \constdesc{\eta}
+%
+\end{align*}
+%
+and
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}{\log \q(\theta \vert \eta)} ={}&
+\expect{\q(\theta \vert \eta)}
+       {-\frac{1}{2} \sigma^{-2} (\theta - \mu)^2 -\frac{1}{2} \log \sigma^2 +
+        \const} %&\constdesc{\theta, \eta}
+\\={}& \frac{1}{2} \log \sigma^2 + \const. %&\constdesc{\eta}.
+%
+\end{align*}
+%
+So
+%
+\begin{align*}
+%
+\KL{\eta, \t} ={}&
+    \mu (\x - \t) - \mu^2 - \sigma^2 + \frac{1}{2} \log \sigma^2 +
+    \const,
+    &\constdesc{\eta}
+%
+\end{align*}
+%
+and we can directly compute
+%
+\begin{align*}
+%
+\fracat{\partial \KL{\eta, \t}}{\partial\eta}{\eta, \t} ={}&
+    \left(\begin{array}{c}
+    \x - \t - 2\mu\\
+    -2\sigma + \sigma^{-1}
+    \end{array}\right)\\
+\fracat{\partial^2 \KL{\eta, \t}}{\partial\eta \partial \eta^T}{\eta, \t} ={}&
+    \left(\begin{array}{cc}
+    -2          &           0\\
+    0           &           -2 - \sigma^{-2}
+    \end{array}\right)\\
+%
+\end{align*}
+%
+
+
+%
+\end{ex}

@@ -8,23 +8,30 @@
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
 
-% Variational parameters
-\def\etaopt{\hat\eta}
+% Variables
+\def\etaopt{\hat\eta} % Optimal vb parameters
 \def\x{x}   % Data
 \def\t{t}   % Generic priur parameter
-\def\z{z}   % Local posterior parameters
-\def\q{q}   % VB dist
+\def\z{z}   % Cluster indicators
 \def\g{g}   % Function of interest
-\def\logp{\ell}   % VB dist
+\def\k{k}   % Cluster index
+\def\n{n}   % Data index
+\def\const{C}   % Constant
+
+% Distributions
+\def\pstick{p_{\mathrm{stick}}}   % Stick breaking distribution
+\def\q{q}   % VB dist
+\def\logp{\ell}   % Log probabiltty
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\norm#1{\mathcal{N}\left(#1\right)}   % KL divergence
-\def\const{C}   % COnstant
-\def\constdesc#1{\textrm{(}\const\textrm{ does not depend on }#1\textrm{)}}
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}
 
 % Dimensions
+\def\N{N}   % Number of datapoints
+\def\K{K}   % Number of components
+\def\kmax{\K_{\mathrm{max}}}   % Truncation
 \def\etadim{D_{\eta}}
 \def\thetadim{D_{\theta}}
 
@@ -33,7 +40,7 @@
 \def\thetadom{\Omega_{\theta}}
 \def\tdom{\Omega_{\t}}
 
-\def\K{K}   % Number of components
-
+% Annotations
 \def\mathand{\quad\quad\textrm{and}\quad\quad}%
 \def\mathwhere{\quad\quad\textrm{where}\quad\quad}%
+\def\constdesc#1{\textrm{(}\const\textrm{ does not depend on }#1\textrm{)}}
