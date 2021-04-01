@@ -1,48 +1,40 @@
 
-# TODO this is set manually at the moment 
-ymax <- 0.26
-
-plot_step_pert_results <- function(input_file,
+plot_step_pert_results <- function(results_list,
                                    remove_legend = FALSE, 
                                    remove_xlab = FALSE, 
-                                   remove_title = FALSE){
-  stepfun_file <- np$load(input_file)
-  logit_v_grid <- stepfun_file['logit_v_grid']
+                                   remove_title = FALSE, 
+                                   ymax = NULL){
   
-  p1 <- ggplot() +
-    geom_line(aes(x = logit_v_grid, 
-                  y = stepfun_file['influence_x_prior_grid']), 
-              color = 'purple') + 
-    geom_hline(yintercept = 0., alpha = 0.5) + 
-    ylab('infl x p0') + 
-    xlab('logit-stick') + 
-    ggtitle('log-phi') + 
-    geom_rect(aes(xmin=stepfun_file['mu1'],
-                  xmax=stepfun_file['mu2'],
-                  ymin=-Inf, ymax=Inf), 
-              color = 'grey', 
-              fill = 'grey', 
-              alpha = 0.5) +
-    get_fontsizes()
+  p1 <- plot_influence_and_logphi(influence_df$logit_v, 
+                            influence_df$influence_x_prior, 
+                            results_list$priors_df$log_phi) + 
+    ggtitle('perturbation')
   
-  
-  p2 <- plot_priors(logit_v_grid,
-                    p0 = stepfun_file['p0'],
-                    pc = stepfun_file['p1']) + 
+  p2 <- plot_priors(results_list$priors_df$v,
+                    p0 = results_list$priors_df$p0,
+                    pc = results_list$priors_df$p1) + 
+    xlab('stick length') + 
     theme(legend.position = 'bottom', 
           legend.title = element_blank())
   
-  p3 <- plot_post_stat_trace_plot(stepfun_file['epsilon_vec'], 
-                                  stepfun_file['refit'], 
-                                  stepfun_file['lr']) + 
+  
+  g0 <- results_list$sensitiivty_df$refit[1]
+  stopifnot(g0 == results_list$sensitiivty_df$lr[1])
+  p3 <- plot_post_stat_trace_plot(results_list$sensitiivty_df$epsilon, 
+                                  results_list$sensitiivty_df$refit - g0,
+                                  results_list$sensitiivty_df$lr - g0) + 
     # ylab('g(pert) - g(init)') + 
     ylab(expression(Delta*'E[# clusters]')) + 
     xlab('epsilon') + 
-    ggtitle('Sensitivity') + 
+    ggtitle('sensitivity') + 
     geom_hline(yintercept = 0., color = 'black') + 
     theme(legend.position = 'bottom', 
-          legend.title = element_blank()) + 
-    ylim(c(-ymax, ymax))
+          legend.title = element_blank())
+  
+  if(!is.null(ymax)){
+    p3 <- p3 + ylim(c(-ymax, ymax))
+  }
+    
   
   if(remove_legend){
     p2 <- p2 + theme(legend.position = 'none')
@@ -69,34 +61,35 @@ plot_step_pert_results <- function(input_file,
   return(g)
 }
 
-g0 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx0.npz', 
+# TODO this is set manually ... 
+ymax = 0.19
+
+g0 <- plot_step_pert_results(fpert2_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
-                             remove_title = FALSE)
+                             remove_title = FALSE, 
+                             ymax = ymax)
 
-g1 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx1.npz', 
+g1 <- plot_step_pert_results(fpert3_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
-                             remove_title = TRUE)
+                             remove_title = TRUE, 
+                             ymax = ymax)
 
-g2 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx2.npz', 
+g2 <- plot_step_pert_results(fpert1_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
-                             remove_title = TRUE)
+                             remove_title = TRUE, 
+                             ymax = ymax)
 
-g3 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx3.npz', 
-                             remove_legend = TRUE, 
-                             remove_xlab = TRUE, 
-                             remove_title = TRUE)
-
-g4 <- plot_step_pert_results('./R_scripts/iris/data/iris_fsens_muindx4.npz', 
+g3 <- plot_step_pert_results(wc_results, 
                              remove_legend = FALSE, 
                              remove_xlab = FALSE, 
                              remove_title = TRUE)
 
 
 
-g0 / g1 / g2 / g3 / g4
+g0 / g1 / g2 / g3
 
 
 # grid.arrange(g0, g1, g2, g3, g4, ncol = 1)

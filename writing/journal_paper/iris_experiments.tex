@@ -52,20 +52,21 @@ We compare against the expected number of clusters obtained by refitting the mod
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=1.176\linewidth]{figure/iris_fsens-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=1.019\linewidth]{figure/iris_fsens-1} 
 
 }
 
-\caption[Demonstration of the influence function on 
-        the expected number of clusters in the iris dataset]{Demonstration of the influence function on 
-        the expected number of clusters in the iris dataset. 
-        (Left) The influence function $I(x)$ 
-        times the initial prior $p_0(x)$ at $\alpha = 6$. 
-        We perturb $p_0$ with $\log \phi$ set to a step
-        function with value one within the grey strips, and zero otherwise. 
-        (Middle) The original prior density $p_0$ and the perturbed prior density $p_0\times \phi$. 
+\caption{Sensitivity of
+        the expected number of clusters in the iris dataset
+        to four multiplicative perturbations with 
+        $L_{\infty}$-norm equal to one. 
+        (Left) The log multiplicative perturbation $\log\phi$ in grey.        
+        In purple is the prior-weighted influence function, scaled to also have 
+        unit $L_{\infty}$-norm. 
+        (Middle) The original prior density $p_0$ and 
+        the perturbed prior density $p_1 = p_0\times \phi$. 
         (Right) The effect of the perturbation 
-        on the change in expected number of clusters as $\epsilon \rightarrow 1$. }\label{fig:iris_fsens}
+        on the change in expected number of clusters as a function of $\epsilon$. }\label{fig:iris_fsens}
 \end{figure}
 
 
