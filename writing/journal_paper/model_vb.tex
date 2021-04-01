@@ -1,1 +1,111 @@
-VB model
+There are two practical problems with forming the posterior
+$p(\theta, \z \vert \x)$ based on the joint distribution given in
+\eqref{bnp_model}.  First, there are an infinite number of parameters,
+and second, the posterior is intractable.  In this section, we describe
+how we circumvent these difficulties using a truncated variational Bayes
+approximation (CITE).
+
+In practice, forming a posterior based on \eqref{bnp_model} with $\kmax =
+\infty$ can be challenging.  In the present paper, we will follow CITE BLEI and
+use a ``truncated model'' where $\kmax$ is large but finite. We ensure that a
+large proportion of the clusters are unoccupied with high posterior probability,
+in which case the truncation approxes the fully nonparametric case with $\kmax =
+\infty$ (CITE HUGGINS).  Under this truncation, the final cluster (indexed by
+$\kmax$) can be thought of as capturing the contribution from the tail of
+clusters that are not explicitly represented in the truncated model.
+
+Under the truncation, our model differs formally from standard finite mixture
+models principally in our usage of the stick breaking prior rather than, say,
+the Dirichlet prior.  Using the stick breaking prior is appealing due to
+its connection to the fully nonparametric model.  Additionally, the stick
+breaking prior deals more gracefully than the Dirichlet prior
+with a large $\kmax$.  {\color{red}TODO: is this true?  Doesn't $\alpha$
+have to do something as $\kmax \rightarrow \infty$ to approximate a DP?}
+
+Second, even with finite $\kmax$, the posterior for \eqref{bnp_model} is
+intractable, so we again follow CITE BLEI and emply a mean field variational
+approximation.  Let $\zeta := (\theta, \z, \nu)$ denote the full vector of
+posterior parameters.  We form our variational approximation by specifying a
+family of approximating distributions of the form $\q(\zeta \vert \eta)$,
+parameterized by a finite-dimensional $\eta \in \etadom \subseteq
+\mathbb{R}^{\etadim}$, such that $\q(\zeta \vert \eta)$ is absolutely continuous
+with respect to the prior $p(\zeta)$ for all $\eta \in \etadom$.  As we discuss
+below, we will choose $\q(\zeta \vert \eta)$ so that we can easily compute or
+approximation expectations with respect to $\q(\zeta \vert \eta)$, and so that
+$\q(\zeta \vert \eta)$ has tractable entropy as a function of $\eta$.
+
+Given our family of variational approximations, we wish to find the member of
+the family that is closest to the posterior $p(\zeta \vert \x)$ in
+Kullback-Leibler (KL) divergence:
+%
+\begin{align}\eqlabel{vb_optimization}
+%
+\etaopt :={}&
+    \argmin_{\eta \in \etadom}
+        \KL{\q(\zeta \vert \eta) || p(\zeta \vert \x)} \mathwhere \\
+\KL{\q(\zeta \vert \eta) || p(\theta \vert \x)}
+={}&    \expect{\q(\zeta \vert \eta)}{
+        \log \q(\zeta \vert \eta) - \logp(\x \vert \zeta) -
+        \logp(\zeta)} + \logp(\x). \nonumber
+%
+\end{align}
+%
+Due to properties of $\q(\zeta \vert \eta)$ or as given in \eqref{bnp_model},
+all the terms in $\KL{\q(\zeta \vert \eta) || p(\theta \vert \x)}$ are tractable
+except for $\logp(\x)$.  However, $\logp(\x)$ does not depend on $\eta$, and
+so can be negelcted in the optimziation.
+
+We will use mean-field variational approximating families of the following form:
+%
+\begin{align*}
+%
+\q(\zeta \vert \eta) =
+    \left( \prod_{\k=1}^{\kmax - 1} \q(\nu_\k \vert \eta) \right)
+    \left( \prod_{\k=1}^{\kmax} \q(\theta_\k \vert \eta) \right)
+    \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) \right).
+%
+\end{align*}
+%
+For $\z$ and $\theta$, in the present work, we will be always able to take
+advantage of conditional conjugatcy.  Specifically, we will take $\q(\z_{\n}
+\vert \eta)$ to be multinomial with a single observation, matching $p(\z_{\n}
+\vert \x, \theta, \nu)$, and we will take $\q(\theta_\k \vert \eta)$, matching
+the distribution of $p(\theta_{\k} \vert \x, \z, \nu)$.
+
+For the stick-breaking distributions $\q(\nu_\k \vert \eta)$ we will need to do
+something more complicated, since we wish to accomodate generic stick breaking
+distributions.  From \eqref{bnp_model} we see that, up to a constant not
+depending on $\nu_\k$,
+%
+\begin{align}\eqlabel{stick_log_post}
+%
+\log \pi_\k ={}&
+    \log \nu_\k + \sum_{\k' < \k} \log (1 - \nu_\k) \nonumber \\
+\logp(\nu_{\k} \vert \x, \theta, \z) ={}&
+    \left(\sum_{\n=1}^\N \z_{\n\k'}\right) \log \nu_\k +
+    \left( \sum_{\k' > \k} \sum_{\n=1}^\N \z_{\n\k'} \right) \log (1 - \nu_\k) +
+    \log \pstick(\nu_\k).
+%
+\end{align}
+%
+When $\pstick(\cdot) = \mathrm{Beta}(\cdot | 1, \alpha)$, then, up to a constant
+not depending on $\nu_\k$, $\log \pstick(\nu_\k) = (\alpha - 1) \log (1 -
+\nu_\k)$, so $\logp(\nu_{\k} \vert \x, \theta, \z)$ is proportional to the
+sufficient statistics $\log \nu_\k$ and $\log(1 - \nu_\k)$ and so in the
+Beta family.  However, for a generic $\pstick(\cdot)$, the posterior
+$p(\nu_{\k} \vert \x, \theta, \z)$ does not have a standard form.
+
+In order to optimize the variational objective \eqref{vb_optimization} we
+see from \eqref{stick_log_post} that we need to evaluate expectations of
+the form
+%
+\begin{align*}
+%
+\expect{\q(\nu_\k \vert \eta)}{\log \nu_\k}
+\textrm{,}\quad
+\expect{\q(\nu_\k \vert \eta)}{\log (1 - \nu_\k)}
+\textrm{,}\quad\textrm{and}\quad
+\expect{\q(\nu_\k \vert \eta)}{\log \pstick(\nu_\k)}.
+%
+\end{align*}
+%
