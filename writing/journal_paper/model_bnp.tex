@@ -80,3 +80,30 @@ the data and parameters as:
 %
 \end{align}
 %
+
+\begin{ex}\exlabel{iris_bnp_process}
+%
+For the iris data, $\x_\n \in \mathbb{R}^4$, and we will model the clusters as
+four dimensional Gaussians.  In this case, $\theta_\k = (\mu_k, \Sigma_\k)$,
+where $\mu_\k \in \mathbb{R}^4$, $\Sigma_\k$ is a a four by four positive
+definite covariance matrix, and
+%
+\begin{align*}
+%
+p(\x_\n \vert \theta_\k) ={}& \norm{\x_n \vert \mu_\k, \Sigma_\k} \\
+\logp(\x_\n \vert \theta_\k) ={}&
+    -\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)
+    -\frac{1}{2} \log |\Sigma_\k| + \const.\\
+    & \constdesc{\theta_\k}
+%
+\end{align*}
+
+For the iris data, we might imagine that each cluster corresponds to a different
+species with a different distribution of flower dimensions.  The BNP model
+implies that there are a potentially infinite number of differet iris species
+that we might observe.  Then $\z_{\n\k} = 1$ would mean that observation $\n$
+was a member of species $\k$, and $\sum_{k=1}^\infty \ind{ \sum_{n=1}^{N}
+\z_{\n\k} > 1}$ is the number of distinct species observed in our particular
+dataset.
+%
+\end{ex}
