@@ -16,11 +16,12 @@ clusters that are not explicitly represented in the truncated model.
 
 Under the truncation, our model differs formally from standard finite mixture
 models principally in our usage of the stick breaking prior rather than, say,
-the Dirichlet prior.  Using the stick breaking prior is appealing due to
-its connection to the fully nonparametric model.  Additionally, the stick
-breaking prior deals more gracefully than the Dirichlet prior
-with a large $\kmax$.  {\color{red}TODO: is this true?  Doesn't $\alpha$
-have to do something as $\kmax \rightarrow \infty$ to approximate a DP?}
+the Dirichlet prior.  Using the stick breaking prior is appealing due to its
+connection to the fully nonparametric model.  Additionally, the stick breaking
+prior deals more gracefully than the Dirichlet prior with a large $\kmax$.  For
+example, unless the Dirichlet parameter scales as $1 / \kmax$, then Dirichlet
+priors strongly favor a large number of  distinct clusters as $\kmax$ grows
+larger \citep[Problem 3]{stanford:2014:bnphw}.
 
 Second, even with finite $\kmax$, the posterior for \eqref{bnp_model} is
 intractable, so we again follow CITE BLEI and emply a mean field variational
@@ -111,7 +112,7 @@ of the form
 
 Each of the expecations are univariate integrals, and so can be efficiently
 approximated numerically.  A particularly easy way to do so is with
-Gauss-Hermite quadrature, as we now describe.
+Gauss-Hermite (GH) quadrature, as we now describe.
 
 First, define a version of $\nu_\k$ that is not constrained to $(0,1)$:
 %
@@ -130,7 +131,8 @@ First, define a version of $\nu_\k$ that is not constrained to $(0,1)$:
 \end{align*}
 %
 We wish to let $\lnu_\k$ be distributed normally under the variational
-distribution, which we write
+distribution.  Let $\lnumean_\k$ and $\lnusd_\k$ be entries of the parameter
+vector $\eta$, and write
 %
 \begin{align*}
 %
@@ -148,8 +150,8 @@ distribution, which we write
 \end{align*}
 %
 Given this, we can approximate expectations of smooth functions
-$f(\nu_\k)$ using Gauss-Hermite quadrature.
-
+$f(\nu_\k)$ using GH quadrature with $\ngh$ knots,
+located at $\xi_g$, weighted by $\omega_g$:
 %
 \begin{align*}
 %
@@ -163,3 +165,27 @@ $f(\nu_\k)$ using Gauss-Hermite quadrature.
 %
 \end{align*}
 %
+Conveniently, $\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}$ is a differentiable
+function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
+technique is similar to the ``reparameterization trick,'' only using
+GH points rather than standard normal draws.)
+
+\begin{ex}
+%
+Recall for the iris dataset we used $p(\x_\n \vert \theta_\k) = \norm{\x_n \vert
+\mu_\k, \Sigma_\k}$, with $\theta_\k = (\mu_\k, \Sigma_\k)$.  So,
+up to a constant not depending on $\eta$,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\expect{\q(\theta_\k \vert \eta)}{\logp(\x_\n \vert \theta_\k)} =\\
+&
+\expect{\q(\theta_\k \vert \eta)}{
+-\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)} +
+-\frac{1}{2} \expect{\q(\theta_\k \vert \eta)}{\log |\Sigma_\k|}.
+%
+\end{align*}
+%
+%
+\end{ex}
