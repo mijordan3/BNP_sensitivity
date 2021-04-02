@@ -110,9 +110,9 @@ $\expect{\q(\theta_\k \vert \eta)}{\log \q(\theta_\k \vert \eta)}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{ex}[VB approximation for $\z_\n$]
+\begin{ex}[VB approximation for $\z_\n$]\exlabel{qz_form}
 %
-From \eqref{bnp_model}, we have oin general that
+From \eqref{bnp_model}, we have in general that
 %
 \begin{align*}
 %
@@ -124,7 +124,7 @@ From \eqref{bnp_model}, we have oin general that
 %
 \end{align*}
 %
-So from the mean field assumption of \eqref{vb_mf},
+So, from the mean field assumption of \eqref{vb_mf},
 %
 \begin{align*}
 %
@@ -149,14 +149,20 @@ entropy,
 %
 \end{align*}
 %
-Note additionall that, given $\etatheta$ and $\etanu$, the optimal
-variational distribution $\q(\z_\n \vert \etaz)$ has a closed form, with
+Additionally, given $\etatheta$ and $\etanu$, the optimal
+variational distribution $\q(\z_\n \vert \etaoptz)$ has a closed form, with
 %
 \begin{align*}
 %
-\expect{\q(\z_\n \vert \etaopt)}{\z_{\n\k}} \propto
+\expect{\q(\z_\n \vert \etaopt)}{\z_{\n\k}} ={}&
+\frac{
     \expect{\q(\theta, \nu \vert \eta)}
-           {\logp(\x_n \vert \theta_\k) + \log \pi_\k}.
+           {\logp(\x_n \vert \theta_\k) + \log \pi_\k}
+}{
+    \sum_{\k'=1}^{\kmax}
+    \expect{\q(\theta, \nu \vert \eta)}
+           {\logp(\x_n \vert \theta_{\k'}) + \log \pi_{\k'}}
+}.
 %
 \end{align*}
 %
@@ -166,10 +172,43 @@ This fact will be helpful later in \secref{local_sensitivity}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 For our sensitivity analysis in \secref{local_sensitivity}, we will require
 $\etaopt$ to be interior to $\etadom$.  Consequently, we will choose
-unconstrained representations of the needed distributions.
+unconstrained representations of the needed distributions or parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}[Unconstrained representation for $\etaz$]
+%
+The multinomial approximating distribution $\q(\z_\n \vert \etaz)$ as given in
+\exref{qz_form} is fully specified by the expectations $\expect{\q(\z_\n \vert
+\etaopt)}{\z_{\n\k}} \in (0, 1)$.  But these expectations have only $\kmax -1$
+degrees of freedom since, for any valid $\q(\z_\n \vert \etaz)$,
+$\sum_{\k=1}^\kmax \expect{\q(\z_\n \vert \etaopt)}{\z_{\n\k}} = 1$, and so the
+optimal values for $\expect{\q(\z_\n \vert \etaopt)}{\z_{\n\k}}$ cannot be
+interior to $(0,1)^\kmax$.  Consequently we parameterize
+$\q(\z_\n \vert \etaz)$ using the unconstrained parameters $\rho_{\n\k}$,
+for $\k=1,\ldots,\kmax - 1$, where
+%
+\begin{align*}
+%
+\expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
+\begin{cases}
+    \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax - 1}\exp(\rho_{\n\k})}
+    & \mathrm{ when }\quad\k < \kmax \\
+    \frac{1}{1 + \sum_{\k'=1}^{\kmax - 1}\exp(\rho_{\n\k})}
+    & \mathrm{ when }\quad\k = \kmax.
+\end{cases}
+%
+\end{align*}
+%
+We thus take $\etaz = (\rho_{11}, \ldots \rho_{1(\kmax - 1)}, \ldots,
+\rho_{\n(\kmax - 1)})$ to be the stacked vector of $\rho_{\n\k}$.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 For the stick-breaking distributions $\q(\nu_\k \vert \eta)$ we will need to do
