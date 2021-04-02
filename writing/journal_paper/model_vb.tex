@@ -153,17 +153,17 @@ Given this, we can approximate expectations of smooth functions
 $f(\nu_\k)$ using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %
-\begin{align*}
+\begin{align}\eqlabel{gh_integral}
 %
 \expect{\q(\nu_\k \vert \eta)}{f(\nu_\k)} ={}&
 \expect{\q(\lnu_\k \vert \eta)}
        {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
-\\\approx{}&
+\nonumber\\\approx{}&
     \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
- \\=:{}&
+ \nonumber\\=:{}&
 \expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}.
 %
-\end{align*}
+\end{align}
 %
 Conveniently, $\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}$ is a differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
@@ -187,5 +187,6 @@ up to a constant not depending on $\eta$,
 %
 \end{align*}
 %
+...actually we just use point distributions.
 %
 \end{ex}
