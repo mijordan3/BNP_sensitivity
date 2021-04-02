@@ -150,8 +150,23 @@ differentiation CITE.
 The Hessian matrix may be quite large, since it involves the VB parameters for
 all the random effects.  In particular, though the dimensions of $\etanu$ and
 $\etatheta$ are of order $\kmax$, the dimension of $\etaz$ is of order $\kmax
-\N$.  For large $\N$, it may not be possible to instantiate the fully dense
-Hessian matrix in memory.  Fortunately, the Hessian of the KL divergence is
-sparse and highly structured in $\etaz$.
+\times\N$.  For large $\N$, it may not be possible to instantiate the fully
+dense Hessian matrix in memory.  Fortunately, the Hessian of the KL divergence
+is sparse and highly structured in $\etaz$.  In particular, it is
+block-diagonal, with
+%
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta_{\z_{n}} \partial \eta_{\z_{m}}^T}
+       {\etaopt(\t_0), \t_0} ={}& 0 \mathtxt{for}n\ne m.
+%
+\end{align*}
+%
+Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax -
+1$, and that the Hessian of $\expect{\q(\zeta \vert \eta)}{\logp(\x \vert
+\zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
+being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
+
 
 %
