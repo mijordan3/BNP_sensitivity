@@ -83,12 +83,22 @@ the data and parameters as:
 %
 \begin{align}\eqlabel{bnp_model}
 %
-\logp(\x, \theta, \z, \nu) ={}&
+% \logp(\x, \theta, \z, \nu) ={}&
+%     \sum_{n=1}^N \sum_{k=1}^{\kmax}
+%         \z_{\n\k} \left(
+%             \logp(\x_n \vert \theta_\k) + \log \pi_\k
+%         \right) +
+% \nonumber \\ {}&
+%     \sum_{k=1}^{\kmax} \left(
+%         \log \pstick(\nu_\k) + \logp(\theta_\k)
+%     \right).
+\MoveEqLeft
+\logp(\x, \theta, \z, \nu) ={}
+\nonumber\\&
     \sum_{n=1}^N \sum_{k=1}^{\kmax}
         \z_{\n\k} \left(
             \logp(\x_n \vert \theta_\k) + \log \pi_\k
         \right) +
-\nonumber \\ {}&
     \sum_{k=1}^{\kmax} \left(
         \log \pstick(\nu_\k) + \logp(\theta_\k)
     \right).
@@ -96,7 +106,9 @@ the data and parameters as:
 \end{align}
 %
 
-\begin{ex}\exlabel{iris_bnp_process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}[Generative process]\exlabel{iris_bnp_process}
 %
 For the iris data, $\x_\n \in \mathbb{R}^4$, and we will model the clusters as
 four dimensional Gaussians.  In this case, $\theta_\k = (\mu_k, \Sigma_\k)$,
@@ -122,3 +134,4 @@ was a member of species $\k$, and $\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
 dataset.
 %
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

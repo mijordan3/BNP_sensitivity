@@ -73,7 +73,35 @@ multiplication and addition.  When $|\t - \t_0|$ is small, we might hope
 that $\etaopt(\t) \approx \etalin(\t)$, and so we can use $\etalin(\t)$
 to quickly approximate a time-consuming optimization problem.
 
-%\subsection{Evaluating $d\etaopt(\t) / d\t$}
+For functions of interest $\g(\eta)$ which are themselves differentiable,
+we can use the chain rule to compute
+%
+\begin{align*}
+%
+\fracat{d g(\etaopt(\t))}{d\t} ={}&
+    \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
+    \fracat{d \etaopt(\t)}{d \t}{\t_0} \\
+\glin(\t) :={}& \g(\etaopt(\t_0)) + \fracat{d g(\etaopt(\t))}{d\t}{\t_0} (\t - \t_0).
+%
+\end{align*}
+%
+For non-differentiable functions of $\eta$, we can still form the approximation
+%
+\begin{align*}
+%
+\gapprox(\t) :={}& \g(\etalin(\t)).
+%
+\end{align*}
+%
+The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
+we can compute influence functions and worst-case perturbations, as we discuss
+below in SECREF.  Converse, $\gapprox(\t)$ may be expected to provide a better
+approximation in some cases since it retains non-linearities in the map $\eta
+\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
+\mapsto \etaopt(\t)$.
+
+
+\subsection{Evaluating $d\etaopt(\t) / d\t$}
 
 In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
 need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
@@ -102,19 +130,28 @@ First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
 \end{align}
 %
 Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nu_\k
-\vert \t)}{\partial \t}{\t_0} $, we can evaluate the mixed partial using
-the derivative of \eqref{gh_integral}.
+\vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
+differentiation, we can evaluate the mixed partial using the derivative of
+\eqref{gh_integral}.  We will consider particular functional forms for
+$\t \mapsto \pstick(\nu_\k \vert \t)$ in \secref{prior_perturbations}.
+
+Observe that \eqref{sens_mixed_partial} will be zero for all entries of
+$\eta$ other than those that parameterize the sticks.
 
 Typically, it is the computation and factorization of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
-$\etadim$ is large.  However, this Hesian matrix does not depend on $\t$, and so
-can be computed once and re-used for many different values of $\t$, or many
+$\etadim$ is large.  However, this Hessian matrix does not depend on $\t$, and
+so can be computed once and re-used for many different values of $\t$, or many
 different classes of prior perturbations.  In our case, we have written
-$\KL{\eta, \t_0}$ as an explicit function of $\eta$.  Consequently, we
-can compute either the Hessian itself or Hessian-vector products using
-automatic differentiation CITE.
+$\KL{\eta, \t_0}$ as an explicit function of $\eta$.  Consequently, we can
+compute either the Hessian itself or Hessian-vector products using automatic
+differentiation CITE.
 
-The Hessian matrix may be quite large, since it involves the VB parameters
-for all the random effects.
+The Hessian matrix may be quite large, since it involves the VB parameters for
+all the random effects.  In particular, though the dimensions of $\etanu$ and
+$\etatheta$ are of order $\kmax$, the dimension of $\etaz$ is of order $\kmax
+\N$.  For large $\N$, it may not be possible to instantiate the fully dense
+Hessian matrix in memory.  Fortunately, the Hessian of the KL divergence is
+sparse and highly structured in $\etaz$.
 
 %

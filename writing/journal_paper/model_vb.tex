@@ -58,20 +58,119 @@ so can be negelcted in the optimziation.
 
 We will use mean-field variational approximating families of the following form:
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_mf}
 %
 \q(\zeta \vert \eta) =
     \left( \prod_{\k=1}^{\kmax - 1} \q(\nu_\k \vert \eta) \right)
     \left( \prod_{\k=1}^{\kmax} \q(\theta_\k \vert \eta) \right)
     \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) \right).
 %
-\end{align*}
+\end{align}
 %
+Under this parameterization, the vector $\eta$ will partition into parameters
+governing $\nu$, $\theta$, and $\z$, which we denote as $\etanu$, $\etatheta$,
+and $\etaz$ respectively, taking $\eta = (\etanu^T, \etatheta^T, \eta\z^T)^T$.
+
 For $\z$ and $\theta$, in the present work, we will be always able to take
-advantage of conditional conjugatcy.  Specifically, we will take $\q(\z_{\n}
+advantage of conditional conjugacy.  Specifically, we will take $\q(\z_{\n}
 \vert \eta)$ to be multinomial with a single observation, matching $p(\z_{\n}
 \vert \x, \theta, \nu)$, and we will take $\q(\theta_\k \vert \eta)$, matching
 the distribution of $p(\theta_{\k} \vert \x, \z, \nu)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}[VB approximation for $\theta_\k$]
+%
+Recall for the iris dataset we used $p(\x_\n \vert \theta_\k) = \norm{\x_n \vert
+\mu_\k, \Sigma_\k}$, with $\theta_\k = (\mu_\k, \Sigma_\k)$.  So,
+up to a constant not depending on $\eta$,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\expect{\q(\theta_\k \vert \eta)}{\logp(\x_\n \vert \theta_\k)} =\\
+&
+\expect{\q(\theta_\k \vert \eta)}{
+-\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)} +
++\frac{1}{2} \expect{\q(\theta_\k \vert \eta)}{\log |\Sigma_\k^{-1}|}.
+%
+\end{align*}
+%
+By taking $\q(\theta_\k \vert \eta) = \wishart{\Sigma_\k^{-1} \vert \eta}
+\norm{\mu_\k \vert \eta}$, the expectations in the preceding display have closed
+form expressions as functions of $\eta$, as does the entropy
+$\expect{\q(\theta_\k \vert \eta)}{\log \q(\theta_\k \vert \eta)}$.
+%
+\end{ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}[VB approximation for $\z_\n$]
+%
+From \eqref{bnp_model}, we have oin general that
+%
+\begin{align*}
+%
+\logp(\z_n \vert \x, \theta, \nu) ={}&
+\sum_{k=1}^{\kmax}
+    \z_{\n\k} \left(
+        \logp(\x_n \vert \theta_\k) + \log \pi_\k
+    \right) + \const & \constdesc{\z_\n}.
+%
+\end{align*}
+%
+So from the mean field assumption of \eqref{vb_mf},
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}{\logp(\z_n \vert \x, \theta, \nu)} ={}&
+\sum_{k=1}^{\kmax}
+    \expect{\q(\z_\n \vert \eta)}{\z_{\n\k}}
+    \expect{\q(\theta, \nu \vert \eta)}
+           {\logp(\x_n \vert \theta_\k) + \log \pi_\k}.
+%
+\end{align*}
+%
+When $\q(\z_\n \vert \eta)$ is multinomial, the needed expectation
+$\expect{\q(\z_\n \vert \eta)}{\z_{\n\k}}$ has a closed form, as does the
+entropy,
+%
+\begin{align*}
+%
+\expect{\q(\z_\n \vert \eta)}{\log \q(\z_\n \vert \eta)} ={}&
+    - \sum_{\k=1}^{\kmax}
+        \expect{\q(\z_\n \vert \eta)}{\z_{\n\k}}
+        \log \left( \expect{\q(\z_\n \vert \eta)}{\z_{\n\k}} \right).
+%
+\end{align*}
+%
+Note additionall that, given $\etatheta$ and $\etanu$, the optimal
+variational distribution $\q(\z_\n \vert \etaz)$ has a closed form, with
+%
+\begin{align*}
+%
+\expect{\q(\z_\n \vert \etaopt)}{\z_{\n\k}} \propto
+    \expect{\q(\theta, \nu \vert \eta)}
+           {\logp(\x_n \vert \theta_\k) + \log \pi_\k}.
+%
+\end{align*}
+%
+This fact will be helpful later in \secref{local_sensitivity}.
+%
+\end{ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+For our sensitivity analysis in \secref{local_sensitivity}, we will require
+$\etaopt$ to be interior to $\etadom$.  Consequently, we will choose
+unconstrained representations of the needed distributions.
+
 
 For the stick-breaking distributions $\q(\nu_\k \vert \eta)$ we will need to do
 something more complicated, since we wish to accomodate generic stick breaking
@@ -169,24 +268,3 @@ Conveniently, $\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}$ is a differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
 technique is similar to the ``reparameterization trick,'' only using
 GH points rather than standard normal draws.)
-
-\begin{ex}
-%
-Recall for the iris dataset we used $p(\x_\n \vert \theta_\k) = \norm{\x_n \vert
-\mu_\k, \Sigma_\k}$, with $\theta_\k = (\mu_\k, \Sigma_\k)$.  So,
-up to a constant not depending on $\eta$,
-%
-\begin{align*}
-%
-\MoveEqLeft
-\expect{\q(\theta_\k \vert \eta)}{\logp(\x_\n \vert \theta_\k)} =\\
-&
-\expect{\q(\theta_\k \vert \eta)}{
--\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)} +
--\frac{1}{2} \expect{\q(\theta_\k \vert \eta)}{\log |\Sigma_\k|}.
-%
-\end{align*}
-%
-...actually we just use point distributions.
-%
-\end{ex}

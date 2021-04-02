@@ -13,7 +13,16 @@
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
-\newtheorem{ex}{Example}
+%\newtheorem{ex}{Example}
+
+% Example environment with a terminating symbol.
+% https://tex.stackexchange.com/questions/16453/denoting-the-end-of-example-remark
+\theoremstyle{definition}
+\newtheorem{examplex}{Example}
+\newenvironment{ex}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\examplex}
+  {\popQED\endexamplex}
+
 
 %%%%%%%%%%%%%%%%%%%%
 % refstyle commands
