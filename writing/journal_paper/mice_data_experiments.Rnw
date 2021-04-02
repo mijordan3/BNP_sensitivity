@@ -118,3 +118,13 @@ SetImageSize(aspect_ratio=base_aspect_ratio)
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)
 
 @
+
+
+<<alpha_pert_logphi_cap>>=
+alpha_pert_logphi_cap <- paste(
+    "The log multiplicative perturbation $\\log \\phi$ corresponding to decreasing the $\\alpha$ parameter by five (left) or increasing the $\\alpha$ parameter by five (right). ")
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.5)
+@
+<<alpha_pert_logphi, cache=simple_cache, fig.show='hold', fig.cap=alpha_pert_logphi_cap>>=
+source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
+@

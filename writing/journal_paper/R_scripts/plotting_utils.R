@@ -58,8 +58,8 @@ plot_influence_and_logphi <- function(logit_v_grid,
     ) + 
     theme(axis.title.y.right = element_text(color = 'purple', 
                                             size = axis_title_size), 
-          axis.text.y.right = element_blank(), 
-          axis.ticks.y.right = element_blank()) + 
+          axis.text.y.right = element_text(color = 'purple', 
+                                           size = axis_ticksize)) + 
     geom_hline(yintercept = 0., alpha = 0.5) + 
     ylab('influence x p0') + 
     xlab('logit(stick length)') + 

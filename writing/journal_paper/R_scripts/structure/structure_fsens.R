@@ -67,6 +67,23 @@ p_admix <- out$p +
 #################
 # plot results
 #################
+
+input_file <- './R_scripts/data_raw/structure/stru_fsens_chawia.npz'
+load_fsens_data <- function(input_file){
+  fsens_results <- np$load(input_file)
+  
+  infl_df <- data.frame(logit_v = fsens_results['logit_v_grid'], 
+                        infl_x_prior = fsens_results['influence_grid_x_prior'])
+  
+  pert_df <- data.frame(logit_v = fsens_results['logit_v_grid2'], 
+                        log_phi = fsens_results['log_phi'], 
+                        p0 = exp(fsens_results['log_p0']), 
+                        pc = exp(fsens_results['log_pc']))
+  
+  sensitivity_df <- data.frame
+}
+np$load(input_file)
+
 plot_struct_fsens_results <- function(input_file){
   
   fsens_results <- np$load(input_file)
