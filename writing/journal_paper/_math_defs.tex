@@ -21,13 +21,16 @@
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
 \def\lnumean{\eta^{\mu}}   % Unconstrained stick vb mean
 \def\lnusd{\eta^{\sigma}}   % Unconstrained stick vb std
+\def\hess#1{H_{#1}}   % Hessian
 
 \def\etatheta{\eta_{\theta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
+\def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
 \def\etaopttheta{\etaopt_{\theta}}  % VB parameters for certain components
 \def\etaoptnu{\etaopt_{\nu}}  % VB parameters for certain components
 \def\etaoptz{\etaopt_{\z}}  % VB parameters for certain components
+\def\etaoptgamma{\etaopt_{\gamma}}  % VB parameters for certain components
 
 
 % Distributions
@@ -37,7 +40,7 @@
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\norm#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
-\def\gamma#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
+\def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}

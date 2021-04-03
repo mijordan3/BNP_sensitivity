@@ -68,8 +68,10 @@ We will use mean-field variational approximating families of the following form:
 \end{align}
 %
 Under this parameterization, the vector $\eta$ will partition into parameters
-governing $\nu$, $\theta$, and $\z$, which we denote as $\etanu$, $\etatheta$,
-and $\etaz$ respectively, taking $\eta = (\etanu^T, \etatheta^T, \eta\z^T)^T$.
+governing $\nu$, $\theta$, and $\z$.  Let the VB parameters governing a
+particular parameter vector be denoted with a subscript: for example, $\q(\theta
+\vert \eta) = \q(\theta \vert \etatheta)$, $\q(\z_\n \vert \eta) = \q(\z \vert
+\eta_{\z_{\n}})$, and so on.
 
 For $\z$ and $\theta$, in the present work, we will be always able to take
 advantage of conditional conjugacy.  Specifically, we will take $\q(\z_{\n}
@@ -179,7 +181,8 @@ unconstrained representations of the needed distributions or parameters.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{ex}[Unconstrained representation for $\etaz$]\exlabel{qz_unconstrained}
+%[Unconstrained representation for $\etaz$]
+\begin{ex}\exlabel{qz_unconstrained}
 %
 The multinomial approximating distribution $\q(\z_\n \vert \etaz)$ as given in
 \exref{qz_form} is fully specified by the expectations $\expect{\q(\z_\n \vert

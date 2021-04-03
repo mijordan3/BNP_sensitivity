@@ -168,5 +168,86 @@ Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax 
 \zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
 being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
 
-
+We propose the following techniques for computing the inverse Hessian when the
+fully matrix is prohibitively large.  To describe the techniques it will be
+useful to use the following compact notation.  Let $\gamma = (\theta, \nu)$
+denote all the parameters besides $\z$, and for generic parameters $a$ and $b$
+let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
+\eta_b^T}{\etaopt(\t_0), \t_0}$, the Hessian with respect to the variational
+parameters governing $a$ and $b$.  Specifically:
 %
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \eta^T}
+       {\etaopt(\t_0), \t_0} ={}&
+\hess{\zeta\zeta} =
+\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\z} \\
+   \hess{\z\gamma}     & \hess{\z\z} \\
+\end{array}
+\right).
+%
+\end{align*}
+%
+The terms $\hess{\gamma\gamma}$ and $\hess{\z\gamma} = \hess{\gamma\z}^T$ are
+typically dense and easily computed using atuomatic differentiation, and the
+term $\hess{\z\z}$ is block diagonal with a closed-form inverse.
+%
+Analogously, let
+%
+\begin{align*}
+%
+\hess{\zeta\t} :=
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \t}
+       {\etaopt(\t_0), \t_0},
+%
+\end{align*}
+%
+and observe that
+%
+\begin{align*}
+%
+\hess{\zeta\t} ={}& \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right).
+%
+\end{align*}
+
+In this notation,
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+-\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\z} \\
+   \hess{\z\gamma}     & \hess{\z\z} \\
+\end{array}
+\right)^{-1}
+\left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right)
+%
+\end{align*}
+%
+We can then use the Schur complement to get the computationally tractable
+expression:
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+-\left(\begin{array}{c}
+I_{\gamma\gamma} \\
+\hess{\z\z}^{-1} \hess{\z\gamma}
+\end{array}\right)
+\left(\hess{\gamma\gamma} -
+      \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \hess{\gamma\t}.
+%
+\end{align*}
+
+In fact, the former expression can be computed entirely using automatic
+differentiation using the fact that $\etaoptz$ has an explicit closed form given
+$\etaoptgamma$, as dicussed in \exref{qz_form}.  TODO: is this worth writing
+here?
+
+When even $\hess{\gamma\gamma}$ is too large to form in memory, one can
+use the conjugate gradient algorithm.  TODO: fill in details.
