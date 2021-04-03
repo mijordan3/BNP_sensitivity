@@ -4,7 +4,7 @@ source activate bnp_sensitivity_jax
 
 epsilon_indx=$SLURM_ARRAY_TASK_ID
 
-out_folder='../fits/'
+out_folder='../fits_20210327/'
 out_filename='iris_fit'
 
 python fit_iris_inflbump.py \

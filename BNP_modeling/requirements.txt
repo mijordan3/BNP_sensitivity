@@ -1,6 +1,7 @@
 numpy
 scipy
 matplotlib
+sklearn
 jax==0.1.77
 jaxlib==0.1.57
 paragami @ git+https://github.com/rgiordan/paragami@jax

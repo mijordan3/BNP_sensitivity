@@ -233,6 +233,6 @@ class WorstCasePerturbation(object):
         # the worst case perturbation. 
         # for plotting only!
         
-        return np.sign(self.influence_fun_interp(logit_v))
+        return np.sign(self.influence_fun_interp(logit_v)) * self.delta
 
 
