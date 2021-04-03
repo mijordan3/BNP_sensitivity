@@ -26,49 +26,55 @@ chawia_outliers <-
   filter(region == 'Chawia')
 
 
-intercepts <- c(min(mbololo_outliers$obs_id) - 1,
-                max(mbololo_outliers$obs_id) + 1, 
-                min(ngangao_outliers$obs_id) - 1, 
-                max(ngangao_outliers$obs_id) + 1,
-                min(chawia_outliers$obs_id) - 1, 
-                max(chawia_outliers$obs_id) - 0.5)
-
 rect_alpha = 0.1
-linesize = 0.5
+linesize = 1
 text_height = 0.1
 text_size = 3
+
+mbololo_box <- geom_rect(aes(xmin = min(mbololo_outliers$obs_id) - 1.5,
+                             xmax = max(mbololo_outliers$obs_id) + 1.5,
+                             ymin = 0.15, 
+                             ymax = 0.5), 
+                         color = 'black', 
+                         alpha = 0., 
+                         size = linesize)
+
+ngangao_box <- geom_rect(aes(xmin = min(ngangao_outliers$obs_id) - 1.5,
+                             xmax = max(ngangao_outliers$obs_id) + 1.5,
+                             ymin = 0.4, 
+                             ymax = 1.1), 
+                         color = 'black', 
+                         alpha = 0., 
+                         size = linesize)
+
+chawia_box <- geom_rect(aes(xmin = min(chawia_outliers$obs_id) - 1.5,
+                             xmax = max(chawia_outliers$obs_id),
+                             ymin = 0.1, 
+                             ymax = 0.6), 
+                         color = 'black', 
+                         alpha = 0., 
+                         size = linesize)
+
 p_admix <- out$p + 
-  # grey out everything we don't want
-  geom_rect(aes(xmin = 0, xmax = intercepts[1], 
-                ymin = 0, ymax = 1), 
-            fill = 'grey', alpha = rect_alpha) + 
-  geom_rect(aes(xmin = intercepts[2], xmax = intercepts[3], 
-                ymin = 0, ymax = 1), 
-            fill = 'grey', alpha = rect_alpha) + 
-  geom_rect(aes(xmin = intercepts[4], xmax = intercepts[5], 
-                ymin = 0, ymax = 1), 
-            fill = 'grey', alpha = rect_alpha) + 
-  # add vertical lines
-  # label mbololo outliers
-  geom_vline(xintercept = c(intercepts[1], intercepts[2]),
-             size = linesize) +
-  # label ngangao outliers
-  geom_vline(xintercept = c(intercepts[3], intercepts[4]),
-             size = linesize) +
-  # label chawia
-  geom_vline(xintercept = c(intercepts[5], intercepts[6]),
-             size = linesize) +
+  mbololo_box + 
+  ngangao_box + 
+  chawia_box + 
   # add letter labels 
-  geom_text(aes(x = intercepts[1] - 5, y = text_height, label = 'A'), 
+  geom_text(aes(x = min(mbololo_outliers$obs_id) - 5, 
+                y = 0.2, 
+                label = 'A'), 
             size = text_size) + 
-  geom_text(aes(x = intercepts[3] - 5, y = text_height, label = 'B'), 
+  geom_text(aes(x = min(ngangao_outliers$obs_id) - 5, 
+                y = 0.5,
+                label = 'B'), 
             size = text_size) + 
-  geom_text(aes(x = (intercepts[5] + intercepts[6]) / 2,
-                y = text_height, label = 'C'), 
+  geom_text(aes(x = median(chawia_outliers$obs_id),
+                y = 0.7, 
+                label = 'C'), 
             size = text_size) + 
-  theme(axis.ticks = element_blank(), 
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+  theme(axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank())
+
 
 #################
 # plot results
@@ -89,7 +95,7 @@ plot_struct_fsens_results <- function(results_list){
     xlab('stick') + 
     ggtitle('priors') + 
     theme(legend.title = element_blank(), 
-          legend.position = 'bottom')
+          legend.position = 'bottom') 
   
   
   p_sens <- plot_post_stat_trace_plot(results_list$sensitivity_df$epsilon, 
@@ -192,4 +198,5 @@ chawia_plots_sum <-
   chawia_plots$p_sens
 
 
-p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum
+p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum + 
+  plot_layout(heights = c(1.25, 1, 1, 1))

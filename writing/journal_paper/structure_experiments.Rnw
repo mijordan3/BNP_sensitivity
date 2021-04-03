@@ -64,7 +64,7 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
 <<stru_func_sens_cap>>=
   stru_func_sens_cap <- paste(
     "Sensitivity of inferred admixtures for several outlying individuals. 
-     For individual A from the Mbololo region, 
+     For individuals A from the Mbololo region, 
      we examine the sensitivity of the inferred mixture proportion of the purple
      population.
     For four individuals from the Ngangao region (B), we examine the inferred green proportion.
@@ -75,7 +75,7 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
     (Middle column) The effect of this perturbation on the prior density. 
     (Right column) Effects on the inferred admixture. ")
 
-SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.4)
 @
   <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
 source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
