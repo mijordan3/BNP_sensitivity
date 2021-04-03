@@ -33,7 +33,7 @@ plot_influence_and_logphi <- function(logit_v_grid,
   if(is.null(logit_v_grid_logphi)){
     logit_v_grid_logphi <- logit_v_grid
   }
-  stopifnot(length(logit_v_grid) == length(log_phi))
+  stopifnot(length(logit_v_grid_logphi) == length(log_phi))
   
   # scale the infl so it matches the log phi
   infl_norm <- max(abs(infl_fun))

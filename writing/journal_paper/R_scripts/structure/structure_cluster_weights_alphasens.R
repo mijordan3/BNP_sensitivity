@@ -1,6 +1,6 @@
 # for these clusters, we add a horizontal line corresponding to the threshold
 thresh_df <- 
-  data.frame(cluster = paste0('cluster ', 4:weights_keep), 
+  data.frame(cluster = paste0('cluster ', 3:weights_keep), 
              thresh = threshold)
 
 weights_df %>% 

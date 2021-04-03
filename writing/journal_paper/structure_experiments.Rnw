@@ -31,7 +31,7 @@ SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
 @
   <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
 out <- plot_initial_fit()
-out$p 
+out$p
 @
 
     
@@ -71,15 +71,24 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
     For the all individuals from the Chawia region (C), we examine the inferred purple proportion.
     (Left column) The worst-case $L_\\infty$ negative perturbation in grey, 
     plotted against the 
-    influence function times the prior (scaled to have $L_\\infty$ norm equal to 1). 
+    prior-weighted influence function (scaled to have $L_\\infty$ norm equal to 1). 
     (Middle column) The effect of this perturbation on the prior density. 
     (Right column) Effects on the inferred admixture. ")
 
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
 @
   <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
-ggplot() + 
-  geom_text(aes(x = 0, y = 0, label = "TODO: this plot "))
-# source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
+source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
 @
+
+<<stru_func_sens_admix_cap>>=
+  stru_func_sens_admix_cap <- paste(
+    "admixtures ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
+@
+  <<stru_func_sens_admix, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_admix_cap>>=
+source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
+@
+
 

@@ -1,25 +1,52 @@
-plot_initial_fit <- function(){
-
-  # we plot the top 7 clusters
-  clusters_keep <- 7
+plot_structure_fit <- function(ind_admix_matr){
   
-  # get inferred admixtures
-  ind_admix_matr <- e_ind_admix_init[, 1:clusters_keep]
-  
-  # number of observations
   n_obs <- dim(ind_admix_matr)[1]
-  
   
   # create a data frame
   ind_admix_df <- 
     data.frame(ind_admix_matr) %>% 
     mutate(obs_id = 1:n(), 
-           label = geographic_labels, 
            # the is the weight of "other" clusters
            # start w z so its the last factor ... 
            z_other = 1 - rowSums(ind_admix_matr)) %>% 
-    gather(key = cluster, value = admix, -c('obs_id', 'label'))
+    gather(key = cluster, value = admix, -c('obs_id'))
   
+  
+  p <- ind_admix_df %>%
+    ggplot() + 
+    # plot the admixture bars
+    geom_col(aes(x = obs_id,
+                 y = admix, 
+                 fill = cluster, 
+                 color = cluster)) + 
+    scale_fill_brewer(palette = 'Set2') + 
+    scale_color_brewer(palette = 'Set2') + 
+    # flip y-axis and get rid of grey space
+    coord_cartesian(xlim = c(0.5, n_obs+0.5), 
+                    ylim = c(1, 0), 
+                    expand = FALSE) + 
+    scale_y_continuous(breaks=NULL) +
+    theme(axis.title = element_blank(), 
+          axis.text.y = element_blank(), 
+          legend.position = 'none', 
+          axis.text.x = element_text(angle = 45, 
+                                     hjust = 1, 
+                                     size = axis_title_size))
+  
+  return(list(ind_admix_df = ind_admix_df, 
+              p = p))
+}
+
+plot_initial_fit <- function(){
+
+  # we plot the top 7 clusters
+  clusters_keep <- 7
+  
+  n_obs <- dim(e_ind_admix_init)[1]
+  out <- plot_structure_fit(e_ind_admix_init[, 1:clusters_keep])
+
+  p <- out$p
+  init_ind_admix_df <- out$ind_admix_df
   
   # these are manually entered
   # these separate out the true populations 
@@ -31,35 +58,16 @@ plot_initial_fit <- function(){
   labels <- c('Mbololo', 'Ngangao', 'Yale', 'Chawia')  
   
   # plot
-  p <- ind_admix_df %>% 
-        ggplot() + 
-        geom_col(aes(x = obs_id,
-                     y = admix, 
-                     fill = cluster, 
-                     color = cluster)) + 
-        scale_fill_brewer(palette = 'Set2') + 
-        scale_color_brewer(palette = 'Set2') + 
-        # flip y-axis and get rid of grey space
-        ylim(c(1, 0)) + 
-        coord_cartesian(xlim = c(0, n_obs), 
-                        ylim = c(1, 0), 
-                        expand = FALSE) + 
+  p <- p + 
         # add separators for the ture populations
         geom_vline(xintercept = intercepts, 
                    linetype = 'dashed') +
         # add labels
         scale_x_continuous(breaks=ticks_loc,
                            labels = labels) + 
-        scale_y_continuous(breaks=NULL) +
-        theme(axis.title = element_blank(), 
-              axis.text.y = element_blank(), 
-              legend.position = 'none', 
-              axis.text.x = element_text(angle = 45, 
-                                         hjust = 1, 
-                                         size = axis_title_size)) 
-  return(list(ind_admix_df = ind_admix_df, 
-              p = p))
+        scale_y_continuous(breaks=NULL) 
+  
+  return(list(p = p, 
+              init_ind_admix_df = init_ind_admix_df, 
+              intercepts = intercepts))
 }
-
-
-

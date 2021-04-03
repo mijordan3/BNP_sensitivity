@@ -8,7 +8,10 @@ plot_step_pert_results <- function(results_list,
   p1 <- plot_influence_and_logphi(influence_df$logit_v, 
                             influence_df$influence_x_prior, 
                             results_list$priors_df$log_phi) + 
-    ggtitle('perturbation')
+    ggtitle('perturbation') + 
+    theme(axis.ticks.y.right = element_blank(), 
+          axis.text.y.right = element_blank())
+  
   
   p2 <- plot_priors(results_list$priors_df$v,
                     p0 = results_list$priors_df$p0,

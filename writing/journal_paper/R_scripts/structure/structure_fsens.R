@@ -1,23 +1,29 @@
 out <- plot_initial_fit()
 
+regions_df <- data.frame(obs_id = unique(out$init_ind_admix_df$obs_id), 
+                         region = geographic_labels)
+out$init_ind_admix_df <- 
+  out$init_ind_admix_df %>% 
+  inner_join(regions_df, by = 'obs_id')
+
 #################
 # label outliers
 #################
 mbololo_outliers <- 
-  out$ind_admix_df %>%
-  filter(label == 'Mbololo') %>% 
+  out$init_ind_admix_df %>%
+  filter(region == 'Mbololo') %>% 
   filter(cluster == 'X3') %>% 
   filter(admix > 0.15)
 
 ngangao_outliers <- 
-  out$ind_admix_df %>%
-  filter(label == 'Ngangao') %>% 
+  out$init_ind_admix_df %>%
+  filter(region == 'Ngangao') %>% 
   filter(cluster == 'X1') %>% 
   filter(admix > 0.4)
 
 chawia_outliers <- 
-  out$ind_admix_df %>%
-  filter(label == 'Chawia')
+  out$init_ind_admix_df %>%
+  filter(region == 'Chawia')
 
 
 intercepts <- c(mbololo_outliers$obs_id - 1,
@@ -68,48 +74,28 @@ p_admix <- out$p +
 # plot results
 #################
 
-input_file <- './R_scripts/data_raw/structure/stru_fsens_chawia.npz'
-load_fsens_data <- function(input_file){
-  fsens_results <- np$load(input_file)
+plot_struct_fsens_results <- function(results_list){
   
-  infl_df <- data.frame(logit_v = fsens_results['logit_v_grid'], 
-                        infl_x_prior = fsens_results['influence_grid_x_prior'])
+  p_logphi <- plot_influence_and_logphi(results_list$infl_df$logit_v, 
+                                        results_list$infl_df$infl_x_prior, 
+                                        results_list$pert_df$log_phi, 
+                                        results_list$pert_df$logit_v) + 
+    theme(axis.ticks.y.right = element_blank(), 
+          axis.text.y.right = element_blank())
   
-  pert_df <- data.frame(logit_v = fsens_results['logit_v_grid2'], 
-                        log_phi = fsens_results['log_phi'], 
-                        p0 = exp(fsens_results['log_p0']), 
-                        pc = exp(fsens_results['log_pc']))
-  
-  sensitivity_df <- data.frame
-}
-np$load(input_file)
-
-plot_struct_fsens_results <- function(input_file){
-  
-  fsens_results <- np$load(input_file)
-  
-  logit_v <- fsens_results['logit_v_grid']
-  infl_function <- fsens_results['influence_grid_x_prior']
-  log_phi <- fsens_results['log_phi']
-  
-  scale <- max(abs(log_phi)) / max(abs(infl_function))
-  
-  p_logphi <- plot_influence_and_logphi(logit_v, 
-                                  infl_function, 
-                                  log_phi) 
-  p_priors <- plot_priors(sigmoid(logit_v), 
-                    exp(fsens_results['log_p0']), 
-                    exp(fsens_results['log_pc'])) + 
+  p_priors <- plot_priors(sigmoid(results_list$pert_df$logit_v),
+                          results_list$pert_df$p0,
+                          results_list$pert_df$pc) + 
     xlab('stick') + 
-    ggtitle('Priors') + 
+    ggtitle('priors') + 
     theme(legend.title = element_blank(), 
           legend.position = 'bottom')
   
   
-  p_sens <- plot_post_stat_trace_plot(fsens_results['epsilon_vec'], 
-                                  fsens_results['refit_vec'], 
-                                  fsens_results['lr_vec']) + 
-    ggtitle(' ') + 
+  p_sens <- plot_post_stat_trace_plot(results_list$sensitivity_df$epsilon, 
+                                      results_list$sensitivity_df$refit, 
+                                      results_list$sensitivity_df$lr) + 
+    ggtitle('sensitivity') + 
     xlab('epsilon') + 
     theme(legend.title = element_blank(), 
           legend.position = 'bottom')
@@ -130,11 +116,11 @@ x_axis_remover <-
 title_remover <- ggtitle(NULL)
 
 mbololo_plots <- 
-  plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_mbololo.npz')
+  plot_struct_fsens_results(mbololo_fsens_results)
 
 mbololo_plots$p_logphi <- 
   mbololo_plots$p_logphi + 
-  ggtitle('Worst-case pert. of A') + 
+  ggtitle('worst-case pert. of A') + 
   get_fontsizes() + 
   x_axis_remover
 
@@ -158,11 +144,11 @@ mbololo_plots_sum <-
 # plots for ngangao outliers
 ##########
 ngangao_plots <- 
-  plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_ngangao.npz')
+  plot_struct_fsens_results(ngangao_fsens_results)
 
 ngangao_plots$p_logphi <- 
   ngangao_plots$p_logphi + 
-  ggtitle('Worst-case pert. of B') + 
+  ggtitle('worst-case pert. of B') + 
   get_fontsizes() + 
   x_axis_remover
 
@@ -188,10 +174,10 @@ ngangao_plots_sum <-
 # plots for chawia outliers
 ##########
 chawia_plots <- 
-  plot_struct_fsens_results('./R_scripts/structure/data/stru_fsens_chawia.npz')
+  plot_struct_fsens_results(chawia_fsens_results)
 
 chawia_plots$p_logphi <- chawia_plots$p_logphi + 
-  ggtitle('Worst-case pert. of C')
+  ggtitle('worst-case pert. of C')
 
 chawia_plots$p_priors <- chawia_plots$p_priors + 
   title_remover
@@ -207,21 +193,3 @@ chawia_plots_sum <-
 
 
 p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum
-
-# layout_matrix <- matrix(c(1, 1, 1, 2:10), 
-#                         nrow = 4, 
-#                         byrow = TRUE)
-# grid.arrange(p_admix, 
-#              mbololo_plots$p1, mbololo_plots$p2, mbololo_plots$p3,
-#              ngangao_plots$p1, ngangao_plots$p2, ngangao_plots$p3,
-#              chawia_plots$p1, chawia_plots$p2, chawia_plots$p3,
-#              layout_matrix = layout_matrix)
-
-# g <- arrangeGrob(p_admix, 
-#                  mbololo_plots$p1, mbololo_plots$p2, mbololo_plots$p3,
-#                  ngangao_plots$p1, ngangao_plots$p2, ngangao_plots$p3,
-#                  chawia_plots$p1, chawia_plots$p2, chawia_plots$p3,
-#                  layout_matrix = layout_matrix)
-# 
-# ggsave('./R_scripts/structure/figures_tmp/fsens_structure.png', g,
-#        width = 7, height = 6)
