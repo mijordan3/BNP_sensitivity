@@ -5,9 +5,15 @@
 \def\iid{\overset{iid}{\sim}}
 \def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
 \def\expecthat#1#2{\underset{#1}{\widehat{\mathbb{E}}}\left[#2\right]}
+\def\abs#1{\left|#1\right|}
+\def\norm#1{\left\Vert#1\right\Vert}
+\def\norminf#1{\left\Vert#1\right\Vert_{\infty}}
+\def\sumk{\sum_{\k=1}^{\kmax}}
+\def\sumkm{\sum_{\k=1}^{\kmax - 1}}
 
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
+\DeclareMathOperator*{\esssup}{\mathrm{esssup}}
 
 % Variables
 \def\etaopt{\hat\eta} % Optimal vb parameters
@@ -17,18 +23,23 @@
 \def\g{g}   % Function of interest
 \def\k{k}   % Cluster index
 \def\n{n}   % Data index
+\def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
 \def\const{C}   % Constant
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
 \def\lnumean{\eta^{\mu}}   % Unconstrained stick vb mean
 \def\lnusd{\eta^{\sigma}}   % Unconstrained stick vb std
 \def\hess#1{H_{#1}}   % Hessian
+\def\phiz{0_\phi}   % The phi zero function.
+\def\infl{\psi}   % The influence function
 
 \def\etatheta{\eta_{\theta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
+\def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
 \def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
 \def\etaopttheta{\etaopt_{\theta}}  % VB parameters for certain components
 \def\etaoptnu{\etaopt_{\nu}}  % VB parameters for certain components
+\def\etaoptnuk{\etaopt_{\nuk}}  % VB parameters for certain components
 \def\etaoptz{\etaopt_{\z}}  % VB parameters for certain components
 \def\etaoptgamma{\etaopt_{\gamma}}  % VB parameters for certain components
 
@@ -38,9 +49,12 @@
 \def\q{q}   % VB dist
 \def\logp{\ell}   % Log probabiltty
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
-\def\norm#1{\mathcal{N}\left(#1\right)}   % Normal distribution
+\def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
+\def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
+\def\pb{p_{0}}   % Base prior
+\def\pa{p_{1}}   % Alternative prior
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}

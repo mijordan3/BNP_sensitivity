@@ -24,26 +24,26 @@ p(\x_n \vert \z_\n, \theta) =
 
 The cluster assignments $\z_{\n}$ will be drawn according to the following
 ``stick-breaking process.''  Fix a density $\pstick(\cdot)$, with respect to the
-Lebesgue measure, over stick lengths $\nu_\k \in (0, 1)$ and draw $\nu_\k \iid
-\pstick(\nu_\k)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
+Lebesgue measure, over stick lengths $\nuk \in (0, 1)$ and draw $\nuk \iid
+\pstick(\nuk)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
 infinite number of IID sticks and the $\kmax - 1$ can be ignored; if $\kmax <
-\infty$, then we set $\nu_\kmax = 1$ for notational convenience below.  Given
+\infty$, then we set $\nu_{\kmax} = 1$ for notational convenience below.  Given
 these stick lengths, we compute indicator probabilities by
 %
 \begin{align*}
 %
 % \pi_\k := \begin{cases}
-% \nu_\k \prod_{\k' < \k} (1 - \nu_{\k'}) & \textrm{For }k < \kmax
+% \nuk \prod_{\k' < \k} (1 - \nu_{\k'}) & \textrm{For }k < \kmax
 %     \textrm{ (all }k\textrm{ when }\kmax = \infty\textrm{)}\\
 % \prod_{\k' < \k} (1 - \nu_{\k'}). & \textrm{For }k = \kmax \\
 % \end{cases}
-\pi_\k := \nu_\k \prod_{\k' < \k} (1 - \nu_{\k'})
+\pi_\k := \nuk \prod_{\k' < \k} (1 - \nu_{\k'})
 %
 \end{align*}
 %
-where the empty product is taken to be equal to $1$. The convention $\nu_\kmax =
+where the empty product is taken to be equal to $1$. The convention $\nu_{\kmax} =
 1$ allows us to use the same formula for all $\pi_\k$ when $\kmax < \infty$.
-Write $\nu := (\nu_1, \ldots, \nu_\kmax)$ for the vector of all stick lengths
+Write $\nu := (\nu_1, \ldots, \nu_{\kmax})$ for the vector of all stick lengths
 and $\pi := (\pi_1, \ldots, \pi_\kmax)$ for the corresponding vector of
 proabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax =
 \infty$, and we draw $\z_\n$ according to
@@ -64,12 +64,12 @@ The stick-breaking process can be though of as a map from  the stick
 distibution, $\pstick(\cdot)$, to a vector of probabilities, $\pi$. Different
 stick distributions will give different indicator probabilities, with different
 implied degrees of concentration.  A particularly common choice for
-$\pstick(\cdot)$ is the $\mathrm{Beta}(\nu_\k \vert 1, \alpha)$ distribution,
+$\pstick(\cdot)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
 %
 \begin{align*}
 %
-\mathrm{Beta}(\nu_\k \vert 1, \alpha) =
-    \frac{\Gamma(1 + \alpha) (1 - \nu_\k)^{\alpha - 1}}
+\mathrm{Beta}(\nuk \vert 1, \alpha) =
+    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
          {\Gamma(\alpha)}
 %
 \end{align*}
@@ -90,7 +90,7 @@ the data and parameters as:
 %         \right) +
 % \nonumber \\ {}&
 %     \sum_{k=1}^{\kmax} \left(
-%         \log \pstick(\nu_\k) + \logp(\theta_\k)
+%         \log \pstick(\nuk) + \logp(\theta_\k)
 %     \right).
 \MoveEqLeft
 \logp(\x, \theta, \z, \nu) ={}
@@ -100,7 +100,7 @@ the data and parameters as:
             \logp(\x_n \vert \theta_\k) + \log \pi_\k
         \right) +
     \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nu_\k) + \logp(\theta_\k)
+        \log \pstick(\nuk) + \logp(\theta_\k)
     \right).
 %
 \end{align}
@@ -117,7 +117,7 @@ definite covariance matrix, and
 %
 \begin{align*}
 %
-p(\x_\n \vert \theta_\k) ={}& \norm{\x_n \vert \mu_\k, \Sigma_\k} \\
+p(\x_\n \vert \theta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Sigma_\k} \\
 \logp(\x_\n \vert \theta_\k) ={}&
     -\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)
     -\frac{1}{2} \log |\Sigma_\k| + \const.\\

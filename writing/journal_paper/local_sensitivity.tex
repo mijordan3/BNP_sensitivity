@@ -1,7 +1,7 @@
 Consider the optimization problem \eqref{vb_optimization}, but now let the
-priors $\pstick(\nu_\k)$ which enter the term $\logp(\zeta)$ depend on a
+priors $\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a
 real-valued parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing
-$\pstick(\nu_\k \vert \t)$.  For example, $\t$ might represent the concentration
+$\pstick(\nuk \vert \t)$.  For example, $\t$ might represent the concentration
 parameter $\alpha$ in the $\mathrm{GEM}(\alpha)$ distribution, or it might
 represent some more general class of perturbations.  In any case, the prior on
 $\zeta$ and posterior in turn depend on $\t$, which we write $p(\zeta \vert \x,
@@ -10,19 +10,13 @@ $\zeta$ and posterior in turn depend on $\t$, which we write $p(\zeta \vert \x,
 The $\t$ dependence propagates to the optimal
 variational parameters as well.  Define the shorthand notation
 %
-\begin{align*}
+\begin{align}\eqlabel{kl_shorthand}
 %
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}.
+\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}
+\mathand
+\etaopt(\t) := \argmin_{\eta \in \etadom} \KL{\eta, \t},
 %
-\end{align*}
-%
-We can then write
-%
-\begin{align*}
-%
-\etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t},
-%
-\end{align*}
+\end{align}
 %
 where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
 
@@ -110,7 +104,7 @@ second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
 $\t$.  We will discuss these two tasks in turn.
 
 First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
-\partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nu_\k
+\partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nuk
 \vert \t)$ depend on $\t$, and so
 %
 \begin{align}\eqlabel{sens_mixed_partial}
@@ -121,19 +115,19 @@ First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
 \sum_{\k=1}^{\kmax}
     \evalat{
         \frac{\partial}{\partial\eta}
-        \expect{\q(\nu_\k \vert \eta)}
-               {\fracat{\log \pstick(\nu_\k \vert \t)}{\partial \t}{\t_0}
+        \expect{\q(\nuk \vert \eta)}
+               {\fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t_0}
                }
         }
         {\etaopt(\t_0)}.
 %
 \end{align}
 %
-Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nu_\k
+Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nuk
 \vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
 differentiation, we can evaluate the mixed partial using the derivative of
 \eqref{gh_integral}.  We will consider particular functional forms for
-$\t \mapsto \pstick(\nu_\k \vert \t)$ in \secref{prior_perturbations}.
+$\t \mapsto \pstick(\nuk \vert \t)$ in \secref{prior_perturbations}.
 
 Observe that \eqref{sens_mixed_partial} will be zero for all entries of
 $\eta$ other than those that parameterize the sticks.

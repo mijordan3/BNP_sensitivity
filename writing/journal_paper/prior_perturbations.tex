@@ -1,1 +1,193 @@
-TODO
+We now consider two classes of prior perturbations: parametric and
+non-parametric.  Recall from \eqref{sens_mixed_partial} that we
+need to specify a map $\t \mapsto \log \pstick(\nuk \vert \t)$.
+
+First, consider the parametric case where we take $\t = \alpha$ and
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \alpha) ={}&
+    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+In this case,
+%
+\begin{align*}
+%
+\expect{\q(\nuk \vert \eta)}
+       {\fracat{\log \pstick(\nuk \vert \alpha)}{\partial \alpha}{\alpha_0}
+} ={}&
+    \expect{\q(\nuk \vert \eta)}{\log(1 - \nuk)}.
+%
+\end{align*}
+%
+We can thus numerically compute the needed derivatives.
+
+To consider more general prior perturbations, fix for the mometn a base stick
+distribution, $\pb(\nuk)$ and an alternative stick distribution
+$\pa(\nuk)$.  Take $\t = \epsilon$ and define
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \epsilon) ={}&
+\frac{\pb(\nuk)^{1 - \epsilon} \pa(\nuk)^\epsilon}
+     {\int_0^1 \pb(\nuk')^{1 - \epsilon} \pa(\nuk')^\epsilon d\nuk'}.
+%
+\end{align*}
+%
+We thus have that $\epsilon$ parameterizes a multiplicative path from
+$\pb(\nuk)$ to $\pa(\nuk)$, with $\pstick(\nuk \vert \epsilon = 0) = \pb(\nuk)$
+and $\pstick(\nuk \vert \epsilon=1) = \pa(\nuk)$.  We will take
+$\t_0$ to be $\epsilon = 0$, so that we are computing $\etaopt$ with the
+prior $\pb(\nuk)$ and approximating the optimum if we had used $\pa(\nuk)$.
+%
+Given this definition,
+%
+\begin{align*}
+%
+\fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
+    \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+    & \constdesc{\nuk}
+%
+\end{align*}
+%
+Again, for a fixed $\pa(\nuk)$ we can compute the needed derivatives.
+
+There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and
+so it can be useful to think of $\etaopt(\epsilon)$ as functional of the
+stick breaking prior, following CITE GUSTAFSON.  Let us fix $\pb(\nuk)$,
+define $\phi(\nuk) := \epsilon \log \left(\pa(\nuk) / \pb(\nuk)\right)$,
+and re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent
+form:
+%
+\begin{align}\eqlabel{phi_perturbation}
+%
+\pstick(\nuk \vert \phi) ={}&
+\frac{\exp\left(\log \pb(\nuk) + \phi(\nuk)\right)}
+     {\int_0^1 \exp\left(\log \pb(\nuk') + \phi(\nuk')\right) d\nuk'}.
+%
+\end{align}
+%
+The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
+well-defined for any Lebesgue-integrable function $\phi(\nuk):
+(0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
+denominator is finite.  Define the norm
+%
+\begin{align*}
+%
+\norminf{\phi} :={} \esssup_{\nuk} |\phi(\nuk)|.
+%
+\end{align*}
+%
+Note that
+%
+\begin{align*}
+%
+\abs{\int_0^1 \exp\left(\log \pb(\nuk) + \phi(\nuk)\right) d\nuk}
+\le{}&
+\exp(\norminf{\phi})\int_0^1 \pb(\nuk) d\nuk,
+%
+\end{align*}
+%
+so that $\pstick(\nuk \vert \phi)$ is a valid distribution whenever
+$\norminf{\phi} < \infty$.
+
+Analogous to \eqref{kl_shorthand}, we can write $\etaopt(\phi) := \argmin_{\eta
+\in \etadom} \KL{\eta, \phi}$ for the optimal variational parameters when
+using the prior $\pstick(\nuk \vert \phi)$.  The optimum $\etaopt(\phi)$
+is thus a functional of $\phi$.
+
+TODO: prove that $\phi$ is in a Banach space.
+
+Observe that
+%
+\begin{align*}
+%
+\log \pstick(\nuk \vert \phi) ={}&
+    \log \pb(\nuk) + \phi(\nuk) + \const
+    & \constdesc{\nuk} \Rightarrow\\
+\KL{\eta, \phi} ={}&
+    \KL{\eta, 0} + \sumkm \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}.
+%
+\end{align*}
+%
+Let $\phiz(\cdot)$ denote the zero function.  Then, using \eqref{vb_eta_sens}
+gives that the directional (Gateaux) derivative in the direction $\phi$
+evaluated at $\phiz$ is given by
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} ={}&
+    - \hess{\zeta\zeta}^{-1}
+    \evalat{
+        \sumkm \frac{\partial}{\partial \eta}
+            \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}}
+           {\etaopt(\phiz), \phiz}.
+%
+\end{align*}
+%
+Differentiating under the integral in $\expect{\q(\nuk \vert
+\eta)}{\phi(\nuk)}$ gives
+%
+\begin{align*}
+%
+\evalat{
+\frac{\partial}{\partial \eta}
+    \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}
+}{\etaopt} ={}&
+\expect{\q(\nuk \vert \etaoptnuk)}
+       {\evalat{\frac{\partial}{\partial \etanuk}
+                  \log\q(\nuk \vert \etanuk)}
+                {\etaoptnuk}
+        \phi(\nuk)} \\
+={}&
+\int_0^1
+    \q(\nu \vert \etaoptnuk)
+    \evalat{\frac{\partial}{\partial \etanuk}
+               \log\q(\nu \vert \etanuk)}
+             {\etaoptnuk}
+    \phi(\nu) d\nu.
+%
+\end{align*}
+%
+Plugging in gives
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
+    \int_0^1
+    -\hess{\zeta\zeta}^{-1}
+    \left(
+        \sumkm
+        \evalat{\frac{\partial}{\partial \etanuk}
+                   \log\q(\nu \vert \etanuk)}
+                 {\etaoptnuk}
+    \right) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+Thus, the influence function for $\etaopt(\psi)$ at $\phiz$ is given by
+%
+\begin{align*}
+%
+\infl(\nu) :={}&
+-\hess{\zeta\zeta}^{-1}
+\left(
+    \sumkm
+    \evalat{\frac{\partial}{\partial \etanuk}
+               \log\q(\nu \vert \etanuk)}
+             {\etaoptnuk}
+\right) \\
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
+    \int_0^1 \infl(\nu) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+
+
+
+%

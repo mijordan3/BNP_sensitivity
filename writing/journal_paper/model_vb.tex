@@ -61,7 +61,7 @@ We will use mean-field variational approximating families of the following form:
 \begin{align}\eqlabel{vb_mf}
 %
 \q(\zeta \vert \eta) =
-    \left( \prod_{\k=1}^{\kmax - 1} \q(\nu_\k \vert \eta) \right)
+    \left( \prod_{\k=1}^{\kmax - 1} \q(\nuk \vert \eta) \right)
     \left( \prod_{\k=1}^{\kmax} \q(\theta_\k \vert \eta) \right)
     \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) \right).
 %
@@ -84,7 +84,7 @@ the distribution of $p(\theta_{\k} \vert \x, \z, \nu)$.
 
 \begin{ex}[VB approximation for $\theta_\k$]
 %
-Recall for the iris dataset we used $p(\x_\n \vert \theta_\k) = \norm{\x_n \vert
+Recall for the iris dataset we used $p(\x_\n \vert \theta_\k) = \normdist{\x_n \vert
 \mu_\k, \Sigma_\k}$, with $\theta_\k = (\mu_\k, \Sigma_\k)$.  So,
 up to a constant not depending on $\eta$,
 %
@@ -100,7 +100,7 @@ up to a constant not depending on $\eta$,
 \end{align*}
 %
 By taking $\q(\theta_\k \vert \eta) = \wishart{\Sigma_\k^{-1} \vert \eta}
-\norm{\mu_\k \vert \eta}$, the expectations in the preceding display have closed
+\normdist{\mu_\k \vert \eta}$, the expectations in the preceding display have closed
 form expressions as functions of $\eta$, as does the entropy
 $\expect{\q(\theta_\k \vert \eta)}{\log \q(\theta_\k \vert \eta)}$.
 %
@@ -214,26 +214,26 @@ We thus take $\etaz = (\rho_{11}, \ldots \rho_{1(\kmax - 1)}, \ldots,
 
 
 
-For the stick-breaking distributions $\q(\nu_\k \vert \eta)$ we will need to do
+For the stick-breaking distributions $\q(\nuk \vert \eta)$ we will need to do
 something more complicated, since we wish to accomodate generic stick breaking
 distributions.  From \eqref{bnp_model} we see that, up to a constant not
-depending on $\nu_\k$,
+depending on $\nuk$,
 %
 \begin{align}\eqlabel{stick_log_post}
 %
 \log \pi_\k ={}&
-    \log \nu_\k + \sum_{\k' < \k} \log (1 - \nu_\k) \nonumber \\
+    \log \nuk + \sum_{\k' < \k} \log (1 - \nuk) \nonumber \\
 \logp(\nu_{\k} \vert \x, \theta, \z) ={}&
-    \left(\sum_{\n=1}^\N \z_{\n\k'}\right) \log \nu_\k +
-    \left( \sum_{\k' > \k} \sum_{\n=1}^\N \z_{\n\k'} \right) \log (1 - \nu_\k) +
-    \log \pstick(\nu_\k).
+    \left(\sum_{\n=1}^\N \z_{\n\k'}\right) \log \nuk +
+    \left( \sum_{\k' > \k} \sum_{\n=1}^\N \z_{\n\k'} \right) \log (1 - \nuk) +
+    \log \pstick(\nuk).
 %
 \end{align}
 %
 When $\pstick(\cdot) = \mathrm{Beta}(\cdot | 1, \alpha)$, then, up to a constant
-not depending on $\nu_\k$, $\log \pstick(\nu_\k) = (\alpha - 1) \log (1 -
-\nu_\k)$, so $\logp(\nu_{\k} \vert \x, \theta, \z)$ is proportional to the
-sufficient statistics $\log \nu_\k$ and $\log(1 - \nu_\k)$ and so in the
+not depending on $\nuk$, $\log \pstick(\nuk) = (\alpha - 1) \log (1 -
+\nuk)$, so $\logp(\nu_{\k} \vert \x, \theta, \z)$ is proportional to the
+sufficient statistics $\log \nuk$ and $\log(1 - \nuk)$ and so in the
 Beta family.  However, for a generic $\pstick(\cdot)$, the posterior
 $p(\nu_{\k} \vert \x, \theta, \z)$ does not have a standard form.
 
@@ -243,11 +243,11 @@ of the form
 %
 \begin{align*}
 %
-\expect{\q(\nu_\k \vert \eta)}{\log \nu_\k}
+\expect{\q(\nuk \vert \eta)}{\log \nuk}
 \textrm{,}\quad
-\expect{\q(\nu_\k \vert \eta)}{\log (1 - \nu_\k)}
+\expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}
 \textrm{,}\quad\textrm{and}\quad
-\expect{\q(\nu_\k \vert \eta)}{\log \pstick(\nu_\k)}.
+\expect{\q(\nuk \vert \eta)}{\log \pstick(\nuk)}.
 %
 \end{align*}
 
@@ -255,19 +255,19 @@ Each of the expecations are univariate integrals, and so can be efficiently
 approximated numerically.  A particularly easy way to do so is with
 Gauss-Hermite (GH) quadrature, as we now describe.
 
-First, define a version of $\nu_\k$ that is not constrained to $(0,1)$:
+First, define a version of $\nuk$ that is not constrained to $(0,1)$:
 %
 \begin{align*}
 %
-\lnu_\k :={} \log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+\lnu_\k :={} \log \left( \frac{\nuk}{1 - \nuk} \right)
 \quad\Leftrightarrow\quad
-\nu_\k :={} \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
-%\fracat{d \lnu_\k}{ d\nu_\k}{\nu_\k} ={}&
-%     \frac{1-\nu_\k}{\nu_\k}
-%     \left(\frac{1}{1 - \nu_\k} + \frac{\nu_\k}{(1 - \nu_\k)^2} \right)
-% \\={}& \frac{1}{\nu_\k} + \frac{1}{1 - \nu_\k}
+\nuk :={} \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
+%\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}&
+%     \frac{1-\nuk}{\nuk}
+%     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
+% \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
 % \\={}&
-%\frac{1}{\nu_\k (1 - \nu_\k)}.
+%\frac{1}{\nuk (1 - \nuk)}.
 %
 \end{align*}
 %
@@ -277,36 +277,36 @@ vector $\eta$, and write
 %
 \begin{align*}
 %
-\q(\lnu_\k \vert \eta) ={}& \norm{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
+\q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
 \Rightarrow \\
-\q(\nu_\k \vert \eta) ={}&
-    \norm{\log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+\q(\nuk \vert \eta) ={}&
+    \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
         \vert \lnumean_\k, \lnusd_\k}
-    \left|\fracat{d \lnu_\k}{ d\nu_\k}{\nu_\k}\right|
+    \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
 \\={}&
-\norm{\log \left( \frac{\nu_\k}{1 - \nu_\k} \right)
+\normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
         \vert \lnumean_\k, \lnusd_\k}
-    \left|\frac{1}{\nu_\k (1 - \nu_\k)}\right|.
+    \left|\frac{1}{\nuk (1 - \nuk)}\right|.
 %
 \end{align*}
 %
 Given this, we can approximate expectations of smooth functions
-$f(\nu_\k)$ using GH quadrature with $\ngh$ knots,
+$f(\nuk)$ using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %
 \begin{align}\eqlabel{gh_integral}
 %
-\expect{\q(\nu_\k \vert \eta)}{f(\nu_\k)} ={}&
+\expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
 \expect{\q(\lnu_\k \vert \eta)}
        {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
 \nonumber\\\approx{}&
     \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
  \nonumber\\=:{}&
-\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}.
+\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
 %
 \end{align}
 %
-Conveniently, $\expecthat{\q(\nu_\k \vert \eta)}{f(\nu_\k)}$ is a differentiable
+Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
 technique is similar to the ``reparameterization trick,'' only using
 GH points rather than standard normal draws.)
