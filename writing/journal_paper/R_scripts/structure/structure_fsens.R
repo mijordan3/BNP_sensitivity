@@ -12,8 +12,8 @@ out$init_ind_admix_df <-
 mbololo_outliers <- 
   out$init_ind_admix_df %>%
   filter(region == 'Mbololo') %>% 
-  filter(cluster == 'X3') %>% 
-  filter(admix > 0.15)
+  filter(cluster == 'X2') %>% 
+  filter(admix > 0.21)
 
 ngangao_outliers <- 
   out$init_ind_admix_df %>%
@@ -26,8 +26,8 @@ chawia_outliers <-
   filter(region == 'Chawia')
 
 
-intercepts <- c(mbololo_outliers$obs_id - 1,
-                mbololo_outliers$obs_id + 1, 
+intercepts <- c(min(mbololo_outliers$obs_id) - 1,
+                max(mbololo_outliers$obs_id) + 1, 
                 min(ngangao_outliers$obs_id) - 1, 
                 max(ngangao_outliers$obs_id) + 1,
                 min(chawia_outliers$obs_id) - 1, 

@@ -78,10 +78,10 @@ chawia_fsens_results <- load_fsens_data(paste0(data_dir,
                                                'stru_fsens_chawia.npz'))
 
 
-chawia_data_file <- np$load('./R_scripts/data_raw/structure/stru_fsens_chawia.npz')
-admix1_refit <- chawia_data_file['admix1_refit']
-admix2_refit <- chawia_data_file['admix2_refit']
-admix1_lr <- chawia_data_file['admix1_lr']
-admix2_lr <- chawia_data_file['admix2_lr']
+mbololo_data_file <- np$load('./R_scripts/data_raw/structure/stru_fsens_mbololo.npz')
+admix1_refit <- mbololo_data_file['admix1_refit']
+admix2_refit <- mbololo_data_file['admix2_refit']
+admix1_lr <- mbololo_data_file['admix1_lr']
+admix2_lr <- mbololo_data_file['admix2_lr']
 
 save.image('./R_scripts/data_processed/structure.RData') 
