@@ -75,7 +75,7 @@ form:
 The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
 well-defined for any Lebesgue-integrable function $\phi(\nuk):
 (0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
-denominator is finite.  Define the norm
+denominator is positive and finite.  Define the norm
 %
 \begin{align*}
 %
@@ -87,14 +87,17 @@ Note that
 %
 \begin{align*}
 %
+\exp(-\norminf{\phi}) \le{}
 \abs{\int_0^1 \exp\left(\log \pb(\nuk) + \phi(\nuk)\right) d\nuk}
-\le{}&
-\exp(\norminf{\phi})\int_0^1 \pb(\nuk) d\nuk,
+\le{}
+\exp(\norminf{\phi}),
 %
 \end{align*}
 %
 so that $\pstick(\nuk \vert \phi)$ is a valid distribution whenever
-$\norminf{\phi} < \infty$.
+$\norminf{\phi} < \infty$.  (As pointed out by GUSTAFSON, the
+converse is not true --- there exist valid distributions with infinte
+$\norminf{\phi}$.)
 
 Analogous to \eqref{kl_shorthand}, we can write $\etaopt(\phi) := \argmin_{\eta
 \in \etadom} \KL{\eta, \phi}$ for the optimal variational parameters when
@@ -187,6 +190,44 @@ Thus, the influence function for $\etaopt(\psi)$ at $\phiz$ is given by
 %
 \end{align*}
 %
+Analogously, for a differentiable function of interest $g(\eta)$,
+the influence function is given via \eqref{vb_g_sens} to be
+%
+\begin{align*}
+%
+\inflg(\nu) :={}&
+-\fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
+    \hess{\zeta\zeta}^{-1}
+\left(
+    \sumkm
+    \evalat{\frac{\partial}{\partial \etanuk}
+               \log\q(\nu \vert \etanuk)}
+             {\etaoptnuk}
+\right) \\
+\fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
+    \int_0^1 \inflg(\nu) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+The influence funciton is a convenient summary of the effect of
+functional prior perturbations on a differnetiable summary statistic, as
+we will show below.
+
+An additional benefit of the influence function is that it admits a closed-form
+expression for the ``worst-case'' perturbation in an $\norminf{\cdot}$ ball
+via Holder's inequality, since
+%
+\begin{align*}
+%
+\sup_{\phi: \norminf{\phi} \le \delta}
+    \fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
+\sup_{\phi: \norminf{\phi} \le \delta}
+    \int_0^1 \inflg(\nu) \phi(\nu) d\nu \\
+\le&{} \delta \int_0^1 \abs{\inflg(\nu) }d\nu,
+%
+\end{align*}
+%
+with equality when $\phi(\nu) = \delta \, \mathrm{sign}(\inflg(\nu))$.
 
 
 

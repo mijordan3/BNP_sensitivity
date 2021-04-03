@@ -70,14 +70,14 @@ to quickly approximate a time-consuming optimization problem.
 For functions of interest $\g(\eta)$ which are themselves differentiable,
 we can use the chain rule to compute
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_g_sens}
 %
 \fracat{d g(\etaopt(\t))}{d\t} ={}&
     \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
     \fracat{d \etaopt(\t)}{d \t}{\t_0} \\
 \glin(\t) :={}& \g(\etaopt(\t_0)) + \fracat{d g(\etaopt(\t))}{d\t}{\t_0} (\t - \t_0).
 %
-\end{align*}
+\end{align}
 %
 For non-differentiable functions of $\eta$, we can still form the approximation
 %
