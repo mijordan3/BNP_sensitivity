@@ -18,6 +18,4 @@ weights_df %>%
   ylab('E[# loci]') + 
   get_fontsizes() + 
   theme(legend.position = 'bottom', 
-        legend.title = element_blank(),
-        strip.text = element_text(size = axis_title_size, 
-                                  margin = margin(.05, 0, .05, 0, "cm"))) 
+        legend.title = element_blank()) 

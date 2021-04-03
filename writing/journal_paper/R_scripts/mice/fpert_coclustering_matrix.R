@@ -26,6 +26,7 @@ p_priors_contr <-
 # Plot co-clustering results
 ######################
 # bins for the co-clustering matrix
+min_keep <- 1e-3
 limits <- c(1e-3, 1e-2, 1e-1, Inf)
 limit_labels <- construct_limit_labels(limits)
 
@@ -38,6 +39,6 @@ plots <- compare_coclust_lr_and_refit(coclust_refit_fpert,
                                       breaks)
 
 top_row <- p_logphi + p_priors + p_priors_contr
-bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr
+bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr 
 
 top_row / bottom_row

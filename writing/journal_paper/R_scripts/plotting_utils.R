@@ -26,7 +26,14 @@ plot_post_stat_trace_plot <- function(alpha_list,
 plot_influence_and_logphi <- function(logit_v_grid, 
                                       infl_fun, 
                                       log_phi, 
-                                      logit_v_grid_logphi = NULL){
+                                      # option to have different grids
+                                      # for log_phi
+                                      # (useful for worst-case ones, 
+                                      # where we want higher resolution)
+                                      logit_v_grid_logphi = NULL, 
+                                      # some more flexible option
+                                      y_limits = NULL, 
+                                      scale = NULL){
   
   stopifnot(length(logit_v_grid) == length(infl_fun))
   
@@ -38,7 +45,10 @@ plot_influence_and_logphi <- function(logit_v_grid,
   # scale the infl so it matches the log phi
   infl_norm <- max(abs(infl_fun))
   log_phi_norm = max(abs(log_phi))
-  scale <- log_phi_norm / infl_norm
+  
+  if(is.null(scale)){
+    scale <- log_phi_norm / infl_norm
+  }
   
   p_logphi <- 
     ggplot() + 
@@ -53,6 +63,7 @@ plot_influence_and_logphi <- function(logit_v_grid,
     scale_y_continuous(  
       # label for log phi
       name = "log phi",
+      limits = y_limits, 
       # Add a second axis for the influence function
       sec.axis = sec_axis(~.*1/scale, name="infl x p0")
     ) + 
