@@ -4,11 +4,43 @@ import jax.numpy as np
 import numpy as onp
 from scipy.optimize import minimize
 
+from sklearn.cluster import KMeans
+
+from copy import deepcopy
+
 import time
 
 import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import modeling_lib
 from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
+
+#########################
+# function to initialize mixture modelswith k-means
+#########################
+def init_centroids_w_kmeans(y, 
+                            k_approx,
+                            n_kmeans_init = 10, 
+                            seed = 1): 
+    
+    
+    n_obs = np.shape(y)[0]
+    dim = np.shape(y)[1]
+
+    # K means init.
+    for i in range(n_kmeans_init):
+        km = KMeans(n_clusters = k_approx, 
+                    random_state = seed).fit(y)
+        enertia = km.inertia_
+        if (i == 0):
+            enertia_best = enertia
+            km_best = deepcopy(km)
+        elif (enertia < enertia_best):
+            enertia_best = enertia
+            km_best = deepcopy(km)
+    
+    init_centroids = np.array(km_best.cluster_centers_)
+    
+    return init_centroids, km_best
 
 def update_stick_beta_params(ez, dp_prior_alpha): 
     

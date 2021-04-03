@@ -25,12 +25,30 @@ plot_post_stat_trace_plot <- function(alpha_list,
 #################
 plot_influence_and_logphi <- function(logit_v_grid, 
                                       infl_fun, 
-                                      log_phi){
+                                      log_phi, 
+                                      # option to have different grids
+                                      # for log_phi
+                                      # (useful for worst-case ones, 
+                                      # where we want higher resolution)
+                                      logit_v_grid_logphi = NULL, 
+                                      # some more flexible option
+                                      y_limits = NULL, 
+                                      scale = NULL){
+  
+  stopifnot(length(logit_v_grid) == length(infl_fun))
+  
+  if(is.null(logit_v_grid_logphi)){
+    logit_v_grid_logphi <- logit_v_grid
+  }
+  stopifnot(length(logit_v_grid_logphi) == length(log_phi))
   
   # scale the infl so it matches the log phi
   infl_norm <- max(abs(infl_fun))
   log_phi_norm = max(abs(log_phi))
-  scale <- log_phi_norm / infl_norm
+  
+  if(is.null(scale)){
+    scale <- log_phi_norm / infl_norm
+  }
   
   p_logphi <- 
     ggplot() + 
@@ -39,23 +57,24 @@ plot_influence_and_logphi <- function(logit_v_grid,
                   y = infl_fun * scale), 
               color = 'purple') + 
     # plot functional perturbation 
-    geom_area(aes(x = logit_v_grid, 
+    geom_area(aes(x = logit_v_grid_logphi, 
                   y = log_phi), 
               fill = 'grey', color = 'black', alpha = 0.5) + 
     scale_y_continuous(  
-      # Features of the first axis
+      # label for log phi
       name = "log phi",
-      # Add a second axis and specify its features
-      sec.axis = sec_axis(~.*1/scale, name="influence x p0")
+      limits = y_limits, 
+      # Add a second axis for the influence function
+      sec.axis = sec_axis(~.*1/scale, name="infl x p0")
     ) + 
-    geom_hline(yintercept = 0., alpha = 0.5) + 
-    ylab('influence x p0') + 
-    xlab('logit-stick') + 
-    ggtitle('log phi') +
     theme(axis.title.y.right = element_text(color = 'purple', 
                                             size = axis_title_size), 
           axis.text.y.right = element_text(color = 'purple', 
                                            size = axis_ticksize)) + 
+    geom_hline(yintercept = 0., alpha = 0.5) + 
+    ylab('influence x p0') + 
+    xlab('logit(stick length)') + 
+    ggtitle('log phi') +
     get_fontsizes()
   
   return(p_logphi)
@@ -75,8 +94,8 @@ plot_priors <- function(logit_v_grid, p0, pc){
                   y = p, 
                   color = prior)) + 
     scale_color_manual(values = c('lightblue', 'blue')) + 
-    xlab('logit stick') + 
-    ggtitle('priors in logit space') + 
+    xlab('logit(stick length)') + 
+    ggtitle('priors') + 
     get_fontsizes() 
   
   return(p_priors)

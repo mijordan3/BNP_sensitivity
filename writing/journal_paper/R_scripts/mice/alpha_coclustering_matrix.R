@@ -1,67 +1,62 @@
 ###################
 # results at alpha = 1
 ###################
-alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha1.0.npz')
-
-coclust_refit1 <- 
-  load_coclust_file(alpha1_coclust_file, 'coclust_refit') 
-
-
-coclust_lr1 <-
-  load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
-
 # bins for the co-clustering matrix
-limits <- c(5e-5, 1e-4, 5e-3, Inf)
-labels <- c('< -5e-3', '(-5e-3, -1e-4]', '(-1e-4, -5e-5]',
-            '(-5e-5, 5e-5]', '(5e-5, 1e-4]', '(1e-4, 5e-3]', '> 5e-3')
+limits <- c(1e-5, 1e-4, 1e-3, Inf)
+limit_labels <- construct_limit_labels(limits)
 
 min_keep = 1e-4 # in the scatter-plot, grey out these values
 breaks = c(1e3, 1e4, 1e5, Inf) # breaks for the contours
 
-plots <- compare_coclust_lr_and_refit(coclust_refit1, 
-                                      coclust_lr1,
+plots_alpha1 <- compare_coclust_lr_and_refit(coclust_refit_alpha1, 
+                                      coclust_lr_alpha1,
                                       coclust_init, 
                                       limits,
-                                      labels,
+                                      limit_labels,
                                       min_keep,
                                       breaks)
 
-plots$p_scatter <- plots$p_scatter + ggtitle('alpha = 1')
-plots$p_coclust <- plots$p_coclust + ggtitle('')
+plots_alpha1$p_scatter <- plots_alpha1$p_scatter + 
+  ggtitle('alpha = 1') + 
+  theme(title = element_text(size = title_size))
 
+plots_alpha1_summed <- 
+  plots_alpha1$p_scatter + 
+  plots_alpha1$p_coclust_refit + 
+  plots_alpha1$p_coclust_lr
+  
 ###################
 # results at alpha = 11
 ###################
-alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha11.0.npz')
+plots_alpha11 <- compare_coclust_lr_and_refit(coclust_refit_alpha11, 
+                                              coclust_lr_alpha11,
+                                              coclust_init, 
+                                              limits,
+                                              limit_labels,
+                                              min_keep,
+                                              breaks)
 
-coclust_refit11 <- 
-  load_coclust_file(alpha1_coclust_file, 'coclust_refit') 
-
-
-coclust_lr11 <-
-  load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
-
-plots11 <- compare_coclust_lr_and_refit(coclust_refit11, 
-                                      coclust_lr11,
-                                      coclust_init, 
-                                      limits,
-                                      labels,
-                                      min_keep,
-                                      breaks)
-
-plots11$p_scatter <- plots11$p_scatter + ggtitle('alpha = 11')
-plots11$p_coclust <- plots11$p_coclust + ggtitle('')
+plots_alpha11$p_scatter <- plots_alpha11$p_scatter +
+  ggtitle('alpha = 11') + 
+  theme(title = element_text(size = title_size))
 
 
-layout_matrix <- matrix(c(1, 3, 2, 4, 2, 4), ncol = 3)
+plots_alpha11_summed <- 
+  plots_alpha11$p_scatter + 
+  plots_alpha11$p_coclust_refit + 
+  plots_alpha11$p_coclust_lr
 
-# grid.arrange(plots$p_scatter, plots$p_coclust, 
-#               plots11$p_scatter, plots11$p_coclust, 
-#               layout_matrix = layout_matrix)
+plots_alpha1_summed / plots_alpha11_summed
 
-g <- arrangeGrob(plots$p_scatter, plots$p_coclust, 
-                 plots11$p_scatter, plots11$p_coclust,
-                 layout_matrix = layout_matrix)
-
-ggsave('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png', 
-       g, width = 6, height = 4.5)
+# layout_matrix <- matrix(c(1, 3, 2, 4, 2, 4), ncol = 3)
+# 
+# # grid.arrange(plots$p_scatter, plots$p_coclust, 
+# #               plots11$p_scatter, plots11$p_coclust, 
+# #               layout_matrix = layout_matrix)
+# 
+# g <- arrangeGrob(plots$p_scatter, plots$p_coclust, 
+#                  plots11$p_scatter, plots11$p_coclust,
+#                  layout_matrix = layout_matrix)
+# 
+# ggsave('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png', 
+#        g, width = 6, height = 4.5)

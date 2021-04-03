@@ -12,6 +12,9 @@ simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
+
+# load data
+load('./R_scripts/data_processed/mice.RData')
 @
 
 Here are results, and a figure. See \figref{example_genes}.
@@ -49,24 +52,17 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 
 <<gene_initial_coclustering_cap>>=
 gene_initial_coclustering_cap <- paste(
-    "The inferred co-clustering matrix at alpha = 3. ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
-             image_width = base_image_width * 0.3)
+    "The inferred co-clustering of gene expressions at $\\alpha = 3.$ ")
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.85, 
+             image_width = 0.6)
 @
 <<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
-alpha1_coclust_file <- np$load('./R_scripts/mice/data/coclustering_alpha1.0.npz')
-
-coclust_init <- load_coclust_file(alpha1_coclust_file, 'coclust_init')
-p <- plot_coclustering(coclust_init) +
-  theme(axis.title = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank())
-
-ggsave('./R_scripts/mice/figures_tmp/init_coclustering.png',
-       width = 4, height = 3)
-include_graphics('./R_scripts/mice/figures_tmp/init_coclustering.png')
-
-
+p <- plot_coclustering(coclust_init) + 
+  theme(axis.title = element_blank(), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank(), 
+        legend.text = element_text(size = axis_ticksize))  
+p
 @
 
 
@@ -78,29 +74,21 @@ include_graphics('./R_scripts/mice/figures_tmp/init_coclustering.png')
 
 
 <<gene_alpha_coclustering_cap>>=
-gene_alpha_coclustering_cap <-
-    "Changes in the co-clustering matrix at alpha = 1 (top row)
+gene_alpha_coclustering_cap <- 
+    paste0("Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
      relative to the co-clustering matrix at alpha = 3.
-     The left column plots differences predicted by the
-     linear approximation against differences from a model refit.
-     Each point represents an entry of the co-clusteirng matrix.
-     The middle and right columns display
-     changes in the co-clustering matrix as obtained by the
-     linear approximation and the model refit, respectively."
-
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.75,
-             image_width = base_image_width)
+     The left column plots differences predicted by the 
+     linear approximation against differences from a model refit. 
+     Each point represents an entry of the co-coclustering matrix. 
+     The middle and right columns display 
+     changes in the co-clustering matrix as obtained by the 
+     linear approximation and the model refit, respectively.")
+     
+SetImageSize(aspect_ratio=base_aspect_ratio)
 @
 <<gene_alpha_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_alpha_coclustering_cap>>=
-
-# can't figure out fontsizes / ratios within knitr ...
-# just save what I want and re-load it.
-# this runs the scripts and saves output to a png
-# we then reload it with "include_graphics"
 source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
-
-include_graphics('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png')
 @
 
 
@@ -109,11 +97,9 @@ include_graphics('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png')
 <<gene_alpha_coclustering_infl_cap>>=
 gene_alpha_coclustering_infl_cap <- paste(
     "The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix. ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.4,
-             image_width = base_image_width)
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.4)
 @
 <<gene_alpha_coclustering_influence, cache=simple_cache, fig.show='hold', fig.cap=gene_alpha_coclustering_infl_cap>>=
-fontsize_scale <- 0.6
 source("R_scripts/mice/coclustering_influence.R",
        echo=knitr_debug, print.eval=TRUE)
 @
@@ -126,10 +112,19 @@ gene_fpert_coclustering_cap <- paste(
     "Effect on the co-clustering matrix after a functional perturbation.
      log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two.
     The chosen log-phi roughly corresponds to a positive bump in the influence function of $g_{ev}$.")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.8,
-             image_width = base_image_width)
+SetImageSize(aspect_ratio=base_aspect_ratio)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)
-include_graphics('./R_scripts/mice/figures_tmp/fpert_coclust_sensitivity.png')
+
+@
+
+
+<<alpha_pert_logphi_cap>>=
+alpha_pert_logphi_cap <- paste(
+    "The log multiplicative perturbation $\\log \\phi$ corresponding to decreasing the $\\alpha$ parameter by five (left) or increasing the $\\alpha$ parameter by five (right). ")
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.5)
+@
+<<alpha_pert_logphi, cache=simple_cache, fig.show='hold', fig.cap=alpha_pert_logphi_cap>>=
+source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
 @

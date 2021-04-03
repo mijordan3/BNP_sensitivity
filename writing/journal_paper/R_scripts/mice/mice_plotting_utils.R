@@ -1,21 +1,3 @@
-load_coclust_file <- function(file, key){
-  # expects a coclustering matrix
-  # converts the matrix to a long data frame
-  
-  coclust_wide <- as.data.frame(file[[key]])
-  
-  coclust <- coclust_wide %>% 
-    mutate(gene1 = colnames(coclust_wide)) %>% 
-    # make it a long data frame
-    gather(key = gene2, value = coclustering, -gene1) %>%
-    # clean up the gene names
-    mutate(gene1 = sub('.', '', gene1), 
-           gene2 = sub('.', '', gene2)) %>% 
-    mutate(gene1 = as.numeric(gene1), 
-           gene2 = as.numeric(gene2))
-  return(coclust)
-}
-
 ################
 # Plotting co-clustering matrix
 ################
@@ -81,42 +63,43 @@ plot_coclust_diff <- function(coclust_diff,
   
   p <- coclust_diff %>%
     plot_coclustering(value = 'diff_bins') + 
-    scale_fill_brewer(type = "div", palette = 'RdBu', direction = -1)
+    scale_fill_brewer(type = "div", palette = 'RdBu', direction = -1, 
+                      drop=FALSE)
   
   return(p)
 }
 
 
-compare_coclust_lr_and_refit_matr <- function(coclust_refit, 
-                                         coclust_lr, 
-                                         coclust_init, 
-                                         limits, 
-                                         limit_labels = NULL){
-  
-  # Get differences in coclustering
-  
-  # first, the refit
-  coclust_refit_diff <- get_coclust_diff(coclust_refit, 
-                                         coclust_init) %>%
-    mutate(method = 'refit - init')
-  
-  # then, the linear response
-  coclust_lr_diff <- get_coclust_diff(coclust_lr, 
-                                      coclust_init) %>% 
-    mutate(method = 'lr - init')
-  
-  # combine: 
-  coclust_diff <- rbind(coclust_refit_diff, 
-                        coclust_lr_diff)
-  
-  # plot
-  p <- plot_coclust_diff(coclust_diff,
-                         limits = limits,
-                         limit_labels = limit_labels) +
-    facet_wrap(~method)
-  
-  return(p)
-}
+# compare_coclust_lr_and_refit_matr <- function(coclust_refit, 
+#                                          coclust_lr, 
+#                                          coclust_init, 
+#                                          limits, 
+#                                          limit_labels = NULL){
+#   
+#   # Get differences in coclustering
+#   
+#   # first, the refit
+#   coclust_refit_diff <- get_coclust_diff(coclust_refit, 
+#                                          coclust_init) %>%
+#     mutate(method = 'refit - init')
+#   
+#   # then, the linear response
+#   coclust_lr_diff <- get_coclust_diff(coclust_lr, 
+#                                       coclust_init) %>% 
+#     mutate(method = 'lr - init')
+#   
+#   # combine: 
+#   coclust_diff <- rbind(coclust_refit_diff, 
+#                         coclust_lr_diff)
+#   
+#   # plot
+#   p <- plot_coclust_diff(coclust_diff,
+#                          limits = limits,
+#                          limit_labels = limit_labels) +
+#     facet_wrap(~method)
+#   
+#   return(p)
+# }
 
 
 compare_coclust_lr_and_refit_scatter <-
@@ -157,7 +140,8 @@ compare_coclust_lr_and_refit_scatter <-
     # geom_density_2d(breaks = breaks) +
     # scale_fill_brewer(palette = 'PuBu') + 
     ylab('lr - init') + 
-    xlab('refit - init')
+    xlab('refit - init') +
+    get_fontsizes()
   
   return(p)
   }
@@ -175,26 +159,67 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
                                                     coclust_lr,
                                                     coclust_init, 
                                                     min_keep, 
-                                                    breaks) + 
-    get_fontsizes()
+                                                    breaks) 
   
   # make coclustering matrix 
-  p_coclust <- compare_coclust_lr_and_refit_matr(coclust_refit,
-                                                 coclust_lr,
-                                                 coclust_init,
-                                                 limits,
-                                                 limit_labels) + 
-    get_fontsizes() + 
-    # remove axis labels
-    theme(axis.text.y = element_blank(), 
-          axis.title.y = element_blank(), 
-          # make it white so it doesnt show up
-          # but not "removed" so that the spacing works out
-          axis.title.x = element_text(color = 'white'),
-          axis.text.x = element_text(color = 'white'),
-          legend.key.width = unit(0.2,"cm"))
+  p_coclust_refit <-
+    get_coclust_diff(coclust_refit, coclust_init) %>% 
+    plot_coclust_diff(limits = limits, 
+                      limit_labels = limit_labels) + 
+    ggtitle('refit - init') + 
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(size = title_size), 
+          legend.position = 'none')
+  
+  p_coclust_lr <-
+    get_coclust_diff(coclust_lr, coclust_init) %>% 
+    plot_coclust_diff(limits = limits, 
+                      limit_labels = limit_labels) + 
+    ggtitle('lr - init') + 
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          legend.key.width = unit(0.2,"cm"), 
+          legend.key.height = unit(0.2, "cm"),
+          legend.margin=margin(-10,-10,-10,-10),
+          plot.title = element_text(size = title_size), 
+          legend.text = element_text(size = axis_ticksize))
+  
+  # p_coclust <- compare_coclust_lr_and_refit_matr(coclust_refit,
+  #                                                coclust_lr,
+  #                                                coclust_init,
+  #                                                limits,
+  #                                                limit_labels) + 
+  #   get_fontsizes() + 
+  #   # remove axis labels
+  #   theme(axis.text.y = element_blank(), 
+  #         axis.title.y = element_blank(), 
+  #         # make it white so it doesnt show up
+  #         # but not "removed" so that the spacing works out
+  #         axis.title.x = element_text(color = 'white'),
+  #         axis.text.x = element_text(color = 'white'),
+  #         legend.key.width = unit(0.2,"cm"))
   
   return(list(p_scatter = p_scatter,
-              p_coclust = p_coclust))
+              p_coclust_refit = p_coclust_refit, 
+              p_coclust_lr = p_coclust_lr))
 }
 
+construct_limit_labels <- function(limits){
+  
+  n_bins <- length(limits)
+  
+  limit_labels <- limits[1:(n_bins - 1)]
+  limit_labels <- c(sprintf("%.0e", sort(-limit_labels)), 
+                    0, 
+                    sprintf("%.0e", limit_labels))
+  
+  limit_labels[1] <- paste0('<', limit_labels[1])
+  
+  n_bins_sym <- length(limit_labels) 
+  limit_labels[n_bins_sym] <- paste0('>', limit_labels[n_bins_sym])
+  
+  return(limit_labels)
+}
