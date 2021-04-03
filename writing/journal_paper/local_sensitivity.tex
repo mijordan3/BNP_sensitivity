@@ -1,0 +1,81 @@
+Suppose we have a dataset $\x$, a real-valued parameter $\theta \in \thetadom
+\subseteq \mathbb{R}^{\thetadim}$, and a log likelihood $\logp(\x | \theta)$.
+Let us take a family of log prior densities, $\ell(\theta \vert \t)$,
+parameterized by some scalar $\t \in \tdom \subseteq \mathbb{R}$, defined
+relative to some dominating measure, $\lambda$.  We can write the posterior
+density (relative to $\lambda$) and expectations as
+%
+\begin{align*}
+%
+p(\theta \vert \x, \t) :={}&
+    \frac{p(\x \vert \theta) p(\theta \vert \t)}
+         {\int_{\thetadom} p(\x \vert \tilde{\theta}) p(\tilde{\theta} \vert \t)
+               \lambda(d \tilde{\theta})}
+= \frac{p(\x \vert \theta) p(\theta \vert \t)}{p(\x \vert \t)} \\
+\expect{p(\theta \vert \x, \t)}{g(\theta)} :={}&
+    \int_{\thetadom} p(\theta \vert \x, \t) g(\theta) \lambda{d\theta}.
+%
+\end{align*}
+%
+
+Suppose also we have a family of variational distributions
+expressed as densities with respect to the same dominating measure, $q(\theta
+\vert \eta)$, parameterized by a variational parameter $\eta \in \etadom
+\subseteq \mathbb{R}^{\etadim}$.
+
+We will form the variational approximation by solving
+%
+\begin{align*}
+%
+\etaopt(\t) :={}&
+    \argmin_{\eta \in \etadom} \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)} \\
+={}& \argmin_{\eta \in \etadom}
+        \expect{\q(\theta \vert \eta)}{
+        \log \q(\theta \vert \eta) - \logp(\x \vert \theta) -
+        \logp(\theta \vert \t) + \logp(\x \vert \t)}.
+%
+\end{align*}
+%
+That is, we wish to find the variational distribution $\q(\theta \vert
+\etaopt(\t))$ that is closest in KL-divergence to $p(\theta \vert \x, \t)$.  We
+have emphasized in the notation $\etaopt(\t)$ that this optimum depends on the
+prior hyperparameter $\t$.  Define the shorthand notation
+%
+\begin{align*}
+%
+\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}.
+%
+\end{align*}
+%
+Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
+and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
+continuous, then $\etaopt(\t)$ satisfies the first-order condition
+%
+\begin{align}\eqlabel{vb_first_order_condition}
+%
+\fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} = 0.
+%
+\end{align}
+%
+If the second derivative
+$\partial^2 \KL{\eta, \t}/ \partial \eta \partial \eta^T$ is
+positive definite in a neighborhood of $\etaopt{\t}$ and $\t$,
+then $\etaopt{\t}$ is a differentiable function of $\t$ by the
+implicit function thoerem.  We can then differentiate
+\eqref{vb_first_order_condition} to get
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+    - \left( \fracat{\partial^2 \KL{\eta, \t}}
+                    {\partial \eta \partial \eta^T}
+                    {\etaopt(\t), \t_0} \right)^{-1}
+    \fracat{\partial^2 \KL{\eta, \t}}
+           {\partial \eta \partial \t}
+           {\etaopt(\t), \t_0}.
+%
+\end{align*}
+%
+
+
+%

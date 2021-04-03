@@ -1,0 +1,104 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+source("R_scripts/initialize.R", echo=FALSE)
+source("R_scripts/plotting_utils.R", echo=FALSE)
+
+# load data
+load('./R_scripts/data_processed/iris.RData')
+@
+      
+<<beta_priors_cap>>=
+beta_priors_cap <- paste("Probability density functions of $\\text{Beta}(1, \\alpha)$ distributions, for various $\\alpha$. ")
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
+@
+<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
+beta_prior <- function(x, alpha){
+  return(dbeta(x, shape1 = 1, shape = alpha))
+}
+
+alpha_vec <- 1:8 * 2
+
+alpha_density_df <- 
+  data.frame(x = seq(0, 1, length.out = 100))
+
+for(alpha in alpha_vec){
+  alpha_density_df[[paste0('alpha = ', alpha)]] <- 
+    beta_prior(alpha_density_df$x, alpha = alpha)
+}
+
+alpha_density_df %>%
+  gather(key = alpha, value = pdf, -x) %>% 
+  # re-order alphas ... 
+  mutate(alpha_num = sub('alpha = ', '', alpha)) %>% 
+  mutate(alpha_num = as.numeric(alpha_num)) %>% 
+  mutate(alpha = fct_reorder(as.factor(alpha),
+                              alpha_num)) %>% 
+  ggplot() + 
+  geom_line(aes(x = x, y = pdf)) + 
+  facet_wrap(~alpha, nrow = 2) + 
+  ylab('p.d.f.') + 
+  xlab('stick length') +
+  get_fontsizes()
+
+@
+
+      
+<<iris_fit_cap>>=
+iris_fit_cap <- paste("The iris data in principal component space and 
+                      model fit at $\\alpha = 6$. 
+                      Colors denote inferred memberships and
+                      ellipses are estimated covariances. ")
+SetImageSize(aspect_ratio = base_aspect_ratio, 
+             image_width = 0.6)
+@
+<<iris_fit, cache=simple_cache, fig.show='hold', fig.cap=iris_fit_cap>>=
+source('./R_scripts/iris/iris_init_fit.R', 
+       echo=knitr_debug, print.eval=TRUE)
+@
+
+<<iris_alpha_sens_cap>>=
+      iris_alpha_sens_cap <- paste(
+"The expected number of clusters in the iris data as $\\alpha$ varies. 
+We compute the linear approximation at $\\alpha=6$ and
+extrapolate the expected number of clusters using the
+linear approximation (green).
+We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). In the right plot, the threshold is set at $t = 1$. 
+")
+
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+@
+<<iris_alpha_sens, cache=simple_cache, fig.show='hold', fig.cap=iris_alpha_sens_cap>>=
+source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+<<iris_fsens_cap>>=
+iris_fsens_cap <- paste(
+        "Sensitivity of
+        the expected number of clusters in the iris dataset
+        to four multiplicative perturbations with 
+        $L_{\\infty}$-norm equal to one. 
+        (Left) The log multiplicative perturbation $\\log\\phi$ in grey.        
+        In purple is the prior-weighted influence function, scaled to also have 
+        unit $L_{\\infty}$-norm. 
+        (Middle) The original prior density $p_0$ and 
+        the perturbed prior density $p_1 = p_0\\times \\phi$. 
+        (Right) The effect of the perturbation 
+        on the change in expected number of clusters as a function of $\\epsilon$. ")
+
+SetImageSize(aspect_ratio = 1.3 * base_aspect_ratio)
+@
+<<iris_fsens, cache=simple_cache, fig.show='hold', fig.cap=iris_fsens_cap>>=
+source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+

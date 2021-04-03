@@ -1,0 +1,96 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  <<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+source("R_scripts/initialize.R", echo=FALSE)
+source("R_scripts/plotting_utils.R")
+source("R_scripts/structure/structure_plotting_utils.R")
+
+# load data
+load('./R_scripts/data_processed/structure.RData')
+@
+      
+
+
+<<stru_init_fit_cap>>=
+stru_init_fit_cap <- paste(
+    "The inferred individual admixtures at $\\alpha = 3$. 
+    Each vertical strip is an individual and each color
+    an ancestral population.
+    Lengths of colored segments represent the inferred mixture proportions.
+    Mbololo, Ngangao, Yale, and Chawia refer to
+    geographic regions from which each individual was collected. ")
+SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
+@
+  <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
+out <- plot_initial_fit()
+out$p
+@
+
+    
+    
+<<stru_alpha_nclusters_cap>>=
+  stru_alpha_nclusters_cap <- paste(
+    "The expected number of clusters in the thrush data as $\\alpha$ varies.
+    We compute the linear approximation at $\\alpha = 3$. In the right plot, the threshold is set at $t = 20$ (approximately $1\\%$ of loci). ")
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+@
+  <<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
+source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+
+<<stru_alpha_cluster_weights_cap>>=
+  stru_alpha_cluster_weights_cap <- paste(
+    "The expected number of loci per cluster as $\\alpha$ varies. 
+     We compute the linear approximation at $\\alpha = 3$. 
+     The horizontal blue line corresponds to the threshold in computing the 
+    expected number of thresholded clusters in Figure~\\ref{fig:stru_alpha_nclusters} ")
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.1)
+@
+  <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
+source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+<<stru_func_sens_cap>>=
+  stru_func_sens_cap <- paste(
+    "Sensitivity of inferred admixtures for several outlying individuals. 
+     For individuals A, 
+     we examine the sensitivity of the inferred mixture proportion of the orange
+     population.
+     For individuals B, 
+     we examine the inferred green proportion.
+     For the individuals C, we examine the inferred purple proportion.
+     (Left column) The worst-case $L_\\infty$ negative perturbation in grey,
+     plotted against the prior-weighted influence function
+     (scaled to have $L_\\infty$ norm equal to 1). 
+    (Middle column) The effect of this perturbation on the prior density. 
+    (Right column) Effects on the inferred admixture. ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.4)
+@
+  <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
+source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+<<stru_func_sens_admix_cap>>=
+  stru_func_sens_admix_cap <- paste(
+    "Inferred admixtures after the worst-case prior perturbation 
+     to individuals A (second row, Figure~\\ref{fig:stru_func_sens}). ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
+@
+  <<stru_func_sens_admix, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_admix_cap>>=
+source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+

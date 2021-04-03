@@ -1,0 +1,32 @@
+\def\mbe{\mathbb{E}}%
+\def\ind#1{\mathbb{I}\left(#1\right)}
+\def\evalat#1#2{\left.#1\right|_{#2}}
+\def\fracat#1#2#3{\left.\frac{#1}{#2}\right\vert_{#3}}
+\def\iid{\overset{iid}{\sim}}
+\def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
+
+\DeclareMathOperator*{\argmax}{\mathrm{argmax}}
+\DeclareMathOperator*{\argmin}{\mathrm{argmin}}
+
+% Variational parameters
+\def\etaopt{\hat\eta}
+\def\x{x}   % Data
+\def\t{t}   % Generic priur parameter
+\def\z{z}   % Local posterior parameters
+\def\q{q}   % VB dist
+\def\logp{\ell}   % VB dist
+\def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
+
+% Dimensions
+\def\etadim{D_{\eta}}
+\def\thetadim{D_{\theta}}
+
+% Domains
+\def\etadom{\Omega_{\eta}}
+\def\thetadom{\Omega_{\theta}}
+\def\tdom{\Omega_{\t}}
+
+\def\K{K}   % Number of components
+
+\def\mathand{\quad\quad\textrm{and}\quad\quad}%
+\def\mathwhere{\quad\quad\textrm{where}\quad\quad}%
