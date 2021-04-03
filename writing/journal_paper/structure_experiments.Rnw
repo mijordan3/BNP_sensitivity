@@ -53,7 +53,7 @@ source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug,
     "The expected number of loci per cluster as $\\alpha$ varies. 
      We compute the linear approximation at $\\alpha = 3$. 
      The horizontal blue line corresponds to the threshold in computing the 
-    expected number of thresholded clusters in Figure REF ")
+    expected number of thresholded clusters in Figure~\\ref{fig:stru_alpha_nclusters} ")
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.1)
 @
   <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
@@ -64,14 +64,15 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
 <<stru_func_sens_cap>>=
   stru_func_sens_cap <- paste(
     "Sensitivity of inferred admixtures for several outlying individuals. 
-     For individuals A from the Mbololo region, 
-     we examine the sensitivity of the inferred mixture proportion of the purple
+     For individuals A, 
+     we examine the sensitivity of the inferred mixture proportion of the orange
      population.
-    For four individuals from the Ngangao region (B), we examine the inferred green proportion.
-    For the all individuals from the Chawia region (C), we examine the inferred purple proportion.
-    (Left column) The worst-case $L_\\infty$ negative perturbation in grey, 
-    plotted against the 
-    prior-weighted influence function (scaled to have $L_\\infty$ norm equal to 1). 
+     For individuals B, 
+     we examine the inferred green proportion.
+     For the individuals C, we examine the inferred purple proportion.
+     (Left column) The worst-case $L_\\infty$ negative perturbation in grey,
+     plotted against the prior-weighted influence function
+     (scaled to have $L_\\infty$ norm equal to 1). 
     (Middle column) The effect of this perturbation on the prior density. 
     (Right column) Effects on the inferred admixture. ")
 
@@ -83,7 +84,8 @@ source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRU
 
 <<stru_func_sens_admix_cap>>=
   stru_func_sens_admix_cap <- paste(
-    "admixtures ")
+    "Inferred admixtures after the worst-case prior perturbation 
+     to individuals A (second row, Figure~\\ref{fig:stru_func_sens}). ")
 
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
 @

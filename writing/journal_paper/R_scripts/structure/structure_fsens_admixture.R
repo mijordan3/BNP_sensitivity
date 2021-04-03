@@ -1,9 +1,16 @@
-out_init <- plot_initial_fit()
+out_init <- plot_initial_fit(add_geographic_labels = FALSE)
+
+add_box <- mbololo_box 
+add_label <- geom_text(aes(x = min(mbololo_outliers$obs_id) - 6, 
+                y = 0.2, 
+                label = 'A'), 
+            size = text_size)
+
 p_admix <- out_init$p +
   ggtitle('initial fit') +
+  add_box + 
+  add_label + 
   theme(title = element_text(size = title_size))
-
-intercepts <- out_init$intercepts
 
 ###################
 # results at epsilon = 0.5
@@ -15,8 +22,8 @@ plot_admix_here <- function(admix_matr){
   out <- plot_structure_fit(admix_matr[, 1:clusters_keep]) 
 
   return(out$p + 
-           geom_vline(xintercept = intercepts, 
-                      linetype = 'dashed') + 
+           add_box + 
+           add_label + 
            theme(axis.text.x = element_blank(), 
                  axis.ticks.x = element_blank(), 
                  title = element_text(size = title_size)))

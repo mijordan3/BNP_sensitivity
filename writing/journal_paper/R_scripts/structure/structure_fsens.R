@@ -1,4 +1,4 @@
-out <- plot_initial_fit()
+out <- plot_initial_fit(add_geographic_labels = FALSE)
 
 regions_df <- data.frame(obs_id = unique(out$init_ind_admix_df$obs_id), 
                          region = geographic_labels)
@@ -27,7 +27,7 @@ chawia_outliers <-
 
 
 rect_alpha = 0.1
-linesize = 1
+linesize = 0.5
 text_height = 0.1
 text_size = 3
 
@@ -50,7 +50,7 @@ ngangao_box <- geom_rect(aes(xmin = min(ngangao_outliers$obs_id) - 1.5,
 chawia_box <- geom_rect(aes(xmin = min(chawia_outliers$obs_id) - 1.5,
                              xmax = max(chawia_outliers$obs_id),
                              ymin = 0.1, 
-                             ymax = 0.6), 
+                             ymax = 0.65), 
                          color = 'black', 
                          alpha = 0., 
                          size = linesize)
@@ -69,7 +69,7 @@ p_admix <- out$p +
                 label = 'B'), 
             size = text_size) + 
   geom_text(aes(x = median(chawia_outliers$obs_id),
-                y = 0.7, 
+                y = 0.75, 
                 label = 'C'), 
             size = text_size) + 
   theme(axis.text.x = element_blank(), 
@@ -137,7 +137,7 @@ mbololo_plots$p_priors <-
 
 mbololo_plots$p_sens <-
   mbololo_plots$p_sens + 
-  ylab('propn. purple') + 
+  ylab('propn. orange') + 
   x_axis_remover 
 
 mbololo_plots_sum <- 

@@ -37,7 +37,7 @@ plot_structure_fit <- function(ind_admix_matr){
               p = p))
 }
 
-plot_initial_fit <- function(){
+plot_initial_fit <- function(add_geographic_labels = TRUE){
 
   # we plot the top 7 clusters
   clusters_keep <- 7
@@ -59,13 +59,21 @@ plot_initial_fit <- function(){
   
   # plot
   p <- p + 
-        # add separators for the ture populations
-        geom_vline(xintercept = intercepts, 
+    scale_y_continuous(breaks=NULL) 
+  
+  if(add_geographic_labels){
+    # add separators for the ture populations
+    
+    p <- p + 
+      geom_vline(xintercept = intercepts, 
                    linetype = 'dashed') +
-        # add labels
-        scale_x_continuous(breaks=ticks_loc,
-                           labels = labels) + 
-        scale_y_continuous(breaks=NULL) 
+      # add labels
+      scale_x_continuous(breaks=ticks_loc,
+                         labels = labels)
+  }else{
+    p <- p + 
+      scale_x_continuous(breaks = NULL)
+  }
   
   return(list(p = p, 
               init_ind_admix_df = init_ind_admix_df, 
