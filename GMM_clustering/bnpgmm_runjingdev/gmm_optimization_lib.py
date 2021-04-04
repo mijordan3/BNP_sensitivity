@@ -3,7 +3,7 @@ import jax.numpy as np
 
 import numpy as onp
 
-from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, init_centroids_with_kmeans
+from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, init_centroids_w_kmeans
 
 from bnpgmm_runjingdev.gmm_clustering_lib import get_kl
 from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_optimal_z_from_vb_dict
