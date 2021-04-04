@@ -166,9 +166,10 @@ Plugging in gives
     -\hess{\zeta\zeta}^{-1}
     \left(
         \sumkm
-        \evalat{\frac{\partial}{\partial \etanuk}
-                   \log\q(\nu \vert \etanuk)}
-                 {\etaoptnuk}
+        \q(\nu \vert \etaoptnuk)
+        \fracat{\partial \log\q(\nu \vert \etanuk)}
+               {\partial \etanuk}
+               {\etaoptnuk}
     \right) \phi(\nu) d\nu.
 %
 \end{align*}
@@ -181,9 +182,10 @@ Thus, the influence function for $\etaopt(\psi)$ at $\phiz$ is given by
 -\hess{\zeta\zeta}^{-1}
 \left(
     \sumkm
-    \evalat{\frac{\partial}{\partial \etanuk}
-               \log\q(\nu \vert \etanuk)}
-             {\etaoptnuk}
+    \q(\nu \vert \etaoptnuk)
+    \fracat{\partial \log\q(\nu \vert \etanuk)}
+           {\partial \etanuk}
+           {\etaoptnuk}
 \right) \\
 \fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
     \int_0^1 \infl(\nu) \phi(\nu) d\nu.
@@ -200,9 +202,10 @@ the influence function is given via \eqref{vb_g_sens} to be
     \hess{\zeta\zeta}^{-1}
 \left(
     \sumkm
-    \evalat{\frac{\partial}{\partial \etanuk}
-               \log\q(\nu \vert \etanuk)}
-             {\etaoptnuk}
+    \q(\nu \vert \etaoptnuk)
+    \fracat{\partial \log\q(\nu \vert \etanuk)}
+           {\partial \etanuk}
+           {\etaoptnuk}
 \right) \\
 \fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
     \int_0^1 \inflg(\nu) \phi(\nu) d\nu.
@@ -229,6 +232,13 @@ via Holder's inequality, since
 %
 with equality when $\phi(\nu) = \delta \, \mathrm{sign}(\inflg(\nu))$.
 
+In order for the supremum over a bounded set $\phi: \norminf{\phi} < \delta$
+to be meaningful, a minimal requirement is that the function $\etaopt(\phi)$
+be Fr{\'e}chet differentiable.
 
-
+\begin{thm}
 %
+The map $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable.
+%
+\end{thm}
+%m9
