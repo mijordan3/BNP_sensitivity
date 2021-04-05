@@ -54,7 +54,7 @@ alpha_density_df %>%
       
 <<iris_fit_cap>>=
 iris_fit_cap <- paste("The iris data in principal component space and 
-                      model fit at $\\alpha = 6$. 
+                      GMM fit at $\\alpha = 6$. 
                       Colors denote inferred memberships and
                       ellipses are estimated covariances. ")
 SetImageSize(aspect_ratio = base_aspect_ratio, 
