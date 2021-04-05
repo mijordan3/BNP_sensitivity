@@ -57,29 +57,31 @@ def cluster_and_get_k_means_inits(y,
     for n in range(len(km_best.labels_)):
         e_z_init[n, km_best.labels_[n]] = 1.0 
     
-#     # set stick parameters to one
-#     vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
-#     vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
+    # set stick parameters to one
+    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
+    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
 
-#     # Set inital inv. covariances
-#     cluster_info_init = onp.zeros((k_approx, dim, dim))
-#     for k in range(k_approx):
-#         indx = onp.argwhere(km_best.labels_ == k).flatten()
+    # Set inital inv. covariances
+    cluster_info_init = onp.zeros((k_approx, dim, dim))
+    for k in range(k_approx):
+        indx = onp.argwhere(km_best.labels_ == k).flatten()
 
-#         if len(indx) <= (y.shape[1] + 1):
-#             # if there's less than one datapoint in the cluster,
-#             # the covariance is not defined.
-#             cluster_info_init[k, :, :] = onp.eye(dim)
-#         else:
-#             resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
-#             cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
-#                                     np.eye(dim) * 1e-4)
-#             # symmetrize ... there might be some numerical issues otherwise
-#             cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
+        if len(indx) <= (y.shape[1] + 1):
+            # if there's less than one datapoint in the cluster,
+            # the covariance is not defined.
+            cluster_info_init[k, :, :] = onp.eye(dim)
+        else:
+            resid_k = y[indx, :] - km_best.cluster_centers_[k, :]
+            cluster_info_init_ = np.linalg.inv(np.cov(resid_k.T) + \
+                                    np.eye(dim) * 1e-4)
+            # symmetrize ... there might be some numerical issues otherwise
+            cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
     
-#     vb_params_dict['centroid_params']['lambdas'] = np.ones(k_approx)
-#     vb_params_dict['centroid_params']['wishart_df'] = np.ones(k_approx)
-#     vb_params_dict['centroid_params']['cluster_info'] = np.array(cluster_info_init)
+    vb_params_dict['centroid_params']['lambdas'] = np.ones(k_approx)
+    
+    init_df = dim
+    vb_params_dict['centroid_params']['wishart_df'] = np.ones(k_approx) * init_df
+    vb_params_dict['centroid_params']['cluster_info'] = np.array(cluster_info_init) / init_df
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
