@@ -71,10 +71,9 @@ source('./R_scripts/iris/iris_init_fit.R',
 We compute the linear approximation at $\\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). In the right plot, the threshold is set at $t = 1$. 
-")
+We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). ")
 
-SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+SetImageSize(aspect_ratio = base_aspect_ratio)
 @
 <<iris_alpha_sens, cache=simple_cache, fig.show='hold', fig.cap=iris_alpha_sens_cap>>=
 source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
@@ -84,7 +83,7 @@ source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
 <<iris_fsens_cap>>=
 iris_fsens_cap <- paste(
         "Sensitivity of
-        the expected number of clusters in the iris dataset
+        the expected number of posterior predictive clusters in the iris dataset
         to four multiplicative perturbations with 
         $L_{\\infty}$-norm equal to one. 
         (Left) The log multiplicative perturbation $\\log\\phi$ in grey.        
