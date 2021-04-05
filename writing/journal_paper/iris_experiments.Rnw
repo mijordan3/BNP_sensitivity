@@ -67,13 +67,13 @@ source('./R_scripts/iris/iris_init_fit.R',
 
 <<iris_alpha_sens_cap>>=
       iris_alpha_sens_cap <- paste(
-"The expected number of clusters in the iris data as $\\alpha$ varies. 
+"The expected number of posterior predictive clusters in the iris data as $\\alpha$ varies. 
 We compute the linear approximation at $\\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). ")
+We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (orange). In the right plot, the threshold was set at $t = 5$. ")
 
-SetImageSize(aspect_ratio = base_aspect_ratio)
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
 @
 <<iris_alpha_sens, cache=simple_cache, fig.show='hold', fig.cap=iris_alpha_sens_cap>>=
 source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
