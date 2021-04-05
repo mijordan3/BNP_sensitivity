@@ -129,16 +129,19 @@ def get_default_prior_params(dim):
 # Some useful moments
 ##################
 def get_e_log_determinant(centroids_param_dict): 
+    # expected log determinant of a matrix sampled
+    # from a wishart 
     
     dim = centroids_param_dict['means'].shape[1]
     
     multivariate_gammas = \
-        np.array([sp.special.digamma(centroids_param_dict['wishart_df'] + 1 - i) \
-                  for i in range(dim)]).sum(0)
+        np.array([sp.special.digamma( \
+                  (centroids_param_dict['wishart_df'] + 1 - i) / 2) \
+                  for i in range(1, dim+1)]).sum(0)
     
     logdet = np.linalg.slogdet(centroids_param_dict['wishart_scale'])[1]
     
-    return multivariate_gammas + logdet    
+    return multivariate_gammas + logdet + dim * np.log(2), logdet   
 
 
 ##########################
@@ -176,7 +179,7 @@ def get_e_log_prior(vb_params_dict,
     means_term = - vb_params_dict['centroid_params']['wishart_df'] * \
                         np.einsum('ki, kij, kj -> k', diff, prior_info, diff)
 
-    
+    # sum over k
     term1 = 0.5 * (e_log_det + lambda_term + means_term).sum()
     
     
@@ -196,7 +199,7 @@ def get_e_log_prior(vb_params_dict,
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params_dict, e_log_det, e_z, gh_loc, gh_weights):
+def get_entropy(vb_params_dict, e_log_det, log_det, e_z, gh_loc, gh_weights):
     # get entropy term
 
     dim = vb_params_dict['centroid_params']['means'].shape[1]
@@ -215,12 +218,11 @@ def get_entropy(vb_params_dict, e_log_det, e_z, gh_loc, gh_weights):
     
     # wishart entropy
     dfs = vb_params_dict['centroid_params']['wishart_df']
-    scales = vb_params_dict['centroid_params']['wishart_scale']
-    wishart_entropy = np.linalg.slogdet(scales)[1] * dfs / 2 + \
+    wishart_entropy = log_det * dfs / 2 + \
                         dfs * dim / 2 * np.log(2) + \
                         sp.special.multigammaln(dfs / 2, dim) - \
                         (dfs - dim - 1) / 2 * e_log_det + \
-                        (dfs * dim) / 2
+                        dfs * dim / 2
     
     wishart_entropy = wishart_entropy.sum()
     
@@ -241,6 +243,7 @@ def get_loglik_obs_by_nk(y, centroid_params_dict, e_log_det):
                         centroid_params_dict['wishart_df'], 
                         centroid_params_dict['wishart_scale'])
     
+    # expectation of info times mean
     e_scale_mean = np.einsum('kij, kj -> ki', 
                              e_scale, 
                              centroid_params_dict['means'])
@@ -350,7 +353,7 @@ def get_kl(y,
     """
 
     # an expensive moment: only compute once here
-    e_log_det = get_e_log_determinant(vb_params_dict['centroid_params'])
+    e_log_det, log_det = get_e_log_determinant(vb_params_dict['centroid_params'])
 
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
@@ -366,7 +369,8 @@ def get_kl(y,
     e_loglik = np.sum(e_z * z_nat_param)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, e_log_det, e_z, gh_loc, gh_weights)
+    entropy = get_entropy(vb_params_dict, e_log_det, log_det, 
+                          e_z, gh_loc, gh_weights)
 
     # prior term
     e_log_prior = get_e_log_prior(vb_params_dict,
