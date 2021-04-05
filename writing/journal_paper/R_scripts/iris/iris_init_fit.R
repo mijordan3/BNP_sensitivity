@@ -17,7 +17,7 @@ p <- ggplot() +
 ##################
 # plot centroids / covariances
 ##################
-unique_clusters = unique(iris_obs$est_z)
+unique_clusters = sort(unique(iris_obs$est_z))
 n_unique_clusters = length(unique_clusters)
 for(i in 1:n_unique_clusters){
   
