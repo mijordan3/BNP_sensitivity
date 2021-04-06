@@ -3,6 +3,8 @@ import jax.scipy as sp
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
+from bnpmodeling_runjingdev.stick_integration_lib import get_e_log_logitnormal
+
 import scipy as osp
 
 import matplotlib.pyplot as plt
@@ -264,7 +266,7 @@ def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
 
     """
     
-    e_perturbation_vec = modeling_lib.get_e_func_logit_stick_vec(
+    e_perturbation_vec = modeling_lib.get_e_log_logitnormal(
                                         stick_propn_mean, stick_propn_info,
                                         gh_loc, gh_weights, log_phi)
 

@@ -7,7 +7,7 @@ from jax import random
 
 import scipy as osp
 
-import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev import stick_integration_lib
 
 
 def get_mixture_weights_from_stick_break_propns(stick_break_propns):
@@ -69,7 +69,7 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
     """
     
     e_stick_lengths = \
-        ef.get_e_logitnormal(stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
+        stick_integration_lib.get_e_logitnormal(stick_propn_mean, stick_propn_info, gh_loc, gh_weights)
     
     # can just multiply expectations bc variational distribution on sticks 
     # are independent 

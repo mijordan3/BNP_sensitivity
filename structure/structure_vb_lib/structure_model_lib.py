@@ -128,7 +128,7 @@ def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     
     # dirichlet entropy term
     pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
-    dir_entropy = ef.dirichlet_entropy(pop_freq_dir_params.transpose((2, 0, 1))).sum()
+    dir_entropy = ef.dirichlet_entropy(pop_freq_dir_params).sum()
     
     # z entropy 
     z_entropy = modeling_lib.multinom_entropy(e_z)

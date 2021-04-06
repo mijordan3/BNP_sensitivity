@@ -10,7 +10,7 @@ from copy import deepcopy
 
 import time
 
-import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev import stick_integration_lib
 from bnpmodeling_runjingdev import modeling_lib
 from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 
@@ -121,7 +121,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
         stick_infos = logitnorm_stick_params_dict['stick_infos']
 
         e_log_sticks, e_log_1m_sticks = \
-            ef.get_e_log_logitnormal(
+            stick_integration_lib.get_e_log_logitnormal(
                 lognorm_means = stick_means,
                 lognorm_infos = stick_infos,
                 gh_loc = gh_loc,
