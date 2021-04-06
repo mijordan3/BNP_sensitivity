@@ -111,6 +111,7 @@ def get_default_prior_params():
 ##########################
 # entropy term
 ##########################
+
 def get_shift_entropy(e_b, e_b2): 
     
     shift_var = e_b2 - e_b**2
@@ -145,6 +146,16 @@ def get_entropy(vb_params_dict, e_z,
 ##########################
 # prior term 
 ##########################
+
+def _get_gamma_moments(info_alpha, info_beta): 
+    
+    e_log_info = sp.special.digamma(info_alpha) - \
+                    np.log(info_beta)
+    
+    e_info = info_alpha / np.log(info_beta)
+    
+    return e_info, e_log_info
+
 def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
     return prior_info * (prior_mean * e_b - 0.5 * e_b2)
 
@@ -170,7 +181,7 @@ def get_e_log_prior(vb_params_dict,
     centroid_means = vb_params_dict['centroids']
     centroid_covar = vb_params_dict['centroids_covar']
     
-    e_centroid_prior = -0.5 * prior_info * (np.trace(centroid_covar).sum() + \
+    e_centroid_prior = -0.5 * prior_info * (np.einsum('kii -> k', centroid_covar).sum() + \
                                             np.sum(centroid_means * centroid_means) - \
                                             2 * np.sum(centroid_means * prior_mean))
         
@@ -178,11 +189,10 @@ def get_e_log_prior(vb_params_dict,
     prior_shape = prior_params_dict['prior_data_info_shape']
     prior_scale = prior_params_dict['prior_data_info_scale']
     
-    e_log_info = sp.special.digamma(vb_params_dict['info_alpha']) - \
-                    np.log(vb_params_dict['info_beta'])
+    e_info, e_log_info = \
+        _get_gamma_moments(vb_params_dict['info_alpha'],
+                           vb_params_dict['info_beta'])
     
-    e_info = vb_params_dict['info_alpha'] / np.log(vb_params_dict['info_beta'])
-   
     data_info_prior = (prior_shape - 1) * e_log_info - e_info / prior_scale
 
     return dp_prior + e_centroid_prior + data_info_prior
@@ -191,12 +201,19 @@ def get_e_log_prior(vb_params_dict,
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
+def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
     # returns a N by k_approx matrix where the (n,k)th entry is the
     # expected log likelihood of the nth observation when it belongs to
     # component k.
 
     num_time_points = x.shape[0]
+    
+    e_info, e_log_info = \
+        _get_gamma_moments(vb_params_dict['info_alpha'],
+                           vb_params_dict['info_beta'])
+    
+    centroids = vb_params_dict['centroids']
+    centroids_covar = vb_params_dict['centroids_covar']
 
     # y is (obs x time points) = (n x t)
     # x is (time points x basis vectors) = (t x b)
@@ -220,22 +237,28 @@ def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
     #         E[(beta_k^T x)^2 +
     #           2 * b_n * beta_k^T x +
     #           b_n^2]
-    quad_term = np.sum(x_times_beta ** 2, axis=0, keepdims=True) + \
+    e_xbeta2 = np.sum(x_times_beta ** 2, axis=0) + \
+                np.einsum('ni, kij, nj -> k', x, centroids_covar, x)
+        
+    quad_term = np.expand_dims(e_xbeta2, axis = 0) + \
                 2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
                 e_b2 * num_time_points
 
-    square_term = -0.5 * data_info * (linear_term + quad_term)
+    square_term = -0.5 * e_info * (linear_term + quad_term)
 
     # We have already summed the (y - mu)^2 terms over time points,so
     # we need to multiply the e_log_info_y by the number of points we've
     # summed over.
     log_info_term = \
-        0.5 * np.log(data_info) * \
+        0.5 * e_log_info * \
         num_time_points
     
     return  square_term + log_info_term
 
-def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict): 
+def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict): 
+    
+    centroids = vb_params_dict['centroids']
+    e_data_info = vb_params_dict['info_alpha'] / vb_params_dict['info_beta']
     
     num_time_points = x.shape[0]
 
@@ -246,13 +269,13 @@ def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict):
     
     # ydiff is (y - xbeta), but summed over time 
     ydiff = (np.expand_dims(y, axis = -1) - \
-             np.expand_dims(x_times_beta, axis = 0)).sum(1) * data_info
+             np.expand_dims(x_times_beta, axis = 0)).sum(1) * e_data_info
     
     prior_diff = prior_params_dict['prior_shift_info'] * prior_params_dict['prior_shift_mean']
     
     # mean and variance of optimal shift
-    e_b = (ydiff + prior_diff) / (num_time_points * data_info + prior_params_dict['prior_shift_info'])
-    var_b = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
+    e_b = (ydiff + prior_diff) / (num_time_points * e_data_info + prior_params_dict['prior_shift_info'])
+    var_b = 1 / (num_time_points  * e_data_info + prior_params_dict['prior_shift_info'])
     
     # second moment
     e_b2 = var_b + e_b**2
