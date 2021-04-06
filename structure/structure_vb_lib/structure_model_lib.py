@@ -5,7 +5,7 @@ import jax.scipy as sp
 import paragami
 
 from bnpmodeling_runjingdev import modeling_lib
-import bnpmodeling_runjingdev.exponential_families as ef
+from bnpmodeling_runjingdev.stick_integration_lib import get_e_log_logitnormal
 
 from numpy.polynomial.hermite import hermgauss
 
@@ -49,12 +49,8 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     ind_admix_params_paragami = paragami.PatternDict()
     
     # variational distribution for each stick is logitnormal
-    ind_admix_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,))
-    ind_admix_params_paragami['stick_infos'] = \
-        paragami.NumericArrayPattern(shape = (n_obs, k_approx - 1,),
-                                        lb = 0.0)
-    vb_params_paragami['ind_admix_params'] = ind_admix_params_paragami
+    vb_params_paragami['ind_admix_params'] = modeling_lib.get_stick_paragami_object(k_approx, 
+                                                                                   (n_obs, ))
     
     vb_params_dict = vb_params_paragami.random(key = prng_key)
 
@@ -128,7 +124,7 @@ def get_entropy(vb_params_dict, e_z, gh_loc, gh_weights):
     
     # dirichlet entropy term
     pop_freq_dir_params = vb_params_dict['pop_freq_dirichlet_params']
-    dir_entropy = ef.dirichlet_entropy(pop_freq_dir_params).sum()
+    dir_entropy = modeling_lib.dirichlet_entropy(pop_freq_dir_params).sum()
     
     # z entropy 
     z_entropy = modeling_lib.multinom_entropy(e_z)
@@ -267,7 +263,7 @@ def get_moments_from_vb_params_dict(vb_params_dict,
     
     # expected log stick lengths
     e_log_sticks, e_log_1m_sticks = \
-        ef.get_e_log_logitnormal(
+        get_e_log_logitnormal(
             lognorm_means = ind_mix_stick_propn_mean,
             lognorm_infos = ind_mix_stick_propn_info,
             gh_loc = gh_loc,
