@@ -52,14 +52,14 @@ plot_influence_and_logphi <- function(logit_v_grid,
   
   p_logphi <- 
     ggplot() + 
-    # plot influnce function
-    geom_line(aes(x = logit_v_grid, 
-                  y = infl_fun * scale), 
-              color = 'purple') + 
     # plot functional perturbation 
     geom_area(aes(x = logit_v_grid_logphi, 
                   y = log_phi), 
               fill = 'grey', color = 'black', alpha = 0.5) + 
+    # plot influnce function
+    geom_line(aes(x = logit_v_grid, 
+                  y = infl_fun * scale), 
+              color = 'purple') + 
     scale_y_continuous(  
       # label for log phi
       name = "log phi",

@@ -3,7 +3,7 @@ import jax.numpy as np
 
 import numpy as onp
 
-from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, init_centroids_with_kmeans
+from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, init_centroids_w_kmeans
 
 from bnpgmm_runjingdev.gmm_clustering_lib import get_kl
 from bnpgmm_runjingdev.gmm_posterior_quantities_lib import get_optimal_z_from_vb_dict
@@ -38,7 +38,7 @@ def cluster_and_get_k_means_inits(y,
     vb_params_dict = vb_params_paragami.random()
 
     # data parameters
-    k_approx = np.shape(vb_params_dict['cluster_params']['centroids'])[0]
+    k_approx = np.shape(vb_params_dict['centroid_params']['means'])[0]
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
         
@@ -48,8 +48,7 @@ def cluster_and_get_k_means_inits(y,
                                                       n_kmeans_init = 10, 
                                                       seed = seed)
     
-    vb_params_dict['cluster_params']['centroids'] = np.array(km_best.cluster_centers_)
-
+    vb_params_dict['centroid_params']['means'] = np.array(km_best.cluster_centers_)
     
     # intialize ez's: 
     # doesn't actually matter for optimization ...
@@ -77,8 +76,12 @@ def cluster_and_get_k_means_inits(y,
                                     np.eye(dim) * 1e-4)
             # symmetrize ... there might be some numerical issues otherwise
             cluster_info_init[k, :, :] = 0.5 * (cluster_info_init_ + cluster_info_init_.T)
-
-    vb_params_dict['cluster_params']['cluster_info'] = np.array(cluster_info_init)
+    
+    vb_params_dict['centroid_params']['lambdas'] = np.ones(k_approx)
+    
+    init_df = dim
+    vb_params_dict['centroid_params']['wishart_df'] = np.ones(k_approx) * init_df
+    vb_params_dict['centroid_params']['cluster_info'] = np.array(cluster_info_init) / init_df
 
     init_free_par = vb_params_paragami.flatten(vb_params_dict, free = True)
 
