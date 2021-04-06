@@ -177,7 +177,7 @@ Plugging in gives
 %
 \end{align*}
 %
-Thus, the influence function for $\etaopt(\psi)$ at $\phiz$ is given by
+Thus, the influence function for $\etaopt(\phi)$ at $\phiz$ is given by
 %
 \begin{align*}
 %
@@ -258,6 +258,18 @@ Additionally, assume that, for each $\k$, and any bounded, Lebesgue-integrable
 function $f(\cdot)$, the map $\eta \mapsto \expect{\q(\nuk \vert \eta)}{f(\nuk)}$
 is continuously differentiable.
 
+Also assume that $\expect{\q(\nu \vert \etanuk)}{\norm{\nabla \log \q(\nu \vert \etanuk)}_2}$
+is a continuous funciton of $\eta$.
+%
+\begin{align*}
+%
+\expect{\q(\nu \vert \etanuk)}{\abs{\nabla^2 \log \q(\nu \vert \etanuk)}} \le{} \infty,
+%
+\end{align*}
+%
+where the absolute value applies componentwise.  TODO: can these assumptions
+on $\q$ be unified?
+
 Then the map $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable
 as a map from $\linf$ to $\mathbb{R}^\etadim$.
 %
@@ -272,55 +284,174 @@ For the duration of the proof, define
 %
 \begin{align*}
 %
-\KLgrad{\eta, \psi} :={}&
-    \fracat{\partial \KL{\eta, \psi}}{\partial \eta}{\eta, \psi}\\
-\KLhess{\eta, \psi} :={}&
-    \fracat{\partial^2 \KL{\eta, \psi}}
-           {\partial \eta \partial \eta^T}{\eta, \psi}.
+\KLgrad{\eta, \phi} :={}&
+    \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}\\
+\KLhess{\eta, \phi} :={}&
+    \fracat{\partial^2 \KL{\eta, \phi}}
+           {\partial \eta \partial \eta^T}{\eta, \phi}.
 %
 \end{align*}
 %
-The key to the proof will be showing that $\KL{\eta, \psi}$  and $\KLgrad{\eta,
-\psi}$ are continuously Fr{\'e}chet differentiable, and that $\KLhess{\eta,
-\psi}$ is positive definite in a ball centered at $\etaopt(\phiz), \phiz$.  The
-result will then follow from the implicit function theorem \citet[Theorem
-4.B(d)]{zeidler:2013:functional}.
+Recall that $\etaopt(\phi)$ is defined as a solution to
+%
+\begin{align*}
+%
+\KLgrad{\eta, \phi} ={}& 0_\etadim.
+%
+\end{align*}
+%
+The key to the proof will be the implicit function theorem in Banach spaces
+\citet[Theorem 4.B(d)]{zeidler:2013:functional}. To use the implicit function
+theorem, we need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable, and that $\KLhess{\eta, \phi}$ is continuous in $\phi$ and so
+positive definite in a ball centered at $\etaopt(\phiz), \phiz$.
 
-First, observe that
+First, observe that the estimating equation can be written as
 %
 \begin{align*}
 %
 \KL{\eta, \phi} ={}&
-    \KL{\eta, \phiz} + \sumkm \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}.
+    \KL{\eta, \phiz} + \sumkm \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}
+    \Rightarrow \\
+%
+\KLgrad{\eta, \phi} ={}&
+\KLgrad{\eta, \phiz} +
+    \sumkm \fracat{\partial \expect{\q(\nu \vert \etanuk)}
+                  {\phi(\nu)}}{\partial \eta}{\eta}
+= 0_\etadim.
 %
 \end{align*}
 %
-By assumption $\eta \mapsto \KL{\eta, \phiz}$ and $\eta \mapsto \KLgrad{\eta,
-\phiz}$ are continuously differentiable, so we need to show that, for all $\k$,
-$\eta, \phi \mapsto \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}$ is continuously
-differentiable at $\etaopt(\phiz), \phiz$.  Since $\norminf{\phi}$ is finite,
-$\phi(\nuk)$ is bounded, so $\eta \mapsto \expect{\q(\nuk \vert
-\eta)}{\phi(\nuk)}$ is continuously differentiable by assumption, and we
-need only show that the map $\psi \mapsto \expect{\q(\nuk \vert
-\eta)}{\phi(\nuk)}$ is continuously differentiable.
+Additionally define
+%
+\begin{align*}
+%
+\nabla \log \q(\nu \vert \etanuk) :={}&
+    \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk} \\
+\nabla^2 \log \q(\nu \vert \etanuk) :={}&
+    \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
+           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+%
+\end{align*}
+
+By assumption, $\eta \mapsto \KLgrad{\eta, \phiz}$ is continuously
+differentiable and does not depend on $\phi$, so we need consider only the
+last term.  But by differentiating under the integral,
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\nu \vert \etanuk)}
+              {\phi(\nu)}}{\partial \eta}{\eta} ={}&
+\expect{\q(\nu \vert \etanuk)}
+       {\left(\nabla \log \q(\nu \vert \etanuk)
+         - \expect{\q(\nu \vert \etanuk)}
+                  {\nabla \log \q(\nu \vert \etanuk)}
+       \right)\phi(\nu)}.
+%
+\end{align*}
+%
+It follows that the map $\phi \mapsto \fracat{\partial \expect{\q(\nu \vert
+\etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is a linear functional of
+$\phi$.  The dual norm is given by
+%
+\begin{align*}
+%
+\sup_{\phi: \norminf{\phi} = 1}
+    \norm{\fracat{\partial \expect{\q(\nu \vert
+    \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}}_2 \le
+    2 \expect{\q(\nu \vert \etanuk)}
+             {\norm{\nabla \log \q(\nu \vert \etanuk)}_2}
+              \norminf{\phi(\nu)}.
+%
+\end{align*}
+%
+so the linear operator is bounded as a function of $\phi$, and a continuous
+funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
+\expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
+continuously Frechet differentiable.
+
+Again differentiating under the integral,
+%
+\begin{align*}
+%
+\fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
+              {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}&
+\expect{\q(\nu \vert \etanuk)}
+       {\left(\nabla \log \q(\nu \vert \etanuk)
+         - \expect{\q(\nu \vert \etanuk)}
+                  {\nabla \log \q(\nu \vert \etanuk)}
+       \right)^2
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
+\\&
+\expect{\q(\nu \vert \etanuk)}
+       {\nabla^2 \log \q(\nu \vert \etanuk)
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)}.
+%
+\end{align*}
+%
+Again this is a linear operator as a function of $\phi$ and bounded by
+assumption.  Consequently the Hessian is invertible in a neighborhood.
+
+\noindent\rule{\textwidth}{1pt}
+
+
+Since $\norminf{\phi}$ is finite, $\phi(\nu)$ is
+bounded, so $\eta \mapsto \expect{\q(\nu \vert \eta)}{\phi(\nu)}$ is
+continuously differentiable by assumption, and we need only show that the map
+$\phi \mapsto \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}$ is continuously
+differentiable.
 
 For two functions $\phi_1$ and $\phi_2$,
 %
 \begin{align*}
 %
-\abs{\expect{\q(\nuk \vert \eta)}{\phi_1(\nuk)} -
-     \expect{\q(\nuk \vert \eta)}{\phi_2(\nuk)}}
+\abs{\expect{\q(\nu \vert \eta)}{\phi_1(\nu)} -
+     \expect{\q(\nu \vert \eta)}{\phi_2(\nu)}}
 \le{}&
-\expect{\q(\nuk \vert \eta)}{\abs{\phi_1(\nuk) - \phi_2(\nuk)}}\\
+\expect{\q(\nu \vert \eta)}{\abs{\phi_1(\nu) - \phi_2(\nu)}}\\
 \le{}&
-\norminf{\phi_1(\nuk) - \phi_2(\nuk)},
+\norminf{\phi_1(\nu) - \phi_2(\nu)},
 %
 \end{align*}
 %
-from which continunity follows.
+from which continunity follows.  But actually continuiuty could follow from
+continuous differentiability.
+
+Let $\dirderiv{\phi}{\Delta} f(\phi)$ denote the directional derivative of the functional
+$f(\cdot)$ in the direction $\Delta$ evaluated at $\phi$, i.e.,
+%
+\begin{align*}
+%
+\dirderiv{\phi}{\Delta} f(\phi) :={}
+\fracat{\partial f(\phi + \epsilon \Delta)}{d\epsilon}{\epsilon=0}.
+%
+\end{align*}
+%
+Thus $\dirderiv{\phi}{\Delta} \expect{\q(\nu \vert \eta)}{\phi(\eta)}$
+is given by
+%
+\begin{align*}
+%
+\dirderiv{\phi}{\Delta} \expect{\q(\nu \vert \eta)}{\phi(\eta)} ={}&
+    \expect{\q(\nu \vert \eta)}{\Delta(\eta)}.
+%
+\end{align*}
+%
+The linear map $\Delta \mapsto \dirderiv{\phi}{\Delta}$ is a bounded
+linear operator, since $\dirderiv{\phi}{\Delta} \le \norminf{\Delta}$.
+
+In fact, the whole thing is linear, which makes it all easy.
+
+Observe that
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\nu \vert \eta)}{\phi(\eta)}}{\partial \eta}{}
+%
+\end{align*}
+%
 
 
-\noindent\rule{\textwidth}{1pt}
 
 OLD:
 

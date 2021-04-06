@@ -4,12 +4,14 @@
 \def\fracat#1#2#3{\left.\frac{#1}{#2}\right\vert_{#3}}
 \def\iid{\overset{iid}{\sim}}
 \def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
+\def\cov#1#2{\underset{#1}{\mathrm{Cov}}\left(#2\right)}
 \def\expecthat#1#2{\underset{#1}{\widehat{\mathbb{E}}}\left[#2\right]}
 \def\abs#1{\left|#1\right|}
 \def\norm#1{\left\Vert#1\right\Vert}
 \def\norminf#1{\left\Vert#1\right\Vert_{\infty}}
 \def\sumk{\sum_{\k=1}^{\kmax}}
 \def\sumkm{\sum_{\k=1}^{\kmax - 1}}
+\def\dirderiv#1#2{\delta_{#1\rightarrow#2}}
 
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
@@ -68,8 +70,8 @@
 \def\N{N}   % Number of datapoints
 \def\K{K}   % Number of components
 \def\kmax{{\K_{\mathrm{max}}}}   % Truncation
-\def\etadim{D_{\eta}}
-\def\thetadim{D_{\theta}}
+\def\etadim{{D_{\eta}}}
+\def\thetadim{{D_{\theta}}}
 \def\ngh{N_{\mathrm{GH}}}   % Number of GH points
 
 % Domains
