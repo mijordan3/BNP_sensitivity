@@ -67,7 +67,8 @@ source('./R_scripts/iris/iris_init_fit.R',
 
 <<iris_alpha_sens_cap>>=
       iris_alpha_sens_cap <- paste(
-"The expected number of posterior predictive clusters in the iris data as $\\alpha$ varies. 
+"The expected number of posterior predictive clusters as $\\alpha$ varies in the 
+the BNP-GMM fit of the iris data. 
 We compute the linear approximation at $\\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
