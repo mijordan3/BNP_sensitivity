@@ -2,6 +2,8 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+import paragami
+
 from bnpmodeling_runjingdev import stick_integration_lib
 
 def assert_positive(x):
@@ -10,6 +12,23 @@ def assert_positive(x):
     # resulting objective should be nan
     # and errors can be caught
     return np.where(x < 0, np.nan, x)
+
+##############
+# paragami object for sticks 
+##############
+def get_stick_paragami_object(k_approx, shape = ()):
+    
+    stick_shape = shape + (k_approx - 1, )
+    
+    stick_params_paragami = paragami.PatternDict()
+    
+    stick_params_paragami['stick_means'] = \
+        paragami.NumericArrayPattern(shape = stick_shape)
+    stick_params_paragami['stick_infos'] = \
+        paragami.NumericArrayPattern(shape = stick_shape, lb = 1e-4)
+    
+    return stick_params_paragami
+
 
 ################
 # define entropies
