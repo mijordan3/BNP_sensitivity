@@ -126,6 +126,9 @@ def get_entropy(vb_params_dict, e_z,
     z_entropy = modeling_lib.multinom_entropy(e_z)
     
     # entropy on sticks
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
+    
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
@@ -287,16 +290,18 @@ def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict):
 # Optimization over e_z
 ##########################
 def get_z_nat_params(y, x, 
-                     stick_means, stick_infos,
-                     data_info, centroids, 
+                     vb_params_dict, 
                      e_b, e_b2, 
                      gh_loc, gh_weights, 
                      prior_params_dict):
 
     # get likelihood term
-    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2) 
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2) 
 
     # get weight term    
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
+    
     e_log_cluster_probs = modeling_lib.\
         get_e_log_cluster_probabilities(stick_means, stick_infos,
                                         gh_loc, gh_weights)
@@ -311,16 +316,14 @@ def get_z_nat_params(y, x,
     return z_nat_param
 
 def get_optimal_z(y, x, 
-                  stick_means, stick_infos,
-                  data_info, centroids,
+                  vb_params_dict,
                   e_b, e_b2, 
                   gh_loc, gh_weights, 
                   prior_params_dict):
 
     z_nat_param = \
         get_z_nat_params(y, x, 
-                         stick_means, stick_infos,
-                         data_info, centroids,
+                         vb_params_dict,
                          e_b, e_b2, 
                          gh_loc, gh_weights, 
                          prior_params_dict)
@@ -370,21 +373,14 @@ def get_kl(y, x,
     kl : float
         The negative elbo.
     """
-
-    # get vb parameters
-    stick_means = vb_params_dict['stick_params']['stick_means']
-    stick_infos = vb_params_dict['stick_params']['stick_infos']
-    centroids = vb_params_dict['centroids']
-    data_info = vb_params_dict['data_info']
     
     # get optimal shifts
-    e_b, e_b2 = get_optimal_shifts(y, x, centroids, data_info, prior_params_dict)
+    e_b, e_b2 = get_optimal_shifts(y, x, vb_params_dict, prior_params_dict)
     
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
             get_optimal_z(y, x, 
-                          stick_means, stick_infos,
-                          data_info, centroids,
+                          vb_params_dict,
                           e_b, e_b2, 
                           gh_loc, gh_weights, 
                           prior_params_dict)
@@ -394,15 +390,14 @@ def get_kl(y, x,
     e_loglik = np.sum(e_z * z_nat_param) 
 
     # entropy term
-    entropy = get_entropy(stick_means, stick_infos, e_z,
+    entropy = get_entropy(vb_params_dict, e_z,
                           e_b, e_b2, 
                           gh_loc, gh_weights)
 
     # prior term
-    e_log_prior = get_e_log_prior(stick_means, stick_infos, 
-                                    data_info, centroids,
-                                    prior_params_dict,
-                                    gh_loc, gh_weights)
+    e_log_prior = get_e_log_prior(vb_params_dict,
+                                  prior_params_dict,
+                                  gh_loc, gh_weights)
     
     elbo = e_log_prior + entropy + e_loglik
         
