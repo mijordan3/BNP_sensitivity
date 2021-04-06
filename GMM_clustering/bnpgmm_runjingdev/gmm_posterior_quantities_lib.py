@@ -1,7 +1,7 @@
 import jax
 import jax.numpy as np
 
-from bnpgmm_runjingdev.gmm_clustering_lib import get_optimal_z, get_e_log_determinant
+from bnpgmm_runjingdev.gmm_clustering_lib import get_optimal_z, _get_e_log_wishart_determinant
 
 import bnpmodeling_runjingdev.cluster_quantities_lib as cluster_lib
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
@@ -42,7 +42,7 @@ def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
     """
 
     # get global vb parameters
-    e_log_det, log_det = get_e_log_determinant(vb_params_dict['centroid_params'])
+    e_log_det, log_det = _get_e_log_wishart_determinant(vb_params_dict['centroid_params'])
 
     # compute optimal e_z from vb global parameters
     e_z, _ = \

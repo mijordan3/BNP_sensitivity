@@ -126,9 +126,9 @@ def get_default_prior_params(dim):
 
 
 ##################
-# Some useful moments
+# this is an expensive computation: we isolate this computation
 ##################
-def get_e_log_determinant(centroids_param_dict): 
+def _get_e_log_wishart_determinant(centroids_param_dict): 
     # expected log determinant of a matrix sampled
     # from a wishart 
     
@@ -148,7 +148,7 @@ def get_e_log_determinant(centroids_param_dict):
 # Expected prior term
 ##########################
 def get_e_log_prior(vb_params_dict,
-                    e_log_det, 
+                    e_log_wishart_det, 
                     prior_params_dict,
                     gh_loc, gh_weights):
     
@@ -180,11 +180,11 @@ def get_e_log_prior(vb_params_dict,
                         np.einsum('ki, kij, kj -> k', diff, prior_info, diff)
 
     # sum over k
-    term1 = 0.5 * (e_log_det + lambda_term + means_term).sum()
+    term1 = 0.5 * (e_log_wishart_det + lambda_term + means_term).sum()
     
     
     term2 = (prior_params_dict['prior_wishart_df'] - dim - 1)/2 * \
-                e_log_det.sum()
+                e_log_wishart_det.sum()
     
     tr_winv_scale = \
         np.einsum('ij, kji -> k',
@@ -199,7 +199,7 @@ def get_e_log_prior(vb_params_dict,
 ##########################
 # Entropy
 ##########################
-def get_entropy(vb_params_dict, e_log_det, log_det, e_z, gh_loc, gh_weights):
+def get_entropy(vb_params_dict, e_log_wishart_det, log_det, e_z, gh_loc, gh_weights):
     # get entropy term
 
     dim = vb_params_dict['centroid_params']['means'].shape[1]
@@ -214,14 +214,14 @@ def get_entropy(vb_params_dict, e_log_det, log_det, e_z, gh_loc, gh_weights):
     
     # normal entropy
     lambdas = vb_params_dict['centroid_params']['lambdas']
-    normal_entropy = (-0.5 * e_log_det - dim / 2 * np.log(lambdas)).sum()
+    normal_entropy = (-0.5 * e_log_wishart_det - dim / 2 * np.log(lambdas)).sum()
     
     # wishart entropy
     dfs = vb_params_dict['centroid_params']['wishart_df']
     wishart_entropy = log_det * dfs / 2 + \
                         dfs * dim / 2 * np.log(2) + \
                         sp.special.multigammaln(dfs / 2, dim) - \
-                        (dfs - dim - 1) / 2 * e_log_det + \
+                        (dfs - dim - 1) / 2 * e_log_wishart_det + \
                         dfs * dim / 2
     
     wishart_entropy = wishart_entropy.sum()
@@ -231,7 +231,7 @@ def get_entropy(vb_params_dict, e_log_det, log_det, e_z, gh_loc, gh_weights):
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, centroid_params_dict, e_log_det):
+def get_loglik_obs_by_nk(y, centroid_params_dict, e_log_wishart_det):
     # returns a n x k matrix whose nkth entry is
     # the likelihood for the nth observation
     # belonging to the kth cluster
@@ -261,21 +261,21 @@ def get_loglik_obs_by_nk(y, centroid_params_dict, e_log_det):
     squared_term = data2_term - 2 * cross_term + \
                     np.expand_dims(e_scale_mean_scale, axis = 0)
         
-    return - 0.5 * squared_term + 0.5 * np.expand_dims(e_log_det, 0)
+    return - 0.5 * squared_term + 0.5 * np.expand_dims(e_log_wishart_det, 0)
 
 ##########################
 # Optimization over e_z
 ##########################
 def get_z_nat_params(y,
                      vb_params_dict, 
-                     e_log_det, 
+                     e_log_wishart_det, 
                      gh_loc, gh_weights,
                      use_bnp_prior = True):
 
     # get likelihood term
     loglik_obs_by_nk = get_loglik_obs_by_nk(y,
                                             vb_params_dict['centroid_params'], 
-                                            e_log_det)
+                                            e_log_wishart_det)
 
     # get weight term
     stick_means = vb_params_dict['stick_params']['stick_means']
@@ -292,14 +292,14 @@ def get_z_nat_params(y,
 
     return z_nat_param
 
-def get_optimal_z(y, vb_params_dict, e_log_det, 
+def get_optimal_z(y, vb_params_dict, e_log_wishart_det, 
                     gh_loc, gh_weights,
                     use_bnp_prior = True):
 
     z_nat_param = \
         get_z_nat_params(y,
                          vb_params_dict,
-                         e_log_det,
+                         e_log_wishart_det,
                          gh_loc,
                          gh_weights,
                          use_bnp_prior)
@@ -353,13 +353,14 @@ def get_kl(y,
     """
 
     # an expensive moment: only compute once here
-    e_log_det, log_det = get_e_log_determinant(vb_params_dict['centroid_params'])
+    e_log_wishart_det, log_wishart_det = \
+        _get_e_log_wishart_determinant(vb_params_dict['centroid_params'])
 
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
             get_optimal_z(y,
                           vb_params_dict,
-                          e_log_det,
+                          e_log_wishart_det,
                           gh_loc,
                           gh_weights,
                           use_bnp_prior = use_bnp_prior)
@@ -369,12 +370,12 @@ def get_kl(y,
     e_loglik = np.sum(e_z * z_nat_param)
 
     # entropy term
-    entropy = get_entropy(vb_params_dict, e_log_det, log_det, 
+    entropy = get_entropy(vb_params_dict, e_log_wishart_det, log_wishart_det, 
                           e_z, gh_loc, gh_weights)
 
     # prior term
     e_log_prior = get_e_log_prior(vb_params_dict,
-                                  e_log_det,
+                                  e_log_wishart_det,
                                   prior_params_dict,
                                   gh_loc,
                                   gh_weights)
