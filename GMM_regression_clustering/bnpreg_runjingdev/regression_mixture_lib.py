@@ -4,8 +4,6 @@ import jax.scipy as sp
 
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
-import bnpgmm_runjingdev.gmm_clustering_lib as gmm_lib
-
 import paragami
 
 
@@ -31,14 +29,11 @@ def get_vb_params_paragami_object(dim, k_approx):
         A paragami patterned dictionary that contains the variational parameters.
     """
 
-    _, vb_params_paragami = \
-        gmm_lib.get_vb_params_paragami_object(dim, k_approx)
+    vb_params_paragami = paragami.PatternDict()
     
-    # don't need cluster infos's
-    # delete cluster params and add only centroids
-    vb_params_paragami.__delitem__('cluster_params')
-    
-    
+    # sticks
+    vb_params_paragami['stick_params'] = modeling_lib.get_stick_paragami_object(k_approx)
+
     # centroids
     vb_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(k_approx, dim))
@@ -119,14 +114,17 @@ def get_entropy(stick_means, stick_infos, e_z,
                 e_b, e_b2, 
                 gh_loc, gh_weights):
     
-    # this contains the stick and z entropys
-    entropy = gmm_lib.get_entropy(stick_means, stick_infos, e_z, 
-                                  gh_loc, gh_weights)
-
+    # entropy on memberships
+    z_entropy = modeling_lib.multinom_entropy(e_z)
+    
+    # entropy on sticks
+    stick_entropy = \
+        modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
+                                gh_loc, gh_weights)
     # add entropy on shifts 
     shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
     
-    return entropy + shift_entropy
+    return z_entropy + stick_entropy + shift_entropy
 
 ##########################
 # prior term 

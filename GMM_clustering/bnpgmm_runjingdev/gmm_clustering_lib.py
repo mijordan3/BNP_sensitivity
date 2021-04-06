@@ -55,11 +55,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     
     # BNP sticks
     # variational distribution for each stick is logitnormal
-    stick_params_paragami = paragami.PatternDict()
-    stick_params_paragami['stick_means'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,))
-    stick_params_paragami['stick_infos'] = \
-        paragami.NumericArrayPattern(shape = (k_approx - 1,), lb = 1e-4)
+    stick_params_paragami = modeling_lib.get_stick_paragami_object(k_approx)
 
     # add the vb_params
     vb_params_paragami['centroid_params'] = cluster_params_paragami
