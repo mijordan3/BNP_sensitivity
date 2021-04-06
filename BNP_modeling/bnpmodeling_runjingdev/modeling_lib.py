@@ -74,6 +74,20 @@ def univariate_normal_entropy(info_obs):
     # np.sum(sp.stats.norm.entropy(scale=np.sqrt(var_obs)))
     return 0.5 * np.sum(-1 * np.log(info_obs) + 1 + np.log(2 * np.pi))
 
+
+def multivariate_normal_entropy(infos): 
+    return - 0.5 * np.linalg.slogdet(infos)[1].sum()
+
+def gamma_entropy(alphas, betas): 
+    
+    # shape rate parameterization
+    
+    entropy = alphas - np.log(betas) + \
+            sp.special.gammaln(alphas) + \
+            (1 - alphas) * sp.special.digamma(alphas)
+    
+    return entropy.sum()
+
 def dirichlet_entropy(alpha):
         
     # dimension is (.... x k)

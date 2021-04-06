@@ -18,7 +18,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     Parameters
     ----------
     dim : int
-        Dimension of the datapoints.
+        Dimension of the regressors.
     k_approx : int
         Number of components in the model.
     Returns
@@ -38,8 +38,15 @@ def get_vb_params_paragami_object(dim, k_approx):
     vb_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(k_approx, dim))
     
+    vb_params_paragami['centroids_covar'] = \
+        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), 
+            base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+    
     # info of data 
-    vb_params_paragami['data_info'] = \
+    vb_params_paragami['info_alpha'] = \
+        paragami.NumericArrayPattern(shape=(1,), lb = 0.)
+    
+    vb_params_paragami['info_beta'] = \
         paragami.NumericArrayPattern(shape=(1,), lb = 0.)
 
     vb_params_dict = vb_params_paragami.random()
@@ -110,7 +117,7 @@ def get_shift_entropy(e_b, e_b2):
     
     return 0.5 * np.log(shift_var)
 
-def get_entropy(stick_means, stick_infos, e_z,
+def get_entropy(vb_params_dict, e_z,
                 e_b, e_b2, 
                 gh_loc, gh_weights):
     
@@ -121,10 +128,19 @@ def get_entropy(stick_means, stick_infos, e_z,
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
-    # add entropy on shifts 
+    # entropy on shifts 
     shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
     
-    return z_entropy + stick_entropy + shift_entropy
+    # entropy on data info 
+    info_entropy = modeling_lib.gamma_entropy(vb_params_dict['info_alpha'], 
+                                              vb_params_dict['info_beta'])
+    
+    # entropy on centroids
+    # negative here because the entropy function expects infos, not covariances
+    centroid_entropy = - modeling_lib.\
+        multivariate_normal_entropy(infos = vb_params_dict['centroids_covar'])
+    
+    return z_entropy + stick_entropy + shift_entropy + info_entropy + centroid_entropy
 
 ##########################
 # prior term 
@@ -132,8 +148,7 @@ def get_entropy(stick_means, stick_infos, e_z,
 def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
     return prior_info * (prior_mean * e_b - 0.5 * e_b2)
 
-def get_e_log_prior(stick_means, stick_infos, 
-                    data_info, centroids,
+def get_e_log_prior(vb_params_dict,
                     prior_params_dict,
                     gh_loc, gh_weights):
     
@@ -141,25 +156,34 @@ def get_e_log_prior(stick_means, stick_infos,
 
     # dp prior
     alpha = prior_params_dict['dp_prior_alpha']
-
+    stick_means = vb_params_dict['stick_params']['stick_means']
+    stick_infos = vb_params_dict['stick_params']['stick_infos']
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                               alpha, gh_loc, gh_weights)
 
     # centroid prior
+    # these prior parameters are just scalars, which makes things easier
     prior_mean = prior_params_dict['prior_centroid_mean']
     prior_info = prior_params_dict['prior_centroid_info']
-
-    e_centroid_prior = sp.stats.norm.logpdf(centroids, 
-                                            loc = prior_mean, 
-                                            scale = 1 / np.sqrt(prior_info)).sum()
+    
+    centroid_means = vb_params_dict['centroids']
+    centroid_covar = vb_params_dict['centroids_covar']
+    
+    e_centroid_prior = -0.5 * prior_info * (np.trace(centroid_covar).sum() + \
+                                            np.sum(centroid_means * centroid_means) - \
+                                            2 * np.sum(centroid_means * prior_mean))
         
     # prior on data info 
-    shape = prior_params_dict['prior_data_info_shape']
-    scale = prior_params_dict['prior_data_info_scale']
-    data_info_prior = sp.stats.gamma.logpdf(data_info, 
-                                            shape, 
-                                            scale = scale)
+    prior_shape = prior_params_dict['prior_data_info_shape']
+    prior_scale = prior_params_dict['prior_data_info_scale']
+    
+    e_log_info = sp.special.digamma(vb_params_dict['info_alpha']) - \
+                    np.log(vb_params_dict['info_beta'])
+    
+    e_info = vb_params_dict['info_alpha'] / np.log(vb_params_dict['info_beta'])
+   
+    data_info_prior = (prior_shape - 1) * e_log_info - e_info / prior_scale
 
     return dp_prior + e_centroid_prior + data_info_prior
     
