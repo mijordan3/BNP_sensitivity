@@ -57,12 +57,11 @@ Given this definition,
 %
 Again, for a fixed $\pa(\nuk)$ we can compute the needed derivatives.
 
-There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and
-so it can be useful to think of $\etaopt(\epsilon)$ as functional of the
-stick breaking prior, following CITE GUSTAFSON.  Let us fix $\pb(\nuk)$,
-define $\phi(\nuk) := \epsilon \log \left(\pa(\nuk) / \pb(\nuk)\right)$,
-and re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent
-form:
+There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and so it
+can be useful to think of $\etaopt(\epsilon)$ as functional of the stick
+breaking prior, following \citet{gustafson:1996:local}.  Let us fix $\pb(\nuk)$,
+define $\phi(\nuk) := \epsilon \log \left(\pa(\nuk) / \pb(\nuk)\right)$, and
+re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent form:
 %
 \begin{align}\eqlabel{phi_perturbation}
 %
@@ -75,7 +74,8 @@ form:
 The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
 well-defined for any Lebesgue-integrable function $\phi(\nuk):
 (0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
-denominator is positive and finite.  Define the norm
+denominator is positive and finite.
+Define the norm
 %
 \begin{align*}
 %
@@ -83,6 +83,11 @@ denominator is positive and finite.  Define the norm
 %
 \end{align*}
 %
+Under this norm, $\phi$ is a member of the Banach space $\linf$ equipped with
+the Borel sets and Lebesgue measure (e.g.,
+\citet[Section 2.1, Example 5]{luenberger:1997:optimization} and
+\citet[Theorem 5.2.1]{dudley:2018:real}).
+
 Note that
 %
 \begin{align*}
@@ -95,16 +100,14 @@ Note that
 \end{align*}
 %
 so that $\pstick(\nuk \vert \phi)$ is a valid distribution whenever
-$\norminf{\phi} < \infty$.  (As pointed out by GUSTAFSON, the
-converse is not true --- there exist valid distributions with infinte
+$\norminf{\phi} < \infty$.  (As pointed out by \citet{gustafson:1996:local}, the
+converse is not true---there exist valid distributions with infinte
 $\norminf{\phi}$.)
 
 Analogous to \eqref{kl_shorthand}, we can write $\etaopt(\phi) := \argmin_{\eta
 \in \etadom} \KL{\eta, \phi}$ for the optimal variational parameters when
 using the prior $\pstick(\nuk \vert \phi)$.  The optimum $\etaopt(\phi)$
 is thus a functional of $\phi$.
-
-TODO: prove that $\phi$ is in a Banach space.
 
 Observe that
 %
@@ -212,9 +215,8 @@ the influence function is given via \eqref{vb_g_sens} to be
 %
 \end{align*}
 %
-The influence funciton is a convenient summary of the effect of
-functional prior perturbations on a differnetiable summary statistic, as
-we will show below.
+The influence funciton is a convenient summary of the effect of functional prior
+perturbations on a differnetiable summary statistic, as we will show below.
 
 An additional benefit of the influence function is that it admits a closed-form
 expression for the ``worst-case'' perturbation in an $\norminf{\cdot}$ ball
@@ -236,9 +238,101 @@ In order for the supremum over a bounded set $\phi: \norminf{\phi} < \delta$
 to be meaningful, a minimal requirement is that the function $\etaopt(\phi)$
 be Fr{\'e}chet differentiable.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}
 %
-The map $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable.
+Assume that $\eta \mapsto \KL{\eta, \phiz}$ is twice continuously
+differentiable in a neighborhood of $\etaopt(\phiz)$, and that
+%
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \phiz}}
+                {\partial \eta \partial \eta^T}
+                {\eta}%
+\end{align*}
+%
+is positive definite in a neighborhood of $\etaopt(\phiz)$.
+
+Additionally, assume that, for each $\k$, and any bounded, Lebesgue-integrable
+function $f(\cdot)$, the map $\eta \mapsto \expect{\q(\nuk \vert \eta)}{f(\nuk)}$
+is continuously differentiable.
+
+Then the map $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable
+as a map from $\linf$ to $\mathbb{R}^\etadim$.
+%
+\begin{proof}
+%
+The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
+$\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
+take the L2 norm $\norm{\cdot}_2$ on the Euclidian spaces.  Let $\ball$ denote a
+ball in $\mathbb{R}^\etadim \times \linf$ centered at $(\etaopt(\phiz), \phiz)$.
+
+For the duration of the proof, define
+%
+\begin{align*}
+%
+\KLgrad{\eta, \psi} :={}&
+    \fracat{\partial \KL{\eta, \psi}}{\partial \eta}{\eta, \psi}\\
+\KLhess{\eta, \psi} :={}&
+    \fracat{\partial^2 \KL{\eta, \psi}}
+           {\partial \eta \partial \eta^T}{\eta, \psi}.
+%
+\end{align*}
+%
+The key to the proof will be showing that $\KL{\eta, \psi}$  and $\KLgrad{\eta,
+\psi}$ are continuously Fr{\'e}chet differentiable, and that $\KLhess{\eta,
+\psi}$ is positive definite in a ball centered at $\etaopt(\phiz), \phiz$.  The
+result will then follow from the implicit function theorem \citet[Theorem
+4.B(d)]{zeidler:2013:functional}.
+
+First, observe that
+%
+\begin{align*}
+%
+\KL{\eta, \phi} ={}&
+    \KL{\eta, \phiz} + \sumkm \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}.
+%
+\end{align*}
+%
+By assumption $\eta \mapsto \KL{\eta, \phiz}$ and $\eta \mapsto \KLgrad{\eta,
+\phiz}$ are continuously differentiable, so we need to show that, for all $\k$,
+$\eta, \phi \mapsto \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}$ is continuously
+differentiable at $\etaopt(\phiz), \phiz$.  Since $\norminf{\phi}$ is finite,
+$\phi(\nuk)$ is bounded, so $\eta \mapsto \expect{\q(\nuk \vert
+\eta)}{\phi(\nuk)}$ is continuously differentiable by assumption, and we
+need only show that the map $\psi \mapsto \expect{\q(\nuk \vert
+\eta)}{\phi(\nuk)}$ is continuously differentiable.
+
+For two functions $\phi_1$ and $\phi_2$,
+%
+\begin{align*}
+%
+\abs{\expect{\q(\nuk \vert \eta)}{\phi_1(\nuk)} -
+     \expect{\q(\nuk \vert \eta)}{\phi_2(\nuk)}}
+\le{}&
+\expect{\q(\nuk \vert \eta)}{\abs{\phi_1(\nuk) - \phi_2(\nuk)}}\\
+\le{}&
+\norminf{\phi_1(\nuk) - \phi_2(\nuk)},
+%
+\end{align*}
+%
+from which continunity follows.
+
+
+\noindent\rule{\textwidth}{1pt}
+
+OLD:
+
+Other references: We will use the
+formulation given in \citep[Theorem 3.4.10]{krantz:2012:implicit}, for which
+we must show that... actually that doesn't give differentiability.
+The result follows then from \citet[Proposition 4.8(c)]{zeidler:2013:functional}.
+See also \citet[Corollary 1.4]{averbukh:1967:theory} and \citep[Appendix
+A]{reeds:1976:thesis}).
+%
+\end{proof}
 %
 \end{thm}
-%m9
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -49,8 +49,10 @@
 \def\pstick{p_{\mathrm{stick}}}   % Stick breaking distribution
 \def\q{q}   % VB dist
 \def\logp{\ell}   % Log probabiltty
-\def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
+\def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
+\def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
+\def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
@@ -74,6 +76,8 @@
 \def\etadom{\Omega_{\eta}}
 \def\thetadom{\Omega_{\theta}}
 \def\tdom{\Omega_{\t}}
+\def\linf{{L_{\infty}[0,1]}}
+\def\ball{\mathcal{B}}
 
 % Annotations
 \def\mathtxt#1{\quad\textrm{#1}\quad}%
