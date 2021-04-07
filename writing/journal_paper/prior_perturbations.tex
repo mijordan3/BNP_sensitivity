@@ -242,19 +242,19 @@ be Fr{\'e}chet differentiable.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}
 %
-Define
-%
-\begin{align*}
-%
-\nabla \log \q(\nu \vert \etanuk) :={}&
-    \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk}
-    \mathtxt{and}
-\nabla^2 \log \q(\nu \vert \etanuk) :={}&
-    \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
-           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
-%
-\end{align*}
-%
+% Define
+% %
+% \begin{align*}
+% %
+% \nabla \log \q(\nu \vert \etanuk) :={}&
+%     \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk}
+%     \mathtxt{and}
+% \nabla^2 \log \q(\nu \vert \etanuk) :={}&
+%     \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
+%            {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+% %
+% \end{align*}
+% %
 Let the following assumptions hold for some neighborhood $\ball_\eta$
 of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
 %
@@ -414,61 +414,19 @@ Observe that the estimating equation can be written as
 \end{align*}
 
 Let us first show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable.  To show this, it will suffice to show that the partial
-deritatives of the maps $\eta \mapsto \KLgrad{\eta, \phi}$ and $\phi \mapsto
-\KLgrad{\eta, \phi}$ exist and are continuous as a function of $\eta, \phi$
-in the dual norm $\norm{\cdot}^*$.
+differentiable.  By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$
+is continuously differentiable and does not depend on $\phi$, so we need only to
+show that $\rho_\eta(\etanuk, \phi)$ is continuously Fr{\'e}chet differentiable.
+To show this, it will suffice to show that the partial deritatives of the maps
+$\eta \mapsto \rho_\eta{\eta, \phi}$ and $\phi \mapsto \rho_\eta{\eta, \phi}$
+exist and are continuous in the dual norm $\norm{\cdot}^*$ as a function of the
+location $\eta, \phi$ at which the derivatives are evaluated.
 
-By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$ is
-continuously differentiable and does not depend on $\phi$, so we need consider
-only $\rho_\eta(\etanuk, \phi)$.  By \assuref{q_dominated} and the boundedness
-of $\phi(\nu)$ we can apply the Lebesgue dominated convergence theorey to
-differentiate under the integral (see, e.g., \citet[Theorem
-1]{giordano:2018:covariances}):
-%
-\begin{align}\eqlabel{q_sens_is_cov}
-%
-\MoveEqLeft
-\fracat{\partial \expect{\q(\nu \vert \etanuk)}
-              {\phi(\nu)}}{\partial \eta}{\eta} ={}\\&
-\expect{\q(\nu \vert \etanuk)}
-       {\left(\nabla \log \q(\nu \vert \etanuk)
-         - \expect{\q(\nu \vert \etanuk)}
-                  {\nabla \log \q(\nu \vert \etanuk)}
-       \right)
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)}.
-       \nonumber
-%
-\end{align}
-%
-Again differentiating \eqref{q_sens_is_cov} using \citet[Theorem
-1]{giordano:2018:covariances} gives
-%
-\begin{align}\eqlabel{q_score_sens_is_cov}
-%
-\MoveEqLeft
-\fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
-              {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}\\&
-\expect{\q(\nu \vert \etanuk)}
-       {\left(\nabla \log \q(\nu \vert \etanuk)
-         - \expect{\q(\nu \vert \etanuk)}
-                  {\nabla \log \q(\nu \vert \etanuk)}
-       \right)^2
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
-\nonumber\\&
-\expect{\q(\nu \vert \etanuk)}{
-       \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
-        - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
-       \right)
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
-       }.
-    \nonumber
-%
-\end{align}
+We first show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.  To do so it
 
 
-We now show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
-differentiable. It follows from \eqref{q_sens_is_cov} that the map $\phi \mapsto
+It follows from \eqref{q_sens_is_cov} that the map $\phi \mapsto
 \rho_\eta(\etanuk, \phi)$ is a linear functional of $\phi$.  Applying Jensen's
 inequality to the $\norm{\cdot}_2$ norm and the triangle inequality twice gives:
 %
