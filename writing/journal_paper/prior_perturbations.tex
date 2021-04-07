@@ -242,37 +242,67 @@ be Fr{\'e}chet differentiable.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}
 %
-Assume that $\eta \mapsto \KL{\eta, \phiz}$ is twice continuously
-differentiable in a neighborhood of $\etaopt(\phiz)$, and that
+Define
 %
 \begin{align*}
 %
-\fracat{\partial^2 \KL{\eta, \phiz}}
+\nabla \log \q(\nu \vert \etanuk) :={}&
+    \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk}
+    \mathtxt{and}
+\nabla^2 \log \q(\nu \vert \etanuk) :={}&
+    \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
+           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+%
+\end{align*}
+%
+Let the following assumptions hold for some neighborhood $\ball_\eta$
+of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
+%
+\begin{assu}\assulabel{kl_diffable}
+    The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
+    continuously differentiable.
+\end{assu}
+%
+\begin{assu}\assulabel{kl_hess}
+    The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
+                    {\partial \eta \partial \eta^T}
+                    {\eta}$ is positive definite.
+\end{assu}
+%
+\begin{assu}\assulabel{log_q_score}
+%
+The maps $\eta \mapsto \expect{\q(\nu \vert \nuk)}{\norm{\nabla \log \q(\nu
+\vert \etanuk)}_2^2}$ and $\eta \mapsto \expect{\q(\nu \vert
+\nuk)}{\norm{\nabla^2 \log \q(\nu \vert \etanuk)}_2}$ are continuous.
+%
+\end{assu}
+%
+Then the map $\phi \mapsto \etaopt(\phi)$ is continuously Fr{\'e}chet
+differentiable as a map from $\linf$ to $\mathbb{R}^\etadim$.  Furthermore, the
+derivative in the direction $\phi - \phiz$ is of the form
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d\phi}{\phiz}\left( \phi - \phiz\right) ={}&
+    \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \\
+%
+\infl(\nu) :={}&
+-\left(\fracat{\partial^2 \KL{\eta, \phiz}}
                 {\partial \eta \partial \eta^T}
-                {\eta}%
-\end{align*}
-%
-is positive definite in a neighborhood of $\etaopt(\phiz)$.
-
-Additionally, assume that, for each $\k$, and any bounded, Lebesgue-integrable
-function $f(\cdot)$, the map $\eta \mapsto \expect{\q(\nuk \vert \eta)}{f(\nuk)}$
-is continuously differentiable.
-
-Also assume that $\expect{\q(\nu \vert \etanuk)}{\norm{\nabla \log \q(\nu \vert \etanuk)}_2}$
-is a continuous funciton of $\eta$.
-%
-\begin{align*}
-%
-\expect{\q(\nu \vert \etanuk)}{\abs{\nabla^2 \log \q(\nu \vert \etanuk)}} \le{} \infty,
+                {\etaopt}\right)^{-1}
+\left(
+    \sumkm
+    \q(\nu \vert \etaoptnuk)
+    \nabla \log \q(\nu \vert \etaoptnuk)
+\right).
 %
 \end{align*}
 %
-where the absolute value applies componentwise.  TODO: can these assumptions
-on $\q$ be unified?
 
-Then the map $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable
-as a map from $\linf$ to $\mathbb{R}^\etadim$.
 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{proof}
 %
 The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
@@ -403,83 +433,17 @@ $\KLhess{\etaopt(\phiz), \phiz}$ is invertible.  So we satisfy conditions (i),
 (ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
 the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
 continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
-\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etopt(\phi)$ is
+\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$ is
 also continuously Fr{\'e}chet differentiable.
 
-The directional
+The directional derivative
 
-
-
-
-\noindent\rule{\textwidth}{1pt}
-
-
-Since $\norminf{\phi}$ is finite, $\phi(\nu)$ is
-bounded, so $\eta \mapsto \expect{\q(\nu \vert \eta)}{\phi(\nu)}$ is
-continuously differentiable by assumption, and we need only show that the map
-$\phi \mapsto \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}$ is continuously
-differentiable.
-
-For two functions $\phi_1$ and $\phi_2$,
-%
-\begin{align*}
-%
-\abs{\expect{\q(\nu \vert \eta)}{\phi_1(\nu)} -
-     \expect{\q(\nu \vert \eta)}{\phi_2(\nu)}}
-\le{}&
-\expect{\q(\nu \vert \eta)}{\abs{\phi_1(\nu) - \phi_2(\nu)}}\\
-\le{}&
-\norminf{\phi_1(\nu) - \phi_2(\nu)},
-%
-\end{align*}
-%
-from which continunity follows.  But actually continuiuty could follow from
-continuous differentiability.
-
-Let $\dirderiv{\phi}{\Delta} f(\phi)$ denote the directional derivative of the functional
-$f(\cdot)$ in the direction $\Delta$ evaluated at $\phi$, i.e.,
-%
-\begin{align*}
-%
-\dirderiv{\phi}{\Delta} f(\phi) :={}
-\fracat{\partial f(\phi + \epsilon \Delta)}{d\epsilon}{\epsilon=0}.
-%
-\end{align*}
-%
-Thus $\dirderiv{\phi}{\Delta} \expect{\q(\nu \vert \eta)}{\phi(\eta)}$
-is given by
-%
-\begin{align*}
-%
-\dirderiv{\phi}{\Delta} \expect{\q(\nu \vert \eta)}{\phi(\eta)} ={}&
-    \expect{\q(\nu \vert \eta)}{\Delta(\eta)}.
-%
-\end{align*}
-%
-The linear map $\Delta \mapsto \dirderiv{\phi}{\Delta}$ is a bounded
-linear operator, since $\dirderiv{\phi}{\Delta} \le \norminf{\Delta}$.
-
-In fact, the whole thing is linear, which makes it all easy.
-
-Observe that
-%
-\begin{align*}
-%
-\fracat{\partial \expect{\q(\nu \vert \eta)}{\phi(\eta)}}{\partial \eta}{}
-%
-\end{align*}
-%
-
-
-
-OLD:
-
-Other references: We will use the
-formulation given in \citep[Theorem 3.4.10]{krantz:2012:implicit}, for which
-we must show that... actually that doesn't give differentiability.
-The result follows then from \citet[Proposition 4.8(c)]{zeidler:2013:functional}.
-See also \citet[Corollary 1.4]{averbukh:1967:theory} and \citep[Appendix
-A]{reeds:1976:thesis}).
+% Other references: We will use the
+% formulation given in \citep[Theorem 3.4.10]{krantz:2012:implicit}, for which
+% we must show that... actually that doesn't give differentiability.
+% The result follows then from \citet[Proposition 4.8(c)]{zeidler:2013:functional}.
+% See also \citet[Corollary 1.4]{averbukh:1967:theory} and \citep[Appendix
+% A]{reeds:1976:thesis}).
 %
 \end{proof}
 %
