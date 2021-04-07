@@ -16,20 +16,19 @@ import unittest
 # get data
 # TODO: replace this with simulated data
 bnp_data_repo = './../../../genomic_time_series_bnp' 
-y, _, _, timepoints = genomics_data_utils.load_genomics_data(bnp_data_repo)
+
+y, _, regressors, _, _, _ = \
+    genomics_data_utils.load_data_and_run_regressions(bnp_data_repo)
+
 n_genes = y.shape[0]
 
-# get regressors
-regressors = spline_bases_lib.get_genomics_spline_basis(timepoints,
-                                                    df=7, 
-                                                    degree=3)
-
 # vb parameters
-k_approx = 30
+k_approx = 40
 vb_params_dict, vb_params_paragami = \
     regression_mixture_lib.get_vb_params_paragami_object(dim = regressors.shape[1],
                                                          k_approx = k_approx)
 
+# print(vb_params_paragami)
 
 # Gauss-Hermite points for integrating logitnormal stick-breaking prior
 gh_deg = 8
@@ -82,13 +81,9 @@ class TestRegressionMixture(unittest.TestCase):
             e_b2 = local_params_dict['e_b2']
 
             # loglik
-            centroids = vb_params_dict['centroids']
-            data_info = vb_params_dict['data_info']
-
             loglik_obs = regression_mixture_lib.get_loglik_obs_by_nk(y, 
                                                                      regressors, 
-                                                                     centroids,
-                                                                     data_info,
+                                                                     vb_params_dict,
                                                                      e_b, 
                                                                      e_b2).sum()
 
@@ -139,33 +134,26 @@ class TestRegressionMixture(unittest.TestCase):
 
             e_z = jax.nn.softmax(ez_free, axis = 1)
 
-
-            # get other (aka global) vb parameters
-            stick_means = vb_params_dict['stick_params']['stick_means']
-            stick_infos = vb_params_dict['stick_params']['stick_infos']
-            centroids = vb_params_dict['centroids']
-            data_info = vb_params_dict['data_info']
-
             z_nat_param = \
-                    regression_mixture_lib.get_optimal_z(y, regressors, 
-                                  stick_means, stick_infos,
-                                  data_info, centroids,
-                                  e_b, e_b2, 
-                                  gh_loc, gh_weights, 
-                                  prior_params_dict)[1]
+                regression_mixture_lib.get_optimal_z(y, regressors, 
+                                                     vb_params_dict,
+                                                     e_b, e_b2, 
+                                                     gh_loc, gh_weights, 
+                                                     prior_params_dict)[1]
 
             e_loglik = np.sum(e_z * z_nat_param) 
 
             # entropy term
-            entropy = regression_mixture_lib.get_entropy(stick_means, stick_infos, e_z,
+            entropy = regression_mixture_lib.get_entropy(vb_params_dict,
+                                                         e_z,
                                                          e_b, e_b2, 
                                                          gh_loc, gh_weights)
 
             # prior term
-            e_log_prior = regression_mixture_lib.get_e_log_prior(stick_means, stick_infos, 
-                                            data_info, centroids,
-                                            prior_params_dict,
-                                            gh_loc, gh_weights)
+            e_log_prior = regression_mixture_lib.get_e_log_prior(vb_params_dict,
+                                                                 prior_params_dict,
+                                                                 gh_loc,
+                                                                 gh_weights)
 
             elbo = e_log_prior + entropy + e_loglik
 
@@ -174,7 +162,7 @@ class TestRegressionMixture(unittest.TestCase):
         
         local_params_free = local_params_paragami.flatten(local_params_dict, free = True)
         local_grad = jax.grad(get_local_kl)(local_params_free)
-
+        
         assert np.abs(local_grad).max() < 1e-6
     
     
