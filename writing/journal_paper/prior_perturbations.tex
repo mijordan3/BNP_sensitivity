@@ -341,7 +341,16 @@ The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
 $\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
 take the L2 norm $\norm{\cdot}_2$ on $\mathbb{R}^{\etadim}$ and $\mathbb{R}$.
 Let $\ball$ denote the ball $\ball_\eta \times \{ \phi: \norminf{\phi} <
-\delta\}$ for some $\delta > 0$.
+\delta\}$ for some $\delta > 0$.  Let $\linop$ denote a linear operator from
+$\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
+%
+\begin{align*}
+%
+\norm{\linop}^* :=
+    \sup_{\eta: \norm{\eta}_2 \le 1} \sup_{\phi: \norminf{\phi} \le 1}
+     \norm{\linop(\eta, \phi)}_2.
+%
+\end{align*}
 
 Recall that $\etaopt(\phi)$, if it exists, is defined as a solution to
 %
@@ -359,7 +368,6 @@ function theorem for Banach spaces. To use the implicit function theorem, we
 need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
 differentiable at $\etaopt(\phiz), \phiz$ and that $\KLhess{\eta, \phi}$ is
 positive definite in $\ball$.
-
 
 Let us define some compact notation for the duration of the proof.
 Let
@@ -381,72 +389,110 @@ Additionally, define $\rho(\etanuk, \phi) :={} \expect{\q(\nu \vert
 \begin{align*}
 %
 \rho_\eta(\etanuk, \phi) :={}
-    \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
-           {\partial \etanuk}{\etanuk} \mathand
+    % \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+    %        {\partial \etanuk}{\etanuk} \mathand
+\fracat{\partial \rho(\etanuk, \phi)}
+       {\partial \etanuk}{\etanuk} \mathand
 \rho_{\eta\eta}(\etanuk, \phi) :={}
-   \fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+   \fracat{\partial^2 \rho(\etanuk, \phi)}
           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
-%
 
-
-
-
-First, observe that the estimating equation can be written as
+Observe that the estimating equation can be written as
 %
 \begin{align*}
 %
-\KL{\eta, \phi} ={}&
-    \KL{\eta, \phiz} + \sumkm \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}
-    \Rightarrow \\
+% \KL{\eta, \phi} ={}&
+%     \KL{\eta, \phiz} + \sumkm \rho(\etanuk, \phi)
+%     \Rightarrow \\
 %
 \KLgrad{\eta, \phi} ={}&
-\KLgrad{\eta, \phiz} +
-    \sumkm \fracat{\partial \expect{\q(\nu \vert \etanuk)}
-                  {\phi(\nu)}}{\partial \eta}{\eta}
+\KLgrad{\eta, \phiz} + \sumkm \rho_\eta(\etanuk, \phi)
 = 0_\etadim.
 %
 \end{align*}
 
-By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$ is continuously
-differentiable and does not depend on $\phi$, so we need consider only the last
-term.  By \assuref{q_dominated} and the boundedness of $\phi(\nu)$ we can apply
-the Lebesgue dominated convergence theorey to differentiate under the integral
-(see, e.g., \citet[Theorem 1]{giordano:2018:covariances}):
+Let us first show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable.  To show this, it will suffice to show that the partial
+deritatives of the maps $\eta \mapsto \KLgrad{\eta, \phi}$ and $\phi \mapsto
+\KLgrad{\eta, \phi}$ exist and are continuous as a function of $\eta, \phi$
+in the dual norm $\norm{\cdot}^*$.
+
+By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$ is
+continuously differentiable and does not depend on $\phi$, so we need consider
+only $\rho_\eta(\etanuk, \phi)$.  By \assuref{q_dominated} and the boundedness
+of $\phi(\nu)$ we can apply the Lebesgue dominated convergence theorey to
+differentiate under the integral (see, e.g., \citet[Theorem
+1]{giordano:2018:covariances}):
 %
-\begin{align*}
+\begin{align}\eqlabel{q_sens_is_cov}
 %
+\MoveEqLeft
 \fracat{\partial \expect{\q(\nu \vert \etanuk)}
-              {\phi(\nu)}}{\partial \eta}{\eta} ={}&
+              {\phi(\nu)}}{\partial \eta}{\eta} ={}\\&
 \expect{\q(\nu \vert \etanuk)}
        {\left(\nabla \log \q(\nu \vert \etanuk)
          - \expect{\q(\nu \vert \etanuk)}
                   {\nabla \log \q(\nu \vert \etanuk)}
        \right)
        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)}.
+       \nonumber
 %
-\end{align*}
+\end{align}
 %
-It follows that the map $\phi \mapsto \fracat{\partial \expect{\q(\nu \vert
-\etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is a linear functional of
-$\phi$.  The dual norm is given by
+Again differentiating \eqref{q_sens_is_cov} using \citet[Theorem
+1]{giordano:2018:covariances} gives
+%
+\begin{align}\eqlabel{q_score_sens_is_cov}
+%
+\MoveEqLeft
+\fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
+              {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}\\&
+\expect{\q(\nu \vert \etanuk)}
+       {\left(\nabla \log \q(\nu \vert \etanuk)
+         - \expect{\q(\nu \vert \etanuk)}
+                  {\nabla \log \q(\nu \vert \etanuk)}
+       \right)^2
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
+\nonumber\\&
+\expect{\q(\nu \vert \etanuk)}{
+       \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
+        - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
+       \right)
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
+       }.
+    \nonumber
+%
+\end{align}
+
+
+We now show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable. It follows from \eqref{q_sens_is_cov} that the map $\phi \mapsto
+\rho_\eta(\etanuk, \phi)$ is a linear functional of $\phi$.  Applying Jensen's
+inequality to the $\norm{\cdot}_2$ norm and the triangle inequality twice gives:
 %
 \begin{align*}
 %
-\sup_{\phi: \norminf{\phi} = 1}
-    \norm{\fracat{\partial \expect{\q(\nu \vert
-    \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}}_2 \le
-    2 \expect{\q(\nu \vert \etanuk)}
+%\sup_{\phi: \norminf{\phi} = 1}
+\norm{\rho_\eta(\etanuk, \phi)}_2 \le
+    4 \expect{\q(\nu \vert \etanuk)}
              {\norm{\nabla \log \q(\nu \vert \etanuk)}_2}
               \norminf{\phi(\nu)}.
 %
 \end{align*}
 %
-so the linear operator is bounded as a function of $\phi$, and a continuous
-funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
-\expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
-continuously Fr{\'e}chet differentiable.
+It follows from \assuref{log_q_score} that $\rho_\eta(\etanuk, \phi)$ is bounded
+as a function of $\phi$ for all $\eta \in \ball_\eta$.  Bounded linear
+functionals are Fr{\'e}chet differentiable (essentially by definition), so $\phi
+\mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet differentiable.
+
+It remains to show that the derivative is continuous.
+
+% so the linear operator is bounded as a function of $\phi$, and a continuous
+% funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
+% \expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
+% continuously Fr{\'e}chet differentiable.
 
 Again differentiating under the integral,
 %
