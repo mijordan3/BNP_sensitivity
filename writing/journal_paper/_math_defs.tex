@@ -56,8 +56,8 @@
 \def\logp{\ell}   % Log probabiltty
 \def\lqgrad#1{{\nabla \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
-\def\lqgradbar#1{\overline{\lqgrad{#1}}\,}   % Log VB distribution gradient centered
-\def\lqhessbar#1{\overline{\lqhess{#1}}\,}   % Log VB distribution Hessian centered
+\def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
+\def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
 \def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
@@ -91,6 +91,6 @@
 
 % Annotations
 \def\mathtxt#1{\quad\textrm{#1}\quad}%
-\def\mathand{\quad\quad\textrm{and}\quad\quad}%
-\def\mathwhere{\quad\quad\textrm{where}\quad\quad}%
+\def\mathand{\quad\textrm{and}\quad}%
+\def\mathwhere{\quad\textrm{where}\quad}%
 \def\constdesc#1{\textrm{(}\const\textrm{ does not depend on }#1\textrm{)}}

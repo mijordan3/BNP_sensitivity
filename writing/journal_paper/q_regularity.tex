@@ -31,9 +31,10 @@ and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
 bounded by $M(\zeta)$ uniformly in $\zeta$.
 %
 \item We say that $\q(\zeta \vert \eta)$ is regular for a function $\psi(\zeta):
-\mathbb{R}^\zetadim \mapsto \mathbb{R}$ if $\q(\zeta \vert \eta) \abs{\psi(\zeta)}$
-and $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \abs{\psi(\zeta)}$ are
-also bounded by $M(\zeta)$ uniformly in $\zeta$.
+\mathbb{R}^\zetadim \mapsto \mathbb{R}$ if $\q(\zeta \vert \eta)
+\abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
+\eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by $M(\zeta)$ uniformly in
+$\zeta$.
 %
 \end{itemize}
 %
@@ -44,6 +45,9 @@ also bounded by $M(\zeta)$ uniformly in $\zeta$.
 %
 When \assuref{q_regular} holds, we have the following results.
 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{lem}\lemlabel{logq_derivs}
 %
 Define
@@ -53,7 +57,9 @@ Define
 \lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
   - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
 \lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
- - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}}.
+ - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}} \\
+\overline{\psi(\zeta)} :={}& \psi(\zeta)
+ - \expect{\q(\zeta \vert \eta)}{\psi(\zeta)}.
 %
 \end{align*}
 %
@@ -66,8 +72,7 @@ of expectations.
 \fracat{\partial \expect{\q(\zeta \vert \eta)}
               {\psi(\zeta)}}{\partial \eta}{\eta} ={}&
 \expect{\q(\zeta \vert \eta)}
-       {\lqgradbar{\zeta \vert \eta}
-       \left( \psi(\zeta) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \right)}.
+       {\lqgradbar{\zeta \vert \eta} \overline{\psi(\zeta)}}.
 %
 \end{align}
 %
@@ -81,13 +86,66 @@ gives
               {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta} ={}&
 \expect{\q(\zeta \vert \eta)}
        {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
-       \left( \psi(\zeta) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \right)} +
+        \overline{\psi(\zeta)} } +
 \nonumber\\&
 \expect{\q(\zeta \vert \eta)}{
        \lqhessbar{\zeta \vert \eta}
-       \left( \psi(\zeta) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \right)
+        \overline{\psi(\zeta)}
        }.
 %
 \end{align}
 %
 \end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}
+%
+Under \assuref{q_regular}, the following are continuous functions of
+$\eta$ in $\ball_\eta$:
+%
+\begin{align*}
+%
+\eta \mapsto{}& \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \mathand
+%
+\eta \mapsto{}&
+    \fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta)}}{\partial \eta}{\eta} \mathand
+\eta \mapsto{}&
+    \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+                  {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta}.
+%
+\end{align*}
+%
+\begin{proof}
+%
+By \assuref{q_regular}, $\q(\zeta \vert \eta) \psi(\zeta) < M(\zeta)$, so we can
+apply continuity of $\eta \mapsto \q(\zeta \vert \eta)$ and the Lebesgue dominated
+convergence theorem (CITE DUDLEY) to get
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta}
+\abs{ \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} -
+      \expect{\q(\zeta \vert \eta')}{\psi(\zeta)}} \le{}&
+\lim_{\eta' \rightarrow \eta}
+\int \abs{\psi(\zeta)}
+        \abs{\q(\zeta \vert \eta) -
+             \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}&
+\int \abs{\psi(\zeta)}
+    \lim_{\eta' \rightarrow \eta}
+     \abs{\q(\zeta \vert \eta) -
+          \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}& 0.
+%
+\end{align*}
+%
+Applying analogous reasoning to \eqref{q_sens_is_cov, q_score_sens_is_cov}
+gives the remainig results.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
