@@ -346,7 +346,8 @@ last term.  But by differentiating under the integral,
        {\left(\nabla \log \q(\nu \vert \etanuk)
          - \expect{\q(\nu \vert \etanuk)}
                   {\nabla \log \q(\nu \vert \etanuk)}
-       \right)\phi(\nu)}.
+       \right)
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)}.
 %
 \end{align*}
 %
@@ -368,7 +369,7 @@ $\phi$.  The dual norm is given by
 so the linear operator is bounded as a function of $\phi$, and a continuous
 funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
 \expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
-continuously Frechet differentiable.
+continuously Fr{\'e}chet differentiable.
 
 Again differentiating under the integral,
 %
@@ -383,14 +384,32 @@ Again differentiating under the integral,
        \right)^2
        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
 \\&
-\expect{\q(\nu \vert \etanuk)}
-       {\nabla^2 \log \q(\nu \vert \etanuk)
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)}.
+\expect{\q(\nu \vert \etanuk)}{
+       \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
+        - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
+       \right)
+       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
+       }.
 %
 \end{align*}
 %
-Again this is a linear operator as a function of $\phi$ and bounded by
+Again this is a linear operator as a function of $\phi$, which is continuous by
 assumption.  Consequently the Hessian is invertible in a neighborhood.
+
+It follows by \citet[Proposition 4.14(c)]{zeidler:2013:functional} that
+$\KLgrad{\eta, \phi}$ is continuosly Fr{\'e}chet differentiable.  Furthermore,
+\citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
+$\KLhess{\etaopt(\phiz), \phiz}$ is invertible.  So we satisfy conditions (i),
+(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
+the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
+continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
+\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etopt(\phi)$ is
+also continuously Fr{\'e}chet differentiable.
+
+The directional
+
+
+
 
 \noindent\rule{\textwidth}{1pt}
 
