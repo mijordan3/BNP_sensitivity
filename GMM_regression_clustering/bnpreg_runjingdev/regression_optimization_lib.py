@@ -44,48 +44,7 @@ def set_params_w_kmeans(y, regressors,
     vb_params_dict['centroids'], _ = \
         init_centroids_w_kmeans(beta, k_approx, 
                                 n_kmeans_init = 10, 
-                                seed = seed)
-
-#     # intialize shifts
-#     _data_info = 100. # set to be large to weight the data more than the prior in the init
-#     e_b_init, e_b2_init = \
-#         regression_mixture_lib.get_optimal_shifts(y, regressors,
-#                                                   vb_params_dict['centroids'],
-#                                                   _data_info,
-#                                                   prior_params_dict)
-    
-#     # intialize ez -- disregard prior
-#     loglik_nk = regression_mixture_lib.get_loglik_obs_by_nk(y, 
-#                                                             regressors,
-#                                                             vb_params_dict['centroids'], 
-#                                                             _data_info,
-#                                                             e_b_init, e_b2_init)
-#     ez_init = jax.nn.softmax(loglik_nk, axis = 1)
-    
-#     # sort z's from largest to smallest
-#     perm = np.argsort(-ez_init.sum(0))
-#     ez_init = ez_init[:, perm]
-#     vb_params_dict['centroids'] = vb_params_dict['centroids'][perm]    
-
-#     # initialize sticks
-#     print('initializing sticks ...')
-#     stick_beta1, stick_beta2 = update_stick_beta_params(ez_init, prior_params_dict['dp_prior_alpha'])
-#     beta_params = np.stack((stick_beta1, stick_beta2), axis = -1)
-    
-#     vb_params_dict['stick_params'] = convert_beta_sticks_to_logitnormal(beta_params, 
-#                                                                         vb_params_dict['stick_params'],
-#                                                                         vb_params_paragami['stick_params'], 
-#                                                                         gh_loc, gh_weights)[0]
-    
-#     # initialze at prior mean
-#     vb_params_dict['data_info'] = \
-#         prior_params_dict['prior_data_info_scale'] * \
-#         prior_params_dict['prior_data_info_shape']
-    
-#     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
-#     vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
-#     vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)
-    
+                                seed = seed)        
     return vb_params_dict
 
 
