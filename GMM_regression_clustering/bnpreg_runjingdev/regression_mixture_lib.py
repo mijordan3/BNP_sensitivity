@@ -38,9 +38,9 @@ def get_vb_params_paragami_object(dim, k_approx):
     vb_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(k_approx, dim))
     
-    vb_params_paragami['centroids_covar'] = \
-        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), 
-            base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
+    vb_params_paragami['centroids_var'] = \
+        paragami.NumericArrayPattern(shape = (k_approx, dim), 
+                                     lb = 0.)
     
     # info of data 
     vb_params_paragami['info_alpha'] = \
@@ -142,7 +142,7 @@ def get_entropy(vb_params_dict, e_z,
     # entropy on centroids
     # negative here because the entropy function expects infos, not covariances
     centroid_entropy = - modeling_lib.\
-        multivariate_normal_entropy(infos = vb_params_dict['centroids_covar'])
+        univariate_normal_entropy(vb_params_dict['centroids_var'])
     
     return z_entropy + stick_entropy + shift_entropy + info_entropy + centroid_entropy
 
@@ -156,7 +156,7 @@ def _get_gamma_moments(info_alpha, info_beta):
                     np.log(info_beta)
     
     e_info = info_alpha / info_beta
-    
+        
     return e_info, e_log_info
 
 def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
@@ -182,10 +182,10 @@ def get_e_log_prior(vb_params_dict,
     prior_info = prior_params_dict['prior_centroid_info']
     
     centroid_means = vb_params_dict['centroids']
-    centroid_covar = vb_params_dict['centroids_covar']
+    centroid_vars = vb_params_dict['centroids_var']
     
-    e_centroid_prior = -0.5 * prior_info * (np.einsum('kii -> k', centroid_covar).sum() + \
-                                            np.sum(centroid_means * centroid_means) - \
+    e_centroid_prior = -0.5 * prior_info * (np.sum(centroid_vars).sum() + \
+                                            np.sum(centroid_means ** 2) - \
                                             2 * np.sum(centroid_means * prior_mean))
         
     # prior on data info 
@@ -216,7 +216,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
                            vb_params_dict['info_beta'])
     
     centroids = vb_params_dict['centroids']
-    centroids_covar = vb_params_dict['centroids_covar']
+    centroids_var = vb_params_dict['centroids_var']
 
     # y is (obs x time points) = (n x t)
     # x is (time points x basis vectors) = (t x b)
@@ -241,7 +241,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
     #           2 * b_n * beta_k^T x +
     #           b_n^2]
     e_xbeta2 = np.sum(x_times_beta ** 2, axis=0) + \
-                np.einsum('ni, kij, nj -> k', x, centroids_covar, x)
+                np.einsum('ti, ki, ti -> k', x, centroids_var, x)
         
     quad_term = np.expand_dims(e_xbeta2, axis = 0) + \
                 2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
@@ -261,7 +261,8 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
 def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict): 
     
     centroids = vb_params_dict['centroids']
-    e_data_info = vb_params_dict['info_alpha'] / vb_params_dict['info_beta']
+    e_data_info = _get_gamma_moments(vb_params_dict['info_alpha'],
+                                     vb_params_dict['info_beta'])[0]
     
     num_time_points = x.shape[0]
 
