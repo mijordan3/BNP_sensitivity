@@ -27,7 +27,7 @@ In this case,
 %
 We can thus numerically compute the needed derivatives.
 
-To consider more general prior perturbations, fix for the mometn a base stick
+To consider more general prior perturbations, fix for the moment a base stick
 distribution, $\pb(\nuk)$ and an alternative stick distribution
 $\pa(\nuk)$.  Take $\t = \epsilon$ and define
 %
@@ -240,78 +240,42 @@ be Fr{\'e}chet differentiable.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}
+\begin{assu}\assulabel{kl_opt_ok}
 %
-% Define
-% %
-% \begin{align*}
-% %
-% \nabla \log \q(\nu \vert \etanuk) :={}&
-%     \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk}
-%     \mathtxt{and}
-% \nabla^2 \log \q(\nu \vert \etanuk) :={}&
-%     \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
-%            {\partial \etanuk \partial \etanuk^T}{\etanuk}.
-% %
-% \end{align*}
-% %
 Let the following assumptions hold for some neighborhood $\ball_\eta$
 of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_diffable}
+\begin{enumerate}
+%
+    \item \itemlabel{kl_diffable}
     The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
     continuously differentiable.
-\end{assu}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_hess}
+\item\itemlabel{kl_hess}
     The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
                     {\partial \eta \partial \eta^T}
-                    {\eta}$ is positive definite.
-\end{assu}
-%
+                    {\eta}$ is positive definite.%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_dominated}
+\item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+\vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
+with $\eta_0 = \etaopt(\phiz)$.
 %
-There exists dominating functions $M_1(\nu)$ and $M_2(\nu)$ on $[0,1]$, each
-with finite Lebesgue measure, such that
-%
-\begin{align*}
-%
-\q(\nu \vert \etanuk) \le M_1(\nu)
-\mathand
-\q(\nu \vert \etanuk) \abs{\nabla \log \q(\nu \vert \etanuk)} \le M_2(\nu),
-%
-\end{align*}
-%
-where the absolute value applies componentwise.
-%
-\end{assu}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{log_q_score}
-%
-The maps
-%
-\begin{align*}
-%
-\etanuk \mapsto{}& \expect{\q(\nu \vert \nuk)}{\norm{\nabla \log \q(\nu
-\vert \etanuk)}_2^2} \mathtxt{and}\\
-\etanuk \mapsto{}& \expect{\q(\nu \vert
-\nuk)}{\norm{\nabla^2 \log \q(\nu \vert \etanuk)}_2}
-%
-\end{align*}
-%
-are continuous.
-%
-\end{assu}
+\end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-Then the map $\phi \mapsto \etaopt(\phi)$ is well-defined and continuously
-Fr{\'e}chet differentiable in a neighborhood of $\phiz$ as a map from $\linf$ to
-$\mathbb{R}^\etadim$. Furthermore, the derivative in the direction $\phi -
-\phiz$ is of the form
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}
+%
+Let \assuref{kl_opt_ok} hold. Then the map $\phi \mapsto \etaopt(\phi)$ is
+well-defined and continuously Fr{\'e}chet differentiable in a neighborhood of
+$\phiz$ as a map from $\linf$ to $\mathbb{R}^\etadim$. Furthermore, the
+derivative in the direction $\phi - \phiz$ is of the formfassuref
 %
 \begin{align*}
 %
@@ -414,13 +378,14 @@ Observe that the estimating equation can be written as
 \end{align*}
 
 Let us first show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable.  By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$
-is continuously differentiable and does not depend on $\phi$, so we need only to
-show that $\rho_\eta(\etanuk, \phi)$ is continuously Fr{\'e}chet differentiable.
-To show this, it will suffice to show that the partial deritatives of the maps
-$\eta \mapsto \rho_\eta{\eta, \phi}$ and $\phi \mapsto \rho_\eta{\eta, \phi}$
-exist and are continuous in the dual norm $\norm{\cdot}^*$ as a function of the
-location $\eta, \phi$ at which the derivatives are evaluated.
+differentiable.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\eta \mapsto
+\KLgrad{\eta, \phiz}$ is continuously differentiable and does not depend on
+$\phi$, so we need only to show that $\rho_\eta(\etanuk, \phi)$ is continuously
+Fr{\'e}chet differentiable. To show this, it will suffice to show that the
+partial deritatives of the maps $\eta \mapsto \rho_\eta{\eta, \phi}$ and $\phi
+\mapsto \rho_\eta{\eta, \phi}$ exist and are continuous in the dual norm
+$\norm{\cdot}^*$ as a function of the location $\eta, \phi$ at which the
+derivatives are evaluated.
 
 We first show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
 differentiable.  To do so it
@@ -440,10 +405,11 @@ inequality to the $\norm{\cdot}_2$ norm and the triangle inequality twice gives:
 %
 \end{align*}
 %
-It follows from \assuref{log_q_score} that $\rho_\eta(\etanuk, \phi)$ is bounded
-as a function of $\phi$ for all $\eta \in \ball_\eta$.  Bounded linear
-functionals are Fr{\'e}chet differentiable (essentially by definition), so $\phi
-\mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet differentiable.
+It follows from ... that $\rho_\eta(\etanuk,
+\phi)$ is bounded as a function of $\phi$ for all $\eta \in \ball_\eta$.
+Bounded linear functionals are Fr{\'e}chet differentiable (essentially by
+definition), so $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.
 
 It remains to show that the derivative is continuous.
 
@@ -451,29 +417,29 @@ It remains to show that the derivative is continuous.
 % funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
 % \expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
 % continuously Fr{\'e}chet differentiable.
-
-Again differentiating under the integral,
 %
-\begin{align*}
-%
-\fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
-              {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}&
-\expect{\q(\nu \vert \etanuk)}
-       {\left(\nabla \log \q(\nu \vert \etanuk)
-         - \expect{\q(\nu \vert \etanuk)}
-                  {\nabla \log \q(\nu \vert \etanuk)}
-       \right)^2
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
-\\&
-\expect{\q(\nu \vert \etanuk)}{
-       \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
-        - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
-       \right)
-       \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
-       }.
-%
-\end{align*}
-%
+% Again differentiating under the integral,
+% %
+% \begin{align*}
+% %
+% \fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
+%               {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}&
+% \expect{\q(\nu \vert \etanuk)}
+%        {\left(\nabla \log \q(\nu \vert \etanuk)
+%          - \expect{\q(\nu \vert \etanuk)}
+%                   {\nabla \log \q(\nu \vert \etanuk)}
+%        \right)^2
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
+% \\&
+% \expect{\q(\nu \vert \etanuk)}{
+%        \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
+%         - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
+%        \right)
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
+%        }.
+% %
+% \end{align*}
+% %
 Again this is a linear operator as a function of $\phi$, which is continuous by
 assumption.  Consequently the Hessian is invertible in a neighborhood.
 
