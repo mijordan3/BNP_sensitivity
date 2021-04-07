@@ -82,11 +82,11 @@ def gamma_entropy(alphas, betas):
     
     # shape rate parameterization
     
-    entropy = alphas - np.log(betas) + \
+    alpha_term = alphas + \
             sp.special.gammaln(alphas) + \
             (1 - alphas) * sp.special.digamma(alphas)
     
-    return entropy.sum()
+    return (alpha_term - np.log(betas)).sum()
 
 def dirichlet_entropy(alpha):
         
@@ -212,3 +212,10 @@ def get_e_log_dirichlet(tau):
     digamma_sum = sp.special.digamma(np.sum(tau, axis = -1, keepdims=True))
 
     return sp.special.digamma(tau) - digamma_sum
+
+def get_e_gamma(alpha, beta): 
+    return alpha / beta
+
+def get_e_log_gamma(alpha, beta): 
+    return sp.special.digamma(alpha) - \
+                    np.log(beta)

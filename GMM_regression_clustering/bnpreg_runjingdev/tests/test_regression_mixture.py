@@ -114,7 +114,10 @@ class TestRegressionMixture(unittest.TestCase):
         
         # set optimal shifts and z's
         _, ez_free, e_b, e_b2 = \
-            get_optimal_local_params_from_vb_dict(y, regressors, vb_params_dict, prior_params_dict, 
+            get_optimal_local_params_from_vb_dict(y,
+                                                  regressors,
+                                                  vb_params_dict,
+                                                  prior_params_dict, 
                                                   gh_loc, gh_weights)
         
         
