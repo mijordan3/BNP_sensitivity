@@ -258,28 +258,60 @@ Define
 Let the following assumptions hold for some neighborhood $\ball_\eta$
 of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_diffable}
     The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
     continuously differentiable.
 \end{assu}
 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_hess}
     The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
                     {\partial \eta \partial \eta^T}
                     {\eta}$ is positive definite.
 \end{assu}
 %
-\begin{assu}\assulabel{log_q_score}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_dominated}
 %
-The maps $\eta \mapsto \expect{\q(\nu \vert \nuk)}{\norm{\nabla \log \q(\nu
-\vert \etanuk)}_2^2}$ and $\eta \mapsto \expect{\q(\nu \vert
-\nuk)}{\norm{\nabla^2 \log \q(\nu \vert \etanuk)}_2}$ are continuous.
+There exists dominating functions $M_1(\nu)$ and $M_2(\nu)$ on $[0,1]$, each
+with finite Lebesgue measure, such that
+%
+\begin{align*}
+%
+\q(\nu \vert \etanuk) \le M_1(\nu)
+\mathand
+\q(\nu \vert \etanuk) \abs{\nabla \log \q(\nu \vert \etanuk)} \le M_2(\nu),
+%
+\end{align*}
+%
+where the absolute value applies componentwise.
 %
 \end{assu}
 %
-Then the map $\phi \mapsto \etaopt(\phi)$ is continuously Fr{\'e}chet
-differentiable as a map from $\linf$ to $\mathbb{R}^\etadim$.  Furthermore, the
-derivative in the direction $\phi - \phiz$ is of the form
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{log_q_score}
+%
+The maps
+%
+\begin{align*}
+%
+\etanuk \mapsto{}& \expect{\q(\nu \vert \nuk)}{\norm{\nabla \log \q(\nu
+\vert \etanuk)}_2^2} \mathtxt{and}\\
+\etanuk \mapsto{}& \expect{\q(\nu \vert
+\nuk)}{\norm{\nabla^2 \log \q(\nu \vert \etanuk)}_2}
+%
+\end{align*}
+%
+are continuous.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+Then the map $\phi \mapsto \etaopt(\phi)$ is well-defined and continuously
+Fr{\'e}chet differentiable in a neighborhood of $\phiz$ as a map from $\linf$ to
+$\mathbb{R}^\etadim$. Furthermore, the derivative in the direction $\phi -
+\phiz$ is of the form
 %
 \begin{align*}
 %
@@ -307,34 +339,59 @@ derivative in the direction $\phi - \phiz$ is of the form
 %
 The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
 $\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
-take the L2 norm $\norm{\cdot}_2$ on the Euclidian spaces.  Let $\ball$ denote a
-ball in $\mathbb{R}^\etadim \times \linf$ centered at $(\etaopt(\phiz), \phiz)$.
+take the L2 norm $\norm{\cdot}_2$ on $\mathbb{R}^{\etadim}$ and $\mathbb{R}$.
+Let $\ball$ denote the ball $\ball_\eta \times \{ \phi: \norminf{\phi} <
+\delta\}$ for some $\delta > 0$.
 
-For the duration of the proof, define
+Recall that $\etaopt(\phi)$, if it exists, is defined as a solution to
+%
+\begin{align*}
+%
+\fracat{\partial \KL{\eta, \phi}}
+                {\partial \eta}
+                {\etaopt(\phi)} = 0_\etadim.
+%\KLgrad{\etaopt(\phi), \phi} ={}& 0_\etadim.
+%
+\end{align*}
+%
+Using this estimating equation, the key to the proof will be the implicit
+function theorem for Banach spaces. To use the implicit function theorem, we
+need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable at $\etaopt(\phiz), \phiz$ and that $\KLhess{\eta, \phi}$ is
+positive definite in $\ball$.
+
+
+Let us define some compact notation for the duration of the proof.
+Let
 %
 \begin{align*}
 %
 \KLgrad{\eta, \phi} :={}&
-    \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}\\
+    \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
+\mathtxt{and}
 \KLhess{\eta, \phi} :={}&
     \fracat{\partial^2 \KL{\eta, \phi}}
            {\partial \eta \partial \eta^T}{\eta, \phi}.
 %
 \end{align*}
 %
-Recall that $\etaopt(\phi)$ is defined as a solution to
+Additionally, define $\rho(\etanuk, \phi) :={} \expect{\q(\nu \vert
+\etanuk)}{\phi(\nu)}$, with
 %
 \begin{align*}
 %
-\KLgrad{\eta, \phi} ={}& 0_\etadim.
+\rho_\eta(\etanuk, \phi) :={}
+    \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+           {\partial \etanuk}{\etanuk} \mathand
+\rho_{\eta\eta}(\etanuk, \phi) :={}
+   \fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+          {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
 %
-The key to the proof will be the implicit function theorem in Banach spaces
-\citet[Theorem 4.B(d)]{zeidler:2013:functional}. To use the implicit function
-theorem, we need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable, and that $\KLhess{\eta, \phi}$ is continuous in $\phi$ and so
-positive definite in a ball centered at $\etaopt(\phiz), \phiz$.
+
+
+
 
 First, observe that the estimating equation can be written as
 %
@@ -351,22 +408,12 @@ First, observe that the estimating equation can be written as
 = 0_\etadim.
 %
 \end{align*}
-%
-Additionally define
-%
-\begin{align*}
-%
-\nabla \log \q(\nu \vert \etanuk) :={}&
-    \fracat{\partial \log \q(\nu \vert \etanuk)}{\partial \etanuk}{\etanuk} \\
-\nabla^2 \log \q(\nu \vert \etanuk) :={}&
-    \fracat{\partial^2 \log \q(\nu \vert \etanuk)}
-           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
-%
-\end{align*}
 
-By assumption, $\eta \mapsto \KLgrad{\eta, \phiz}$ is continuously
-differentiable and does not depend on $\phi$, so we need consider only the
-last term.  But by differentiating under the integral,
+By \assuref{kl_diffable}, $\eta \mapsto \KLgrad{\eta, \phiz}$ is continuously
+differentiable and does not depend on $\phi$, so we need consider only the last
+term.  By \assuref{q_dominated} and the boundedness of $\phi(\nu)$ we can apply
+the Lebesgue dominated convergence theorey to differentiate under the integral
+(see, e.g., \citet[Theorem 1]{giordano:2018:covariances}):
 %
 \begin{align*}
 %
