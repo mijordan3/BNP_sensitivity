@@ -98,11 +98,11 @@ def get_default_prior_params():
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
     # gamma prior on data info
-    prior_params_dict['prior_data_info_shape'] = np.array([1.])
+    prior_params_dict['prior_data_info_shape'] = np.array([10.])
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_scale'] = np.array([0.0001])
+    prior_params_dict['prior_data_info_scale'] = np.array([0.1])
     prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
@@ -116,7 +116,7 @@ def get_shift_entropy(e_b, e_b2):
     
     shift_var = e_b2 - e_b**2
     
-    return 0.5 * np.log(shift_var)
+    return 0.5 * (np.log(shift_var) + np.log(2 * np.pi) + 1)
 
 def get_entropy(vb_params_dict, e_z,
                 e_b, e_b2, 
@@ -155,7 +155,7 @@ def _get_gamma_moments(info_alpha, info_beta):
     e_log_info = sp.special.digamma(info_alpha) - \
                     np.log(info_beta)
     
-    e_info = info_alpha / np.log(info_beta)
+    e_info = info_alpha / info_beta
     
     return e_info, e_log_info
 
@@ -255,7 +255,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
     log_info_term = \
         0.5 * e_log_info * \
         num_time_points
-    
+        
     return  square_term + log_info_term
 
 def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict): 
@@ -388,7 +388,7 @@ def get_kl(y, x,
         e_z = e_z_opt
     
     e_loglik = np.sum(e_z * z_nat_param) 
-
+    
     # entropy term
     entropy = get_entropy(vb_params_dict, e_z,
                           e_b, e_b2, 

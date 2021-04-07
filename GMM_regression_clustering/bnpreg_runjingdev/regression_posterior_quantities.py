@@ -14,20 +14,14 @@ from bnpreg_runjingdev import regression_mixture_lib
 def get_optimal_local_params_from_vb_dict(y, x, vb_params_dict, prior_params_dict, 
                                           gh_loc, gh_weights): 
     
-    # get vb parameters
-    stick_means = vb_params_dict['stick_params']['stick_means']
-    stick_infos = vb_params_dict['stick_params']['stick_infos']
-    centroids = vb_params_dict['centroids']
-    data_info = vb_params_dict['data_info']
-    
+
     # optimal shifts
-    e_b, e_b2 = regression_mixture_lib.get_optimal_shifts(y, x, centroids, data_info, prior_params_dict)
+    e_b, e_b2 = regression_mixture_lib.get_optimal_shifts(y, x, vb_params_dict, prior_params_dict)
 
     # optimal z's
     ez, ez_free = \
         regression_mixture_lib.get_optimal_z(y, x, 
-                                             stick_means, stick_infos,
-                                             data_info, centroids,
+                                             vb_params_dict,
                                              e_b, e_b2, 
                                              gh_loc, gh_weights, 
                                              prior_params_dict)
