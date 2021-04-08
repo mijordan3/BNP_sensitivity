@@ -1,52 +1,25 @@
-Suppose we have a dataset $\x$, a real-valued parameter $\theta \in \thetadom
-\subseteq \mathbb{R}^{\thetadim}$, and a log likelihood $\logp(\x | \theta)$.
-Let us take a family of log prior densities, $\ell(\theta \vert \t)$,
-parameterized by some scalar $\t \in \tdom \subseteq \mathbb{R}$, defined
-relative to some dominating measure, $\lambda$.  We can write the posterior
-density (relative to $\lambda$) and expectations as
-%
-\begin{align*}
-%
-p(\theta \vert \x, \t) :={}&
-    \frac{p(\x \vert \theta) p(\theta \vert \t)}
-         {\int_{\thetadom} p(\x \vert \tilde{\theta}) p(\tilde{\theta} \vert \t)
-               \lambda(d \tilde{\theta})}
-= \frac{p(\x \vert \theta) p(\theta \vert \t)}{p(\x \vert \t)} \\
-\expect{p(\theta \vert \x, \t)}{g(\theta)} :={}&
-    \int_{\thetadom} p(\theta \vert \x, \t) g(\theta) \lambda{d\theta}.
-%
-\end{align*}
-%
+Consider the optimization problem \eqref{vb_optimization}, but now let the
+priors $\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a
+real-valued parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing
+$\pstick(\nuk \vert \t)$.  For example, $\t$ might represent the concentration
+parameter $\alpha$ in the $\mathrm{GEM}(\alpha)$ distribution, or it might
+represent some more general class of perturbations.  In any case, the prior on
+$\zeta$ and posterior in turn depend on $\t$, which we write $p(\zeta \vert \x,
+\t)$.
 
-Suppose also we have a family of variational distributions
-expressed as densities with respect to the same dominating measure, $q(\theta
-\vert \eta)$, parameterized by a variational parameter $\eta \in \etadom
-\subseteq \mathbb{R}^{\etadim}$.
+The $\t$ dependence propagates to the optimal
+variational parameters as well.  Define the shorthand notation
+%
+\begin{align}\eqlabel{kl_shorthand}
+%
+\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}
+\mathand
+\etaopt(\t) := \argmin_{\eta \in \etadom} \KL{\eta, \t},
+%
+\end{align}
+%
+where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
 
-We will form the variational approximation by solving
-%
-\begin{align*}
-%
-\etaopt(\t) :={}&
-    \argmin_{\eta \in \etadom} \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)} \\
-={}& \argmin_{\eta \in \etadom}
-        \expect{\q(\theta \vert \eta)}{
-        \log \q(\theta \vert \eta) - \logp(\x \vert \theta) -
-        \logp(\theta \vert \t) + \logp(\x \vert \t)}.
-%
-\end{align*}
-%
-That is, we wish to find the variational distribution $\q(\theta \vert
-\etaopt(\t))$ that is closest in KL-divergence to $p(\theta \vert \x, \t)$.  We
-have emphasized in the notation $\etaopt(\t)$ that this optimum depends on the
-prior hyperparameter $\t$.  Define the shorthand notation
-%
-\begin{align*}
-%
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}.
-%
-\end{align*}
-%
 Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
 and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
 continuous, then $\etaopt(\t)$ satisfies the first-order condition
@@ -57,25 +30,218 @@ continuous, then $\etaopt(\t)$ satisfies the first-order condition
 %
 \end{align}
 %
-If the second derivative
-$\partial^2 \KL{\eta, \t}/ \partial \eta \partial \eta^T$ is
-positive definite in a neighborhood of $\etaopt{\t}$ and $\t$,
-then $\etaopt{\t}$ is a differentiable function of $\t$ by the
-implicit function thoerem.  We can then differentiate
-\eqref{vb_first_order_condition} to get
+Recall that the intractable $\logp(\x \vert \t)$ does not depend on
+$\eta$, and so vanishes in \eqref{vb_first_order_condition}, and in all
+expressions involving partial $\eta$ derivatives.
+
+If the second derivative $\partial^2 \KL{\eta, \t}/ \partial \eta \partial
+\eta^T$ is positive definite in a neighborhood of $\etaopt(\t)$ and $\t$, then
+$\etaopt(\t)$ is a differentiable function of $\t$ by the implicit function
+thoerem.  We can then differentiate \eqref{vb_first_order_condition} to get
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_eta_sens}
 %
 \fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
     - \left( \fracat{\partial^2 \KL{\eta, \t}}
                     {\partial \eta \partial \eta^T}
-                    {\etaopt(\t), \t_0} \right)^{-1}
+                    {\etaopt(\t_0), \t_0} \right)^{-1}
     \fracat{\partial^2 \KL{\eta, \t}}
            {\partial \eta \partial \t}
-           {\etaopt(\t), \t_0}.
+           {\etaopt(\t_0), \t_0}.
+%
+\end{align}
+
+For a general $\t$, we can form a Taylor series approximation to $\etaopt(\t)$
+from a solution to \eqref{vb_first_order_condition} for some $\t_0$ and the
+result \eqref{vb_eta_sens}.  Specifically, we define
+%
+\begin{align*}
+%
+\etalin(\t) := \etaopt(\t_0) + \fracat{d \etaopt(\t)}{d \t^T}{\t_0} (\t - \t_0).
 %
 \end{align*}
 %
+Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
+$d\etaopt(\t) / d\t | \t_0$, evaluating $\etalin(\t)$ involves only
+multiplication and addition.  When $|\t - \t_0|$ is small, we might hope
+that $\etaopt(\t) \approx \etalin(\t)$, and so we can use $\etalin(\t)$
+to quickly approximate a time-consuming optimization problem.
 
-
+For functions of interest $\g(\eta)$ which are themselves differentiable,
+we can use the chain rule to compute
 %
+\begin{align}\eqlabel{vb_g_sens}
+%
+\fracat{d g(\etaopt(\t))}{d\t} ={}&
+    \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
+    \fracat{d \etaopt(\t)}{d \t}{\t_0} \\
+\glin(\t) :={}& \g(\etaopt(\t_0)) + \fracat{d g(\etaopt(\t))}{d\t}{\t_0} (\t - \t_0).
+%
+\end{align}
+%
+For non-differentiable functions of $\eta$, we can still form the approximation
+%
+\begin{align*}
+%
+\gapprox(\t) :={}& \g(\etalin(\t)).
+%
+\end{align*}
+%
+The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
+we can compute influence functions and worst-case perturbations, as we discuss
+below in SECREF.  Converse, $\gapprox(\t)$ may be expected to provide a better
+approximation in some cases since it retains non-linearities in the map $\eta
+\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
+\mapsto \etaopt(\t)$.
+
+
+\subsection{Evaluating $d\etaopt(\t) / d\t$}
+
+In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
+need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
+the objective function $\KL{\eta, \t_0}$ and the $\etadim \times 1$ mixed
+second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
+$\t$.  We will discuss these two tasks in turn.
+
+First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
+\partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nuk
+\vert \t)$ depend on $\t$, and so
+%
+\begin{align}\eqlabel{sens_mixed_partial}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \t}
+       {\etaopt(\t_0), \t_0} ={}&
+\sum_{\k=1}^{\kmax}
+    \evalat{
+        \frac{\partial}{\partial\eta}
+        \expect{\q(\nuk \vert \eta)}
+               {\fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t_0}
+               }
+        }
+        {\etaopt(\t_0)}.
+%
+\end{align}
+%
+Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nuk
+\vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
+differentiation, we can evaluate the mixed partial using the derivative of
+\eqref{gh_integral}.  We will consider particular functional forms for
+$\t \mapsto \pstick(\nuk \vert \t)$ in \secref{prior_perturbations}.
+
+Observe that \eqref{sens_mixed_partial} will be zero for all entries of
+$\eta$ other than those that parameterize the sticks.
+
+Typically, it is the computation and factorization of the Hessian matrix that is
+the most computationally intensive part of \eqref{vb_eta_sens}, especially when
+$\etadim$ is large.  However, this Hessian matrix does not depend on $\t$, and
+so can be computed once and re-used for many different values of $\t$, or many
+different classes of prior perturbations.  In our case, we have written
+$\KL{\eta, \t_0}$ as an explicit function of $\eta$.  Consequently, we can
+compute either the Hessian itself or Hessian-vector products using automatic
+differentiation CITE.
+
+The Hessian matrix may be quite large, since it involves the VB parameters for
+all the random effects.  In particular, though the dimensions of $\etanu$ and
+$\etatheta$ are of order $\kmax$, the dimension of $\etaz$ is of order $\kmax
+\times\N$.  For large $\N$, it may not be possible to instantiate the fully
+dense Hessian matrix in memory.  Fortunately, the Hessian of the KL divergence
+is sparse and highly structured in $\etaz$.  In particular, it is
+block-diagonal, with
+%
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta_{\z_{n}} \partial \eta_{\z_{m}}^T}
+       {\etaopt(\t_0), \t_0} ={}& 0 \mathtxt{for}n\ne m.
+%
+\end{align*}
+%
+Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax -
+1$, and that the Hessian of $\expect{\q(\zeta \vert \eta)}{\logp(\x \vert
+\zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
+being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
+
+We propose the following techniques for computing the inverse Hessian when the
+fully matrix is prohibitively large.  To describe the techniques it will be
+useful to use the following compact notation.  Let $\gamma = (\theta, \nu)$
+denote all the parameters besides $\z$, and for generic parameters $a$ and $b$
+let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
+\eta_b^T}{\etaopt(\t_0), \t_0}$, the Hessian with respect to the variational
+parameters governing $a$ and $b$.  Specifically:
+%
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \eta^T}
+       {\etaopt(\t_0), \t_0} ={}&
+\hess{\zeta\zeta} =
+\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\z} \\
+   \hess{\z\gamma}     & \hess{\z\z} \\
+\end{array}
+\right).
+%
+\end{align*}
+%
+The terms $\hess{\gamma\gamma}$ and $\hess{\z\gamma} = \hess{\gamma\z}^T$ are
+typically dense and easily computed using atuomatic differentiation, and the
+term $\hess{\z\z}$ is block diagonal with a closed-form inverse.
+%
+Analogously, let
+%
+\begin{align*}
+%
+\hess{\zeta\t} :=
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \t}
+       {\etaopt(\t_0), \t_0},
+%
+\end{align*}
+%
+and observe that
+%
+\begin{align*}
+%
+\hess{\zeta\t} ={}& \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right).
+%
+\end{align*}
+
+In this notation,
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+-\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\z} \\
+   \hess{\z\gamma}     & \hess{\z\z} \\
+\end{array}
+\right)^{-1}
+\left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right)
+%
+\end{align*}
+%
+We can then use the Schur complement to get the computationally tractable
+expression:
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+-\left(\begin{array}{c}
+I_{\gamma\gamma} \\
+\hess{\z\z}^{-1} \hess{\z\gamma}
+\end{array}\right)
+\left(\hess{\gamma\gamma} -
+      \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \hess{\gamma\t}.
+%
+\end{align*}
+
+In fact, the former expression can be computed entirely using automatic
+differentiation using the fact that $\etaoptz$ has an explicit closed form given
+$\etaoptgamma$, as dicussed in \exref{qz_form}.  TODO: is this worth writing
+here?
+
+When even $\hess{\gamma\gamma}$ is too large to form in memory, one can
+use the conjugate gradient algorithm.  TODO: fill in details.

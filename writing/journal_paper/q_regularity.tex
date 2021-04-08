@@ -1,0 +1,151 @@
+
+\begin{assu}\assulabel{q_regular}
+%
+Define
+%
+\begin{align*}
+%
+\lqgrad{\zeta \vert \eta} :={}&
+    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}
+    \mathtxt{and}
+%
+\lqhess{\zeta \vert \eta} :={}&
+    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta}.
+%
+\end{align*}
+%
+A variational density $\q(\zeta \vert \eta)$ defined relative to the dominating
+measure $\lambda(\cdot)$ is regular if the following conditions hold in a
+neighborhood $\ball_\eta$ of $\eta_0$:
+%
+\begin{itemize}
+%
+\item  The map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
+differentiable.
+%
+\item  There exists an envelope function $M(\zeta)$, integrable with respect to
+$\lambda$ with $\int M(\zeta) \lambda(d\zeta) < \infty$, such that
+all of $\q(\zeta \vert \eta)$, $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2$,
+and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
+bounded by $M(\zeta)$ uniformly in $\zeta$.
+%
+\item We say that $\q(\zeta \vert \eta)$ is regular for a function $\psi(\zeta):
+\mathbb{R}^\zetadim \mapsto \mathbb{R}$ if $\q(\zeta \vert \eta)
+\abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
+\eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by $M(\zeta)$ uniformly in
+$\zeta$.
+%
+\end{itemize}
+%
+%
+\end{assu}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+When \assuref{q_regular} holds, we have the following results.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_derivs}
+%
+Define
+%
+\begin{align*}
+%
+\lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
+  - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
+\lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
+ - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}} \\
+\overline{\psi(\zeta)} :={}& \psi(\zeta)
+ - \expect{\q(\zeta \vert \eta)}{\psi(\zeta)}.
+%
+\end{align*}
+%
+Then, under \assuref{q_regular}, we can apply \citet[Theorem
+1]{giordano:2018:covariances} to rewrite the following derivatives as functions
+of expectations.
+%
+\begin{align}\eqlabel{q_sens_is_cov}
+%
+\fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta)}}{\partial \eta}{\eta} ={}&
+\expect{\q(\zeta \vert \eta)}
+       {\lqgradbar{\zeta \vert \eta} \overline{\psi(\zeta)}}.
+%
+\end{align}
+%
+Using the product rule and differentiating \eqref{q_sens_is_cov} again using
+gives
+%
+\begin{align}\eqlabel{q_score_sens_is_cov}
+%
+%\MoveEqLeft
+\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta} ={}&
+\expect{\q(\zeta \vert \eta)}
+       {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
+        \overline{\psi(\zeta)} } +
+\nonumber\\&
+\expect{\q(\zeta \vert \eta)}{
+       \lqhessbar{\zeta \vert \eta}
+        \overline{\psi(\zeta)}
+       }.
+%
+\end{align}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}
+%
+Under \assuref{q_regular}, the following are continuous functions of
+$\eta$ in $\ball_\eta$:
+%
+\begin{align*}
+%
+\eta \mapsto{}& \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \mathand
+%
+\eta \mapsto{}&
+    \fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta)}}{\partial \eta}{\eta} \mathand
+\eta \mapsto{}&
+    \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+                  {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta}.
+%
+\end{align*}
+%
+\begin{proof}
+%
+By \assuref{q_regular}, $\q(\zeta \vert \eta) \psi(\zeta) < M(\zeta)$, so we can
+apply continuity of $\eta \mapsto \q(\zeta \vert \eta)$ and the Lebesgue dominated
+convergence theorem (CITE DUDLEY) to get
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta}
+\abs{ \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} -
+      \expect{\q(\zeta \vert \eta')}{\psi(\zeta)}} \le{}&
+\lim_{\eta' \rightarrow \eta}
+\int \abs{\psi(\zeta)}
+        \abs{\q(\zeta \vert \eta) -
+             \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}&
+\int \abs{\psi(\zeta)}
+    \lim_{\eta' \rightarrow \eta}
+     \abs{\q(\zeta \vert \eta) -
+          \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}& 0.
+%
+\end{align*}
+%
+Applying analogous reasoning to \eqref{q_sens_is_cov, q_score_sens_is_cov}
+gives the remainig results.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

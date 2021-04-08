@@ -141,13 +141,13 @@
 \def\section{\@startsiction{section}{1}{\z@}{-0.24in}{0.10in}
              {\large\bf\raggedright}}
 \def\subsection{\@startsection{subsection}{2}{\z@}{-0.20in}{0.08in}
-                {\normalsize\bf\raggedright}}
+                {\normdistalsize\bf\raggedright}}
 \def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-0.18in}{0.08in}
-                {\normalsize\sc\raggedright}}
+                {\normdistalsize\sc\raggedright}}
 \def\paragraph{\@startsiction{paragraph}{4}{\z@}{1.5ex plus
-  0.5ex minus .2ex}{-1em}{\normalsize\bf}}
+  0.5ex minus .2ex}{-1em}{\normdistalsize\bf}}
 \def\subparagraph{\@startsiction{subparagraph}{5}{\z@}{1.5ex plus
-  0.5ex minus .2ex}{-1em}{\normalsize\bf}}
+  0.5ex minus .2ex}{-1em}{\normdistalsize\bf}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -219,17 +219,17 @@
  \let\maketitle\relax \let\@maketitle\relax
  \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax}
 
-\def\@startauthor{\noindent \normalsize\bf}
+\def\@startauthor{\noindent \normdistalsize\bf}
 \def\@endauthor{}
 \def\@starteditor{\noindent \small {\bf Editor:~}}
-\def\@endeditor{\normalsize}
+\def\@endeditor{\normdistalsize}
 \def\@maketitle{\vbox{\hsize\textwidth
  \linewidth\hsize \vskip \beforetitskip
  {\begin{center} \Large\bf \@title \par \end{center}} \vskip \aftertitskip
  {\def\and{\unskip\enspace{\rm and}\enspace}%
   \def\addr{\small\it}%
   \def\email{\hfill\small\sc}%
-  \def\name{\normalsize\bf}%
+  \def\name{\normdistalsize\bf}%
   \def\AND{\@endauthor\rm\hss \vskip \interauthorskip \@startauthor}
   \@startauthor \@author \@endauthor}
 

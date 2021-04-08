@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[11pt]{article}
 
 % Any additional packages needed should be included after jmlr2e.
 % Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
@@ -78,21 +78,34 @@
 This is an abstract
 \end{abstract}
 
-\section{Introduction}\label{sec:introduction}
+\section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
 
 
 \section{Stick-breaking Dirichlet processes}
+    \subsection{Discrete Bayesian Nonparametric Model}
+    \seclabel{model_bnp}
+    \input{model_bnp.tex}
+
+    \subsection{Variational Approximation}
+    \seclabel{model_vb}
+    \input{model_vb.tex}
 
 
-\section{Local sensitivity}
+\section{Local sensitivity}\seclabel{local_sensitivity}
 \input{local_sensitivity.tex}
 
+\section{Regularity}
+\input{q_regularity.tex}
+
+
+\section{Prior perturbations}\seclabel{prior_perturbations}
+\input{prior_perturbations.tex}
+
+\subsection{Gaussian mixture modeling on Iris data}
+\input{iris_experiments.tex}
 
 \section{Results}
-
-\subsection{Gaussian mixture modeling on iris data}
-\input{iris_experiments.tex}
 
 \subsection{Regression mixture modeling}
 \input{mice_data_experiments.tex}
