@@ -45,14 +45,15 @@ def get_vb_params_paragami_object(dim, k_approx):
                     base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
     
     # info of data 
-    vb_params_paragami['data_info'] = \
+    vb_params_paragami['data_info_alpha'] = \
+        paragami.NumericArrayPattern(shape=(k_approx,), lb = 0.)
+    
+    vb_params_paragami['data_info_beta'] = \
         paragami.NumericArrayPattern(shape=(k_approx,), lb = 0.)
 
     vb_params_dict = vb_params_paragami.random()
 
     return vb_params_dict, vb_params_paragami
-
-
 
 ##########################
 # Set up prior parameters
@@ -86,16 +87,7 @@ def get_default_prior_params():
     prior_params_dict['prior_centroid_info'] = np.array([0.1])
     prior_params_paragami['prior_centroid_info'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
-    
-    # normal prior on shifts
-    prior_params_dict['prior_shift_mean'] = np.array([0.0])
-    prior_params_paragami['prior_shift_mean'] = \
-        paragami.NumericArrayPattern(shape=(1, ))
-
-    prior_params_dict['prior_shift_info'] = np.array([0.1])
-    prior_params_paragami['prior_shift_info'] = \
-        paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
-    
+        
     # gamma prior on data info
     prior_params_dict['prior_data_info_shape'] = np.array([10.])
     prior_params_paragami['prior_data_info_shape'] = \
@@ -110,13 +102,6 @@ def get_default_prior_params():
 ##########################
 # entropy term
 ##########################
-
-def get_shift_entropy(e_b, e_b2): 
-    
-    shift_var = e_b2 - e_b**2
-    
-    return 0.5 * (np.log(shift_var) + np.log(2 * np.pi) + 1)
-
 def get_entropy(vb_params_dict, e_z,
                 gh_loc, gh_weights):
     
@@ -130,17 +115,29 @@ def get_entropy(vb_params_dict, e_z,
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
-        
+    
     # entropy on centroids
     # negative here because the entropy function expects infos, not covariances
     centroid_entropy = - modeling_lib.\
-        multivariate_normal_entropy(vb_params_dict['centroids_covar'])
+        multivariate_normal_entropy(vb_params_dict['centroids_covar']) 
     
-    return z_entropy + stick_entropy + shift_entropy + centroid_entropy
+    # entropy on information 
+    info_entropy = modeling_lib.gamma_entropy(vb_params_dict['data_info_alpha'], 
+                                              vb_params_dict['data_info_beta'])
+    
+    return z_entropy + stick_entropy + centroid_entropy + info_entropy
 
 ##########################
 # prior term 
 ##########################
+
+def _get_gamma_moments(alpha, beta): 
+    
+    e_info = modeling_lib.get_e_gamma(alpha, beta)
+
+    e_log_info = modeling_lib.get_e_log_gamma(alpha, beta)
+        
+    return e_info, e_log_info
 
 def get_e_log_prior(vb_params_dict,
                     prior_params_dict,
@@ -155,6 +152,17 @@ def get_e_log_prior(vb_params_dict,
     dp_prior = \
         modeling_lib.get_e_logitnorm_dp_prior(stick_means, stick_infos,
                                               alpha, gh_loc, gh_weights)
+    
+    
+    # prior on data info 
+    prior_shape = prior_params_dict['prior_data_info_shape']
+    prior_scale = prior_params_dict['prior_data_info_scale']
+    
+    e_info, e_log_info = _get_gamma_moments(vb_params_dict['data_info_alpha'], 
+                                            vb_params_dict['data_info_beta'])
+    
+    data_info_prior = (prior_shape - 1) * e_log_info - e_info / prior_scale
+    data_info_prior = data_info_prior.sum()
 
     # centroid prior
     # these prior parameters are just scalars, which makes things easier
@@ -164,18 +172,10 @@ def get_e_log_prior(vb_params_dict,
     centroid_means = vb_params_dict['centroids']
     centroid_covars = vb_params_dict['centroids_covar']
     
-    e_centroid_prior = -0.5 * prior_info * (np.einsum('kii -> k', centroid_covars).sum() + \
-                                            np.sum(centroid_means ** 2) - \
-                                            2 * np.sum(centroid_means * prior_mean))
-        
-    # prior on data info 
-    prior_shape = prior_params_dict['prior_data_info_shape']
-    prior_scale = prior_params_dict['prior_data_info_scale']
-    
-    data_info = vb_params_dict['data_info']
-    
-    data_info_prior = (prior_shape - 1) * np.log(data_info) - data_info / prior_scale
-    data_info_prior = data_info_prior.sum()
+    e_centroid_prior = -0.5 * prior_info * \
+                        (np.einsum('kii -> k', centroid_covars).sum() + \
+                        np.sum(centroid_means ** 2) - \
+                        2 * np.sum(centroid_means * prior_mean))
     
     return dp_prior + e_centroid_prior + data_info_prior
     
@@ -190,8 +190,8 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict):
 
     num_time_points = x.shape[0]
     
-    data_info = np.expand_dims(vb_params_dict['data_info'], 
-                               axis = 0)
+    e_info, e_log_info = _get_gamma_moments(vb_params_dict['data_info_alpha'], 
+                                            vb_params_dict['data_info_beta'])
     
     centroids = vb_params_dict['centroids']
     centroids_covar = vb_params_dict['centroids_covar']
@@ -215,17 +215,16 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict):
         
     e_xbeta2 = np.expand_dims(e_xbeta2, axis = 0) 
 
-    square_term = -0.5 * data_info * (linear_term + e_xbeta2)
+    square_term = -0.5 * np.expand_dims(e_info, axis = 0) * (linear_term + e_xbeta2)
 
     # We have already summed the (y - mu)^2 terms over time points,so
     # we need to multiply the e_log_info_y by the number of points we've
     # summed over.
     log_info_term = \
-        0.5 * np.log(data_info) * \
+        0.5 * np.expand_dims(e_log_info, axis = 0) * \
         num_time_points
         
     return  square_term + log_info_term
-
 
 ##########################
 # Optimization over e_z
@@ -236,7 +235,7 @@ def get_z_nat_params(y, x,
                      prior_params_dict):
 
     # get likelihood term
-    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2) 
+    loglik_obs_by_nk = get_loglik_obs_by_nk(y, x, vb_params_dict) 
 
     # get weight term    
     stick_means = vb_params_dict['stick_params']['stick_means']
@@ -311,7 +310,6 @@ def get_kl(y, x,
     e_z_opt, z_nat_param = \
             get_optimal_z(y, x, 
                           vb_params_dict,
-                          e_b, e_b2, 
                           gh_loc, gh_weights, 
                           prior_params_dict)
     if e_z is None:
@@ -321,7 +319,6 @@ def get_kl(y, x,
     
     # entropy term
     entropy = get_entropy(vb_params_dict, e_z,
-                          e_b, e_b2, 
                           gh_loc, gh_weights)
 
     # prior term
