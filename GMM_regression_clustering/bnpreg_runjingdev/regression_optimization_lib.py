@@ -46,29 +46,38 @@ def set_params_w_kmeans(y, regressors,
                                 n_kmeans_init = 10, 
                                 seed = seed)
     
+    # initialze centroids
     vb_params_dict['centroids'] = np.array(init_centroids)
+        
     
-    # set stick parameters to one
-    vb_params_dict['stick_params']['stick_propn_mean'] = np.ones(k_approx - 1)
-    vb_params_dict['stick_params']['stick_propn_info'] = np.ones(k_approx - 1)
+    # initialize covariances to prior 
+    prior_centroid_info = prior_params_dict['prior_centroid_info']
+    vb_params_dict['centroids_covar'] = \
+        np.array([np.eye(dim) / prior_centroid_info for k in range(k_approx)])
     
-    # initialize to something small
-    vb_params_dict['data_info'] = np.ones(k_approx) 
+    # TODO initialize data info
+    
+    # get initial estimates of ez's: ignore prior
+    loglik_nk = regression_mixture_lib.get_loglik_obs_by_nk(y, 
+                                                            regressors,
+                                                            vb_params_dict)
+    ez_init = jax.nn.softmax(loglik_nk, axis = 1)
+    
+    # sort z's from largest to smallest
+    perm = np.argsort(-ez_init.sum(0))
+    ez_init = ez_init[:, perm]
+    vb_params_dict['centroids'] = vb_params_dict['centroids'][perm]    
 
-#     # Set inital inv. covariances
-#     cluster_cov_init = onp.zeros((k_approx, dim, dim))
-#     for k in range(k_approx):
-#         indx = onp.argwhere(km_best.labels_ == k).flatten()
 
-#         if len(indx) <= (dim + 1):
-#             # if there's less than one datapoint in the cluster,
-#             # the covariance is not defined.
-#             cluster_cov_init[k, :, :] = onp.eye(dim)
-#         else:
-#             resid_k = beta[indx, :] - km_best.cluster_centers_[k, :]
-#             cluster_cov_init[k, :, :] = onp.cov(resid_k.T) 
+    # initialize sticks
+    print('initializing sticks ...')
+    stick_beta1, stick_beta2 = update_stick_beta_params(ez_init, prior_params_dict['dp_prior_alpha'])
+    beta_params = np.stack((stick_beta1, stick_beta2), axis = -1)
     
-#     vb_params_dict['centroids_covar'] = np.array(cluster_cov_init)
+    vb_params_dict['stick_params'] = convert_beta_sticks_to_logitnormal(beta_params, 
+                                                                        vb_params_dict['stick_params'],
+                                                                        vb_params_paragami['stick_params'], 
+                                                                        gh_loc, gh_weights)[0]
     
     return vb_params_dict
 
