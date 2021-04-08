@@ -223,6 +223,8 @@ def load_data_and_run_regressions(genomic_time_series_dir,
     y, _, _, timepoints = load_genomics_data(genomic_time_series_dir, 
                                              split_test_train = False)
     
+    y_shifted = y - np.mean(y, axis = 1, keepdims = True)
+    
     # get regressors
     regressors = spline_bases_lib.get_genomics_spline_basis(timepoints,
                                                             df=df,
@@ -230,7 +232,7 @@ def load_data_and_run_regressions(genomic_time_series_dir,
     
     # get initial coefficients 
     beta, beta_infos, y_infos = \
-        regression_lib.run_regressions(y - np.mean(y, axis = 1, keepdims = True),
+        regression_lib.run_regressions(y_shifted,
                                        regressors)
     
-    return y, timepoints, regressors, beta, beta_infos, y_infos
+    return y_shifted, timepoints, regressors, beta, beta_infos, y_infos

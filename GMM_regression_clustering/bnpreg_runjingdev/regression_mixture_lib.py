@@ -118,7 +118,6 @@ def get_shift_entropy(e_b, e_b2):
     return 0.5 * (np.log(shift_var) + np.log(2 * np.pi) + 1)
 
 def get_entropy(vb_params_dict, e_z,
-                e_b, e_b2, 
                 gh_loc, gh_weights):
     
     # entropy on memberships
@@ -131,8 +130,6 @@ def get_entropy(vb_params_dict, e_z,
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
-    # entropy on shifts 
-    shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
         
     # entropy on centroids
     # negative here because the entropy function expects infos, not covariances
@@ -144,8 +141,6 @@ def get_entropy(vb_params_dict, e_z,
 ##########################
 # prior term 
 ##########################
-def get_shift_prior(e_b, e_b2, prior_mean, prior_info): 
-    return prior_info * (prior_mean * e_b - 0.5 * e_b2)
 
 def get_e_log_prior(vb_params_dict,
                     prior_params_dict,
@@ -188,7 +183,7 @@ def get_e_log_prior(vb_params_dict,
 ##########################
 # Likelihood term
 ##########################
-def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
+def get_loglik_obs_by_nk(y, x, vb_params_dict):
     # returns a N by k_approx matrix where the (n,k)th entry is the
     # expected log likelihood of the nth observation when it belongs to
     # component k.
@@ -206,31 +201,21 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
     # centroids is (clusters x basis vectors) = (k x b)
     x_times_beta = np.einsum('tb,kb->tk', x, centroids)
     
-    # mu_nkt = beta_k^T x_t + b_nk
-
-    # \sum_t (y_nt - mu_nkt) ^ 2 =
-    #   \sum_t (y_nt^2 - 2 * y_nt * mu_nkt + mu_nkt ^ 2) =
-    #   \sum_t (linear_term +                quad_term)
-
-    # \sum_t E(y^2 - 2 * y * mu) =
-    #        E(sum(y_t^2) - 2 * sum(y) * beta_k^T x - 2 * sum(y_t) * b_nk):
+    
+    # this is E(y^2 - 2 y(x\beta))
+    # shape is n x k
     linear_term = \
         np.sum(y ** 2, axis=1, keepdims=True) + \
-        -2 * np.einsum('nt,tk->nk', y, x_times_beta) + \
-        -2 * np.sum(y, axis = 1, keepdims = True) * e_b
+        -2 * np.einsum('nt,tk->nk', y, x_times_beta) 
 
-    # This is E(mu^2) =
-    #         E[(beta_k^T x)^2 +
-    #           2 * b_n * beta_k^T x +
-    #           b_n^2]
+    # This is E((x\beta)^2) 
+    # vector of length k
     e_xbeta2 = np.sum(x_times_beta ** 2, axis=0) + \
                 np.einsum('ti, kij, tj -> k', x, centroids_covar, x)
         
-    quad_term = np.expand_dims(e_xbeta2, axis = 0) + \
-                2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
-                e_b2 * num_time_points
+    e_xbeta2 = np.expand_dims(e_xbeta2, axis = 0) 
 
-    square_term = -0.5 * data_info * (linear_term + quad_term)
+    square_term = -0.5 * data_info * (linear_term + e_xbeta2)
 
     # We have already summed the (y - mu)^2 terms over time points,so
     # we need to multiply the e_log_info_y by the number of points we've
@@ -241,41 +226,12 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
         
     return  square_term + log_info_term
 
-def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict): 
-    
-    centroids = vb_params_dict['centroids']
-    data_info = np.expand_dims(vb_params_dict['data_info'], 
-                               axis = 0)
-    
-    num_time_points = x.shape[0]
-
-    # y is (obs x time points) = (n x t)
-    # x is (time points x basis vectors) = (t x b)
-    # centroids is (clusters x basis vectors) = (k x b)
-    x_times_beta = np.einsum('tb,kb->tk', x, centroids)
-    
-    # ydiff is (y - xbeta), but summed over time 
-    ydiff = (np.expand_dims(y, axis = -1) - \
-             np.expand_dims(x_times_beta, axis = 0)).sum(1) * data_info
-    
-    prior_diff = prior_params_dict['prior_shift_info'] * prior_params_dict['prior_shift_mean']
-    
-    # mean and variance of optimal shift
-    e_b = (ydiff + prior_diff) / (num_time_points * data_info + prior_params_dict['prior_shift_info'])
-    var_b = 1 / (num_time_points  * data_info + prior_params_dict['prior_shift_info'])
-    
-    # second moment
-    e_b2 = var_b + e_b**2
-    
-    return e_b, e_b2
-
 
 ##########################
 # Optimization over e_z
 ##########################
 def get_z_nat_params(y, x, 
                      vb_params_dict, 
-                     e_b, e_b2, 
                      gh_loc, gh_weights, 
                      prior_params_dict):
 
@@ -290,33 +246,22 @@ def get_z_nat_params(y, x,
         get_e_log_cluster_probabilities(stick_means, stick_infos,
                                         gh_loc, gh_weights)
     
-    # prior on shifts 
-    prior_shift_mean = prior_params_dict['prior_shift_mean']
-    prior_shift_info = prior_params_dict['prior_shift_info']
-    shift_prior = get_shift_prior(e_b, e_b2, prior_shift_mean, prior_shift_info)
-    
-    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs 
 
     return z_nat_param
 
 def get_optimal_z(y, x, 
                   vb_params_dict,
-                  e_b, e_b2, 
                   gh_loc, gh_weights, 
                   prior_params_dict):
 
     z_nat_param = \
         get_z_nat_params(y, x, 
                          vb_params_dict,
-                         e_b, e_b2, 
                          gh_loc, gh_weights, 
                          prior_params_dict)
 
-    # e_z = jax.nn.softmax(z_nat_param, axis = 1)
-    
-    print('setting e_z')
-    e_z = onp.ones(z_nat_param.shape) * 1e-6
-    e_z[:, 0] = 1.
+    e_z = jax.nn.softmax(z_nat_param, axis = 1)
     
     return e_z, z_nat_param
 
@@ -361,10 +306,7 @@ def get_kl(y, x,
     kl : float
         The negative elbo.
     """
-    
-    # get optimal shifts
-    e_b, e_b2 = get_optimal_shifts(y, x, vb_params_dict, prior_params_dict)
-    
+        
     # get optimal cluster belongings
     e_z_opt, z_nat_param = \
             get_optimal_z(y, x, 
