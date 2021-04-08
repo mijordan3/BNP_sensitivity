@@ -2,6 +2,8 @@ import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+import numpy as onp
+
 import bnpmodeling_runjingdev.modeling_lib as modeling_lib
 
 import paragami
@@ -38,9 +40,9 @@ def get_vb_params_paragami_object(dim, k_approx):
     vb_params_paragami['centroids'] = \
         paragami.NumericArrayPattern(shape=(k_approx, dim))
     
-    vb_params_paragami['centroids_var'] = \
-        paragami.NumericArrayPattern(shape = (k_approx, dim), 
-                                     lb = 0.)
+    vb_params_paragami['centroids_covar'] = \
+        paragami.pattern_containers.PatternArray(array_shape = (k_approx, ), \
+                    base_pattern = paragami.PSDSymmetricMatrixPattern(size=dim))
     
     # info of data 
     vb_params_paragami['data_info'] = \
@@ -135,7 +137,7 @@ def get_entropy(vb_params_dict, e_z,
     # entropy on centroids
     # negative here because the entropy function expects infos, not covariances
     centroid_entropy = - modeling_lib.\
-        univariate_normal_entropy(vb_params_dict['centroids_var'])
+        multivariate_normal_entropy(vb_params_dict['centroids_covar'])
     
     return z_entropy + stick_entropy + shift_entropy + centroid_entropy
 
@@ -165,9 +167,9 @@ def get_e_log_prior(vb_params_dict,
     prior_info = prior_params_dict['prior_centroid_info']
     
     centroid_means = vb_params_dict['centroids']
-    centroid_vars = vb_params_dict['centroids_var']
+    centroid_covars = vb_params_dict['centroids_covar']
     
-    e_centroid_prior = -0.5 * prior_info * (np.sum(centroid_vars) + \
+    e_centroid_prior = -0.5 * prior_info * (np.einsum('kii -> k', centroid_covars).sum() + \
                                             np.sum(centroid_means ** 2) - \
                                             2 * np.sum(centroid_means * prior_mean))
         
@@ -197,7 +199,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
                                axis = 0)
     
     centroids = vb_params_dict['centroids']
-    centroids_var = vb_params_dict['centroids_var']
+    centroids_covar = vb_params_dict['centroids_covar']
 
     # y is (obs x time points) = (n x t)
     # x is (time points x basis vectors) = (t x b)
@@ -222,7 +224,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
     #           2 * b_n * beta_k^T x +
     #           b_n^2]
     e_xbeta2 = np.sum(x_times_beta ** 2, axis=0) + \
-                np.einsum('ti, ki, ti -> k', x, centroids_var, x)
+                np.einsum('ti, kij, tj -> k', x, centroids_covar, x)
         
     quad_term = np.expand_dims(e_xbeta2, axis = 0) + \
                 2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
@@ -310,7 +312,11 @@ def get_optimal_z(y, x,
                          gh_loc, gh_weights, 
                          prior_params_dict)
 
-    e_z = jax.nn.softmax(z_nat_param, axis = 1)
+    # e_z = jax.nn.softmax(z_nat_param, axis = 1)
+    
+    print('setting e_z')
+    e_z = onp.ones(z_nat_param.shape) * 1e-6
+    e_z[:, 0] = 1.
     
     return e_z, z_nat_param
 
