@@ -44,7 +44,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     
     # info of data 
     vb_params_paragami['data_info'] = \
-        paragami.NumericArrayPattern(shape=(1,), lb = 0.)
+        paragami.NumericArrayPattern(shape=(k_approx,), lb = 0.)
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -193,7 +193,9 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
 
     num_time_points = x.shape[0]
     
-    data_info = vb_params_dict['data_info']
+    data_info = np.expand_dims(vb_params_dict['data_info'], 
+                               axis = 0)
+    
     centroids = vb_params_dict['centroids']
     centroids_var = vb_params_dict['centroids_var']
 
@@ -240,7 +242,8 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict, e_b, e_b2):
 def get_optimal_shifts(y, x, vb_params_dict, prior_params_dict): 
     
     centroids = vb_params_dict['centroids']
-    data_info = vb_params_dict['data_info']
+    data_info = np.expand_dims(vb_params_dict['data_info'], 
+                               axis = 0)
     
     num_time_points = x.shape[0]
 
