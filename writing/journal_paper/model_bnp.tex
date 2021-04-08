@@ -1,0 +1,137 @@
+We will consider discrete Bayesian nonparametric (BNP) generative models which
+draw data points $\x_n$ from one of a certain number of clusters indexed by $\k =
+1, \ldots, \kmax$, where in principle $\kmax$ might be infinity.  Each cluster
+is characterized by a vector $\theta_\k \in \thetadom \subseteq
+\mathbb{R}^{\thetadim}$, with $p(\x_n \vert \theta_\k)$ denoting the
+distribution of data arising from  cluster $\k$. We will model the $\theta_\k$
+as arising IID from a known prior $\theta_\k \iid p(\theta_\k)$, and write
+$\theta = (\theta_1, \theta_2, \ldots)$.
+
+The cluster assignments are represented by indicator variables $\z_{\n\k} \in
+\{0, 1\}$, where $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise.  Let
+$\z_\n$ with a single index denote all the cluster indicators for a given
+datapoint, $\z_\n = (\z_{\n1}, \ldots, \z_{\n\kmax})$, and let $\z$ with no
+index denote the collection $\z = (\z_1, \ldots, \z_\N)$.  With $\z$ defined in
+this way, we can write
+%
+\begin{align*}
+%
+p(\x_n \vert \z_\n, \theta) =
+    \prod_{k=1}^\kmax p(\x_n \vert \theta_\k)^{\z_{\n\k}}.
+%
+\end{align*}
+
+
+The cluster assignments $\z_{\n}$ will be drawn according to the following
+``stick-breaking process.''  Fix a density $\pstick(\cdot)$, with respect to the
+Lebesgue measure, over stick lengths $\nuk \in (0, 1)$ and draw $\nuk \iid
+\pstick(\nuk)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
+infinite number of IID sticks and the $\kmax - 1$ can be ignored; if $\kmax <
+\infty$, then we set $\nu_{\kmax} = 1$ for notational convenience below.  Given
+these stick lengths, we compute indicator probabilities by
+%
+\begin{align*}
+%
+% \pi_\k := \begin{cases}
+% \nuk \prod_{\k' < \k} (1 - \nu_{\k'}) & \textrm{For }k < \kmax
+%     \textrm{ (all }k\textrm{ when }\kmax = \infty\textrm{)}\\
+% \prod_{\k' < \k} (1 - \nu_{\k'}). & \textrm{For }k = \kmax \\
+% \end{cases}
+\pi_\k := \nuk \prod_{\k' < \k} (1 - \nu_{\k'})
+%
+\end{align*}
+%
+where the empty product is taken to be equal to $1$. The convention $\nu_{\kmax} =
+1$ allows us to use the same formula for all $\pi_\k$ when $\kmax < \infty$.
+Write $\nu := (\nu_1, \ldots, \nu_{\kmax})$ for the vector of all stick lengths
+and $\pi := (\pi_1, \ldots, \pi_\kmax)$ for the corresponding vector of
+proabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax =
+\infty$, and we draw $\z_\n$ according to
+%
+\begin{align*}
+%
+p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \\
+p(\z_\n \vert \pi) ={}&
+    \ind{\sum_{\k=1}^{\kmax} \z_{\n\k} = 1}
+    \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
+%
+\end{align*}
+%
+Since $\pi$ is a deterministic function of $\nu$, we can also write
+$p(\z_\n \vert \nu)$ with no ambiguity.
+
+The stick-breaking process can be though of as a map from  the stick
+distibution, $\pstick(\cdot)$, to a vector of probabilities, $\pi$. Different
+stick distributions will give different indicator probabilities, with different
+implied degrees of concentration.  A particularly common choice for
+$\pstick(\cdot)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
+%
+\begin{align*}
+%
+\mathrm{Beta}(\nuk \vert 1, \alpha) =
+    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
+         {\Gamma(\alpha)}
+%
+\end{align*}
+%
+since this choice is equivalent to drawing $\pi$ from a Dirichlet process.
+In this case we can write $\pi \sim \mathrm{GEM}(\alpha)$.  TODO: probably
+this is not precisely correct.
+
+For a fixed $\pstick(\cdot)$, we can thus write the joint distribution of
+the data and parameters as:
+%
+\begin{align}\eqlabel{bnp_model}
+%
+% \logp(\x, \theta, \z, \nu) ={}&
+%     \sum_{n=1}^N \sum_{k=1}^{\kmax}
+%         \z_{\n\k} \left(
+%             \logp(\x_n \vert \theta_\k) + \log \pi_\k
+%         \right) +
+% \nonumber \\ {}&
+%     \sum_{k=1}^{\kmax} \left(
+%         \log \pstick(\nuk) + \logp(\theta_\k)
+%     \right).
+\MoveEqLeft
+\logp(\x, \theta, \z, \nu) ={}
+\nonumber\\&
+    \sum_{n=1}^N \sum_{k=1}^{\kmax}
+        \z_{\n\k} \left(
+            \logp(\x_n \vert \theta_\k) + \log \pi_\k
+        \right) +
+    \sum_{k=1}^{\kmax} \left(
+        \log \pstick(\nuk) + \logp(\theta_\k)
+    \right).
+%
+\end{align}
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}[Generative process]\exlabel{iris_bnp_process}
+%
+For the iris data, $\x_\n \in \mathbb{R}^4$, and we will model the clusters as
+four dimensional Gaussians.  In this case, $\theta_\k = (\mu_k, \Sigma_\k)$,
+where $\mu_\k \in \mathbb{R}^4$, $\Sigma_\k$ is a a four by four positive
+definite covariance matrix, and
+%
+\begin{align*}
+%
+p(\x_\n \vert \theta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Sigma_\k} \\
+\logp(\x_\n \vert \theta_\k) ={}&
+    -\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)
+    -\frac{1}{2} \log |\Sigma_\k| + \const.\\
+    & \constdesc{\theta_\k}
+%
+\end{align*}
+
+For the iris data, we might imagine that each cluster corresponds to a different
+species with a different distribution of flower dimensions.  The BNP model
+implies that there are a potentially infinite number of differet iris species
+that we might observe.  Then $\z_{\n\k} = 1$ would mean that observation $\n$
+was a member of species $\k$, and $\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
+\z_{\n\k} > 1}$ is the number of distinct species observed in our particular
+dataset.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

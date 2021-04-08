@@ -1,0 +1,469 @@
+We now consider two classes of prior perturbations: parametric and
+non-parametric.  Recall from \eqref{sens_mixed_partial} that we
+need to specify a map $\t \mapsto \log \pstick(\nuk \vert \t)$.
+
+First, consider the parametric case where we take $\t = \alpha$ and
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \alpha) ={}&
+    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+In this case,
+%
+\begin{align*}
+%
+\expect{\q(\nuk \vert \eta)}
+       {\fracat{\log \pstick(\nuk \vert \alpha)}{\partial \alpha}{\alpha_0}
+} ={}&
+    \expect{\q(\nuk \vert \eta)}{\log(1 - \nuk)}.
+%
+\end{align*}
+%
+We can thus numerically compute the needed derivatives.
+
+To consider more general prior perturbations, fix for the moment a base stick
+distribution, $\pb(\nuk)$ and an alternative stick distribution
+$\pa(\nuk)$.  Take $\t = \epsilon$ and define
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \epsilon) ={}&
+\frac{\pb(\nuk)^{1 - \epsilon} \pa(\nuk)^\epsilon}
+     {\int_0^1 \pb(\nuk')^{1 - \epsilon} \pa(\nuk')^\epsilon d\nuk'}.
+%
+\end{align*}
+%
+We thus have that $\epsilon$ parameterizes a multiplicative path from
+$\pb(\nuk)$ to $\pa(\nuk)$, with $\pstick(\nuk \vert \epsilon = 0) = \pb(\nuk)$
+and $\pstick(\nuk \vert \epsilon=1) = \pa(\nuk)$.  We will take
+$\t_0$ to be $\epsilon = 0$, so that we are computing $\etaopt$ with the
+prior $\pb(\nuk)$ and approximating the optimum if we had used $\pa(\nuk)$.
+%
+Given this definition,
+%
+\begin{align*}
+%
+\fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
+    \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+    & \constdesc{\nuk}
+%
+\end{align*}
+%
+Again, for a fixed $\pa(\nuk)$ we can compute the needed derivatives.
+
+There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and so it
+can be useful to think of $\etaopt(\epsilon)$ as functional of the stick
+breaking prior, following \citet{gustafson:1996:local}.  Let us fix $\pb(\nuk)$,
+define $\phi(\nuk) := \epsilon \log \left(\pa(\nuk) / \pb(\nuk)\right)$, and
+re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent form:
+%
+\begin{align}\eqlabel{phi_perturbation}
+%
+\pstick(\nuk \vert \phi) ={}&
+\frac{\exp\left(\log \pb(\nuk) + \phi(\nuk)\right)}
+     {\int_0^1 \exp\left(\log \pb(\nuk') + \phi(\nuk')\right) d\nuk'}.
+%
+\end{align}
+%
+The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
+well-defined for any Lebesgue-integrable function $\phi(\nuk):
+(0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
+denominator is positive and finite.
+Define the norm
+%
+\begin{align*}
+%
+\norminf{\phi} :={} \esssup_{\nuk} |\phi(\nuk)|.
+%
+\end{align*}
+%
+Under this norm, $\phi$ is a member of the Banach space $\linf$ equipped with
+the Borel sets and Lebesgue measure (e.g.,
+\citet[Section 2.1, Example 5]{luenberger:1997:optimization} and
+\citet[Theorem 5.2.1]{dudley:2018:real}).
+
+Note that
+%
+\begin{align*}
+%
+\exp(-\norminf{\phi}) \le{}
+\abs{\int_0^1 \exp\left(\log \pb(\nuk) + \phi(\nuk)\right) d\nuk}
+\le{}
+\exp(\norminf{\phi}),
+%
+\end{align*}
+%
+so that $\pstick(\nuk \vert \phi)$ is a valid distribution whenever
+$\norminf{\phi} < \infty$.  (As pointed out by \citet{gustafson:1996:local}, the
+converse is not true---there exist valid distributions with infinte
+$\norminf{\phi}$.)
+
+Analogous to \eqref{kl_shorthand}, we can write $\etaopt(\phi) := \argmin_{\eta
+\in \etadom} \KL{\eta, \phi}$ for the optimal variational parameters when
+using the prior $\pstick(\nuk \vert \phi)$.  The optimum $\etaopt(\phi)$
+is thus a functional of $\phi$.
+
+Observe that
+%
+\begin{align*}
+%
+\log \pstick(\nuk \vert \phi) ={}&
+    \log \pb(\nuk) + \phi(\nuk) + \const
+    & \constdesc{\nuk} \Rightarrow\\
+\KL{\eta, \phi} ={}&
+    \KL{\eta, 0} + \sumkm \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}.
+%
+\end{align*}
+%
+Let $\phiz(\cdot)$ denote the zero function.  Then, using \eqref{vb_eta_sens}
+gives that the directional (Gateaux) derivative in the direction $\phi$
+evaluated at $\phiz$ is given by
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} ={}&
+    - \hess{\zeta\zeta}^{-1}
+    \evalat{
+        \sumkm \frac{\partial}{\partial \eta}
+            \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}}
+           {\etaopt(\phiz), \phiz}.
+%
+\end{align*}
+%
+Differentiating under the integral in $\expect{\q(\nuk \vert
+\eta)}{\phi(\nuk)}$ gives
+%
+\begin{align*}
+%
+\evalat{
+\frac{\partial}{\partial \eta}
+    \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}
+}{\etaopt} ={}&
+\expect{\q(\nuk \vert \etaoptnuk)}
+       {\evalat{\frac{\partial}{\partial \etanuk}
+                  \log\q(\nuk \vert \etanuk)}
+                {\etaoptnuk}
+        \phi(\nuk)} \\
+={}&
+\int_0^1
+    \q(\nu \vert \etaoptnuk)
+    \evalat{\frac{\partial}{\partial \etanuk}
+               \log\q(\nu \vert \etanuk)}
+             {\etaoptnuk}
+    \phi(\nu) d\nu.
+%
+\end{align*}
+%
+Plugging in gives
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
+    \int_0^1
+    -\hess{\zeta\zeta}^{-1}
+    \left(
+        \sumkm
+        \q(\nu \vert \etaoptnuk)
+        \fracat{\partial \log\q(\nu \vert \etanuk)}
+               {\partial \etanuk}
+               {\etaoptnuk}
+    \right) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+Thus, the influence function for $\etaopt(\phi)$ at $\phiz$ is given by
+%
+\begin{align*}
+%
+\infl(\nu) :={}&
+-\hess{\zeta\zeta}^{-1}
+\left(
+    \sumkm
+    \q(\nu \vert \etaoptnuk)
+    \fracat{\partial \log\q(\nu \vert \etanuk)}
+           {\partial \etanuk}
+           {\etaoptnuk}
+\right) \\
+\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
+    \int_0^1 \infl(\nu) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+Analogously, for a differentiable function of interest $g(\eta)$,
+the influence function is given via \eqref{vb_g_sens} to be
+%
+\begin{align*}
+%
+\inflg(\nu) :={}&
+-\fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
+    \hess{\zeta\zeta}^{-1}
+\left(
+    \sumkm
+    \q(\nu \vert \etaoptnuk)
+    \fracat{\partial \log\q(\nu \vert \etanuk)}
+           {\partial \etanuk}
+           {\etaoptnuk}
+\right) \\
+\fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
+    \int_0^1 \inflg(\nu) \phi(\nu) d\nu.
+%
+\end{align*}
+%
+The influence funciton is a convenient summary of the effect of functional prior
+perturbations on a differnetiable summary statistic, as we will show below.
+
+An additional benefit of the influence function is that it admits a closed-form
+expression for the ``worst-case'' perturbation in an $\norminf{\cdot}$ ball
+via Holder's inequality, since
+%
+\begin{align*}
+%
+\sup_{\phi: \norminf{\phi} \le \delta}
+    \fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
+\sup_{\phi: \norminf{\phi} \le \delta}
+    \int_0^1 \inflg(\nu) \phi(\nu) d\nu \\
+\le&{} \delta \int_0^1 \abs{\inflg(\nu) }d\nu,
+%
+\end{align*}
+%
+with equality when $\phi(\nu) = \delta \, \mathrm{sign}(\inflg(\nu))$.
+
+In order for the supremum over a bounded set $\phi: \norminf{\phi} < \delta$
+to be meaningful, a minimal requirement is that the function $\etaopt(\phi)$
+be Fr{\'e}chet differentiable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Let the following assumptions hold for some neighborhood $\ball_\eta$
+of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{kl_diffable}
+    The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
+    continuously differentiable.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item\itemlabel{kl_hess}
+    The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
+                    {\partial \eta \partial \eta^T}
+                    {\eta}$ is positive definite.%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+\vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
+with $\eta_0 = \etaopt(\phiz)$.
+%
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}
+%
+Let \assuref{kl_opt_ok} hold. Then the map $\phi \mapsto \etaopt(\phi)$ is
+well-defined and continuously Fr{\'e}chet differentiable in a neighborhood of
+$\phiz$ as a map from $\linf$ to $\mathbb{R}^\etadim$. Furthermore, the
+derivative in the direction $\phi - \phiz$ is of the formfassuref
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\phi)}{d\phi}{\phiz}\left( \phi - \phiz\right) ={}&
+    \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \\
+%
+\infl(\nu) :={}&
+-\left(\fracat{\partial^2 \KL{\eta, \phiz}}
+                {\partial \eta \partial \eta^T}
+                {\etaopt}\right)^{-1}
+\left(
+    \sumkm
+    \q(\nu \vert \etaoptnuk)
+    \nabla \log \q(\nu \vert \etaoptnuk)
+\right).
+%
+\end{align*}
+%
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{proof}
+%
+The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
+$\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
+take the L2 norm $\norm{\cdot}_2$ on $\mathbb{R}^{\etadim}$ and $\mathbb{R}$.
+Let $\ball$ denote the ball $\ball_\eta \times \{ \phi: \norminf{\phi} <
+\delta\}$ for some $\delta > 0$.  Let $\linop$ denote a linear operator from
+$\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
+%
+\begin{align*}
+%
+\norm{\linop}^* :=
+    \sup_{\eta: \norm{\eta}_2 \le 1} \sup_{\phi: \norminf{\phi} \le 1}
+     \norm{\linop(\eta, \phi)}_2.
+%
+\end{align*}
+
+Recall that $\etaopt(\phi)$, if it exists, is defined as a solution to
+%
+\begin{align*}
+%
+\fracat{\partial \KL{\eta, \phi}}
+                {\partial \eta}
+                {\etaopt(\phi)} = 0_\etadim.
+%\KLgrad{\etaopt(\phi), \phi} ={}& 0_\etadim.
+%
+\end{align*}
+%
+Using this estimating equation, the key to the proof will be the implicit
+function theorem for Banach spaces. To use the implicit function theorem, we
+need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable at $\etaopt(\phiz), \phiz$ and that $\KLhess{\eta, \phi}$ is
+positive definite in $\ball$.
+
+Let us define some compact notation for the duration of the proof.
+Let
+%
+\begin{align*}
+%
+\KLgrad{\eta, \phi} :={}&
+    \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
+\mathtxt{and}
+\KLhess{\eta, \phi} :={}&
+    \fracat{\partial^2 \KL{\eta, \phi}}
+           {\partial \eta \partial \eta^T}{\eta, \phi}.
+%
+\end{align*}
+%
+Additionally, define $\rho(\etanuk, \phi) :={} \expect{\q(\nu \vert
+\etanuk)}{\phi(\nu)}$, with
+%
+\begin{align*}
+%
+\rho_\eta(\etanuk, \phi) :={}
+    % \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+    %        {\partial \etanuk}{\etanuk} \mathand
+\fracat{\partial \rho(\etanuk, \phi)}
+       {\partial \etanuk}{\etanuk} \mathand
+\rho_{\eta\eta}(\etanuk, \phi) :={}
+   \fracat{\partial^2 \rho(\etanuk, \phi)}
+          {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+%
+\end{align*}
+
+Observe that the estimating equation can be written as
+%
+\begin{align*}
+%
+% \KL{\eta, \phi} ={}&
+%     \KL{\eta, \phiz} + \sumkm \rho(\etanuk, \phi)
+%     \Rightarrow \\
+%
+\KLgrad{\eta, \phi} ={}&
+\KLgrad{\eta, \phiz} + \sumkm \rho_\eta(\etanuk, \phi)
+= 0_\etadim.
+%
+\end{align*}
+
+Let us first show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\eta \mapsto
+\KLgrad{\eta, \phiz}$ is continuously differentiable and does not depend on
+$\phi$, so we need only to show that $\rho_\eta(\etanuk, \phi)$ is continuously
+Fr{\'e}chet differentiable. To show this, it will suffice to show that the
+partial deritatives of the maps $\eta \mapsto \rho_\eta{\eta, \phi}$ and $\phi
+\mapsto \rho_\eta{\eta, \phi}$ exist and are continuous in the dual norm
+$\norm{\cdot}^*$ as a function of the location $\eta, \phi$ at which the
+derivatives are evaluated.
+
+We first show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.  To do so it
+
+
+It follows from \eqref{q_sens_is_cov} that the map $\phi \mapsto
+\rho_\eta(\etanuk, \phi)$ is a linear functional of $\phi$.  Applying Jensen's
+inequality to the $\norm{\cdot}_2$ norm and the triangle inequality twice gives:
+%
+\begin{align*}
+%
+%\sup_{\phi: \norminf{\phi} = 1}
+\norm{\rho_\eta(\etanuk, \phi)}_2 \le
+    4 \expect{\q(\nu \vert \etanuk)}
+             {\norm{\nabla \log \q(\nu \vert \etanuk)}_2}
+              \norminf{\phi(\nu)}.
+%
+\end{align*}
+%
+It follows from ... that $\rho_\eta(\etanuk,
+\phi)$ is bounded as a function of $\phi$ for all $\eta \in \ball_\eta$.
+Bounded linear functionals are Fr{\'e}chet differentiable (essentially by
+definition), so $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.
+
+It remains to show that the derivative is continuous.
+
+% so the linear operator is bounded as a function of $\phi$, and a continuous
+% funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
+% \expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
+% continuously Fr{\'e}chet differentiable.
+%
+% Again differentiating under the integral,
+% %
+% \begin{align*}
+% %
+% \fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
+%               {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}&
+% \expect{\q(\nu \vert \etanuk)}
+%        {\left(\nabla \log \q(\nu \vert \etanuk)
+%          - \expect{\q(\nu \vert \etanuk)}
+%                   {\nabla \log \q(\nu \vert \etanuk)}
+%        \right)^2
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
+% \\&
+% \expect{\q(\nu \vert \etanuk)}{
+%        \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
+%         - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
+%        \right)
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
+%        }.
+% %
+% \end{align*}
+% %
+Again this is a linear operator as a function of $\phi$, which is continuous by
+assumption.  Consequently the Hessian is invertible in a neighborhood.
+
+It follows by \citet[Proposition 4.14(c)]{zeidler:2013:functional} that
+$\KLgrad{\eta, \phi}$ is continuosly Fr{\'e}chet differentiable.  Furthermore,
+\citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
+$\KLhess{\etaopt(\phiz), \phiz}$ is invertible.  So we satisfy conditions (i),
+(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
+the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
+continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
+\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$ is
+also continuously Fr{\'e}chet differentiable.
+
+The directional derivative
+
+% Other references: We will use the
+% formulation given in \citep[Theorem 3.4.10]{krantz:2012:implicit}, for which
+% we must show that... actually that doesn't give differentiability.
+% The result follows then from \citet[Proposition 4.8(c)]{zeidler:2013:functional}.
+% See also \citet[Corollary 1.4]{averbukh:1967:theory} and \citep[Appendix
+% A]{reeds:1976:thesis}).
+%
+\end{proof}
+%
+\end{thm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

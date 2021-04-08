@@ -1,32 +1,97 @@
+
+% Operators
 \def\mbe{\mathbb{E}}%
 \def\ind#1{\mathbb{I}\left(#1\right)}
 \def\evalat#1#2{\left.#1\right|_{#2}}
 \def\fracat#1#2#3{\left.\frac{#1}{#2}\right\vert_{#3}}
 \def\iid{\overset{iid}{\sim}}
 \def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
+\def\cov#1#2{\underset{#1}{\mathrm{Cov}}\left(#2\right)}
+\def\expecthat#1#2{\underset{#1}{\widehat{\mathbb{E}}}\left[#2\right]}
+\def\abs#1{\left|#1\right|}
+\def\norm#1{\left\Vert#1\right\Vert}
+\def\norminf#1{\left\Vert#1\right\Vert_{\infty}}
+\def\sumk{\sum_{\k=1}^{\kmax}}
+\def\sumkm{\sum_{\k=1}^{\kmax - 1}}
+\def\dirderiv#1#2{\delta_{#1\rightarrow#2}} % A directional derivative (unused?)
+\def\linop{\mathcal{L}} % A linear operator
 
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
+\DeclareMathOperator*{\esssup}{\mathrm{esssup}}
 
-% Variational parameters
-\def\etaopt{\hat\eta}
+% Variables
+\def\etaopt{\hat\eta} % Optimal vb parameters
 \def\x{x}   % Data
 \def\t{t}   % Generic priur parameter
-\def\z{z}   % Local posterior parameters
+\def\z{z}   % Cluster indicators
+\def\g{g}   % Function of interest
+\def\k{k}   % Cluster index
+\def\n{n}   % Data index
+\def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
+\def\const{C}   % Constant
+\def\lnu{\tilde{\nu}}   % Unconstrained stick
+\def\lnumean{\eta^{\mu}}   % Unconstrained stick vb mean
+\def\lnusd{\eta^{\sigma}}   % Unconstrained stick vb std
+\def\hess#1{H_{#1}}   % Hessian
+\def\phiz{0_\phi}   % The phi zero function.
+\def\infl{\psi}   % The influence function
+\def\inflg{\psi_{\g}}   % The influence function for a function of interest
+
+\def\etatheta{\eta_{\theta}}  % VB parameters for certain components
+\def\etanu{\eta_{\nu}}  % VB parameters for certain components
+\def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
+\def\etaz{\eta_{\z}}  % VB parameters for certain components
+\def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
+\def\etaopttheta{\etaopt_{\theta}}  % VB parameters for certain components
+\def\etaoptnu{\etaopt_{\nu}}  % VB parameters for certain components
+\def\etaoptnuk{\etaopt_{\nuk}}  % VB parameters for certain components
+\def\etaoptz{\etaopt_{\z}}  % VB parameters for certain components
+\def\etaoptgamma{\etaopt_{\gamma}}  % VB parameters for certain components
+
+
+% Distributions
+\def\pstick{p_{\mathrm{stick}}}   % Stick breaking distribution
 \def\q{q}   % VB dist
-\def\logp{\ell}   % VB dist
+\def\logp{\ell}   % Log probabiltty
+\def\lqgrad#1{{\nabla \log \q}\left(#1\right)}   % Log VB distribution gradient
+\def\lqhess#1{{\nabla^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
+\def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
+\def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
+\def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
+\def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
+\def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
+\def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
+\def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
+\def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
+\def\pb{p_{0}}   % Base prior
+\def\pa{p_{1}}   % Alternative prior
+
+% Taylor series
+\def\etalin{\etaopt^{\mathrm{lin}}}
+\def\glin{\g^{\mathrm{lin}}}
+\def\gapprox{\g^{\etalin}}
 
 % Dimensions
-\def\etadim{D_{\eta}}
-\def\thetadim{D_{\theta}}
+\def\N{N}   % Number of datapoints
+\def\K{K}   % Number of components
+\def\kmax{{\K_{\mathrm{max}}}}   % Truncation
+\def\etadim{{D_{\eta}}}
+\def\thetadim{{D_{\theta}}}
+\def\zetadim{{D_{\zeta}}}
+\def\ngh{N_{\mathrm{GH}}}   % Number of GH points
 
 % Domains
 \def\etadom{\Omega_{\eta}}
 \def\thetadom{\Omega_{\theta}}
 \def\tdom{\Omega_{\t}}
+\def\linf{{L_{\infty}[0,1]}}
+\def\ball{\mathcal{B}}
 
-\def\K{K}   % Number of components
-
-\def\mathand{\quad\quad\textrm{and}\quad\quad}%
-\def\mathwhere{\quad\quad\textrm{where}\quad\quad}%
+% Annotations
+\def\mathtxt#1{\quad\textrm{#1}\quad}%
+\def\mathand{\quad\textrm{and}\quad}%
+\def\mathwhere{\quad\textrm{where}\quad}%
+\def\constdesc#1{\textrm{(}\const\textrm{ does not depend on }#1\textrm{)}}
+\def\assuitemref#1#2{\assuref{#1} (\itemref{#2})}%
