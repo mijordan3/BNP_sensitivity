@@ -192,6 +192,10 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict):
     
     e_info, e_log_info = _get_gamma_moments(vb_params_dict['data_info_alpha'], 
                                             vb_params_dict['data_info_beta'])
+    
+    print('removing loglik term')
+    e_info = e_info * 0.
+    e_log_info = e_log_info * 0. - 200
         
     centroids = vb_params_dict['centroids']
     centroids_covar = vb_params_dict['centroids_covar']
