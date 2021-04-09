@@ -56,8 +56,8 @@ def set_params_w_kmeans(y, regressors,
         np.array([np.eye(dim) / prior_centroid_info for k in range(k_approx)])
     
     # initialize data info
-    vb_params_dict['data_info_alpha'] = np.ones(k_approx) * prior_params_dict['prior_data_info_shape'] 
-    vb_params_dict['data_info_beta'] =  np.ones(k_approx) / prior_params_dict['prior_data_info_scale']
+    vb_params_dict['data_info_alpha'] = np.ones(k_approx)
+    vb_params_dict['data_info_beta'] =  np.ones(k_approx)
     
     # get initial estimates of ez's: ignore prior
     loglik_nk = regression_mixture_lib.get_loglik_obs_by_nk(y, 
