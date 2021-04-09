@@ -84,16 +84,16 @@ def get_default_prior_params():
     prior_params_paragami['prior_centroid_mean'] = \
         paragami.NumericArrayPattern(shape=(1, ))
 
-    prior_params_dict['prior_centroid_info'] = np.array([0.1])
+    prior_params_dict['prior_centroid_info'] = np.array([1.0])
     prior_params_paragami['prior_centroid_info'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
         
     # gamma prior on data info
-    prior_params_dict['prior_data_info_shape'] = np.array([10.])
+    prior_params_dict['prior_data_info_shape'] = np.array([1.])
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_scale'] = np.array([0.05])
+    prior_params_dict['prior_data_info_scale'] = np.array([0.01])
     prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
@@ -192,11 +192,7 @@ def get_loglik_obs_by_nk(y, x, vb_params_dict):
     
     e_info, e_log_info = _get_gamma_moments(vb_params_dict['data_info_alpha'], 
                                             vb_params_dict['data_info_beta'])
-    
-    print('removing loglik term')
-    e_info = e_info * 0.
-    e_log_info = e_log_info * 0. - 200
-        
+            
     centroids = vb_params_dict['centroids']
     centroids_covar = vb_params_dict['centroids_covar']
 
