@@ -309,6 +309,9 @@ differentiable. By \assuitemref{kl_opt_ok}{q_stick_regular} and
 Therefore, $\eta \mapsto \rho_\eta(\eta, \t)$ is continuously differentiable for
 all $\t \in \ball_\t$.
 
+TODO: this is not quite right as-is --- you need to expand the eta derivative
+first.
+
 Furthermore, by \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
 the Lebesgue dominated convergence theorem to exchange differentiation and
 integration to write
@@ -316,9 +319,10 @@ integration to write
 \begin{align*}
 %
 \fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t} ={}&
+    \frac{\partial}{\partial \eta}
     \expect{\q(\nu \vert \etanuk)}{
         \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
-    }.
+    } \Big\vert_\eta.
 %
 \end{align*}
 %
