@@ -117,7 +117,8 @@ intensive map $\t \mapsto \etaopt(\t)$.
 
 When, then, is $\etaopt(\t)$ continuously differentiable?  We now state some
 sufficient conditions which will allow us to prove that $\etaopt(\t)$ is
-continuously differentiable via the implicit function theorem.
+continuously differentiable via the implicit function theorem
+(e.g., \citet{krantz:2012:implicit}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,18 +177,18 @@ logq_continuous} in \appref{proofs}).
 \begin{assu}\assulabel{kl_opt_ok}
 %
 Let the following assumptions hold for some neighborhood $\ball_\eta$
-of $\etaopt(\phiz)$, and, for $\eta \in \ball_\eta$:
+of $\etaopt$, and, for $\eta \in \ball_\eta$:
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
 %
     \item \itemlabel{kl_diffable}
-    The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
+    The map $\eta \mapsto \KL{\eta, 0}$ is twice
     continuously differentiable.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item\itemlabel{kl_hess}
-    The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
+    The Hessian matrix $\fracat{\partial^2 \KL{\eta, 0}}
                     {\partial \eta \partial \eta^T}
                     {\eta}$ is positive definite.%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,6 +222,12 @@ differentiable with derivative
 %
 \end{align}
 %
+\begin{proof}
+%
+The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}.
+%
+\end{proof}
+%
 \end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -229,7 +236,7 @@ differentiable with derivative
 
 In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
 need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
-the objective function $\KL{\eta, \t_0}$ and the $\etadim \times 1$ mixed
+the objective function $\KL{\eta, 0}$ and the $\etadim \times 1$ mixed
 second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
 $\t$.  We will discuss these two tasks in turn.
 
