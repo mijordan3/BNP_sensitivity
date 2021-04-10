@@ -86,6 +86,8 @@ where $\esssup$ is defined with respect to the Lebesgue measure on $[0,1]$.
 Then $\pstick(\nuk \vert \phi)$ is a valid distribution whenever $\phi$ lies
 within a neighborhood of $\phiz$, as we state in the following proposition.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{prop}\proplabel{pert_well_defined}
 %
 Let $\linf$ denote the Banach space of functions on $[0,1]$ with the norm
@@ -94,14 +96,16 @@ $\norminf{\cdot}$ (as in, e.g., \citet[Section 2.1, Example
 There exists a $\norminf{\cdot}$-neighborhood of $\phiz$, denoted $\ball_\phi
 \subset \linf$, such that $\pstick(\nuk \vert \phi)$ as defined in
 \eqref{phi_perturbation} is a valid probability density for all $\phi \in
-\ball_\phi$.
+\ball_\phi$\footnote{As pointed out by \citet{gustafson:1996:local}, the
+converse of \propref{pert_well_defined} not true---there exist valid
+distributions with infinte $\norminf{\phi}$.  We will discuss this and other
+issues related to \citet{gustafson:1996:local} below.}.
 %
 \begin{proof}
 %
 The function $\pstick(\nuk \vert \phi)$ is a valid density whenever
 $\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one, and $\int
 \pstick(\nuk \vert \phi) = 1$. Since $\pb(\nuk) \ge 0$,
-
 %
 \begin{align*}
 %
@@ -130,173 +134,44 @@ so that $\int \pstick(\nuk \vert \phi) = 1$ whenever $\norminf{\phi} < \infty$.
 \end{proof}
 %
 \end{prop}
-  (As pointed out by \citet{gustafson:1996:local}, the
-converse is not true---there exist valid distributions with infinte
-$\norminf{\phi}$.)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Analogous to \eqref{kl_shorthand}, we can write $\etaopt(\phi) := \argmin_{\eta
-\in \etadom} \KL{\eta, \phi}$ for the optimal variational parameters when
-using the prior $\pstick(\nuk \vert \phi)$.  The optimum $\etaopt(\phi)$
-is thus a functional of $\phi$.
+Thanks to \propref{pert_well_defined}, we might expect to sensibly write
+$\etaopt(\phi) := \argmin_{\eta \in \etadom} \KL{\eta, \phi}$ for the optimal
+variational parameters when using the prior $\pstick(\nuk \vert \phi)$.  The
+optimum $\etaopt(\phi): \linf \mapsto \mathbb{R}^\etadim$ is thus a functional
+of $\phi$.  We might hope to form a Taylor series expansion of $\etaopt(\phi)$.
 
-Observe that
 %
-\begin{align*}
-%
-\log \pstick(\nuk \vert \phi) ={}&
-    \log \pb(\nuk) + \phi(\nuk) + \const
-    & \constdesc{\nuk} \Rightarrow\\
-\KL{\eta, \phi} ={}&
-    \KL{\eta, 0} + \sumkm \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}.
-%
-\end{align*}
-%
-Let $\phiz(\cdot)$ denote the zero function.  Then, using \eqref{vb_eta_sens}
-gives that the directional (Gateaux) derivative in the direction $\phi$
-evaluated at $\phiz$ is given by
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\phi)}{d \phi}{\phiz} ={}&
-    - \hess{\zeta\zeta}^{-1}
-    \evalat{
-        \sumkm \frac{\partial}{\partial \eta}
-            \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}}
-           {\etaopt(\phiz), \phiz}.
-%
-\end{align*}
-%
-Differentiating under the integral in $\expect{\q(\nuk \vert
-\eta)}{\phi(\nuk)}$ gives
-%
-\begin{align*}
-%
-\evalat{
-\frac{\partial}{\partial \eta}
-    \expect{\q(\nuk \vert \eta)}{\phi(\nuk)}
-}{\etaopt} ={}&
-\expect{\q(\nuk \vert \etaoptnuk)}
-       {\evalat{\frac{\partial}{\partial \etanuk}
-                  \log\q(\nuk \vert \etanuk)}
-                {\etaoptnuk}
-        \phi(\nuk)} \\
-={}&
-\int_0^1
-    \q(\nu \vert \etaoptnuk)
-    \evalat{\frac{\partial}{\partial \etanuk}
-               \log\q(\nu \vert \etanuk)}
-             {\etaoptnuk}
-    \phi(\nu) d\nu.
-%
-\end{align*}
-%
-Plugging in gives
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
-    \int_0^1
-    -\hess{\zeta\zeta}^{-1}
-    \left(
-        \sumkm
-        \q(\nu \vert \etaoptnuk)
-        \fracat{\partial \log\q(\nu \vert \etanuk)}
-               {\partial \etanuk}
-               {\etaoptnuk}
-    \right) \phi(\nu) d\nu.
-%
-\end{align*}
-%
-Thus, the influence function for $\etaopt(\phi)$ at $\phiz$ is given by
-%
-\begin{align*}
-%
-\infl(\nu) :={}&
--\hess{\zeta\zeta}^{-1}
-\left(
-    \sumkm
-    \q(\nu \vert \etaoptnuk)
-    \fracat{\partial \log\q(\nu \vert \etanuk)}
-           {\partial \etanuk}
-           {\etaoptnuk}
-\right) \\
-\fracat{d \etaopt(\phi)}{d \phi}{\phiz} =&{}
-    \int_0^1 \infl(\nu) \phi(\nu) d\nu.
-%
-\end{align*}
-%
-Analogously, for a differentiable function of interest $g(\eta)$,
-the influence function is given via \eqref{vb_g_sens} to be
-%
-\begin{align*}
-%
-\inflg(\nu) :={}&
--\fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
-    \hess{\zeta\zeta}^{-1}
-\left(
-    \sumkm
-    \q(\nu \vert \etaoptnuk)
-    \fracat{\partial \log\q(\nu \vert \etanuk)}
-           {\partial \etanuk}
-           {\etaoptnuk}
-\right) \\
-\fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
-    \int_0^1 \inflg(\nu) \phi(\nu) d\nu.
-%
-\end{align*}
-%
-The influence funciton is a convenient summary of the effect of functional prior
-perturbations on a differnetiable summary statistic, as we will show below.
-
-An additional benefit of the influence function is that it admits a closed-form
-expression for the ``worst-case'' perturbation in an $\norminf{\cdot}$ ball
-via Holder's inequality, since
-%
-\begin{align*}
-%
-\sup_{\phi: \norminf{\phi} \le \delta}
-    \fracat{d g(\etaopt(\phi))}{d \phi}{\phiz} =&{}
-\sup_{\phi: \norminf{\phi} \le \delta}
-    \int_0^1 \inflg(\nu) \phi(\nu) d\nu \\
-\le&{} \delta \int_0^1 \abs{\inflg(\nu) }d\nu,
-%
-\end{align*}
-%
-with equality when $\phi(\nu) = \delta \, \mathrm{sign}(\inflg(\nu))$.
-
-In order for the supremum over a bounded set $\phi: \norminf{\phi} < \delta$
-to be meaningful, a minimal requirement is that the function $\etaopt(\phi)$
-be Fr{\'e}chet differentiable.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_opt_ok}
-%
-Let the following assumptions hold for some neighborhood $\ball_\eta$
-of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-%
-    \item \itemlabel{kl_diffable}
-    The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
-    continuously differentiable.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item\itemlabel{kl_hess}
-    The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
-                    {\partial \eta \partial \eta^T}
-                    {\eta}$ is positive definite.%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
-\vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
-with $\eta_0 = \etaopt(\phiz)$.
-%
-\end{enumerate}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{assu}\assulabel{kl_stick_opt_ok}
+% %
+% Let the following assumptions hold for some neighborhood $\ball_\eta$
+% of $\etaopt(\phiz)$, and for $\eta \in \ball_\eta$:
+% %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{enumerate}
+% %
+%     \item \itemlabel{kl_diffable}
+%     The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
+%     continuously differentiable.
+% %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \item\itemlabel{kl_hess}
+%     The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
+%                     {\partial \eta \partial \eta^T}
+%                     {\eta}$ is positive definite.%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+% \vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
+% with $\eta_0 = \etaopt(\phiz)$.
+% %
+% \end{enumerate}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% \end{assu}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

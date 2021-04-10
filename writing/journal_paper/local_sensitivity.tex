@@ -1,28 +1,64 @@
 Consider the optimization problem \eqref{vb_optimization}, but now let the
 priors $\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a
 real-valued parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing
-$\pstick(\nuk \vert \t)$.  For example, $\t$ might represent the concentration
-parameter $\alpha$ in the $\mathrm{GEM}(\alpha)$ distribution, or it might
-represent some more general class of perturbations.  In any case, the prior on
-$\zeta$ and posterior in turn depend on $\t$, which we write $p(\zeta \vert \x,
-\t)$.
+$\pstick(\nuk \vert \t)$.
 
-The $\t$ dependence propagates to the optimal
-variational parameters as well.  Define the shorthand notation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{alpha_perturbation}
+%
+When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we
+model
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \alpha) ={}&
+    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from the
+choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
+%
+\begin{align*}
+%
+\log \pstick(\nuk \vert \t) ={}&
+    (\t + \alpha_0 - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In \secref{prior_perturbations}, we will consider a more general class of
+perturbations than \exref{alpha_perturbation}.
+
+In any case, the prior on $\zeta$ and posterior in turn depend on $\t$, which we
+write $p(\zeta \vert \x, \t)$. The $\t$ dependence propagates to the optimal
+variational parameters as well through the dependence of the KL divergence on
+$\t$.  Define the shorthand notation
 %
 \begin{align}\eqlabel{kl_shorthand}
 %
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}
+\KL{\eta, \t} := \KL{\q(\zeta \vert \eta) || p(\x \vert \theta, \t)}
 \mathand
-\etaopt(\t) := \argmin_{\eta \in \etadom} \KL{\eta, \t},
+\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
 %
 \end{align}
 %
 where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
+Without loss of generality, we will continue to use $\etaopt$ with no argument
+to refer to $\etaopt(0)$.  That is, we take $\t = 0$ at the ``original''
+problem, \eqref{vb_optimization}.
 
 Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
 and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
-continuous, then $\etaopt(\t)$ satisfies the first-order condition
+continuous, then $\etaopt(\t)$ satisfies the following first-order condition for
+all $\t$:
 %
 \begin{align}\eqlabel{vb_first_order_condition}
 %
@@ -30,45 +66,30 @@ continuous, then $\etaopt(\t)$ satisfies the first-order condition
 %
 \end{align}
 %
-Recall that the intractable $\logp(\x \vert \t)$ does not depend on
-$\eta$, and so vanishes in \eqref{vb_first_order_condition}, and in all
-expressions involving partial $\eta$ derivatives.
+Recall that the intractable $\logp(\x \vert \t)$ does not depend on $\eta$, and
+so vanishes in \eqref{vb_first_order_condition}, and in all expressions
+involving partial $\eta$ derivatives of the KL divergence.
 
-If the second derivative $\partial^2 \KL{\eta, \t}/ \partial \eta \partial
-\eta^T$ is positive definite in a neighborhood of $\etaopt(\t)$ and $\t$, then
-$\etaopt(\t)$ is a differentiable function of $\t$ by the implicit function
-thoerem.  We can then differentiate \eqref{vb_first_order_condition} to get
-%
-\begin{align}\eqlabel{vb_eta_sens}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
-    - \left( \fracat{\partial^2 \KL{\eta, \t}}
-                    {\partial \eta \partial \eta^T}
-                    {\etaopt(\t_0), \t_0} \right)^{-1}
-    \fracat{\partial^2 \KL{\eta, \t}}
-           {\partial \eta \partial \t}
-           {\etaopt(\t_0), \t_0}.
-%
-\end{align}
-
-For a general $\t$, we can form a Taylor series approximation to $\etaopt(\t)$
-from a solution to \eqref{vb_first_order_condition} for some $\t_0$ and the
-result \eqref{vb_eta_sens}.  Specifically, we define
+If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
+already computed the solution $\etaopt$ to the ``original'' problem
+\eqref{vb_optimization}, then we can form a Taylor series
+approximation to $\etaopt(\t)$.  Specifically, we define
 %
 \begin{align*}
 %
-\etalin(\t) := \etaopt(\t_0) + \fracat{d \etaopt(\t)}{d \t^T}{\t_0} (\t - \t_0).
+\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t^T}{\t=0} \t .
 %
 \end{align*}
 %
 Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
-$d\etaopt(\t) / d\t | \t_0$, evaluating $\etalin(\t)$ involves only
-multiplication and addition.  When $|\t - \t_0|$ is small, we might hope
-that $\etaopt(\t) \approx \etalin(\t)$, and so we can use $\etalin(\t)$
-to quickly approximate a time-consuming optimization problem.
+$d\etaopt(\t) / d\t | 0$, evaluating $\etalin(\t)$ involves only
+multiplication and addition.  When $|\t|$ is small, by continuous
+differentiability of $\etaopt(\t)$, we might hope that $\etaopt(\t) \approx
+\etalin(\t)$, and so we can use $\etalin(\t)$ to quickly approximate a
+time-consuming optimization problem.
 
-For functions of interest $\g(\eta)$ which are themselves differentiable,
-we can use the chain rule to compute
+Futhermore, or functions of interest $\g(\eta)$ which are themselves
+differentiable, we can use the chain rule to compute
 %
 \begin{align}\eqlabel{vb_g_sens}
 %
@@ -89,10 +110,119 @@ For non-differentiable functions of $\eta$, we can still form the approximation
 %
 The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
 we can compute influence functions and worst-case perturbations, as we discuss
-below in SECREF.  Converse, $\gapprox(\t)$ may be expected to provide a better
-approximation in some cases since it retains non-linearities in the map $\eta
-\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
-\mapsto \etaopt(\t)$.
+below in \secref{prior_perturbations}.  Converse, $\gapprox(\t)$ may be expected
+to provide a better approximation in some cases since it retains non-linearities
+in the map $\eta \mapsto \g(\eta)$, linearizing only the computationally
+intensive map $\t \mapsto \etaopt(\t)$.
+
+When, then, is $\etaopt(\t)$ continuously differentiable?  We now state some
+sufficient conditions which will allow us to prove that $\etaopt(\t)$ is
+continuously differentiable via the implicit function theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}[The VB approximation is nice]\assulabel{q_regular}
+%
+Define
+%
+\begin{align*}
+%
+\lqgrad{\zeta \vert \eta} :={}&
+    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}
+    \mathtxt{and}
+%
+\lqhess{\zeta \vert \eta} :={}&
+    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta}.
+%
+\end{align*}
+%
+We say that a variational density $\q(\zeta \vert \eta)$ defined relative to the
+dominating measure $\lambda(\cdot)$ is ``regular'' if the following conditions
+hold in a neighborhood $\ball_\eta$ of $\eta_0$:
+%
+\begin{itemize}
+%
+\item  The map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
+differentiable.
+%
+\item  There exists an envelope function $M(\zeta)$, integrable with respect to
+$\lambda$ with $\int M(\zeta) \lambda(d\zeta) < \infty$, such that
+all of $\q(\zeta \vert \eta)$, $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2$,
+and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
+bounded by $M(\zeta)$ uniformly in $\zeta$.
+%
+\item We say that $\q(\zeta \vert \eta)$ is regular for a function $\psi(\zeta):
+\mathbb{R}^\zetadim \mapsto \mathbb{R}$ if $\q(\zeta \vert \eta)
+\abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
+\eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by $M(\zeta)$ uniformly in
+$\zeta$.
+%
+\end{itemize}
+%
+%
+\end{assu}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Assuref{q_regular} states conditions under which we interchange limits with
+variational  expectations, giving continuity of variational expectations and
+explicit forms for their derivatives (see, e.g., \lemref{logq_derivs,
+logq_continuous} in \appref{proofs}).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Let the following assumptions hold for some neighborhood $\ball_\eta$
+of $\etaopt(\phiz)$, and, for $\eta \in \ball_\eta$:
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{kl_diffable}
+    The map $\eta \mapsto \KL{\eta, \phiz}$ is twice
+    continuously differentiable.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item\itemlabel{kl_hess}
+    The Hessian matrix $\fracat{\partial^2 \KL{\eta, \phiz}}
+                    {\partial \eta \partial \eta^T}
+                    {\eta}$ is positive definite.%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+\vert \t)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
+with $\eta_0 = \etaopt$.
+%
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{etat_deriv}
+%
+Under \assuref{kl_opt_ok}, the map $\t \mapsto \etaopt(\t)$ is continuously
+differentiable with derivative
+%
+\begin{align}\eqlabel{vb_eta_sens}
+%
+\fracat{d \etaopt(\t)}{d \t}{0} ={}&
+    - \left( \fracat{\partial^2 \KL{\eta, \t}}
+                    {\partial \eta \partial \eta^T}
+                    {\etaopt, 0} \right)^{-1}
+    \fracat{\partial^2 \KL{\eta, \t}}
+           {\partial \eta \partial \t}
+           {\etaopt, 0}.
+%
+\end{align}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \subsection{Evaluating $d\etaopt(\t) / d\t$}
