@@ -55,6 +55,26 @@ Without loss of generality, we will continue to use $\etaopt$ with no argument
 to refer to $\etaopt(0)$.  That is, we take $\t = 0$ at the ``original''
 problem, \eqref{vb_optimization}.
 
+Expanding $\logp(\zeta \vert \t)$ in \eqref{vb_optimization}, we see that
+%
+\begin{align}
+%
+\logp(\zeta \vert \t) ={}& \logp(\zeta) +
+    \sumkm \left( \log \pstick(\nuk\vert\t) -
+                  \log \pstick(\nuk \vert 0) \right) \Rightarrow \nonumber\\
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} +
+    \sumkm \expect{\q(\nu\vert\etanuk)}{
+        \log \pstick(\nuk\vert\t) - \log \pstick(\nuk \vert 0)
+    }. \eqlabel{kl_pert}
+%
+\end{align}
+%
+We thus see that the optimization objective $\KL{\eta, \t}$ is the original
+optimiation obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
+$\etanu$ and $\t$.  This fact will be useful in our theoretical results as well
+as the practical considerations of \secref{evaluating_deriv}.
+
 Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
 and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
 continuous, then $\etaopt(\t)$ satisfies the following first-order condition for
@@ -148,16 +168,16 @@ hold in a neighborhood $\ball_\eta$ of $\eta_0$:
 differentiable.
 %
 \item  There exists an envelope function $M(\zeta)$, integrable with respect to
-$\lambda$ with $\int M(\zeta) \lambda(d\zeta) < \infty$, such that
-all of $\q(\zeta \vert \eta)$, $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2$,
-and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
+$\lambda$ with $\int M(\zeta) \lambda(d\zeta) < \infty$, such that all of
+$\q(\zeta \vert \eta)$, $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
+\eta}}_2$, and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
 bounded by $M(\zeta)$ uniformly in $\zeta$.
 %
-\item We say that $\q(\zeta \vert \eta)$ is regular for a function $\psi(\zeta):
-\mathbb{R}^\zetadim \mapsto \mathbb{R}$ if $\q(\zeta \vert \eta)
-\abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
-\eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by $M(\zeta)$ uniformly in
-$\zeta$.
+\item \itemlabel{q_fun_regular} We say that $\q(\zeta \vert \eta)$ is regular
+for a function $\psi(\zeta): \mathbb{R}^\zetadim \mapsto \mathbb{R}$ if
+$\q(\zeta \vert \eta) \abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta)
+\norm{\lqgrad{\zeta \vert \eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by
+$M(\zeta)$ uniformly in $\zeta$.
 %
 \end{itemize}
 %
@@ -176,28 +196,48 @@ logq_continuous} in \appref{proofs}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_opt_ok}
 %
-Let the following assumptions hold for some neighborhood $\ball_\eta$
-of $\etaopt$, and, for $\eta \in \ball_\eta$:
+Let the following conditions hold for some neighborhood $\ball_\eta$
+of $\etaopt$.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
 %
-    \item \itemlabel{kl_diffable}
-    The map $\eta \mapsto \KL{\eta, 0}$ is twice
-    continuously differentiable.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item\itemlabel{kl_hess}
-    The Hessian matrix $\fracat{\partial^2 \KL{\eta, 0}}
-                    {\partial \eta \partial \eta^T}
-                    {\eta}$ is positive definite.%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
-\vert \t)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
-with $\eta_0 = \etaopt$.
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
+    continuously differentiable at $\etaopt$.
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
+    0}} {\partial \eta \partial \eta^T} {\eta}$ is positive definite for all
+    $\eta \in \ball_\eta$.
+
+    \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+    \vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
+    with $\eta_0 = \etaopt$.
 %
 \end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{prior_pert_smooth}
+%
+Let the following conditions hold for some neighborhood $\ball_\t \subseteq
+\mathbb{R}$ of zero.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{pstick_smooth} The map $\t \mapsto \log \pstick(\nu \vert
+    \t)$ is continuously differentiable at $\t$.
+
+    \item\itemlabel{q_pstick_regular} The variational approximations $\q(\nu
+    \vert \etanuk)$ to the stick-breaking posteriors are regular with respect to
+    $\log \pstick(\nu \vert \t)$  and $\partial \log \pstick(\nu \vert \t) /
+    \partial \t$ for all $\t \in \ball_\t$ in the sense of \assuref{q_regular}
+    with $\eta_0 = \etaopt$.
+%
+\end{enumerate}
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,8 +247,8 @@ with $\eta_0 = \etaopt$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}\thmlabel{etat_deriv}
 %
-Under \assuref{kl_opt_ok}, the map $\t \mapsto \etaopt(\t)$ is continuously
-differentiable with derivative
+Let \assuref{kl_opt_ok, prior_pert_smooth} hold.  Then the map $\t \mapsto
+\etaopt(\t)$ is continuously differentiable with derivative
 %
 \begin{align}\eqlabel{vb_eta_sens}
 %
@@ -222,8 +262,104 @@ differentiable with derivative
 %
 \end{align}
 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 \begin{proof}
 %
+Let us define some compact notation for the duration of the proof. Let $\ball :=
+\ball_\eta \times \ball_\t$.  Let
+%
+\begin{align*}
+%
+\KLgrad{\eta, \t} :={}&
+    \fracat{\partial \KL{\eta, \t}}{\partial \eta}{\eta, \t}
+\mathtxt{and}
+\KLhess{\eta, \t} :={}&
+    \fracat{\partial^2 \KL{\eta, \t}}
+           {\partial \eta \partial \eta^T}{\eta, \t}.
+%
+\end{align*}
+%
+Additionally, define $\rho(\etanuk, \t) :={} \expect{\q(\nu \vert \etanuk)}{\log
+\pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)}$, with
+%
+\begin{align*}
+%
+\rho_\eta(\etanuk, \t) :={}
+    % \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\t(\nu)}}
+    %        {\partial \etanuk}{\etanuk} \mathand
+\fracat{\partial \rho(\etanuk, \t)}
+       {\partial \etanuk}{\etanuk} \mathand
+\rho_{\eta\eta}(\etanuk, \t) :={}
+   \fracat{\partial^2 \rho(\etanuk, \t)}
+          {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+%
+\end{align*}
+
+By \eqref{kl_pert}, we have that
+%
+\begin{align*}
+%
+\KLgrad{\eta, \t} ={}& \KLgrad{\eta, 0} + \rho_\eta(\eta, \t).
+%
+\end{align*}
+%
+By \assuitemref{kl_opt_ok}{kl_diffable}, $\KL{\eta, 0}$ is continuously
+differentiable.
+
+By \assuitemref{kl_opt_ok}{q_stick_regular} and
+\assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
+\lemref{logq_continuous} with $\psi(\nu) = \log \pstick(\nu \vert \t)$ to get
+that $\eta \mapsto \rho_\eta(\eta, \t)$ is continuously differentiable for all
+$\t \in \ball_\t$.
+
+Furthermore, by \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
+the Lebesgue dominated convergence theorem to exchange differentiation and
+integration to write
+%
+\begin{align*}
+%
+\fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t} ={}&
+    \expect{\q(\nu \vert \etanuk)}{
+        \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
+    }.
+%
+\end{align*}
+%
+By \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can again apply the
+Lebesgue dominated convergence theorem, this time to exchange differentiation
+and limits, together with \assuitemref{prior_pert_smooth}{pstick_smooth}, to
+write
+%
+\begin{align*}
+%
+\MoveEqLeft
+\lim_{\t' \rightarrow \t} \abs{\left(
+    \fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t'} -
+    \fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t} \right)}
+\\\le{}&
+\lim_{\t' \rightarrow \t}
+\expect{\q(\nu \vert \etanuk)}{\abs{
+    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t'} -
+    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
+}}
+\\={}&
+\expect{\q(\nu \vert \etanuk)}{\lim_{\t' \rightarrow \t} \abs{
+    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t'} -
+    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
+}}
+\\={}& 0.
+%
+\end{align*}
+%
+It follows that $\t \mapsto \rho_\eta(\eta, \t)$ is also continuously
+differentiable.  Since both its partial derivatives is continuously
+differentiable, the joint map $\eta, \t \mapsto \rho_\eta(\eta, \t)$
+is also continuously differentiable.
+
+
+
+
 The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}.
 %
 \end{proof}
@@ -232,7 +368,7 @@ The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subsection{Evaluating $d\etaopt(\t) / d\t$}
+\subsection{Evaluating $d\etaopt(\t) / d\t$}\seclabel{evaluating_deriv}
 
 In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
 need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
