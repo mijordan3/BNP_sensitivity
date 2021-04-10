@@ -196,8 +196,7 @@ logq_continuous} in \appref{proofs}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_opt_ok}
 %
-Let the following conditions hold for some neighborhood $\ball_\eta$
-of $\etaopt$.
+Let the following conditions on the variational optimum hold.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
@@ -206,8 +205,7 @@ of $\etaopt$.
     continuously differentiable at $\etaopt$.
 
     \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
-    0}} {\partial \eta \partial \eta^T} {\eta}$ is positive definite for all
-    $\eta \in \ball_\eta$.
+    0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
 
     \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
     \vert \etanuk)$ to the stick-breaking posteriors satisfy \assuref{q_regular}
@@ -303,15 +301,13 @@ By \eqref{kl_pert}, we have that
 \KLgrad{\eta, \t} ={}& \KLgrad{\eta, 0} + \rho_\eta(\eta, \t).
 %
 \end{align*}
-%
-By \assuitemref{kl_opt_ok}{kl_diffable}, $\KL{\eta, 0}$ is continuously
-differentiable.
 
-By \assuitemref{kl_opt_ok}{q_stick_regular} and
+By \assuitemref{kl_opt_ok}{kl_diffable}, $\KL{\eta, 0}$ is continuously
+differentiable. By \assuitemref{kl_opt_ok}{q_stick_regular} and
 \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
-\lemref{logq_continuous} with $\psi(\nu) = \log \pstick(\nu \vert \t)$ to get
-that $\eta \mapsto \rho_\eta(\eta, \t)$ is continuously differentiable for all
-$\t \in \ball_\t$.
+\lemref{logq_continuous} with $\psi(\nu) = \log \pstick(\nu \vert \t)$.
+Therefore, $\eta \mapsto \rho_\eta(\eta, \t)$ is continuously differentiable for
+all $\t \in \ball_\t$.
 
 Furthermore, by \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
 the Lebesgue dominated convergence theorem to exchange differentiation and
@@ -353,17 +349,39 @@ write
 \end{align*}
 %
 It follows that $\t \mapsto \rho_\eta(\eta, \t)$ is also continuously
-differentiable.  Since both its partial derivatives is continuously
-differentiable, the joint map $\eta, \t \mapsto \rho_\eta(\eta, \t)$
-is also continuously differentiable.
+differentiable for all $\eta \in \ball_\eta$.  Since both its partial
+derivatives is continuously differentiable, the joint map $\eta, \t \mapsto
+\rho_\eta(\eta, \t)$ is also continuously differentiable.
 
+TODO: you may need to show that the derivatives are continuous in both
+arguments; check a textbook.
 
+Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
+is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
+$\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
+The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}, where
+we make the following formal identifications:
 
-The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}.
+\begin{center}
+\begin{tabular}{|c|c|}
+%
+\hline Krantz \& Parks notation & Our notation \\\hline
+$\Phi(x)$                       & $\KL(\eta, \t)$ \\\hline
+$Q$                             & $1$ \\\hline
+$M$                             & $\etadim$ \\\hline
+$U$                             & $\ball$ \\\hline
+$W$                             & $\ball_\t$ \\\hline
+$x_1,\ldots,x_Q$                & $\t$ \\\hline
+$x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
+$f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
+%
+\end{tabular}
+\end{center}
 %
 \end{proof}
-%
+
+
 \end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
