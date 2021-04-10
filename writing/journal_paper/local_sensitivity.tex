@@ -356,9 +356,10 @@ derivatives is continuously differentiable, the joint map $\eta, \t \mapsto
 TODO: you may need to show that the derivatives are continuous in both
 arguments; check a textbook.
 
-Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
-is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
-$\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
+% This does not appear to be necessary.
+% Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
+% is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
+% $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
 The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}, where
 we make the following formal identifications:
@@ -375,6 +376,7 @@ $W$                             & $\ball_\t$ \\\hline
 $x_1,\ldots,x_Q$                & $\t$ \\\hline
 $x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
 $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
+Equation 3.32                   & \assuitemref{kl_opt_ok}{kl_hess} \\\hline
 %
 \end{tabular}
 \end{center}
