@@ -74,33 +74,63 @@ re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent form:
 The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
 well-defined for any Lebesgue-integrable function $\phi(\nuk):
 (0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
-denominator is positive and finite.
-Define the norm
+denominator is positive and finite.  In fact, let us define the norm
 %
 \begin{align*}
 %
-\norminf{\phi} :={} \esssup_{\nuk} |\phi(\nuk)|.
+\norminf{\phi} :={} \esssup_{\nuk} |\phi(\nuk)|,
 %
 \end{align*}
 %
-Under this norm, $\phi$ is a member of the Banach space $\linf$ equipped with
-the Borel sets and Lebesgue measure (e.g.,
-\citet[Section 2.1, Example 5]{luenberger:1997:optimization} and
-\citet[Theorem 5.2.1]{dudley:2018:real}).
+where $\esssup$ is defined with respect to the Lebesgue measure on $[0,1]$.
+Then $\pstick(\nuk \vert \phi)$ is a valid distribution whenever $\phi$ lies
+within a neighborhood of $\phiz$, as we state in the following proposition.
 
-Note that
+\begin{prop}\proplabel{pert_well_defined}
+%
+Let $\linf$ denote the Banach space of functions on $[0,1]$ with the norm
+$\norminf{\cdot}$ (as in, e.g., \citet[Section 2.1, Example
+5]{luenberger:1997:optimization} or \citet[Theorem 5.2.1]{dudley:2018:real}).
+There exists a $\norminf{\cdot}$-neighborhood of $\phiz$, denoted $\ball_\phi
+\subset \linf$, such that $\pstick(\nuk \vert \phi)$ as defined in
+\eqref{phi_perturbation} is a valid probability density for all $\phi \in
+\ball_\phi$.
+%
+\begin{proof}
+%
+The function $\pstick(\nuk \vert \phi)$ is a valid density whenever
+$\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one, and $\int
+\pstick(\nuk \vert \phi) = 1$. Since $\pb(\nuk) \ge 0$,
+
+%
+\begin{align*}
+%
+\essinf_{\nuk \in [0,1]} \exp\left(\log \pb(\nuk) + \phi(\nuk)\right)
+    \ge{}&
+\essinf_{\nuk \in [0,1]} \pb(\nuk)
+\essinf_{\nuk \in [0,1]} \exp\left(\phi(\nuk)\right)
+\ge{}0,
+%
+\end{align*}
+%
+so $\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one. Similarly,
+since $\int \pb(\nuk) d\nuk = 1$,
 %
 \begin{align*}
 %
 \exp(-\norminf{\phi}) \le{}
 \abs{\int_0^1 \exp\left(\log \pb(\nuk) + \phi(\nuk)\right) d\nuk}
 \le{}
-\exp(\norminf{\phi}),
+\exp(\norminf{\phi}).
 %
 \end{align*}
 %
-so that $\pstick(\nuk \vert \phi)$ is a valid distribution whenever
-$\norminf{\phi} < \infty$.  (As pointed out by \citet{gustafson:1996:local}, the
+so that $\int \pstick(\nuk \vert \phi) = 1$ whenever $\norminf{\phi} < \infty$.
+%
+\end{proof}
+%
+\end{prop}
+  (As pointed out by \citet{gustafson:1996:local}, the
 converse is not true---there exist valid distributions with infinte
 $\norminf{\phi}$.)
 
