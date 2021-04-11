@@ -27,17 +27,20 @@ $\eta_0$ and $\lambda$-integrable $M(\zeta)$ with $\int M(\zeta) \lambda(d\zeta)
 %
 \begin{enumerate}
 %
-\item  \itemlabel{kldiffable} The map $\eta \mapsto \log \q(\zeta \vert \eta)$
+\item  \itemlabel{qdiffable} The map $\eta \mapsto \log \q(\zeta \vert \eta)$
 is twice continuously differentiable.
 %
 \item \itemlabel{qdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta) \le
 M(\zeta)$.
 %
 \item \itemlabel{qgraddom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
-\norm{\lqgrad{\zeta \vert \eta}}^2_2 \le M(\zeta)$.
+\norm{\lqgrad{\zeta \vert \eta}}_2 \le M(\zeta)$.
 %
 \item \itemlabel{qhessdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
 \norm{\lqhess{\zeta \vert \eta}}_2 \le M(\zeta)$.
+%
+\item \itemlabel{qgradsqdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
+\norm{\lqgrad{\zeta \vert \eta}}_2^2 \le M(\zeta)$.
 %
 \end{enumerate}
 %
@@ -71,16 +74,20 @@ continuously differentiable.
 $\q(\zeta \vert \eta) \psi(\zeta, \t) \le M_\psi(\zeta)$.
 %
 \item \itemlabel{funqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
 M_\psi(\zeta)$.
 %
 \item \itemlabel{funqhessdom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
 $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
 M_\psi(\zeta)$.
 %
-\item \itemlabel{funqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psigrad{\zeta, \t}
+\item \itemlabel{fungradqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psigrad{\zeta, \t}
 \le M_\psi(\zeta)$.
+%
+\item \itemlabel{funqgradsqdom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
 %
 \end{enumerate}
 %
@@ -120,30 +127,6 @@ Then the following equalties hold:
         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
        \right)
        }\eqlabel{q_sens_is_cov}\\\nonumber\\
-% %
-% \end{align}
-% %
-% and
-% %
-% \begin{align}
-%
-\MoveEqLeft
-\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
-      {\psi(\zeta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
-\nonumber\\&
-\expect{\q(\zeta \vert \eta)}
-       {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
-       \left(
-        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
-       \right)
-       } +
-\nonumber\\ &
-\expect{\q(\zeta \vert \eta)}{
-       \lqhessbar{\zeta \vert \eta}
-       \left(
-        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
-       \right)
-       } \eqlabel{q_score_sens_is_cov}\\\nonumber\\
 %
 \MoveEqLeft
 \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
@@ -152,9 +135,101 @@ Then the following equalties hold:
          {\lqgradbar{\zeta \vert \eta} \left(
           \psigrad{\zeta,\t} - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta, \t})}
          \right)
-         }\eqlabel{q_sens_psi_grad_is_cov}
+         } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
+ %
+ \MoveEqLeft
+ \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+       {\psi(\zeta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
+ \nonumber\\&
+ \expect{\q(\zeta \vert \eta)}
+        {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
+        \left(
+         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+        \right)
+        } +
+ \nonumber\\ &
+ \expect{\q(\zeta \vert \eta)}{
+        \lqhessbar{\zeta \vert \eta}
+        \left(
+         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+        \right)
+        }. \eqlabel{q_score_sens_is_cov}
 %
 \end{align}
+%
+\begin{proof}
+%
+The proof follows by repeatedly using the dominated convergence theorem (DCT) to
+interchange the order of integration and differentiation as in \citep[Theorem
+1]{giordano:2018:covariances}.  For example,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\fracat{\partial \int \q(\zeta \vert \nu) \psi(\zeta \vert \t) \lambda(d\zeta)}
+       {\partial \eta}{\eta}
+={}\\&
+\int \fracat{\partial \q(\zeta \vert \nu) \psi(\zeta \vert \t) }
+          {\partial \eta}{\eta} \lambda(d\zeta)={}
+&\mathtxt{(\assuitemref{dist_nice}{qdom} and the DCT)}
+\\&
+\int \lqgrad{\zeta, \eta} \psi(\zeta \vert \t) \q(\zeta, \eta) \lambda(d\zeta) ={}
+&\mathtxt{(\assuitemref{dist_nice}{qdiffable})}
+\\&
+\expect{\q(\zeta, \eta)}{\lqgrad{\zeta, \eta} \psi(\zeta \vert \t) }.
+%
+\end{align*}
+%
+Applying analogous reasoning to the denominator of
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)} =
+\frac{\int \psi(\zeta, \t) \q(\zeta \vert \eta) \lambda(d\zeta)}
+     {\int \q(\zeta \vert \eta) \lambda(d\zeta)}
+%
+\end{align*}
+%
+and applying the chain rule gives \eqref{q_sens_is_cov}.
+
+Similarly, by applying \assuitemref{dist_fun_nice}{fundom} and the DCT
+gives
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\zeta \vert \eta)}{\psi(\zeta \vert \eta)}}
+       {\partial \t}{\t} ={}&
+\expect{\q(\zeta \vert \eta)}{\psigrad{\zeta \vert \eta}}.
+%
+\end{align*}
+%
+Applying \assuitemref{dist_fun_nice}{funqgraddom} and the DCT gives
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\zeta \vert \eta)}
+                        {\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}}
+       {\partial \t}{\t} ={}&
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta \vert \eta}},
+%
+\end{align*}
+%
+where we have used the fact that the absolute value of any component
+of the vector $\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)$ is
+bounded above by $\norm{\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}_2$,
+together with the fact that, for any fuction $a(\zeta)$,
+%
+\begin{align*}
+%
+\int a(\zeta) \lambda(d\zeta) \le M(\zeta)
+%
+\end{align*}
+%
+
+
+%
+\end{proof}
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
