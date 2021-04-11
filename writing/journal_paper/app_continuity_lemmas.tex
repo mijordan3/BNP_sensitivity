@@ -1,0 +1,212 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{dist_nice}
+%
+Let $\q(\zeta \vert \eta)$ be a density on the random variable $\zeta$
+parameterized by $\eta$ defined relative to a dominating measure $\lambda$.
+%
+Define
+%
+\begin{align*}
+%
+\lqgrad{\zeta \vert \eta} :={}&
+    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}
+    \mathtxt{and}
+%
+\lqhess{\zeta \vert \eta} :={}&
+    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta}.
+%
+\end{align*}
+%
+For a given $\eta_0$, assume there exists a $\ball_\eta$ be some neighborhood of
+$\eta_0$ and $\lambda$-integrable $M(\zeta)$ with $\int M(\zeta) \lambda(d\zeta) <
+\infty$ such that the following conditions hold.
+%
+\begin{enumerate}
+%
+\item  \itemlabel{kldiffable} The map $\eta \mapsto \log \q(\zeta \vert \eta)$
+is twice continuously differentiable.
+%
+\item \itemlabel{qdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta) \le
+M(\zeta)$.
+%
+\item \itemlabel{qgraddom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
+\norm{\lqgrad{\zeta \vert \eta}}^2_2 \le M(\zeta)$.
+%
+\item \itemlabel{qhessdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
+\norm{\lqhess{\zeta \vert \eta}}_2 \le M(\zeta)$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{dist_fun_nice}
+%
+Let \assuref{dist_nice} hold, and let $\psi(\zeta, \t)$ be a scalar-valued
+$\lambda$-measurable function of $\zeta$ and $\t$.  Define
+%
+\begin{align*}
+%
+\psigrad{\zeta, \t} := \fracat{\partial \psi(\zeta, \t)}{\partial \t}{\t}.
+%
+\end{align*}
+%
+For a given $\t_0$, assume
+there exists a $\ball_\t$ be some neighborhood of $\t_0$ and
+$\lambda$-integrable $M_\psi(\zeta)$ with $\int M_\psi(\zeta) \lambda(d\zeta) <
+\infty$ such that the following conditions hold.
+%
+\begin{enumerate}
+%
+\item  \itemlabel{fundiffable} The map $\t \mapsto \psi(\zeta, \t)$ is
+continuously differentiable.
+%
+\item \itemlabel{fundom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \psi(\zeta, \t) \le M_\psi(\zeta)$.
+%
+\item \itemlabel{funqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
+%
+\item \itemlabel{funqhessdom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
+%
+\item \itemlabel{funqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psigrad{\zeta, \t}
+\le M_\psi(\zeta)$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_derivs}
+%
+Let \assuref{dist_nice, dist_fun_nice} hold.  Define
+%
+\begin{align*}
+%
+\lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
+  - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
+\lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
+ - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}} \\
+% \psibar{\zeta, \t} :={}& \psi(\zeta,\t)
+%  - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}\\
+% \psigradbar{\zeta, \t} :={}& \psigrad{\zeta,\t}
+% - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta,\t}}.
+%
+\end{align*}
+%
+Then the following equalties hold:
+%
+\begin{align}
+%
+\MoveEqLeft
+\fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta, \t)}}{\partial \eta}{\eta} ={}
+\expect{\q(\zeta \vert \eta)}
+       {\lqgradbar{\zeta \vert \eta} \left(
+        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+       \right)
+       }\eqlabel{q_sens_is_cov}\\\nonumber\\
+% %
+% \end{align}
+% %
+% and
+% %
+% \begin{align}
+%
+\MoveEqLeft
+\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+      {\psi(\zeta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
+\nonumber\\&
+\expect{\q(\zeta \vert \eta)}
+       {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
+       \left(
+        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+       \right)
+       } +
+\nonumber\\ &
+\expect{\q(\zeta \vert \eta)}{
+       \lqhessbar{\zeta \vert \eta}
+       \left(
+        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+       \right)
+       } \eqlabel{q_score_sens_is_cov}\\\nonumber\\
+%
+\MoveEqLeft
+\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+      {\psi(\zeta, \t)}}{\partial \eta \partial \t}{\eta, \t} ={}\nonumber\\&
+  \expect{\q(\zeta \vert \eta)}
+         {\lqgradbar{\zeta \vert \eta} \left(
+          \psigrad{\zeta,\t} - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta, \t})}
+         \right)
+         }\eqlabel{q_sens_psi_grad_is_cov}
+%
+\end{align}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}
+%
+Under \assuref{q_regular}, the following are continuous functions of
+$\eta$ in $\ball_\eta$:
+%
+\begin{align*}
+%
+\eta \mapsto{}& \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \mathand
+%
+\eta \mapsto{}&
+    \fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta)}}{\partial \eta}{\eta} \mathand
+\eta \mapsto{}&
+    \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+                  {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta}.
+%
+\end{align*}
+%
+\begin{proof}
+%
+By \assuref{q_regular}, $\q(\zeta \vert \eta) \psi(\zeta) < M(\zeta)$, so we can
+apply continuity of $\eta \mapsto \q(\zeta \vert \eta)$ and the Lebesgue dominated
+convergence theorem (CITE DUDLEY) to get
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta}
+\abs{ \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} -
+      \expect{\q(\zeta \vert \eta')}{\psi(\zeta)}} \le{}&
+\lim_{\eta' \rightarrow \eta}
+\int \abs{\psi(\zeta)}
+        \abs{\q(\zeta \vert \eta) -
+             \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}&
+\int \abs{\psi(\zeta)}
+    \lim_{\eta' \rightarrow \eta}
+     \abs{\q(\zeta \vert \eta) -
+          \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}& 0.
+%
+\end{align*}
+%
+Applying analogous reasoning to \eqref{q_sens_is_cov, q_score_sens_is_cov}
+gives the remainig results.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
