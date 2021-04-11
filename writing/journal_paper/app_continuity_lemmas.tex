@@ -107,11 +107,7 @@ Let \assuref{dist_nice, dist_fun_nice} hold.  Define
 \lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
   - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
 \lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
- - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}} \\
-% \psibar{\zeta, \t} :={}& \psi(\zeta,\t)
-%  - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}\\
-% \psigradbar{\zeta, \t} :={}& \psigrad{\zeta,\t}
-% - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta,\t}}.
+ - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}}.
 %
 \end{align*}
 %
@@ -250,46 +246,120 @@ collecting terms.
 
 \begin{lem}\lemlabel{logq_continuous}
 %
-Under \assuref{q_regular}, the following are continuous functions of
-$\eta$ in $\ball_\eta$:
+Let \assuref{dist_nice, dist_fun_nice} hold.  Then
 %
 \begin{align*}
 %
-\eta \mapsto{}& \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} \mathand
+\eta, \t \mapsto \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}
 %
-\eta \mapsto{}&
-    \fracat{\partial \expect{\q(\zeta \vert \eta)}
-              {\psi(\zeta)}}{\partial \eta}{\eta} \mathand
-\eta \mapsto{}&
-    \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
-                  {\psi(\zeta)}}{\partial \eta \partial \eta^2}{\eta}.
+\quad\mathand\quad
+%
+\eta, \t \mapsto  \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}
 %
 \end{align*}
+%
+are continuous on $\ball_\eta \times \ball_\t$.
 %
 \begin{proof}
 %
-By \assuref{q_regular}, $\q(\zeta \vert \eta) \psi(\zeta) < M(\zeta)$, so we can
-apply continuity of $\eta \mapsto \q(\zeta \vert \eta)$ and the Lebesgue dominated
-convergence theorem (CITE DUDLEY) to get
+By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}$ is a continuous combination of terms of the form
 %
 \begin{align*}
 %
-\lim_{\eta' \rightarrow \eta}
-\abs{ \expect{\q(\zeta \vert \eta)}{\psi(\zeta)} -
-      \expect{\q(\zeta \vert \eta')}{\psi(\zeta)}} \le{}&
-\lim_{\eta' \rightarrow \eta}
-\int \abs{\psi(\zeta)}
-        \abs{\q(\zeta \vert \eta) -
-             \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}&
-\int \abs{\psi(\zeta)}
-    \lim_{\eta' \rightarrow \eta}
-     \abs{\q(\zeta \vert \eta) -
-          \q(\zeta \vert \eta')}\lambda(d\zeta) \\={}& 0.
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}}
+       && \mathtxt{\assuitemref{dist_fun_nice}{fungradqgraddom}} \\
+\expect{\q(\zeta \vert \eta)}
+      {\lqgrad{\zeta \vert \eta}}
+      && \mathtxt{\assuitemref{dist_nice}{qgraddom}} \\
+\expect{\q(\zeta \vert \eta)}
+    {\psigrad{\zeta,\t}}.
+    && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}}
 %
 \end{align*}
 %
-Applying analogous reasoning to \eqref{q_sens_is_cov, q_score_sens_is_cov}
-gives the remainig results.
+By the corresponding assumptions, the dominated convergence theorem (DCT)
+applies to each of these terms.  Together with
+\assuitemref{dist_fun_nice}{fundiffable} and \assuitemref{dist_nice}{qdiffable},
+each of the expressions in the preceding display are continuous.  For example,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
+   \expect{\q(\zeta \vert \eta')}
+          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+      }_2 =\\&
+%
+\norm{\int \left(
+\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
+\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
+\right)\lambda(d\zeta)
+}_2  \le\\&
+%
+\int \norm{
+\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
+\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
+}_2 \lambda(d\zeta) \le\\&
+%
+\int \norm{
+\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
+    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \norm{
+\q(\zeta \vert \eta')
+    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
+    \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \norm{
+\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
+    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
+}_2 \lambda(d\zeta).
+%
+\end{align*}
+%
+By \assuitemref{dist_fun_nice}{fungradqgraddom} we can apply the DCT to each
+term in the final line of the preceding display, giving
+%
+\begin{align*}
+%
+\MoveEqLeft
+\lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t}
+\norm{\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
+   \expect{\q(\zeta \vert \eta')}
+          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+      }_2 \le\\&
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
+    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\zeta \vert \eta')
+    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
+    \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
+    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
+}_2 \lambda(d\zeta) = 0,
+%
+\end{align*}
+%
+the final equality following from the continuity assumptions of
+\assuitemref{dist_nice}{qdiffable} and \assuitemref{dist_fun_nice}{fundiffable}.
 %
 \end{proof}
 %
