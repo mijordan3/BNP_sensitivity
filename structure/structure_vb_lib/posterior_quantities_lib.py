@@ -4,7 +4,6 @@ import jax.scipy as sp
 
 from structure_vb_lib import structure_model_lib 
 
-import bnpmodeling_runjingdev.exponential_families as ef
 from bnpmodeling_runjingdev import cluster_quantities_lib, modeling_lib
 
 

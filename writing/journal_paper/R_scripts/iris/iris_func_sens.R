@@ -65,21 +65,21 @@ plot_step_pert_results <- function(results_list,
 }
 
 # TODO this is set manually ... 
-ymax = 0.19
+ymax = 0.25
 
-g0 <- plot_step_pert_results(fpert2_results, 
+g0 <- plot_step_pert_results(fpert1_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = FALSE, 
                              ymax = ymax)
 
-g1 <- plot_step_pert_results(fpert3_results, 
+g1 <- plot_step_pert_results(fpert2_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = TRUE, 
                              ymax = ymax)
 
-g2 <- plot_step_pert_results(fpert1_results, 
+g2 <- plot_step_pert_results(fpert3_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = TRUE, 

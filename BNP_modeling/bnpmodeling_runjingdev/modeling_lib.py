@@ -1,9 +1,10 @@
-import bnpmodeling_runjingdev.exponential_families as ef
-
 import jax
 import jax.numpy as np
 import jax.scipy as sp
 
+import paragami
+
+from bnpmodeling_runjingdev import stick_integration_lib
 
 def assert_positive(x):
     # I happen to use this a lot ...
@@ -12,8 +13,26 @@ def assert_positive(x):
     # and errors can be caught
     return np.where(x < 0, np.nan, x)
 
+##############
+# paragami object for sticks 
+##############
+def get_stick_paragami_object(k_approx, shape = ()):
+    
+    stick_shape = shape + (k_approx - 1, )
+    
+    stick_params_paragami = paragami.PatternDict()
+    
+    stick_params_paragami['stick_means'] = \
+        paragami.NumericArrayPattern(shape = stick_shape)
+    stick_params_paragami['stick_infos'] = \
+        paragami.NumericArrayPattern(shape = stick_shape, lb = 1e-4)
+    
+    return stick_params_paragami
+
+
 ################
 # define entropies
+################
 def multinom_entropy(e_z):
     # returns the entropy of the cluster belongings
     return -1 * np.sum(e_z * np.log(e_z + 1e-8))
@@ -42,91 +61,39 @@ def get_stick_breaking_entropy(stick_propn_mean, stick_propn_info,
     stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv =\
-        ef.get_e_log_logitnormal(
+        stick_integration_lib.get_e_log_logitnormal(
             lognorm_means = stick_propn_mean,
             lognorm_infos = stick_propn_info,
             gh_loc = gh_loc,
             gh_weights = gh_weights)
 
-    return np.sum(ef.univariate_normal_entropy(stick_propn_info)) + \
+    return np.sum(univariate_normal_entropy(stick_propn_info)) + \
                     np.sum(e_log_v + e_log_1mv)
 
-################
-# define priors
-def get_e_centroid_prior(centroids, prior_mean, prior_info):
-    # expected log prior for cluster centroids
-    # Note that the variational distribution for the centroid is a dirac
-    # delta function
+def univariate_normal_entropy(info_obs):
+    # np.sum(sp.stats.norm.entropy(scale=np.sqrt(var_obs)))
+    return 0.5 * np.sum(-1 * np.log(info_obs) + 1 + np.log(2 * np.pi))
 
-    assert prior_info > 0
-
-    beta_base_prior = ef.uvn_prior(prior_mean = prior_mean,
-                                    prior_info = prior_info,
-                                    e_obs = centroids.flatten(),
-                                    var_obs = np.array([0.]))
-
-    return np.sum(beta_base_prior)
-
-def get_e_log_wishart_prior(gamma, df, V_inv):
-    # expected log prior for cluster info matrices gamma
-
-    dim = V_inv.shape[0]
-
-    assert np.shape(gamma)[1] == dim
-
-    tr_V_inv_gamma = np.einsum('ij, kji -> k', V_inv, gamma)
-
-    s, logdet = np.linalg.slogdet(gamma)
-
-    return np.sum((df - dim - 1) / 2 * logdet - 0.5 * tr_V_inv_gamma)
-
-# Get a vector of expected functions of the logit sticks.
-# You can use this to define proportional functional perturbations to the
-# logit stick distributions.
-# The function func should take arguments in the logit stick space, i.e.
-# logit_stick = log(stick / (1 - stick)).
-def get_e_func_logit_stick_vec(stick_propn_mean, stick_propn_info,
-                                gh_loc, gh_weights, func):
-
-    # print('DEBUG: 0th lognorm mean: ', stick_propn_mean[0])
-    # e_phi = np.array([
-    #     ef.get_e_fun_normal(
-    #         stick_propn_mean[k], stick_propn_info[k], \
-    #         gh_loc, gh_weights, func)
-    #     for k in range(len(stick_propn_mean))
-    # ])
-    e_phi = ef.get_e_fun_normal(
-            stick_propn_mean, stick_propn_info, \
-            gh_loc, gh_weights, func)
-
-    return e_phi
-
-def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
-                                gh_loc, gh_weights):
-    # expected log prior for the stick breaking proportions under the
-    # logitnormal variational distribution
-
-    # integration is done numerical with Gauss Hermite quadrature.
-    # gh_loc and gh_weights specifiy the location and weights of the
-    # quadrature points
-
-    gh_weights = assert_positive(gh_weights)
-
-    assert stick_propn_mean.shape == stick_propn_info.shape
-    stick_propn_info = assert_positive(stick_propn_info)
-
-    e_log_v, e_log_1mv = \
-        ef.get_e_log_logitnormal(
-            lognorm_means = stick_propn_mean,
-            lognorm_infos = stick_propn_info,
-            gh_loc = gh_loc,
-            gh_weights = gh_weights)
-
-    return (alpha - 1) * np.sum(e_log_1mv)
+def dirichlet_entropy(alpha):
+        
+    # dimension is (.... x k)
+    
+    dirichlet_dim = alpha.shape[-1]
+    sum_alpha = np.sum(alpha, axis=-1)
+    log_beta = np.sum(sp.special.gammaln(alpha), axis=-1) - \
+               sp.special.gammaln(sum_alpha)
+    
+    entropy = \
+        log_beta - \
+        (dirichlet_dim - sum_alpha) * sp.special.digamma(sum_alpha) - \
+        np.sum((alpha - 1) * sp.special.digamma(alpha), axis=-1)
+    
+    return np.sum(entropy)
 
 
 ##############
 # likelihoods
+##############
 def get_e_log_cluster_probabilities_from_e_log_stick(e_log_v, e_log_1mv):
     zeros_shape = e_log_v.shape[0:-1] + (1,)
 
@@ -153,7 +120,7 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     stick_propn_info = assert_positive(stick_propn_info)
 
     e_log_v, e_log_1mv = \
-        ef.get_e_log_logitnormal(
+        stick_integration_lib.get_e_log_logitnormal(
             lognorm_means = stick_propn_mean,
             lognorm_infos = stick_propn_info,
             gh_loc = gh_loc,
@@ -166,23 +133,32 @@ def get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
     else:
         return e_log_cluster_probs
 
+def get_e_logitnorm_dp_prior(stick_propn_mean, stick_propn_info, alpha,
+                                gh_loc, gh_weights):
+    # expected log prior for the stick breaking proportions under the
+    # logitnormal variational distribution
 
-def loglik_ind(stick_propn_mean, stick_propn_info, e_z, gh_loc, gh_weights):
-
-    # likelihood of cluster belongings e_z
+    # integration is done numerical with Gauss Hermite quadrature.
+    # gh_loc and gh_weights specifiy the location and weights of the
+    # quadrature points
 
     gh_weights = assert_positive(gh_weights)
 
     assert stick_propn_mean.shape == stick_propn_info.shape
-
     stick_propn_info = assert_positive(stick_propn_info)
 
-    # expected log likelihood of all indicators for all n observations
-    e_log_cluster_probs = \
-        get_e_log_cluster_probabilities(stick_propn_mean, stick_propn_info,
-                                        gh_loc, gh_weights)
+    e_log_v, e_log_1mv = \
+        stick_integration_lib.get_e_log_logitnormal(
+            lognorm_means = stick_propn_mean,
+            lognorm_infos = stick_propn_info,
+            gh_loc = gh_loc,
+            gh_weights = gh_weights)
 
-    return np.sum(e_z * e_log_cluster_probs)
+    return (alpha - 1) * np.sum(e_log_1mv)
+
+##############
+# some useful moments
+##############
 
 def get_e_beta(tau):
     # tau should have shape (..., 2). The last dimensions are the

@@ -17,7 +17,6 @@ source("R_scripts/mice/mice_plotting_utils.R")
 load('./R_scripts/data_processed/mice.RData')
 @
 
-Here are results, and a figure. See \figref{example_genes}.
 %
 <<example_genes_cap>>=
 example_genes_cap <- paste(
@@ -53,15 +52,15 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 <<gene_initial_coclustering_cap>>=
 gene_initial_coclustering_cap <- paste(
     "The inferred co-clustering of gene expressions at $\\alpha = 3.$ ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.85, 
+SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
              image_width = 0.6)
 @
 <<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
-p <- plot_coclustering(coclust_init) + 
-  theme(axis.title = element_blank(), 
-        axis.text = element_blank(), 
-        axis.ticks = element_blank(), 
-        legend.text = element_text(size = axis_ticksize))  
+p <- plot_coclustering(coclust_init) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        legend.text = element_text(size = axis_ticksize))
 p
 @
 
@@ -74,17 +73,17 @@ p
 
 
 <<gene_alpha_coclustering_cap>>=
-gene_alpha_coclustering_cap <- 
+gene_alpha_coclustering_cap <-
     paste0("Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
      relative to the co-clustering matrix at alpha = 3.
-     The left column plots differences predicted by the 
-     linear approximation against differences from a model refit. 
-     Each point represents an entry of the co-coclustering matrix. 
-     The middle and right columns display 
-     changes in the co-clustering matrix as obtained by the 
+     The left column plots differences predicted by the
+     linear approximation against differences from a model refit.
+     Each point represents an entry of the co-coclustering matrix.
+     The middle and right columns display
+     changes in the co-clustering matrix as obtained by the
      linear approximation and the model refit, respectively.")
-     
+
 SetImageSize(aspect_ratio=base_aspect_ratio)
 @
 <<gene_alpha_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_alpha_coclustering_cap>>=

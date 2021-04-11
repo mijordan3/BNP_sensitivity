@@ -32,8 +32,8 @@
 }
 
 \caption[The iris data in principal component space and 
-                      model fit at $\alpha = 6$]{The iris data in principal component space and 
-                      model fit at $\alpha = 6$. 
+                      GMM fit at $\alpha = 6$]{The iris data in principal component space and 
+                      GMM fit at $\alpha = 6$. 
                       Colors denote inferred memberships and
                       ellipses are estimated covariances. }\label{fig:iris_fit}
 \end{figure}
@@ -49,12 +49,11 @@
 
 }
 
-\caption[The expected number of clusters in the iris data as $\alpha$ varies]{The expected number of clusters in the iris data as $\alpha$ varies. 
+\caption[The expected number of posterior predictive clusters in the iris data as $\alpha$ varies]{The expected number of posterior predictive clusters in the iris data as $\alpha$ varies. 
 We compute the linear approximation at $\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (orange). In the right plot, the threshold is set at $t = 1$. 
-}\label{fig:iris_alpha_sens}
+We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (orange). In the right plot, the threshold was set at $t = 5$. }\label{fig:iris_alpha_sens}
 \end{figure}
 
 
@@ -70,7 +69,7 @@ We compare against the expected number of clusters obtained by refitting the mod
 }
 
 \caption{Sensitivity of
-        the expected number of clusters in the iris dataset
+        the expected number of posterior predictive clusters in the iris dataset
         to four multiplicative perturbations with 
         $L_{\infty}$-norm equal to one. 
         (Left) The log multiplicative perturbation $\log\phi$ in grey.        
