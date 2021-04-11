@@ -93,7 +93,7 @@ def get_default_prior_params():
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_scale'] = np.array([0.01])
+    prior_params_dict['prior_data_info_scale'] = np.array([0.001])
     prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
