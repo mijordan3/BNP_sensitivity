@@ -360,6 +360,35 @@ term in the final line of the preceding display, giving
 %
 the final equality following from the continuity assumptions of
 \assuitemref{dist_nice}{qdiffable} and \assuitemref{dist_fun_nice}{fundiffable}.
+
+Similarly, $\fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}$ involves terms of the form
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T
+        \psi(\zeta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
+       %
+\expect{\q(\zeta \vert \eta)}
+      {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T}
+      && \mathtxt{\assuitemref{dist_fun_nice}{qgradsqdom}} \\
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqhess{\zeta \vert \eta}
+        \psi(\zeta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}} \\
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqhess{\zeta \vert \eta}},
+       && \mathtxt{\assuitemref{dist_nice}{qhessdom}}
+%
+\end{align*}
+%
+to which we can apply the DCT by the corresponding assumption.  Reasoning
+analogously to the other term, the conclusion follows.
 %
 \end{proof}
 %
