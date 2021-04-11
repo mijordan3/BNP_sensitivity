@@ -192,8 +192,8 @@ Applying analogous reasoning to the denominator of
 %
 and applying the chain rule gives \eqref{q_sens_is_cov}.
 
-Similarly, by applying \assuitemref{dist_fun_nice}{fundom} and the DCT
-gives
+For \eqref{q_sens_psi_grad_is_cov}, by anaologously applying
+\assuitemref{dist_fun_nice}{fundom} and the DCT gives
 %
 \begin{align*}
 %
@@ -215,19 +215,29 @@ Applying \assuitemref{dist_fun_nice}{funqgraddom} and the DCT gives
 %
 \end{align*}
 %
-where we have used the fact that the absolute value of any component
-of the vector $\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)$ is
-bounded above by $\norm{\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}_2$,
-together with the fact that, for any fuction $a(\zeta)$,
+where we have used the fact that the absolute value of any component of the
+vector $\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)$ is bounded above by a
+constant times $\norm{\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}_2$.
+From the preceding two displays, \eqref{q_sens_psi_grad_is_cov} follows.
+
+Finally, for \eqref{q_score_sens_is_cov}, we need to differentiate
+\eqref{q_sens_is_cov}.  In addition to quantities already considered
+above, \eqref{q_sens_is_cov} involves terms of the following form,
+to which we can apply the DCT using the corresponding assumptions:
 %
 \begin{align*}
 %
-\int a(\zeta) \lambda(d\zeta) \le M(\zeta)
+\expect{\q{\zeta \vert \eta}}
+    {\lqgrad{\zeta \vert \eta}} &&
+    \textrm{\assuitemref{dist_nice}{qgraddom}}\\
+\expect{\q{\zeta \vert \eta}}
+    {\lqgrad{\zeta \vert \eta} \psi(\zeta, \t)}. &&
+    \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}
 %
 \end{align*}
 %
-
-
+\Eqref{q_score_sens_is_cov} then follows by differentiating as above and
+collecting terms.
 %
 \end{proof}
 %
