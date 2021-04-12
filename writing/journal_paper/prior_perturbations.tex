@@ -7,51 +7,53 @@ prior, ultimatlely proving an analogue of \thmref{etat_deriv} for a particular
 function space.
 
 To define functional perturbations, fix for the moment a base stick
-distribution, $\pb(\nuk)$ and an alternative stick distribution $\pa(\nuk)$.
+distribution, $\pbase(\nuk)$ and an alternative stick distribution $\palt(\nuk)$.
 Take $\t = \epsilon$ and define
 %
 \begin{align}\eqlabel{epsilon_pert}
 %
 \pstick(\nuk \vert \epsilon) ={}&
-\frac{\pb(\nuk)^{1 - \epsilon} \pa(\nuk)^\epsilon}
-     {\int_0^1 \pb(\nuk')^{1 - \epsilon} \pa(\nuk')^\epsilon d\nuk'}.
+\frac{\pbase(\nuk)^{1 - \epsilon} \palt(\nuk)^\epsilon}
+     {\int_0^1 \pbase(\nuk')^{1 - \epsilon} \palt(\nuk')^\epsilon d\nuk'}.
 %
 \end{align}
 %
 We thus have that $\epsilon$ parameterizes a multiplicative path from
-$\pb(\nuk)$ to $\pa(\nuk)$, with $\pstick(\nuk \vert \epsilon = 0) = \pb(\nuk)$
-and $\pstick(\nuk \vert \epsilon=1) = \pa(\nuk)$.  We will take
+$\pbase(\nuk)$ to $\palt(\nuk)$, with $\pstick(\nuk \vert \epsilon = 0) = \pbase(\nuk)$
+and $\pstick(\nuk \vert \epsilon=1) = \palt(\nuk)$.  We will take
 $\t_0$ to be $\epsilon = 0$, so that we are computing $\etaopt$ with the
-prior $\pb(\nuk)$ and approximating the optimum if we had used $\pa(\nuk)$.
+prior $\pbase(\nuk)$ and approximating the optimum if we had used $\palt(\nuk)$.
 %
 Given this definition,
 %
 \begin{align*}
 %
 \log \pstick(\nuk \vert \epsilon) ={}&
-    \log \pa(\nuk) + \epsilon \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+    \log \palt(\nuk) + \epsilon \log \frac{\palt(\nuk)}{\pbase(\nuk)} + \const.
     & \constdesc{\nuk}
 % \\
 % \fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
-%     \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+%     \log \frac{\palt(\nuk)}{\pbase(\nuk)} + \const.
 %     & \constdesc{\nuk}
 %
 \end{align*}
 %
 Identifying $\t$ with $\epsilon$, we can apply \thmref{etat_deriv} to
-$\pstick(\nuk \vert \epsilon)$ as long as $\log (\pa(\nuk) / \pb(\nuk))$
+$\pstick(\nuk \vert \epsilon)$ as long as $\log (\palt(\nuk) / \pbase(\nuk))$
 satisfies \assuitemref{kl_opt_ok}{q_stick_regular}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}
 %
-We can use \eqref{epsilon_pert} to form an equivalent representatoin of
-the parametric perturbation given in \exref{alpha_perturbation}.  For fixed
+We can use \eqref{epsilon_pert} to form an equivalent representatoin of the
+parametric perturbation given in \exref{alpha_perturbation}.  For fixed
 $\alpha_0$ and $\alpha_1$, take
 %
 \begin{align*}
 %
-\pb(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_0}\\
-\pa(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_1}.
+\pbase(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_0}\\
+\palt(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_1}.
 %
 \end{align*}
 %
@@ -70,25 +72,66 @@ $\alpha = \epsilon \alpha_1$ that the two parameterizations of the prior are
 formally equivalent.
 %
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and so it
-can be useful to think of $\etaopt(\epsilon)$ as functional of the stick
-breaking prior, following \citet{gustafson:1996:local}.  Let us fix $\pb(\nuk)$,
-define $\phi(\nuk) := \epsilon \log \left(\pa(\nuk) / \pb(\nuk)\right)$, and
-re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent form:
+There are many (an infinite number!) of $\palt(\nuk)$ to choose from, so, rather
+than fixing $\palt$, it can be useful to think of $\etaopt(\epsilon)$ as {\em
+functional} of $\palt$ \citep{gustafson:1996:local}.  Let us fix $\pbase(\nuk)$,
+define $\phi(\nuk) := \epsilon \log \left(\palt(\nuk) / \pbase(\nuk)\right)$,
+and re-write $\pstick(\nuk \vert \epsilon)$ in the following equivalent form:
 %
 \begin{align}\eqlabel{phi_perturbation}
 %
 \pstick(\nuk \vert \phi) ={}&
-\frac{\exp\left(\log \pb(\nuk) + \phi(\nuk)\right)}
-     {\int_0^1 \exp\left(\log \pb(\nuk') + \phi(\nuk')\right) d\nuk'}.
+\frac{\exp\left(\log \pbase(\nuk) + \phi(\nuk)\right)}
+     {\int_0^1 \exp\left(\log \pbase(\nuk') + \phi(\nuk')\right) d\nuk'}.
 %
 \end{align}
 %
-The advantage of \eqref{phi_perturbation} is that $\pstick(\nuk \vert \phi)$ is
-well-defined for any Lebesgue-integrable function $\phi(\nuk):
-(0,1)\mapsto\mathbb{R}$, and a valid distribution for any $\phi$ such that the
-denominator is positive and finite.  In fact, let us define the norm
+The advantage of using $\phi$ in \eqref{phi_perturbation} rather than specifying
+$\palt$ directly is that $\pstick(\nuk \vert \phi)$ is well-defined for any
+Lebesgue-integrable function $\phi(\nuk): (0,1)\mapsto\mathbb{R}$, and a valid
+distribution for any function $\phi$ such that the numerator is positive and the
+denominator is nonzero.  We can thus safely define perturbations in terms of
+general functions without worrying about whether the functions are valid
+distributions. We will take $\phiz$ to be the identically zero perturbation so
+that $\pstick(\nuk \vert \phiz) = \pbase(\nuk)$.
+
+By analogy with \eqref{kl_shorthand}, we can write
+%
+\begin{align}\eqlabel{kl_fun_shorthand}
+%
+\KL{\eta, \phi} := \KL{\q(\zeta \vert \eta) || p(\x \vert \theta, \phi)}
+\mathand
+\etaopt(\phi) := \argmin_{\zeta \in \etadom} \KL{\eta, \phi}.
+%
+\end{align}
+%
+Further, by analogy with \eqref{etalin_def}, if the map $\phi \mapsto
+\etaopt(\phi)$ is sufficiently ``nice'', then we might hope to find a linear
+functional $d\etaopt(\phi) / d\phi$ such that
+%
+\begin{align}\eqlabel{etalin_fun_def}
+%
+\etalin(\phi) := \etaopt + \fracat{d \etaopt(\phi)}{d \phi}{\t=0} \phi
+%
+\end{align}
+%
+and $\etaopt(\phi) \approx \etalin(\phi)$ when $\phi$ is ``small'' in some sense
+(again, to be specified precisely below).  The compuationally intensive task of
+finding $\etaopt(\phi)$ for infinitely many alternative prior distributions can
+then be replaced by the analytically and computationally simple $\etalin(\phi)$.
+In addition to approximating the effect of particular perturbations, we will see
+below that the linearization will allow us to find worst-case perturbations as
+well as convenient visual summaries of the effect of prior perturbation.
+
+Our task, then is to find notions of ``nice'' and ''small'' such that
+\eqref{etalin_fun_def} holds and $\etaopt(\phi) \approx \etalin(\phi)$. To that
+end, we will embed $\phi$ in a complete normed vector space, that is, in a
+Banach space.  We can then appeal to the Banach space version of the
+implicit function theorem, in perfect analogy with \thmref{etat_deriv}.
+
+Define the norm
 %
 \begin{align*}
 %
@@ -96,48 +139,50 @@ denominator is positive and finite.  In fact, let us define the norm
 %
 \end{align*}
 %
-where $\esssup$ is defined with respect to the Lebesgue measure on $[0,1]$.
-Then $\pstick(\nuk \vert \phi)$ is a valid distribution whenever $\phi$ lies
-within a neighborhood of $\phiz$, as we state in the following proposition.
+where $\esssup$ is defined with respect to the Lebesgue measure on $[0,1]$. As
+pointed out by \citet{gustafson:1996:local}, $\norminf{\cdot}$ is attactive
+because $\pstick(\nuk \vert \phi)$ is a valid distribution whenever $\phi$ lies
+within a neighborhood of $\phiz$, as we state in the following
+proposition.\footnote{\citet{gustafson:1996:local} also observes that the
+converse of \propref{pert_well_defined} is not true---there exist valid
+distributions with infinte $\norminf{\phi}$.  We will discuss this and other
+issues related to \citet{gustafson:1996:local} below.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{prop}\proplabel{pert_well_defined}
 %
+% Linf also in \citet[Section 2.1, Example 5]{luenberger:1997:optimization}
 Let $\linf$ denote the Banach space of functions on $[0,1]$ with the norm
-$\norminf{\cdot}$ (as in, e.g., \citet[Section 2.1, Example
-5]{luenberger:1997:optimization} or \citet[Theorem 5.2.1]{dudley:2018:real}).
+$\norminf{\cdot}$ \citep[Theorem 5.2.1]{dudley:2018:real}.
 There exists a $\norminf{\cdot}$-neighborhood of $\phiz$, denoted $\ball_\phi
 \subset \linf$, such that $\pstick(\nuk \vert \phi)$ as defined in
 \eqref{phi_perturbation} is a valid probability density for all $\phi \in
-\ball_\phi$\footnote{As pointed out by \citet{gustafson:1996:local}, the
-converse of \propref{pert_well_defined} not true---there exist valid
-distributions with infinte $\norminf{\phi}$.  We will discuss this and other
-issues related to \citet{gustafson:1996:local} below.}.
+\ball_\phi$
 %
 \begin{proof}
 %
 The function $\pstick(\nuk \vert \phi)$ is a valid density whenever
 $\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one, and $\int
-\pstick(\nuk \vert \phi) = 1$. Since $\pb(\nuk) \ge 0$,
+\pstick(\nuk \vert \phi) = 1$. Since $\pbase(\nuk) \ge 0$,
 %
 \begin{align*}
 %
-\essinf_{\nuk \in [0,1]} \exp\left(\log \pb(\nuk) + \phi(\nuk)\right)
+\essinf_{\nuk \in [0,1]} \exp\left(\log \pbase(\nuk) + \phi(\nuk)\right)
     \ge{}&
-\essinf_{\nuk \in [0,1]} \pb(\nuk)
+\essinf_{\nuk \in [0,1]} \pbase(\nuk)
 \essinf_{\nuk \in [0,1]} \exp\left(\phi(\nuk)\right)
 \ge{}0,
 %
 \end{align*}
 %
 so $\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one. Similarly,
-since $\int \pb(\nuk) d\nuk = 1$,
+since $\int \pbase(\nuk) d\nuk = 1$,
 %
 \begin{align*}
 %
 \exp(-\norminf{\phi}) \le{}
-\abs{\int_0^1 \exp\left(\log \pb(\nuk) + \phi(\nuk)\right) d\nuk}
+\abs{\int_0^1 \exp\left(\log \pbase(\nuk) + \phi(\nuk)\right) d\nuk}
 \le{}
 \exp(\norminf{\phi}).
 %

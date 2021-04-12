@@ -57,14 +57,14 @@ problem, \eqref{vb_optimization}.
 
 If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
 already computed the solution $\etaopt$ to the ``original'' problem
-\eqref{vb_optimization}, then we can form a Taylor series
-approximation to $\etaopt(\t)$.  Specifically, we define
+\eqref{vb_optimization}, then we can form a Taylor series approximation to
+$\etaopt(\t)$.  Specifically, we define
 %
-\begin{align*}
+\begin{align}\eqlabel{etalin_def}
 %
-\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t^T}{\t=0} \t .
+\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t}{\t=0} \t .
 %
-\end{align*}
+\end{align}
 %
 Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
 $d\etaopt(\t) / d\t | 0$, evaluating $\etalin(\t)$ involves only
