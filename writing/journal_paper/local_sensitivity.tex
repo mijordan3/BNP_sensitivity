@@ -23,13 +23,13 @@ model
 Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from the
 choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 %
-\begin{align*}
+\begin{align}\eqlabel{gem_alpha_pert}
 %
-\log \pstick(\nuk \vert \t) ={}&
-    (\t + \alpha_0 - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha + \alpha_0 - 1) \log(1 - \nuk) + \const.
+    %& \constdesc{\nuk}
 %
-\end{align*}
+\end{align}
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,8 +112,11 @@ continuously differentiable via the implicit function theorem
 %
 Let $\q(\zeta \vert \eta)$ be a (possibly unnormalized) density over the random
 variable $\zeta$ parameterized by $\eta$ defined relative to a dominating
-measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\zeta \vert \eta)$
-is twice continuously differentiable.
+measure $\lambda$.\footnote{For the purposes of this assumption  $\q(\zeta \vert
+\eta)$ and $\zeta$ can be taken to be some general distribution, not necessarily
+corresponding to our BNP model or variational approximation.} Assume that the
+map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
+differentiable.
 
 Let $\psi(\zeta, \t)$ be a scalar-valued $\lambda$-measurable function of
 $\zeta$ and $\t$.  Assume that the map $\t \mapsto \psi(\zeta, \t)$ is
@@ -169,14 +172,17 @@ M_\psi(\zeta)$.
 \Assuref{dist_fun_nice} states sufficient conditions for which we can apply the
 dominated convergence theorem to varaiational expectations, allowing us to
 translate continuity of the variational and model densitites into continuity of
-the variatioanl objective.  The details can be found in \lemref{logq_derivs,
-logq_continuous} of \appref{cont_lemmas}.
+the variational objective.  The details can be found in \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}.  We might equivalently have said that
+we can exchange limits and variational expectations whenever needed,
+\assuref{dist_fun_nice} simply being a precise catalogue of what is needed.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_opt_ok}
 %
-Let the following conditions on the variational optimum hold.
+Let the following conditions on the variational approximation hold.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
@@ -278,7 +284,7 @@ for all $\t \in \ball_\t$.
 
 We wish to apply the implicit function theorem to
 \eqref{vb_first_order_condition}, for which we must show that $\partial
-\KL{\eta, \t} \partial \eta$ is continuously differentiable in both $\eta$ and
+\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
 $\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
 \partial \eta$ is continuously differentiable, so we need only consider
 $\rho_\eta(\etanuk, \t)$.
@@ -297,10 +303,11 @@ $\t$.
 % is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
 % $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
-Together with \assuitemref{kl_opt_ok}{kl_hess}, the result then follows from the
-implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.
-For convenience, \tabref{kranz_notation} shows the correspondence between
-their notation and ours.
+Together with the fact that $\partial^2 \KL{\eta, \t} / \partial \eta
+\partial\eta^T$ is invertible at $\etaopt$, \assuitemref{kl_opt_ok}{kl_hess},
+the result then follows from the implicit function theorem \citet[Theorem
+3.3.1]{krantz:2012:implicit}. For convenience, \tabref{kranz_notation} shows the
+correspondence between their notation and ours.
 % Note
 % that we make the following formal identifications with the notation of
 % \citet[Theorem 3.3.1]{krantz:2012:implicit}:
@@ -323,7 +330,19 @@ $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
 \end{center}
 %
 \end{proof}
-
-
+%
 \end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{our_approximation}
+%
+For the variational approximation of \secref{model_vb} and perturbation
+given in \exref{alpha_perturbation}, $\alpha \mapsto \etaopt(\alpha)$
+is continuously differentiable.
+%
+\end{cor}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

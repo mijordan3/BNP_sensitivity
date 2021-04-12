@@ -1,43 +1,22 @@
-We now consider two classes of prior perturbations: parametric and
-non-parametric.  Recall from \eqref{sens_mixed_partial} that we
-need to specify a map $\t \mapsto \log \pstick(\nuk \vert \t)$.
+Recall from \exref{alpha_perturbation} and \corref{our_approximation} derive
+sensitivity measures for perturbations that lie within the
+$\mathrm{GEM}(\alpha)$ family.  However, there is typically no {\em a priori}
+reason to believe that the stick breaking prior lies within this parametric
+family.  In this section, we consider perturbing the functional form of the
+prior, ultimatlely proving an analogue of \thmref{etat_deriv} for a particular
+function space.
 
-First, consider the parametric case where we take $\t = \alpha$ and
+To define functional perturbations, fix for the moment a base stick
+distribution, $\pb(\nuk)$ and an alternative stick distribution $\pa(\nuk)$.
+Take $\t = \epsilon$ and define
 %
-\begin{align*}
-%
-\pstick(\nuk \vert \alpha) ={}&
-    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
-\log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
-%
-\end{align*}
-%
-In this case,
-%
-\begin{align*}
-%
-\expect{\q(\nuk \vert \eta)}
-       {\fracat{\log \pstick(\nuk \vert \alpha)}{\partial \alpha}{\alpha_0}
-} ={}&
-    \expect{\q(\nuk \vert \eta)}{\log(1 - \nuk)}.
-%
-\end{align*}
-%
-We can thus numerically compute the needed derivatives.
-
-To consider more general prior perturbations, fix for the moment a base stick
-distribution, $\pb(\nuk)$ and an alternative stick distribution
-$\pa(\nuk)$.  Take $\t = \epsilon$ and define
-%
-\begin{align*}
+\begin{align}\eqlabel{epsilon_pert}
 %
 \pstick(\nuk \vert \epsilon) ={}&
 \frac{\pb(\nuk)^{1 - \epsilon} \pa(\nuk)^\epsilon}
      {\int_0^1 \pb(\nuk')^{1 - \epsilon} \pa(\nuk')^\epsilon d\nuk'}.
 %
-\end{align*}
+\end{align}
 %
 We thus have that $\epsilon$ parameterizes a multiplicative path from
 $\pb(\nuk)$ to $\pa(\nuk)$, with $\pstick(\nuk \vert \epsilon = 0) = \pb(\nuk)$
@@ -49,13 +28,48 @@ Given this definition,
 %
 \begin{align*}
 %
-\fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
-    \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+\log \pstick(\nuk \vert \epsilon) ={}&
+    \log \pa(\nuk) + \epsilon \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
     & \constdesc{\nuk}
+% \\
+% \fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
+%     \log \frac{\pa(\nuk)}{\pb(\nuk)} + \const.
+%     & \constdesc{\nuk}
 %
 \end{align*}
 %
-Again, for a fixed $\pa(\nuk)$ we can compute the needed derivatives.
+Identifying $\t$ with $\epsilon$, we can apply \thmref{etat_deriv} to
+$\pstick(\nuk \vert \epsilon)$ as long as $\log (\pa(\nuk) / \pb(\nuk))$
+satisfies \assuitemref{kl_opt_ok}{q_stick_regular}.
+
+\begin{ex}
+%
+We can use \eqref{epsilon_pert} to form an equivalent representatoin of
+the parametric perturbation given in \exref{alpha_perturbation}.  For fixed
+$\alpha_0$ and $\alpha_1$, take
+%
+\begin{align*}
+%
+\pb(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_0}\\
+\pa(\nuk) :={}& \betadist{\nuk \vert 1, \alpha_1}.
+%
+\end{align*}
+%
+Then, up to a constant not depending on $\nuk$,
+%
+\begin{align}\eqlabel{gem_epsilon_pert}
+%
+\log \pstick(\nuk \vert \epsilon) =
+    (\alpha_0 - 1) \log(1 - \nuk) +
+    \epsilon  (\alpha_1 - \alpha_0) \log(1 - \nuk).
+%
+\end{align}
+%
+Comparing \eqref{gem_alpha_pert} and \eqref{gem_epsilon_pert}, we see by taking
+$\alpha = \epsilon \alpha_1$ that the two parameterizations of the prior are
+formally equivalent.
+%
+\end{ex}
 
 There are many (an infinite number!) of $\pa(\nuk)$ to choose from, and so it
 can be useful to think of $\etaopt(\epsilon)$ as functional of the stick
