@@ -31,10 +31,6 @@ Given this definition,
 \log \pstick(\nuk \vert \epsilon) ={}&
     \log \palt(\nuk) + \epsilon \log \frac{\palt(\nuk)}{\pbase(\nuk)} + \const.
     & \constdesc{\nuk}
-% \\
-% \fracat{\partial \log \pstick(\nuk \vert \epsilon) }{\partial \epsilon}{0} ={}&
-%     \log \frac{\palt(\nuk)}{\pbase(\nuk)} + \const.
-%     & \constdesc{\nuk}
 %
 \end{align*}
 %
@@ -212,36 +208,40 @@ stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Note that \assuref{q_fun_stick_regular} is actually weaker than
-\assuref{q_stick_regular}, the additional assumption in
-\assuref{q_stick_regular} having been replaced by the assumption that
-$\norminf{\phi} < \delta$.
+Superficially \assuref{q_fun_stick_regular} seems weaker than
+\assuref{q_stick_regular}.  However, the additional condition on $\log
+\pstick(\nu \vert \t)$ in \assuref{q_stick_regular} will be replaced in
+\thmref{eta_phi_deriv} by the stronger assumption that $\norminf{\phi} <
+\delta$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}
+\begin{thm}\thmlabel{eta_phi_deriv}
 %
 Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
 \etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
 neighborhood of $\phiz$ as a map from $\linf$ to $\mathbb{R}^\etadim$.
-Furthermore, the derivative in the direction $\phi - \phiz$ is of the form
+Furthermore, the derivative at $\phiz$ in the direction $\phi$ is of the form
 %
-\begin{align*}
+\begin{align}
 %
 \fracat{d \etaopt(\phi)}{d\phi}{\phiz} \phi ={}&
-    \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \\
+    \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \eqlabel{infl_fun_def}\\
 %
+\lqgradbar{\nuk \vert \etanuk} :={}&
+    \lqgradbar{\nuk \vert \etanuk} -
+    \expect{\q(\nu \vert \etanuk)}{\lqgradbar{\nuk \vert \etanuk}}
+    \mathand \nonumber\\
 \infl(\nu) :={}&
 -\left(\fracat{\partial^2 \KL{\eta, \phiz}}
                 {\partial \eta \partial \eta^T}
                 {\etaopt}\right)^{-1}
 \left(
     \sumkm
-    \q(\nu \vert \etaoptnuk)
-    \nabla \log \q(\nu \vert \etaoptnuk)
-\right).
+    \q(\nu \vert \etaoptnuk) \lqgradbar{\nuk \vert \etanuk}
+\right). \nonumber
 %
-\end{align*}
+\end{align}
 %
 
 %
@@ -390,16 +390,17 @@ Next, we consider the partial derivative in the direction $\phi$.  Observing
 that $\rho_\eta(\etanuk, \phi)$ is in fact linear in $\phi$, we see that the
 partial derivative in the $\phi$ direction is given by the linear map
 %
-\begin{align*}
+\begin{align}\eqlabel{rho_phi_partial}
 %
-\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \phi}{\eta, \phi} \phi =
+\fracat{\partial \rho_\eta(\etanuk, \phi)}
+       {\partial \phi}{\eta, \phi} \phi =
     \rho_\eta(\etanuk, \phi).
 %
-\end{align*}
+\end{align}
 %
 By \lemref{logq_derivs} \eqref{q_sens_is_cov},
 %
-\begin{align*}
+\begin{align}\eqlabel{rho_phi_partial_cov}
 %
 \rho_\eta(\etanuk, \phi) ={}&
 \expect{\q(\nuk \vert \etanuk)}
@@ -408,10 +409,8 @@ By \lemref{logq_derivs} \eqref{q_sens_is_cov},
        \right)
        }.
 %
-\end{align*}
+\end{align}
 %
-
-
 Note that
 %
 \begin{align*}
@@ -423,8 +422,8 @@ Note that
 %
 \end{align*}
 %
-so that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is a bounded linear operator and so
-a valid derivative.
+so that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is a bounded linear operator and
+so a valid derivative.
 
 We now need to show continuity of the map of $\eta, \phi \mapsto
 \rho_\eta(\etanuk, \phi)$ in the dual norm $\norm{\cdot}^*$.  Obviously the
@@ -471,9 +470,9 @@ Fre{\'e}chet differentiable ($C^1$ in the notation of Zeidler) in a neighborhood
 of $\etaopt(\phiz), \phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional},
 $\etaopt(\phi)$ is also continuously Fr{\'e}chet differentiable.
 
-The form of the derivative is given by the directional derivatives
-$d \etaopt(\t \phi) / d\t | \t = 0$, which, by \thmref{etat_deriv} are given
-by
+The form of the derivative is given by the directional derivatives $d \etaopt(\t
+\phi) / d\t | \t = 0$, which, by \thmref{etat_deriv} and \eqref{rho_phi_partial,
+rho_phi_partial_cov}, is given by
 %
 \begin{align*}
 %
@@ -481,10 +480,19 @@ by
                 {\partial \eta \partial \eta^T}
                 {\etaopt}\right)^{-1}
 \left(
-    \sumkm \expect{\q(\nu \vert \etaoptnuk)}{\lqgradbar{\nuk \vert \etanuk'} \phi(\nuk)}
+    \sumkm \expect{\q(\nu \vert \etaoptnuk)}
+                  {\lqgradbar{\nuk \vert \etanuk}
+                   \phi(\nuk) }
 \right).
 %
 \end{align*}
+%
+In the last line of the preceding display we have dropped the $\expect{\q(\nuk
+\vert \etanuk)}{\phi(\nuk)}$ term since $\expect{\q(\nu \vert \etaoptnuk)}
+{\lqgradbar{\nuk \vert \etanuk}} = 0$.  (Note that a general version of the
+same result is given immediately following the statement of \citet[Theorem
+4.B(c)]{zeidler:2013:functional}.)  \Eqref{infl_fun_def} follows by
+re-writing the preceding display as an integral.
 %
 \end{proof}
 %
