@@ -320,7 +320,10 @@ Expanding $\logp(\zeta \vert \phi)$ in \eqref{vb_optimization} using
 %
 By \assuref{kl_opt_ok}, $\partial \KL{\eta, \phiz} / \partial \eta$ is
 continuously Fr{\'e}chet differentiable (it does not depend on $\phi$), so we
-need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.
+need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.  As
+in the proof of \thmref{etat_deriv}, we will show continuous differentiability
+by showing that the partial derivatives in the $\eta$ and $\phi$ directions
+are continuous, this time in the dual norm $\norm{\cdot}^*$.
 
 Let us first consider the partial derivative of $\rho_\eta(\etanuk, \phi)$ in
 the $\eta$ direction. By \lemref{logq_derivs} \eqref{q_score_sens_is_cov},
@@ -371,10 +374,89 @@ the preceding display is linear in $\phi$,
 %
 Since continuity in $\norm{\cdot}_2$ implies continuity in $\normop{\cdot}$,
 the preceding display and \lemref{logq_continuous} gives that
-$\partial \rho_\eta(\etanuk, \phi) / \partial \etanuk$ is continuous.
+$\partial \rho_\eta(\etanuk, \phi) / \partial \etanuk$ is continuous,
+since
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta} \lim_{\phi' \rightarrow \phi}
+\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
+      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
+      }^* = 0.
+%
+\end{align*}
+
+Next, we consider the partial derivative in the direction $\phi$.  Observing
+that $\rho_\eta(\etanuk, \phi)$ is in fact linear in $\phi$, we see that the
+partial derivative in the $\phi$ direction is given by the linear map
+%
+\begin{align*}
+%
+\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \phi}{\eta, \phi} \phi =
+    \rho_\eta(\etanuk, \phi).
+%
+\end{align*}
+%
+Note that
+%
+\begin{align*}
+%
+\sup_{\phi: \norminf{\phi} \le 1} \norm{\rho_\eta(\etanuk, \phi)}_2 \le{}&
+    2 \expect{\q(\nuk \vert \etanuk)}
+             {\norm{\lqhessbar{\nuk \vert \etanuk}}_2
+             },
+%
+\end{align*}
+%
+so that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is a bounded linear operator and so
+a valid derivative.
+
+We now need to show continuity of the map of $\eta, \phi \mapsto
+\rho_\eta(\etanuk, \phi)$ in the dual norm $\norm{\cdot}^*$.  Obviously the
+linear map does not depend on the location $\phi$ at which it is evaluated, so
+we need consider only continuity in $\eta$.  The linear map is zero in the
+$\eta$ direction, so the dual norm is given by
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* ={}\\&
+\sup_{\phi: \norminf{\phi} \le 1}
+    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \le{}\\&
+4 \norm{
+    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk'}} -
+    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk}}
+}_2.
+%
+\end{align*}
+%
+Applying \lemref{logq_continuous} to the preceding display gives
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta}
+    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* = 0,
+%
+\end{align*}
+%
+and so $\partial \rho_\eta(\eta, \phi) / \partial \phi$ is a bounded linear
+function, continuous in the point at which it is evaluated, and so continuously
+Fr{\'e}chet differentiable.
+
+Since its partial derivatives are continuously it follows by \citet[Proposition
+4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
+\partial \KL{\eta, \phi} / \partial \eta$ is continuosly Fr{\'e}chet
+differentiable.  Furthermore, \citet[Chapter 4 Condition
+21b]{zeidler:2013:functional} holds since $\KLhess{\etaopt(\phiz), \phiz}$ is
+invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i),
+(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
+the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
+continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
+\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$ is
+also continuously Fr{\'e}chet differentiable.
 
 
-
+%
 \end{proof}
 %
 \end{thm}
