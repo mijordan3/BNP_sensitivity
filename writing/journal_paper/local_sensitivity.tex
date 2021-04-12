@@ -55,41 +55,6 @@ Without loss of generality, we will continue to use $\etaopt$ with no argument
 to refer to $\etaopt(0)$.  That is, we take $\t = 0$ at the ``original''
 problem, \eqref{vb_optimization}.
 
-Expanding $\logp(\zeta \vert \t)$ in \eqref{vb_optimization}, we see that
-%
-\begin{align}
-%
-\logp(\zeta \vert \t) ={}& \logp(\zeta) +
-    \sumkm \left( \log \pstick(\nuk\vert\t) -
-                  \log \pstick(\nuk \vert 0) \right) \Rightarrow \nonumber\\
-\KL{\eta, \t} ={}&
-    \KL{\eta, 0} +
-    \sumkm \expect{\q(\nu\vert\etanuk)}{
-        \log \pstick(\nuk\vert\t) - \log \pstick(\nuk \vert 0)
-    }. \eqlabel{kl_pert}
-%
-\end{align}
-%
-We thus see that the optimization objective $\KL{\eta, \t}$ is the original
-optimiation obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
-$\etanu$ and $\t$.  This fact will be useful in our theoretical results as well
-as the practical considerations of \secref{evaluating_deriv}.
-
-Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
-and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
-continuous, then $\etaopt(\t)$ satisfies the following first-order condition for
-all $\t$:
-%
-\begin{align}\eqlabel{vb_first_order_condition}
-%
-\fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} = 0.
-%
-\end{align}
-%
-Recall that the intractable $\logp(\x \vert \t)$ does not depend on $\eta$, and
-so vanishes in \eqref{vb_first_order_condition}, and in all expressions
-involving partial $\eta$ derivatives of the KL divergence.
-
 If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
 already computed the solution $\etaopt$ to the ``original'' problem
 \eqref{vb_optimization}, then we can form a Taylor series
@@ -139,58 +104,6 @@ When, then, is $\etaopt(\t)$ continuously differentiable?  We now state some
 sufficient conditions which will allow us to prove that $\etaopt(\t)$ is
 continuously differentiable via the implicit function theorem
 (e.g., \citet{krantz:2012:implicit}).
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{assu}[The VB approximation is nice]\assulabel{q_regular}
-% %
-% Define
-% %
-% \begin{align*}
-% %
-% \lqgrad{\zeta \vert \eta} :={}&
-%     \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}
-%     \mathtxt{and}
-% %
-% \lqhess{\zeta \vert \eta} :={}&
-%     \fracat{\partial^2 \log \q(\zeta \vert \eta)}
-%            {\partial \eta \partial \eta^T}{\eta}.
-% %
-% \end{align*}
-% %
-% We say that a variational density $\q(\zeta \vert \eta)$ defined relative to the
-% dominating measure $\lambda(\cdot)$ is ``regular'' if the following conditions
-% hold in a neighborhood $\ball_\eta$ of $\eta_0$:
-% %
-% \begin{itemize}
-% %
-% \item  The map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
-% differentiable.
-% %
-% \item  There exists an envelope function $M(\zeta)$, integrable with respect to
-% $\lambda$ with $\int M(\zeta) \lambda(d\zeta) < \infty$, such that all of
-% $\q(\zeta \vert \eta)$, $\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert
-% \eta}}_2$, and $\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2$ are
-% bounded by $M(\zeta)$ uniformly in $\zeta$.
-% %
-% \item \itemlabel{q_fun_regular} We say that $\q(\zeta \vert \eta)$ is regular
-% for a function $\psi(\zeta): \mathbb{R}^\zetadim \mapsto \mathbb{R}$ if
-% $\q(\zeta \vert \eta) \abs{\psi(\zeta)}$ and $\q(\zeta \vert \eta)
-% \norm{\lqgrad{\zeta \vert \eta}}_2^2 \abs{\psi(\zeta)}$ are also bounded by
-% $M(\zeta)$ uniformly in $\zeta$.
-% %
-% \end{itemize}
-% %
-% %
-% \end{assu}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% \Assuref{q_regular} states conditions under which we interchange limits with
-% variational  expectations, giving continuity of variational expectations and
-% explicit forms for their derivatives (see, e.g., \lemref{logq_derivs,
-% logq_continuous} in \appref{proofs}).
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,36 +166,11 @@ M_\psi(\zeta)$.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\Assuref{dist_fun_nice} states sufficient conditions for which we can
-establish the following lemma.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{lem}\lemlabel{logq_continuous}\seeproof{logq_continuous}
-%
-Let \assuref{dist_fun_nice} hold for some $\psi$ as well as with $\psi(\zeta,
-\t) = 1$.  Then
-%
-\begin{align*}
-%
-\eta, \t \mapsto \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
-\t}{\eta, \t}
-%
-\quad\mathand\quad
-%
-\eta, \t \mapsto  \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
-\eta^T}{\eta}
-%
-\end{align*}
-%
-are continuous on $\ball_\eta \times \ball_\t$.
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\Assuref{dist_fun_nice} states sufficient conditions for which we can apply the
+dominated convergence theorem to varaiational expectations, allowing us to
+translate continuity of the variational and model densitites into continuity of
+the variatioanl objective.  The details can be found in \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -293,6 +181,9 @@ Let the following conditions on the variational optimum hold.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
 %
+    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
+    to $\etadom$.
+
     \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
     continuously differentiable at $\etaopt$.
 
@@ -302,7 +193,7 @@ Let the following conditions on the variational optimum hold.
     \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
     \vert \etanuk)$ to the stick-breaking posteriors satisfy
     \assuref{dist_fun_nice} with $\eta_0 = \etaopt$, with $\psi(\zeta, \t) = 1$,
-    and with $\psi(\zeta, \t) = \log \pstick(\zeta \vert \t)$.
+    and with $\psi(\zeta, \t) = \log \pstick(\zeta \vert \t)$, for all $\k$.
 %
 \end{enumerate}
 %
@@ -332,117 +223,89 @@ Let \assuref{kl_opt_ok} hold.  Then the map $\t \mapsto
 %
 \begin{proof}
 %
-Let us define some compact notation for the duration of the proof. Let $\ball :=
-\ball_\eta \times \ball_\t$, where $\ball_\eta$ is given in
-\assuitemref{kl_opt_ok}{q_stick_regular} (ultimately via \assuref{q_regular})
-and $\ball_\t$ is given in \assuref{prior_pert_smooth}.  Let
+For the duration of the proof, define
 %
 \begin{align*}
 %
-\KLgrad{\eta, \t} :={}&
-    \fracat{\partial \KL{\eta, \t}}{\partial \eta}{\eta, \t}
-\mathtxt{and}
-\KLhess{\eta, \t} :={}&
-    \fracat{\partial^2 \KL{\eta, \t}}
-           {\partial \eta \partial \eta^T}{\eta, \t}.
-%
-\end{align*}
-%
-Additionally, define $\rho(\etanuk, \t) :={} \expect{\q(\nu \vert \etanuk)}{\log
-\pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)}$, with
-%
-\begin{align*}
-%
-\rho_\eta(\etanuk, \t) :={}
-    % \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\t(\nu)}}
-    %        {\partial \etanuk}{\etanuk} \mathand
+\rho(\etanuk, \t) :={}&
+    \expect{\q(\nu \vert \etanuk)}
+           {\log \pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)} \\
+\rho_\eta(\etanuk, \t) :={}&
 \fracat{\partial \rho(\etanuk, \t)}
-       {\partial \etanuk}{\etanuk} \mathand
-\rho_{\eta\eta}(\etanuk, \t) :={}
+       {\partial \etanuk}{\etanuk} \\
+\rho_{\eta\eta}(\etanuk, \t) :={}&
    \fracat{\partial^2 \rho(\etanuk, \t)}
           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
+%
+Expanding $\logp(\zeta \vert \t)$ in \eqref{vb_optimization}, we see that
+%
+\begin{align}
+%
+\logp(\zeta \vert \t) ={}& \logp(\zeta) +
+    \sumkm \left( \log \pstick(\nuk\vert\t) -
+                  \log \pstick(\nuk \vert 0) \right) \Rightarrow \nonumber\\
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} + \sumkm \rho(\etanuk, \t). \eqlabel{kl_pert}
+%
+\end{align}
+%
+We thus see that the optimization objective $\KL{\eta, \t}$ is the original
+optimization obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
+$\etanu$ and $\t$.
 
-By \eqref{kl_pert}, we have that
+By \lemref{logq_derivs}, $\rho(\etanuk, \t)$ is differentiable in $\eta$, and by
+\lemref{logq_continuous} $\etanuk \mapsto \rho(\etanuk, \t)$ is continuously
+differentiable for all $\t \in \ball_\t$.  So $\partial \KL{\eta, \t}  /
+\partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
+first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_first_order_condition}
 %
-\KLgrad{\eta, \t} ={}& \KLgrad{\eta, 0} + \rho_\eta(\eta, \t).
+\fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} ={}
+\fracat{\partial \KL{\eta, 0}}{ \partial \eta}{\etaopt(\t)}
++  \sumkm \rho_\eta(\etaoptnuk(\t), \t) ={} 0
 %
-\end{align*}
+\end{align}
+%
+for all $\t \in \ball_\t$.
+% Recall that the intractable $\logp(\x \vert \t)$
+% does not depend on $\eta$, and so vanishes in \eqref{vb_first_order_condition},
+% and in all expressions involving partial $\eta$ derivatives of the KL
+% divergence.
 
-By \assuitemref{kl_opt_ok}{kl_diffable}, $\KL{\eta, 0}$ is continuously
-differentiable. By \assuitemref{kl_opt_ok}{q_stick_regular} and
-\assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
-\lemref{logq_continuous} with $\psi(\nu) = \log \pstick(\nu \vert \t)$.
-Therefore, $\eta \mapsto \rho_\eta(\eta, \t)$ is continuously differentiable for
-all $\t \in \ball_\t$.
+We wish to apply the implicit function theorem to
+\eqref{vb_first_order_condition}, for which we must show that $\partial
+\KL{\eta, \t} \partial \eta$ is continuously differentiable in both $\eta$ and
+$\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
+\partial \eta$ is continuously differentiable, so we need only consider
+$\rho_\eta(\etanuk, \t)$.
 
-TODO: this is not quite right as-is --- you need to expand the eta derivative
-first.
-
-Furthermore, by \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can apply
-the Lebesgue dominated convergence theorem to exchange differentiation and
-integration to write
-%
-\begin{align*}
-%
-\fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t} ={}&
-    \frac{\partial}{\partial \eta}
-    \expect{\q(\nu \vert \etanuk)}{
-        \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
-    } \Big\vert_\eta.
-%
-\end{align*}
-%
-By \assuitemref{prior_pert_smooth}{q_pstick_regular}, we can again apply the
-Lebesgue dominated convergence theorem, this time to exchange differentiation
-and limits, together with \assuitemref{prior_pert_smooth}{pstick_smooth}, to
-write
-%
-\begin{align*}
-%
-\MoveEqLeft
-\lim_{\t' \rightarrow \t} \abs{\left(
-    \fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t'} -
-    \fracat{\partial \rho_\eta(\eta, \t)}{\partial\t}{\t} \right)}
-\\\le{}&
-\lim_{\t' \rightarrow \t}
-\expect{\q(\nu \vert \etanuk)}{\abs{
-    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t'} -
-    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
-}}
-\\={}&
-\expect{\q(\nu \vert \etanuk)}{\lim_{\t' \rightarrow \t} \abs{
-    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t'} -
-    \fracat{\partial \log \pstick(\nu \vert \t)}{\partial \t}{\t}
-}}
-\\={}& 0.
-%
-\end{align*}
-%
-It follows that $\t \mapsto \rho_\eta(\eta, \t)$ is also continuously
-differentiable for all $\eta \in \ball_\eta$.  Since both its partial
-derivatives is continuously differentiable, the joint map $\eta, \t \mapsto
-\rho_\eta(\eta, \t)$ is also continuously differentiable.
-
-TODO: you may need to show that the derivatives are continuous in both
-arguments; check a textbook.
+By \lemref{logq_continuous} and \assuitemref{kl_opt_ok}{q_stick_regular}, we
+have that both $\partial \rho_\eta(\etanuk, \t) / \partial \eta$ and $\partial
+\rho_\eta(\etanuk, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
+Since both its partial derivatives are continuously differentiable, the joint
+map $\eta, \t \mapsto \rho_\eta(\eta, \t)$ is also continuously differentiable
+(e.g., \citet[Theorem 3.2]{fleming:2012:functions}).  Consequently, $\partial
+\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
+$\t$.
 
 % This does not appear to be necessary.
 % Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
 % is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
 % $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
-The result follows from \citet[Theorem 3.3.1]{krantz:2012:implicit}, where
-we make the following formal identifications:
+Together with \assuitemref{kl_opt_ok}{kl_hess}, the result then follows from the
+implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.  Note
+that we make the following formal identifications with the notation of
+\citet[Theorem 3.3.1]{krantz:2012:implicit}:
 
 \begin{center}
 \begin{tabular}{|c|c|}
 %
 \hline Krantz \& Parks notation & Our notation \\\hline
-$\Phi(x)$                       & $\KL(\eta, \t)$ \\\hline
+$\Phi(x)$                       & $\KL{\eta, \t}$ \\\hline
 $Q$                             & $1$ \\\hline
 $M$                             & $\etadim$ \\\hline
 $U$                             & $\ball$ \\\hline
@@ -450,7 +313,7 @@ $W$                             & $\ball_\t$ \\\hline
 $x_1,\ldots,x_Q$                & $\t$ \\\hline
 $x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
 $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
-Equation 3.32                   & \assuitemref{kl_opt_ok}{kl_hess} \\\hline
+%Equation 3.32                   & \assuitemref{kl_opt_ok}{kl_hess} \\\hline
 %
 \end{tabular}
 \end{center}

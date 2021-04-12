@@ -148,6 +148,40 @@ collecting terms.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}\seeproof{logq_continuous}
+%
+Let \assuref{dist_fun_nice} hold for some $\psi$ as well as with $\psi(\zeta,
+\t) = 1$.  Then
+%
+\begin{align*}
+%
+\eta, \t \mapsto{}& \fracat{\partial
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta}{\eta, \t}
+%
+\mathtxt{,}\\
+%
+\eta, \t \mapsto{}& \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}
+%
+\mathtxt{, and}\\
+%
+\eta, \t \mapsto{}&  \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}
+%
+\end{align*}
+%
+are continuous on $\ball_\eta \times \ball_\t$.
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %
 \begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
 %
