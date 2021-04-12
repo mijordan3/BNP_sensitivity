@@ -1,122 +1,11 @@
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{dist_fun_nice}
-%
-%
-Let $\q(\zeta \vert \eta)$ be a (possibly unnormalized) density over the random
-variable $\zeta$ parameterized by $\eta$ defined relative to a dominating
-measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\zeta \vert \eta)$
-is twice continuously differentiable.
-
-Let $\psi(\zeta, \t)$ be a scalar-valued $\lambda$-measurable function of
-$\zeta$ and $\t$.  Assume that the map $\t \mapsto \psi(\zeta, \t)$ is
-continuously differentiable.
-
-Define the following shorthand notation:
-%
-\begin{align*}
-%
-\lqgrad{\zeta \vert \eta} :={}&
-    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta} \\
-%
-\lqhess{\zeta \vert \eta} :={}&
-    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
-           {\partial \eta \partial \eta^T}{\eta} \\
-%
-\psigrad{\zeta, \t} :={}& \fracat{\partial \psi(\zeta, \t)}{\partial \t}{\t}.
-%
-\end{align*}
-%
-For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
-$\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
-$\lambda$-integrable $M_\psi(\zeta)$ with $\int M_\psi(\zeta) \lambda(d\zeta) <
-\infty$ such that the following conditions hold.
-%
-\begin{enumerate}
-%
-% \item  \itemlabel}, {fundiffab The map $\t \mapsto \psi(\zeta, \t)$ is
-% continuously differentiable.
-%
-\item \itemlabel{fundom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \psi(\zeta, \t) \le M_\psi(\zeta)$.
-%
-\item \itemlabel{funqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
-%
-\item \itemlabel{funqhessdom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
-%
-\item \itemlabel{fungradqgraddom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psigrad{\zeta, \t}
-\le M_\psi(\zeta)$.
-%
-\item \itemlabel{funqgradsqdom} For all $\eta, \t \in \ball_\eta \times \ball_\t$,
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
-%
-\end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{dist_nice}
-%
-Let \assuref{dist_fun_nice} hold with $\psi(\zeta, \t) = 1$.
-
-% , and
-% %
-% Define
-% %
-% \begin{align*}
-% %
-% \lqgrad{\zeta \vert \eta} :={}&
-%     \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}
-%     \mathtxt{and}
-% %
-% \lqhess{\zeta \vert \eta} :={}&
-%     \fracat{\partial^2 \log \q(\zeta \vert \eta)}
-%            {\partial \eta \partial \eta^T}{\eta}.
-% %
-% \end{align*}
-% %
-% For a given $\eta_0$, assume there exists a $\ball_\eta$ be some neighborhood of
-% $\eta_0$ and $\lambda$-integrable $M(\zeta)$ with $\int M(\zeta) \lambda(d\zeta) <
-% \infty$ such that the following conditions hold.
-% %
-% \begin{enumerate}
-% %
-% \item  \itemlabel{qdiffable} The map $\eta \mapsto \log \q(\zeta \vert \eta)$
-% is twice continuously differentiable.
-% %
-% \item \itemlabel{fundom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta) \le
-% M(\zeta)$.
-% %
-% \item \itemlabel{funqgraddom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
-% \norm{\lqgrad{\zeta \vert \eta}}_2 \le M(\zeta)$.
-% %
-% \item \itemlabel{funqhessdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
-% \norm{\lqhess{\zeta \vert \eta}}_2 \le M(\zeta)$.
-% %
-% \item \itemlabel{funqgradsqdom} For all $\eta \in \ball_\eta$, $\q(\zeta \vert \eta)
-% \norm{\lqgrad{\zeta \vert \eta}}_2^2 \le M(\zeta)$.
-% %
-% \end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{lem}\lemlabel{logq_derivs}
 %
-Let \assuref{dist_fun_nice, dist_nice} hold.  Define
+Let \assuref{dist_fun_nice} hold for some $\psi(\zeta, \t)$ as well as
+for $\psi(\zeta, \t) = 1$.  Define
 %
 \begin{align*}
 %
@@ -183,7 +72,7 @@ interchange the order of integration and differentiation as in \citep[Theorem
 ={}\\&
 \int \fracat{\partial \q(\zeta \vert \nu) \psi(\zeta \vert \t) }
           {\partial \eta}{\eta} \lambda(d\zeta)={}
-&\mathtxt{(\assuitemref{dist_nice}{fundom} and the DCT)}
+&\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and the DCT)}
 \\&
 \int \lqgrad{\zeta, \eta} \psi(\zeta \vert \t) \q(\zeta, \eta) \lambda(d\zeta) ={}
 \\&
@@ -240,7 +129,7 @@ to which we can apply the DCT using the corresponding assumptions:
 %
 \expect{\q{\zeta \vert \eta}}
     {\lqgrad{\zeta \vert \eta}} &&
-    \textrm{\assuitemref{dist_nice}{funqgraddom}}\\
+    \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}\\
 \expect{\q{\zeta \vert \eta}}
     {\lqgrad{\zeta \vert \eta} \psi(\zeta, \t)}. &&
     \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}
@@ -259,27 +148,8 @@ collecting terms.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{lem}\lemlabel{logq_continuous}
 %
-Let \assuref{dist_nice, dist_fun_nice} hold.  Then
-%
-\begin{align*}
-%
-\eta, \t \mapsto \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
-\t}{\eta, \t}
-%
-\quad\mathand\quad
-%
-\eta, \t \mapsto  \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
-\eta^T}{\eta}
-%
-\end{align*}
-%
-are continuous on $\ball_\eta \times \ball_\t$.
-%
-\begin{proof}
+\begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
 %
 By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
 \expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
@@ -292,7 +162,7 @@ By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
        && \mathtxt{\assuitemref{dist_fun_nice}{fungradqgraddom}} \\
 \expect{\q(\zeta \vert \eta)}
       {\lqgrad{\zeta \vert \eta}}
-      && \mathtxt{\assuitemref{dist_nice}{funqgraddom}} \\
+      && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}} \\
 \expect{\q(\zeta \vert \eta)}
     {\psigrad{\zeta,\t}}.
     && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}}
@@ -397,7 +267,7 @@ Similarly, $\fracat{\partial^2
 %
 \expect{\q(\zeta \vert \eta)}
        {\lqhess{\zeta \vert \eta}},
-       && \mathtxt{\assuitemref{dist_nice}{funqhessdom}}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}}
 %
 \end{align*}
 %
@@ -406,5 +276,4 @@ analogously to the other term, the conclusion follows.
 %
 \end{proof}
 %
-\end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
