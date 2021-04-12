@@ -1,74 +1,80 @@
 Consider the optimization problem \eqref{vb_optimization}, but now let the
 priors $\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a
 real-valued parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing
-$\pstick(\nuk \vert \t)$.  For example, $\t$ might represent the concentration
-parameter $\alpha$ in the $\mathrm{GEM}(\alpha)$ distribution, or it might
-represent some more general class of perturbations.  In any case, the prior on
-$\zeta$ and posterior in turn depend on $\t$, which we write $p(\zeta \vert \x,
-\t)$.
+$\pstick(\nuk \vert \t)$.
 
-The $\t$ dependence propagates to the optimal
-variational parameters as well.  Define the shorthand notation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{alpha_perturbation}
+%
+When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we
+model
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \alpha) ={}&
+    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from the
+choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
+%
+\begin{align*}
+%
+\log \pstick(\nuk \vert \t) ={}&
+    (\t + \alpha_0 - 1) \log(1 - \nuk) + \const. &
+    \constdesc{\nuk}
+%
+\end{align*}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In \secref{prior_perturbations}, we will consider a more general class of
+perturbations than \exref{alpha_perturbation}.
+
+In any case, the prior on $\zeta$ and posterior in turn depend on $\t$, which we
+write $p(\zeta \vert \x, \t)$. The $\t$ dependence propagates to the optimal
+variational parameters as well through the dependence of the KL divergence on
+$\t$.  Define the shorthand notation
 %
 \begin{align}\eqlabel{kl_shorthand}
 %
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || p(\x \vert \theta, \t)}
+\KL{\eta, \t} := \KL{\q(\zeta \vert \eta) || p(\x \vert \theta, \t)}
 \mathand
-\etaopt(\t) := \argmin_{\eta \in \etadom} \KL{\eta, \t},
+\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
 %
 \end{align}
 %
 where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
+Without loss of generality, we will continue to use $\etaopt$ with no argument
+to refer to $\etaopt(0)$.  That is, we take $\t = 0$ at the ``original''
+problem, \eqref{vb_optimization}.
 
-Assuming that, for all $\t \in \tdom$, $\etaopt(\t)$ is interior to $\etadom$,
-and that the first derivative $\partial \KL{\eta, \t}/ \partial \eta$ is
-continuous, then $\etaopt(\t)$ satisfies the first-order condition
-%
-\begin{align}\eqlabel{vb_first_order_condition}
-%
-\fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} = 0.
-%
-\end{align}
-%
-Recall that the intractable $\logp(\x \vert \t)$ does not depend on
-$\eta$, and so vanishes in \eqref{vb_first_order_condition}, and in all
-expressions involving partial $\eta$ derivatives.
-
-If the second derivative $\partial^2 \KL{\eta, \t}/ \partial \eta \partial
-\eta^T$ is positive definite in a neighborhood of $\etaopt(\t)$ and $\t$, then
-$\etaopt(\t)$ is a differentiable function of $\t$ by the implicit function
-thoerem.  We can then differentiate \eqref{vb_first_order_condition} to get
-%
-\begin{align}\eqlabel{vb_eta_sens}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
-    - \left( \fracat{\partial^2 \KL{\eta, \t}}
-                    {\partial \eta \partial \eta^T}
-                    {\etaopt(\t_0), \t_0} \right)^{-1}
-    \fracat{\partial^2 \KL{\eta, \t}}
-           {\partial \eta \partial \t}
-           {\etaopt(\t_0), \t_0}.
-%
-\end{align}
-
-For a general $\t$, we can form a Taylor series approximation to $\etaopt(\t)$
-from a solution to \eqref{vb_first_order_condition} for some $\t_0$ and the
-result \eqref{vb_eta_sens}.  Specifically, we define
+If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
+already computed the solution $\etaopt$ to the ``original'' problem
+\eqref{vb_optimization}, then we can form a Taylor series
+approximation to $\etaopt(\t)$.  Specifically, we define
 %
 \begin{align*}
 %
-\etalin(\t) := \etaopt(\t_0) + \fracat{d \etaopt(\t)}{d \t^T}{\t_0} (\t - \t_0).
+\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t^T}{\t=0} \t .
 %
 \end{align*}
 %
 Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
-$d\etaopt(\t) / d\t | \t_0$, evaluating $\etalin(\t)$ involves only
-multiplication and addition.  When $|\t - \t_0|$ is small, we might hope
-that $\etaopt(\t) \approx \etalin(\t)$, and so we can use $\etalin(\t)$
-to quickly approximate a time-consuming optimization problem.
+$d\etaopt(\t) / d\t | 0$, evaluating $\etalin(\t)$ involves only
+multiplication and addition.  When $|\t|$ is small, by continuous
+differentiability of $\etaopt(\t)$, we might hope that $\etaopt(\t) \approx
+\etalin(\t)$, and so we can use $\etalin(\t)$ to quickly approximate a
+time-consuming optimization problem.
 
-For functions of interest $\g(\eta)$ which are themselves differentiable,
-we can use the chain rule to compute
+Futhermore, or functions of interest $\g(\eta)$ which are themselves
+differentiable, we can use the chain rule to compute
 %
 \begin{align}\eqlabel{vb_g_sens}
 %
@@ -89,159 +95,235 @@ For non-differentiable functions of $\eta$, we can still form the approximation
 %
 The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
 we can compute influence functions and worst-case perturbations, as we discuss
-below in SECREF.  Converse, $\gapprox(\t)$ may be expected to provide a better
-approximation in some cases since it retains non-linearities in the map $\eta
-\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
-\mapsto \etaopt(\t)$.
+below in \secref{prior_perturbations}.  Converse, $\gapprox(\t)$ may be expected
+to provide a better approximation in some cases since it retains non-linearities
+in the map $\eta \mapsto \g(\eta)$, linearizing only the computationally
+intensive map $\t \mapsto \etaopt(\t)$.
+
+When, then, is $\etaopt(\t)$ continuously differentiable?  We now state some
+sufficient conditions which will allow us to prove that $\etaopt(\t)$ is
+continuously differentiable via the implicit function theorem
+(e.g., \citet{krantz:2012:implicit}).
 
 
-\subsection{Evaluating $d\etaopt(\t) / d\t$}
-
-In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
-need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
-the objective function $\KL{\eta, \t_0}$ and the $\etadim \times 1$ mixed
-second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
-$\t$.  We will discuss these two tasks in turn.
-
-First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
-\partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nuk
-\vert \t)$ depend on $\t$, and so
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{dist_fun_nice}
 %
-\begin{align}\eqlabel{sens_mixed_partial}
+Let $\q(\zeta \vert \eta)$ be a (possibly unnormalized) density over the random
+variable $\zeta$ parameterized by $\eta$ defined relative to a dominating
+measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\zeta \vert \eta)$
+is twice continuously differentiable.
+
+Let $\psi(\zeta, \t)$ be a scalar-valued $\lambda$-measurable function of
+$\zeta$ and $\t$.  Assume that the map $\t \mapsto \psi(\zeta, \t)$ is
+continuously differentiable.
+
+Define the following shorthand notation:
 %
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \t}
-       {\etaopt(\t_0), \t_0} ={}&
-\sum_{\k=1}^{\kmax}
-    \evalat{
-        \frac{\partial}{\partial\eta}
-        \expect{\q(\nuk \vert \eta)}
-               {\fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t_0}
-               }
-        }
-        {\etaopt(\t_0)}.
+\begin{align*}
+%
+\lqgrad{\zeta \vert \eta} :={}&
+    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta} \\
+%
+\lqhess{\zeta \vert \eta} :={}&
+    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta} \\
+%
+\psigrad{\zeta, \t} :={}& \fracat{\partial \psi(\zeta, \t)}{\partial \t}{\t}.
+%
+\end{align*}
+%
+For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
+$\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
+$\lambda$-integrable $M_\psi(\zeta)$ with $\int M_\psi(\zeta) \lambda(d\zeta) <
+\infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
+\times \ball_\t$:
+%
+\begin{enumerate}
+%
+\item \itemlabel{fundom}
+$\q(\zeta \vert \eta) \psi(\zeta, \t) \le M_\psi(\zeta)$.
+%
+\item \itemlabel{funqgraddom}
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
+%
+\item \itemlabel{funqhessdom}
+$\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
+%
+\item \itemlabel{fungradqgraddom}
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psigrad{\zeta, \t}
+\le M_\psi(\zeta)$.
+%
+\item \itemlabel{funqgradsqdom}
+$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
+M_\psi(\zeta)$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Assuref{dist_fun_nice} states sufficient conditions for which we can apply the
+dominated convergence theorem to varaiational expectations, allowing us to
+translate continuity of the variational and model densitites into continuity of
+the variatioanl objective.  The details can be found in \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Let the following conditions on the variational optimum hold.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
+    to $\etadom$.
+
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
+    continuously differentiable at $\etaopt$.
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
+    0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
+
+    \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
+    \vert \etanuk)$ to the stick-breaking posteriors satisfy
+    \assuref{dist_fun_nice} with $\eta_0 = \etaopt$, with $\psi(\zeta, \t) = 1$,
+    and with $\psi(\zeta, \t) = \log \pstick(\zeta \vert \t)$, for all $\k$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{etat_deriv}
+%
+Let \assuref{kl_opt_ok} hold.  Then the map $\t \mapsto
+\etaopt(\t)$ is continuously differentiable with derivative
+%
+\begin{align}\eqlabel{vb_eta_sens}
+%
+\fracat{d \etaopt(\t)}{d \t}{0} ={}&
+    - \left( \fracat{\partial^2 \KL{\eta, \t}}
+                    {\partial \eta \partial \eta^T}
+                    {\etaopt, 0} \right)^{-1}
+    \fracat{\partial^2 \KL{\eta, \t}}
+           {\partial \eta \partial \t}
+           {\etaopt, 0}.
 %
 \end{align}
 %
-Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nuk
-\vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
-differentiation, we can evaluate the mixed partial using the derivative of
-\eqref{gh_integral}.  We will consider particular functional forms for
-$\t \mapsto \pstick(\nuk \vert \t)$ in \secref{prior_perturbations}.
-
-Observe that \eqref{sens_mixed_partial} will be zero for all entries of
-$\eta$ other than those that parameterize the sticks.
-
-Typically, it is the computation and factorization of the Hessian matrix that is
-the most computationally intensive part of \eqref{vb_eta_sens}, especially when
-$\etadim$ is large.  However, this Hessian matrix does not depend on $\t$, and
-so can be computed once and re-used for many different values of $\t$, or many
-different classes of prior perturbations.  In our case, we have written
-$\KL{\eta, \t_0}$ as an explicit function of $\eta$.  Consequently, we can
-compute either the Hessian itself or Hessian-vector products using automatic
-differentiation CITE.
-
-The Hessian matrix may be quite large, since it involves the VB parameters for
-all the random effects.  In particular, though the dimensions of $\etanu$ and
-$\etatheta$ are of order $\kmax$, the dimension of $\etaz$ is of order $\kmax
-\times\N$.  For large $\N$, it may not be possible to instantiate the fully
-dense Hessian matrix in memory.  Fortunately, the Hessian of the KL divergence
-is sparse and highly structured in $\etaz$.  In particular, it is
-block-diagonal, with
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{proof}
+%
+For the duration of the proof, define
 %
 \begin{align*}
 %
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta_{\z_{n}} \partial \eta_{\z_{m}}^T}
-       {\etaopt(\t_0), \t_0} ={}& 0 \mathtxt{for}n\ne m.
+\rho(\etanuk, \t) :={}&
+    \expect{\q(\nu \vert \etanuk)}
+           {\log \pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)}
+\mathand\\
+\rho_\eta(\etanuk, \t) :={}&
+\fracat{\partial \rho(\etanuk, \t)}
+       {\partial \etanuk}{\etanuk}.
+% \rho_{\eta\eta}(\etanuk, \t) :={}&
+%    \fracat{\partial^2 \rho(\etanuk, \t)}
+%           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
 %
-Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax -
-1$, and that the Hessian of $\expect{\q(\zeta \vert \eta)}{\logp(\x \vert
-\zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
-being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
+Expanding $\logp(\zeta \vert \t)$ in \eqref{vb_optimization}, we see that
+%
+\begin{align}
+%
+\logp(\zeta \vert \t) ={}& \logp(\zeta) +
+    \sumkm \left( \log \pstick(\nuk\vert\t) -
+                  \log \pstick(\nuk \vert 0) \right) \Rightarrow \nonumber\\
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} + \sumkm \rho(\etanuk, \t). \eqlabel{kl_pert}
+%
+\end{align}
+%
+We thus see that the optimization objective $\KL{\eta, \t}$ is the original
+optimization obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
+$\etanu$ and $\t$.
 
-We propose the following techniques for computing the inverse Hessian when the
-fully matrix is prohibitively large.  To describe the techniques it will be
-useful to use the following compact notation.  Let $\gamma = (\theta, \nu)$
-denote all the parameters besides $\z$, and for generic parameters $a$ and $b$
-let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
-\eta_b^T}{\etaopt(\t_0), \t_0}$, the Hessian with respect to the variational
-parameters governing $a$ and $b$.  Specifically:
+By \lemref{logq_derivs}, $\rho(\etanuk, \t)$ is differentiable in $\eta$, and by
+\lemref{logq_continuous} $\etanuk \mapsto \rho(\etanuk, \t)$ is continuously
+differentiable for all $\t \in \ball_\t$.  So $\partial \KL{\eta, \t}  /
+\partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
+first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_first_order_condition}
 %
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \eta^T}
-       {\etaopt(\t_0), \t_0} ={}&
-\hess{\zeta\zeta} =
-\left(
-\begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
-\end{array}
-\right).
+\fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} ={}
+\fracat{\partial \KL{\eta, 0}}{ \partial \eta}{\etaopt(\t)}
++  \sumkm \rho_\eta(\etaoptnuk(\t), \t) ={} 0
 %
-\end{align*}
+\end{align}
 %
-The terms $\hess{\gamma\gamma}$ and $\hess{\z\gamma} = \hess{\gamma\z}^T$ are
-typically dense and easily computed using atuomatic differentiation, and the
-term $\hess{\z\z}$ is block diagonal with a closed-form inverse.
-%
-Analogously, let
-%
-\begin{align*}
-%
-\hess{\zeta\t} :=
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \t}
-       {\etaopt(\t_0), \t_0},
-%
-\end{align*}
-%
-and observe that
-%
-\begin{align*}
-%
-\hess{\zeta\t} ={}& \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right).
-%
-\end{align*}
+for all $\t \in \ball_\t$.
+% Recall that the intractable $\logp(\x \vert \t)$
+% does not depend on $\eta$, and so vanishes in \eqref{vb_first_order_condition},
+% and in all expressions involving partial $\eta$ derivatives of the KL
+% divergence.
 
-In this notation,
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
--\left(
-\begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
-\end{array}
-\right)^{-1}
-\left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right)
-%
-\end{align*}
-%
-We can then use the Schur complement to get the computationally tractable
-expression:
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
--\left(\begin{array}{c}
-I_{\gamma\gamma} \\
-\hess{\z\z}^{-1} \hess{\z\gamma}
-\end{array}\right)
-\left(\hess{\gamma\gamma} -
-      \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \hess{\gamma\t}.
-%
-\end{align*}
+We wish to apply the implicit function theorem to
+\eqref{vb_first_order_condition}, for which we must show that $\partial
+\KL{\eta, \t} \partial \eta$ is continuously differentiable in both $\eta$ and
+$\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
+\partial \eta$ is continuously differentiable, so we need only consider
+$\rho_\eta(\etanuk, \t)$.
 
-In fact, the former expression can be computed entirely using automatic
-differentiation using the fact that $\etaoptz$ has an explicit closed form given
-$\etaoptgamma$, as dicussed in \exref{qz_form}.  TODO: is this worth writing
-here?
+By \lemref{logq_continuous} and \assuitemref{kl_opt_ok}{q_stick_regular}, we
+have that both $\partial \rho_\eta(\etanuk, \t) / \partial \eta$ and $\partial
+\rho_\eta(\etanuk, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
+Since both its partial derivatives are continuously differentiable, the joint
+map $\eta, \t \mapsto \rho_\eta(\eta, \t)$ is also continuously differentiable
+(e.g., \citet[Theorem 3.2]{fleming:2012:functions}).  Consequently, $\partial
+\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
+$\t$.
 
-When even $\hess{\gamma\gamma}$ is too large to form in memory, one can
-use the conjugate gradient algorithm.  TODO: fill in details.
+% This does not appear to be necessary.
+% Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
+% is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
+% $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
+
+Together with \assuitemref{kl_opt_ok}{kl_hess}, the result then follows from the
+implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.
+For convenience, \tabref{kranz_notation} shows the correspondence between
+their notation and ours.
+% Note
+% that we make the following formal identifications with the notation of
+% \citet[Theorem 3.3.1]{krantz:2012:implicit}:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+%
+\hline Krantz \& Parks notation & Our notation \\\hline
+$\Phi(x)$                       & $\KL{\eta, \t}$ \\\hline
+$Q$                             & $1$ \\\hline
+$M$                             & $\etadim$ \\\hline
+$U$                             & $\ball$ \\\hline
+$W$                             & $\ball_\t$ \\\hline
+$x_1,\ldots,x_Q$                & $\t$ \\\hline
+$x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
+$f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
+%Equation 3.32                   & \assuitemref{kl_opt_ok}{kl_hess} \\\hline
+%
+\end{tabular}\tablabel{kranz_notation}
+\end{center}
+%
+\end{proof}
+
+
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
