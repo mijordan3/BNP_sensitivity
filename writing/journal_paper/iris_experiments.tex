@@ -38,26 +38,26 @@ We wish to evaluate the sensitivity of the expected number of clusters to the
 stick-breaking distribution. 
 Define the expected number of \textit{in-sample} clusters as
 \begin{align*}
-\g_{\text{n.cl}}(\eta) &= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
+\gclusters(\eta) &= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
 \z_{\n\k} > 0}} \\ 
 &= \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
 \left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
 \end{align*}
 %
-The in-sample quantity $\g_{\text{n.cl}}$ is an estimate for 
+The in-sample quantity $\gclusters$ is an estimate for 
 the number of species present in the observed iris dataset. 
 Alternatively, we can define a {\itshape posterior predictive} quantity, 
 which is an estimate of the number of species one would expect to see 
 should a new iris dataset of size $N$ be collected.
 Define the posterior predictive number of clusters as 
 \begin{align*}
-g_{\text{n.cl.pred}}(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k}^\kmax\left(1 -
+\gclusterspred(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k}^\kmax\left(1 -
 (1 - \pi_k)^N\right)},
 \end{align*}
 where recall that $\pi_k$ are the mixture weights computed from the stick-lengths, $\pi_\k = \nuk \prod_{\k' < \k} (1 - \nu_{\k'})$.
 
 We first consider the sensitivity of these posterior quantities 
-$g_{\text{n.cl.}}$ and $g_{\text{n.cl.pred}}$ 
+$\gclusters$ and $\gclusterspred$ 
 to the prior parameter $\alpha$. 
 \figref{beta_priors} displays the probability density functions 
 $\pstick(\nuk \vert \alpha) = \betadist{\nuk \vert 1, \alpha}$ 
@@ -106,13 +106,15 @@ On the other hand, to form the path of $g$ by refitting at each $\alpha$ in
 
 }
 
-\caption[The expected number of posterior predictive clusters as $\alpha$ varies in the 
-the BNP-GMM fit of the iris data]{The expected number of posterior predictive clusters as $\alpha$ varies in the 
-the BNP-GMM fit of the iris data.  
+\caption[The expected number of clusters as $\alpha$ varies in the 
+the BNP-GMM fit of the iris data]{The expected number of clusters as $\alpha$ varies in the 
+the BNP-GMM fit of the iris data. 
+On the left is the sensitivity of the in-sample quantity.  
+On the right is the the predictive quantity. 
 We compute the linear approximation at $\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (orange). In the right plot, the threshold was set at $t = 5$. }\label{fig:iris_alpha_sens}
+We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (orange). }\label{fig:iris_alpha_sens}
 \end{figure}
 
 
@@ -128,7 +130,7 @@ We compare against the expected number of clusters obtained by refitting the mod
 }
 
 \caption{Sensitivity of
-        the expected number of posterior predictive clusters in the iris dataset
+        the expected number of in-sample clusters in the iris dataset
         to four multiplicative perturbations with 
         $L_{\infty}$-norm equal to one. 
         (Left) The log multiplicative perturbation $\log\phi$ in grey.        
@@ -143,4 +145,14 @@ We compare against the expected number of clusters obtained by refitting the mod
 
 \end{knitrout}
 
+
+% \begin{table}[tb]
+% \centering
+% \caption{Timing results on the iris dataset. }
+% \begin{tabular}{|l|r|}
+%     \hline
+%     foo & 1.2
+%     \hline
+% \end{tabular}
+% \end{table}
 

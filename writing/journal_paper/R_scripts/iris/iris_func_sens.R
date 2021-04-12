@@ -65,7 +65,7 @@ plot_step_pert_results <- function(results_list,
 }
 
 # TODO this is set manually ... 
-ymax = 0.25
+ymax = 0.018
 
 g0 <- plot_step_pert_results(fpert1_results, 
                              remove_legend = TRUE, 
@@ -92,7 +92,7 @@ g3 <- plot_step_pert_results(wc_results,
 
 
 
-g0 / g1 / g2 / g3
+g0 / g2 / g1 / g3
 
 
 # grid.arrange(g0, g1, g2, g3, g4, ncol = 1)
