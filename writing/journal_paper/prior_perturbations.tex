@@ -397,13 +397,28 @@ partial derivative in the $\phi$ direction is given by the linear map
 %
 \end{align*}
 %
+By \lemref{logq_derivs} \eqref{q_sens_is_cov},
+%
+\begin{align*}
+%
+\rho_\eta(\etanuk, \phi) ={}&
+\expect{\q(\nuk \vert \etanuk)}
+       {\lqgradbar{\nuk \vert \etanuk} \left(
+        \phi(\nuk) - \expect{\q(\nuk \vert \etanuk)}{\phi(\nuk)}
+       \right)
+       }.
+%
+\end{align*}
+%
+
+
 Note that
 %
 \begin{align*}
 %
 \sup_{\phi: \norminf{\phi} \le 1} \norm{\rho_\eta(\etanuk, \phi)}_2 \le{}&
     2 \expect{\q(\nuk \vert \etanuk)}
-             {\norm{\lqhessbar{\nuk \vert \etanuk}}_2
+             {\norm{\lqgradbar{\nuk \vert \etanuk}}_2
              },
 %
 \end{align*}
@@ -424,8 +439,8 @@ $\eta$ direction, so the dual norm is given by
 \sup_{\phi: \norminf{\phi} \le 1}
     \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \le{}\\&
 4 \norm{
-    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk'}} -
-    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk}}
+    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk'}} -
+    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk}}
 }_2.
 %
 \end{align*}
@@ -440,22 +455,36 @@ Applying \lemref{logq_continuous} to the preceding display gives
 \end{align*}
 %
 and so $\partial \rho_\eta(\eta, \phi) / \partial \phi$ is a bounded linear
-function, continuous in the point at which it is evaluated, and so continuously
-Fr{\'e}chet differentiable.
+function, continuous in the point at which it is evaluated, and so $\phi \mapsto
+\rho_\eta(\eta, \phi)$ is continuously Fr{\'e}chet differentiable.
 
-Since its partial derivatives are continuously it follows by \citet[Proposition
+Since its partial derivatives are continuous, it follows by \citet[Proposition
 4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
-\partial \KL{\eta, \phi} / \partial \eta$ is continuosly Fr{\'e}chet
+\partial \KL{\eta, \phi} / \partial \eta$ is continously Fr{\'e}chet
 differentiable.  Furthermore, \citet[Chapter 4 Condition
 21b]{zeidler:2013:functional} holds since $\KLhess{\etaopt(\phiz), \phiz}$ is
 invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i),
 (ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
-the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
-continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
-\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$ is
-also continuously Fr{\'e}chet differentiable.
+the function $\etaopt(\phi)$ exists.  Moreover, since we have shown that $\eta,
+\phi \mapsto \partial \KL{\eta, \phi} / \partial \eta$ is continuously
+Fre{\'e}chet differentiable ($C^1$ in the notation of Zeidler) in a neighborhood
+of $\etaopt(\phiz), \phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional},
+$\etaopt(\phi)$ is also continuously Fr{\'e}chet differentiable.
 
-
+The form of the derivative is given by the directional derivatives
+$d \etaopt(\t \phi) / d\t | \t = 0$, which, by \thmref{etat_deriv} are given
+by
+%
+\begin{align*}
+%
+-\left(\fracat{\partial^2 \KL{\eta, \phiz}}
+                {\partial \eta \partial \eta^T}
+                {\etaopt}\right)^{-1}
+\left(
+    \sumkm \expect{\q(\nu \vert \etaoptnuk)}{\lqgradbar{\nuk \vert \etanuk'} \phi(\nuk)}
+\right).
+%
+\end{align*}
 %
 \end{proof}
 %
