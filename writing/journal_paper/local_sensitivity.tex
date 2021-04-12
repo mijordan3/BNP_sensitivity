@@ -229,13 +229,14 @@ For the duration of the proof, define
 %
 \rho(\etanuk, \t) :={}&
     \expect{\q(\nu \vert \etanuk)}
-           {\log \pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)} \\
+           {\log \pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)}
+\mathand\\
 \rho_\eta(\etanuk, \t) :={}&
 \fracat{\partial \rho(\etanuk, \t)}
-       {\partial \etanuk}{\etanuk} \\
-\rho_{\eta\eta}(\etanuk, \t) :={}&
-   \fracat{\partial^2 \rho(\etanuk, \t)}
-          {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+       {\partial \etanuk}{\etanuk}.
+% \rho_{\eta\eta}(\etanuk, \t) :={}&
+%    \fracat{\partial^2 \rho(\etanuk, \t)}
+%           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
 %
@@ -297,9 +298,12 @@ $\t$.
 % $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
 Together with \assuitemref{kl_opt_ok}{kl_hess}, the result then follows from the
-implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.  Note
-that we make the following formal identifications with the notation of
-\citet[Theorem 3.3.1]{krantz:2012:implicit}:
+implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.
+For convenience, \tabref{kranz_notation} shows the correspondence between
+their notation and ours.
+% Note
+% that we make the following formal identifications with the notation of
+% \citet[Theorem 3.3.1]{krantz:2012:implicit}:
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -315,7 +319,7 @@ $x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
 $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
 %Equation 3.32                   & \assuitemref{kl_opt_ok}{kl_hess} \\\hline
 %
-\end{tabular}
+\end{tabular}\tablabel{kranz_notation}
 \end{center}
 %
 \end{proof}
