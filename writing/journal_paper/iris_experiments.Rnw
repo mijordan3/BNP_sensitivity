@@ -8,50 +8,30 @@
   
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R", echo=FALSE)
 
 # load data
 load('./R_scripts/data_processed/iris.RData')
-@
-      
-<<beta_priors_cap>>=
-beta_priors_cap <- paste("Probability density functions of $\\text{Beta}(1, \\alpha)$ distributions, for various $\\alpha$. ")
-SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
-@
-<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
-beta_prior <- function(x, alpha){
-  return(dbeta(x, shape1 = 1, shape = alpha))
-}
 
-alpha_vec <- 1:8 * 2
+# some quantities we cite in the text
+min_enum_clust <- round(min(alpha_sens_df$n_clusters_refit), 1)
+max_enum_clust <- round(max(alpha_sens_df$n_clusters_refit), 1)
 
-alpha_density_df <- 
-  data.frame(x = seq(0, 1, length.out = 100))
-
-for(alpha in alpha_vec){
-  alpha_density_df[[paste0('alpha = ', alpha)]] <- 
-    beta_prior(alpha_density_df$x, alpha = alpha)
-}
-
-alpha_density_df %>%
-  gather(key = alpha, value = pdf, -x) %>% 
-  # re-order alphas ... 
-  mutate(alpha_num = sub('alpha = ', '', alpha)) %>% 
-  mutate(alpha_num = as.numeric(alpha_num)) %>% 
-  mutate(alpha = fct_reorder(as.factor(alpha),
-                              alpha_num)) %>% 
-  ggplot() + 
-  geom_line(aes(x = x, y = pdf)) + 
-  facet_wrap(~alpha, nrow = 2) + 
-  ylab('p.d.f.') + 
-  xlab('stick length') +
-  get_fontsizes()
+min_enum_clust_pred <- round(min(alpha_sens_df_pred$n_clusters_refit), 1)
+max_enum_clust_pred <- round(max(alpha_sens_df_pred$n_clusters_refit), 1)
 
 @
 
-      
+We demonstrate the local sensitivity computations on a 
+Gaussian mixture model (GMM) of the iris dataset. 
+The model and variational approximation were detailed in 
+\exref{iris_bnp_process,iris_var_distr}, respectively. 
+\figref{iris_fit} shows the GMM fit at $\alpha = 6$. 
+The data consists of three species of iris, and
+the BNP model correspondingly identifies three dominant clusters. 
+
 <<iris_fit_cap>>=
 iris_fit_cap <- paste("The iris data in principal component space and 
                       GMM fit at $\\alpha = 6$. 
@@ -65,10 +45,69 @@ source('./R_scripts/iris/iris_init_fit.R',
        echo=knitr_debug, print.eval=TRUE)
 @
 
+We wish to evaluate the sensitivity of the expected number of clusters to the 
+stick-breaking distribution. 
+Define the expected number of \textit{in-sample} clusters as
+\begin{align*}
+\g_{\text{n.cl}}(\eta) &= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
+\z_{\n\k} > 0}} \\ 
+&= \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
+\left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
+\end{align*}
+%
+The in-sample quantity $\g_{\text{n.cl}}$ is an estimate for 
+the number of species present in the observed iris dataset. 
+Alternatively, we can define a {\itshape posterior predictive} quantity, 
+which is an estimate of the number of species one would expect to see 
+should a new iris dataset of size $N$ be collected.
+Define the posterior predictive number of clusters as 
+\begin{align*}
+g_{\text{n.cl.pred}}(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k}^\kmax\left(1 -
+(1 - \pi_k)^N\right)},
+\end{align*}
+where recall that $\pi_k$ are the mixture weights computed from the stick-lengths, $\pi_\k = \nuk \prod_{\k' < \k} (1 - \nu_{\k'})$.
+
+We first consider the sensitivity of these posterior quantities 
+$g_{\text{n.cl.}}$ and $g_{\text{n.cl.pred}}$ 
+to the prior parameter $\alpha$. 
+\figref{beta_priors} displays the probability density functions 
+$\pstick(\nuk \vert \alpha) = \betadist{\nuk \vert 1, \alpha}$ 
+for a range of $\alpha$. 
+
+We first fit the model at $\alpha = 6$. 
+Subsequent refits at $\alpha\not=6$ used the fit at $\alpha = 6$ as an initialization. 
+As $\alpha$ increases, the expected number of clusters increases (\figref{iris_alpha_sens}). 
+The expected number of in-sample clusters is relatively insensitive to changes in the $\alpha$ parameter. 
+As $\alpha$ varies from $\alpha = 1, ..., 16$, the $g_{\text{n.cl.}}$ varies 
+only from \Sexpr{min_enum_clust} to \Sexpr{max_enum_clust} (recall that the true number of iris species is three). 
+On the other hand the posterior preditive quantitiy is sensitive to changes in $\alpha$. Over the same range of $\alpha$, $g_{\text{n.cl.pred}}$ varies from 
+\Sexpr{min_enum_clust_pred} to \Sexpr{max_enum_clust_pred}. 
+
+The linear approximation captures the changes in both the in-sample and predictive number of clusters. 
+We computed the linear approximation at $\alpha = 6$. 
+Forming the linear approximation, which requires inverting the Hessian matrix, required TODO seconds. 
+Subsequent evaluations of $\etalin(\alpha)$ for any $\alpha$ requires only a vector-scalar multiplication and vector-vector addition. 
+Thus, after forming the linear approximation at $\alpha = 6$,
+using the approximation to form the path of $g$ as $\alpha$ varies in
+\figref{iris_alpha_sens} took only TODO seconds. 
+On the other hand, to form the path of $g$ by refitting at each $\alpha$ in 
+\figref{iris_alpha_sens} took TODO seconds in total, with a median refit time of TODO. 
+
+
+
+<<beta_priors_cap>>=
+beta_priors_cap <- paste("Probability density functions of $\\text{Beta}(1, \\alpha)$ distributions, for various $\\alpha$. ")
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
+@
+<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
+source('./R_scripts/iris/plot_beta_priors.R', 
+       echo=knitr_debug, print.eval=TRUE)
+@
+
 <<iris_alpha_sens_cap>>=
       iris_alpha_sens_cap <- paste(
 "The expected number of posterior predictive clusters as $\\alpha$ varies in the 
-the BNP-GMM fit of the iris data. 
+the BNP-GMM fit of the iris data.  
 We compute the linear approximation at $\\alpha=6$ and
 extrapolate the expected number of clusters using the
 linear approximation (green).

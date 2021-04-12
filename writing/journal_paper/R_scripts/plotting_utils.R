@@ -7,8 +7,8 @@ plot_post_stat_trace_plot <- function(alpha_list,
   
   trace_df <- data.frame(alpha = alpha_list, 
                          refit = refit_list, 
-                         lr = lr_list) %>% 
-    gather(key = method, value = value, -alpha)
+                         lin = lr_list) %>% 
+    gather(key = method, value = value, -alpha) 
   
   p <- trace_df %>%
     ggplot(aes(x = alpha, y = value, color = method, shape = method)) + 

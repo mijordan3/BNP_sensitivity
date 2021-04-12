@@ -1,0 +1,16 @@
+We evaluate the local sensitivity of perturbations to the BNP prior on three data analysis examples.
+We first demonstrate the local sensitivity computations using a Gaussian mixture model on the canonical iris data set.
+Secondly, we consider the problem of clustering time-course gene expression data,
+and evaluate the sensitivity of the resulting co-clustering matrix to prior perturbations.
+Finally, we use a BNP model to infer population structure from genetic data.
+
+In each example, we examine the effects varying the parameter $\alpha$
+in the $\betadist{\nuk \vert 1, \alpha}$ distribution on sticks;
+we also examine the effects of changing the functional form the the Beta prior itself.
+We compare the posterior inferences computed from the linear approximation against
+the inferences obtained from re-fitting the model after each prior pertrubation.
+Overall, the linear approximation provides a descriptive tool that well-captures both the
+direction and size of changes in posterior quantities after a prior perturbation.
+Moreover, the speed in forming a linear approximation is up to an order of magnitude faster than refitting the model.
+Lastly, we show that the influence function provides a useful guide in revealing which
+functional pertrubations will result in large changes in the posterior statistic of interest.

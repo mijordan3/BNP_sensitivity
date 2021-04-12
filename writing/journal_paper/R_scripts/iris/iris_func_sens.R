@@ -32,7 +32,7 @@ plot_step_pert_results <- function(results_list,
     ggtitle('sensitivity') + 
     geom_hline(yintercept = 0., color = 'black') + 
     theme(legend.position = 'bottom', 
-          legend.title = element_blank())
+          legend.title = element_blank()) 
   
   if(!is.null(ymax)){
     p3 <- p3 + ylim(c(-ymax, ymax))
