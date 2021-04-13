@@ -76,5 +76,30 @@ fpert1_results <- load_fsens_results(paste0(data_dir, "iris_fpert1.npz"))
 fpert2_results <- load_fsens_results(paste0(data_dir, "iris_fpert2.npz"))
 fpert3_results <- load_fsens_results(paste0(data_dir, "iris_fpert3.npz"))
 
+
+####################
+# alpha timing results
+###################
+alpha_timing <- np$load(paste0(data_dir, "iris_alpha_timing.npz"))
+
+init_fit_time <- sum(alpha_timing['init_fit_time'])
+total_alpha_refit_time <- sum(alpha_timing['refit_time_vec'])
+total_alpha_lr_time <- sum(alpha_timing['lr_time_vec'])
+alpha_hess_time <- alpha_timing['hess_solve_time']
+
+#################
+# worst-case timing results
+#################
+wc_results_file <- np$load(paste0(data_dir, "iris_worst_case.npz"))
+
+# save results at epsilon = 1
+n_epsilon <- length(wc_results_file['refit_time_vec'])
+wc_refit_time <- wc_results_file['refit_time_vec'][n_epsilon]
+wc_lr_time <- wc_results_file['lr_time_vec'][n_epsilon]
+wc_hessian_time <- wc_results_file['hess_solve_time']
+
+# influence function timing 
+infl_time <- influence_data['infl_time'] + influence_data['grad_g_time']
+
 save.image('./R_scripts/data_processed/iris.RData') 
 

@@ -146,13 +146,31 @@ We compare against the expected number of clusters obtained by refitting the mod
 \end{knitrout}
 
 
-% \begin{table}[tb]
-% \centering
-% \caption{Timing results on the iris dataset. }
-% \begin{tabular}{|l|r|}
-%     \hline
-%     foo & 1.2
-%     \hline
-% \end{tabular}
-% \end{table}
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the iris dataset. }
+\begin{tabular}{|r|r|}
+    \hline 
+    & time (seconds) \\ 
+    \hline 
+    Initial fit & 0.96 \\
+    \hline 
+    Hessian solve for $\alpha$ sensitivity & 
+        0.021\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ... , 16$ & 
+        0.018\\
+    Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
+        9.6\\
+    \hline 
+    Hessian solve for worst-case $\phi$ & 
+        0.021\\
+    Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
+    for worst-case $\phi$ & 
+        0.0011\\
+    Refits $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
+        0.72\\ 
+    \hline 
+    The influence function & 0.1\\ \hline
+\end{tabular}
+\end{table}
 

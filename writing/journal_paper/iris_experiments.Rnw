@@ -32,7 +32,7 @@ The model and variational approximation were detailed in
 The data consists of three species of iris, and
 the BNP model correspondingly identifies three dominant clusters. 
 
-<<iris_fit_cap>>=
+<<iris_fit_cap, cache=FALSE>>=
 iris_fit_cap <- paste("The iris data in principal component space and 
                       GMM fit at $\\alpha = 6$. 
                       Colors denote inferred memberships and
@@ -95,7 +95,7 @@ On the other hand, to form the path of $g$ by refitting at each $\alpha$ in
 
 
 
-<<beta_priors_cap>>=
+<<beta_priors_cap, cache=FALSE>>=
 beta_priors_cap <- paste("Probability density functions of $\\text{Beta}(1, \\alpha)$ distributions, for various $\\alpha$. ")
 SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
 @
@@ -104,7 +104,7 @@ source('./R_scripts/iris/plot_beta_priors.R',
        echo=knitr_debug, print.eval=TRUE)
 @
 
-<<iris_alpha_sens_cap>>=
+<<iris_alpha_sens_cap, cache=FALSE>>=
       iris_alpha_sens_cap <- paste(
 "The expected number of clusters as $\\alpha$ varies in the 
 the BNP-GMM fit of the iris data. 
@@ -122,7 +122,7 @@ source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 
-<<iris_fsens_cap>>=
+<<iris_fsens_cap, cache=FALSE>>=
 iris_fsens_cap <- paste(
         "Sensitivity of
         the expected number of in-sample clusters in the iris dataset
@@ -143,13 +143,31 @@ source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 
-% \begin{table}[tb]
-% \centering
-% \caption{Timing results on the iris dataset. }
-% \begin{tabular}{|l|r|}
-%     \hline
-%     foo & 1.2
-%     \hline
-% \end{tabular}
-% \end{table}
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the iris dataset. }
+\begin{tabular}{|r|r|}
+    \hline 
+    & time (seconds) \\ 
+    \hline 
+    Initial fit & \Sexpr{sprintf('%1.2g', init_fit_time)} \\
+    \hline 
+    Hessian solve for $\alpha$ sensitivity & 
+        \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ... , 16$ & 
+        \Sexpr{sprintf('%1.2g', total_alpha_lr_time)}\\
+    Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
+        \Sexpr{sprintf('%1.2g', total_alpha_refit_time)}\\
+    \hline 
+    Hessian solve for worst-case $\phi$ & 
+        \Sexpr{sprintf('%1.2g', wc_hessian_time)}\\
+    Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
+    for worst-case $\phi$ & 
+        \Sexpr{sprintf('%1.2g', wc_lr_time)}\\
+    Refits $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
+        \Sexpr{sprintf('%1.2g', wc_refit_time)}\\ 
+    \hline 
+    The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ \hline
+\end{tabular}
+\end{table}
 
