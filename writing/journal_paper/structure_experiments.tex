@@ -108,3 +108,34 @@
 \end{knitrout}
 
 
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the structure dataset. }
+\begin{tabular}{|r|r|}
+\hline 
+    & time (seconds) \\ 
+    \hline 
+    Initial fit & 6.7 \\
+    \hline
+    Hessian solve for $\alpha$ sensitivity & 
+        0.31\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ..., 10$ & 
+        0.009\\
+    Refits $\eta(\alpha)$ for $\alpha = 1, ..., 10$ & 
+        52\\
+    \hline
+    The influence function & 0.59\\
+    Hessian solve for worst-case $\phi$ &
+        0.37\\
+    Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$ 
+      for worst-case $\phi$ &
+        0.00087\\
+    Refit $\eta(\epsilon)|_{\epsilon = 1}$ 
+      for worst-case $\phi$ &
+        13\\
+    \hline
+\end{tabular}
+\end{table}
+
+
+

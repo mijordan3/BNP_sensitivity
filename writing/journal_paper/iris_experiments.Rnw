@@ -159,6 +159,7 @@ source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
     Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
         \Sexpr{sprintf('%1.2g', total_alpha_refit_time)}\\
     \hline 
+    The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ 
     Hessian solve for worst-case $\phi$ & 
         \Sexpr{sprintf('%1.2g', wc_hessian_time)}\\
     Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
@@ -167,7 +168,6 @@ source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
     Refit $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
         \Sexpr{sprintf('%1.2g', wc_refit_time)}\\ 
     \hline 
-    The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ \hline
 \end{tabular}
 \end{table}
 

@@ -24,8 +24,7 @@ alpha_sens_df <-
     n_clusters_refit = alpha_sens_file['n_clusters_refit'], 
     n_clusters_lr = alpha_sens_file['n_clusters_lr'], 
     n_clusters_thresh_refit = alpha_sens_file['n_clusters_thresh_refit'],
-    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr']) %>%
-  filter(alpha <= 10)
+    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr']) 
 
 threshold <- alpha_sens_file['threshold']
 
@@ -78,10 +77,32 @@ chawia_fsens_results <- load_fsens_data(paste0(data_dir,
                                                'stru_fsens_chawia.npz'))
 
 
-mbololo_data_file <- np$load('./R_scripts/data_raw/structure/stru_fsens_mbololo.npz')
+mbololo_data_file <- np$load(paste0(data_dir, 'stru_fsens_mbololo.npz'))
 admix1_refit <- mbololo_data_file['admix1_refit']
 admix2_refit <- mbololo_data_file['admix2_refit']
 admix1_lr <- mbololo_data_file['admix1_lr']
 admix2_lr <- mbololo_data_file['admix2_lr']
+
+#################
+# timing results
+#################
+
+# for alpha sensitivity
+alpha_timing_results <- 
+  np$load('./R_scripts/data_raw/structure/structure_alphasens_timing.npz')
+init_fit_time <- alpha_timing_results['init_optim_time']
+alpha_hess_time <- alpha_timing_results['hess_solve_time']
+total_alpha_refit_time <- sum(alpha_timing_results['refit_time_vec'])
+total_alpha_lr_time <- sum(alpha_timing_results['lr_time_vec'])
+
+# for functional sensitivity
+# just report for the mbololo region
+fsens_hess_time <- mbololo_data_file['hess_solve_time']
+
+n <- length(mbololo_data_file['refit_time_vec'])
+fsens_refit_time <- mbololo_data_file['refit_time_vec'][n]
+fsens_lr_time <- mbololo_data_file['lr_time_vec'][n]
+
+infl_time <- mbololo_data_file['grad_g_time'] + mbololo_data_file['infl_time']
 
 save.image('./R_scripts/data_processed/structure.RData') 
