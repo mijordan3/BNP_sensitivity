@@ -229,8 +229,8 @@ Furthermore, the derivative at $\phiz$ in the direction $\phi$ is of the form
     \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \eqlabel{infl_fun_def}\\
 %
 \lqgradbar{\nuk \vert \etanuk} :={}&
-    \lqgradbar{\nuk \vert \etanuk} -
-    \expect{\q(\nu \vert \etanuk)}{\lqgradbar{\nuk \vert \etanuk}}
+    \lqgrad{\nuk \vert \etanuk} -
+    \expect{\q(\nu \vert \etanuk)}{\lqgrad{\nuk \vert \etanuk}}
     \mathand \nonumber\\
 \infl(\nu) :={}&
 -\left(\fracat{\partial^2 \KL{\eta, \phiz}}
@@ -352,14 +352,14 @@ the preceding display is linear in $\phi$,
 %
 \norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
       \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-      }^* \le \\
+      }^* \\ \le
 %
 & \norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
         \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'}
-    }^* +
+    }^* + \\&\quad
 \norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'} -
       \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-    }^* \le \\
+    }^* \\ \le
 %
 & \normop{
     \expect{\q(\nuk \vert \etanuk)}
