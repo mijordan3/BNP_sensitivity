@@ -40,30 +40,33 @@ class InfluenceOperator(object):
                             self.get_log_qk(logit_stick, vb_free_params).sum(0)
 
         self.grad_log_q = jax.jacobian(self.get_log_q, argnums = 1)
-
+        
+        # prior density
+        self.get_log_logitstick_prior = lambda x: get_log_logitstick_prior(x,
+                                                                           self.alpha0)
+        
         # a len(vb_opt) x (k_approx - 1) binary matrix
         # with 1 if the ith vb free parameter affects the jth stick distribution.
         self.stick_params_mapping = \
                 get_stick_params_mapping(self.vb_params_paragami, 
                                          stick_key)
-
+        
+        # define the grad_g x prior ratio terms 
+        self.get_grad_log_q_prior_rat_normed = \
+            jax.jit(lambda x : self._get_grad_log_q_prior_rat(x, True))
+        self.get_grad_log_q_prior_rat_unnormed = \
+            jax.jit(lambda x : self._get_grad_log_q_prior_rat(x, False))
+        
+        
     def get_influence(self,
                       logit_stick,
                       grad_g = None, 
                       normalize_by_prior = True):
 
-        # this is len(vb_opt) x len(logit_stick)
-        grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
-
-        # this is (k_approx - 1) x len(logit_stick)
-        prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick, normalize_by_prior))
-        
-        # map each stick to appropriate vb free param
-        # this is len(vb_opt) x len(logit_stick)
-        prior_ratio_expanded = np.dot(self.stick_params_mapping, prior_ratio)
-
-        # combine prior ratio and grad log q
-        grad_log_q_prior_rat = grad_log_q * prior_ratio_expanded
+        if normalize_by_prior: 
+            grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_normed(logit_stick)
+        else: 
+            grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_unnormed(logit_stick)
         
         # solve
         if grad_g is None: 
@@ -79,17 +82,35 @@ class InfluenceOperator(object):
             
         else: 
             assert len(grad_g) == len(self.vb_opt)
-            grad_g_hess_inv = self.hessian_solver(grad_g).block_until_ready()
+            grad_g_hess_inv = self.hessian_solver(grad_g)
             influence = np.dot(grad_g_hess_inv, grad_log_q_prior_rat)
 
             return influence, grad_g_hess_inv
+    
+    def _get_grad_log_q_prior_rat(self, logit_stick, normalize_by_prior = True): 
+        
+        # this is len(vb_opt) x len(logit_stick)
+        grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
 
+        # this is (k_approx - 1) x len(logit_stick)
+        prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick, normalize_by_prior))
+        
+        # map each stick to appropriate vb free param
+        # this is len(vb_opt) x len(logit_stick)
+        prior_ratio_expanded = np.dot(self.stick_params_mapping, prior_ratio)
+
+        # combine prior ratio and grad log q
+        grad_log_q_prior_rat = grad_log_q * prior_ratio_expanded
+        
+        return grad_log_q_prior_rat
+
+    
     def get_q_prior_log_ratio(self, logit_stick, normalize_by_prior = True):
         # this is log q(logit_stick)  - log p_0(logit_stick)
         # returns a matrix of (k_approx - 1) x length(logit_stick)
         
         if normalize_by_prior: 
-            log_beta_prior = get_log_logitstick_prior(logit_stick, self.alpha0)
+            log_beta_prior = self.get_log_logitstick_prior(logit_stick)
             log_beta_prior = np.expand_dims(log_beta_prior, 0)
         else: 
             log_beta_prior = 0.

@@ -1,0 +1,313 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_derivs}
+%
+Let \assuref{dist_fun_nice} hold for some $\psi(\zeta, \t)$ as well as
+for $\psi(\zeta, \t) = 1$.  Define
+%
+\begin{align*}
+%
+\lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
+  - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
+\lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
+ - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}}.
+%
+\end{align*}
+%
+Then the following equalties hold:
+%
+\begin{align}
+%
+\MoveEqLeft
+\fracat{\partial \expect{\q(\zeta \vert \eta)}
+              {\psi(\zeta, \t)}}{\partial \eta}{\eta} ={}
+\expect{\q(\zeta \vert \eta)}
+       {\lqgradbar{\zeta \vert \eta} \left(
+        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+       \right)
+       }\eqlabel{q_sens_is_cov}\\\nonumber\\
+%
+\MoveEqLeft
+\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+      {\psi(\zeta, \t)}}{\partial \eta \partial \t}{\eta, \t} ={}\nonumber\\&
+  \expect{\q(\zeta \vert \eta)}
+         {\lqgradbar{\zeta \vert \eta} \left(
+          \psigrad{\zeta,\t} - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta, \t})}
+         \right)
+         } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
+ %
+ \MoveEqLeft
+ \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
+       {\psi(\zeta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
+ \nonumber\\&
+ \expect{\q(\zeta \vert \eta)}
+        {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
+        \left(
+         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+        \right)
+        } +
+ \nonumber\\ &
+ \expect{\q(\zeta \vert \eta)}{
+        \lqhessbar{\zeta \vert \eta}
+        \left(
+         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+        \right)
+        }. \eqlabel{q_score_sens_is_cov}
+%
+\end{align}
+%
+\begin{proof}
+%
+The proof follows by repeatedly using the dominated convergence theorem (DCT) to
+interchange the order of integration and differentiation as in \citep[Theorem
+1]{giordano:2018:covariances}.  For example,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\fracat{\partial \int \q(\zeta \vert \nu) \psi(\zeta \vert \t) \lambda(d\zeta)}
+       {\partial \eta}{\eta}
+={}\\&
+\int \fracat{\partial \q(\zeta \vert \nu) \psi(\zeta \vert \t) }
+          {\partial \eta}{\eta} \lambda(d\zeta)={}
+&\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and the DCT)}
+\\&
+\int \lqgrad{\zeta, \eta} \psi(\zeta \vert \t) \q(\zeta, \eta) \lambda(d\zeta) ={}
+\\&
+\expect{\q(\zeta, \eta)}{\lqgrad{\zeta, \eta} \psi(\zeta \vert \t) }.
+%
+\end{align*}
+%
+Applying analogous reasoning to the denominator of
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)} =
+\frac{\int \psi(\zeta, \t) \q(\zeta \vert \eta) \lambda(d\zeta)}
+     {\int \q(\zeta \vert \eta) \lambda(d\zeta)}
+%
+\end{align*}
+%
+and applying the chain rule gives \eqref{q_sens_is_cov}.
+
+For \eqref{q_sens_psi_grad_is_cov}, by anaologously applying
+\assuitemref{dist_fun_nice}{fundom} and the DCT gives
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\zeta \vert \eta)}{\psi(\zeta \vert \eta)}}
+       {\partial \t}{\t} ={}&
+\expect{\q(\zeta \vert \eta)}{\psigrad{\zeta \vert \eta}}.
+%
+\end{align*}
+%
+Applying \assuitemref{dist_fun_nice}{funqgraddom} and the DCT gives
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\zeta \vert \eta)}
+                        {\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}}
+       {\partial \t}{\t} ={}&
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta \vert \eta}},
+%
+\end{align*}
+%
+where we have used the fact that the absolute value of any component of the
+vector $\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)$ is bounded above by a
+constant times $\norm{\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}_2$.
+From the preceding two displays, \eqref{q_sens_psi_grad_is_cov} follows.
+
+Finally, for \eqref{q_score_sens_is_cov}, we need to differentiate
+\eqref{q_sens_is_cov}.  In addition to quantities already considered
+above, \eqref{q_sens_is_cov} involves terms of the following form,
+to which we can apply the DCT using the corresponding assumptions:
+%
+\begin{align*}
+%
+\expect{\q{\zeta \vert \eta}}
+    {\lqgrad{\zeta \vert \eta}} &&
+    \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}\\
+\expect{\q{\zeta \vert \eta}}
+    {\lqgrad{\zeta \vert \eta} \psi(\zeta, \t)}. &&
+    \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}
+%
+\end{align*}
+%
+\Eqref{q_score_sens_is_cov} then follows by differentiating as above and
+collecting terms.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}\seeproof{logq_continuous}
+%
+Let \assuref{dist_fun_nice} hold for some $\psi$ as well as with $\psi(\zeta,
+\t) = 1$.  Then
+%
+\begin{align*}
+%
+\eta, \t \mapsto{}& \fracat{\partial
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta}{\eta, \t}
+%
+\mathtxt{,}\\
+%
+\eta, \t \mapsto{}& \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}
+%
+\mathtxt{, and}\\
+%
+\eta, \t \mapsto{}&  \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}
+%
+\end{align*}
+%
+are continuous on $\ball_\eta \times \ball_\t$.
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+\begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
+%
+By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}$ is a continuous combination of terms of the form
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}}
+       && \mathtxt{\assuitemref{dist_fun_nice}{fungradqgraddom}} \\
+\expect{\q(\zeta \vert \eta)}
+      {\lqgrad{\zeta \vert \eta}}
+      && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}} \\
+\expect{\q(\zeta \vert \eta)}
+    {\psigrad{\zeta,\t}}.
+    && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}}
+%
+\end{align*}
+%
+By the corresponding assumptions, the dominated convergence theorem (DCT)
+applies to each of these terms, and by \assuref{dist_fun_nice}, each of the
+expressions in the preceding display are continuous.  For example,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
+   \expect{\q(\zeta \vert \eta')}
+          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+      }_2 =\\&
+%
+\norm{\int \left(
+\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
+\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
+\right)\lambda(d\zeta)
+}_2  \le\\&
+%
+\int \norm{
+\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
+\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
+}_2 \lambda(d\zeta) \le\\&
+%
+\int \norm{
+\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
+    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \norm{
+\q(\zeta \vert \eta')
+    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
+    \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \norm{
+\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
+    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
+}_2 \lambda(d\zeta).
+%
+\end{align*}
+%
+By \assuitemref{dist_fun_nice}{fungradqgraddom} we can apply the DCT to each
+term in the final line of the preceding display, giving
+%
+\begin{align*}
+%
+\MoveEqLeft
+\lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t}
+\norm{\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
+   \expect{\q(\zeta \vert \eta')}
+          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+      }_2 \le\\&
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
+    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\zeta \vert \eta')
+    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
+    \psigrad{\zeta, \t}
+}_2 \lambda(d\zeta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
+    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
+}_2 \lambda(d\zeta) = 0,
+%
+\end{align*}
+%
+the final equality following from the continuity assumptions of
+\assuref{dist_fun_nice}.
+
+Similarly, $\fracat{\partial^2
+\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}$ involves terms of the form
+%
+\begin{align*}
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T
+        \psi(\zeta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
+       %
+\expect{\q(\zeta \vert \eta)}
+      {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T}
+      && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqhess{\zeta \vert \eta}
+        \psi(\zeta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}} \\
+%
+\expect{\q(\zeta \vert \eta)}
+       {\lqhess{\zeta \vert \eta}},
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}}
+%
+\end{align*}
+%
+to which we can apply the DCT by the corresponding assumption.  Reasoning
+analogously to the other term, the conclusion follows.
+%
+\end{proof}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
