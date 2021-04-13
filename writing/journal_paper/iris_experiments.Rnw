@@ -164,7 +164,7 @@ source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
     Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
     for worst-case $\phi$ & 
         \Sexpr{sprintf('%1.2g', wc_lr_time)}\\
-    Refits $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
+    Refit $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
         \Sexpr{sprintf('%1.2g', wc_refit_time)}\\ 
     \hline 
     The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ \hline

@@ -156,3 +156,35 @@
 
 
 \end{knitrout}
+
+
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the mice dataset. }
+\begin{tabular}{|r|r|}
+    \hline 
+    & time (seconds) \\ 
+    \hline 
+    Initial fit & 35 \\
+    \hline 
+    Hessian solve for $\alpha$ sensitivity & 
+        2.6\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
+        0.0013\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
+        0.0012\\
+    Refit $\eta(\alpha)$ for $\alpha = 1$ & 
+        12\\
+    Refit $\eta(\alpha)$ for $\alpha = 11$ & 
+        11\\
+    \hline
+    Hessian solve for $\phi$ &
+        4.9\\
+    Linear approx. $\eta^{lin}(\epsilon)$ at $\epsilon = 1$ &
+        0.001\\
+    Refit $\eta(\epsilon)$ at $\epsilon = 1$ &
+        14\\
+    \hline
+    The influence function & 4.5\\ \hline
+\end{tabular}
+\end{table}

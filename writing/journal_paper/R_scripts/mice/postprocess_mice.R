@@ -153,4 +153,28 @@ coclust_refit_fpert <-
 coclust_lr_fpert <-
   load_coclust_file(fpert_coclust_file, 'coclust_lr') 
 
+####################
+# timing results
+####################
+
+# paramametric sensitivity timing results
+alpha_timing_results <- 
+  np$load(paste0(data_dir, 'mice_alphasens_timing.npz'))
+init_fit_time <- alpha_timing_results['init_optim_time']
+alpha_hess_time <- alpha_timing_results['hessian_solve_time']
+refit_time_vec <- alpha_timing_results['refit_time_vec']
+lr_time_vec <- alpha_timing_results['lr_time_vec']
+
+# functional sensitivity timing results
+fsens_timing_results <- np$load(paste0(data_dir, 
+      'functional_coclustering_gauss_pert1_timing.npz'))
+
+phi_hessian_time <- fsens_timing_results['hess_solve_time']
+
+n <- length(fsens_timing_results['refit_time_vec'])
+phi_refit_time <- fsens_timing_results['refit_time_vec'][n]
+phi_lr_time <- fsens_timing_results['lr_time_vec'][n]
+
+infl_time <- fsens_timing_results['grad_time'] +
+              fsens_timing_results['infl_time']
 save.image('./R_scripts/data_processed/mice.RData') 

@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -18,7 +18,7 @@ load('./R_scripts/data_processed/mice.RData')
 @
 
 %
-<<example_genes_cap>>=
+<<example_genes_cap, cache=FALSE>>=
 example_genes_cap <- paste(
     "(Left) An example gene and its expression over time.
      (Right) The cubic B-spline with 7 degrees of freedom. ")
@@ -33,7 +33,7 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 
 
 
-<<gene_centroids_cap>>=
+<<gene_centroids_cap, cache=FALSE>>=
 gene_centroids_cap <- paste(
     "In blue, inferred centroids from the twelve most occupied clusters.
     In grey, gene expressions averaged over replicates and
@@ -49,7 +49,7 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 
 
 
-<<gene_initial_coclustering_cap>>=
+<<gene_initial_coclustering_cap, cache=FALSE>>=
 gene_initial_coclustering_cap <- paste(
     "The inferred co-clustering of gene expressions at $\\alpha = 3.$ ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
@@ -72,7 +72,7 @@ p
 
 
 
-<<gene_alpha_coclustering_cap>>=
+<<gene_alpha_coclustering_cap, cache=FALSE>>=
 gene_alpha_coclustering_cap <-
     paste0("Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
@@ -93,7 +93,7 @@ source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eva
 
 
 
-<<gene_alpha_coclustering_infl_cap>>=
+<<gene_alpha_coclustering_infl_cap, cache=FALSE>>=
 gene_alpha_coclustering_infl_cap <- paste(
     "The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix. ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.4)
@@ -106,7 +106,7 @@ source("R_scripts/mice/coclustering_influence.R",
 
 
 
-<<gene_fpert_coclustering_cap>>=
+<<gene_fpert_coclustering_cap, cache=FALSE>>=
 gene_fpert_coclustering_cap <- paste(
     "Effect on the co-clustering matrix after a functional perturbation.
      log-phi (top left, in grey) is set to a Gaussian p.d.f. centered at mu = -4.2, and scaled to have L-infinity norm equal to two.
@@ -119,7 +119,7 @@ source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.ev
 @
 
 
-<<alpha_pert_logphi_cap>>=
+<<alpha_pert_logphi_cap, cache=FALSE>>=
 alpha_pert_logphi_cap <- paste(
     "The log multiplicative perturbation $\\log \\phi$ corresponding to decreasing the $\\alpha$ parameter by five (left) or increasing the $\\alpha$ parameter by five (right). ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.5)
@@ -127,3 +127,35 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.5)
 <<alpha_pert_logphi, cache=simple_cache, fig.show='hold', fig.cap=alpha_pert_logphi_cap>>=
 source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
 @
+
+
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the mice dataset. }
+\begin{tabular}{|r|r|}
+    \hline 
+    & time (seconds) \\ 
+    \hline 
+    Initial fit & \Sexpr{sprintf('%1.2g', init_fit_time)} \\
+    \hline 
+    Hessian solve for $\alpha$ sensitivity & 
+        \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
+        \Sexpr{sprintf('%1.2g', lr_time_vec[1])}\\
+    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
+        \Sexpr{sprintf('%1.2g', lr_time_vec[2])}\\
+    Refit $\eta(\alpha)$ for $\alpha = 1$ & 
+        \Sexpr{sprintf('%1.2g', refit_time_vec[1])}\\
+    Refit $\eta(\alpha)$ for $\alpha = 11$ & 
+        \Sexpr{sprintf('%1.2g', refit_time_vec[2])}\\
+    \hline
+    Hessian solve for $\phi$ perturbation &
+        \Sexpr{sprintf('%1.2g', phi_hessian_time)}\\
+    Linear approx. $\eta^{lin}(\epsilon)$ at $\epsilon = 1$ &
+        \Sexpr{sprintf('%1.2g', phi_lr_time)}\\
+    Refit $\eta(\epsilon)$ at $\epsilon = 1$ &
+        \Sexpr{sprintf('%1.2g', phi_refit_time)}\\
+    \hline
+    The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ \hline
+\end{tabular}
+\end{table}
