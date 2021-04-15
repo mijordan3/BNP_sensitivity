@@ -1,19 +1,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Do not edit the TeX file your work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
 % will be overwritten.  Edit the RnW
 % file instead.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
 
 
 We demonstrate the local sensitivity computations on a 
-Gaussian mixture model (GMM) of the iris dataset. 
-The model and variational approximation were detailed in 
+Gaussian mixture model of the iris dataset. 
+The generative model and variational approximation were detailed in 
 \exref{iris_bnp_process,iris_var_distr}, respectively. 
 \figref{iris_fit} shows the GMM fit at $\alpha = 6$. 
-The data consists of three species of iris, and
+The data consists of three iris species, and
 the BNP model correspondingly identifies three dominant clusters. 
 
 
@@ -50,37 +50,60 @@ Alternatively, we can define a {\itshape posterior predictive} quantity,
 which is an estimate of the number of species one would expect to see 
 should a new iris dataset of size $N$ be collected.
 Define the posterior predictive number of clusters as 
-\begin{align*}
-\gclusterspred(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k}^\kmax\left(1 -
+\begin{align}\eqlabel{post_pred_nclusters}
+\gclusterspred(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
 (1 - \pi_k)^N\right)},
-\end{align*}
-where recall that $\pi_k$ are the mixture weights computed from the stick-lengths, $\pi_\k = \nuk \prod_{\k' < \k} (1 - \nu_{\k'})$.
+\end{align}
+where recall that $\pi_k$ are the mixture weights computed from the stick-lengths, $\pi_\k = \nuk \prod_{\k' < \k} (1 - \nu_{\k'})$. 
 
-We first consider the sensitivity of these posterior quantities 
-$\gclusters$ and $\gclusterspred$ 
-to the prior parameter $\alpha$. 
+Unlike the in-sample quantity, the expectation for the predictive quantity is not a simple closed-form function of the variational parameters.  
+Instead, we approximate~\eqref{post_pred_nclusters} using Monte Carlo draws from the variational distribution. 
+Specifically, we use the ``reparameterization trick" to sample from the variational distribution:
+we use an appropriately chosen, $\eta$-dependent transformation 
+$f(\cdot, \eta)$ that satisfies 
+\begin{align*}
+  u \iid\normdist{0, I} \implies 
+  f(u, \eta) \stackrel{d}{=} \nu \sim \q(\cdot | \eta).
+\end{align*}
+To form a Monte Carlo estimate of \eqref{post_pred_nclusters}, 
+we sample $u_1, ..., u_m\stackrel{iid}{\sim}\normdist{0, I}$ 
+and then average the expression inside the expectation over the points 
+$f(u_1, \eta), ..., f(u_m, \eta)$.
+We use the reparameterization trick so that conditional on $u_1, ..., u_m$,  our Monte Carlo estimate of $\gclusterspred$ is a determinstic function of 
+the variational parameters $\eta$. 
+In our experiments below, all displayed values of $\gclusterspred(\eta)$ are
+Monte-Carlo approximations, 
+conditional on the same $m = 10,000$ a priori draws $u_1, ..., u_m$. 
+
+We evaluate the sensitivity of the posterior quantities 
+$\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$ in the
+$\betadist{\nuk \vert 1, \alpha}$ stick distribution. 
 \figref{beta_priors} displays the probability density functions 
-$\pstick(\nuk \vert \alpha) = \betadist{\nuk \vert 1, \alpha}$ 
 for a range of $\alpha$. 
 
-We first fit the model at $\alpha = 6$. 
-Subsequent refits at $\alpha\not=6$ used the fit at $\alpha = 6$ as an initialization. 
-As $\alpha$ increases, the expected number of clusters increases (\figref{iris_alpha_sens}). 
-The expected number of in-sample clusters is relatively insensitive to changes in the $\alpha$ parameter. 
-As $\alpha$ varies from $\alpha = 1, ..., 16$, the $g_{\text{n.cl.}}$ varies 
+We fit the initial model at $\alpha = 6$. 
+Subsequent refits at $\alpha\not=6$ used the variational parameters at 
+$\alpha = 6$ as an initialization. 
+As $\alpha$ increases, both the expected in-sample and the expected predictive number of clusters increases (\figref{iris_alpha_sens}). 
+The in-sample quantity is relatively insensitive to changes in the $\alpha$ parameter. 
+As $\alpha$ varies from $\alpha = 1, ..., 16$, $g_{\text{n.cl.}}$ varies 
 only from 3 to 3.4 (recall that the true number of iris species is three). 
-On the other hand the posterior preditive quantitiy is sensitive to changes in $\alpha$. Over the same range of $\alpha$, $g_{\text{n.cl.pred}}$ varies from 
+On the other hand the posterior preditive quantitiy is sensitive to changes in $\alpha$. Over the same range of $\alpha$, 
+$\gclusterspred$ varies from 
 3.6 to 8.1. 
 
-The linear approximation captures the changes in both the in-sample and predictive number of clusters. 
-We computed the linear approximation at $\alpha = 6$. 
-Forming the linear approximation, which requires inverting the Hessian matrix, required TODO seconds. 
-Subsequent evaluations of $\etalin(\alpha)$ for any $\alpha$ requires only a vector-scalar multiplication and vector-vector addition. 
-Thus, after forming the linear approximation at $\alpha = 6$,
-using the approximation to form the path of $g$ as $\alpha$ varies in
-\figref{iris_alpha_sens} took only TODO seconds. 
-On the other hand, to form the path of $g$ by refitting at each $\alpha$ in 
-\figref{iris_alpha_sens} took TODO seconds in total, with a median refit time of TODO. 
+We computed the linear approximation at $\alpha = 6$.  
+The linear approximation is able to reproduce changes to both 
+the in-sample and predictive quantities found by refitting the model at each
+$\alpha = 1, ..., 16$.  
+Furthermore, the linear approximation is an order of magnitude faster than refitting. 
+Forming the linear approximation, which requires a Hessian inversion (\eqref{vb_eta_sens}), required 0.02 seconds. 
+After forming the linear approximation at $\alpha = 6$,
+computing $\etalin(\alpha)$ for all $\alpha = 1, ... 16$ took another 
+0.02 seconds.
+On the other hand, to refit $\etaopt(\alpha)$ for the same $\alpha$'s took
+a total of 10 seconds, 
+with a median refit time of 0.7 seconds. 
 
 
 
@@ -97,6 +120,8 @@ On the other hand, to form the path of $g$ by refitting at each $\alpha$ in
 
 
 \end{knitrout}
+
+
 
 
 \begin{knitrout}
@@ -119,6 +144,20 @@ We compare against the expected number of clusters obtained by refitting the mod
 
 
 \end{knitrout}
+
+
+
+
+
+\figref{iris_fsens} demonstrates the ability of the influence function to 
+provide guidance on the effect of potential functional perturbations on a 
+posterior statistic. 
+In the left column of \figref{iris_fsens} we plot the prior-weighted influence function for the in-sample number of clusters. 
+We consider three multiplicative perturbations of the form 
+\begin{align*}
+\log \phi(x) = e^{2(x - \mu)^2}.
+\end{align*}
+For the first perturbation, we set $\mu$ such that $\log\phi$ is centered at a location where the influence function is negative. 
 
 
 
@@ -146,31 +185,31 @@ We compare against the expected number of clusters obtained by refitting the mod
 \end{knitrout}
 
 
-\begin{table}[tb]
-\centering
-\caption{Compute time of results on the iris dataset. }
-\begin{tabular}{|r|r|}
-    \hline 
-    & time (seconds) \\ 
-    \hline 
-    Initial fit & 0.96 \\
-    \hline 
-    Hessian solve for $\alpha$ sensitivity & 
-        0.021\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ... , 16$ & 
-        0.018\\
-    Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
-        9.6\\
-    \hline 
-    The influence function & 0.1\\ 
-    Hessian solve for worst-case $\phi$ & 
-        0.021\\
-    Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
-    for worst-case $\phi$ & 
-        0.0011\\
-    Refit $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
-        0.72\\ 
-    \hline 
-\end{tabular}
-\end{table}
+% \begin{table}[tb]
+% \centering
+% \caption{Compute time of results on the iris dataset. }
+% \begin{tabular}{|r|r|}
+%     \hline 
+%     & time (seconds) \\ 
+%     \hline 
+%     Initial fit & sprintf('%1.2g', init_fit_time) \\
+%     \hline 
+%     Hessian solve for $\alpha$ sensitivity & 
+%         sprintf('%1.2g', alpha_hess_time)\\
+%     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ... , 16$ & 
+%         sprintf('%1.2g', total_alpha_lr_time)\\
+%     Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
+%         sprintf('%1.2g', total_alpha_refit_time)\\
+%     \hline 
+%     The influence function & sprintf('%1.2g', infl_time)\\ 
+%     Hessian solve for worst-case $\phi$ & 
+%         sprintf('%1.2g', wc_hessian_time)\\
+%     Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$
+%     for worst-case $\phi$ & 
+%         sprintf('%1.2g', wc_lr_time)\\
+%     Refit $\eta(\epsilon)|_{\epsilon = 1}$ for worst-case $\phi$ & 
+%         sprintf('%1.2g', wc_refit_time)\\ 
+%     \hline 
+% \end{tabular}
+% \end{table}
 

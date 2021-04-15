@@ -84,6 +84,8 @@ alpha_timing <- np$load(paste0(data_dir, "iris_alpha_timing.npz"))
 
 init_fit_time <- sum(alpha_timing['init_fit_time'])
 total_alpha_refit_time <- sum(alpha_timing['refit_time_vec'])
+median_alpha_refit_time <- median(alpha_timing['refit_time_vec'])
+
 total_alpha_lr_time <- sum(alpha_timing['lr_time_vec'])
 alpha_hess_time <- alpha_timing['hess_solve_time']
 

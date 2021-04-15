@@ -1,16 +1,37 @@
-We evaluate the local sensitivity of perturbations to the BNP prior on three data analysis examples.
-We first demonstrate the local sensitivity computations using a Gaussian mixture model on the canonical iris data set.
-Secondly, we consider the problem of clustering time-course gene expression data,
+We evaluate the prior sensitivity in BNP models applied to three distinct data analysis examples.
+We first demonstrate local sensitivity in a Gaussian mixture model (GMM) of the canonical iris data set.
+Secondly, we use BNP to cluster time-course gene expression data,
 and evaluate the sensitivity of the resulting co-clustering matrix to prior perturbations.
-Finally, we use a BNP model to infer population structure from genetic data.
+Finally, we adapt Structure~\citep{pritchard:2000:structure}, a Bayesian population genetics model,
+to incorporate a BNP prior, thus allowing for
+an infinite number latent populations.
+We study how the estimated population structure may change as a
+result of the prior specification.
 
-In each example, we examine the effects varying the parameter $\alpha$
-in the $\betadist{\nuk \vert 1, \alpha}$ distribution on sticks;
-we also examine the effects of changing the functional form the the Beta prior itself.
+In each example, we examine both the effects of varying the parameter $\alpha$
+in the $\betadist{\nuk \vert 1, \alpha}$ stick distribution, as well as
+the effects of changing the functional form the the Beta prior itself.
 We compare the posterior inferences computed from the linear approximation against
 the inferences obtained from re-fitting the model after each prior pertrubation.
-Overall, the linear approximation provides a descriptive tool that well-captures both the
-direction and size of changes in posterior quantities after a prior perturbation.
-Moreover, the speed in forming a linear approximation is up to an order of magnitude faster than refitting the model.
-Lastly, we show that the influence function provides a useful guide in revealing which
-functional pertrubations will result in large changes in the posterior statistic of interest.
+
+The initial variational parameters, fit to a model
+with Beta-distributed sticks at some chosen value $\alpha = \alpha_0$,
+were optimized using the BFGS algorithm run with a loose convergence tolerance
+followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-quality optimum.
+Unless otherwise noted, all subsequent refits after a prior pertrubation were found
+using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
+
+To compute local sensitivity, we invert the Hessian in~\eqref{vb_eta_sens} using
+the conjugate gradient algorithm, thus avoiding the need for
+instatiating the Hessian matrix in memory.
+The conjugate gradient algorithm along with the optimizers BFGS and trust-ncg
+are implemented in SciPy~\citep{scipy}.
+All derivatives were computed using the Python
+automatic differentiation libarary Jax~\citep{jax2018github}.
+
+% We demonstrate that the linear approximation provides a descriptive tool that well-captures both the
+% direction and size of changes in posterior quantities after a prior perturbation.
+% In addition, the influence function provides a useful guide in revealing which
+% functional pertrubations will result in large changes in the posterior statistic of interest.
+% Importantly, the speed in forming a linear approximation is an order
+% of magnitude faster than refitting the model on the data examples we consider.
