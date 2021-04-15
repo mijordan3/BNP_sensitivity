@@ -18,6 +18,7 @@
 *~
 *.html
 *.json
+*cache*
 
 *.out
 *.err

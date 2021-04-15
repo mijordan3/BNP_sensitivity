@@ -1,5 +1,5 @@
 
-plot_step_pert_results <- function(results_list,
+plot_func_pert_results <- function(results_list,
                                    remove_legend = FALSE, 
                                    remove_xlab = FALSE, 
                                    remove_title = FALSE, 
@@ -67,38 +67,29 @@ plot_step_pert_results <- function(results_list,
 # TODO this is set manually ... 
 ymax = 0.018
 
-g0 <- plot_step_pert_results(fpert1_results, 
+g0 <- plot_func_pert_results(fpert1_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = FALSE, 
                              ymax = ymax)
 
-g1 <- plot_step_pert_results(fpert2_results, 
+g1 <- plot_func_pert_results(fpert3_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = TRUE, 
                              ymax = ymax)
 
-g2 <- plot_step_pert_results(fpert3_results, 
-                             remove_legend = TRUE, 
-                             remove_xlab = TRUE, 
-                             remove_title = TRUE, 
-                             ymax = ymax)
-
-g3 <- plot_step_pert_results(wc_results, 
+g2 <- plot_func_pert_results(fpert2_results, 
                              remove_legend = FALSE, 
                              remove_xlab = FALSE, 
-                             remove_title = TRUE)
+                             remove_title = TRUE, 
+                             ymax = ymax)
 
 
+g0 / g1 / g2
 
-g0 / g2 / g1 / g3
+# g3 <- plot_func_pert_results(wc_results, 
+#                              remove_legend = FALSE, 
+#                              remove_xlab = FALSE, 
+#                              remove_title = TRUE)
 
-
-# grid.arrange(g0, g1, g2, g3, g4, ncol = 1)
-
-# g_all <- arrangeGrob(g0, g1, g2, g3, g4, ncol = 1)
-# 
-# ggsave('./R_scripts/iris/figures_tmp/iris_func_pert.png', 
-#        g_all, 
-#        width = 6, height = 8)

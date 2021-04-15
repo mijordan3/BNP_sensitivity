@@ -14,9 +14,10 @@ the effects of changing the functional form the the Beta prior itself.
 We compare the posterior inferences computed from the linear approximation against
 the inferences obtained from re-fitting the model after each prior pertrubation.
 
-The initial variational parameters, fit to a model
-with Beta-distributed sticks at some chosen value $\alpha = \alpha_0$,
-were optimized using the BFGS algorithm run with a loose convergence tolerance
+The initial variational parameters were fit to a model
+with Beta-distributed sticks at some chosen parameter $\alpha = \alpha_0$;
+we optimize the initial variational parameters with
+the BFGS algorithm run with a loose tolerance
 followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-quality optimum.
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
