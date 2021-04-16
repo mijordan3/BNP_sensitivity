@@ -52,9 +52,12 @@ See \figref{example_genes} for an example gene and the B-spline basis.
 
 Let $\x_\n$ be the vector of observations $(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
 Each cluster is characterized by a vector of regression coefficients 
-$\theta_k$; the distribution of the data arising from cluster $k$ is 
+$\beta_k$ and a variance $\tau^{-1}_k$; let $\theta_k = (\beta_k, \tau_k)$. 
+The distribution of the data arising from cluster $k$ is 
 \begin{align*}
-p(\x_\n | \theta_k, b_{n}) = \normdist{\x_\n | X\theta_k + b_{n}, \sigma^2I_{M \times M}},
+p(\x_\n | \theta_k, b_{n}) = 
+\normdist{\x_\n | X\beta_k + b_{n},
+\tau^{-2}I_{\ntimepoints \times \ntimepoints}},
 \end{align*}
 where $b_{n}$ is a gene-specific additive offset. 
 
@@ -65,10 +68,10 @@ The joint distribution similar to~\eqref{bnp_model}, except with the addition of
 \nonumber\\&
     \sum_{n=1}^N \sum_{k=1}^{\kmax}
         \z_{\n\k} \left(
-            \logp(\x_n \vert \theta_\k, b_n, \sigma) + \logp(b_n) + \log \pi_\k
+            \logp(\x_n \vert \theta_\k, b_n) + \logp(b_n) + \log \pi_\k
         \right) +
     \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \logp(\theta_\k) + \logp(\sigma)
+        \log \pstick(\nuk) + \logp(\theta_\k) 
     \right).
 \end{align*}
 The prior on the shift $\logp(b_n)$ 

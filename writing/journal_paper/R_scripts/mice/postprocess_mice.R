@@ -136,7 +136,7 @@ influence_df <-
 #################
 # the priors, initial and perturbed
 fpert_coclust_file <-
-  np$load(paste0(data_dir, 'functional_coclustering_gauss_pert1.npz'))
+  np$load(paste0(data_dir, 'functional_coclustering.npz'))
 
 prior_pert_df <- 
   data.frame(logit_v = fpert_coclust_file['logit_v_grid'],
@@ -167,7 +167,7 @@ lr_time_vec <- alpha_timing_results['lr_time_vec']
 
 # functional sensitivity timing results
 fsens_timing_results <- np$load(paste0(data_dir, 
-      'functional_coclustering_gauss_pert1_timing.npz'))
+      'functional_coclustering_timing.npz'))
 
 phi_hessian_time <- fsens_timing_results['hess_solve_time']
 

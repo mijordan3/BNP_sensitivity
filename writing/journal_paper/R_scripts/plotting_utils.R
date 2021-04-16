@@ -55,7 +55,8 @@ plot_influence_and_logphi <- function(logit_v_grid,
     # plot functional perturbation 
     geom_area(aes(x = logit_v_grid_logphi, 
                   y = log_phi), 
-              fill = 'grey', color = 'black', alpha = 0.5) + 
+              fill = 'grey', 
+              color = 'black') + 
     # plot influnce function
     geom_line(aes(x = logit_v_grid, 
                   y = infl_fun * scale), 

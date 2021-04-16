@@ -43,9 +43,12 @@ See \figref{example_genes} for an example gene and the B-spline basis.
 
 Let $\x_\n$ be the vector of observations $(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
 Each cluster is characterized by a vector of regression coefficients 
-$\theta_k$; the distribution of the data arising from cluster $k$ is 
+$\beta_k$ and a variance $\tau^{-1}_k$; let $\theta_k = (\beta_k, \tau_k)$. 
+The distribution of the data arising from cluster $k$ is 
 \begin{align*}
-p(\x_\n | \theta_k, b_{n}) = \normdist{\x_\n | X\theta_k + b_{n}, \sigma^2I_{M \times M}},
+p(\x_\n | \theta_k, b_{n}) = 
+\normdist{\x_\n | X\beta_k + b_{n},
+\tau^{-2}I_{\ntimepoints \times \ntimepoints}},
 \end{align*}
 where $b_{n}$ is a gene-specific additive offset. 
 
@@ -56,12 +59,14 @@ The joint distribution similar to~\eqref{bnp_model}, except with the addition of
 \nonumber\\&
     \sum_{n=1}^N \sum_{k=1}^{\kmax}
         \z_{\n\k} \left(
-            \logp(\x_n \vert \theta_\k, b_n) + \logp(b_n) \log \pi_\k
+            \logp(\x_n \vert \theta_\k, b_n, \sigma) + \logp(b_n) + \log \pi_\k
         \right) +
     \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \logp(\theta_\k)
+        \log \pstick(\nuk) + \logp(\theta_\k) + \logp(\sigma)
     \right).
 \end{align*}
+The prior on the shift $\logp(b_n)$ 
+
 
 %
 
@@ -220,26 +225,26 @@ The joint distribution similar to~\eqref{bnp_model}, except with the addition of
     \hline 
     & time (seconds) \\ 
     \hline 
-    Initial fit & 35 \\
+    Initial fit & 25 \\
     \hline 
     Hessian solve for $\alpha$ sensitivity & 
-        2.6\\
+        3.8\\
     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
-        0.0013\\
+        0.0011\\
     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
-        0.0012\\
+        0.0011\\
     Refit $\eta(\alpha)$ for $\alpha = 1$ & 
-        12\\
+        16\\
     Refit $\eta(\alpha)$ for $\alpha = 11$ & 
-        11\\
+        13\\
     \hline
-    The influence function & 4.5\\ 
+    The influence function & 4.8\\ 
     Hessian solve for $\phi$ perturbation &
-        4.9\\
+        3.2\\
     Linear approx. $\eta^{lin}(\epsilon)$ at $\epsilon = 1$ &
-        0.001\\
+        0.00081\\
     Refit $\eta(\epsilon)$ at $\epsilon = 1$ &
-        14\\
+        19\\
     \hline
 \end{tabular}
 \end{table}
