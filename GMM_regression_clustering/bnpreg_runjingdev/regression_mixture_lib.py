@@ -40,7 +40,7 @@ def get_vb_params_paragami_object(dim, k_approx):
     
     # info of data 
     vb_params_paragami['data_info'] = \
-        paragami.NumericArrayPattern(shape=(1,), lb = 0.)
+        paragami.NumericArrayPattern(shape=(k_approx,), lb = 0.)
 
     vb_params_dict = vb_params_paragami.random()
 
@@ -91,11 +91,11 @@ def get_default_prior_params():
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
     # gamma prior on data info
-    prior_params_dict['prior_data_info_shape'] = np.array([1.])
+    prior_params_dict['prior_data_info_shape'] = np.array([2.])
     prior_params_paragami['prior_data_info_shape'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
 
-    prior_params_dict['prior_data_info_scale'] = np.array([0.0001])
+    prior_params_dict['prior_data_info_scale'] = np.array([0.05])
     prior_params_paragami['prior_data_info_scale'] = \
         paragami.NumericArrayPattern(shape=(1, ), lb = 0.0)
     
@@ -159,7 +159,7 @@ def get_e_log_prior(stick_means, stick_infos,
     scale = prior_params_dict['prior_data_info_scale']
     data_info_prior = sp.stats.gamma.logpdf(data_info, 
                                             shape, 
-                                            scale = scale)
+                                            scale = scale).sum()
 
     return dp_prior + e_centroid_prior + data_info_prior
     
@@ -200,7 +200,8 @@ def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
                 2 * np.sum(x_times_beta, axis=0, keepdims=True) * e_b + \
                 e_b2 * num_time_points
 
-    square_term = -0.5 * data_info * (linear_term + quad_term)
+    square_term = -0.5 * np.expand_dims(data_info, axis = 0) * \
+                    (linear_term + quad_term)
 
     # We have already summed the (y - mu)^2 terms over time points,so
     # we need to multiply the e_log_info_y by the number of points we've
@@ -209,12 +210,14 @@ def get_loglik_obs_by_nk(y, x, centroids, data_info, e_b, e_b2):
         0.5 * np.log(data_info) * \
         num_time_points
     
-    return  square_term + log_info_term
+    return  square_term + np.expand_dims(log_info_term, axis = 0)
 
 def get_optimal_shifts(y, x, centroids, data_info, prior_params_dict): 
     
     num_time_points = x.shape[0]
-
+    
+    data_info = np.expand_dims(data_info, axis = 0)
+    
     # y is (obs x time points) = (n x t)
     # x is (time points x basis vectors) = (t x b)
     # centroids is (clusters x basis vectors) = (k x b)
