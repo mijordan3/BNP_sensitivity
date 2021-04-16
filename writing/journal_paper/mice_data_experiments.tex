@@ -8,6 +8,61 @@
 
 
 
+We consider the problem of clustering time-course gene expression data. 
+While thousands genes might be measured in a given genomics experiment, 
+many genes may exhibit similar expression patterns.  
+Clustering genes is one way to reduce the dimensionality of a complex data set 
+and faciliates scientific interpretations. 
+Often, such dimensionality reduction is used for exploratory analysis and
+is a first step before further downstream analyses. 
+It is important, therefore, to acertain the stability of the 
+discovered clusters. 
+ 
+We study a publicly available data set of mice gene expression
+\citep{shoemaker:2015:ultrasensitive}.
+Mice were infected with different influenza viruses, and gene expression
+was assessed at 14 time points after infection.
+Our analysis focuses on mice treated with the ``A/California/04/2009'' strain. 
+We normalize the data as described in
+\citet{shoemaker:2015:ultrasensitive} and then apply the differential
+analysis tool EDGE \citep{Storey:2005:significance} to rank the genes from most to least significantly differentially expressed. 
+We run our analysis below on the top $\ngenes = 1000$ genes.
+
+\subsubsection*{The model}
+
+
+Each gene consists of $\ntimepoints = 42$ measurements of expression: three replicates at 14 unique timepoints.
+The timepoints are unevenly spaced, with more frequent observations at the beginning. 
+We model the first 11 timepoints with cubic B-splines with 7 degrees of freedom.
+For the last three timepoints, $t = 72, 120, 168$ hours,
+we use indicator functions. 
+That is, if $\tilde X$ is the matrix where each column is a B-spline basis vector evaluated at the $\ntimepoints$ timepoints, we append to $\tilde X$ three additional columns where each column is 1 if $t = 72, 120,$ or 168, repectively, and 0 otherwise. 
+Call the full design matrix $X$. 
+Without the indicator columns, the matrix $\tilde X^T \tilde X$ is nearly singular, because the later timepoints are more spread out. 
+See \figref{example_genes} for an example gene and the B-spline basis. 
+
+Let $\x_\n$ be the vector of observations $(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
+Each cluster is characterized by a vector of regression coefficients 
+$\theta_k$; the distribution of the data arising from cluster $k$ is 
+\begin{align*}
+p(\x_\n | \theta_k, b_{n}) = \normdist{\x_\n | X\theta_k + b_{n}, \sigma^2I_{M \times M}},
+\end{align*}
+where $b_{n}$ is a gene-specific additive offset. 
+
+The joint distribution similar to~\eqref{bnp_model}, except with the addition of the additive offset: 
+\begin{align*}
+\MoveEqLeft
+\logp(\x, \theta, \z, \nu) ={}
+\nonumber\\&
+    \sum_{n=1}^N \sum_{k=1}^{\kmax}
+        \z_{\n\k} \left(
+            \logp(\x_n \vert \theta_\k, b_n) + \logp(b_n) \log \pi_\k
+        \right) +
+    \sum_{k=1}^{\kmax} \left(
+        \log \pstick(\nuk) + \logp(\theta_\k)
+    \right).
+\end{align*}
+
 %
 
 \begin{knitrout}

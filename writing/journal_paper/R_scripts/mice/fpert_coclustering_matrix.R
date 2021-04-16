@@ -41,4 +41,7 @@ plots <- compare_coclust_lr_and_refit(coclust_refit_fpert,
 top_row <- p_logphi + p_priors + p_priors_contr
 bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr 
 
-top_row / bottom_row
+grid.arrange(patchworkGrob(top_row), 
+             patchworkGrob(bottom_row))
+
+# top_row / bottom_row
