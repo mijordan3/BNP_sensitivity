@@ -98,7 +98,8 @@ Consider $(x_1, x_2) \in \mathbb{R}^2$ and the polar coordinates $r :=
 \begin{align*}
 %
 f(r, \theta) := \begin{cases}
-\frac{r / | \sin \theta |}{1 + r / | \sin \theta |}
+\frac{\left(\frac{r}{| \sin \theta |}\right)^2}
+     {1 + \left(\frac{r}{| \sin \theta |}\right)^2}
     & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
     \textrm{ and } r > 0 \\
 0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
@@ -107,23 +108,6 @@ f(r, \theta) := \begin{cases}
 \end{cases}
 %
 \end{align*}
-%
-Then $f$ has a directional derivative in every direction, but is not Fr{\'e}chet
-differentiable.
-%
-\begin{proof}
-%
-By ordinary calculus, for any $\theta$, $\fracat{\partial f(r, \theta)}{\partial
-r}{r=0} = 0$, so the linear approximation to $f(r, \theta)$ at $r=0$ is
-identically zero.  However, for any $r$, there exists a $\theta(r)$ such that
-$r / |\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the error in
-the linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not go
-to zero as $r \rightarrow 0$.
-%
-\end{proof}
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -134,20 +118,133 @@ to zero as $r \rightarrow 0$.
 \centering
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\Figref{r2_pathological} contains a plot of $f(r, \theta)$, both over
+$\mathbb{R}^2$ and along paths for particular choices of $\theta$.
+
+Then $f$ has a directional derivative in every direction, but is not Fr{\'e}chet
+differentiable. By ordinary calculus, for any $\theta$, $\fracat{\partial f(r,
+\theta)}{\partial r}{r=0} = 0$, so the linear approximation to $f(r, \theta)$ at
+$r=0$ is identically zero.  However, for any $r$, there exists a $\theta(r)$
+such that $r / |\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the
+error in the linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not
+go to zero as $r \rightarrow 0$.
+
+Note that the second derivative in a particular direction is given by
+$\fracat{\partial^2 f(r, \theta)}{\partial r^2}{r=0} = \frac{1}{2 |\sin
+\theta|}$, which can be made arbitrarily large by taking $\theta$ close to $0$
+or to $\pi$.  We could modify $f(r, \theta)$ to be Fr{\'e}chet differentiable
+by smoothly ``capping'' $1 / |\sin \theta|$ at some arbitrarily large value.
+However, the ability to meaningfully extrapolate $f(r, \theta)$ in the direction
+of a very large but finite second derivative will still be extremely limited. In
+this sense, Fr{\'e}chet differentiability is a weak necessary but not sufficient
+requirement if we are interested in extrapolating using linear approximations.
+
+Note also that $f(r, \theta)$ is disccontinuous at $r=0$.  It turns out that
+this is not essential to the example; see \citet[Example
+1.9]{averbukh:1967:theory} for an (only slightly more complicated) example of a
+function on $\mathbb{R}^2$ that is continuous and directionally differentiable
+but not Fr{\'e}chet differentiable at $r=0$.  Hence continuity does not imply
+Fr{\'e}chet differentiability.  However, the converse is true: Fr{\'e}chet
+differentiability implies continuity.
+
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-See \figref{r2_pathological} for a plot of \exref{r2_pathological}.
+A similar example that is more directly relevant is the following.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+Let $\q(\zeta)$ be a density relative to the Lebesge measure on $[0,1]$.
+Define $f: \lp{p} \mapsto \mathbb{R}$ with $1 \le p < \infty$ as follows:
+%
+\begin{align*}
+%
+f(\phi) :=
+\begin{cases}
+    %
+    \expect{\q(\zeta)}{\log \left(1 + \phi(\zeta)\right)} &
+    \textrm{when }\phi(\zeta) > -1\textrm{ almost surely} \\
+    %
+    0 & \textrm{otherwise}.
+%
+\end{cases}
+%
+\end{align*}
+%
+Then, at $\phiz$,  $f(\phi)$ has a directional derivative for every $\phi$, but
+is discontinous in $\norm{\cdot}_p$ and so not Fr{\'e}chet differentiable, as
+we now show.
+
+For any $0 < \epsilon < 1$, let $S_\epsilon \subset [0, 1]$ be a measurable set
+with Lebesgue measure $\epsilon$ and probability at least $\epsilon$ under
+$\q(\zeta)$ (such a set must exist because $\int_0^1 \q(\zeta) d\zeta = 1$). For
+$\delta > 0$ let
+%
+\begin{align*}
+%
+\phi(\zeta; \epsilon, \delta) :=
+\begin{cases}
+    %
+    \delta - 1      & \textrm{ for }\zeta\in S_\epsilon \\
+    0      & \textrm{ for }\zeta\notin S_\epsilon.
+    %
+\end{cases}
+%
+\end{align*}
+%
+Then $\phi(\zeta; \epsilon, \delta) \in \lp{p}$ with $\norm{\phi(\cdot;
+\epsilon, \delta)}_p = (\int_0^1 \phi(\zeta)^p d\zeta)^{1/p} =\epsilon^{1/p}
+(\delta - 1)$.  Furthermore,
+%
+\begin{align*}
+%
+\abs{f(\phi(\zeta; \epsilon, \delta))} ={}&
+    \expect{\q(\zeta)}{\ind{\zeta \in S_\epsilon}} \abs{\log(\delta)} \ge
+    \epsilon \abs{\log(\delta)}.
+%
+\end{align*}
+%,
+Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
+\rightarrow 0$,
+%
+\begin{align*}
+%
+\abs{f(\phi(\zeta; \epsilon_n, \delta(\epsilon_n))) - f(\phiz)} \ge{}& 1\\
+\norm{\phi(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{}& 0.
+%
+\end{align*}
+%
+So $f$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$, and
+cannot be Fr{\'e}chet differentiable.
+
+However, the directional derivative exists in any direction (does it?). First,
+suppose that $\inf_{\zeta} \phi(\zeta) = -\infty$.  Then $\inf_{\zeta} t
+\phi(\zeta) = -\infty$ for any $t > 0$, so $f(t\phi) = 0$ for all $t$, and
+$\lim_{t \rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 =
+0$.
+
+If $-\infty < \inf_\zeta \phi(\zeta) \le \sup_\zeta < \infty$, i.e.
+if $\phi$ is bounded, then by the dominated convergence theorem,
+%
+\begin{align*}
+%
+\fracat{\partial f(t \phi)}{\partial t}{t=0} =
+    \expect{q(\zeta)}{\phi(\zeta)}.
+%
+\end{align*}
+%
+
+If $-\infty < \inf_\zeta \phi(\zeta)$ but $\sup_\zeta \phi(\zeta) = \infty$,
+then can we apply the DCT?
+%
 
 
-Another example is \citet[Example 1.9]{averbukh:1967:theory}.
 
 
--------------------
-
-The above example is not the best.  What we want to say is that if a function is
-Frechet differentiable then it is continuous.  (Zeidler Proposition 4.5 (d)). It
-is possible to define discontinuous functions whose Gateaux derivatives exist.
-And this is what we are worried about.  For this, a simpler R2 example will
-suffice.  And we can use the function $\expect{\q(\theta)}{\log(1 +
-\phi(\theta))}$ with the L2 norm as an example, which is perfect.
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
