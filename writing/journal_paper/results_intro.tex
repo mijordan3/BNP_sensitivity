@@ -1,6 +1,6 @@
 We evaluate the prior sensitivity in BNP models applied to three distinct data analysis examples.
 We first demonstrate local sensitivity in a Gaussian mixture model (GMM) of the canonical iris data set.
-Secondly, we use BNP to cluster time-course gene expression data,
+Secondly, we use BNP to cluster time-course gene expression data
 and evaluate the sensitivity of the resulting co-clustering matrix to prior perturbations.
 Finally, we adapt Structure~\citep{pritchard:2000:structure}, a Bayesian population genetics model,
 to incorporate a BNP prior, thus allowing for
@@ -17,7 +17,7 @@ the inferences obtained from re-fitting the model after each prior pertrubation.
 The initial variational parameters were fit to a model
 with Beta-distributed sticks at some chosen parameter $\alpha = \alpha_0$;
 we optimize the initial variational parameters with
-the BFGS algorithm run with a loose tolerance
+the BFGS algorithm run until a loose tolerance
 followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-quality optimum.
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.

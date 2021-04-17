@@ -29,6 +29,7 @@
 \def\g{g}   % Function of interest
 \def\k{k}   % Cluster index
 \def\n{n}   % Data index
+\def\b{b}   % additive shift for mice model
 \def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
 \def\const{C}   % Constant
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
@@ -103,9 +104,10 @@
 \def\assuitemref#1#2{\assuref{#1} (\itemref{#2})}%
 
 % some posterior statistics
-\newcommand{\gclusters}{g_{\text{cl}}}
-\newcommand{\gclusterspred}{g_{\text{p.cl}}}
+\newcommand{\gclusters}{g_{\text{cl}}} % number of in-sample clusters
+\newcommand{\gclusterspred}{g_{\text{p.cl}}} % number of predictive clusters
+\newcommand{\coclusteringmatr}{\zeta} % coclustering matrix
 
-% dimension for mice data
-\newcommand{\ngenes}{N}
-\newcommand{\ntimepoints}{M}
+% commands for for mice data
+\newcommand{\ngenes}{N} % number of genes
+\newcommand{\ntimepoints}{M} % number of timepoints

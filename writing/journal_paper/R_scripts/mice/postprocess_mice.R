@@ -105,6 +105,22 @@ coclust_refit_alpha1 <-
 coclust_lr_alpha1 <-
   load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
 
+# some summary statistics to report in the main tex
+get_max_diff <- function(coclust_refit, 
+                         coclust_init){
+  diff_df <- 
+    inner_join(coclust_refit, 
+               coclust_init, 
+               by = c('gene1', 'gene2')) %>%
+    mutate(diff = coclustering.x - coclustering.y)
+  
+  maxdiff <- max(abs(diff_df$diff))
+  
+  return(maxdiff)
+}
+
+maxdiff_alpha1 <- get_max_diff(coclust_refit_alpha1, coclust_init)
+
 ################
 # The coclustering at alpha = 11
 ################
@@ -118,6 +134,8 @@ coclust_refit_alpha11 <-
 coclust_lr_alpha11 <-
   load_coclust_file(alpha11_coclust_file, 'coclust_lr') 
 
+# max change in alpha = 11
+maxdiff_alpha11 <- get_max_diff(coclust_refit_alpha11, coclust_init)
 
 ###################
 # data for the influence function

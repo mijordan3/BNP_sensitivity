@@ -54,7 +54,7 @@ Define the expected number of \textit{in-sample} clusters as
 &= \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
 \left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
 \end{align*}
-The expectation and product can be interchanged because $q$ is mean-field. 
+Recall that the expectation and product can be interchanged because $q$ is mean-field. 
 
 The in-sample quantity $\gclusters$ is an estimate for 
 the number of species present in the observed iris dataset. 
@@ -89,26 +89,32 @@ Monte-Carlo approximations,
 conditional on the same $m = 10,000$ draws $u_1, ..., u_m$, fixed a priori. 
 
 We evaluate the sensitivity of the posterior quantities 
-$\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$ in the
-$\betadist{\nuk \vert 1, \alpha}$ stick distribution. 
-\figref{beta_priors} displays probability density functions of the stick distribution over a range of $\alpha$. 
-
-We fit the initial model at $\alpha = 6$. 
-Subsequent refits at $\alpha\not=6$ used the variational parameters at 
-$\alpha = 6$ as an initialization. 
+$\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$. 
+We first fitted the initial approximate posterior at $\alpha_0 = 6$. 
+Subsequent refits at $\alpha\not=\alpha_0$ used the variational parameters
+$\etaopt(\alpha_0)$ as an initialization. 
 As $\alpha$ increases, both the expected in-sample and the expected predictive number of clusters increases (\figref{iris_alpha_sens}). 
 The in-sample quantity is relatively insensitive to changes in the $\alpha$ parameter. 
-As $\alpha$ varies from $\alpha = 1, ..., 16$, $\gclusters$ varies 
-only from \Sexpr{sprintf("%2.1f", min_enum_clust)} to \Sexpr{sprintf("%2.1f", max_enum_clust)} (recall that the true number of iris species is three). 
+As $\alpha$ varies from $\alpha = 1, ..., 16$,
+the quantity $\gclusters(\etaopt(\alpha))$
+varies only from 
+\Sexpr{sprintf("%2.1f", min_enum_clust)} to
+\Sexpr{sprintf("%2.1f", max_enum_clust)}
+(recall that the true number of iris species is three). 
 On the other hand, the posterior preditive quantity is sensitive 
 to changes in $\alpha$.
-Over the same range of $\alpha$, $\gclusterspred$ varies from 
-\Sexpr{sprintf("%2.1f", min_enum_clust_pred)} to \Sexpr{sprintf("%2.1f", max_enum_clust_pred)}. 
+Over the same range of $\alpha$, $\gclusterspred(\etaopt(\alpha))$
+varies from 
+\Sexpr{sprintf("%2.1f", min_enum_clust_pred)} to 
+\Sexpr{sprintf("%2.1f", max_enum_clust_pred)}. 
 
-We computed the linear approximation at $\alpha = 6$.  
-The linear approximation is able to reproduce changes to both 
-the in-sample and predictive quantities found by refitting the model at each
-$\alpha = 1, ..., 16$ (\figref{iris_alpha_sens}).  
+We constructed the linear approximation at $\alpha = 6$ and computed
+the approximate variational parameters $\etalin(\alpha)$ at 
+$\alpha = 1, ..., 16$. 
+Substituting $\etalin(\alpha)$ for $\etaopt(\alpha)$, 
+we observe that $g(\etalin(\alpha))$ is able to mimic the changes 
+in both the in-sample and predictive quantities 
+found by refitting the model (\figref{iris_alpha_sens}).  
 Furthermore, the linear approximation is an order of magnitude faster than refitting. 
 Forming the linear approximation, which requires a Hessian inversion (\eqref{vb_eta_sens}), required \Sexpr{sprintf('%1.1g', alpha_hess_time)} seconds. 
 After forming the linear approximation at $\alpha = 6$,
@@ -121,12 +127,13 @@ with a median refit time of \Sexpr{sprintf('%1.1g', median_alpha_refit_time)} se
 
 
 <<beta_priors_cap>>=
+# TODO: move this figure to the BNP section?
 beta_priors_cap <- paste("Probability density functions of $\\text{Beta}(1, \\alpha)$ distributions, for various $\\alpha$. ")
 SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
 @
 <<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
-source('./R_scripts/iris/plot_beta_priors.R', 
-       echo=knitr_debug, print.eval=TRUE)
+# source('./R_scripts/iris/plot_beta_priors.R',
+#        echo=knitr_debug, print.eval=TRUE)
 @
 
 
@@ -162,26 +169,35 @@ We next consider functional perturbations,
 and we demonstrate the ability of the influence function to 
 provide guidance on the anticipated effect of perturbations 
 on the posterior quantity. 
-Each row of \figref{iris_fsens} presents a different 
-multiplicative perturbation $\phi$ to the initial $\betadist{1, 6}$ stick distribution. 
+Each row of \figref{iris_fsens} explores a different 
+multiplicative perturbation $\phi$ to the initial $\betadist{1, \alpha_0}$ stick distribution. 
 The left column of \figref{iris_fsens} displays the perturbation $\phi$ overlayed with the prior-weighted influence function for $\gclusters$.
 The perturbations are of the form 
 $\log \phi(x) = e^{2(x - \mu)^2}$, with each perturbation having a 
-different value of $\mu$. 
-The middle column displays the initial density,
-$p_0(\nu_k) = \betadist{\nu_k\vert 1, 6}$, along with the perturbed density,
-$p_1(\nu_k) = \betadist{\nu_k\vert 1, 6}\phi(\nu_k)$.
+different value of $\mu$.
+Our perturbation is multiplicative in form, 
+$p(\nu_k|\epsilon) = p_0(\nu_k)\phi(\nu_k)^\epsilon$.
+The middle column of \figref{iris_fsens} displays the initial density,
+$p_0(\nu_k) = \betadist{\nu_k\vert 1, \alpha_0}$,
+along with the perturbed density,
+$p(\nu_k|\epsilon = 1)$. 
 
-Each perturbation $\phi$ produces distinct changes in the expected number of in-sample clusters $\gclusters$ (\figref{iris_fsens} right column). 
-The changes in $\gclusters$ after each perturbation are 
-different in both sign and magnitude. 
-By examining the perturbed densities alone, it is difficult to anticipate 
+Each perturbation $\phi$ produces distinct changes in the expected number of in-sample clusters $\gclusters$. 
+The right column of \figref{iris_fsens} plots the differences
+$\gclusters(\etaopt(\epsilon)) - \gclusters(\etaopt(0))$ 
+as $\epsilon\rightarrow 1$, where $\etaopt(\epsilon)$ are variational parameters
+fitted with prior stick-distribution $p(\nu_k|\epsilon)$. 
+For each perturbation, the changes in are different in both sign and magnitude. 
+
+By examining the perturbed densities $p(\nu_k|\epsilon = 1)$ alone, 
+it is difficult to anticipate 
 the effect of the perturbation on $\gclusters$. 
 However, the sign and magnitude of the change in $\gclusters$ is well-explained by the influence function. 
 When $\log\phi$ is centered at a location where the influence function is negative, the effect on $\gclusters$ is negative (top row); 
 conversely, when $\log\phi$ is centered at a location where the influence function is positive, the effect on $\gclusters$ is positive (bottom row); finally, when $\log\phi$ is centered at a location where the influence is both negative and positive, the effects cancel, and the change in the posterior statistic is roughly zero (middle row). 
-In each case, the linear approximation is able to capture the changes in the posterior statistic. 
-In applications below, we use influence function to guide our choice of functional perturbaton and to explain why some perturbations result in greater sensitivity than others. 
+In each case, the linear approximation $\gclusters(\etalin(\epsilon))$
+is able to capture the changes in the posterior statistic. 
+In applications below, the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
 
 Finally, we consider the 
 worst-case perturbation with unit $L_\infty$ norm.

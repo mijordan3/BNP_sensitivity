@@ -18,12 +18,14 @@ load('./R_scripts/data_processed/mice.RData')
 @
 
 We consider the problem of clustering time-course gene expression data. 
-While thousands genes might be measured in a given genomics experiment, 
+While thousands of genes might be simultaneously 
+measured in a given genomics experiment, 
 many genes may exhibit similar expression patterns.  
-Clustering genes is one way to reduce the dimensionality of a complex data set 
-and faciliates scientific interpretations. 
+Clustering gene expressions
+is one way to reduce the dimensionality of a complex data set 
+and to facilitate scientific interpretations of intricate biological processes. 
 Often, such dimensionality reduction is used for exploratory analysis and
-is a first step before further downstream analyses. 
+is a first step before further downstream investigation.  
 It is important, therefore, to acertain the stability of the 
 discovered clusters. 
  
@@ -39,43 +41,22 @@ We run our analysis below on the top $\ngenes = 1000$ genes.
 
 \subsubsection*{The model}
 
-
-Each gene consists of $\ntimepoints = 42$ measurements of expression: three replicates at 14 unique timepoints.
+Each gene consists of $\ntimepoints = 42$ measurements of expression: three measurements (called biological replicates) at 14 unique timepoints.
 The timepoints are unevenly spaced, with more frequent observations at the beginning. 
-We model the first 11 timepoints with cubic B-splines with 7 degrees of freedom.
+Following \citet{Luan:2003:clustering} we smooth the time course with cubic B-splines. 
+Specifically, we model the first 11 timepoints with
+cubic B-splines with 7 degrees of freedom.
 For the last three timepoints, $t = 72, 120, 168$ hours,
 we use indicator functions. 
-That is, if $\tilde X$ is the matrix where each column is a B-spline basis vector evaluated at the $\ntimepoints$ timepoints, we append to $\tilde X$ three additional columns where each column is 1 if $t = 72, 120,$ or 168, repectively, and 0 otherwise. 
+That is, if $\tilde X$ is the matrix where each column is a B-spline basis vector evaluated at the $\ntimepoints$ measurement times, 
+we append to $\tilde X$ three additional columns 
+where each column is 1 if $t = 72, 120,$ or 168, repectively, and 0 otherwise. 
 Call the full design matrix $X$. 
-Without the indicator columns, the matrix $\tilde X^T \tilde X$ is nearly singular, because the later timepoints are more spread out. 
+We do this for numerical stability; 
+without the indicator columns,
+the matrix $\tilde X^T \tilde X$ is nearly singular, 
+because the later timepoints are more spread out. 
 See \figref{example_genes} for an example gene and the B-spline basis. 
-
-Let $\x_\n$ be the vector of observations $(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
-Each cluster is characterized by a vector of regression coefficients 
-$\beta_k$ and a variance $\tau^{-1}_k$; let $\theta_k = (\beta_k, \tau_k)$. 
-The distribution of the data arising from cluster $k$ is 
-\begin{align*}
-p(\x_\n | \theta_k, b_{n}) = 
-\normdist{\x_\n | X\beta_k + b_{n},
-\tau^{-2}I_{\ntimepoints \times \ntimepoints}},
-\end{align*}
-where $b_{n}$ is a gene-specific additive offset. 
-
-The joint distribution similar to~\eqref{bnp_model}, except with the addition of the additive offset: 
-\begin{align*}
-\MoveEqLeft
-\logp(\x, \theta, \z, \nu) ={}
-\nonumber\\&
-    \sum_{n=1}^N \sum_{k=1}^{\kmax}
-        \z_{\n\k} \left(
-            \logp(\x_n \vert \theta_\k, b_n) + \logp(b_n) + \log \pi_\k
-        \right) +
-    \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \logp(\theta_\k) 
-    \right).
-\end{align*}
-The prior on the shift $\logp(b_n)$ 
-
 
 %
 <<example_genes_cap, cache=FALSE>>=
@@ -90,8 +71,74 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 %
 
 
+Let $\x_\n$ be the vector of observations 
+$(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
+Each cluster is characterized by a vector of regression coefficients 
+$\beta_k$ and a variance $\tau^{-1}_k$; let $\theta_k = (\beta_k, \tau_k)$. 
+The distribution of the data arising from cluster $k$ is 
+\begin{align*}
+p(\x_\n | \theta_k, \b_{n}) = 
+\normdist{\x_\n | X\beta_k + \b_{n},
+\tau^{-1}I_{\ntimepoints \times \ntimepoints}},
+\end{align*}
+where $\b_{n}$ is a gene-specific additive offset. 
 
+The joint distribution equivalent to~\eqref{bnp_model}, 
+except for the addition of a prior term for the additive offset: 
+\begin{align*}
+\MoveEqLeft
+\logp(\x, \theta, \z, \nu) ={}
+\nonumber\\&
+    \sum_{n=1}^N \sum_{k=1}^{\kmax}
+        \z_{\n\k} \left(
+            \logp(\x_n \vert \theta_\k, \b_n) + \logp(\b_n) + \log \pi_\k
+        \right) +
+    \sum_{k=1}^{\kmax} \left(
+        \log \pstick(\nuk) + \logp(\theta_\k) 
+    \right).
+\end{align*}
+We use a normal prior for the shifts $\b_n$, 
+a multivariate normal prior for the coefficients $\beta_n$,
+and a gamma prior for the inverse variance $\tau$. 
 
+Our variational distribution factorizes as~\eqref{vb_mf}, with the addition
+of a factor for the additive shift that is conditional on $\z$: 
+\begin{align*}
+\q(\zeta \vert \eta) =
+    \left( \prod_{\k=1}^{\kmax - 1} \q(\nuk \vert \eta) \right)
+    \left( \prod_{\k=1}^{\kmax} \q(\theta_\k \vert \eta) \right)
+    \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) 
+    \q(\b_{\n} \vert \z_{\n}, \eta)\right).
+\end{align*}
+We set $\q(\b_{\n} \vert \z_{\n} = k, \eta)$ to be Gaussian, with mean and variance dependent on $k$. 
+For simplicity in this application,
+we let $\q(\theta_\k \vert \eta) = \delta (\theta \vert \eta)$, 
+where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location. 
+
+By parameterizing 
+$\q(\z_{\n}, \b_{\n} \vert \eta) = \q(\z_{\n} \vert \eta)  \q(\b_{\n} \vert \z_{\n}, \eta)$ 
+the optimal variational parameters for $\q(\z_{\n}, \b_{\n} \vert \eta)$ 
+have a closed form given $\q(\nu, \theta \vert \eta)$. See TODO APPENDIX. 
+Therefore, our model fits the global/local framework as discussed in TODO PREVIOUS SECTION,
+with global latent variables $(\nu, \theta)$ and local latent variables $(\z, \b)$, and the size of the sensitivity matrix remains independent of $\ngenes$. 
+
+We fit the initial model at $\alpha = 6$. 
+\figref{gene_centroids} shows the inferred centroids 
+$X\expect{}{\beta_k}$. 
+\figref{gene_initial_coclustering} displays the inferred coclustering matrix. 
+More precisely, let $\coclusteringmatr(\eta)$ denote the inferred coclustering matrix; 
+its $i,j$-th entry is the
+posterior probability that gene $i$ belongs to the same cluster
+as gene $j$, given by 
+\begin{align*}
+\coclusteringmatr_{ij}(\eta) 
+&= \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}} \\
+&= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_i = k}
+\expect{\q(\z_j\vert\eta)}{\z_j = k}\right).
+\end{align*}
+
+Next, we evaluate the sensitivity of the inferred coclustering matrix to 
+both parametric and functional perturbations to the stick distribution. 
 
 <<gene_centroids_cap, cache=FALSE>>=
 gene_centroids_cap <- paste(
@@ -105,13 +152,9 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 
-
-
-
-
 <<gene_initial_coclustering_cap, cache=FALSE>>=
 gene_initial_coclustering_cap <- paste(
-    "The inferred co-clustering of gene expressions at $\\alpha = 3.$ ")
+    "The inferred co-clustering of gene expressions at $\\alpha = 6.$ ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
              image_width = 0.6)
 @
@@ -125,6 +168,25 @@ p
 @
 
 
+\subsubsection*{Sensitivity analysis}
+
+We first evaluate the sensitivity of the coclustering matrix $\coclusteringmatr$ 
+to the choice of the $\alpha$ parameter in the
+$\betadist{\nuk \vert 1, \alpha}$ stick distribution. 
+The initial coclustering matrix obtained at $\alpha = 6$ is shown in \figref{gene_initial_coclustering}. 
+Let $\etaopt(\alpha)$ be the varaiational parameters refit at another $\alpha$,
+and let $\etalin(\alpha)$ be variational parameters computed using the linear approximation with derivatives formed at $\alpha = 6$. 
+
+Using the variational parameters at $\alpha = 6$ as an initialization, 
+we refit the approximate posterior at $\alpha = 1$ and $\alpha = 11$. 
+The effect of changing $\alpha$ on the co-clustering matrix is miniscule 
+(\figref{gene_alpha_coclustering}). 
+The largest absolute change in the entries of the matrices
+$\coclusteringmatr(\etaopt(1)) - \coclusteringmatr(\etaopt(6))$ and 
+$\coclusteringmatr(\etaopt(11)) - \coclusteringmatr(\etaopt(6))$ were
+\Sexpr{sprintf("%.3f", maxdiff_alpha1)} and 
+\Sexpr{sprintf("%.3f", maxdiff_alpha11)}, respectively. 
+
 
 
 
@@ -136,7 +198,7 @@ p
 gene_alpha_coclustering_cap <-
     paste0("Changes in the co-clustering matrix at alpha = 1 (top row)
      and alpha = 11 (bottom row),
-     relative to the co-clustering matrix at alpha = 3.
+     relative to the co-clustering matrix at alpha = 6.
      The left column plots differences predicted by the
      linear approximation against differences from a model refit.
      Each point represents an entry of the co-coclustering matrix.
