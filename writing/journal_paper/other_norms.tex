@@ -159,8 +159,10 @@ A similar example that is more directly relevant is the following.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}
 %
-Let $\q(\zeta)$ be a density relative to the Lebesge measure on $[0,1]$.
-Define $f: \lp{p} \mapsto \mathbb{R}$ with $1 \le p < \infty$ as follows:
+Let $\q(\zeta)$ be a density relative to the Lebesge measure on $[0,1]$ such
+that $\int \q(\zeta)^p d\zeta < \infty$ for all $1 \le p < \infty$. (Bounded
+densities or the Beta distribution are examples.) Define $f: \lp{p} \mapsto
+\mathbb{R}$ with $1 \le p < \infty$ as follows:
 %
 \begin{align*}
 %
@@ -227,20 +229,48 @@ suppose that $\inf_{\zeta} \phi(\zeta) = -\infty$.  Then $\inf_{\zeta} t
 \phi(\zeta) = -\infty$ for any $t > 0$, so $f(t\phi) = 0$ for all $t$, and
 $\lim_{t \rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 =
 0$.
+%
+% If $-\infty < \inf_\zeta \phi(\zeta) \le \sup_\zeta < \infty$, i.e.
+% if $\phi$ is bounded, then by the dominated convergence theorem,
+% %
+% \begin{align*}
+% %
+% \fracat{\partial f(t \phi)}{\partial t}{t=0} =
+%     \expect{q(\zeta)}{\phi(\zeta)}.
+% %
+% \end{align*}
+% %
+% If $-\infty < \inf_\zeta \phi(\zeta)$ but $\sup_\zeta \phi(\zeta) = \infty$,
+% then can we apply the DCT?
 
-If $-\infty < \inf_\zeta \phi(\zeta) \le \sup_\zeta < \infty$, i.e.
-if $\phi$ is bounded, then by the dominated convergence theorem,
+If $-\infty < \inf_\zeta \phi(\zeta)$, then there exists a $t_0 > 0$ such that
+$t_0 \phi(\zeta)$ is strictly larger than $-1$.  Let us consider only $t < t_0$.
+Since it may yet be the case that $\sup_\zeta \phi(\zeta) = \infty$, to compute
+the directional derivative we must show that we can apply the dominated
+convergence theorem.  First,
 %
 \begin{align*}
 %
-\fracat{\partial f(t \phi)}{\partial t}{t=0} =
-    \expect{q(\zeta)}{\phi(\zeta)}.
+f(\phi) ={}&
+    \int \q(\zeta) \log(1 + \phi(\zeta)) \ind{\phi(\zeta) \le 0} d\zeta + \\
+    &\int \q(\zeta) \log(1 + \phi(\zeta)) \ind{\phi(\zeta) > 0} d\zeta.
 %
 \end{align*}
 %
+The integrand $\log(1 + \phi(\zeta)) \ind{\zeta \le 0}$ of the first term
+is bounded, so we can apply the DCT.  For the second term,
+%
+\begin{align*}
+%
+\q(\zeta) \log(1 + t \phi(\zeta)) \ind{t \phi(\zeta) > 0}   \le{}&
+    \q(\zeta) (1 + t \phi(\zeta)) \ind{t \phi(\zeta) > 0}.%
+\end{align*}
+%
+Without loss of generality we can take $t < 1$ so that the preceding display is
+integrable for all $t$ whenever $\int \q(\zeta) \abs{\phi(\zeta)} d\zeta <
+\infty$. But this follows by Holder's inequality with the Lebesgue measure.
 
-If $-\infty < \inf_\zeta \phi(\zeta)$ but $\sup_\zeta \phi(\zeta) = \infty$,
-then can we apply the DCT?
+
 %
 
 
