@@ -27,9 +27,6 @@ From our linear approximation, we expect another order of accuracy, namely that
 \lim_{t \rightarrow 0} \frac{\norm{\etaopt(t \phi) - \etalin(t\phi)}_2}{t} = 0.
 %
 \end{align*}
-%
-That is, we expect an extra order of accuracy from our linear approximation
-in $\norm{\phi}$.
 
 The preceding display is enough if we have a fixed $\phi$ in mind.  However, if
 we want to search over a larger set of candidate $\phi$, we want the derivative
@@ -48,11 +45,12 @@ an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
 
 The function $f$ is {\em directionally differentiable} (also known as a Gateaux
 differentiable) if there exists a bounded linear functional $f^{\mathrm{lin}}:
-B_1 \mapsto B_2$ such that
+B_1 \mapsto B_2$ such that the following condition holds for any
+$\phi$ with $\norm{\phi - \phi_0} < \infty$:
 %
 \begin{align*}
 %
-\textrm{For any }\phi: \norm{\phi - \phi_0} = 1\textrm{, }
+%\textrm{For any }\phi\textrm{ with }\norm{\phi - \phi_0} < \infty\textrm{, }
 \lim_{t \rightarrow 0}
     \frac{f(\phi) - f(\phi_0) -
           f^{\mathrm{lin}}(t (\phi - \phi_0) )
@@ -62,7 +60,8 @@ B_1 \mapsto B_2$ such that
 %
 
 Similarly, the function $f$ is {\em boundedly differentiable} (also known as
-Fr{\'echet} differentiable) at $\phi_0$ if
+Fr{\'echet} differentiable) at $\phi_0$ if we can take the limit uniformly in
+$\phi$:
 %
 \begin{align*}
 %
@@ -82,10 +81,11 @@ Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
 then the two derivatives must coincide \citep[Proposition
 4.8]{zeidler:2013:functional}, which justifies our presumptuous notation.
 
-The difference between bounded and directional differentiability is whether the
-linear approximation holds uniformly in $\phi$.  It is possible for functions to
-be directionally but not boundedly differentiable even in $\mathbb{R}^2$, as the
-following example demonstrates.
+% The difference between bounded and directional differentiability is whether the
+% linear approximation holds uniformly in $\phi$.
+
+It is possible for functions to be directionally but not boundedly
+differentiable even in $\mathbb{R}^2$, as the following example demonstrates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,15 +95,25 @@ Consider $(x_1, x_2) \in \mathbb{R}^2$ and the polar coordinates $r :=
 \sqrt{x_1^2 + x_2^2}$ and $\theta := \arctan(x_2 / x_1)$.  Let $\{\pi k: k \in
 \mathbb{Z} \}$ denote integer multiples of $\pi$.  Define
 %
+% \begin{align*}
+% %
+% f(r, \theta) := \begin{cases}
+% \frac{\left(\frac{r}{| \sin \theta |}\right)^2}
+%      {1 + \left(\frac{r}{| \sin \theta |}\right)^2}
+%     & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
+%     \textrm{ and } r > 0 \\
+% 0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
+%     \} \textrm{ or }r = 0
+% %
+% \end{cases}
 \begin{align*}
 %
 f(r, \theta) := \begin{cases}
-\frac{\left(\frac{r}{| \sin \theta |}\right)^2}
-     {1 + \left(\frac{r}{| \sin \theta |}\right)^2}
-    & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
-    \textrm{ and } r > 0 \\
-0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
-    \} \textrm{ or }r = 0
+    \left(\frac{r}{| \sin \theta |}\right)^2
+        & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
+        \textrm{ and } r > 0 \\
+    0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
+        \} \textrm{ or }r = 0
 %
 \end{cases}
 %
@@ -124,12 +134,12 @@ f(r, \theta) := \begin{cases}
 $\mathbb{R}^2$ and along paths for particular choices of $\theta$.
 
 Then $f$ has a directional derivative in every direction, but is not Fr{\'e}chet
-differentiable. By ordinary calculus, for any $\theta$, $\fracat{\partial f(r,
-\theta)}{\partial r}{r=0} = 0$, so the linear approximation to $f(r, \theta)$ at
-$r=0$ is identically zero.  However, for any $r$, there exists a $\theta(r)$
-such that $r / |\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the
-error in the linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not
-go to zero as $r \rightarrow 0$.
+differentiable.  By ordinary calculus, for any $\theta$, $\fracat{\partial f(r,
+\theta)}{\partial r}{r=0} = 0$, so the directional derivatives all exist and are
+identically $0$.  However, for any $r$, there exists a $\theta(r)$ such that $r /
+|\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the error in the
+linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not go to zero
+as $r \rightarrow 0$.
 
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,12 +177,15 @@ Then $\tilde{f}$ is continuous and Fr{\'e}chet differentiable at $r=0$. In this
 case, for any $r$, $\sup_{\theta} r / |\sin(\theta(r))| = r / M$, so  both
 $\lim_{r \rightarrow 0} \tilde{f}(r, \theta) \le \lim_{r \rightarrow 0} r^2 /
 M^2 = 0$ and $\lim_{r \rightarrow 0} \tilde{f}(r, \theta) / r \le \lim_{r
-\rightarrow 0}  r / M^2 = 0$.
+\rightarrow 0}  r / M^2 = 0$.  (Note that $\tilde{f}$ is continuous only
+at $r=0$, not on a ball centered at $0$.)
 
-However, in the direction $\theta = \sin^{-1}(1 / M)$, the error of the linear
-extrapolation to any $r_0$ is still $\tilde{f}(r, \theta) - 0 = M r_0^2$. Since
-Fr{\'e}chet differentiability requires only $M < \infty$, the extraplation error
-can be arbitrarily large for Fr{\'e}chet differentiable functions.
+Despite being Fr{\'e}chet differentiable, the linear approximation may not
+extrapolate well to any finite $r$.  In the direction $\theta = \sin^{-1}(1 /
+M)$, the error of the linear extrapolation to any $r_0$ is still $\tilde{f}(r,
+\theta) - 0 = M r_0^2$. Since Fr{\'e}chet differentiability requires only $M <
+\infty$, the extraplation error can be arbitrarily large, even for Fr{\'e}chet
+differentiable functions.
 
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,33 +193,35 @@ can be arbitrarily large for Fr{\'e}chet differentiable functions.
 
 \Exref{r2_pathological} is neither Fr{\'e}chet differentiable nor continuous,
 whereas \exref{r2_pathological} is both Fr{\'e}chet differentiable and
-continuous.  It turns out that, even in $\mathbb{R}^2$, it is possible for a function
-to be ....
+continuous.  In general, however, Fr{\'e}chet differentiability is stronger than
+continuity, in the sense that Fr{\'e}chet differentiability implies continuity,
+but continuity does not imply Fr{\'e}chet differentiability \citep[Proposition
+4.8 (d)]{zeidler:2013:functional}.  See also \citet[Example
+1.9]{averbukh:1967:theory} for a simple example of a function on $\mathbb{R}^2$
+that is continuous and directionally differentiable but not Fr{\'e}chet
+differentiable.
 
-Note also that $f(r, \theta)$ is disccontinuous at $r=0$.  It turns out that
-this is not essential to the example; see \citet[Example
-1.9]{averbukh:1967:theory} for an (only slightly more complicated) example of a
-function on $\mathbb{R}^2$ that is continuous and directionally differentiable
-but not Fr{\'e}chet differentiable at $r=0$.  Hence continuity does not imply
-Fr{\'e}chet differentiability.  However, the converse is true: Fr{\'e}chet
-differentiability implies continuity.
-
-
-
-A similar example that is more directly relevant is the following.
+The sort of pathology exhibited by \exref{r2_pathological, r2_pathological_v2}
+requires some care to construct in $\mathbb{R}^2$, but requires some care to
+avoid in infinite-dimensional spaces.  We now give an illustrative example in
+the $\lp{p}$ spaces; since the result will be important for VB prior
+sensitivity, we will state is as a lemma rather than merely an example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}
+\begin{lem}\lemlabel{e_log_nonfrechet}
 
-TODO: make this a lemma.  Then, by saying that \assuref{dist_fun_nice}
-holds with $\int M_\psi(\zeta)^{1/q} d\zeta < \infty$ for $1 \le q < \infty$,
-I think you will get existence of the $L_p$ derivatives.
+% TODO: make this a lemma.  Then, by saying that \assuref{dist_fun_nice}
+% holds with $\int M_\psi(\zeta)^{1/q} d\zeta < \infty$ for $1 \le q < \infty$,
+% I think you will get existence of the $L_p$ derivatives.
 
-Let $\q(\zeta)$ be a density relative to the Lebesge measure on $[0,1]$ such
-that $\int \q(\zeta)^p d\zeta < \infty$ for all $1 \le p < \infty$. (Bounded
-densities or the Beta distribution are examples.) Define $f: \lp{p} \mapsto
-\mathbb{R}$ with $1 \le p < \infty$ as follows:
+Fix $1 \le p < \infty$, and let $q = (1 - p^{-1})^{-1}$, from which $p^{-1} +
+q^{-1}=1$ follows.\footnote{Regrettably the standard choices of $p$ and $q$ for
+$\lp{p}$ spaces and their duals overlap with our notation for probability and
+variational distributions, but there should be no ambiguity in context.}  Let
+$\q(\zeta)$ be a density relative to the Lebesgue measure on $[0,1]$ such that
+$\int \q(\zeta)^q d\zeta < \infty$. Define $f: \lp{p} \mapsto \mathbb{R}$ as
+follows:
 %
 \begin{align*}
 %
@@ -222,13 +237,15 @@ f(\phi) :=
 %
 \end{align*}
 %
-Then, at $\phiz$,  $f(\phi)$ has a directional derivative for every $\phi$, but
-is discontinous in $\norm{\cdot}_p$ and so not Fr{\'e}chet differentiable, as
-we now show.
+Then $f$ is discontinous at $\phiz$ in $\norm{\cdot}_p$ and so not Fr{\'e}chet
+differentiable.  However $f$ has a directional derivative at $\phiz$ in every
+direction $\phi - \phiz$.
 
+\begin{proof}
+%
 For any $0 < \epsilon < 1$, let $S_\epsilon \subset [0, 1]$ be a measurable set
 with Lebesgue measure $\epsilon$ and probability at least $\epsilon$ under
-$\q(\zeta)$ (such a set must exist because $\int_0^1 \q(\zeta) d\zeta = 1$). For
+$\q(\zeta)$.  Such a set must exist because $\int_0^1 \q(\zeta) d\zeta = 1$. For
 $\delta > 0$ let
 %
 \begin{align*}
@@ -260,8 +277,9 @@ Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
 %
 \begin{align*}
 %
-\abs{f(\phi(\zeta; \epsilon_n, \delta(\epsilon_n))) - f(\phiz)} \ge{}& 1\\
-\norm{\phi(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{}& 0.
+\abs{f(\phi(\zeta; \epsilon_n, \delta(\epsilon_n))) - f(\phiz)} \ge{} 1
+\mathtxt{and}
+\norm{\phi(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{} 0.
 %
 \end{align*}
 %
@@ -275,9 +293,23 @@ $\inf_{\zeta} \phi(\zeta) = -\infty$.  Then $\inf_{\zeta} t \phi(\zeta) =
 
 If $-\infty < \inf_\zeta \phi(\zeta)$, then there exists a $t_0 > 0$ such that
 $t_0 \phi(\zeta)$ is strictly larger than $-1$.  Let us consider only $t < t_0$.
-Since it may yet be the case that $\sup_\zeta \phi(\zeta) = \infty$, to compute
-the directional derivative we must show that we can apply the dominated
-convergence theorem.  First,
+If we can apply the dominated convergence theorem, then
+%
+\begin{align*}
+%
+\fracat{\partial f(t \phi)}{\partial t}{t=0} ={}&
+    \int \q(\zeta) \fracat{\partial \log(1 + t \phi(\zeta))}{\partial t}{t=0} d\zeta
+\\={}&
+\int \q(\zeta) \phi(\zeta) d\zeta.
+%
+\end{align*}
+%
+The directional derivative in the direction $\phi - \phiz$ at $\phiz$ would thus
+be given by $\expect{\q(\zeta)}{\phi(\zeta)}$.
+
+If $\sup_\zeta \phi(\zeta) < \infty$ then we can apply the dominated convergence
+theorem with a multiple of the constant function.  For the case $\sup_\zeta
+\phi(\zeta) = \infty$, observe that
 %
 \begin{align*}
 %
@@ -304,21 +336,13 @@ since
 \begin{align*}
 %
 \int_0^1 \q(\zeta) \abs{\phi(\zeta)} d \zeta \le{}&
-    \left( \int \q(\zeta)^{\frac{p}{p-1}} d\zeta \right)^{ \frac{p-1}{p} }
+    \left( \int \q(\zeta)^q d\zeta \right)^{1/q}
     \left( \int \abs{\phi(\zeta)}^p d\zeta \right)^{1/p} \le \infty.
 %
 \end{align*}
 %
-Consequently,
 %
-\begin{align*}
+\end{proof}
 %
-\fracat{\partial f(t \phi)}{\partial t}{t=0} ={}&
-    \int \q(\zeta) \fracat{\partial \log(1 + t \phi(\zeta))}{\partial t}{t=0} d\zeta
-\\={}&
-\int \q(\zeta) \phi(\zeta) d\zeta.
-%
-\end{align*}
-%
-\end{ex}
+\end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

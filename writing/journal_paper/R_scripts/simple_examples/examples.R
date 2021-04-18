@@ -18,7 +18,18 @@ FunMe <- function(x, y) {
     theta <- atan(y / x)
     abs_sin <- abs(sin(theta))
     ratio <- r / abs_sin
-    return(ifelse(r > 0, ratio^2 / (1 + ratio^2), 0))
+    #return(ifelse(r > 0, ratio^2 / (1 + ratio^2), 0))
+    return(ifelse(r > 0, ratio^2, 0))
+}
+
+TruncateForPlot <- function(x, quant=0.95, use_na=TRUE) {
+    x_trim_level <- quantile(x, quant)
+    if (use_na) {
+        x[x > x_trim_level] <- NA
+    } else {
+        x[x > x_trim_level] <- x_trim_level
+    }
+    return(x)
 }
 
 #Fun <- FunAverbukh
@@ -30,7 +41,7 @@ if (FALSE) {
     num_points <- 200
 }
 if (TRUE) {
-    x_range <- 0.1
+    x_range <- 0.01
     num_points <- 200
 }
 
@@ -59,13 +70,14 @@ df_line <- do.call(
         }
     ))
 
-ggplot(df_line) +
+ggplot(df_line %>% mutate(f=TruncateForPlot(f, quant=0.7))) +
     geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 
 
 png(file.path(image_path, "pathological_r2_example.png"), units="in", width=6, height=3, res=300)
 grid.arrange(
-    ggplot(df) +
+    #ggplot(df) +
+    ggplot(df %>% mutate(f=TruncateForPlot(f, quant=0.95, use_na=FALSE))) +
         geom_raster(aes(x=x, y=y, fill=f)) +
         theme_bw() +
         theme(
@@ -76,7 +88,7 @@ grid.arrange(
         ) +
         xlab(TeX("$x_1$")) + ylab(TeX("$x_2$"))
 ,
-    ggplot(df_line) +
+    ggplot(df_line %>% mutate(f=TruncateForPlot(f, quant=0.7))) +
         geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 , ncol=2
 )
