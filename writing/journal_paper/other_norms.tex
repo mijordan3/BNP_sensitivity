@@ -114,7 +114,8 @@ f(r, \theta) := \begin{cases}
 \begin{figure}[h!]
 
 \includegraphics[width=0.980\linewidth,height=0.490\linewidth]{static_images/pathological_r2_example.png}
-\caption{A plot of $f(x_1, x_2)$ from \exref{r2_pathological}.}\figlabel{r2_pathological}
+\caption{A plot of $f(x_1, x_2)$ from \exref{r2_pathological}.}
+\figlabel{r2_pathological}
 \centering
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,6 +131,9 @@ such that $r / |\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the
 error in the linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not
 go to zero as $r \rightarrow 0$.
 
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Note that the second derivative in a particular direction is given by
 $\fracat{\partial^2 f(r, \theta)}{\partial r^2}{r=0} = \frac{1}{2 |\sin
 \theta|}$, which can be made arbitrarily large by taking $\theta$ close to $0$
@@ -140,6 +144,45 @@ of a very large but finite second derivative will still be extremely limited. In
 this sense, Fr{\'e}chet differentiability is a weak necessary but not sufficient
 requirement if we are interested in extrapolating using linear approximations.
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{r2_pathological_v2}
+%
+In the context of \exref{r2_pathological}, fix some $0 < M < \infty$,
+and define
+%
+\begin{align*}
+%
+\tilde{f}(r, \theta) := \begin{cases}
+    f(r, \theta) & \textrm{when }\frac{1}{\abs{\sin(\theta)}} \le M \\
+    0. & \textrm{when }\frac{1}{\abs{\sin(\theta)}} > M.
+%
+\end{cases}
+%
+\end{align*}
+%
+Then $\tilde{f}$ is continuous and Fr{\'e}chet differentiable at $r=0$. In this
+case, for any $r$, $\sup_{\theta} r / |\sin(\theta(r))| = r / M$, so  both
+$\lim_{r \rightarrow 0} \tilde{f}(r, \theta) \le \lim_{r \rightarrow 0} r^2 /
+M^2 = 0$ and $\lim_{r \rightarrow 0} \tilde{f}(r, \theta) / r \le \lim_{r
+\rightarrow 0}  r / M^2 = 0$.
+
+However, in the direction $\theta = \sin^{-1}(1 / M)$, the error of the linear
+extrapolation to any $r_0$ is still $\tilde{f}(r, \theta) - 0 = M r_0^2$. Since
+Fr{\'e}chet differentiability requires only $M < \infty$, the extraplation error
+can be arbitrarily large for Fr{\'e}chet differentiable functions.
+
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\Exref{r2_pathological} is neither Fr{\'e}chet differentiable nor continuous,
+whereas \exref{r2_pathological} is both Fr{\'e}chet differentiable and
+continuous.  It turns out that, even in $\mathbb{R}^2$, it is possible for a function
+to be ....
+
 Note also that $f(r, \theta)$ is disccontinuous at $r=0$.  It turns out that
 this is not essential to the example; see \citet[Example
 1.9]{averbukh:1967:theory} for an (only slightly more complicated) example of a
@@ -148,9 +191,6 @@ but not Fr{\'e}chet differentiable at $r=0$.  Hence continuity does not imply
 Fr{\'e}chet differentiability.  However, the converse is true: Fr{\'e}chet
 differentiability implies continuity.
 
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 A similar example that is more directly relevant is the following.
@@ -158,7 +198,11 @@ A similar example that is more directly relevant is the following.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}
-%
+
+TODO: make this a lemma.  Then, by saying that \assuref{dist_fun_nice}
+holds with $\int M_\psi(\zeta)^{1/q} d\zeta < \infty$ for $1 \le q < \infty$,
+I think you will get existence of the $L_p$ derivatives.
+
 Let $\q(\zeta)$ be a density relative to the Lebesge measure on $[0,1]$ such
 that $\int \q(\zeta)^p d\zeta < \infty$ for all $1 \le p < \infty$. (Bounded
 densities or the Beta distribution are examples.) Define $f: \lp{p} \mapsto
@@ -224,24 +268,10 @@ Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
 So $f$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$, and
 cannot be Fr{\'e}chet differentiable.
 
-However, the directional derivative exists in any direction (does it?). First,
-suppose that $\inf_{\zeta} \phi(\zeta) = -\infty$.  Then $\inf_{\zeta} t
-\phi(\zeta) = -\infty$ for any $t > 0$, so $f(t\phi) = 0$ for all $t$, and
-$\lim_{t \rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 =
-0$.
-%
-% If $-\infty < \inf_\zeta \phi(\zeta) \le \sup_\zeta < \infty$, i.e.
-% if $\phi$ is bounded, then by the dominated convergence theorem,
-% %
-% \begin{align*}
-% %
-% \fracat{\partial f(t \phi)}{\partial t}{t=0} =
-%     \expect{q(\zeta)}{\phi(\zeta)}.
-% %
-% \end{align*}
-% %
-% If $-\infty < \inf_\zeta \phi(\zeta)$ but $\sup_\zeta \phi(\zeta) = \infty$,
-% then can we apply the DCT?
+However, the directional derivative exists in any direction. First, suppose that
+$\inf_{\zeta} \phi(\zeta) = -\infty$.  Then $\inf_{\zeta} t \phi(\zeta) =
+-\infty$ for any $t > 0$, so $f(t\phi) = 0$ for all $t$, and $\lim_{t
+\rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 = 0$.
 
 If $-\infty < \inf_\zeta \phi(\zeta)$, then there exists a $t_0 > 0$ such that
 $t_0 \phi(\zeta)$ is strictly larger than $-1$.  Let us consider only $t < t_0$.
@@ -268,13 +298,27 @@ is bounded, so we can apply the DCT.  For the second term,
 %
 Without loss of generality we can take $t < 1$ so that the preceding display is
 integrable for all $t$ whenever $\int \q(\zeta) \abs{\phi(\zeta)} d\zeta <
-\infty$. But this follows by Holder's inequality with the Lebesgue measure.
-
-
+\infty$. But this follows by Holder's inequality with the Lebesgue measure,
+since
 %
-
-
-
-
+\begin{align*}
+%
+\int_0^1 \q(\zeta) \abs{\phi(\zeta)} d \zeta \le{}&
+    \left( \int \q(\zeta)^{\frac{p}{p-1}} d\zeta \right)^{ \frac{p-1}{p} }
+    \left( \int \abs{\phi(\zeta)}^p d\zeta \right)^{1/p} \le \infty.
+%
+\end{align*}
+%
+Consequently,
+%
+\begin{align*}
+%
+\fracat{\partial f(t \phi)}{\partial t}{t=0} ={}&
+    \int \q(\zeta) \fracat{\partial \log(1 + t \phi(\zeta))}{\partial t}{t=0} d\zeta
+\\={}&
+\int \q(\zeta) \phi(\zeta) d\zeta.
+%
+\end{align*}
+%
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
