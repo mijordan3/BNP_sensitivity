@@ -466,10 +466,6 @@ Let $\pbase(\nu) = \ind{0 \le \nu \le 1}$.  For some $\delta > 0$ and $0 <
     \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right)
         \ind{\epsilon \le \nu \le 1} +
     \delta \ind{0 \le \nu \le \epsilon}.
-% \\\approx{}&
-%     \left(1-\delta \epsilon \right)
-%         \ind{\epsilon \le \nu \le 1} +
-%     \delta \ind{0 \le \nu \le \epsilon}
 %
 \end{align*}
 %
@@ -485,12 +481,6 @@ Then \eqref{phi_for_palt} gives, for some $\alpha$,
         \ind{\epsilon \le \nu \le 1} +
     \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \nu \le \epsilon}.
 %
-% \\\approx{}&
-%     \left( \alpha\left(1-\delta \epsilon \right)^{1/p}
-%         - 1
-%     \right)
-%         \ind{\epsilon \le \nu \le 1} +
-%     \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \nu \le \epsilon}.
 %
 \end{align*}
 %
@@ -582,11 +572,11 @@ adding the same amount of arbitrarily small probability mass.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-Of course, if we relax the constraint that $\phi(\nu) \ge 0$, then
-we cannot guarantee that $\pstick(\nu \vert \phi) \ge 0$ in an open ball
-around $\phiz$.  However, pointwise negative priors are no substantive
-problem, as long as the prior can be normalized.  To that end, we state
-the following generalization of \citep[Result 2]{gustafson:1996:local}.
+Of course, if we relax the constraint that $\phi(\nu) \ge 0$, then we cannot
+guarantee that $\pstick(\nu \vert \phi) \ge 0$ in an open ball around $\phiz$.
+However, pointwise negative priors are no substantive problem, as long as
+normalizing integral is neither zero nor infinity.  To that end, we state the
+following generalization of \citep[Result 2]{gustafson:1996:local}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -594,8 +584,7 @@ the following generalization of \citep[Result 2]{gustafson:1996:local}.
 \begin{lem}
 %
 Fix a $1 \le p < \infty$ and $\pbase(\nu)$ as in \defref{prior_nl_pert}.
-There exists a $\delta < \infty$ such that $\norm{\phi}_p \le \delta$
-implies that
+If $\norm{\phi}_p < 1$ then
 %
 \begin{align*}
 %
@@ -636,55 +625,55 @@ Consequently,
 So, as in \citep[Result 2]{gustafson:1996:local}, $\norm{\phi}_p < \infty$
 implies that the prior can be normalized.
 
-Next, by convexity, for any $x \ge y \ge 0$,
+Next, by convexity,\footnote{Apply the definition of convexity to the points
+$0$, $x$, and $x + y$, and again to the points $0$, $y$, and $x+y$, then add the
+results.} for any $x \ge y \ge 0$,
 %
 \begin{align*}
 %
-(x + y)^p \ge{}& x^p + y^p \\
-(x - y)^p \le{}& x^p - y^p.
+(x + y)^p \ge{} x^p + y^p \mathand
+(x - y)^p \le{} x^p - y^p.
 %
 \end{align*}
 %
-Applying the previous display to the integral,
+Also note that, since $\pbase(\nu) \ge 0$,
+%
+\begin{align*}
+%
+\pbase(\nu)^{1/p} + \phi(\nu) \le 0
+\quad\Rightarrow\quad
+\phi(\nu) \le 0 \mathand
+\abs{\phi(\nu)} - \pbase(\nu)^{1/p} \ge 0.
+%
+\end{align*}
+%
+We can thus write
 %
 \begin{align*}
 %
 \MoveEqLeft
 \int \mathrm{sign}(\pbase(\nu)^{1/p} + \phi(\nu))
-    \abs{\pbase(\nu)^{1/p} + \phi(\nu)}^{p} d\nu \ge{}\\&
-    \int \abs{\pbase(\nu)^{-p} + \abs{\phi(\nu)} }^{p}
-        \ind{\phi(\nu) > 0}
+    \abs{\pbase(\nu)^{1/p} + \abs{\phi(\nu)}}^{p} d\nu
+={}\\&
+    \int \left(\pbase(\nu)^{1/p} + \phi(\nu)\right)^{p}
+        \ind{\pbase(\nu)^{1/p} + \phi(\nu) \ge 0}
         d\nu - \\&
-    \int \abs{\pbase(\nu)^{-p} - \abs{\phi(\nu)} }^{p}
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}}
-        d\nu - \\&
-    \int \abs{\abs{\phi(\nu)} - \pbase(\nu)^{-p} }^{p}
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
+    \int \left(\abs{\phi(\nu)} - \pbase(\nu)^{1/p}\right)^{p}
+        \ind{\pbase(\nu)^{1/p} + \phi(\nu) < 0}
         d\nu
 \\\ge{}&
-    \int \left(\pbase(\nu) + \abs{\phi(\nu)}^{p} \right)
-        \ind{\phi(\nu) > 0}
+    \int \left(\pbase(\nu) - \abs{\phi(\nu)}^{p}\right)
+        \ind{\pbase(\nu)^{1/p} + \phi(\nu) \ge 0}
         d\nu - \\&
-    \int \left(\abs{\phi(\nu)}^{p}  - \pbase(\nu) \right)
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}}
-        d\nu - \\&
-    \int \left(\pbase(\nu) - \abs{\phi(\nu)}^{p} \right)
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
+    \int \left(\abs{\phi(\nu)}^p - \pbase(\nu)\right)
+        \ind{\pbase(\nu)^{1/p} + \phi(\nu) < 0}
         d\nu
-\\\ge{}&
-    \int \pbase(\nu) \bigg(
-        \ind{\phi(\nu) > 0} +
-%\\&\quad\quad\quad\quad\quad
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}} -
-\\&\quad\quad\quad\quad\quad
-        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
-    \bigg) d\nu - \norm{\phi}_p^p.
+\\={}&
+    \int \pbase(\nu) d\nu - \int \abs{\phi(\nu)}^p d\nu
+\\={}&
+    1 - \norm{\phi}_p^p.
 %
 \end{align*}
-%
-I believe that this will not do, since here the size of the unit ball must
-depend on $\phi$.
-
 %
 \end{proof}
 %
