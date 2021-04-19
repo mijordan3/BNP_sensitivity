@@ -101,7 +101,7 @@ compare_coclust_lr_and_refit_scatter <-
     # identity line
     geom_abline(slope = 1, intercept = 0, color = 'red') +
     # the points
-    geom_point(alpha = 0.1, shape = 'o', size = 1) +
+    geom_point(alpha = 0.1, shape = 16, size = 1) +
     # 2d density
     # geom_density_2d(breaks = breaks) +
     # scale_fill_brewer(palette = 'PuBu') + 

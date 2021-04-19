@@ -24,7 +24,7 @@ p_priors_contr <-
 plots <- compare_coclust_lr_and_refit(coclust_refit_fpert, 
                                       coclust_lr_fpert,
                                       coclust_init, 
-                                      vmax = 0.05)
+                                      vmax = 0.1)
 
 top_row <- p_logphi + p_priors_contr
 bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr 

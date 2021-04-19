@@ -11,7 +11,7 @@ log_phi <- function(logit_v, alpha1, alpha0 = 6){
 
 
 ymax <- 15
-scale <- 200
+scale <- 550
 
 p1 <- plot_influence_and_logphi(influence_df$logit_v, 
                           influence_df$influence_x_prior, 

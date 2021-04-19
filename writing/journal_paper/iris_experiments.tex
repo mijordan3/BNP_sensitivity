@@ -9,7 +9,7 @@
 
 
 We demonstrate the local sensitivity computations on a 
-Gaussian mixture model of the iris dataset. 
+Gaussian mixture model of the iris data set. 
 The generative model and variational approximation were detailed in 
 \exref{iris_bnp_process,iris_var_distr}, respectively. 
 \figref{iris_fit} shows the GMM fit at $\alpha = 6$. 
@@ -46,10 +46,10 @@ Define the expected number of \textit{in-sample} clusters as
 Recall that the expectation and product can be interchanged because $q$ is mean-field. 
 
 The in-sample quantity $\gclusters$ is an estimate for 
-the number of species present in the observed iris dataset. 
+the number of species present in the observed iris data set. 
 Alternatively, we can define a {\itshape posterior predictive} quantity, 
 which is an estimate of the number of species one would expect to see 
-should a new iris dataset of size $N$ be collected.
+should a new iris data set of size $N$ be collected.
 Define the posterior predictive number of clusters as 
 \begin{align}\eqlabel{post_pred_nclusters}
 \gclusterspred(\eta) = \expect{\q(\nu\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
@@ -184,7 +184,7 @@ When $\log\phi$ is centered at a location where the influence function is negati
 conversely, when $\log\phi$ is centered at a location where the influence function is positive, the effect on $\gclusters$ is positive (bottom row); finally, when $\log\phi$ is centered at a location where the influence is both negative and positive, the effects cancel, and the change in the posterior statistic is roughly zero (middle row). 
 In each case, the linear approximation $\gclusters(\etalin(\epsilon))$
 is able to capture the changes in the posterior statistic. 
-In applications below, we use influence function to guide our choice of functional perturbaton and to explain why some perturbations result in greater sensitivity than others. 
+In applications below, the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
 
 Finally, we consider the 
 worst-case perturbation with unit $L_\infty$ norm.
@@ -198,7 +198,7 @@ $\gclusters$ compared to the other unit $L_\infty$ norm perturbations in
 \figref{iris_fsens}. 
 However, even with the worst-case perturbation, 
 the change in $\gclusters$ is still small;
-we thus conclude that in the iris dataset $\gclusters$ appears to be a quantity insensitive to the prior. 
+we thus conclude that in the iris data set $\gclusters$ appears to be a quantity insensitive to the prior. 
 
 
 
@@ -210,7 +210,7 @@ we thus conclude that in the iris dataset $\gclusters$ appears to be a quantity 
 }
 
 \caption{Sensitivity of
-        the expected number of in-sample clusters in the iris dataset
+        the expected number of in-sample clusters in the iris data set
         to three multiplicative perturbations with 
         unit $L_{\infty}$-norm 
         (Left) The log multiplicative perturbation $\log\phi$ in grey.        
@@ -234,11 +234,11 @@ we thus conclude that in the iris dataset $\gclusters$ appears to be a quantity 
 }
 
 \caption[Sensitivity of
-        the expected number of in-sample clusters in the iris dataset
-        to the worst-case multiplicative perturbations with 
+        the expected number of in-sample clusters in the iris data set
+        to the worst-case multiplicative perturbation with 
         unit $L_{\infty}$-norm]{Sensitivity of
-        the expected number of in-sample clusters in the iris dataset
-        to the worst-case multiplicative perturbations with 
+        the expected number of in-sample clusters in the iris data set
+        to the worst-case multiplicative perturbation with 
         unit $L_{\infty}$-norm.}\label{fig:iris_worstcase}
 \end{figure}
 
@@ -247,7 +247,7 @@ we thus conclude that in the iris dataset $\gclusters$ appears to be a quantity 
 
 % \begin{table}[tb]
 % \centering
-% \caption{Compute time of results on the iris dataset. }
+% \caption{Compute time of results on the iris data set. }
 % \begin{tabular}{|r|r|}
 %     \hline 
 %     & time (seconds) \\ 
