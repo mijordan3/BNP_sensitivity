@@ -1,3 +1,40 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{defn}
+%
+For a measure $\lambda$ on $(0,1)$ and $1 \le p \le \infty$, let
+$\lp{\lambda,p}$ define the space of $\lambda$-integrable functions from
+$(0,1)\mapsto\mathbb{R}$ with
+%
+\begin{align*}
+%
+\left(a \phi_1 + \phi_2 \right)(\theta) :={}&
+    a \phi_1(\theta) + \phi_2(\theta) \\
+\norm{\phi}_{\lambda,p} :={}&
+\begin{cases}
+    \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)\right)^{1/p}
+    & \textrm{when }1\le p < \infty\\
+    \esssup_{\theta} \abs{\phi(\theta)}
+    & \textrm{when }p = \infty.
+\end{cases}
+%
+\end{align*}
+%
+When $\lambda$ is the Lebesgue measure, we may simply write $\norm{\cdot}_{p} =
+\norm{\cdot}_{\lambda,p}$.
+%
+\end{defn}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By \citep[Theorem 5.2.1]{dudley:2018:real}, $\lp{\lambda,p}$ is a Banach
+space (i.e., a complete, normed vector space).
+
+
+
+
 In \secref{prior_perturbations} we considered a multiplicative perturbations
 of the form \eqref{phi_perturbation} with the $\norminf{\cdot}$ norm.  In
 this section we consider other norms, illustrating that other choices
@@ -211,27 +248,35 @@ sensitivity, we will state is as a lemma rather than merely an example.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}\lemlabel{e_log_nonfrechet}
 
-% TODO: make this a lemma.  Then, by saying that \assuref{dist_fun_nice}
-% holds with $\int M_\psi(\zeta)^{1/q} d\zeta < \infty$ for $1 \le q < \infty$,
-% I think you will get existence of the $L_p$ derivatives.
+TODO: $\q$ should not be defined relative to $\lambda$.  And for
+discontinuity we need
+to require that there is a region such that
+$\inf_\theta h(\theta) \q(\theta) p(\theta) > 0$.  Maybe it would be
+better to just split this out into two different proofs?
 
-Let $\lambda$ be probability measure over $[0,1]$ with a continuous component.
-Fix $1 \le p < \infty$, and let $q = (1 - p^{-1})^{-1}$, from which $p^{-1} +
-q^{-1}=1$ follows.\footnote{Regrettably the standard choices of $p$ and $q$ for
-$\lp{p}$ spaces and their duals overlap with our notation for probability and
-variational distributions, but there should be no ambiguity in context.}  Let
-$\q(\zeta)$ be a density relative $\lambda$ such that $\int \q(\theta)^q
-\lambda(d\theta) < \infty$.  Let $\lp{\lambda,p}$ denote the space with the norm
+Let $\lambda$ be continuous probability measure over $[0,1]$. Fix $1 \le p <
+\infty$, and let $q = (1 - p^{-1})^{-1}$, from which $p^{-1} + q^{-1}=1$
+follows.\footnote{Regrettably the standard choices of $p$ and $q$ for $\lp{p}$
+spaces and their duals overlap with our notation for probability and variational
+distributions, but there should be no ambiguity in context.}
+
+Let $\q(\theta)$ be a density relative $\lambda$, and $h(\theta)$ a measurable
+function such that $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ and
+$\int \abs{ \q(\theta) h(\theta)}^q \lambda(d\theta) < \infty$.
+
+Let $\lp{\lambda,p}$ denote the space with the norm
 $\norm{\phi}_{\lambda,p} := \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)
-\right)^{1/p}$.  Define $f: \lp{\lambda, p} \mapsto \mathbb{R}$ as follows:
+\right)^{1/p}$.
+
+Define $f: \lp{\lambda, p} \mapsto \mathbb{R}$ as follows:
 %
 \begin{align*}
 %
 f(\phi) :=
 \begin{cases}
     %
-    \expect{\q(\zeta)}{\log \left(1 + \phi(\zeta)\right)} &
-    \textrm{when }\phi(\zeta) > -1\textrm{ almost surely} \\
+    \expect{\q(\theta)}{h(\theta) \log \left(1 + \phi(\theta)\right)} &
+    \textrm{when }0 < 1 + \phi(\theta)\textrm{ for all }\theta \\
     %
     0 & \textrm{otherwise}.
 %
@@ -245,6 +290,10 @@ However $f$ has a directional derivative at $\phiz$ in every direction $\phi -
 
 \begin{proof}
 %
+Since $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ we can choose a set
+$S$ such that either $\inf_{\theta \in S} h(\theta) \q(\theta) \ge h_0$ or
+$\inf_{\theta \in S} h(\theta) \q(\theta) \le -h_0$..........
+
 Since $\lambda$ has a continuous component, for any sufficiently small $\epsilon >
 0$, there exists a set $S_\epsilon$ with $\lambda(S_\epsilon) = \epsilon$. Since
 $\int q(\theta) \lambda(d\theta) = 1$, we can find a set $S_\epsilon$ such that
@@ -699,5 +748,33 @@ We can thus write
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Observe, that, for $1 \le p < \infty$, we take the log perturbation given by
+\defref{prior_nl_pert} is
+%
+\begin{align*}
+%
+\log \pstick(\nu \vert \phi) ={}&
+\begin{cases}
+    \log \pbase(\nu) + \log\left(1 + \frac{\phi(\nu)}{\pbase(\nu)^{1/p}} \right)
+    & \textrm{when }\rho(\nu, \phi) > 0 \\
+    -\infty     & \textrm{when }\rho(\nu, \phi) \le 0.
+%
+\end{cases}
+%
+\end{align*}
+%
 
-With these results, we can
+
+We can now state our main results.
+
+
+\begin{thm}
+%
+Fix $1 \le p < \infty$ and define a prior perturbation as in
+\defref{prior_nl_pert}.
+Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
+stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
+\etaopt$, with $\psi(\zeta, \t) = 1$, and with $\psi(\zeta, \t) = \log\left(1 + \frac{\phi(\nu)}{\pbase(\nu)^{1/p}} \right)$, for all $\k$.
+
+%
+\end{thm}
