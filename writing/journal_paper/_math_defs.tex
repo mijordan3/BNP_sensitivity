@@ -53,14 +53,17 @@
 
 
 % Distributions central to the story
-\def\pstick{p_{\mathrm{stick}}}   % Stick breaking distribution
-\def\q{q}   % VB dist
+\def\p{\mathfrak{p}}   % Other distributions
+\def\q{\mathfrak{q}}   % VB dist
+\def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
 \def\logp{\ell}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
 \def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
 \def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
 \def\psigrad#1{{\nabla_\t \psi}\left(#1\right)}   % Function of interest grad
+\def\pbase{\p_{0}}   % Base prior
+\def\palt{\p_{1}}   % Alternative prior
 % \def\psigradbar#1{\overline{\psigrad{#1}}\,\,}   % Cenetered function of interest
 % \def\psibar#1{\overline{\psi\left(#1\right)}\,\,}   % Cenetered function of interest
 
@@ -72,8 +75,6 @@
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
-\def\pbase{p_{0}}   % Base prior
-\def\palt{p_{1}}   % Alternative prior
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}
