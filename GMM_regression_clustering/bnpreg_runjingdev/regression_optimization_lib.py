@@ -80,7 +80,7 @@ def set_params_w_kmeans(y, regressors,
     # initialze at prior mean
     vb_params_dict['data_info'] = \
         prior_params_dict['prior_data_info_scale'] * \
-        prior_params_dict['prior_data_info_shape']
+        prior_params_dict['prior_data_info_shape'] * onp.ones(k_approx)
     
 #     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
 #     vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
