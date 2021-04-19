@@ -2,9 +2,9 @@ We will consider discrete Bayesian nonparametric (BNP) generative models which
 draw data points $\x_n$ from one of a certain number of clusters indexed by $\k =
 1, \ldots, \kmax$, where in principle $\kmax$ might be infinity.  Each cluster
 is characterized by a vector $\theta_\k \in \thetadom \subseteq
-\mathbb{R}^{\thetadim}$, with $p(\x_n \vert \theta_\k)$ denoting the
+\mathbb{R}^{\thetadim}$, with $\p(\x_n \vert \theta_\k)$ denoting the
 distribution of data arising from  cluster $\k$. We will model the $\theta_\k$
-as arising IID from a known prior $\theta_\k \iid p(\theta_\k)$, and write
+as arising IID from a known prior $\theta_\k \iid \p(\theta_\k)$, and write
 $\theta = (\theta_1, \theta_2, \ldots)$.
 
 The cluster assignments are represented by indicator variables $\z_{\n\k} \in
@@ -16,8 +16,8 @@ this way, we can write
 %
 \begin{align*}
 %
-p(\x_n \vert \z_\n, \theta) =
-    \prod_{k=1}^\kmax p(\x_n \vert \theta_\k)^{\z_{\n\k}}.
+\p(\x_n \vert \z_\n, \theta) =
+    \prod_{k=1}^\kmax \p(\x_n \vert \theta_\k)^{\z_{\n\k}}.
 %
 \end{align*}
 
@@ -50,15 +50,15 @@ proabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax
 %
 \begin{align*}
 %
-p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \\
-p(\z_\n \vert \pi) ={}&
+\p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \\
+\p(\z_\n \vert \pi) ={}&
     \ind{\sum_{\k=1}^{\kmax} \z_{\n\k} = 1}
     \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
 %
 \end{align*}
 %
 Since $\pi$ is a deterministic function of $\nu$, we can also write
-$p(\z_\n \vert \nu)$ with no ambiguity.
+$\p(\z_\n \vert \nu)$ with no ambiguity.
 
 The stick-breaking process can be though of as a map from  the stick
 distibution, $\pstick(\cdot)$, to a vector of probabilities, $\pi$. Different
@@ -117,7 +117,7 @@ definite covariance matrix, and
 %
 \begin{align*}
 %
-p(\x_\n \vert \theta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Sigma_\k} \\
+\p(\x_\n \vert \theta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Sigma_\k} \\
 \logp(\x_\n \vert \theta_\k) ={}&
     -\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)
     -\frac{1}{2} \log |\Sigma_\k| + \const.\\
