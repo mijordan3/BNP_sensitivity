@@ -23,13 +23,13 @@ model
 Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from the
 choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 %
-\begin{align*}
+\begin{align}\eqlabel{gem_alpha_pert}
 %
-\log \pstick(\nuk \vert \t) ={}&
-    (\t + \alpha_0 - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha + \alpha_0 - 1) \log(1 - \nuk) + \const.
+    %& \constdesc{\nuk}
 %
-\end{align*}
+\end{align}
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,14 +57,14 @@ problem, \eqref{vb_optimization}.
 
 If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
 already computed the solution $\etaopt$ to the ``original'' problem
-\eqref{vb_optimization}, then we can form a Taylor series
-approximation to $\etaopt(\t)$.  Specifically, we define
+\eqref{vb_optimization}, then we can form a Taylor series approximation to
+$\etaopt(\t)$.  Specifically, we define
 %
-\begin{align*}
+\begin{align}\eqlabel{etalin_def}
 %
-\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t^T}{\t=0} \t .
+\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t}{\t=0} \t .
 %
-\end{align*}
+\end{align}
 %
 Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
 $d\etaopt(\t) / d\t | 0$, evaluating $\etalin(\t)$ involves only
@@ -112,8 +112,11 @@ continuously differentiable via the implicit function theorem
 %
 Let $\q(\zeta \vert \eta)$ be a (possibly unnormalized) density over the random
 variable $\zeta$ parameterized by $\eta$ defined relative to a dominating
-measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\zeta \vert \eta)$
-is twice continuously differentiable.
+measure $\lambda$.\footnote{For the purposes of this assumption  $\q(\zeta \vert
+\eta)$ and $\zeta$ can be taken to be some general distribution, not necessarily
+corresponding to our BNP model or variational approximation.} Assume that the
+map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
+differentiable.
 
 Let $\psi(\zeta, \t)$ be a scalar-valued $\lambda$-measurable function of
 $\zeta$ and $\t$.  Assume that the map $\t \mapsto \psi(\zeta, \t)$ is
@@ -169,14 +172,17 @@ M_\psi(\zeta)$.
 \Assuref{dist_fun_nice} states sufficient conditions for which we can apply the
 dominated convergence theorem to varaiational expectations, allowing us to
 translate continuity of the variational and model densitites into continuity of
-the variatioanl objective.  The details can be found in \lemref{logq_derivs,
-logq_continuous} of \appref{cont_lemmas}.
+the variational objective.  The details can be found in \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}.  We might equivalently have said that
+we can exchange limits and variational expectations whenever needed,
+\assuref{dist_fun_nice} simply being a precise catalogue of what is needed.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{kl_opt_ok}
 %
-Let the following conditions on the variational optimum hold.
+Let the following conditions on the variational approximation hold.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
@@ -189,11 +195,6 @@ Let the following conditions on the variational optimum hold.
 
     \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
     0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
-
-    \item\itemlabel{q_stick_regular} The variational approximations $\q(\nu
-    \vert \etanuk)$ to the stick-breaking posteriors satisfy
-    \assuref{dist_fun_nice} with $\eta_0 = \etaopt$, with $\psi(\zeta, \t) = 1$,
-    and with $\psi(\zeta, \t) = \log \pstick(\zeta \vert \t)$, for all $\k$.
 %
 \end{enumerate}
 %
@@ -202,9 +203,21 @@ Let the following conditions on the variational optimum hold.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_stick_regular}
+%
+Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
+stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
+\etaopt$, with $\psi(\zeta, \t) = 1$, and with $\psi(\zeta, \t) = \log
+\pstick(\zeta \vert \t)$, for all $\k$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}\thmlabel{etat_deriv}
 %
-Let \assuref{kl_opt_ok} hold.  Then the map $\t \mapsto
+Let \assuref{kl_opt_ok, q_stick_regular} hold.  Then the map $\t \mapsto
 \etaopt(\t)$ is continuously differentiable with derivative
 %
 \begin{align}\eqlabel{vb_eta_sens}
@@ -234,9 +247,6 @@ For the duration of the proof, define
 \rho_\eta(\etanuk, \t) :={}&
 \fracat{\partial \rho(\etanuk, \t)}
        {\partial \etanuk}{\etanuk}.
-% \rho_{\eta\eta}(\etanuk, \t) :={}&
-%    \fracat{\partial^2 \rho(\etanuk, \t)}
-%           {\partial \etanuk \partial \etanuk^T}{\etanuk}.
 %
 \end{align*}
 %
@@ -278,12 +288,12 @@ for all $\t \in \ball_\t$.
 
 We wish to apply the implicit function theorem to
 \eqref{vb_first_order_condition}, for which we must show that $\partial
-\KL{\eta, \t} \partial \eta$ is continuously differentiable in both $\eta$ and
+\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
 $\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
 \partial \eta$ is continuously differentiable, so we need only consider
 $\rho_\eta(\etanuk, \t)$.
 
-By \lemref{logq_continuous} and \assuitemref{kl_opt_ok}{q_stick_regular}, we
+By \lemref{logq_continuous} and \assuref{q_stick_regular}, we
 have that both $\partial \rho_\eta(\etanuk, \t) / \partial \eta$ and $\partial
 \rho_\eta(\etanuk, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
 Since both its partial derivatives are continuously differentiable, the joint
@@ -297,10 +307,11 @@ $\t$.
 % is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
 % $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
-Together with \assuitemref{kl_opt_ok}{kl_hess}, the result then follows from the
-implicit function theorem \citet[Theorem 3.3.1]{krantz:2012:implicit}.
-For convenience, \tabref{kranz_notation} shows the correspondence between
-their notation and ours.
+Together with the fact that $\partial^2 \KL{\eta, \t} / \partial \eta
+\partial\eta^T$ is invertible at $\etaopt$, \assuitemref{kl_opt_ok}{kl_hess},
+the result then follows from the implicit function theorem \citet[Theorem
+3.3.1]{krantz:2012:implicit}. For convenience, \tabref{kranz_notation} shows the
+correspondence between their notation and ours.
 % Note
 % that we make the following formal identifications with the notation of
 % \citet[Theorem 3.3.1]{krantz:2012:implicit}:
@@ -323,7 +334,19 @@ $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
 \end{center}
 %
 \end{proof}
-
-
+%
 \end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{our_approximation}
+%
+For the variational approximation of \secref{model_vb} and perturbation
+given in \exref{alpha_perturbation}, $\alpha \mapsto \etaopt(\alpha)$
+is continuously differentiable.
+%
+\end{cor}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

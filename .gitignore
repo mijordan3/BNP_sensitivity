@@ -18,7 +18,11 @@
 *~
 *.html
 *.json
+
 *cache*
+*.nav
+*.snm
+
 
 *.out
 *.err

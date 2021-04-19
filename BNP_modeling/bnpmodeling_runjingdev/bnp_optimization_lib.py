@@ -217,13 +217,13 @@ def optimize_kl(get_kl_loss,
                    jac = lambda x : onp.array(get_grad(x)), 
                    hessp = lambda x,v : onp.array(get_hvp(x, v)))
         print('Newton time: {:.03f}sec'.format(time.time() - t1))
-
+    
+    optim_time = time.time() - t0
+    
     vb_opt = out.x
     vb_opt_dict = vb_params_paragami.fold(vb_opt, free = True)
     print('Newton out: ', out.message)
     
     print('done. ')
-    
-    optim_time = time.time() - t0
     
     return vb_opt_dict, vb_opt, out, optim_time
