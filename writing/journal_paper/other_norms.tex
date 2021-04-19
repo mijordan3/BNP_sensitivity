@@ -346,3 +346,211 @@ since
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+We can define the family of nonlinear perturbations similar to
+\citep{gustafson:1996:local}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_nl_pert}
+%
+Fix $\pbase(\nu)$ and $1 \le p \le \infty$.  For any $\phi \in \lp{p}$, define
+\footnote{We have dropped a factor of $p$ from the perturbation when $p <
+\infty$ relative to the definition in \citep{gustafson:1996:local}.}
+%
+\begin{align*}
+%
+\pstick'(\nu \vert \phi) :={}& \begin{cases}
+%
+\left(\pbase(\nu)^{-1} + \phi(\nu) \right)^{p}
+    & \textrm{when }p < \infty \\
+\pbase(\nu)\exp(\phi(\nu))
+    & \textrm{when }p = \infty
+%
+\end{cases}\\
+%
+\pstick(\nu \vert \phi) :={}&
+    \frac{\pstick'(\nu \vert \phi)}{\int \pstick'(\nu' \vert \phi) d\nu'}.
+%
+\end{align*}
+%
+\end{defn}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Defref{prior_nl_pert} provides one class of answers to what it means to perturb
+a prior, and how to measure the size of the perturbation.  \citep[Result
+2]{gustafson:1996:local} states that using $\norm{\cdot}_p$ with its
+corresponding perturbation gives a notion of ``size'' of a perturbation that is
+a norm, invariant to changes in the base measure, and invariant under one-to-one
+re-parameterizations.
+
+Unlike \citep{gustafson:1996:local}, we allow the perturbations $\phi$ to be
+negative.  There are two reasons for doing so.  First, if $\phi$ must be
+pointwise positive, then $\pstick(\nu \vert \phi)$ is not defined in an open
+ball containing $\phiz$, and standard results from functional analysis cannot be
+directly applied to establish properties like Fr{\'e}chet differentiability.
+There may be priors that cannot be achieved by considering only positive
+perturbations.  But perhaps most importantly, when $\phi$ must be positive, the
+norm $\norm{\cdot}_p$ treats ablating and adding prior mass very asymmetrically
+when $p < \infty$, arguably violating an intutive notions of the ``size''
+of perturbation.
+
+Suppose $p < \infty$ and we wish to choose a $\phi$ to change $\pbase$ into
+$\palt$, for which \defref{prior_nl_pert} gives that we must choose
+%
+\begin{align}\eqlabel{phi_for_palt}
+%
+\phi(\nu) = \alpha \palt(\nu)^{1/p} - \pbase(\nu)^{1/p}
+    \mathtxt{where}\alpha > 0.
+%
+\end{align}
+%
+The fact that we are free to choose $\alpha$ follows from the fact that we
+normalize after perturbing.  In many, but not all cases, one can choose $\alpha$
+large enough so that $\alpha^p \palt(\nu) \ge \pbase(\nu)$, and $\phi$ is
+positive.  However, by doing so, one might have to create a ``large''
+perturbation, according to the $\norm{\cdot}_p$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+Let $\pbase(\nu) = \frac{4}{3}\ind{\frac{1}{4} \le \nu \le 1}$ and $\palt(\nu) =
+\frac{4}{3}\ind{0 \le \nu \le \frac{3}{4}}$.  Then, for any $\alpha > 0$, any $1
+\le p < \infty$, and for $\phi$ as given in \eqref{phi_for_palt}, $\phi(7/8) <
+0$.  So there is no value of $\alpha$ that can transform $\pbase$ into $\palt$
+using only a positive perturbation.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+Let $\pbase(\nu) = \ind{0 \le \nu \le 1}$.  For some $\delta > 0$ and $0 <
+\epsilon \ll 1$, let
+%
+\begin{align*}
+%
+\palt(\nu) :={}&
+    \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right)
+        \ind{\epsilon \le \nu \le 1} +
+    \delta \ind{0 \le \nu \le \epsilon}.
+% \\\approx{}&
+%     \left(1-\delta \epsilon \right)
+%         \ind{\epsilon \le \nu \le 1} +
+%     \delta \ind{0 \le \nu \le \epsilon}
+%
+\end{align*}
+%
+% where the final approximation is due to the smallness of $\epsilon$.
+Then \eqref{phi_for_palt} gives, for some $\alpha$,
+%
+\begin{align*}
+%
+\phi ={}&
+    \left( \alpha\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p}
+        - 1
+    \right)
+        \ind{\epsilon \le \nu \le 1} +
+    \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \nu \le \epsilon}.
+%
+% \\\approx{}&
+%     \left( \alpha\left(1-\delta \epsilon \right)^{1/p}
+%         - 1
+%     \right)
+%         \ind{\epsilon \le \nu \le 1} +
+%     \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \nu \le \epsilon}.
+%
+\end{align*}
+%
+And
+%
+\begin{align*}
+%
+\norm{\phi}_p ={}&
+    \left( \alpha\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p} - 1
+    \right) (1- \epsilon) +
+    \left(\alpha \delta^{1/p} - 1 \right) \epsilon.
+%
+\end{align*}
+%
+For $\phi$ to be positive, we require
+%
+\begin{align*}
+%
+\alpha^p \ge \frac{1 - \epsilon}{1 - \delta \epsilon}
+    \mathtxt{and}
+\alpha^p \ge \frac{1}{\delta}.
+%
+\end{align*}
+
+First, let us consider adding a small amount of prior mass, taking $\delta = 2 -
+\epsilon$; let the corresponding perturbation be $\phi^+$.  For $\delta > 1$,
+then we achieve $\phi \ge 0$ by taking $\alpha^p = \frac{1 - \epsilon}{1 -
+\delta \epsilon}$.  Using the fact that $\epsilon \ll 1$ and keeping only
+leading-order terms,
+%
+\begin{align*}
+%
+\frac{1-\epsilon}{1 - \delta \epsilon} \approx{}&
+    (1- \epsilon)(1 + \delta \epsilon)
+\\\approx{}& 1 + (\delta - 1) \epsilon
+\\\approx{}& 1 + \epsilon,
+%
+\end{align*}
+%
+so
+%
+\begin{align*}
+%
+\norm{\phi^+}_p  ={}&
+    \left(\alpha \delta^{1/p} - 1 \right) \epsilon
+\\\approx{}&
+    \left(
+        \left( \left(1 + \epsilon\right) \left(2 - \epsilon \right)\right)^{1/p}
+        - 1 \right) \epsilon
+\\\approx{}&
+%
+\left( 2^{1/p} - 1 \right) \epsilon.
+%
+\end{align*}
+%
+
+Next, consider removing the same amount of mass with the symmetric change
+$\delta = \epsilon$, letting $\phi^-$ be the corresponding perturbation. Then we
+can ensure that $\phi(\nu) \ge 0$ with $\alpha^p \ge \epsilon^{-1}$, and
+$\epsilon \ll 1$ gives
+%
+\begin{align*}
+%
+\frac{1-\delta\epsilon}{1 - \epsilon} \approx{}& 1- \epsilon,
+%
+\end{align*}
+%
+and
+%
+\begin{align*}
+%
+\norm{\phi^-}_p  ={}&
+    \left( \alpha\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p} - 1
+    \right) (1- \epsilon)
+\\\approx{}&
+\left(\left(\frac{1- \epsilon}{\epsilon}  \right)^{1/p} - 1\right)(1 - \epsilon)
+%
+\\\approx{}&
+    \left( \frac{1}{\epsilon}\right)^{1/p}.
+%
+\end{align*}
+
+Since $\epsilon$ is small, $\norm{\phi^-}_p \approx \left(
+\frac{1}{\epsilon}\right)^{1/p} \gg \norm{\phi^+}_p \approx \left( 2^{1/p} - 1
+\right) \epsilon$, despite the two perturbations respectively removing and
+adding the same amount of arbitrarily small probability mass.
+
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
