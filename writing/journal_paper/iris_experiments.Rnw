@@ -179,36 +179,42 @@ We next examine functional perturbations,
 and we demonstrate the ability of the influence function to 
 provide guidance on the anticipated effect of potential perturbations 
 on a posterior quantity. 
-We first consider functional perturbations of the form 
-$\log \phi(x) = e^{2(x - \mu)^2}$, with each perturbation having a 
+We consider functional perturbations of the form 
+$\log \phi_\mu(x) = e^{2(x - \mu)^2}$, with each perturbation having a 
 different mode $\mu$ (\figref{iris_fsens} left column). 
 The perturbations are multiplicative in form, 
-$p(\nu_k|\epsilon) = p_0(\nu_k)\phi(\nu_k)^\epsilon$.
+$p(\nu_k|\epsilon) = p_0(\nu_k)\phi_\mu(\nu_k)^\epsilon$.
 The middle column of \figref{iris_fsens} displays the initial density,
 $p_0(\nu_k) = \betadist{\nu_k\vert 1, \alpha_0}$,
-along with the perturbed density,
-$p(\nu_k|\epsilon = 1)$. 
+along with the perturbed densities
+$p(\nu_k|\epsilon = 1)$ for different choices of $\mu$. 
 
-Each perturbation with a different choice of $\mu$ 
+Each perturbation $\phi_\mu$ with a different choice of $\mu$ 
 produces distinct changes in the expected number
 of in-sample clusters $\gclusters$. 
 The right column of \figref{iris_fsens} plots the differences
 $\gclusters(\etaopt(\epsilon)) - \gclusters(\etaopt(0))$ 
-as $\epsilon\rightarrow 1$, where $\etaopt(\epsilon)$ are variational parameters
-fitted with stick-distribution $p(\nu_k|\epsilon)$.
-The changes in $\gclusters$
-are distinct in both sign and magnitude across perturbations. 
+for $\epsilon\in[0,1]$, where $\etaopt(\epsilon)$ are variational parameters
+fitted under the perturbed stick-distribution $p(\nu_k|\epsilon)$.
+Depending on the perturbation, 
+the change in $\gclusters$ can be positive, negative, or nearly zero. 
+In each case, the approximation 
+$\gclusters(\etalin(\epsilon)) - \gclusters(\etalin(0))$
+is able to mirror the qualitative behavior observed under refitting.
+
+TODO: depending on what has been said about influence functions before, we may need a more thorough discussion here. 
 
 By examining the perturbed densities $p(\nu_k|\epsilon = 1)$ alone, 
 it is difficult to anticipate 
-the effect of the perturbation on $\gclusters$. 
+its effect of a given perturbation on $\gclusters$. 
 However, the sign and magnitude of the change in $\gclusters$ 
 are well-explained by the influence function. 
-When $\log\phi$ is centered at a location where the influence function is negative, the effect on $\gclusters$ is negative (top row); 
-conversely, when $\log\phi$ is centered at a location where the influence function is positive, the effect on $\gclusters$ is positive (bottom row); finally, when $\log\phi$ is centered at a location where the influence is both negative and positive, the effects cancel, and the change $\gclusters$ is roughly zero (middle row). 
-In each case, the linear approximation $\gclusters(\etalin(\epsilon))$
-is able to capture the changes in the posterior statistic. 
-In applications below, the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
+When $\log\phi_\mu$ is centered at a location where the influence function is negative, its effect on $\gclusters$ is negative (\figref{iris_fsens} top row); 
+conversely, when $\log\phi_\mu$ is centered at a location where the influence function is positive, its effect on $\gclusters$ is positive (bottom row); 
+finally, when $\log\phi_\mu$ is centered at a location where the influence transitions from negative to positive, its effect on
+$\gclusters$ is roughly zero (middle row). 
+In the other data applications below, 
+the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
 
 Finally, we consider the 
 worst-case perturbation with unit $L_\infty$ norm.
@@ -221,8 +227,8 @@ We see that this worst-case perturbation has a much larger effect on
 $\gclusters$ compared to the other unit $L_\infty$ norm perturbations in
 \figref{iris_fsens}. 
 However, even with the worst-case perturbation, 
-the change in $\gclusters$ is still small;
-we thus conclude that in the iris data set $\gclusters$ appears to be a quantity insensitive to the prior. 
+the change in $\gclusters$ is still small.
+We conclude that on the iris data set, $\gclusters$ appears to be a quantity insensitive to the prior under a Gaussian mixture model. 
 
 
 <<iris_fsens_cap>>=
@@ -232,12 +238,13 @@ iris_fsens_cap <- paste(
         to three multiplicative perturbations with 
         unit $L_{\\infty}$-norm 
         (Left) The log multiplicative perturbation $\\log\\phi$ in grey.        
-        In purple is the prior-weighted influence function, scaled to also have 
+        The prior-weighted influence function in purple, scaled to also have 
         unit $L_{\\infty}$-norm. 
         (Middle) The original prior density $p_0$ and 
         the perturbed prior density $p_1 = p_0\\times \\phi$. 
         (Right) The effect of the perturbation 
-        on the change in expected number of clusters as a function of $\\epsilon$. ")
+        on the change in expected number of in-sample clusters 
+        as $\\epsilon$ varies. ")
 
 SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio)
 @
