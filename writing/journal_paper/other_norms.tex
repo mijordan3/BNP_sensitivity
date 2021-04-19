@@ -361,15 +361,17 @@ Fix $\pbase(\nu)$ and $1 \le p \le \infty$.  For any $\phi \in \lp{p}$, define
 %
 \begin{align*}
 %
-\pstick'(\nu \vert \phi) :={}& \begin{cases}
+\rho(\nu \vert \phi) :={}& \begin{cases}
 %
-\left(\pbase(\nu)^{-1} + \phi(\nu) \right)^{p}
+\pbase(\nu)^{1/p} + \phi(\nu)
     & \textrm{when }p < \infty \\
 \pbase(\nu)\exp(\phi(\nu))
     & \textrm{when }p = \infty
 %
 \end{cases}\\
 %
+\pstick(\nu \vert \phi)' :={}&
+    \mathrm{sign}(\rho(\nu \vert \phi)) \abs{\rho(\nu \vert \phi)}^p\\
 \pstick(\nu \vert \phi) :={}&
     \frac{\pstick'(\nu \vert \phi)}{\int \pstick'(\nu' \vert \phi) d\nu'}.
 %
@@ -578,4 +580,113 @@ adding the same amount of arbitrarily small probability mass.
 
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Of course, if we relax the constraint that $\phi(\nu) \ge 0$, then
+we cannot guarantee that $\pstick(\nu \vert \phi) \ge 0$ in an open ball
+around $\phiz$.  However, pointwise negative priors are no substantive
+problem, as long as the prior can be normalized.  To that end, we state
+the following generalization of \citep[Result 2]{gustafson:1996:local}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}
+%
+Fix a $1 \le p < \infty$ and $\pbase(\nu)$ as in \defref{prior_nl_pert}.
+There exists a $\delta < \infty$ such that $\norm{\phi}_p \le \delta$
+implies that
+%
+\begin{align*}
+%
+\int_0^1 \pstick'(\nu \vert \phi) d\nu < \infty
+\mathtxt{and}
+\int_0^1 \pstick'(\nu \vert \phi) d\nu > 0.
+%
+\end{align*}
+%
+\begin{proof}
+%
+By Jensen's inequality applied pointwise to the convex function $x \mapsto
+x^p$,
+%
+\begin{align*}
+%
+\abs{\pbase(\nu)^{1/p} + \phi(\nu) }^{p} \le{}&
+    \left(\pbase(\nu)^{1/p} + \abs{\phi(\nu)} \right)^{p}
+\\={}&
+    2^p \left(\frac{1}{2}\pbase(\nu)^{1/p} +
+              \frac{1}{2} \abs{\phi(\nu)} \right)^{p}
+\\\le{}&
+    2^{p-1} \left(\pbase(\nu) + \abs{\phi(\nu)}^p \right).
+%
+\end{align*}
+%
+Consequently,
+%
+\begin{align*}
+%
+\int \abs{\pbase(\nu)^{1/p} + \phi(\nu) }^{p} d\nu \le{}&
+    2^{p-1} \int \left(\pbase(\nu) + \abs{\phi(\nu)}^p \right) d\nu
+\\={}&
+    2^{p-1} \left(1 + \norm{\phi}_p^p\right).
+%
+\end{align*}
+%
+So, as in \citep[Result 2]{gustafson:1996:local}, $\norm{\phi}_p < \infty$
+implies that the prior can be normalized.
+
+Next, by convexity, for any $x \ge y \ge 0$,
+%
+\begin{align*}
+%
+(x + y)^p \ge{}& x^p + y^p \\
+(x - y)^p \le{}& x^p - y^p.
+%
+\end{align*}
+%
+Applying the previous display to the integral,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \mathrm{sign}(\pbase(\nu)^{1/p} + \phi(\nu))
+    \abs{\pbase(\nu)^{1/p} + \phi(\nu)}^{p} d\nu \ge{}\\&
+    \int \abs{\pbase(\nu)^{-p} + \abs{\phi(\nu)} }^{p}
+        \ind{\phi(\nu) > 0}
+        d\nu - \\&
+    \int \abs{\pbase(\nu)^{-p} - \abs{\phi(\nu)} }^{p}
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}}
+        d\nu - \\&
+    \int \abs{\abs{\phi(\nu)} - \pbase(\nu)^{-p} }^{p}
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
+        d\nu
+\\\ge{}&
+    \int \left(\pbase(\nu) + \abs{\phi(\nu)}^{p} \right)
+        \ind{\phi(\nu) > 0}
+        d\nu - \\&
+    \int \left(\abs{\phi(\nu)}^{p}  - \pbase(\nu) \right)
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}}
+        d\nu - \\&
+    \int \left(\pbase(\nu) - \abs{\phi(\nu)}^{p} \right)
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
+        d\nu
+\\\ge{}&
+    \int \pbase(\nu) \bigg(
+        \ind{\phi(\nu) > 0} +
+%\\&\quad\quad\quad\quad\quad
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \le \pbase(\nu)^{1/p}} -
+\\&\quad\quad\quad\quad\quad
+        \ind{\phi(\nu) \le 0} \ind{\abs{\phi(\nu)} \ge \pbase(\nu)^{1/p}}
+    \bigg) d\nu - \norm{\phi}_p^p
+%
+\end{align*}
+%
+
+
+%
+\end{proof}
+%
+\end{lem}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
