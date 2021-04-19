@@ -1,0 +1,31 @@
+We will make frequent use of a corrolary of the dominated convergence
+theorem, so we state it here.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{dct}
+\citep[Theorem 16.8]{billingsley:1986:probability}
+%
+Let $\lambda$ be a probability measure on $\thetadom$, and let $S_\t \subseteq
+\mathbb{R}$.  Let $f:\thetadom \times S_\t \mapsto \mathbb{R}$.
+
+If there exists a function $M(\theta)$ with $\int M(\theta) \lambda(d\theta) <
+\infty$ such that $\abs{f(\theta, \t)} \le M(\theta)$, $\lambda$-almost surely,
+for all $\t \in S_\t$, then the map $\t \mapsto \int f(\theta, \t)
+\lambda(d\theta)$ is continuous.
+
+Further, suppose that the derivative $\fracat{\partial f(\theta, \t)}{\partial
+\t}{\t}$ exist $\lambda$-almost surely for $\t \in S_\t$.  If there exists
+an $M'(\theta)$ such that $\int M'(\theta) \lambda(d\theta) < \infty$ and
+$\abs{\fracat{\partial f(\theta, \t)}{\partial \t}{\t}} \le M'(\theta)$,
+$\lambda$-almost surely and for all $\t \in S_\t$, then
+%
+\begin{align*}
+%
+\fracat{\partial \int f(\theta, \t) \lambda(d\theta)}{\partial \t}{\t} =
+     \int \fracat{\partial f(\theta, \t)}{\partial \t}{\t} \lambda(d\theta).
+%
+\end{align*}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
