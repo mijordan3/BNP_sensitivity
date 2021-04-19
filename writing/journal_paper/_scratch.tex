@@ -233,3 +233,220 @@ with equality when $\phi(\nu) = \delta \, \mathrm{sign}(\inflg(\nu))$.
 In order for the supremum over a bounded set $\phi: \norminf{\phi} < \delta$
 to be meaningful, a minimal requirement is that the function $\etaopt(\phi)$
 be Fr{\'e}chet differentiable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Let us define some compact notation for the duration of the proof.
+Let
+%
+\begin{align*}
+%
+\KLgrad{\eta, \phi} :={}&
+    \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
+\mathtxt{and}
+\KLhess{\eta, \phi} :={}&
+    \fracat{\partial^2 \KL{\eta, \phi}}
+           {\partial \eta \partial \eta^T}{\eta, \phi}.
+%
+\end{align*}
+%
+Additionally, define $\rho(\etanuk, \phi) :={} \expect{\q(\nu \vert
+\etanuk)}{\phi(\nu)}$, with
+%
+\begin{align*}
+%
+\rho_\eta(\etanuk, \phi) :={}
+    % \fracat{\partial \expect{\q(\nu \vert \etanuk)}{\phi(\nu)}}
+    %        {\partial \etanuk}{\etanuk} \mathand
+\fracat{\partial \rho(\etanuk, \phi)}
+       {\partial \etanuk}{\etanuk} \mathand
+\rho_{\eta\eta}(\etanuk, \phi) :={}
+   \fracat{\partial^2 \rho(\etanuk, \phi)}
+          {\partial \etanuk \partial \etanuk^T}{\etanuk}.
+%
+\end{align*}
+
+Observe that the estimating equation can be written as
+%
+\begin{align*}
+%
+% \KL{\eta, \phi} ={}&
+%     \KL{\eta, \phiz} + \sumkm \rho(\etanuk, \phi)
+%     \Rightarrow \\
+%
+\KLgrad{\eta, \phi} ={}&
+\KLgrad{\eta, \phiz} + \sumkm \rho_\eta(\etanuk, \phi)
+= 0_\etadim.
+%
+\end{align*}
+
+Let us first show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\eta \mapsto
+\KLgrad{\eta, \phiz}$ is continuously differentiable and does not depend on
+$\phi$, so we need only to show that $\rho_\eta(\etanuk, \phi)$ is continuously
+Fr{\'e}chet differentiable. To show this, it will suffice to show that the
+partial deritatives of the maps $\eta \mapsto \rho_\eta{\eta, \phi}$ and $\phi
+\mapsto \rho_\eta{\eta, \phi}$ exist and are continuous in the dual norm
+$\norm{\cdot}^*$ as a function of the location $\eta, \phi$ at which the
+derivatives are evaluated.
+
+We first show that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.  To do so it
+
+
+It follows from \eqref{q_sens_is_cov} that the map $\phi \mapsto
+\rho_\eta(\etanuk, \phi)$ is a linear functional of $\phi$.  Applying Jensen's
+inequality to the $\norm{\cdot}_2$ norm and the triangle inequality twice gives:
+%
+\begin{align*}
+%
+%\sup_{\phi: \norminf{\phi} = 1}
+\norm{\rho_\eta(\etanuk, \phi)}_2 \le
+    4 \expect{\q(\nu \vert \etanuk)}
+             {\norm{\nabla \log \q(\nu \vert \etanuk)}_2}
+              \norminf{\phi(\nu)}.
+%
+\end{align*}
+%
+It follows from ... that $\rho_\eta(\etanuk,
+\phi)$ is bounded as a function of $\phi$ for all $\eta \in \ball_\eta$.
+Bounded linear functionals are Fr{\'e}chet differentiable (essentially by
+definition), so $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is Fr{\'e}chet
+differentiable.
+
+It remains to show that the derivative is continuous.
+
+% so the linear operator is bounded as a function of $\phi$, and a continuous
+% funciton of $\eta$ by assumption.  Therefore $\phi \mapsto \fracat{\partial
+% \expect{\q(\nu \vert \etanuk)} {\phi(\nu)}}{\partial \eta}{\eta}$ is
+% continuously Fr{\'e}chet differentiable.
+%
+% Again differentiating under the integral,
+% %
+% \begin{align*}
+% %
+% \fracat{\partial^2 \expect{\q(\nu \vert \etanuk)}
+%               {\phi(\nu)}}{\partial \eta \partial \eta^2}{\eta} ={}&
+% \expect{\q(\nu \vert \etanuk)}
+%        {\left(\nabla \log \q(\nu \vert \etanuk)
+%          - \expect{\q(\nu \vert \etanuk)}
+%                   {\nabla \log \q(\nu \vert \etanuk)}
+%        \right)^2
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)} +
+% \\&
+% \expect{\q(\nu \vert \etanuk)}{
+%        \left(                            \nabla^2 \log \q(\nu \vert \etanuk)
+%         - \expect{\q(\nu \vert \etanuk)}{\nabla^2 \log \q(\nu \vert \etanuk)}
+%        \right)
+%        \left( \phi(\nu) - \expect{\q(\nu \vert \etanuk)}{\phi(\nu)} \right)
+%        }.
+% %
+% \end{align*}
+% %
+Again this is a linear operator as a function of $\phi$, which is continuous by
+assumption.  Consequently the Hessian is invertible in a neighborhood.
+
+It follows by \citet[Proposition 4.14(c)]{zeidler:2013:functional} that
+$\KLgrad{\eta, \phi}$ is continuosly Fr{\'e}chet differentiable.  Furthermore,
+\citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
+$\KLhess{\etaopt(\phiz), \phiz}$ is invertible.  So we satisfy conditions (i),
+(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
+the function $\etaopt(\phi)$ exists.  Moreover, since $\KLgrad{\eta, \phi}$ is
+continuously Fre{\'e}chet differentiable in a neighborhood of $\etaopt(\phiz),
+\phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$ is
+also continuously Fr{\'e}chet differentiable.
+
+The directional derivative
+
+% Other references: We will use the
+% formulation given in \citep[Theorem 3.4.10]{krantz:2012:implicit}, for which
+% we must show that... actually that doesn't give differentiability.
+% The result follows then from \citet[Proposition 4.8(c)]{zeidler:2013:functional}.
+% See also \citet[Corollary 1.4]{averbukh:1967:theory} and \citep[Appendix
+% A]{reeds:1976:thesis}).
+%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{averbukh}
+%
+(\citet[Example 1.9]{averbukh:1967:theory})
+%
+Consider $(x_1, x_2) \in \mathbb{R}^2$ and the polar coordinates $r :=
+\sqrt{x_1^2 + x_2^2}$ and $\theta := \arctan(x_2 / x_1)$.  Let $\{\pi k: k \in
+\mathbb{Z} \}$ denote integer multiples of $\pi$.  Define
+%
+\begin{align*}
+%
+f(r, \theta) := \begin{cases}
+\frac{r^2}{| \sin \theta |} \exp\left( -\frac{r}{|\sin \theta|}\right)
+    & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z} \} \\
+0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z} \}
+%
+\end{cases}
+%
+\end{align*}
+%
+Then $f$ is continuous at $(0, 0)$ and has a directional derivative in every
+direction, but is not Fr{\'e}chet differentiable.
+%
+\begin{proof}
+%
+It is easy to show that $\sup_{y \ge 0} y \exp(-y) = \exp(-1)$, which is
+achieved at $y=1$. So, for any $(r_1, \theta_1)$ and $(r_2, \theta_2)$,
+$\abs{f(r_1, \theta_1) - f(r_2, \theta_2)} \le \abs{r_1 - r_2} \exp(-1)$, from
+which it follows that $f(r, \theta)$ is continuous at $0$.  Moreover, for any
+fixed direction $\theta$, $\fracat{\partial f(r, \theta)}{\partial r}{r=0} = 0$,
+so the linear approximation to $f(r, \theta)$ at $(0, 0)$ in any direction is
+identically zero.  For any $r > 0$, the error in the linear approximation is
+given by $\sup_{\theta} \abs{f(r, \theta) - 0} = r \exp(-1)$, which is achieved
+by setting $r / |\sin \theta| = 1$.  Thus the error in the linear approximation
+is of order $r$, not smaller.
+%
+\end{proof}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[h!]
+
+\includegraphics[width=0.980\linewidth,height=0.667\linewidth]{static_images/averbukh_example.png}
+\caption{A plot of $f(x_1, x_2)$ from \exref{averbukh}.}\figlabel{averbukh_plot}
+\centering
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
