@@ -408,28 +408,53 @@ $\palt$, for which \defref{prior_nl_pert} gives that we must choose
 \end{align}
 %
 The fact that we are free to choose $\alpha$ follows from the fact that we
-normalize after perturbing.  In many, but not all cases, one can choose $\alpha$
-large enough so that $\alpha^p \palt(\nu) \ge \pbase(\nu)$, and $\phi$ is
-positive.  However, by doing so, one might have to create a ``large''
-perturbation, according to the $\norm{\cdot}_p$.
+normalize after perturbing.  As long as $\palt(\nu) > 0$ whenever $\pbase(\nu) >
+0$ (a condition which is certainly not always satisfied), one can choose
+%
+\begin{align*}
+%
+\alpha = \sup_{\nu} \left(\frac{\pbase(\nu)}{\palt(\nu)}\right)^{1/p}
+%
+\end{align*}
+%
+to guarantee that $\phi(\nu)$ is non-negative.  However, by doing so, one might
+have to create a ``large'' perturbation, according to the $\norm{\cdot}_p$,
+as the following \exref{positive_pert_large} demonstrates.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{ex}
+% %
+% Let $\pbase(\nu) = \frac{4}{3}\ind{\frac{1}{4} \le \nu \le 1}$ and $\palt(\nu) =
+% \frac{4}{3}\ind{0 \le \nu \le \frac{3}{4}}$.  Then, for any $\alpha > 0$, any $1
+% \le p < \infty$, and for $\phi$ as given in \eqref{phi_for_palt}, $\phi(7/8) <
+% 0$.  So there is no value of $\alpha$ that can transform $\pbase$ into $\palt$
+% using only a positive perturbation.
+% %
+% \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}
+\begin{ex}\exlabel{positive_pert_large}
 %
-Let $\pbase(\nu) = \frac{4}{3}\ind{\frac{1}{4} \le \nu \le 1}$ and $\palt(\nu) =
-\frac{4}{3}\ind{0 \le \nu \le \frac{3}{4}}$.  Then, for any $\alpha > 0$, any $1
-\le p < \infty$, and for $\phi$ as given in \eqref{phi_for_palt}, $\phi(7/8) <
-0$.  So there is no value of $\alpha$ that can transform $\pbase$ into $\palt$
-using only a positive perturbation.
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[h!]
+
+\includegraphics[width=0.980\linewidth,height=0.980\linewidth]{static_images/positive_phi_example.png}
 %
+\caption{A plot of the perturbations from \exref{positive_pert_large}
+with $p=2$ and $\epsilon=0.05$.  Positive $\phi$ can only add mass, so to remove
+a small amount of mass requires adding mass everywhere else and re-normalizing,
+resulting in a large perturbation according to $\norm{\cdot}_p$.}
+%
+\figlabel{positive_pert_large}
+\centering
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Let $\pbase(\nu) = \ind{0 \le \nu \le 1}$.  For some $\delta > 0$ and $0 <
 \epsilon \ll 1$, let
 %

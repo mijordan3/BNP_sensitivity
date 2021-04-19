@@ -93,3 +93,67 @@ grid.arrange(
 , ncol=2
 )
 dev.off()
+
+
+
+
+
+
+#######################################
+# Prior perturbation size
+
+
+
+PAlt <- function(x, eps, delta) {
+    return(
+        ifelse(x < eps, delta, (1 - delta * eps) / (1 - eps))
+    )
+}
+
+x_grid <- seq(0, 1, length.out=1000)
+
+p <- 2
+epsilon <- 0.05
+df <- data.frame(
+    x=x_grid,
+    pbase=1,
+    pp=PAlt(x_grid, eps=epsilon, delta=2-epsilon),
+    pm=PAlt(x_grid, eps=epsilon, delta=epsilon)) %>%
+    mutate(ratiom=pbase / pm, ratiop=pbase / pp) %>%
+    mutate(alpham=max(ratiom)^(1/p), alphap=max(ratiop)^(1/p)) %>%
+    mutate(phim=alpham * pm^(1/p) - pbase^(1/p),
+           phip=alphap * pp^(1/p) - pbase^(1/p))
+
+phi_range <- max(c(df$phim, df$phip))
+
+
+png(file.path(image_path, "positive_phi_example.png"), units="in", width=6, height=6, res=300)
+grid.arrange(
+    ggplot(df) +
+        geom_area(aes(x=x, y=pp, fill="plus"), alpha=0.1) +
+        geom_area(aes(x=x, y=pbase, fill="base"), alpha=0.1) +
+        geom_line(aes(x=x, y=pp, color="plus")) +
+        geom_line(aes(x=x, y=pbase, color="base")) +
+        ylim(0, 2)
+    ,
+    ggplot(df) +
+        geom_area(aes(x=x, y=pm, fill="minus"), alpha=0.1) +
+        geom_area(aes(x=x, y=pbase, fill="base"), alpha=0.1) +
+        geom_line(aes(x=x, y=pm, color="minus")) +
+        geom_line(aes(x=x, y=pbase, color="base")) +
+        ylim(0, 2)
+    ,
+    ggplot(df) +
+        geom_line(aes(x=x, y=phip, color="phi plus")) +
+        geom_area(aes(x=x, y=phip, fill="phi plus"), alpha=0.1) +
+        ylim(-1e-3, phi_range)
+    ,
+    ggplot(df) +
+        geom_line(aes(x=x, y=phim, color="phi minus")) +
+        geom_area(aes(x=x, y=phim, fill="phi minus"), alpha=0.1) +
+        ylim(-1e-3, phi_range)
+    , ncol=2
+)
+dev.off()
+
+
