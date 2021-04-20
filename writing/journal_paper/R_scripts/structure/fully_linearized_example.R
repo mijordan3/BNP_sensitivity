@@ -1,22 +1,7 @@
 ###############
 # plot logit sticks parameter
 ###############
-plot_stick_params <- function(param_df){
-  p <- param_df %>%
-    mutate(population = paste0('population ', population)) %>% 
-    ggplot() + 
-    geom_point(aes(x = epsilon, y = y,
-                   color = method, shape = method)) + 
-    geom_line(aes(x = epsilon, y = y,
-                  color = method)) + 
-    facet_wrap(~population, scales = 'free_y', nrow = 1) + 
-    scale_color_brewer(palette = 'Dark2') + 
-    get_fontsizes() 
-  
-  return(p)
-}
-
-p0 <- logit_stick_df %>% 
+p0 <- logit_stick_flin_df %>% 
   plot_stick_params() + 
   ylab('logit-stick location') + 
   theme(legend.position = 'none', 
@@ -26,9 +11,12 @@ p0 <- logit_stick_df %>%
         strip.background = element_rect(fill = 'white', 
                                         color = 'white'))
 
-p1 <- admix_df %>% 
+p1 <- admix_flin_df %>% 
   plot_stick_params() + 
   ylab('admixture') + 
+  # plot the fully-linearized quantity
+  geom_line(aes(x = epsilon, y = fully_lin), 
+            color = 'blue') + 
   theme(legend.position = 'bottom',
         legend.title = element_blank(), 
         legend.justification = 'right',

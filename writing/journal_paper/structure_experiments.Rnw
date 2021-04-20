@@ -8,7 +8,7 @@
   
   <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/structure/structure_plotting_utils.R")
@@ -142,27 +142,90 @@ When $t > 0$, we again resort to Monte Carlo estimates of $\gpop$.
 As discussed in \secref{results_iris}, we use the re-parameterization trick 
 which allows us to use fixed draws from a distribution independent of $\eta$ shared across every computation of $\gpop(\eta; t)$ below. 
 
-The expected number of latent populations is sensitive to $\alpha$. 
-Without any thresholding, the expected number of population quickly increases as $\alpha$ increases; in fact, it saturates at $\kmax = 20$ when $\alpha = 10$. 
+The expected number of latent populations is sensitive to $\alpha$ (\figref{stru_alpha_nclusters}). 
+Without any thresholding ($t = 0$),
+the expected number of populations quickly increases as $\alpha$ increases; 
+in fact, it saturates at $\kmax = 20$ when $\alpha = 7$. 
 This sensitivity is likely due to the fact that the non-thresholded quantity 
 is highly dependent on the behavior of small, nearly unoccupied populations;
-even though the probability of a single locus belonging to these rare populations is small, the probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed genotypes belonging to these rare populations is still large. 
+even though the probability of a single locus belonging to these rare populations is small, the probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed genotypes belonging to these rare populations is non-negligable.  
 
-This motivates the use of the expected thresholded number of clusters. 
-We threshold at Even using the thresholded quanti
-The linear approximation, computed at $\alpha_0 = 3$ produces nearly the same expected number of clusters as observed by refitting the model. 
+This motivates the use of thresholding in the number of clusters. 
+We threshold at $t = 20$ and $t = 40$, corresponding to approximately 
+$2$ and $4\%$ 
+of the total number of loci in the data set, respectively. 
+In the refits, these thresholded estimates still vary between two and four
+latent populations. 
+
+The linear approximation, computed at $\alpha_0 = 3$,
+produces nearly the same expected number of clusters with $t = 0$ as observed by refitting the model.
+However, it under-estimated the sensitivity in the thresholded quantities. 
+In particular, the linear approximaition failed to predict the reduction to 
+two latent populations at $\alpha = 1$. 
 
     
 <<stru_alpha_nclusters_cap>>=
   stru_alpha_nclusters_cap <- paste(
     "The expected number of populations in the thrush data as $\\alpha$ varies.
     We compute the linear approximation at $\\alpha = 3$. In the right plot, the threshold is set at $t = 20$ (approximately $1\\%$ of loci). ")
-SetImageSize(aspect_ratio = base_aspect_ratio)
+SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio)
 @
   <<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
 source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
+We provide some more intuition concerning the expected number of populations with some threshold $t > 0$. 
+This posterior quantity is closely related to the expected number of loci belonging to each population, defined as
+\begin{align*}
+\gloci(\eta; k)
+&= \expect{\q(\z\vert\eta)}{\sum_{n=1}^{\nindiv}
+\sum_{l=1}^{\nloci}
+\sum_{i=1}^2
+\z_{\n l i \k}}. 
+\end{align*}
+
+\figref{stru_alpha_cluster_weights} plots the expected number of loci belonging to the first six populations, as $\alpha$ varies.
+At the initial fit $\alpha = \alpha_0$, there are
+\Sexpr{sprintf('%.0f', weights_alpha_init$weight[1])} expected loci belonging to population1, 
+\Sexpr{sprintf('%.0f', weights_alpha_init$weight[2])} belonging to population 2, and 
+\Sexpr{sprintf('%.0f', weights_alpha_init$weight[3])} belonging to population 3. 
+The remaining populations all have fewer than
+\Sexpr{ceiling(weights_alpha_init$weight[4])} expected loci. 
+Said another way, given a sample of population memberships, 
+$\z\sim \q(\z\vert\eta)$, we would expect approximately
+$\Sexpr{sprintf('%.0f', weights_alpha_init$weight[1])}$ of
+the memberships to belong to population 1, 
+$\Sexpr{sprintf('%.0f', weights_alpha_init$weight[2])}$ to belong to population 2, and so forth. 
+At $\alpha = \alpha_0$, the expected number of loci belonging to 
+populations 1, 2, 3 clearly are clearly above either threshold, $t = 20$ or $t = 40$; the expected allocations to the remaining populations are all well below these thresholds. 
+Thus, and $\alpha = \alpha_0$, there are clearly 3 populations under our 
+thresholded definition. 
+
+At $\alpha = 7$, the expected number of loci belonging to population 4
+and population 5 increases to 
+$\Sexpr{sprintf('%.1f', weights_alpha_large$weight[4])}$, 
+and a new population emerges above the threshold at $t = 20$. 
+On the other hand, at $\alpha = 1$, 
+the expected number of loci belonging to population 3 decreases to 
+$\Sexpr{sprintf('%.1f', weights_alpha_small$weight[3])}$, 
+below the thresholds $t = 20$ and $t = 40$. 
+Thus, the expected number of latent population with thresholding decreases to two. 
+The linear approximation under-estimated this decrease in population 3, and therefore continued to predict three latent populations. 
+
+<<stru_alpha_cluster_weights_cap>>=
+  stru_alpha_cluster_weights_cap <- paste(
+    "The expected number of loci per cluster as $\\alpha$ varies. 
+     We compute the linear approximation at $\\alpha = 3$. 
+     The horizontal blue line corresponds to the threshold in computing the 
+    expected number of thresholded clusters in Figure~\\ref{fig:stru_alpha_nclusters} ")
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
+@
+<<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
+source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_debug, print.eval=TRUE)
+@
+    
+    
+    
 
 \subsubsection*{Sensitivity: individual admixtures}
 
@@ -239,6 +302,16 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 0.8)
 @
   <<stru_lin_bad_example, cache=simple_cache, fig.show='hold', fig.cap=stru_lin_bad_example_cap>>=
 source("R_scripts/structure/mbololo_bad_approximation.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+<<stru_fully_lin_example_cap>>=
+  stru_fully_lin_example_cap <- paste(
+    "fully linearized good ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.8)
+@
+  <<stru_fully_lin_example, cache=simple_cache, fig.show='hold', fig.cap=stru_fully_lin_example_cap>>=
+source("R_scripts/structure/fully_linearized_example.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 

@@ -21,24 +21,21 @@ alpha0 <- alpha_sens_file['alpha0']
 alpha_sens_df <- 
   data.frame(
     alpha = alpha_sens_file['alpha_list'], 
-    n_clusters_refit = alpha_sens_file['n_clusters_refit'], 
-    n_clusters_lr = alpha_sens_file['n_clusters_lr'], 
+    n_clusters_refit = alpha_sens_file['n_clusters_thresh_refit0'], 
+    n_clusters_lr = alpha_sens_file['n_clusters_thresh_lr0'], 
     # first threshold
-    n_clusters_thresh_refit = alpha_sens_file['n_clusters_thresh_refit'],
-    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr'], 
+    n_clusters_thresh_refit1 = alpha_sens_file['n_clusters_thresh_refit1'],
+    n_clusters_thresh_lr1 = alpha_sens_file['n_clusters_thresh_lr1'], 
     # second threshold
     n_clusters_thresh_refit2 = alpha_sens_file['n_clusters_thresh_refit2'],
-    n_clusters_thresh_lr2 = alpha_sens_file['n_clusters_thresh_lr2'], 
-    # third threshold
-    n_clusters_thresh_refit3 = alpha_sens_file['n_clusters_thresh_refit3'],
-    n_clusters_thresh_lr3 = alpha_sens_file['n_clusters_thresh_lr3']) 
+    n_clusters_thresh_lr2 = alpha_sens_file['n_clusters_thresh_lr2']) 
 
-threshold <- alpha_sens_file['threshold']
+threshold0 <- alpha_sens_file['threshold0']
+threshold1 <- alpha_sens_file['threshold1']
 threshold2 <- alpha_sens_file['threshold2']
-threshold3 <- alpha_sens_file['threshold3']
 
 # cluster weights
-weights_keep <- 9
+weights_keep <- 6
 
 weights_refit_df <-
   data.frame(alpha_sens_file['cluster_weights_refit'][, 1:weights_keep]) %>% 
@@ -48,12 +45,28 @@ weights_refit_df <-
 weights_lr_df <- 
   data.frame(alpha_sens_file['cluster_weights_lr'][, 1:weights_keep]) %>% 
   mutate(alpha = alpha_sens_file['alpha_list'], 
-         method = 'lr')
+         method = 'lin')
 
 weights_df <- rbind(weights_refit_df, weights_lr_df) %>% 
   gather(key = cluster, value = weight, -c('alpha', 'method')) %>% 
-  mutate(cluster = sub('X', 'cluster ', cluster)) %>% 
-  filter(alpha <= 10)
+  mutate(cluster = sub('X', 'population ', cluster)) 
+
+# we report some of these numbers in the text
+weights_alpha_init <- weights_df %>% 
+  filter(alpha == 3) %>% 
+  filter(method == 'refit')
+
+weights_alpha_large <- weights_df %>% 
+  filter(alpha == 7) %>% 
+  filter(method == 'refit')
+
+weights_alpha_small <- weights_df %>% 
+  filter(alpha == 1) %>% 
+  filter(method == 'refit')
+
+weights_alpha_lr <- weights_df %>% 
+  filter(alpha == 1) %>% 
+  filter(method == 'lin')
 
 #################
 # functional sensitivity results
@@ -100,6 +113,14 @@ logit_stick_df <-
 
 admix_df <- 
   read_csv(paste0(data_dir, 'mbololo_admix_bad_example.csv'))
+
+# the scalar posterior quantites on which the fully-linearized quantity did ok
+logit_stick_flin_df <- 
+  read_csv(paste0(data_dir, 'mbololo_logit_stick_fully_lin.csv'))
+
+admix_flin_df <- 
+  read_csv(paste0(data_dir, 'mbololo_admix_fully_lin.csv'))
+
 
 #################
 # timing results
