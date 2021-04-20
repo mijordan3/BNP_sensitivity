@@ -1,4 +1,37 @@
 
+We will make frequent use of a corrolary of the dominated convergence
+theorem, so we state it here.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{dct}
+\citep[Theorem 16.8]{billingsley:1986:probability}
+%
+Let $\lambda$ be a probability measure on $\thetadom$, and let $S_\t \subseteq
+\mathbb{R}$.  Let $f:\thetadom \times S_\t \mapsto \mathbb{R}$.
+
+If there exists a function $M(\theta)$ with $\int M(\theta) \lambda(d\theta) <
+\infty$ such that $\abs{f(\theta, \t)} \le M(\theta)$, $\lambda$-almost surely,
+for all $\t \in S_\t$, then the map $\t \mapsto \int f(\theta, \t)
+\lambda(d\theta)$ is continuous.
+
+Further, suppose that the derivative $\fracat{\partial f(\theta, \t)}{\partial
+\t}{\t}$ exist $\lambda$-almost surely for $\t \in S_\t$.  If there exists
+an $M'(\theta)$ such that $\int M'(\theta) \lambda(d\theta) < \infty$ and
+$\abs{\fracat{\partial f(\theta, \t)}{\partial \t}{\t}} \le M'(\theta)$,
+$\lambda$-almost surely and for all $\t \in S_\t$, then
+%
+\begin{align*}
+%
+\fracat{\partial \int f(\theta, \t) \lambda(d\theta)}{\partial \t}{\t} =
+     \int \fracat{\partial f(\theta, \t)}{\partial \t}{\t} \lambda(d\theta).
+%
+\end{align*}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -60,8 +93,8 @@ Then the following equalties hold:
 %
 \begin{proof}
 %
-The proof follows by repeatedly using the dominated convergence theorem (DCT) to
-interchange the order of integration and differentiation as in \citep[Theorem
+The proof follows by repeatedly using \thmref{dct} to interchange the order of
+integration and differentiation as in \citep[Theorem
 1]{giordano:2018:covariances}.  For example,
 %
 \begin{align*}
@@ -72,7 +105,7 @@ interchange the order of integration and differentiation as in \citep[Theorem
 ={}\\&
 \int \fracat{\partial \q(\theta \vert \nu) \psi(\theta \vert \t) }
           {\partial \eta}{\eta} \lambda(d\theta)={}
-&\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and the DCT)}
+&\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and \thmref{dct})}
 \\&
 \int \lqgrad{\theta, \eta} \psi(\theta \vert \t) \q(\theta, \eta) \lambda(d\theta) ={}
 \\&
@@ -103,7 +136,7 @@ For \eqref{q_sens_psi_grad_is_cov}, by anaologously applying
 %
 \end{align*}
 %
-Applying \assuitemref{dist_fun_nice}{funqgraddom} and the DCT gives
+Applying \assuitemref{dist_fun_nice}{funqgraddom} and \thmref{dct} gives
 %
 \begin{align*}
 %
@@ -123,7 +156,7 @@ From the preceding two displays, \eqref{q_sens_psi_grad_is_cov} follows.
 Finally, for \eqref{q_score_sens_is_cov}, we need to differentiate
 \eqref{q_sens_is_cov}.  In addition to quantities already considered
 above, \eqref{q_sens_is_cov} involves terms of the following form,
-to which we can apply the DCT using the corresponding assumptions:
+to which we can apply \thmref{dct} using the corresponding assumptions:
 %
 \begin{align*}
 %
@@ -203,9 +236,9 @@ By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
 %
 \end{align*}
 %
-By the corresponding assumptions, the dominated convergence theorem (DCT)
-applies to each of these terms, and by \assuref{dist_fun_nice}, each of the
-expressions in the preceding display are continuous.  For example,
+By the corresponding assumptions, \thmref{dct} applies to each of these terms,
+and by \assuref{dist_fun_nice}, each of the expressions in the preceding display
+are continuous.  For example,
 %
 \begin{align*}
 %
@@ -245,8 +278,8 @@ expressions in the preceding display are continuous.  For example,
 %
 \end{align*}
 %
-By \assuitemref{dist_fun_nice}{fungradqgraddom} we can apply the DCT to each
-term in the final line of the preceding display, giving
+By \assuitemref{dist_fun_nice}{fungradqgraddom} we can apply \thmref{dct} to
+each term in the final line of the preceding display, giving
 %
 \begin{align*}
 %
@@ -305,9 +338,162 @@ Similarly, $\fracat{\partial^2
 %
 \end{align*}
 %
-to which we can apply the DCT by the corresponding assumption.  Reasoning
+to which we can apply \thmref{dct} by the corresponding assumption.  Reasoning
 analogously to the other term, the conclusion follows.
 %
 \end{proof}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Next, we prove a result for directional derivatives in $\lp{p}$ spaces.
+
+
+\begin{assu}\assulabel{lp_regular}
+%
+Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
+$\q(\theta)$ be a density defined relative to $\lambda$.  Let $q$ be such that
+$p^{-1} + q^{-1} = 1$.  Fix a function $\psi(\theta): \thetadom \mapsto
+\mathbb{R}$ with $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, and assume that
+%
+\begin{align*}
+%
+\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^q
+\pbase(\theta) \lambda(d\theta) < \infty.
+%
+\end{align*}
+%
+or, equivalently, that
+%
+\begin{align*}
+%
+\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
+    \q(\theta) \lambda(d\theta)
+< \infty.
+%
+\end{align*}
+%
+\end{assu}
+
+
+\begin{lem}\lemlabel{lp_integral_bound}
+%
+Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$, then there
+exists an $M(\theta)$ with $\int M(\theta) \lambda(d\theta) < \infty$
+such that, for all $0 \le \t \le (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$,
+%
+\begin{align}\eqlabel{lp_integral_bound}
+%
+\abs{\psi(\theta)}\abs{\logtrim\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    <{}& M(\theta).
+\end{align}
+%
+If $\inf_\theta \psi(\theta) > \infty$, then we can define $M(\theta)$ so that,
+additionally,
+%
+\begin{align}\eqlabel{lp_integral_deriv_bound}
+%
+\abs{\psi(\theta)}\abs{\t \gamma(\theta)} \q(\theta)
+    <{}& M(\theta).
+%
+\end{align}
+%
+\begin{proof}
+
+First, suppose that $\inf_\theta \psi(\theta) = -\infty$.  Then
+$\logtrim\left(1 + \t \gamma(\theta)\right) = 0$ for all $\t \ge 0$, and
+\eqref{lp_integral_bound} holds trivially with $M(\theta) = 0$.
+
+Next, suppose that $\inf_\theta \psi(\theta) > -\infty$, and let
+$\t_{max} := (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$.  Then, if
+$\t \le \t_{max}$, then
+$\inf_\theta \logtrim \left(1 + \t \gamma(\theta)\right) \ge \log(1/2)$.
+Let us limit to such $\t$.  We can write
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \abs{\psi(\theta)}
+    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    \lambda(d\theta) ={}
+\\&
+\int \abs{\psi(\theta)}
+    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) \le 0}
+    \q(\theta)\lambda(d\theta)  +
+\\&
+\int \abs{\psi(\theta)}
+    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\lambda(d\theta).
+%
+\end{align*}
+%
+For all $0 \le \t \le \t_{max}$, $0 \le \abs{\logtrim\left(1 + \t
+\gamma(\theta)\right)} \ind{\gamma(\theta) \le 0} \le \log(1/2)$,
+so the first term in the preceding display is dominated by the integrable
+function $\log(1/2) \abs{\psi(\theta)}\q(\theta)$.
+
+For the second term, by Holder's inequality with respect to $\pbase(\theta)$,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \abs{\psi(\theta)}
+    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\lambda(d\theta)
+\\\le{}&
+\t_{max}
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\lambda(d\theta)
+\\={}&
+\t_{max}
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
+    \ind{\gamma(\theta) > 0}
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \lambda(d\theta)
+\\\le{}&
+\t_{max}
+\left(
+\int
+    \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
+    \pbase(\theta) \lambda(d\theta)
+\right)^{1/q}
+\left(
+\int\abs{\gamma(\theta)}^p \pbase(\theta) \lambda(d\theta)
+\right)^{1/p}
+\\\le{}&
+\t_{max}
+\left(
+\int
+    \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
+    \pbase(\theta) \lambda(d\theta)
+\right)^{1/q}
+\norm{\gamma}_{\pbase,p}.
+%
+\end{align*}
+%
+By assumption, the final equation in the preceding display is finite.
+
+\Eqref{lp_integral_deriv_bound} follows by applying Holder's inequality
+in the same way directly to \eqref{lp_integral_deriv_bound}.
+%
+\end{proof}
+%
+\end{lem}
+
+%
+% \begin{lem}\lemlabel{lp_derivative}
+% %
+% Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
+% $\q(\theta \vert \eta)$ define a class of densities relative to $\lambda$
+% parameterized by $\eta$ in an open ball $\ball_\eta$.  Let \assuref{lp_regular}
+% hold uniformly in $\ball_\eta$ (i.e., the supremum over $\eta \in \ball_\eta$
+% of the integrals in \assuref{lp_regular} is finite) for the ....
+%
+% No, let's split it up.
+% %
+% \end{lem}

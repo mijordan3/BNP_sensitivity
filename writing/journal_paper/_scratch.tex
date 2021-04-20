@@ -450,3 +450,205 @@ is of order $r$, not smaller.
 \centering
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{e_log_nonfrechet}
+
+TODO: $\q$ should not be defined relative to $\lambda$.  And for
+discontinuity we need
+to require that there is a region such that
+$\inf_\theta h(\theta) \q(\theta) p(\theta) > 0$.  Maybe it would be
+better to just split this out into two different proofs?
+
+Let $\lambda$ be continuous probability measure over $[0,1]$. Fix $1 \le p <
+\infty$, and let $q = (1 - p^{-1})^{-1}$, from which $p^{-1} + q^{-1}=1$
+follows.\footnote{Regrettably the standard choices of $p$ and $q$ for $\lp{p}$
+spaces and their duals overlap with our notation for probability and variational
+distributions, but there should be no ambiguity in context.}
+
+Let $\q(\theta)$ be a density relative $\lambda$, and $h(\theta)$ a measurable
+function such that $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ and
+$\int \abs{ \q(\theta) h(\theta)}^q \lambda(d\theta) < \infty$.
+
+Let $\lp{\lambda,p}$ denote the space with the norm
+$\norm{\phi}_{\lambda,p} := \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)
+\right)^{1/p}$.
+
+Define $f: \lp{\lambda, p} \mapsto \mathbb{R}$ as follows:
+%
+\begin{align*}
+%
+f(\phi) :=
+\begin{cases}
+    %
+    \expect{\q(\theta)}{h(\theta) \log \left(1 + \phi(\theta)\right)} &
+    \textrm{when }0 < 1 + \phi(\theta)\textrm{ for all }\theta \\
+    %
+    0 & \textrm{otherwise}.
+%
+\end{cases}
+%
+\end{align*}
+%
+Then $f$ is discontinous at $\phiz$ and so not Fr{\'e}chet differentiable.
+However $f$ has a directional derivative at $\phiz$ in every direction $\phi -
+\phiz$.
+
+\begin{proof}
+%
+Since $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ we can choose a set
+$S$ such that either $\inf_{\theta \in S} h(\theta) \q(\theta) \ge h_0$ or
+$\inf_{\theta \in S} h(\theta) \q(\theta) \le -h_0$..........
+
+Since $\lambda$ has a continuous component, for any sufficiently small $\epsilon >
+0$, there exists a set $S_\epsilon$ with $\lambda(S_\epsilon) = \epsilon$. Since
+$\int q(\theta) \lambda(d\theta) = 1$, we can find a set $S_\epsilon$ such that
+$\int q(\theta) \lambda(d\theta) \ge \epsilon$ as well.\footnote{Were there no
+such set, the measure under $\q$ of a partition of the domain into sets with
+$\lambda$-measure no smaller than $\epsilon$ could not be $1$.}
+
+For $\delta > 0$, let
+%
+\begin{align*}
+%
+\phi(\zeta; \epsilon, \delta) :=
+\begin{cases}
+    %
+    \delta - 1      & \textrm{ for }\zeta\in S_\epsilon \\
+    0      & \textrm{ for }\zeta\notin S_\epsilon.
+    %
+\end{cases}
+%
+\end{align*}
+%
+Then $\phi(\theta; \epsilon, \delta) \in \lp{\lambda,p}$ with $\norm{\phi(\cdot;
+\epsilon, \delta)}_p = (\int_0^1 \phi(\theta)^p \lambda(d\theta)^{1/p}
+=\epsilon^{1/p} (\delta - 1)$.  Furthermore,
+%
+\begin{align*}
+%
+\abs{f(\phi(\theta; \epsilon, \delta))} ={}&
+    \expect{\q(\theta)}{\ind{\theta \in S_\epsilon}} \abs{\log(\delta)} \ge
+    \epsilon \abs{\log(\delta)}.
+%
+\end{align*}
+%,
+Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
+\rightarrow 0$,
+%
+\begin{align*}
+%
+\abs{f(\phi(\zeta; \epsilon_n, \delta(\epsilon_n))) - f(\phiz)} \ge{} 1
+\mathtxt{and}
+\norm{\phi(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{} 0.
+%
+\end{align*}
+%
+So $f$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$, and
+cannot be Fr{\'e}chet differentiable.
+
+We now show that the directional derivative exists in any direction.  First,
+suppose that $\inf_{\theta} \phi(\zeta) = -\infty$.  Then $\inf_{\theta} t
+\phi(\theta) = -\infty$ for any $t > 0$, so $f(t\theta) = 0$ for all $t$, and
+$\lim_{t \rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 =
+0$.  Trivially, the directional derivative exists and is $0$ for $\phi$ that are
+unbounded below.
+
+If $-\infty < \inf_\theta \phi(\theta)$, then there exists a $t_0 > 0$ such that
+$t_0 \phi(\theta)$ is strictly larger than $-1$.  Let us consider only $t <
+t_0$. If we can apply the DCT, then
+%
+\begin{align*}
+%
+\fracat{\partial f(t \phi)}{\partial t}{t=0} ={}&
+    \int \q(\theta) \fracat{\partial \log(1 + t \phi(\theta))}{\partial t}{t=0}
+        \lambda(d\theta)
+\\={}&
+\int \q(\theta) \phi(\theta) \lambda(d\theta).
+%
+\end{align*}
+%
+The directional derivative in the direction $\phi - \phiz$ at $\phiz$ would thus
+be given by $\expect{\q(\theta)}{\phi(\theta)}$.
+
+We then need only to establish that we can apply the DCT. If $\sup_\theta
+\phi(\theta) < \infty$ then we can apply the dominated convergence theorem with
+a multiple of the constant function.  For the case $\sup_\theta \phi(\theta) =
+\infty$, observe that
+%
+\begin{align*}
+%
+f(\phi) ={}&
+    \int \q(\theta) \log(1 + \phi(\theta)) \ind{\phi(\theta) \le 0}
+        \lambda(d\theta) + \\
+    &\int \q(\theta) \log(1 + \phi(\theta)) \ind{\phi(\theta) > 0}
+        \lambda(d\theta).
+%
+\end{align*}
+%
+The integrand $\log(1 + \phi(\zeta)) \ind{\zeta \le 0}$ of the first term
+is bounded, so we can apply the DCT.  For the second term, the shape of
+the logarithm gives
+%
+\begin{align*}
+%
+\q(\theta) \log(1 + t \phi(\theta)) \ind{t \phi(\theta) > 0}   \le{}&
+    \q(\theta) (1 + t \phi(\theta)) \ind{t \phi(\theta) > 0}.%
+\end{align*}
+%
+The preceding display is integrable for all finite $t$ whenever $\int \q(\theta)
+\abs{\phi(\theta)} \lambda(d\theta) < \infty$. But this follows by Holder's
+inequality, since
+%
+\begin{align*}
+%
+\int_0^1 \q(\theta) \abs{\phi(\theta)} \lambda(d \theta) \le{}&
+    \left( \int \q(\theta)^q \lambda(d \theta) \right)^{1/q}
+    \left( \int \abs{\phi(\theta)}^p \lambda(d \theta) \right)^{1/p}
+\\={}&
+    \left( \int \q(\theta)^q \lambda(d \theta) \right)^{1/q}
+    \norm{\phi}_{\lambda,p}
+\\\le{}&
+    \infty.
+%
+\end{align*}
+%
+The result follows.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

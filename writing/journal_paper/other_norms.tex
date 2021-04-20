@@ -4,7 +4,7 @@
 
 \begin{defn}
 %
-For a measure $\lambda$ on $(0,1)$ and $1 \le p \le \infty$, let
+For a probability measure $\lambda$ on $(0,1)$ and $1 \le p \le \infty$, let
 $\lp{\lambda,p}$ define the space of $\lambda$-integrable functions from
 $(0,1)\mapsto\mathbb{R}$ with
 %
@@ -22,8 +22,8 @@ $(0,1)\mapsto\mathbb{R}$ with
 %
 \end{align*}
 %
-When $\lambda$ is the Lebesgue measure, we may simply write $\norm{\cdot}_{p} =
-\norm{\cdot}_{\lambda,p}$.
+When $\lambda$ is proportional to the  Lebesgue measure, we may simply write
+$\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
 %
 \end{defn}
 
@@ -244,177 +244,6 @@ avoid in infinite-dimensional spaces.  We now give an illustrative example in
 the $\lp{p}$ spaces; since the result will be important for VB prior
 sensitivity, we will state is as a lemma rather than merely an example.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}\lemlabel{e_log_nonfrechet}
-
-TODO: $\q$ should not be defined relative to $\lambda$.  And for
-discontinuity we need
-to require that there is a region such that
-$\inf_\theta h(\theta) \q(\theta) p(\theta) > 0$.  Maybe it would be
-better to just split this out into two different proofs?
-
-Let $\lambda$ be continuous probability measure over $[0,1]$. Fix $1 \le p <
-\infty$, and let $q = (1 - p^{-1})^{-1}$, from which $p^{-1} + q^{-1}=1$
-follows.\footnote{Regrettably the standard choices of $p$ and $q$ for $\lp{p}$
-spaces and their duals overlap with our notation for probability and variational
-distributions, but there should be no ambiguity in context.}
-
-Let $\q(\theta)$ be a density relative $\lambda$, and $h(\theta)$ a measurable
-function such that $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ and
-$\int \abs{ \q(\theta) h(\theta)}^q \lambda(d\theta) < \infty$.
-
-Let $\lp{\lambda,p}$ denote the space with the norm
-$\norm{\phi}_{\lambda,p} := \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)
-\right)^{1/p}$.
-
-Define $f: \lp{\lambda, p} \mapsto \mathbb{R}$ as follows:
-%
-\begin{align*}
-%
-f(\phi) :=
-\begin{cases}
-    %
-    \expect{\q(\theta)}{h(\theta) \log \left(1 + \phi(\theta)\right)} &
-    \textrm{when }0 < 1 + \phi(\theta)\textrm{ for all }\theta \\
-    %
-    0 & \textrm{otherwise}.
-%
-\end{cases}
-%
-\end{align*}
-%
-Then $f$ is discontinous at $\phiz$ and so not Fr{\'e}chet differentiable.
-However $f$ has a directional derivative at $\phiz$ in every direction $\phi -
-\phiz$.
-
-\begin{proof}
-%
-Since $\int \abs{h(\theta)} \q(\theta) \lambda(d\theta) > 0$ we can choose a set
-$S$ such that either $\inf_{\theta \in S} h(\theta) \q(\theta) \ge h_0$ or
-$\inf_{\theta \in S} h(\theta) \q(\theta) \le -h_0$..........
-
-Since $\lambda$ has a continuous component, for any sufficiently small $\epsilon >
-0$, there exists a set $S_\epsilon$ with $\lambda(S_\epsilon) = \epsilon$. Since
-$\int q(\theta) \lambda(d\theta) = 1$, we can find a set $S_\epsilon$ such that
-$\int q(\theta) \lambda(d\theta) \ge \epsilon$ as well.\footnote{Were there no
-such set, the measure under $\q$ of a partition of the domain into sets with
-$\lambda$-measure no smaller than $\epsilon$ could not be $1$.}
-
-For $\delta > 0$, let
-%
-\begin{align*}
-%
-\phi(\zeta; \epsilon, \delta) :=
-\begin{cases}
-    %
-    \delta - 1      & \textrm{ for }\zeta\in S_\epsilon \\
-    0      & \textrm{ for }\zeta\notin S_\epsilon.
-    %
-\end{cases}
-%
-\end{align*}
-%
-Then $\phi(\theta; \epsilon, \delta) \in \lp{\lambda,p}$ with $\norm{\phi(\cdot;
-\epsilon, \delta)}_p = (\int_0^1 \phi(\theta)^p \lambda(d\theta)^{1/p}
-=\epsilon^{1/p} (\delta - 1)$.  Furthermore,
-%
-\begin{align*}
-%
-\abs{f(\phi(\theta; \epsilon, \delta))} ={}&
-    \expect{\q(\theta)}{\ind{\theta \in S_\epsilon}} \abs{\log(\delta)} \ge
-    \epsilon \abs{\log(\delta)}.
-%
-\end{align*}
-%,
-Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
-\rightarrow 0$,
-%
-\begin{align*}
-%
-\abs{f(\phi(\zeta; \epsilon_n, \delta(\epsilon_n))) - f(\phiz)} \ge{} 1
-\mathtxt{and}
-\norm{\phi(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{} 0.
-%
-\end{align*}
-%
-So $f$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$, and
-cannot be Fr{\'e}chet differentiable.
-
-We now show that the directional derivative exists in any direction.  First,
-suppose that $\inf_{\theta} \phi(\zeta) = -\infty$.  Then $\inf_{\theta} t
-\phi(\theta) = -\infty$ for any $t > 0$, so $f(t\theta) = 0$ for all $t$, and
-$\lim_{t \rightarrow 0} (f(t \phi) - f(\phiz)) / t = \lim_{t \rightarrow 0} 0 =
-0$.  Trivially, the directional derivative exists and is $0$ for $\phi$ that are
-unbounded below.
-
-If $-\infty < \inf_\theta \phi(\theta)$, then there exists a $t_0 > 0$ such that
-$t_0 \phi(\theta)$ is strictly larger than $-1$.  Let us consider only $t <
-t_0$. If we can apply the DCT, then
-%
-\begin{align*}
-%
-\fracat{\partial f(t \phi)}{\partial t}{t=0} ={}&
-    \int \q(\theta) \fracat{\partial \log(1 + t \phi(\theta))}{\partial t}{t=0}
-        \lambda(d\theta)
-\\={}&
-\int \q(\theta) \phi(\theta) \lambda(d\theta).
-%
-\end{align*}
-%
-The directional derivative in the direction $\phi - \phiz$ at $\phiz$ would thus
-be given by $\expect{\q(\theta)}{\phi(\theta)}$.
-
-We then need only to establish that we can apply the DCT. If $\sup_\theta
-\phi(\theta) < \infty$ then we can apply the dominated convergence theorem with
-a multiple of the constant function.  For the case $\sup_\theta \phi(\theta) =
-\infty$, observe that
-%
-\begin{align*}
-%
-f(\phi) ={}&
-    \int \q(\theta) \log(1 + \phi(\theta)) \ind{\phi(\theta) \le 0}
-        \lambda(d\theta) + \\
-    &\int \q(\theta) \log(1 + \phi(\theta)) \ind{\phi(\theta) > 0}
-        \lambda(d\theta).
-%
-\end{align*}
-%
-The integrand $\log(1 + \phi(\zeta)) \ind{\zeta \le 0}$ of the first term
-is bounded, so we can apply the DCT.  For the second term, the shape of
-the logarithm gives
-%
-\begin{align*}
-%
-\q(\theta) \log(1 + t \phi(\theta)) \ind{t \phi(\theta) > 0}   \le{}&
-    \q(\theta) (1 + t \phi(\theta)) \ind{t \phi(\theta) > 0}.%
-\end{align*}
-%
-The preceding display is integrable for all finite $t$ whenever $\int \q(\theta)
-\abs{\phi(\theta)} \lambda(d\theta) < \infty$. But this follows by Holder's
-inequality, since
-%
-\begin{align*}
-%
-\int_0^1 \q(\theta) \abs{\phi(\theta)} \lambda(d \theta) \le{}&
-    \left( \int \q(\theta)^q \lambda(d \theta) \right)^{1/q}
-    \left( \int \abs{\phi(\theta)}^p \lambda(d \theta) \right)^{1/p}
-\\={}&
-    \left( \int \q(\theta)^q \lambda(d \theta) \right)^{1/q}
-    \norm{\phi}_{\lambda,p}
-\\\le{}&
-    \infty.
-%
-\end{align*}
-%
-The result follows.
-%
-\end{proof}
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 We can define the family of nonlinear perturbations similar to
 \citep{gustafson:1996:local}.
 
@@ -422,25 +251,26 @@ We can define the family of nonlinear perturbations similar to
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_nl_pert}
 %
-Fix $\pbase(\nu)$ and $1 \le p \le \infty$.  For any $\phi \in \lp{p}$, define
-\footnote{We have dropped a factor of $p$ from the perturbation when $p <
+Let $\pbase(\theta)$ be a density with respect to a probability measure
+$\lambda$, and fix $1 \le p \le \infty$.  For any $\phi \in \lp{\lambda,p}$,
+define \footnote{We have dropped a factor of $p$ from the perturbation when $p <
 \infty$ relative to the definition in \citep{gustafson:1996:local}.}
 %
 \begin{align*}
 %
-\rho(\nu \vert \phi) :={}& \begin{cases}
+\rho(\theta \vert \phi) :={}& \begin{cases}
 %
-\pbase(\nu)^{1/p} + \phi(\nu)
+\pbase(\theta)^{1/p} + \phi(\theta)
     & \textrm{when }p < \infty \\
-\pbase(\nu)\exp(\phi(\nu))
+\pbase(\theta)\exp(\phi(\theta))
     & \textrm{when }p = \infty
 %
 \end{cases}\\
 %
-\pstick(\nu \vert \phi)' :={}&
-    \mathrm{sign}(\rho(\nu \vert \phi)) \abs{\rho(\nu \vert \phi)}^p\\
-\pstick(\nu \vert \phi) :={}&
-    \frac{\pstick'(\nu \vert \phi)}{\int \pstick'(\nu' \vert \phi) d\nu'}.
+\tilde{\p}(\theta \vert \phi) :={}&
+    \mathrm{sign}(\rho(\theta \vert \phi)) \abs{\rho(\theta \vert \phi)}^p\\
+\p(\nu \vert \phi) :={}&
+    \frac{\tilde{\p}(\theta \vert \phi)}{\int \tilde{\p}(\theta' \vert \phi) d\theta'}.
 %
 \end{align*}
 %
@@ -450,28 +280,28 @@ Fix $\pbase(\nu)$ and $1 \le p \le \infty$.  For any $\phi \in \lp{p}$, define
 
 \Defref{prior_nl_pert} provides one class of answers to what it means to perturb
 a prior, and how to measure the size of the perturbation.  \citep[Result
-2]{gustafson:1996:local} states that using $\norm{\cdot}_p$ with its
+2]{gustafson:1996:local} states that using $\norm{\cdot}_{\lambda, p}$ with its
 corresponding perturbation gives a notion of ``size'' of a perturbation that is
 a norm, invariant to changes in the base measure, and invariant under one-to-one
 re-parameterizations.
 
 Unlike \citep{gustafson:1996:local}, we allow the perturbations $\phi$ to be
 negative.  There are two reasons for doing so.  First, if $\phi$ must be
-pointwise positive, then $\pstick(\nu \vert \phi)$ is not defined in an open
-ball containing $\phiz$, and standard results from functional analysis cannot be
+pointwise positive, then $\p(\theta \vert \phi)$ is not defined in an open ball
+containing $\phiz$, and standard results from functional analysis cannot be
 directly applied to establish properties like Fr{\'e}chet differentiability.
 There may be priors that cannot be achieved by considering only positive
 perturbations.  But perhaps most importantly, when $\phi$ must be positive, the
-norm $\norm{\cdot}_p$ treats ablating and adding prior mass very asymmetrically
-when $p < \infty$, arguably violating an intutive notions of the ``size''
-of perturbation.
+norm $\norm{\cdot}_{\lambda, p}$ treats ablating and adding prior mass very
+asymmetrically when $p < \infty$, arguably violating an intutive notions of the
+``size'' of perturbation.
 
 Suppose $p < \infty$ and we wish to choose a $\phi$ to change $\pbase$ into
 $\palt$, for which \defref{prior_nl_pert} gives that we must choose
 %
 \begin{align}\eqlabel{phi_for_palt}
 %
-\phi(\nu) = \alpha \palt(\nu)^{1/p} - \pbase(\nu)^{1/p}
+\phi(\theta) = \alpha \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
     \mathtxt{where}\alpha > 0.
 %
 \end{align}
@@ -650,6 +480,8 @@ following generalization of \citep[Result 2]{gustafson:1996:local}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}
 %
+TODO: fix the notation here.
+
 Fix a $1 \le p < \infty$ and $\pbase(\nu)$ as in \defref{prior_nl_pert}.
 If $\norm{\phi}_p < 1$ then
 %
@@ -748,18 +580,43 @@ We can thus write
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+It will be notationaly convenient in our discussion to treat the map $x \mapsto
+\log(x)$ as simply discontinuous at $x = 0$, rather than undefined (or
+complex-valued). Define the ``trimmed log'' function as
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}
+%
+\begin{align*}
+%
+\logtrim(x) :=
+\begin{cases}
+    \log x  &\textrm{when }x > 0 \\
+    0       &\textrm{when }x \le 0.
+\end{cases}
+%
+\end{align*}
+%
+% In order for the directional derivative to exist in the direction of
+% functions unbounded below, the value must be \log(1) = zero when undefined
+%
+% Otherwise, the when $x \le 0$ is simply a placeholder; for our purposes, it would
+% ideally be some abstract number that is distant from all real numbers but zero
+% distance to itself.  (Neither $0$ nor $\infty$ quite fit the bill.) Mostly we
+% will require that $\logtrim(x)$ is discontinuous in a neighborhood of $0$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Observe, that, for $1 \le p < \infty$, we take the log perturbation given by
 \defref{prior_nl_pert} is
 %
 \begin{align*}
 %
-\log \pstick(\nu \vert \phi) ={}&
-\begin{cases}
-    \log \pbase(\nu) + \log\left(1 + \frac{\phi(\nu)}{\pbase(\nu)^{1/p}} \right)
-    & \textrm{when }\rho(\nu, \phi) > 0 \\
-    -\infty     & \textrm{when }\rho(\nu, \phi) \le 0.
-%
-\end{cases}
+\logtrim \p(\theta \vert \phi) ={}&
+    \log \pbase(\theta) +
+        \logtrim\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right).
 %
 \end{align*}
 %
