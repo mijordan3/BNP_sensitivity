@@ -4,15 +4,15 @@
 
 \begin{lem}\lemlabel{logq_derivs}
 %
-Let \assuref{dist_fun_nice} hold for some $\psi(\zeta, \t)$ as well as
-for $\psi(\zeta, \t) = 1$.  Define
+Let \assuref{dist_fun_nice} hold for some $\psi(\theta, \t)$ as well as
+for $\psi(\theta, \t) = 1$.  Define
 %
 \begin{align*}
 %
-\lqgradbar{\zeta \vert \eta} :={}& \lqgrad{\zeta \vert \eta}
-  - \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}} \\
-\lqhessbar{\zeta \vert \eta} :={}& \lqhess{\zeta \vert \eta}
- - \expect{\q(\zeta \vert \eta)}{\lqhess{\zeta \vert \eta}}.
+\lqgradbar{\theta \vert \eta} :={}& \lqgrad{\theta \vert \eta}
+  - \expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} \\
+\lqhessbar{\theta \vert \eta} :={}& \lqhess{\theta \vert \eta}
+ - \expect{\q(\theta \vert \eta)}{\lqhess{\theta \vert \eta}}.
 %
 \end{align*}
 %
@@ -21,38 +21,38 @@ Then the following equalties hold:
 \begin{align}
 %
 \MoveEqLeft
-\fracat{\partial \expect{\q(\zeta \vert \eta)}
-              {\psi(\zeta, \t)}}{\partial \eta}{\eta} ={}
-\expect{\q(\zeta \vert \eta)}
-       {\lqgradbar{\zeta \vert \eta} \left(
-        \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+\fracat{\partial \expect{\q(\theta \vert \eta)}
+              {\psi(\theta, \t)}}{\partial \eta}{\eta} ={}
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta} \left(
+        \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
        \right)
        }\eqlabel{q_sens_is_cov}\\\nonumber\\
 %
 \MoveEqLeft
-\fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
-      {\psi(\zeta, \t)}}{\partial \eta \partial \t}{\eta, \t} ={}\nonumber\\&
-  \expect{\q(\zeta \vert \eta)}
-         {\lqgradbar{\zeta \vert \eta} \left(
-          \psigrad{\zeta,\t} - \expect{\q(\zeta \vert \eta)}{\psigrad{\zeta, \t})}
+\fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+      {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t} ={}\nonumber\\&
+  \expect{\q(\theta \vert \eta)}
+         {\lqgradbar{\theta \vert \eta} \left(
+          \psigrad{\theta,\t} - \expect{\q(\theta \vert \eta)}{\psigrad{\theta, \t})}
          \right)
          } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
  %
  \MoveEqLeft
- \fracat{\partial^2 \expect{\q(\zeta \vert \eta)}
-       {\psi(\zeta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
+ \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+       {\psi(\theta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
  \nonumber\\&
- \expect{\q(\zeta \vert \eta)}
-        {\lqgradbar{\zeta \vert \eta} \lqgradbar{\zeta \vert \eta}^T
+ \expect{\q(\theta \vert \eta)}
+        {\lqgradbar{\theta \vert \eta} \lqgradbar{\theta \vert \eta}^T
         \left(
-         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
         \right)
         } +
  \nonumber\\ &
- \expect{\q(\zeta \vert \eta)}{
-        \lqhessbar{\zeta \vert \eta}
+ \expect{\q(\theta \vert \eta)}{
+        \lqhessbar{\theta \vert \eta}
         \left(
-         \psi(\zeta,\t) - \expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)}
+         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
         \right)
         }. \eqlabel{q_score_sens_is_cov}
 %
@@ -67,16 +67,16 @@ interchange the order of integration and differentiation as in \citep[Theorem
 \begin{align*}
 %
 \MoveEqLeft
-\fracat{\partial \int \q(\zeta \vert \nu) \psi(\zeta \vert \t) \lambda(d\zeta)}
+\fracat{\partial \int \q(\theta \vert \nu) \psi(\theta \vert \t) \lambda(d\theta)}
        {\partial \eta}{\eta}
 ={}\\&
-\int \fracat{\partial \q(\zeta \vert \nu) \psi(\zeta \vert \t) }
-          {\partial \eta}{\eta} \lambda(d\zeta)={}
+\int \fracat{\partial \q(\theta \vert \nu) \psi(\theta \vert \t) }
+          {\partial \eta}{\eta} \lambda(d\theta)={}
 &\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and the DCT)}
 \\&
-\int \lqgrad{\zeta, \eta} \psi(\zeta \vert \t) \q(\zeta, \eta) \lambda(d\zeta) ={}
+\int \lqgrad{\theta, \eta} \psi(\theta \vert \t) \q(\theta, \eta) \lambda(d\theta) ={}
 \\&
-\expect{\q(\zeta, \eta)}{\lqgrad{\zeta, \eta} \psi(\zeta \vert \t) }.
+\expect{\q(\theta, \eta)}{\lqgrad{\theta, \eta} \psi(\theta \vert \t) }.
 %
 \end{align*}
 %
@@ -84,9 +84,9 @@ Applying analogous reasoning to the denominator of
 %
 \begin{align*}
 %
-\expect{\q(\zeta \vert \eta)}{\psi(\zeta, \t)} =
-\frac{\int \psi(\zeta, \t) \q(\zeta \vert \eta) \lambda(d\zeta)}
-     {\int \q(\zeta \vert \eta) \lambda(d\zeta)}
+\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)} =
+\frac{\int \psi(\theta, \t) \q(\theta \vert \eta) \lambda(d\theta)}
+     {\int \q(\theta \vert \eta) \lambda(d\theta)}
 %
 \end{align*}
 %
@@ -97,9 +97,9 @@ For \eqref{q_sens_psi_grad_is_cov}, by anaologously applying
 %
 \begin{align*}
 %
-\fracat{\partial \expect{\q(\zeta \vert \eta)}{\psi(\zeta \vert \eta)}}
+\fracat{\partial \expect{\q(\theta \vert \eta)}{\psi(\theta \vert \eta)}}
        {\partial \t}{\t} ={}&
-\expect{\q(\zeta \vert \eta)}{\psigrad{\zeta \vert \eta}}.
+\expect{\q(\theta \vert \eta)}{\psigrad{\theta \vert \eta}}.
 %
 \end{align*}
 %
@@ -107,17 +107,17 @@ Applying \assuitemref{dist_fun_nice}{funqgraddom} and the DCT gives
 %
 \begin{align*}
 %
-\fracat{\partial \expect{\q(\zeta \vert \eta)}
-                        {\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}}
+\fracat{\partial \expect{\q(\theta \vert \eta)}
+                        {\lqgrad{\theta \vert \eta}\psi(\theta \vert \eta)}}
        {\partial \t}{\t} ={}&
-\expect{\q(\zeta \vert \eta)}
-       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta \vert \eta}},
+\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta \vert \eta}},
 %
 \end{align*}
 %
 where we have used the fact that the absolute value of any component of the
-vector $\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)$ is bounded above by a
-constant times $\norm{\lqgrad{\zeta \vert \eta}\psi(\zeta \vert \eta)}_2$.
+vector $\lqgrad{\theta \vert \eta}\psi(\theta \vert \eta)$ is bounded above by a
+constant times $\norm{\lqgrad{\theta \vert \eta}\psi(\theta \vert \eta)}_2$.
 From the preceding two displays, \eqref{q_sens_psi_grad_is_cov} follows.
 
 Finally, for \eqref{q_score_sens_is_cov}, we need to differentiate
@@ -127,11 +127,11 @@ to which we can apply the DCT using the corresponding assumptions:
 %
 \begin{align*}
 %
-\expect{\q{\zeta \vert \eta}}
-    {\lqgrad{\zeta \vert \eta}} &&
+\expect{\q{\theta \vert \eta}}
+    {\lqgrad{\theta \vert \eta}} &&
     \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}\\
-\expect{\q{\zeta \vert \eta}}
-    {\lqgrad{\zeta \vert \eta} \psi(\zeta, \t)}. &&
+\expect{\q{\theta \vert \eta}}
+    {\lqgrad{\theta \vert \eta} \psi(\theta, \t)}. &&
     \textrm{\assuitemref{dist_fun_nice}{funqgraddom}}
 %
 \end{align*}
@@ -155,24 +155,24 @@ collecting terms.
 
 \begin{lem}\lemlabel{logq_continuous}\seeproof{logq_continuous}
 %
-Let \assuref{dist_fun_nice} hold for some $\psi$ as well as with $\psi(\zeta,
+Let \assuref{dist_fun_nice} hold for some $\psi$ as well as with $\psi(\theta,
 \t) = 1$.  Then
 %
 \begin{align*}
 %
 \eta, \t \mapsto{}& \fracat{\partial
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta}{\eta, \t}
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta}{\eta, \t}
 %
 \mathtxt{,}\\
 %
 \eta, \t \mapsto{}& \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
 \t}{\eta, \t}
 %
 \mathtxt{, and}\\
 %
 \eta, \t \mapsto{}&  \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
 \eta^T}{\eta}
 %
 \end{align*}
@@ -186,19 +186,19 @@ are continuous on $\ball_\eta \times \ball_\t$.
 \begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
 %
 By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
 \t}{\eta, \t}$ is a continuous combination of terms of the form
 %
 \begin{align*}
 %
-\expect{\q(\zeta \vert \eta)}
-       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}}
+\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}}
        && \mathtxt{\assuitemref{dist_fun_nice}{fungradqgraddom}} \\
-\expect{\q(\zeta \vert \eta)}
-      {\lqgrad{\zeta \vert \eta}}
+\expect{\q(\theta \vert \eta)}
+      {\lqgrad{\theta \vert \eta}}
       && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}} \\
-\expect{\q(\zeta \vert \eta)}
-    {\psigrad{\zeta,\t}}.
+\expect{\q(\theta \vert \eta)}
+    {\psigrad{\theta,\t}}.
     && \mathtxt{\assuitemref{dist_fun_nice}{funqgraddom}}
 %
 \end{align*}
@@ -210,38 +210,38 @@ expressions in the preceding display are continuous.  For example,
 \begin{align*}
 %
 \MoveEqLeft
-\norm{\expect{\q(\zeta \vert \eta)}
-       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
-   \expect{\q(\zeta \vert \eta')}
-          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+\norm{\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
+   \expect{\q(\theta \vert \eta')}
+          {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
       }_2 =\\&
 %
 \norm{\int \left(
-\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
-\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
-\right)\lambda(d\zeta)
+\q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
+\q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
+\right)\lambda(d\theta)
 }_2  \le\\&
 %
 \int \norm{
-\q(\zeta \vert \eta) \lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t} -
-\q(\zeta \vert \eta') \lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}
-}_2 \lambda(d\zeta) \le\\&
+\q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
+\q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
+}_2 \lambda(d\theta) \le\\&
 %
 \int \norm{
-\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
-    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
-}_2 \lambda(d\zeta) + \\&\quad
+\left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
+    \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
+}_2 \lambda(d\theta) + \\&\quad
 %
 \int \norm{
-\q(\zeta \vert \eta')
-    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
-    \psigrad{\zeta, \t}
-}_2 \lambda(d\zeta) + \\&\quad
+\q(\theta \vert \eta')
+    \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
+    \psigrad{\theta, \t}
+}_2 \lambda(d\theta) + \\&\quad
 %
 \int \norm{
-\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
-    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
-}_2 \lambda(d\zeta).
+\q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
+    \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
+}_2 \lambda(d\theta).
 %
 \end{align*}
 %
@@ -252,27 +252,27 @@ term in the final line of the preceding display, giving
 %
 \MoveEqLeft
 \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t}
-\norm{\expect{\q(\zeta \vert \eta)}
-       {\lqgrad{\zeta \vert \eta} \psigrad{\zeta,\t}} -
-   \expect{\q(\zeta \vert \eta')}
-          {\lqgrad{\zeta \vert \eta'} \psigrad{\zeta,\t'}}
+\norm{\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
+   \expect{\q(\theta \vert \eta')}
+          {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
       }_2 \le\\&
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
-\left(\q(\zeta \vert \eta) - \q(\zeta \vert \eta')\right)
-    \lqgrad{\zeta \vert \eta} \psigrad{\zeta, \t}
-}_2 \lambda(d\zeta) + \\&\quad
+\left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
+    \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
+}_2 \lambda(d\theta) + \\&\quad
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
-\q(\zeta \vert \eta')
-    \left( \lqgrad{\zeta \vert \eta} - \lqgrad{\zeta \vert \eta'} \right)
-    \psigrad{\zeta, \t}
-}_2 \lambda(d\zeta) + \\&\quad
+\q(\theta \vert \eta')
+    \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
+    \psigrad{\theta, \t}
+}_2 \lambda(d\theta) + \\&\quad
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
-\q(\zeta \vert \eta')\lqgrad{\zeta \vert \eta'}
-    \left( \psigrad{\zeta, \t} - \psigrad{\zeta, \t'} \right)
-}_2 \lambda(d\zeta) = 0,
+\q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
+    \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
+}_2 \lambda(d\theta) = 0,
 %
 \end{align*}
 %
@@ -280,27 +280,27 @@ the final equality following from the continuity assumptions of
 \assuref{dist_fun_nice}.
 
 Similarly, $\fracat{\partial^2
-\expect{\q(\zeta \vert \eta)} {\psi(\zeta, \t)}}{\partial \eta \partial
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
 \eta^T}{\eta}$ involves terms of the form
 %
 \begin{align*}
 %
-\expect{\q(\zeta \vert \eta)}
-       {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T
-        \psi(\zeta,\t)}
+\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \lqgrad{\theta \vert \eta}^T
+        \psi(\theta,\t)}
        && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
        %
-\expect{\q(\zeta \vert \eta)}
-      {\lqgrad{\zeta \vert \eta} \lqgrad{\zeta \vert \eta}^T}
+\expect{\q(\theta \vert \eta)}
+      {\lqgrad{\theta \vert \eta} \lqgrad{\theta \vert \eta}^T}
       && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
 %
-\expect{\q(\zeta \vert \eta)}
-       {\lqhess{\zeta \vert \eta}
-        \psi(\zeta,\t)}
+\expect{\q(\theta \vert \eta)}
+       {\lqhess{\theta \vert \eta}
+        \psi(\theta,\t)}
        && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}} \\
 %
-\expect{\q(\zeta \vert \eta)}
-       {\lqhess{\zeta \vert \eta}},
+\expect{\q(\theta \vert \eta)}
+       {\lqhess{\theta \vert \eta}},
        && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}}
 %
 \end{align*}

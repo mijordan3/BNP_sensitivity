@@ -38,13 +38,13 @@ In \secref{prior_perturbations}, we will consider a more general class of
 perturbations than \exref{alpha_perturbation}.
 
 In any case, the prior on $\zeta$ and posterior in turn depend on $\t$, which we
-write $p(\zeta \vert \x, \t)$. The $\t$ dependence propagates to the optimal
+write $\p(\zeta \vert \x, \t)$. The $\t$ dependence propagates to the optimal
 variational parameters as well through the dependence of the KL divergence on
 $\t$.  Define the shorthand notation
 %
 \begin{align}\eqlabel{kl_shorthand}
 %
-\KL{\eta, \t} := \KL{\q(\zeta \vert \eta) || p(\x \vert \zeta, \t)}
+\KL{\eta, \t} := \KL{\q(\zeta \vert \eta) || \p(\x \vert \zeta, \t)}
 \mathand
 \etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
 %
@@ -110,59 +110,59 @@ continuously differentiable via the implicit function theorem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{dist_fun_nice}
 %
-Let $\q(\zeta \vert \eta)$ be a (possibly unnormalized) density over the random
-variable $\zeta$ parameterized by $\eta$ defined relative to a dominating
-measure $\lambda$.\footnote{For the purposes of this assumption  $\q(\zeta \vert
-\eta)$ and $\zeta$ can be taken to be some general distribution, not necessarily
+Let $\q(\theta \vert \eta)$ be a (possibly unnormalized) density over the random
+variable $\theta$ parameterized by $\eta$ defined relative to a dominating
+measure $\lambda$.\footnote{For the purposes of this assumption  $\q(\theta \vert
+\eta)$ and $\theta$ can be taken to be some general distribution, not necessarily
 corresponding to our BNP model or variational approximation.} Assume that the
-map $\eta \mapsto \log \q(\zeta \vert \eta)$ is twice continuously
+map $\eta \mapsto \log \q(\theta \vert \eta)$ is twice continuously
 differentiable.
 
-Let $\psi(\zeta, \t)$ be a scalar-valued $\lambda$-measurable function of
-$\zeta$ and $\t$.  Assume that the map $\t \mapsto \psi(\zeta, \t)$ is
+Let $\psi(\theta, \t)$ be a scalar-valued $\lambda$-measurable function of
+$\theta$ and $\t$.  Assume that the map $\t \mapsto \psi(\theta, \t)$ is
 continuously differentiable.
 
 Define the following shorthand notation:
 %
 \begin{align*}
 %
-\lqgrad{\zeta \vert \eta} :={}&
-    \fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta} \\
+\lqgrad{\theta \vert \eta} :={}&
+    \fracat{\partial \log \q(\theta \vert \eta)}{\partial \eta}{\eta} \\
 %
-\lqhess{\zeta \vert \eta} :={}&
-    \fracat{\partial^2 \log \q(\zeta \vert \eta)}
+\lqhess{\theta \vert \eta} :={}&
+    \fracat{\partial^2 \log \q(\theta \vert \eta)}
            {\partial \eta \partial \eta^T}{\eta} \\
 %
-\psigrad{\zeta, \t} :={}& \fracat{\partial \psi(\zeta, \t)}{\partial \t}{\t}.
+\psigrad{\theta, \t} :={}& \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t}.
 %
 \end{align*}
 %
 For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
 $\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
-$\lambda$-integrable $M_\psi(\zeta)$ with $\int M_\psi(\zeta) \lambda(d\zeta) <
+$\lambda$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \lambda(d\theta) <
 \infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
 \times \ball_\t$:
 %
 \begin{enumerate}
 %
 \item \itemlabel{fundom}
-$\q(\zeta \vert \eta) \psi(\zeta, \t) \le M_\psi(\zeta)$.
+$\q(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
 %
 \item \itemlabel{funqgraddom}
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
+$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
 %
 \item \itemlabel{funqhessdom}
-$\q(\zeta \vert \eta) \norm{\lqhess{\zeta \vert \eta}}_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
+$\q(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
 %
 \item \itemlabel{fungradqgraddom}
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}_2 \psigrad{\zeta, \t}
-\le M_\psi(\zeta)$.
+$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
+\le M_\psi(\theta)$.
 %
 \item \itemlabel{funqgradsqdom}
-$\q(\zeta \vert \eta) \norm{\lqgrad{\zeta \vert \eta}}^2_2 \psi(\zeta, \t) \le
-M_\psi(\zeta)$.
+$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
 %
 \end{enumerate}
 %
@@ -206,9 +206,9 @@ Let the following conditions on the variational approximation hold.
 \begin{assu}\assulabel{q_stick_regular}
 %
 Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
-stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
-\etaopt$, with $\psi(\zeta, \t) = 1$, and with $\psi(\zeta, \t) = \log
-\pstick(\zeta \vert \t)$, for all $\k$.
+stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\theta = \nuk$,
+$\eta_0 = \etaopt$, and with both $\psi(\zeta, \t) = 1$ and $\psi(\zeta, \t) =
+\log \pstick(\zeta \vert \t)$, for all $\k$.
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -266,9 +266,9 @@ We thus see that the optimization objective $\KL{\eta, \t}$ is the original
 optimization obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
 $\etanu$ and $\t$.
 
-By \lemref{logq_derivs}, $\rho(\etanuk, \t)$ is differentiable in $\eta$, and by
-\lemref{logq_continuous} $\etanuk \mapsto \rho(\etanuk, \t)$ is continuously
-differentiable for all $\t \in \ball_\t$.  So $\partial \KL{\eta, \t}  /
+By \lemref{logq_derivs}, $\etanuk \mapsto \rho(\etanuk, \t)$ is continuous, and
+by \lemref{logq_continuous} $\etanuk \mapsto \rho(\etanuk, \t)$ is continuously
+differentiable, for all $\eta, \t \in \ball$.  So $\partial \KL{\eta, \t}  /
 \partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
 first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
 %
@@ -307,9 +307,9 @@ $\t$.
 % is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
 % $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
 
-Together with the fact that $\partial^2 \KL{\eta, \t} / \partial \eta
-\partial\eta^T$ is invertible at $\etaopt$, \assuitemref{kl_opt_ok}{kl_hess},
-the result then follows from the implicit function theorem \citet[Theorem
+Together with \assuitemref{kl_opt_ok}{kl_hess}, which gives that $\partial^2
+\KL{\eta, \t} / \partial \eta \partial\eta^T$ is invertible at $\etaopt$, the
+result then follows from the implicit function theorem \citet[Theorem
 3.3.1]{krantz:2012:implicit}. For convenience, \tabref{kranz_notation} shows the
 correspondence between their notation and ours.
 % Note

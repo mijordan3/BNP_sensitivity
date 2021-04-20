@@ -1,5 +1,5 @@
 There are two practical problems with forming the posterior
-$p(\beta, \nu, \z \vert \x)$ based on the joint distribution given in
+$\p(\beta, \nu, \z \vert \x)$ based on the joint distribution given in
 \eqref{bnp_model}.  First, there are an infinite number of parameters,
 and second, the posterior is intractable.  In this section, we describe
 how we circumvent these difficulties using a truncated variational Bayes
@@ -30,21 +30,21 @@ posterior parameters.  We form our variational approximation by specifying a
 family of approximating distributions of the form $\q(\zeta \vert \eta)$,
 parameterized by a finite-dimensional $\eta \in \etadom \subseteq
 \mathbb{R}^{\etadim}$, such that $\q(\zeta \vert \eta)$ is absolutely continuous
-with respect to the prior $p(\zeta)$ for all $\eta \in \etadom$.  As we discuss
+with respect to the prior $\p(\zeta)$ for all $\eta \in \etadom$.  As we discuss
 below, we will choose $\q(\zeta \vert \eta)$ so that we can easily compute or
 approximation expectations with respect to $\q(\zeta \vert \eta)$, and so that
 $\q(\zeta \vert \eta)$ has tractable entropy as a function of $\eta$.
 
 Given our family of variational approximations, we wish to find the member of
-the family that is closest to the posterior $p(\zeta \vert \x)$ in
+the family that is closest to the posterior $\p(\zeta \vert \x)$ in
 Kullback-Leibler (KL) divergence:
 %
 \begin{align}\eqlabel{vb_optimization}
 %
 \etaopt :={}&
     \argmin_{\eta \in \etadom}
-        \KL{\q(\zeta \vert \eta) || p(\zeta \vert \x)} \mathwhere \\
-\KL{\q(\zeta \vert \eta) || p(\zeta \vert \x)}
+        \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)} \mathwhere \\
+\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}
 ={}&    \expect{\q(\zeta \vert \eta)}{
         \log \q(\zeta \vert \eta) - \logp(\x \vert \zeta) -
         \logp(\zeta)} + \logp(\x). \nonumber
@@ -52,7 +52,7 @@ Kullback-Leibler (KL) divergence:
 \end{align}
 %
 Due to properties of $\q(\zeta \vert \eta)$ or as given in \eqref{bnp_model},
-all the terms in $\KL{\q(\zeta \vert \eta) || p(\zeta \vert \x)}$ are tractable
+all the terms in $\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}$ are tractable
 except for $\logp(\x)$.  However, $\logp(\x)$ does not depend on $\eta$, and
 so can be negelcted in the optimziation.
 
@@ -75,16 +75,16 @@ particular parameter vector be denoted with a subscript: for example, $\q(\beta
 
 For $\z$ and $\beta$, in the present work, we will be always able to take
 advantage of conditional conjugacy.  Specifically, we will take $\q(\z_{\n}
-\vert \eta)$ to be multinomial with a single observation, matching $p(\z_{\n}
+\vert \eta)$ to be multinomial with a single observation, matching $\p(\z_{\n}
 \vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$, matching
-the distribution of $p(\beta_{\k} \vert \x, \z, \nu)$.
+the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{ex}[VB approximation for $\beta_\k$]
 %
-Recall for the iris dataset we used $p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert
+Recall for the iris dataset we used $\p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert
 \mu_\k, \Sigma_\k}$, with $\beta_\k = (\mu_\k, \Sigma_\k)$.  So,
 up to a constant not depending on $\eta$,
 %
@@ -235,7 +235,7 @@ not depending on $\nuk$, $\log \pstick(\nuk) = (\alpha - 1) \log (1 -
 \nuk)$, so $\logp(\nu_{\k} \vert \x, \beta, \z)$ is proportional to the
 sufficient statistics $\log \nuk$ and $\log(1 - \nuk)$ and so in the
 Beta family.  However, for a generic $\pstick(\cdot)$, the posterior
-$p(\nu_{\k} \vert \x, \beta, \z)$ does not have a standard form.
+$\p(\nu_{\k} \vert \x, \beta, \z)$ does not have a standard form.
 
 In order to optimize the variational objective \eqref{vb_optimization} we see
 from \eqref{stick_log_post} that we need to evaluate or approximate expectations
