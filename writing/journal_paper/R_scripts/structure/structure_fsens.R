@@ -137,7 +137,7 @@ mbololo_plots$p_priors <-
 
 mbololo_plots$p_sens <-
   mbololo_plots$p_sens + 
-  ylab('propn. orange') + 
+  ylab('propn. pop2') + 
   x_axis_remover 
 
 mbololo_plots_sum <- 
@@ -166,7 +166,7 @@ ngangao_plots$p_priors <-
 
 ngangao_plots$p_sens <-
   ngangao_plots$p_sens + 
-  ylab('propn. green') + 
+  ylab('propn. pop1') + 
   title_remover + 
   x_axis_remover 
 
@@ -190,13 +190,15 @@ chawia_plots$p_priors <- chawia_plots$p_priors +
 
 chawia_plots$p_sens <- chawia_plots$p_sens + 
   title_remover + 
-  ylab('propn. purple')
+  ylab('propn. pop3')
 
 chawia_plots_sum <- 
   chawia_plots$p_logphi + 
   chawia_plots$p_priors + 
   chawia_plots$p_sens
 
+
+p_admix <- p_admix + theme(legend.position = 'top')
 
 p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum + 
   plot_layout(heights = c(1.25, 1, 1, 1))

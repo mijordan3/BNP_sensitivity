@@ -5,6 +5,8 @@ thresh_df <-
 
 weights_df %>% 
   left_join(thresh_df, by ='cluster') %>% 
+  # lets just use the top 8 clusters
+  filter(cluster != 'cluster 9') %>% 
   ggplot() + 
   # add line for threshold: only for some clusters ... 
   geom_line(aes(x = alpha, y = thresh), 
@@ -14,7 +16,7 @@ weights_df %>%
   geom_line(aes(x = alpha, y = weight, color = method)) + 
   scale_color_brewer(palette = 'Dark2') + 
   geom_vline(xintercept = alpha0, color = 'red', linetype = 'dashed') + 
-  facet_wrap(~cluster, nrow = 3, scales = 'free_y') + 
+  facet_wrap(~cluster, nrow = 2, scales = 'free_y') + 
   ylab('E[# loci]') + 
   get_fontsizes() + 
   theme(legend.position = 'bottom', 

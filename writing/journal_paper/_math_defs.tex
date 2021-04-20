@@ -109,9 +109,18 @@
 \newcommand{\gclusters}{g_{\text{cl}}} % number of in-sample clusters
 \newcommand{\gclusterspred}{g_{\text{p.cl}}} % number of predictive clusters
 \newcommand{\coclusteringmatr}{\zeta} % coclustering matrix
-\newcommand{\laplacianevsum}{\g_{\text{ev}}} % the sum of the eigenvalues of the graph-laplacian
+\newcommand{\laplacianevsum}{\g_{\text{ev}}} % the sum of the eigenvalues of the graph-laplacian (for mice)
+\newcommand{\gpop}{g_{\text{pop}}} % number of in-sample populations (for structure)
+
 
 % commands for for mice data
 \newcommand{\ngenes}{N} % number of genes
 \newcommand{\ntimepoints}{M} % number of timepoints
 \newcommand{\regmatrix}{X}
+
+% commands for for structure data
+\newcommand{\nindiv}{N} % number of individuals genotyped
+\newcommand{\nloci}{L} % number of loci
+\newcommand{\latentpop}{\theta} % latent population frequencies
+\newcommand{\latentadmix}{\pi} % latent admixtures
+\def\categoricaldist#1{\mathrm{Categorical}\left(#1\right)}

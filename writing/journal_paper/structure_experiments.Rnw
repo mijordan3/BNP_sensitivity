@@ -8,7 +8,7 @@
   
   <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/structure/structure_plotting_utils.R")
@@ -17,49 +17,154 @@ source("R_scripts/structure/structure_plotting_utils.R")
 load('./R_scripts/data_processed/structure.RData')
 @
       
+Our final data analysis example is an application of population genetics. 
+Given a database of individuals and their genotypes at selected genetic loci, 
+population geneticists often seek identify the presence of latent populations, 
+infer the populuation of origin for specific loci, 
+and estimate the degree to which populations are admixed in each individual. 
+Identifying admixed individuals and characterizing latent populations 
+give clues to understanding ancestral migration patterns. 
+
+The data we use come from a study of 155 samples of an endangered bird species, the Taita thrush CITE. 
+The individuals were collected from four regions in southeast Kenya, and each individual was genotyped at seven microstellite loci. 
+This data set was also studied in~\citet{pritchard:2000:structure}. 
+
+\subsubsection*{The model}
+
+\citet{pritchard:2000:structure} also studied this thrush data set; 
+they introduced a Bayesian model for such genetic data, called STRUCTURE. 
+Later, \citet{raj:2014:faststructure} introduced fastSTRUCTURE, a variational inference approach to STRUCTURE. 
+Both implmentations of STRUCTURE used a finite mixture model with a Dirichlet distributed prior on the individual admixture proportions.  
+We adapt the STRUCTURE model by replacing the Dirichlet distributed prior with a GEM prior. 
+We outline the model below. 
+
+Let $\x_{nli}$ be the genotype for individual $n$ at locus $l$ and chromosme $i$. 
+The Taita thrush is a diploid organism so $i \in \{0, 1\}$. 
+In our data set, there are $\nindiv = 155$ individuals genotyped at $\nloci = 7$ loci. 
+Let $\z_{nli}$ be the latent population membership 
+of the observed genotype $\x_{nli}$. 
+Then 
+\begin{align}
+p(\x_{nli} \vert \latentpop_{kl}, z_{n\ell ik} = 1) = 
+\categoricaldist{\x_{nli}\vert \latentpop_{k\ell}},
+\end{align}
+where $\latentpop_{kl}\in\Delta^{J_l - 1}$ are the latent frequencies for the $J_l$ possible alleles at locus $l$, under population $k$. 
+The prior on $\theta_{kl}$ is uniform over the $(J_l - 1)$-simplex, 
+independently for all $k$ and $l$.
+
+Unlike the previous data examples, each individual now has their own stick-breaking process. 
+Draw sticks 
+\begin{align*}
+\nu_{nk} \iid \pstick(\nu_{nk}) \quad \forall n = 1, ..., \nindiv; k = 1, 2, ...
+\end{align*}
+and construct the the admixture of individual $n$
+\begin{align*}
+\latentadmix_{nk} = \nu_{nk} \prod_{k' < k} (1 - \nu_{nk'}).
+\end{align*}
+%
+The latent population memberships are then drawn according to
+\begin{align*}
+p(\z_{nlik} = 1 | \latentadmix_n) = \latentadmix_{nk}.
+\end{align*}
+
+The variational distribution remains mean-field: 
+\begin{align*}
+\q(\zeta \vert \eta) =
+    \left( 
+    \prod_{\n=1}^{\nindiv}\prod_{\k=1}^{\kmax - 1}
+    \q(\nu_{nk} \vert \eta) \right)
+    \left(\prod_{\k=1}^{\kmax}\prod_{l=1}^{\nloci}
+    \q(\theta_{\k l} \vert \eta) \right)
+    \left( \prod_{\n=1}^{\N} \prod_{l=1}^{\nloci} \prod_{i=1}^{2} \q(\z_{\n l i} \vert \eta) \right).
+\end{align*}
+As before, we let the distribution of the sticks $\nu_{nk}$ be logit-normal;
+and we let each membership indicator $\z_{\n l i}$ be multinomial. 
+For each allele frequency $\theta_{\k l}$, we use a Dirichlet distribution. 
+
+We fit the variational distribution with stick distribution
+$\pstick(\nu_{nk}) = \betadist{\nu_{nk}\vert 1, \alpha_0}$, $\alpha_0 = 6$. 
+\figref{stru_init_fit} shows the inferred individual admixtures. 
+There appears to be three dominant latent populations, which we call 
+populations 1, 2, and 3. 
+The inferred populations generally correspond with the Mbololo, Ngangao, and Chawia geographic regions: 
+individuals from the Mbololo region have population 1 as the dominant admixture proportion; 
+individuals from the Ngangao regions are dominantly population 2; 
+individuals from the Chawia region appear to be a mixture of populations 1, 2 and 3. 
+The four individuals from the Yale region appear most closely similar to individuals from the Ngangao region. 
+
+The resulting inference from our model is qualitatively similar to the results obtained by STRUCTURE in \citet{pritchard:2000:structure}. 
+STRUCTURE uses a Dirichlet prior for the individual admixtures 
+with some fixed number of populations $K$ and does inference with MCMC. 
+To select $K$, \citet{pritchard:2000:structure} ran STRUCTURE for $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
+$p(K | \x)$, under the a uniformly distributed prior on $K$. 
+Their algorithm selected $K = 3$. 
+At $\alpha_0 = 3$, our BNP model agrees with \citet{pritchard:2000:structure} in that we also uncover three dominant latent populations. 
 
 
 <<stru_init_fit_cap>>=
 stru_init_fit_cap <- paste(
     "The inferred individual admixtures at $\\alpha = 3$. 
     Each vertical strip is an individual and each color
-    an ancestral population.
-    Lengths of colored segments represent the inferred mixture proportions.
+    a latent population.
+    Lengths of colored segments represent the inferred admixture proportions.
     Mbololo, Ngangao, Yale, and Chawia refer to
-    geographic regions from which each individual was collected. ")
+    geographic regions from which each individual was collected. 
+    In the text, we refer to the green, orange, and purple latent populations 
+    as population 1, 2, and 3, respectively. ")
 SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
 @
   <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
 out <- plot_initial_fit()
-out$p
+out$p 
 @
 
-    
+
+\subsubsection*{Sensitivity: expected number of populations}
+
+We start by evaluating the sensitivity of the expected number of populations
+to the $\alpha$ parameter in the $\betadist{\nu_{nk}\vert 1, \alpha}$ stick distribution. 
+We focus on the in-sample quantity. 
+Define the expected number of populations as
+\begin{align*}
+\gpop(\eta; t)
+&= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ 
+\sum_{n=1}^{\nindiv}
+\sum_{l=1}^{\nloci}
+\sum_{i=1}^2
+\z_{\n l i \k} > t}}. 
+\end{align*}
+% 
+Here, the integer value $t$ is a threshold, allowing us to count only populations as present if they contain at least $t$ loci. 
+When $t = 0$, this $\gpop$ is equivalent to the expected in-sample number of clusters discussed in \secref{results_iris}, except the summation is now over individuals, loci, and chromosomes. 
+As before, $\gpop$ at $t = 0$ has a simple closed form expression as a function of the expectations of $\z_{\n l i \k}$.
+
+When $t > 0$, we again resort to Monte Carlo estimates of $\gpop$. 
+As discussed in \secref{results_iris}, we use the re-parameterization trick 
+which allows us to use fixed draws from a distribution independent of $\eta$ shared across every computation of $\gpop(\eta; t)$ below. 
+
+The expected number of latent populations is sensitive to $\alpha$. 
+Without any thresholding, the expected number of population quickly increases as $\alpha$ increases; in fact, it saturates at $\kmax = 20$ when $\alpha = 10$. 
+This sensitivity is likely due to the fact that the non-thresholded quantity 
+is highly dependent on the behavior of small, nearly unoccupied populations;
+even though the probability of a single locus belonging to these rare populations is small, the probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed genotypes belonging to these rare populations is still large. 
+
+This motivates the use of the expected thresholded number of clusters. 
+We threshold at Even using the thresholded quanti
+The linear approximation, computed at $\alpha_0 = 3$ produces nearly the same expected number of clusters as observed by refitting the model. 
+
     
 <<stru_alpha_nclusters_cap>>=
   stru_alpha_nclusters_cap <- paste(
-    "The expected number of clusters in the thrush data as $\\alpha$ varies.
+    "The expected number of populations in the thrush data as $\\alpha$ varies.
     We compute the linear approximation at $\\alpha = 3$. In the right plot, the threshold is set at $t = 20$ (approximately $1\\%$ of loci). ")
-SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+SetImageSize(aspect_ratio = base_aspect_ratio)
 @
   <<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
 source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 
-
-<<stru_alpha_cluster_weights_cap>>=
-  stru_alpha_cluster_weights_cap <- paste(
-    "The expected number of loci per cluster as $\\alpha$ varies. 
-     We compute the linear approximation at $\\alpha = 3$. 
-     The horizontal blue line corresponds to the threshold in computing the 
-    expected number of thresholded clusters in Figure~\\ref{fig:stru_alpha_nclusters} ")
-SetImageSize(aspect_ratio = base_aspect_ratio * 1.1)
-@
-  <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
-source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_debug, print.eval=TRUE)
-@
-
+\subsubsection*{Sensitivity: individual admixtures}
 
 <<stru_func_sens_cap>>=
   stru_func_sens_cap <- paste(
@@ -80,17 +185,6 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 1.4)
 @
   <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
 source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
-@
-
-<<stru_func_sens_admix_cap>>=
-  stru_func_sens_admix_cap <- paste(
-    "Inferred admixtures after the worst-case prior perturbation 
-     to individuals A (second row, Figure~\\ref{fig:stru_func_sens}). ")
-
-SetImageSize(aspect_ratio = base_aspect_ratio * 1.3)
-@
-  <<stru_func_sens_admix, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_admix_cap>>=
-source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
 @
 
 
@@ -122,6 +216,31 @@ source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, prin
     \hline
 \end{tabular}
 \end{table}
+
+\subsection{Limitations}
+
+<<stru_func_sens_admix_cap>>=
+  stru_func_sens_admix_cap <- paste(
+    "Inferred admixtures after the worst-case prior perturbation 
+     to individuals A (second row, Figure~\\ref{fig:stru_func_sens}). ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
+@
+  <<stru_func_sens_admix, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_admix_cap>>=
+source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
+@
+
+
+<<stru_lin_bad_example_cap>>=
+  stru_lin_bad_example_cap <- paste(
+    "caption. ")
+
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.8)
+@
+  <<stru_lin_bad_example, cache=simple_cache, fig.show='hold', fig.cap=stru_lin_bad_example_cap>>=
+source("R_scripts/structure/mbololo_bad_approximation.R", echo=knitr_debug, print.eval=TRUE)
+@
+
 
 
 

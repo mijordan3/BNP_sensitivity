@@ -46,6 +46,7 @@
 *.npz
 *.ped
 *.stru
+*.csv
 
 # Distribution / packaging
 .Python

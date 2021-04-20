@@ -23,12 +23,21 @@ alpha_sens_df <-
     alpha = alpha_sens_file['alpha_list'], 
     n_clusters_refit = alpha_sens_file['n_clusters_refit'], 
     n_clusters_lr = alpha_sens_file['n_clusters_lr'], 
+    # first threshold
     n_clusters_thresh_refit = alpha_sens_file['n_clusters_thresh_refit'],
-    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr']) 
+    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr'], 
+    # second threshold
+    n_clusters_thresh_refit2 = alpha_sens_file['n_clusters_thresh_refit2'],
+    n_clusters_thresh_lr2 = alpha_sens_file['n_clusters_thresh_lr2'], 
+    # third threshold
+    n_clusters_thresh_refit3 = alpha_sens_file['n_clusters_thresh_refit3'],
+    n_clusters_thresh_lr3 = alpha_sens_file['n_clusters_thresh_lr3']) 
 
 threshold <- alpha_sens_file['threshold']
+threshold2 <- alpha_sens_file['threshold2']
+threshold3 <- alpha_sens_file['threshold3']
 
-# cluter weights
+# cluster weights
 weights_keep <- 9
 
 weights_refit_df <-
@@ -77,11 +86,20 @@ chawia_fsens_results <- load_fsens_data(paste0(data_dir,
                                                'stru_fsens_chawia.npz'))
 
 
-mbololo_data_file <- np$load(paste0(data_dir, 'stru_fsens_mbololo.npz'))
-admix1_refit <- mbololo_data_file['admix1_refit']
-admix2_refit <- mbololo_data_file['admix2_refit']
-admix1_lr <- mbololo_data_file['admix1_lr']
-admix2_lr <- mbololo_data_file['admix2_lr']
+##############
+# mbololo example admixture
+##############
+mbololo_admix_file <- np$load(paste0(data_dir, 
+                                     'mbololo_fsens_admix_example.npz'))
+admix_refit <- mbololo_admix_file['admix_refit']
+admix_lr <- mbololo_admix_file['admix_lr']
+
+# the scalar posterior quantites on which our linear approximation failed
+logit_stick_df <- 
+  read_csv(paste0(data_dir, 'mbololo_logit_stick_bad_example.csv'))
+
+admix_df <- 
+  read_csv(paste0(data_dir, 'mbololo_admix_bad_example.csv'))
 
 #################
 # timing results
@@ -97,6 +115,8 @@ total_alpha_lr_time <- sum(alpha_timing_results['lr_time_vec'])
 
 # for functional sensitivity
 # just report for the mbololo region
+mbololo_data_file <- np$load(paste0(data_dir, 
+                                    'stru_fsens_mbololo.npz'))
 fsens_hess_time <- mbololo_data_file['hess_solve_time']
 
 n <- length(mbololo_data_file['refit_time_vec'])

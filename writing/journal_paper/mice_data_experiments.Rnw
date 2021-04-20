@@ -149,8 +149,8 @@ as gene $j$, given by
 \begin{align*}
 \coclusteringmatr_{ij}(\eta) 
 &= \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}} \\
-&= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_i = k}
-\expect{\q(\z_j\vert\eta)}{\z_j = k}\right).
+&= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
+\expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
 \end{align*}
 
 Below, we evaluate the sensitivity of the inferred co-clustering matrix to 
