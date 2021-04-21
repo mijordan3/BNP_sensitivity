@@ -18,21 +18,37 @@ geographic_labels <- stru_init_file['labels']
 alpha_sens_file <- np$load(paste0(data_dir, 'alpha_sens.npz'))
 alpha0 <- alpha_sens_file['alpha0']
 
-alpha_sens_df <- 
-  data.frame(
-    alpha = alpha_sens_file['alpha_list'], 
-    n_clusters_refit = alpha_sens_file['n_clusters_thresh_refit0'], 
-    n_clusters_lr = alpha_sens_file['n_clusters_thresh_lr0'], 
-    # first threshold
-    n_clusters_thresh_refit1 = alpha_sens_file['n_clusters_thresh_refit1'],
-    n_clusters_thresh_lr1 = alpha_sens_file['n_clusters_thresh_lr1'], 
-    # second threshold
-    n_clusters_thresh_refit2 = alpha_sens_file['n_clusters_thresh_refit2'],
-    n_clusters_thresh_lr2 = alpha_sens_file['n_clusters_thresh_lr2']) 
-
+# we considered different thresholds
 threshold0 <- alpha_sens_file['threshold0']
 threshold1 <- alpha_sens_file['threshold1']
 threshold2 <- alpha_sens_file['threshold2']
+
+alpha_sens_df_thresh0 <- 
+  data.frame(
+    alpha = alpha_sens_file['alpha_list'], 
+    refit = alpha_sens_file['n_clusters_thresh_refit0'], 
+    lin = alpha_sens_file['n_clusters_thresh_lr0'],
+    threshold = threshold0)
+
+alpha_sens_df_thresh1 <- 
+  data.frame(
+    alpha = alpha_sens_file['alpha_list'], 
+    refit = alpha_sens_file['n_clusters_thresh_refit1'], 
+    lin = alpha_sens_file['n_clusters_thresh_lr1'],
+    threshold = threshold1)
+
+
+alpha_sens_df_thresh2 <- 
+  data.frame(
+    alpha = alpha_sens_file['alpha_list'], 
+    refit = alpha_sens_file['n_clusters_thresh_refit2'], 
+    lin = alpha_sens_file['n_clusters_thresh_lr2'],
+    threshold = threshold2)
+
+alpha_sens_df <- rbind(alpha_sens_df_thresh0, 
+                       alpha_sens_df_thresh1, 
+                       alpha_sens_df_thresh2)
+
 
 # cluster weights
 weights_keep <- 6

@@ -98,9 +98,12 @@ plot_struct_fsens_results <- function(results_list){
           legend.position = 'bottom') 
   
   
-  p_sens <- plot_post_stat_trace_plot(results_list$sensitivity_df$epsilon, 
-                                      results_list$sensitivity_df$refit, 
-                                      results_list$sensitivity_df$lr) + 
+  results_df <- 
+    data.frame(t = results_list$sensitivity_df$epsilon, 
+               refit = results_list$sensitivity_df$refit, 
+               lin = results_list$sensitivity_df$lr)
+  
+  p_sens <- plot_post_stat_trace_plot(results_df) + 
     ggtitle('sensitivity') + 
     xlab('epsilon') + 
     theme(legend.title = element_blank(), 

@@ -8,14 +8,19 @@ p0 <- logit_stick_flin_df %>%
         axis.text.x = element_blank(), 
         axis.title.x = element_blank())
 
+
+# a copy of the data to draw fully linearized lines 
+dummy_df <- 
+  admix_flin_df %>% 
+  mutate(population = paste0('population ', population))
+
 p1 <- admix_flin_df %>% 
   plot_stick_params() + 
   ylab('admixture') + 
   # plot the fully-linearized quantity
-  geom_line(aes(x = epsilon, y = fully_lin), 
-            color = 'blue') + 
-  theme(legend.position = 'bottom',
-        legend.title = element_blank(), 
-        legend.justification = 'right')
+  geom_line(data = dummy_df, 
+            aes(x = epsilon, y = fully_lin), 
+            color = 'red', 
+            linetype = 'dashed') 
 
 p0 / p1

@@ -3,18 +3,13 @@
 ###############
 plot_stick_params <- function(param_df, title = 'population'){
   p <- param_df %>%
+    spread(key = method, value = y) %>% 
     mutate(population = paste(title, population, sep = ' ')) %>% 
-    ggplot() + 
-    geom_point(aes(x = epsilon, y = y,
-                   color = method, shape = method)) + 
-    geom_line(aes(x = epsilon, y = y,
-                  color = method)) + 
-    facet_wrap(~population, scales = 'free_y', nrow = 1) + 
-    scale_color_brewer(palette = 'Dark2') + 
-    get_fontsizes() + 
-    theme(strip.background = element_rect(fill = 'white',
-                                          color = 'white'))
-  
+    rename(t = epsilon) %>% 
+    plot_post_stat_trace_plot() + 
+    facet_wrap(~population, nrow = 1, scales = 'free_y') + 
+    xlab('epsilon')
+    
   return(p)
 }
 
@@ -27,9 +22,6 @@ p0 <- logit_stick_df %>%
 
 p1 <- admix_df %>% 
   plot_stick_params() + 
-  ylab('admixture') + 
-  theme(legend.position = 'bottom',
-        legend.title = element_blank(), 
-        legend.justification = 'right')
+  ylab('admixture') 
 
 p0 / p1

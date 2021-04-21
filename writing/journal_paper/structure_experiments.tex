@@ -375,13 +375,22 @@ The linearly approximated values failed to detect this change.
 The reason is because for this perturbation, the mapping from 
 $\epsilon$ to the variational parameter on the stick-distribution governing the inferred admixtures is highly non-linear. 
 The top row plots the location parameter of the logit-normal distribution 
+as $\epsilon$ varies from 0 to 1. 
+In our approximation, the location parameter is linear with respect to $\epsilon$. 
+However, the true relationship between the location parameter of the first stick and $\epsilon$ as obtained by refitting is concave -- the location parameter increases at first, then decreases. 
+Thus, the linear approximation expects the change in this location parameter to be positive when in fact it is negative. 
+The corresponding admixture mixture proportion of population 1 is therefore mis-estimated by the linear approximation. 
+Furthermore, the admixture proportion of population two depends on the first stick length. 
+Because our linear approximation over-estimated the length of the first stick, 
+and the second admixture proportion is a product of the second stick and remaining stick length after the first stick, 
+the linear approximation then under-estimates the admixture proportion of population 2. 
 
 
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.627\linewidth]{figure/stru_lin_bad_example-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.666\linewidth]{figure/stru_lin_bad_example-1} 
 
 }
 
@@ -392,10 +401,16 @@ The top row plots the location parameter of the logit-normal distribution
 \end{knitrout}
 
 
+
+In the examples above, we only linearized the mapping $\epsilon \mapsto \etaopt(\epsilon)$. 
+In most examples, we find that retaining the non-linearities from $\eta\mapsto g$ performed as well, or better than, fully linearizing the mapping from $\epsilon \mapsto \eta$. 
+There are exceptions, as we discuss below. 
+
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.627\linewidth]{figure/stru_fully_lin_example-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.666\linewidth]{figure/stru_fully_lin_example-1} 
 
 }
 
@@ -404,6 +419,7 @@ The top row plots the location parameter of the logit-normal distribution
 
 
 \end{knitrout}
+
 
 
 
