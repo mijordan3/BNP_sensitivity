@@ -349,12 +349,15 @@ analogously to the other term, the conclusion follows.
 Next, we prove a result for directional derivatives in $\lp{p}$ spaces.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{lp_regular}
 %
 Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
-$\q(\theta)$ be a density defined relative to $\lambda$.  Let $q$ be such that
-$p^{-1} + q^{-1} = 1$.  Fix a function $\psi(\theta): \thetadom \mapsto
-\mathbb{R}$ with $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, and assume that
+$\q(\theta)$ be a density defined relative to $\lambda$.  Let $q$ be the real
+number such that $p^{-1} + q^{-1} = 1$.  Fix a function $\psi(\theta): \thetadom
+\mapsto \mathbb{R}$ with $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, and
+assume that
 %
 \begin{align*}
 %
@@ -374,86 +377,93 @@ or, equivalently, that
 \end{align*}
 %
 \end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}\lemlabel{lp_integral_bound}
 %
-Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$, then there
+Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$
+and $\inf_\theta \gamma(\theta) > -\infty$, then there
 exists an $M(\theta)$ with $\int M(\theta) \lambda(d\theta) < \infty$
 such that, for all $0 \le \t \le (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$,
 %
-\begin{align}\eqlabel{lp_integral_bound}
+\begin{align}
 %
-\abs{\psi(\theta)}\abs{\logtrim\left(1 + \t \gamma(\theta)\right)}\q(\theta)
-    <{}& M(\theta).
-\end{align}
+\abs{\psi(\theta)}\abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    <{}& M(\theta) \mathand \eqlabel{lp_integral_bound}\\
 %
-If $\inf_\theta \psi(\theta) > \infty$, then we can define $M(\theta)$ so that,
-additionally,
-%
-\begin{align}\eqlabel{lp_integral_deriv_bound}
-%
-\abs{\psi(\theta)}\abs{\t \gamma(\theta)} \q(\theta)
-    <{}& M(\theta).
+\abs{\psi(\theta)}\abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}}\q(\theta)
+    <{}& M(\theta). \eqlabel{lp_integral_deriv_bound}
 %
 \end{align}
 %
 \begin{proof}
 
-First, suppose that $\inf_\theta \psi(\theta) = -\infty$.  Then
-$\logtrim\left(1 + \t \gamma(\theta)\right) = 0$ for all $\t \ge 0$, and
-\eqref{lp_integral_bound} holds trivially with $M(\theta) = 0$.
-
-Next, suppose that $\inf_\theta \psi(\theta) > -\infty$, and let
-$\t_{max} := (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$.  Then, if
-$\t \le \t_{max}$, then
-$\inf_\theta \logtrim \left(1 + \t \gamma(\theta)\right) \ge \log(1/2)$.
-Let us limit to such $\t$.  We can write
+Let $\t_{max} := (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$.  Then
+%
+\begin{align*}
+%
+1 + \t \gamma(\theta) \ge{}& 1 - \t \abs{\inf_\theta \gamma(\theta)}
+\\={}
+    1 - \frac{\t}{2 \t_{max}}.
+%
+\end{align*}
+%
+So $\t \le \t_{max} \Rightarrow 1 + \t \gamma(\theta) \ge 1/2$ for all $\theta$.
+Expanding the integral,
 %
 \begin{align*}
 %
 \MoveEqLeft
 \int \abs{\psi(\theta)}
-    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
     \lambda(d\theta) ={}
 \\&
 \int \abs{\psi(\theta)}
-    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) \le 0}
     \q(\theta)\lambda(d\theta)  +
 \\&
 \int \abs{\psi(\theta)}
-    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) > 0}
     \q(\theta)\lambda(d\theta).
 %
 \end{align*}
 %
-For all $0 \le \t \le \t_{max}$, $0 \le \abs{\logtrim\left(1 + \t
+For all $0 \le \t \le \t_{max}$, $0 \le \abs{\log\left(1 + \t
 \gamma(\theta)\right)} \ind{\gamma(\theta) \le 0} \le \log(1/2)$,
 so the first term in the preceding display is dominated by the integrable
 function $\log(1/2) \abs{\psi(\theta)}\q(\theta)$.
 
-For the second term, by Holder's inequality with respect to $\pbase(\theta)$,
+For the second term, by the fact that $x \ge 0 \Rightarrow \log (1 + x) \le x$
+and Holder's inequality with respect to $\pbase(\theta)$,
 %
 \begin{align*}
 %
 \MoveEqLeft
 \int \abs{\psi(\theta)}
-    \abs{\logtrim\left(1 + \t \gamma(\theta)\right)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) > 0}
     \q(\theta)\lambda(d\theta)
 \\\le{}&
-\t_{max}
+\t
 \int \abs{\psi(\theta)}
     \abs{\gamma(\theta)}
     \ind{\gamma(\theta) > 0}
     \q(\theta)\lambda(d\theta)
 \\={}&
-\t_{max}
+\t
 \int \abs{\psi(\theta)}
     \abs{\gamma(\theta)}
     \ind{\gamma(\theta) > 0}
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \lambda(d\theta)
+\\\le{}&
+\t
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
     \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \lambda(d\theta)
 \\\le{}&
 \t_{max}
@@ -476,24 +486,98 @@ For the second term, by Holder's inequality with respect to $\pbase(\theta)$,
 %
 \end{align*}
 %
-By assumption, the final equation in the preceding display is finite.
+By assumption, the final equation in the preceding display is finite, and the
+second line does not depend on $\t$, so we have proven the existence of an
+integrable bounding function.  \Eqref{lp_integral_bound} follows.
 
-\Eqref{lp_integral_deriv_bound} follows by applying Holder's inequality
-in the same way directly to \eqref{lp_integral_deriv_bound}.
+For \eqref{lp_integral_deriv_bound} observe that $\t \le \t_{max}$ implies
+%
+\begin{align*}
+%
+\abs{\psi(\theta)}
+    \abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}} \q(\theta)
+\le{}&
+2 \t \abs{\psi(\theta)} \abs{\gamma(\theta)} \q(\theta).
+%
+\end{align*}
+%
+Thus \eqref{lp_integral_deriv_bound} was proven along the way to
+proving \eqref{lp_integral_bound}.
 %
 \end{proof}
 %
 \end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_regular_lp}
 %
-% \begin{lem}\lemlabel{lp_derivative}
-% %
-% Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
-% $\q(\theta \vert \eta)$ define a class of densities relative to $\lambda$
-% parameterized by $\eta$ in an open ball $\ball_\eta$.  Let \assuref{lp_regular}
-% hold uniformly in $\ball_\eta$ (i.e., the supremum over $\eta \in \ball_\eta$
-% of the integrals in \assuref{lp_regular} is finite) for the ....
+For each $\eta$ in an open set $\ball_\eta$, let \assuref{lp_regular} hold with
+$\psi(\theta)$ equal to each of the following functions:
 %
-% No, let's split it up.
-% %
-% \end{lem}
+\begin{align*}
+%
+& \norm{\lqgrad{\theta, \eta}}_2 \\
+& \norm{\lqgrad{\theta, \eta}}^2_2 \\
+& \norm{\lqhess{\theta, \eta}}^2.
+%
+\end{align*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thm}\lemlabel{lp_derivative}
+%
+Fix $\pbase$, $\lambda$, and $1 \le p < \infty$ as in \defref{prior_nl_pert}.
+Let $\q(\theta \vert \eta)$ define a class of densities relative to $\lambda$
+parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
+\assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
+\assuref{kl_opt_ok}.
+
+Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
+$\inf_\theta \phi(\theta) > -\infty$, the function $\t \mapsto \etaopt(\t \phi)$
+is differentiable at $\t = 0$ with derivative
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
+    - \left( \fracat{\partial^2 \KL{\eta, \t}}
+                    {\partial \eta \partial \eta^T}
+                    {\etaopt, 0} \right)^{-1}
+    \expect{\q(\theta \vert \etaopt)}{
+        \lqgradbar{\theta \vert \etaopt}
+        \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
+    }.
+%
+\end{align*}
+%
+\begin{proof}
+%
+The KL divergence is given by
+%
+\begin{align*}
+%
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} +
+    \expect{\q(\theta \vert \eta)}
+           {\log \left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right)}.
+%
+\end{align*}
+%
+Define $\gamma(\theta) := \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}$, and note
+that $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{p}$, so $\norm{\gamma}_{\pbase,
+p} \le \infty$ and $\inf_\theta \gamma(\theta) > -\infty$.  By
+\assuref{q_regular_lp} and \lemref{lp_integral_bound}, we have that that
+\assuref{dist_fun_nice} holds with $\psi(\theta, \t) = \log \left(1 + \t
+\frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)$, and \thmref{etat_deriv}
+holds.
+%
+\end{proof}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
