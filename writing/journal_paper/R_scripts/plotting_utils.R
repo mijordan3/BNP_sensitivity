@@ -1,21 +1,25 @@
 #################
 # Function to make a trace plot of posterior statistics
 #################
-plot_post_stat_trace_plot <- function(alpha_list,
-                                      refit_list,
-                                      lr_list){
+plot_post_stat_trace_plot <- function(results_df){
   
-  trace_df <- data.frame(alpha = alpha_list, 
-                         refit = refit_list, 
-                         lin = lr_list) %>% 
-    gather(key = method, value = value, -alpha) 
+  # results df has three columns: 
+  # t, the prior parameter
+  # refit, the refitted values
+  # and lin, the lr values
+  
+  trace_df <- results_df %>%
+    gather(key = method, value = y, c(refit, lin)) 
   
   p <- trace_df %>%
-    ggplot(aes(x = alpha, y = value, color = method, shape = method)) + 
+    ggplot(aes(x = t, y = y, color = method, shape = method)) + 
     geom_point() + 
     geom_line() + 
-    scale_color_brewer(palette = 'Dark2') + 
+    scale_color_brewer(palette = 'Set1') + 
+    theme(legend.title = element_blank(), 
+          legend.position = 'bottom') + 
     get_fontsizes()
+  
   return(p)
 }
 

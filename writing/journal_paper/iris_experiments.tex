@@ -15,7 +15,8 @@ four measurements taken per flower:
 sepal length, sepal width, petal length, and petal width. 
 The generative model and variational approximation for the GMM 
 were detailed in 
-\exref{iris_bnp_process,iris_var_distr}, respectively. 
+\exref{iris_bnp_process,iris_var_distr}, respectively, 
+with data dimension $d = 4$ and truncation parameter $\kmax = 15$. 
 \figref{iris_fit} shows the GMM fit at $\alpha = 6$. 
 The data set contains three iris species, and
 the BNP model correspondingly identifies three dominant clusters. 
@@ -37,6 +38,7 @@ the BNP model correspondingly identifies three dominant clusters.
 
 
 \end{knitrout}
+
 
 We wish to evaluate the sensitivity of the expected number of clusters to the 
 stick-breaking distribution. 
@@ -71,57 +73,59 @@ $f(\cdot, \eta)$ that satisfies
   u \iid\normdist{0, I} \implies 
   f(u, \eta) \stackrel{d}{=} \nu \sim \q(\cdot | \eta).
 \end{align*}
-With $\nu$ being a vector of logit-normal random variables under $q$, 
-$f(\cdot ; \eta)$ is a function that scales and shifts the normal draws $u$ according to parameters in $\eta$;
+Since $\nu$ is a vector of logit-normal random variables under $q$, 
+we let $f(\cdot ; \eta)$ be a function that scales and shifts the normal draws $u$ according to parameters in $\eta$;
 it then applies the sigmoid function to the 
 scaled and shifted draws. 
 
 To form a Monte Carlo estimate of \eqref{post_pred_nclusters}, 
-we sampled $u_1, ..., u_m\stackrel{iid}{\sim}\normdist{0, I}$ 
+we sampled $u_1, \dots, u_m\stackrel{iid}{\sim}\normdist{0, I}$ 
 and then averaged the expression inside the expectation evaluated at points 
-$f(u_1, \eta), ..., f(u_m, \eta)$.
-We used the reparameterization trick so that conditional on $u_1, ..., u_m$,
+$f(u_1, \eta), \ldots, f(u_m, \eta)$.
+We used the reparameterization trick so that conditional on $u_1, \ldots, u_m$,
 our Monte Carlo estimate of $\gclusterspred$ is a determinstic function of 
 the variational parameters $\eta$. 
 In our experiments below, all displayed values of $\gclusterspred(\eta)$ are
 Monte Carlo approximations, 
-conditional on the same $m = 10,000$ draws $u_1, ..., u_m$, fixed a priori. 
+conditional on the same $m = 10,000$ draws $u_1, \ldots, u_m$, fixed a priori. 
 
-We evaluate the sensitivity of the posterior quantities 
+We first evaluate the sensitivity of the posterior quantities 
 $\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$. 
-We first fitted the initial approximate posterior at $\alpha_0 = 6$. 
-Subsequent refits at $\alpha\not=\alpha_0$ used the variational parameters
-$\etaopt(\alpha_0)$ as an initialization. 
-As $\alpha$ increases, both the expected in-sample and the expected predictive number of clusters increases (\figref{iris_alpha_sens}). 
-The in-sample quantity is insensitive to changes in the $\alpha$ parameter. 
-As $\alpha$ varies from $\alpha = 1, ..., 16$,
-the quantity $\gclusters(\etaopt(\alpha))$
-varies only from 
-3.0 to
+We fit the initial variational posterior at $\alpha_0 = 6$,
+and we formed the linear approximation (\eqref{vb_eta_sens}) at this initial fit. 
+Without further optimization, we use the linear approximation to quickly evaluate 
+$\etalin(\alpha)$ for all $\alpha = 1, \ldots, 16$ (\eqref{etalin_def}),
+and produce posterior quantites $g(\etalin(\alpha))$. 
+
+The in-sample quantity appears insensitive to changes in the $\alpha$ parameter
+(\figref{iris_alpha_sens}). 
+As $\alpha$ varies from $\alpha = 1, \ldots, 16$,
+the quantity $\gclusters(\etalin(\alpha))$
+varies only from 3.0 to
 3.4
 (recall that the true number of iris species is three). 
 On the other hand, the posterior preditive quantity is sensitive 
 to changes in $\alpha$.
-Over the same range of $\alpha$, $\gclusterspred(\etaopt(\alpha))$
+Over the same range of $\alpha$, $\gclusterspred(\etalin(\alpha))$
 varies from 
 3.6 to 
 8.1. 
 
-We formed the linear approximation at $\alpha = \alpha_0$ and computed
-the approximate variational parameters $\etalin(\alpha)$ at 
-$\alpha = 1, ..., 16$. 
-Substituting the linear approximation for the refitted variational parameters,
-$g(\etalin(\alpha))$ is able to mimic the changes 
-in both the in-sample and predictive quantities 
-found by refitting the model (\figref{iris_alpha_sens}).  
-Furthermore, the linear approximation is an order of magnitude faster than refitting. 
-Forming the linear approximation at $\alpha = \alpha_0$, required 0.02 seconds. 
+
+Subsequent refits at $\alpha\not=\alpha_0$ confirm sensitivity conclusions of the linear approximation. 
+Over the range $\alpha = 1, \ldots, 16$,
+the values $g(\etalin(\alpha))$ closely mimic the 
+values $g(\etaopt(\alpha))$ found by refitting 
+the variational parameters at each $\alpha$ (\figref{iris_alpha_sens}).
+Importantly, 
+the linear approximation is an order of magnitude faster than refitting. 
+Forming the linear approximation at $\alpha = \alpha_0$, 
+required 0.02 seconds. 
 After forming the linear approximation,
-computing $\etalin(\alpha)$ for all $\alpha = 1, ... 16$ took another 
+computing $\etalin(\alpha)$ for all $\alpha = 1, \ldots, 16$ took another 
 0.02 seconds.
 On the other hand, to refit $\etaopt(\alpha)$ for the same range of
-$\alpha$'s took a total of 10 seconds, 
-with a median refit time of 0.7 seconds. 
+$\alpha$'s took a total of  9 seconds, with a median refit time of 0.6 seconds. 
 
 
 
@@ -134,19 +138,19 @@ with a median refit time of 0.7 seconds.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.392\linewidth]{figure/iris_alpha_sens-1} 
+{\centering \includegraphics[width=0.784\linewidth,height=0.439\linewidth]{figure/iris_alpha_sens-1} 
 
 }
 
 \caption[The expected number of clusters as $\alpha$ varies in the 
-the BNP-GMM fit of the iris data]{The expected number of clusters as $\alpha$ varies in the 
-the BNP-GMM fit of the iris data. 
-On the left is the sensitivity of the in-sample quantity.  
-On the right is the the predictive quantity. 
+the GMM fit of the iris data]{The expected number of clusters as $\alpha$ varies in the 
+the GMM fit of the iris data. 
+On the left is the sensitivity of the in-sample quantity $\gclusters$.  
+On the right is the the predictive quantity $\gclusterspred$. 
 We compute the linear approximation at $\alpha=6$ and
 extrapolate the expected number of clusters using the
-linear approximation (green).
-We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (orange). }\label{fig:iris_alpha_sens}
+linear approximation (red).
+We compare against the expected number of clusters obtained by refitting the model at each $\alpha$ (blue). }\label{fig:iris_alpha_sens}
 \end{figure}
 
 
@@ -169,7 +173,7 @@ on a posterior quantity.
 We consider functional perturbations of the form 
 $\log \phi_\mu(x) = e^{2(x - \mu)^2}$, with each perturbation having a 
 different mode $\mu$ (\figref{iris_fsens} left column). 
-The perturbations are multiplicative in form, 
+The perturbations are multiplicative with perturbed prior 
 $p(\nu_k|\epsilon) = p_0(\nu_k)\phi_\mu(\nu_k)^\epsilon$.
 The middle column of \figref{iris_fsens} displays the initial density,
 $p_0(\nu_k) = \betadist{\nu_k\vert 1, \alpha_0}$,
@@ -189,33 +193,36 @@ In each case, the approximation
 $\gclusters(\etalin(\epsilon)) - \gclusters(\etalin(0))$
 is able to mirror the qualitative behavior observed under refitting.
 
-TODO: depending on what has been said about influence functions before, we may need a more thorough discussion here. 
+\todo{depending on what has been said about influence functions before, we may need a more thorough discussion below}
 
-By examining the perturbed densities $p(\nu_k|\epsilon = 1)$ alone, 
-it is difficult to anticipate 
-its effect of a given perturbation on $\gclusters$. 
-However, the sign and magnitude of the change in $\gclusters$ 
-are well-explained by the influence function. 
-When $\log\phi_\mu$ is centered at a location where the influence function is negative, its effect on $\gclusters$ is negative (\figref{iris_fsens} top row); 
+While each perturbation produces distinct changes in $\gclusters$, 
+it is difficult to anticipate the effect of the perturbation 
+by comparing the original and perturbed densities alone. 
+However, the sign and magnitude of the change in $\gclusters$ after 
+prior perturbation are well-explained by its influence function
+(\figref{iris_fsens} left column). 
+When $\log\phi_\mu$ is centered at a location where the influence function is negative, the effect of the perturbation on $\gclusters$ 
+is negative (\figref{iris_fsens} top row); 
 conversely, when $\log\phi_\mu$ is centered at a location where the influence function is positive, its effect on $\gclusters$ is positive (bottom row); 
 finally, when $\log\phi_\mu$ is centered at a location where the influence transitions from negative to positive, its effect on
 $\gclusters$ is roughly zero (middle row). 
+In the last case, $\log\phi_\mu$ placed approximately equal weight on the negative and positive portions of the prior-weighted influence function, resulting in an approximately zero inner-product (\eqref{TODO}). 
 In the other data applications below, 
 the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
 
 Finally, we consider the 
-worst-case perturbation with unit $L_\infty$ norm.
+worst-case multiplicative perturbation with unit $L_\infty$ norm.
 Recall that the worst-case perturbation with unit $L_\infty$ norm is a 
 step-function taking on values $\pm1$ corresponding 
 to the sign of the influence function (\figref{iris_worstcase} left).  
 The middle column of \figref{iris_worstcase} shows the prior density perturbed by the worst-case perturbation; 
 the right column shows the effect on $\gclusters$. 
-We see that this worst-case perturbation has a much larger effect on
+This worst-case perturbation has a much larger effect on
 $\gclusters$ compared to the other unit $L_\infty$ norm perturbations in
 \figref{iris_fsens}. 
 However, even with the worst-case perturbation, 
-the change in $\gclusters$ is still small;
-we thus conclude that in the iris data set $\gclusters$ appears to be a quantity insensitive to the prior. 
+the change in $\gclusters$ is still small.
+We conclude that on the iris data set, $\gclusters$ appears to be a quantity insensitive to the prior under a Gaussian mixture model. 
 
 
 
@@ -231,12 +238,13 @@ we thus conclude that in the iris data set $\gclusters$ appears to be a quantity
         to three multiplicative perturbations with 
         unit $L_{\infty}$-norm 
         (Left) The log multiplicative perturbation $\log\phi$ in grey.        
-        In purple is the prior-weighted influence function, scaled to also have 
+        The prior-weighted influence function in purple, scaled to also have 
         unit $L_{\infty}$-norm. 
         (Middle) The original prior density $p_0$ and 
         the perturbed prior density $p_1 = p_0\times \phi$. 
         (Right) The effect of the perturbation 
-        on the change in expected number of clusters as a function of $\epsilon$. }\label{fig:iris_fsens}
+        on the change in expected number of in-sample clusters 
+        as $\epsilon$ varies. }\label{fig:iris_fsens}
 \end{figure}
 
 
@@ -273,9 +281,9 @@ we thus conclude that in the iris data set $\gclusters$ appears to be a quantity
 %     \hline 
 %     Hessian solve for $\alpha$ sensitivity & 
 %         sprintf('%1.2g', alpha_hess_time)\\
-%     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ... , 16$ & 
+%     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, \ldots , 16$ & 
 %         sprintf('%1.2g', total_alpha_lr_time)\\
-%     Refits $\eta(\alpha)$ for $\alpha = 1, ... , 16$ & 
+%     Refits $\eta(\alpha)$ for $\alpha = 1, \ldots , 16$ & 
 %         sprintf('%1.2g', total_alpha_refit_time)\\
 %     \hline 
 %     The influence function & sprintf('%1.2g', infl_time)\\ 

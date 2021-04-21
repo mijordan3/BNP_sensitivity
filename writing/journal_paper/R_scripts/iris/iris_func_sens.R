@@ -20,13 +20,15 @@ plot_func_pert_results <- function(results_list,
     theme(legend.position = 'bottom', 
           legend.title = element_blank())
   
-  
+  # the posterior quantity at the initial fit
   g0 <- results_list$sensitiivty_df$refit[1]
   stopifnot(g0 == results_list$sensitiivty_df$lr[1])
-  p3 <- plot_post_stat_trace_plot(results_list$sensitiivty_df$epsilon, 
-                                  results_list$sensitiivty_df$refit - g0,
-                                  results_list$sensitiivty_df$lr - g0) + 
-    # ylab('g(pert) - g(init)') + 
+  
+  results_df <- 
+    data.frame(t = results_list$sensitiivty_df$epsilon, 
+               refit = results_list$sensitiivty_df$refit - g0,
+               lin = results_list$sensitiivty_df$lr - g0)
+  p3 <- plot_post_stat_trace_plot(results_df) + 
     ylab(expression(Delta*'E[# clusters]')) + 
     xlab('epsilon') + 
     ggtitle('sensitivity') + 
@@ -87,9 +89,4 @@ g2 <- plot_func_pert_results(fpert2_results,
 
 
 g0 / g1 / g2
-
-# g3 <- plot_func_pert_results(wc_results, 
-#                              remove_legend = FALSE, 
-#                              remove_xlab = FALSE, 
-#                              remove_title = TRUE)
 
