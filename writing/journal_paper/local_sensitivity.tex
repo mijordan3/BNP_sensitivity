@@ -256,6 +256,9 @@ convenience we keep the notation general.}
 %
 \begin{align*}
 %
+\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
+                {\partial \eta \partial \eta^T}
+                {\etaopt} \\
 \lqgradbar{\theta \vert \etaopt} :={}&
     \lqgrad{\theta \vert \etaopt} -
     \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
@@ -268,9 +271,7 @@ with derivative
 \begin{align}\eqlabel{vb_eta_sens}
 %
 \fracat{d \etaopt(\t)}{d \t}{0} ={}&
-    - \left( \fracat{\partial^2 \KL{\eta, \t}}
-                    {\partial \eta \partial \eta^T}
-                    {\etaopt, 0} \right)^{-1}
+    - \hessopt^{-1}
     \expect{\q(\theta \vert \etaopt)}{
         \lqgradbar{\theta \vert \etaopt}
         \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}

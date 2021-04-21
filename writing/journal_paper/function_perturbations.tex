@@ -186,28 +186,28 @@ arguably violating an intutive notions of the ``size'' of perturbation, though
 we defer a detailed discussion of this point to \appref{positive_pert}.
 
 We argue that pointwise negative priors are no substantive problem, as long as
-normalizing integral is neither zero nor infinity, and we do not extrapolate to
-negative alternatives $\palt(\theta)$.  (Indeed, embedding statistical problems
-in non-statisical vectors spaces is a venerable technique when applying
-functional analysis to statistics, see, e.g., \citet[Chapter
+normalizing integral is neither zero nor infinity, and as long as we do not
+extrapolate to negative alternatives $\palt(\theta)$.  (Indeed, embedding
+statistical problems in non-statisical vectors spaces is a venerable technique
+when applying functional analysis to statistics, see, e.g., \citet[Chapter
 6]{serfling:2009:approximation}.)  In order to permit negative $\phi$, we thus
 state the following generalization of \citep[Result 2]{gustafson:1996:local}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}
+\begin{lem}\lemlabel{pert_well_defined}
 %
 Fix a $1 \le p \le \infty$ and $\pbase(\theta)$ as in \defref{prior_nl_pert}.
 For any $\phi \in \lp{\lambda,p}$ and $\norm{\phi}_{\lambda,p} < 1$, then
 %
 \begin{align*}
 %
-\int_0^1 \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty
-\mathtxt{and}
-\int_0^1 \tilde{\p}(\theta \vert \phi) \lambda(d\theta)  > 0.
+0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty,
 %
 \end{align*}
+%
+so that $\int p(\theta \vert \phi) \lambda(d\theta) = 1$.
 %
 \begin{proof}
 %
@@ -289,9 +289,101 @@ We can thus write
     1 - \norm{\phi}_p^p.
 %
 \end{align*}
+
+Finally, consider $p = \infty$.  Since $\int \pbase(\theta) \lambda(d\theta) =
+1$,
+%
+\begin{align*}
+%
+\exp(-\norminf{\phi}) \le{}
+\abs{\int_0^1 \exp\left(\log \pbase(\theta) + \phi(\theta)\right) \lambda(d\theta)}
+\le{}
+\exp(\norminf{\phi}).
+%
+\end{align*}
+%
+so that $0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty$
+whenever $\norminf{\phi} < \infty$.
 %
 \end{proof}
 %
 \end{lem}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+For any particular $\phi$, we can apply \thmref{etat_deriv}.
+
+\begin{cor}\corlabel{etafun_deriv_form}
+%
+Let \assuref{kl_opt_ok} hold at $\eta_0 = \etaopt$.
+%
+Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
+\infty$.  In a slight abuse of notation, define $\p(\theta \vert \t) :=
+\p(\theta \vert \t \phi)$.  Let the variational densities $\q(\theta \vert
+\eta)$ satisfy \assuref{dist_fun_nice} for $\t_0 = 0$ with both $\psi(\theta,
+\t) \equiv 1$ (no $\theta$ dependence) and with and $\psi(\theta, \t) = \log
+\p(\theta \vert \t)$.
+
+Define the influence function
+%
+\begin{align}\eqlabel{infl_defn}
+%
+\infl_p(\theta) :={}&
+\begin{cases}
+    - p \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}}
+& \textrm{when }1 \le p < \infty \\
+%
+    - \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \q(\theta \vert \etaopt).
+& \textrm{when }p = \infty
+%
+\end{cases}
+%
+\end{align}
+%
+Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
+with derivative
+%
+\begin{align}\eqlabel{vb_eta_sens}
+%
+\fracat{d \etaopt(\t)}{d \t}{0} ={}&
+    \int \infl_p(\theta) \phi(\theta) \lambda(d\theta).
+%
+\end{align}
+%
+\begin{proof}
+%
+The result follows immediately from \thmref{etat_deriv}, observing that, for
+$1 \le p < \infty$
+%
+\begin{align*}
+%
+\logp(\theta \vert \t) ={}&
+    p \log\left(\pbase^{1/p} + \phi(\theta) \right)
+\\={}&
+    \log \pbase(\theta) + p \log\left(1 + \t \frac{\phi(\theta}{\pbase(\theta)^{1/p}}\right)
+\Rightarrow\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+    p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
+%
+\end{align*}
+%
+and, for $p = \infty$,
+%
+\begin{align*}
+%
+\logp(\theta \vert \t) ={}&
+    \log \pbase(\theta) + \t \phi(\theta)
+\Rightarrow\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+    \phi(\theta).
+%
+\end{align*}
+%
+\end{proof}
+%
+\end{cor}
