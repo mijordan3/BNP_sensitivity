@@ -1,0 +1,57 @@
+In \corref{gem_approximation_ok} of \secref{local_sensitivity}, we showed that
+we can form a Taylor series approximation to the dependence of a variational
+optimum on the parameter $\alpha$ in a Beta prior. However, there is typically
+no {\em a priori} reason to believe that the stick breaking prior lies within
+the parametric Beta family.  In this section, we follow
+\citet{gustafson:1996:local} and define a class of ways to perturb to the
+functional form of the prior, corresponding to the $\lp{p}$ classes of
+integrable functions (which we will define and discuss below).
+
+For any particular perturbation, \thmref{etat_deriv} can be applied directly by
+verifying \assuref{q_stick_regular}.  However, we will argue that it is
+typically more useful to examine the form of the derivative to find influential
+perturbations, for which one wants a stronger result than can be provided
+by \thmref{etat_deriv} alone---we will require that the derivatives give
+{\em uniformly good linear approximations} within bounded sets.
+We address this question in \secref{differentiability}.
+
+Let us return again to the general problem of inference on a parameter
+$\theta$>
+
+Fix for the moment a base stick distribution, $\pbase(\nuk)$.  Suppose we have
+found $\etaopt$ using the prior $\pbase(\nuk)$, wish to ask what the variational
+optimum would have been had we used some alternative stick distribution,
+$\palt(\nuk)$.  Let us write $\etaopt(\pbase)$ and $\etaopt(\palt)$ for these
+two approximations, respectively.  To approximately answer this question using
+the local sensitivity approach of \secref{local_sensitivity}, we must somehow
+define a continuous path from $\pbase(\nuk)$ to $\palt(\nuk)$ parameterized,
+say, by $\t \in [0, 1]$.  There are, in fact, many ways to do so.  For example,
+one might form the mixture distribution:
+%
+\begin{align*}
+%
+\pstick(\nu \vert \t) =
+    (1- \t) \prod_{k=1}^{\kmax - 1} \pbase(\nuk) +
+    \t \prod_{k=1}^{\kmax - 1} \sumkm \palt(\nuk).
+%
+\end{align*}
+%
+Then $\pstick(\nu \vert 0)$
+We could then attempt to apply \thmref{etat_deriv} using $\pstick(\nu \vert \t)$
+to compute $d\etaopt(\t) / d\t$, and approximate
+%
+\begin{align*}
+%
+\etaopt(\palt) \approx \etaopt(\pbase) + \frac{d \etaopt(\t)}{d\t}{\t=1}(1 - 0).
+%
+\end{align*}
+%
+However, we might just as well have defined
+%
+\begin{align*}
+%
+\log\pstick(\nu \vert \t) =
+    (1- \t) \sumkm \log\pbase(\nuk) + \t \sumkm \log\palt(\nuk).
+%
+\end{align*}
+%
