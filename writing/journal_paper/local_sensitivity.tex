@@ -110,10 +110,10 @@ continuously differentiable via the implicit function theorem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{dist_fun_nice}
 %
-Let $\q(\theta \vert \eta)$ be a (possibly unnormalized) density over the random
-variable $\theta$ parameterized by $\eta$ defined relative to a dominating
-measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\theta \vert
-\eta)$ is twice continuously differentiable.
+Let $\q(\theta \vert \eta)$ be a (integrable, but possibly unnormalized) density
+over the random variable $\theta$ parameterized by $\eta$ defined relative to a
+dominating measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\theta
+\vert \eta)$ is twice continuously differentiable.
 
 Let $\psi(\theta, \t)$ be a scalar-valued $\lambda$-measurable function of
 $\theta$ and $\t$.  Assume that the map $\t \mapsto \psi(\theta, \t)$ is
@@ -167,9 +167,9 @@ M_\psi(\theta)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \Assuref{dist_fun_nice} states sufficient conditions for which we can apply the
-dominated convergence theorem to varaiational expectations, allowing us to
-translate continuity of the variational and model densitites into continuity of
-the variational objective.  The details can be found in \lemref{logq_derivs,
+dominated convergence theorem to variational, allowing us to translate
+continuity of the variational and model densitites into continuity of the
+variational objective.  The details can be found in \lemref{logq_derivs,
 logq_continuous} of \appref{cont_lemmas}.  We might equivalently have said that
 we can exchange limits and variational expectations whenever needed,
 \assuref{dist_fun_nice} simply being a precise catalogue of what is needed.
@@ -202,11 +202,12 @@ Let the following conditions on the variational approximation hold.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{q_stick_regular}
 %
-Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
-stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\theta = \nuk$,
-$\eta_0 = \etaopt$, and with both $\psi(\theta, \t) \equiv 1$ (no $\theta$
-dependence) and with $\theta = \nuk$ and $\psi(\nuk, \t) = \log \pstick(\nuk
-\vert \t)$, for all $\k$.
+Let $\p(\theta \vert \t)$ be a class of (integrable, possibly non-normalized)
+densities relative to a dominating measure, $\lambda$, defined for $\t$ in an
+open set $\ball_t$ containing $\t_0$. Assume that the variational densities
+$\q(\theta \vert \eta)$ are defined relative to $\lambda$ and satisfy
+\assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no $\theta$
+dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t)$.
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,8 +216,19 @@ dependence) and with $\theta = \nuk$ and $\psi(\nuk, \t) = \log \pstick(\nuk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}\thmlabel{etat_deriv}
 %
-Let \assuref{kl_opt_ok, q_stick_regular} hold.  Then the map $\t \mapsto
-\etaopt(\t)$ is continuously differentiable with derivative
+Let \assuref{kl_opt_ok, q_stick_regular} hold at $\eta_0 = \etaopt$ and $\t_0 =
+0$.  Define
+%
+\begin{align*}
+%
+\lqgradbar{\theta \vert \etaopt} :={}&
+    \lqgrad{\theta \vert \etaopt} -
+    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
+%
+\end{align*}
+%
+Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable with
+derivative
 %
 \begin{align}\eqlabel{vb_eta_sens}
 %
@@ -224,9 +236,13 @@ Let \assuref{kl_opt_ok, q_stick_regular} hold.  Then the map $\t \mapsto
     - \left( \fracat{\partial^2 \KL{\eta, \t}}
                     {\partial \eta \partial \eta^T}
                     {\etaopt, 0} \right)^{-1}
-    \fracat{\partial^2 \KL{\eta, \t}}
-           {\partial \eta \partial \t}
-           {\etaopt, 0}.
+    \expect{\q(\theta \vert \etaopt)}{
+        \lqgradbar{\theta \vert \etaopt}
+        \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
+    }.
+    % \fracat{\partial^2 \KL{\eta, \t}}
+    %        {\partial \eta \partial \t}
+    %        {\etaopt, 0}.
 %
 \end{align}
 %
@@ -238,34 +254,33 @@ For the duration of the proof, define
 %
 \begin{align*}
 %
-\rho(\etanuk, \t) :={}&
-    \expect{\q(\nu \vert \etanuk)}
-           {\log \pstick(\nu \vert \t) - \log \pstick(\nu \vert 0)}
+\rho(\eta, \t) :={}&
+    \expect{\q(\theta \vert \eta)}
+           {\log \p(\theta \vert \t) - \log \p(\theta \vert 0)}
 \mathand\\
-\rho_\eta(\etanuk, \t) :={}&
-\fracat{\partial \rho(\etanuk, \t)}
-       {\partial \etanuk}{\etanuk}.
+\rho_\eta(\eta, \t) :={}&
+\fracat{\partial \rho(\eta, \t)}
+       {\partial \eta}{\eta}.
 %
 \end{align*}
 %
-Expanding $\logp(\zeta \vert \t)$ in \eqref{vb_optimization}, we see that
+Expanding $\logp(\theta \vert \t)$ in \eqref{vb_optimization}, we see that
 %
 \begin{align}
 %
-\logp(\zeta \vert \t) ={}& \logp(\zeta) +
-    \sumkm \left( \log \pstick(\nuk\vert\t) -
-                  \log \pstick(\nuk \vert 0) \right) \Rightarrow \nonumber\\
+% \logp(\theta \vert \t) ={}& \logp(\theta) +
+%     \log \p(\theta\vert\t) - \log \p(\theta \vert 0) \Rightarrow \nonumber\\
 \KL{\eta, \t} ={}&
-    \KL{\eta, 0} + \sumkm \rho(\etanuk, \t). \eqlabel{kl_pert}
+    \KL{\eta, 0} + \rho(\eta, \t). \eqlabel{kl_pert}
 %
 \end{align}
 %
-We thus see that the optimization objective $\KL{\eta, \t}$ is the original
-optimization obejctive, $\KL{\eta, 0}$, plus an additive term depending only on
-$\etanu$ and $\t$.
-
-By \lemref{logq_derivs}, $\etanuk \mapsto \rho(\etanuk, \t)$ is continuous, and
-by \lemref{logq_continuous} $\etanuk \mapsto \rho(\etanuk, \t)$ is continuously
+% We thus see that the optimization objective $\KL{\eta, \t}$ is the original
+% optimization obejctive, $\KL{\eta, 0}$, plus the additive term $\rho(\eta,
+% \t)$ depending only on $\eta$ and $\t$.
+%
+By \lemref{logq_derivs}, $\eta \mapsto \rho(\eta, \t)$ is continuous, and
+by \lemref{logq_continuous} $\eta \mapsto \rho(\eta, \t)$ is continuously
 differentiable, for all $\eta, \t \in \ball$.  So $\partial \KL{\eta, \t}  /
 \partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
 first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
@@ -274,26 +289,22 @@ first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
 %
 \fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} ={}
 \fracat{\partial \KL{\eta, 0}}{ \partial \eta}{\etaopt(\t)}
-+  \sumkm \rho_\eta(\etaoptnuk(\t), \t) ={} 0
++  \rho_\eta(\etaopt(\t), \t) ={} 0
 %
 \end{align}
 %
 for all $\t \in \ball_\t$.
-% Recall that the intractable $\logp(\x \vert \t)$
-% does not depend on $\eta$, and so vanishes in \eqref{vb_first_order_condition},
-% and in all expressions involving partial $\eta$ derivatives of the KL
-% divergence.
 
 We wish to apply the implicit function theorem to
 \eqref{vb_first_order_condition}, for which we must show that $\partial
 \KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
 $\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
 \partial \eta$ is continuously differentiable, so we need only consider
-$\rho_\eta(\etanuk, \t)$.
+$\rho_\eta(\theta, \t)$.
 
 By \lemref{logq_continuous} and \assuref{q_stick_regular}, we
-have that both $\partial \rho_\eta(\etanuk, \t) / \partial \eta$ and $\partial
-\rho_\eta(\etanuk, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
+have that both $\partial \rho_\eta(\eta, \t) / \partial \eta$ and $\partial
+\rho_\eta(\eta, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
 Since both its partial derivatives are continuously differentiable, the joint
 map $\eta, \t \mapsto \rho_\eta(\eta, \t)$ is also continuously differentiable
 (e.g., \citet[Theorem 3.2]{fleming:2012:functions}).  Consequently, $\partial
@@ -330,6 +341,23 @@ $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
 %
 \end{tabular}\tablabel{kranz_notation}
 \end{center}
+
+The form of the derivative is given by combining \eqref{kl_pert} with
+\eqref{q_sens_psi_grad_is_cov} of \lemref{logq_derivs}, since
+%
+\begin{align*}
+%
+\fracat{\partial^2 \KL{\eta, \t}}
+       {\partial \eta \partial \t}
+       {\etaopt, 0} =
+\expect{\q(\theta \vert \etaopt)}{
+    \lqgradbar{\theta \vert \etaopt}
+    \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
+}.
+%
+\end{align*}
+%
+
 %
 \end{proof}
 %
