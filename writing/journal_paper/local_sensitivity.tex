@@ -217,7 +217,10 @@ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t)$.
 \begin{thm}\thmlabel{etat_deriv}
 %
 Let \assuref{kl_opt_ok, q_stick_regular} hold at $\eta_0 = \etaopt$ and $\t_0 =
-0$.  Define
+0$.  Define\footnote{Note that if $\q(\theta \vert \eta)$ is normalized, then
+$\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} = 0$ for all $\eta$
+and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$.  For
+convenience we keep the notation general.}
 %
 \begin{align*}
 %

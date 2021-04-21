@@ -2,3 +2,6 @@ The prior must be defined for t in an open neighborhood of 0; for functional
 perturbations unbounded above we require t to be positive.
 
 Use either vert or commas for \lqgrad and \lqhess
+
+Decide whether you want to simplify the formulas by requiring that
+q be a density.
