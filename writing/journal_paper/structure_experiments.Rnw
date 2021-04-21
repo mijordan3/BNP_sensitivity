@@ -223,11 +223,46 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
 <<stru_alpha_cluster_weights, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_cluster_weights_cap>>=
 source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_debug, print.eval=TRUE)
 @
-    
-    
-    
 
 \subsubsection*{Sensitivity: individual admixtures}
+
+Examining the inferred admixtures in \figref{stru_init_fit} provide clues into historical migration patterns of the genotyped individuals. 
+For example, while individuals collected from the Mbololo region are inferred to primarily be admixed with population 1, 
+there are a few individuals have abnormally large admixture proportions of population 2 than the rest. 
+Conversely, while individuals collected from the Ngangao region are primarily population 2, several individuals have abnormally large admixture proportions of population 1. 
+This suggests the presence of migration between the Ngangao and Mbololo regions. 
+
+In this subsection, we evaluate the sensitivity of this conclusion to possible prior perturbations. 
+We consider the posterior statistic 
+\begin{align*}
+\gadmix(\eta; \mathcal{N}, k) = 
+ \expect{\q(\z\vert\eta)}{\frac{1}{|\mathcal{N}|}\sum_{n\in\mathcal{N}}
+\pi_{\n\k}},
+\end{align*}
+the average admixture proportion of population $\k$ in a set of 
+individuals $\mathcal{N}$. 
+
+We present results on three variations of $\gadmix$: 
+the six individuals from the Mbololo region with outlying proportions 
+of population 2 ($\mathcal{N} = \{25, ..., 30\}, k = 2$); 
+the four individuals from the Ngangao region with outlying proportions 
+of population 1 ($\mathcal{N} = \{44, ..., 37\}, k = 1$); 
+and all individuals from the Chawia region 
+($\mathcal{N} = \{44, ..., 37\}, k = 3$). 
+The first two cases are related to the question of migration between the Mbololo and Ngangao regions. 
+In the last case, we are examining the sensitivity of the presense of the third population in the Chawia region. 
+
+For each statistic, we construct the worst-case negative perturbation (negative because we are interested in making these patterns disappear). 
+\figref{stru_func_sens} displays the effect of each worst-case perturbation on its respective posterior statistic. 
+The linear approximation $\gadmix(\etalin(\epsilon); \mathcal{N}, k)$ 
+predicts that the presence of population 2 in the outlying Mbololo individuals to be sensitive to this worst-case perturbation:
+the admixture proportion of population 2 is nearly halved after the perturbation. 
+The quantity computed by refitting the model confirms the prediction by the linear approximation. 
+On the other hand, the presence of population 1 in the outlying Ngangao individuals appear to be insensitive, even after a worst-case perturbation. 
+The linear approximation and the refits agree on this conclusion. 
+Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive under the linear approximation, as this admixture proportion steadily decreases as $\epsilon\rightarrow 1$ 
+However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $\epsilon = 0.5$. 
+
 
 <<stru_func_sens_cap>>=
   stru_func_sens_cap <- paste(
@@ -246,10 +281,13 @@ source("R_scripts/structure/structure_cluster_weights_alphasens.R", echo=knitr_d
 
 SetImageSize(aspect_ratio = base_aspect_ratio * 1.4)
 @
-  <<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
+<<stru_func_sens, cache=simple_cache, fig.show='hold', fig.cap=stru_func_sens_cap>>=
 source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
+discussion of overall findings
+
+compute time. 
 
 \begin{table}[tb]
 \centering
@@ -280,7 +318,16 @@ source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRU
 \end{tabular}
 \end{table}
 
-\subsection{Limitations}
+\subsection{Limitations of local sensitivity}
+
+In this final subsection, 
+we discuss some examples where employing local sensitivity fails to reproduce
+the changes in a posterior statistic observed by refitting. 
+The linear approximation $\etalin(t)$, naturally, will be a poor subsitute when prior perturbation produces non-linear changes in $\etaopt(t)$. 
+The examples discussed below use the STRUCTURE model and dataset presented in 
+subsection above, and we consider the first perturbation shown in \figref{stru_func_sens}.
+
+Recall from \figref{stru_func_sens} that the linear approximation 
 
 <<stru_func_sens_admix_cap>>=
   stru_func_sens_admix_cap <- paste(

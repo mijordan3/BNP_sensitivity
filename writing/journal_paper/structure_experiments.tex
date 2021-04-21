@@ -205,11 +205,13 @@ thresholded definition.
 At $\alpha = 7$, the expected number of loci belonging to population 4
 and population 5 increases to 
 $20.7$, 
-and a new cluster emerges above the threshold at $t = 20$. 
+and a new population emerges above the threshold at $t = 20$. 
 On the other hand, at $\alpha = 1$, 
-the expected number of loci belonging to population 3 decreases 
+the expected number of loci belonging to population 3 decreases to 
 $6.7$, 
-
+below the thresholds $t = 20$ and $t = 40$. 
+Thus, the expected number of latent population with thresholding decreases to two. 
+The linear approximation under-estimated this decrease in population 3, and therefore continued to predict three latent populations. 
 
 
 \begin{knitrout}
@@ -227,11 +229,37 @@ $6.7$,
 
 
 \end{knitrout}
-    
-    
-    
 
 \subsubsection*{Sensitivity: individual admixtures}
+
+Examining the inferred admixtures in \figref{stru_init_fit} provide clues into historical migration patterns of the genotyped individuals. 
+For example, while individuals collected from the Mbololo region are inferred to primarily be admixed with population 1, 
+there are a few individuals have abnormally large admixture proportions of population 2 than the rest. 
+Conversely, while individuals collected from the Ngangao region are primarily population 2, several individuals have abnormally large admixture proportions of population 1. 
+This suggests the presence of migration between the Ngangao and Mbololo regions. 
+
+In this subsection, we evaluate the sensitivity of this conclusion to possible prior perturbations. 
+We consider the posterior statistic 
+\begin{align*}
+\gadmix(\eta; \mathcal{N}, k) = 
+ \expect{\q(\z\vert\eta)}{\frac{1}{|\mathcal{N}|}\sum_{n\in\mathcal{N}}
+\pi_{\n\k}},
+\end{align*}
+the average admixture proportion of population $\k$ in a set of 
+individuals $\mathcal{N}$. 
+
+We present results on three variations of $\gadmix$: 
+the six individuals from the Mbololo region with outlying proportions 
+of population 2 ($\mathcal{N} = \{25, ..., 30\}, k = 2$); 
+the four individuals from the Ngangao region with outlying proportions 
+of population 1 ($\mathcal{N} = \{44, ..., 37\}, k = 1$); 
+and all individuals from the Chawia region 
+($\mathcal{N} = \{44, ..., 37\}, k = 3$). 
+The first two cases are related to the question of migration between the Mbololo and Ngangao regions. 
+In the last case, we are examining the sensitivity of the presense of the third population in the Chawia region. 
+
+
+
 
 
 \begin{knitrout}
