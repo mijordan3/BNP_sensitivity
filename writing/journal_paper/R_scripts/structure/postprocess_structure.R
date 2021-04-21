@@ -114,6 +114,14 @@ logit_stick_df <-
 admix_df <- 
   read_csv(paste0(data_dir, 'mbololo_admix_bad_example.csv'))
 
+# we report some of these quantities
+admix_df$y[(admix_df$method == 'refit') & 
+           (admix_df$population == 1) & 
+           (admix_df$epsilon == 1)]
+admix_df_refit <- 
+  admix_df %>% 
+  filter(method == 'refit')
+
 # the scalar posterior quantites on which the fully-linearized quantity did ok
 logit_stick_flin_df <- 
   read_csv(paste0(data_dir, 'mbololo_logit_stick_fully_lin.csv'))

@@ -258,7 +258,16 @@ and all individuals from the Chawia region
 The first two cases are related to the question of migration between the Mbololo and Ngangao regions. 
 In the last case, we are examining the sensitivity of the presense of the third population in the Chawia region. 
 
-
+For each statistic, we construct the worst-case negative perturbation (negative because we are interested in making these patterns disappear). 
+\figref{stru_func_sens} displays the effect of each worst-case perturbation on its respective posterior statistic. 
+The linear approximation $\gadmix(\etalin(\epsilon); \mathcal{N}, k)$ 
+predicts that the presence of population 2 in the outlying Mbololo individuals to be sensitive to this worst-case perturbation:
+the admixture proportion of population 2 is nearly halved after the perturbation. 
+The quantity computed by refitting the model confirms the prediction by the linear approximation. 
+On the other hand, the presence of population 1 in the outlying Ngangao individuals appear to be insensitive, even after a worst-case perturbation. 
+The linear approximation and the refits agree on this conclusion. 
+Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive under the linear approximation, as this admixture proportion steadily decreases as $\epsilon\rightarrow 1$ 
+However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $\epsilon = 0.5$. 
 
 
 
@@ -286,6 +295,9 @@ In the last case, we are examining the sensitivity of the presense of the third 
 
 \end{knitrout}
 
+discussion of overall findings
+
+compute time. 
 
 \begin{table}[tb]
 \centering
@@ -316,7 +328,23 @@ In the last case, we are examining the sensitivity of the presense of the third 
 \end{tabular}
 \end{table}
 
-\subsection{Limitations}
+\subsection{Limitations of local sensitivity}
+
+In this final subsection, 
+we discuss some examples where employing local sensitivity fails to reproduce
+the changes in a posterior statistic observed by refitting. 
+The linear approximation $\etalin(t)$, naturally, will be a poor subsitute when prior perturbation produces non-linear changes in $\etaopt(t)$. 
+The examples discussed below use the STRUCTURE model and dataset presented in 
+subsection above, and we consider the first perturbation shown in \figref{stru_func_sens}.
+
+Recall from \figref{stru_func_sens} that the linear approximation agreed with the refit in predicting the admixture proportion of population 2 
+in the outlying Mbololo individuals. 
+We delve more closely into the inferred admixtures under both the refitted and linearly approximated variational parameters after this perturbation. 
+While the linear approximation was able to capture the overall proportion of population 2 in the Mbololo individuals, 
+the linear approximation does not perform uniformly well over all individuals 
+(\figref{stru_func_sens_admix}). 
+In particular, the admixture proportion of population 2 in individual $n = 25$ dramatically increased after this perturbation. 
+The linear approximation failed to detect this change. 
 
 
 \begin{knitrout}
@@ -332,6 +360,21 @@ In the last case, we are examining the sensitivity of the presense of the third 
 
 
 \end{knitrout}
+
+\figref{stru_lin_bad_example_cap} examines this individual more closely. 
+The bottom row plots this individual's admixture proportions as $\epsilon$ varies from 0 to 1. 
+In the refit, the admixture proportion of population 1 decreased from 
+0.53
+to 
+0.29, 
+while the admixture proportion of population 2 increased from            
+0.29
+to 
+0.56. 
+The linearly approximated values failed to detect this change. 
+The reason is because for this perturbation, the mapping from 
+$\epsilon$ to the variational parameter on the stick-distribution governing the inferred admixtures is highly non-linear. 
+The top row plots the location parameter of the logit-normal distribution 
 
 
 

@@ -44,8 +44,7 @@ get_fontsizes <- function(scaling = 1){
                           legend.text = element_text(size=axis_title_size), 
                           plot.title = element_text(size = title_size), 
                           axis.ticks.length = unit(0.05, "cm"), 
-                          strip.text = element_text(size = axis_title_size, 
-                                                    margin = margin(.05, 0, .05, 0, "cm")),
+                          strip.text = element_text(size = title_size),
                           legend.margin=margin(-10,-10,-10,-10))
   
   return(fontsize_theme)
