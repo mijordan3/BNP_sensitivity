@@ -322,3 +322,174 @@ and cannot be Fr{\'e}chet differentiable.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Indeed, \exref{e_log_disocontinuous_v2} shows that the KL divergence
+cannot be Fr{\'e}chet differentiable for $p < \infty$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{cor}\corlabel{kl_discontinuous}
+%
+Assume that $\pbase(\theta)$ and $\q(\theta \vert \eta)$ are defined relative to
+the Lebesgue measure, and that $\etaopt$ it a VB optimum.  For $1 \le p <
+\infty$, the class of perturbations defined in \defref{prior_nl_pert}, and the
+space $\lp{\lambda, p}$, the maps
+%
+\begin{align*}
+%
+\phi \mapsto{}& \KL{\etaopt, \phi} \mathand \\
+\phi \mapsto{}&
+\begin{cases}
+    \KL{\etaopt, \phi} & \textrm{when }\inf \phi > -\infty \\
+    \KL{\etaopt, \phiz} & \textrm{otherwise}.
+\end{cases}
+%
+\end{align*}
+%
+are discontinuous at $\phiz$, and so not Fr{\'e}chet differentiable.
+%
+\begin{proof}
+%
+For any $\etaopt$, for any set $\S$ with $\expect{\pbase(\theta)}{\ind{S}} > 0$,
+$\expect{\q(\theta \vert \etaopt)}{\ind{S}} > 0$ as well, since otherwise
+the KL divergence would be infinite and $\etaopt$ cannot be a VB optimum.
+Since $\lambda$ is the Lebesgue measure, there exist sets $S_\epsilon$...
+TODO a little more work here.
+
+By \eqref{nl_vb_pert_p}, the KL divergence is of the form
+%
+\begin{align*}
+%
+\KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
+    p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right).
+%
+\end{align*}
+%
+Define $\gamma(\theta) = \phi(\theta) / \pbase(\theta)^{1/p}$, and note that
+$\gamma \in \lp{\pbase, p}$ with $\norm{\gamma}_{\pbase, p} =
+\norm{\phi}_{\lambda, p}$.  The results then follow from
+\exref{e_log_disocontinuous_v1, e_log_disocontinuous_v2}.
+%
+\end{proof}
+%
+\end{cor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Despite \corlabel{kl_discontinuous}, the directional derivatives exist
+as long as $\inf_\theta \phi(\theta) > -\infty$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_regular_lp}
+%
+For each $\eta$ in an open set $\ball_\eta$, let \assuref{lp_regular} hold with
+$\psi(\theta)$ equal to each of the following functions:
+%
+\begin{align*}
+%
+& \norm{\lqgrad{\theta, \eta}}_2 \\
+& \norm{\lqgrad{\theta, \eta}}^2_2 \\
+& \norm{\lqhess{\theta, \eta}}^2.
+%
+\end{align*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thm}\lemlabel{lp_derivative}
+%
+Fix $\pbase$, $\lambda$, and $1 \le p < \infty$ as in \defref{prior_nl_pert}.
+Let $\q(\theta \vert \eta)$ define a class of densities relative to $\lambda$
+parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
+\assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
+\assuref{kl_opt_ok}.
+
+Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
+$\inf_\theta \phi(\theta) > -\infty$, the function $\t \mapsto \etaopt(\t \phi)$
+is differentiable at $\t = 0$ with the derivative given in
+\corref{etafun_deriv_form}.
+%
+\begin{proof}
+%
+The KL divergence is given by
+%
+\begin{align*}
+%
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} +
+    \expect{\q(\theta \vert \eta)}
+           {\log \left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right)}.
+%
+\end{align*}
+%
+Define $\gamma(\theta) := \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}$, and note
+that $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{p}$, so $\norm{\gamma}_{\pbase,
+p} \le \infty$ and $\inf_\theta \gamma(\theta) > -\infty$.  By
+\assuref{q_regular_lp} and \lemref{lp_integral_bound}, we have that that
+\assuref{dist_fun_nice} holds with $\psi(\theta, \t) = \log \left(1 + \t
+\frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)$, and \thmref{etat_deriv}
+holds.
+%
+\end{proof}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+The problems are only with priors near zero, which are not possible for
+the log perturbation.  Indeed, we have:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_fun_stick_regular}
+%
+Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
+stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
+\etaopt$ and with $\psi(\zeta, \t) = 1$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{eta_phi_deriv}
+%
+Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
+\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
+neighborhood of $\phiz$ as a map from $\linf$ to $\mathbb{R}^\etadim$,
+with the derivative given in \corref{etafun_deriv_form}.
+
+(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
+% Furthermore, the derivative at $\phiz$ in the direction $\phi$ is of the form
+% %
+% \begin{align}
+% %
+% \fracat{d \etaopt(\phi)}{d\phi}{\phiz} \phi ={}&
+%     \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \eqlabel{infl_fun_def}\\
+% %
+% \infl(\nu) :={}&
+% -\left(\fracat{\partial^2 \KL{\eta, \phiz}}
+%                 {\partial \eta \partial \eta^T}
+%                 {\etaopt}\right)^{-1}
+% \left(
+%     \sumkm
+%     \q(\nu \vert \etaoptnuk) \lqgradbar{\nuk \vert \etanuk}
+% \right). \nonumber
+% %
+% \end{align}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{thm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

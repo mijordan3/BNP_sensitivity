@@ -209,103 +209,7 @@ For any $\phi \in \lp{\lambda,p}$ and $\norm{\phi}_{\lambda,p} < 1$, then
 %
 so that $\int p(\theta \vert \phi) \lambda(d\theta) = 1$.
 %
-\begin{proof}
-%
-First, consider the case $p < \infty$. By Jensen's inequality applied pointwise
-to the convex function $x \mapsto x^p$,
-%
-\begin{align*}
-%
-\abs{\pbase(\theta)^{1/p} + \phi(\theta) }^{p} \le{}&
-    \left(\pbase(\theta)^{1/p} + \abs{\phi(\theta)} \right)^{p}
-\\={}&
-    2^p \left(\frac{1}{2}\pbase(\theta)^{1/p} +
-              \frac{1}{2} \abs{\phi(\theta)} \right)^{p}
-\\\le{}&
-    2^{p-1} \left(\pbase(\theta) + \abs{\phi(\theta)}^p \right).
-%
-\end{align*}
-%
-Consequently,
-%
-\begin{align*}
-%
-\int \abs{\pbase(\theta)^{1/p} + \phi(\theta) }^{p} d\theta \le{}&
-    2^{p-1} \int \left(\pbase(\theta) + \abs{\phi(\theta)}^p \right) d\theta
-\\={}&
-    2^{p-1} \left(1 + \norm{\phi}_p^p\right).
-%
-\end{align*}
-%
-So, as in \citep[Result 2]{gustafson:1996:local}, $\norm{\phi}_p < \infty$
-implies that the prior can be normalized.
-
-Next, by convexity,\footnote{Apply the definition of convexity to the points
-$0$, $x$, and $x + y$, and again to the points $0$, $y$, and $x+y$, then add the
-results.} for any $x \ge y \ge 0$,
-%
-\begin{align*}
-%
-(x + y)^p \ge{} x^p + y^p \mathand
-(x - y)^p \le{} x^p - y^p.
-%
-\end{align*}
-%
-Also note that, since $\pbase(\theta) \ge 0$,
-%
-\begin{align*}
-%
-\pbase(\theta)^{1/p} + \phi(\theta) \le 0
-\quad\Rightarrow\quad
-\phi(\theta) \le 0 \mathand
-\abs{\phi(\theta)} - \pbase(\theta)^{1/p} \ge 0.
-%
-\end{align*}
-%
-We can thus write
-%
-\begin{align*}
-%
-\MoveEqLeft
-\int \mathrm{sign}(\pbase(\theta)^{1/p} + \phi(\theta))
-    \abs{\pbase(\theta)^{1/p} + \abs{\phi(\theta)}}^{p} d\theta
-={}\\&
-    \int \left(\pbase(\theta)^{1/p} + \phi(\theta)\right)^{p}
-        \ind{\pbase(\theta)^{1/p} + \phi(\theta) \ge 0}
-        d\theta - \\&
-    \int \left(\abs{\phi(\theta)} - \pbase(\theta)^{1/p}\right)^{p}
-        \ind{\pbase(\theta)^{1/p} + \phi(\theta) < 0}
-        d\theta
-\\\ge{}&
-    \int \left(\pbase(\theta) - \abs{\phi(\theta)}^{p}\right)
-        \ind{\pbase(\theta)^{1/p} + \phi(\theta) \ge 0}
-        d\theta - \\&
-    \int \left(\abs{\phi(\theta)}^p - \pbase(\theta)\right)
-        \ind{\pbase(\theta)^{1/p} + \phi(\theta) < 0}
-        d\theta
-\\={}&
-    \int \pbase(\theta) d\theta - \int \abs{\phi(\theta)}^p d\theta
-\\={}&
-    1 - \norm{\phi}_p^p.
-%
-\end{align*}
-
-Finally, consider $p = \infty$.  Since $\int \pbase(\theta) \lambda(d\theta) =
-1$,
-%
-\begin{align*}
-%
-\exp(-\norminf{\phi}) \le{}
-\abs{\int_0^1 \exp\left(\log \pbase(\theta) + \phi(\theta)\right) \lambda(d\theta)}
-\le{}
-\exp(\norminf{\phi}).
-%
-\end{align*}
-%
-so that $0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty$
-whenever $\norminf{\phi} < \infty$.
-%
-\end{proof}
+(For a proof see \appref{proofs} \proofref{pert_well_defined}.)
 %
 \end{lem}
 
@@ -318,11 +222,11 @@ perturbations are given, for $1 \le p < \infty$, by
 \begin{align}
 %
 \logp(\theta \vert \t \phi) ={}&
-   p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
+   % p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
 % \\={}&
-%    \log \pbase(\theta) +
-%        p \log\left(1 + \t \frac{\phi(\theta}{\pbase(\theta)^{1/p}}\right)
-% \Rightarrow\\
+   \log \pbase(\theta) +
+       p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+\Rightarrow \nonumber\\
 \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
    p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
    \eqlabel{nl_vb_pert_p}
