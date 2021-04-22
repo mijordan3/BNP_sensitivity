@@ -278,8 +278,7 @@ will also experience large changes.
 Our intuition is confirmed in \figref{gene_fpert_coclustering}. 
 After perturbing by $\log\phi_{\textrm{ev}}$, 
 the largest changes in the co-clustering matrix are of now of order $10^{-1}$, 
-an order of magnitude larger than the largest changes
-after the $\alpha$ perturbations. 
+compared with changes on the order of $10^{-2}$ after the $\alpha$ perturbations. 
 The linear approximation again able to capture the qualitative changes in the co-clustering matrix after refitting at the perturbed prior. 
 
 
@@ -313,18 +312,18 @@ The linear approximation again able to capture the qualitative changes in the co
 
 The influence function is able to explain why the co-clustering matrix is 
 insensitive to $\alpha$.
-\figref{alpha_pert_logphi} shows the functional perturbation $\log\phi$ 
-that corresponds to a change in $\alpha$, 
+The functional perturbation
+that corresponds to a change in $\alpha$ is
 \begin{align*}
-\log \phi_\alpha(\nu_k) :=
-\log\betadist{\nu_k\vert 1, \alpha} -
-\log\betadist{\nu_k\vert 1, \alpha_0},
+\log \phi_\alpha(\nu_\k) :=
+\log\betadist{\nu_\k\vert 1, \alpha} -
+\log\betadist{\nu_\k\vert 1, \alpha_0}.
 \end{align*}
-for $\alpha = 1$ and $\alpha = 11$.
-These perturbations are large when the influence function is small. 
-Hence, the inner product between the influence function and $\log\phi$ 
-is small, and the linear approximation will predict small changes. 
-The refitted results confirms the linear approximation predictions. 
+The function $\log\phi_\alpha(\nu_\k)$ is large when the influence function is small and vice-versa (\figref{alpha_pert_logphi}),
+resulting in a small inner-product between the influence function
+and $\log\phi_\alpha$. 
+Thus, the linear approximation will predict small changes, and 
+the refitted results confirms the linear approximation predictions. 
 
 
 \begin{knitrout}
@@ -344,20 +343,20 @@ The refitted results confirms the linear approximation predictions.
 
 \end{knitrout}
 
-Even with the selected functional perturbation however, 
+However, even with the selected functional perturbation,
 the size of the differences in the co-clustering matrix remains modest. 
-It is unlikely that any conclusions drawn from the co-clustering matrix would have changed after the prior perturbation. 
+It is unlikely that any conclusions derived from the co-clustering matrix would have changed after the functional perturbation. 
 The co-clustering matrix appears insensitive to perturbations in the stick-breaking distribution. 
 
-Finally, we note that the computational cost of the linear approximation is again favorable compared with refitting (\tabref{foo}). 
+Finally, we note that the computational cost of the linear approximation is again favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
 took 3-4 seconds; subsequent evaluations of $\etalin$ take milliseconds. 
-Conversely, refitting the model can take up to 20 seconds. 
+Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
 \begin{table}[tb]
 \centering
 \caption{Compute time of results on the mice data set. }
-\tablabel{foo}
+\tablabel{mice_timing}
 \begin{tabular}{|r|r|}
     \hline 
     & time (seconds) \\ 
