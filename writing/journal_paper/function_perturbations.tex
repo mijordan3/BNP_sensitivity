@@ -312,7 +312,37 @@ whenever $\norminf{\phi} < \infty$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-For any particular $\phi$, we can apply \thmref{etat_deriv}.
+For any particular $\phi$, we can apply \thmref{etat_deriv}.  Note that the
+perturbations are given, for $1 \le p < \infty$, by
+%
+\begin{align}
+%
+\logp(\theta \vert \t \phi) ={}&
+   p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
+% \\={}&
+%    \log \pbase(\theta) +
+%        p \log\left(1 + \t \frac{\phi(\theta}{\pbase(\theta)^{1/p}}\right)
+% \Rightarrow\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+   p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
+   \eqlabel{nl_vb_pert_p}
+%
+\end{align}
+%
+and, for $p = \infty$,
+%
+\begin{align}
+%
+\logp(\theta \vert \t) ={}&
+   \log \pbase(\theta) + \t \phi(\theta)
+\Rightarrow \nonumber\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+   \phi(\theta).
+\eqlabel{nl_vb_pert_pinf}
+%
+\end{align}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -356,33 +386,8 @@ differentiable at $\t=0$ with derivative
 %
 \begin{proof}
 %
-The result follows immediately from \thmref{etat_deriv}, observing that, for
-$1 \le p < \infty$,
-%
-\begin{align*}
-%
-\logp(\theta \vert \t \phi) ={}&
-    p \log\left(\pbase^{1/p} + \t \phi(\theta) \right)
-\\={}&
-    \log \pbase(\theta) +
-        p \log\left(1 + \t \frac{\phi(\theta}{\pbase(\theta)^{1/p}}\right)
-\Rightarrow\\
-\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
-    p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
-%
-\end{align*}
-%
-and, for $p = \infty$,
-%
-\begin{align*}
-%
-\logp(\theta \vert \t) ={}&
-    \log \pbase(\theta) + \t \phi(\theta)
-\Rightarrow\\
-\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
-    \phi(\theta).
-%
-\end{align*}
+The result follows immediately from \thmref{etat_deriv}, \eqref{nl_vb_pert_p},
+and \eqref{nl_vb_pert_pinf}.
 %
 \end{proof}
 %
