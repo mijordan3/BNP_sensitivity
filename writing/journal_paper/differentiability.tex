@@ -1,43 +1,59 @@
-
-
-
-
-
-In \secref{prior_perturbations} we considered a multiplicative perturbations
-of the form \eqref{phi_perturbation} with the $\norminf{\cdot}$ norm.  In
-this section we consider other norms, illustrating that other choices
-have problems with KL divergence.
-
-First, we recall what we hope to get from our linear approximation.  We wish to
-approximation $\etaopt(\phi)$ using the linear approximation $\etalin(\phi)$
-evaluated at $\phiz$, hoping that the error $\norm{\etaopt(\phi) -
-\etalin(\phi)}_2$ is small whenever the $\norm{\phi}$ is small (for some choice
-of $\norm{\cdot}$).  A bare minimum for such a local approximation to work is
-for $\phi \mapsto \etaopt(\phi)$ to be continuous, so that, for any
-$\phi$,
+Although \corref{etafun_deriv_form} is explicitly about a fixed $\phi$,
+it suggests an intriguing result if it is taken to hold for all $\phi$ in some
+ball, $\ball_p(\delta) := \{\phi: \norm{\phi}_{\lambda,p} \le \delta \}$.
+Specifically, let $q^{-1} + p^{-1} = 1$ and observe that, by Holder's inequality,
 %
 \begin{align*}
 %
-\lim_{t \rightarrow 0} \norm{\etaopt(t \phi) - \etaopt}_2 = 0.
+\sup_{\phi \in \ball_p(\delta)} \fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
+    \sup_{\phi \in \ball_p(\delta)}
+        \int \infl_p(\theta) \phi(\theta) \lambda(d\theta)
+\\\le{}&
+    \sup_{\phi \in \ball_p(\delta)}
+        \left( \int \abs{\infl_p(\theta)}^{1/q} \lambda(d\theta) \right)^q
+        \left( \int \abs{\phi(\theta)}^{1/p} \lambda(d\theta)\right)^p
+\\={}&
+\delta \left( \int \abs{\infl_p(\theta)}^{1/q} \lambda(d\theta) \right)^q,
 %
 \end{align*}
 %
-By this reasoning, however, $\etaopt$ itself is a ``good'' approximation to
-$\etaopt(\phi)$ when $\norm{\phi}$ is small---when $\phi$ is small, by
-continuity we can simply say that nothing has changed and be reasonably correct.
-From our linear approximation, we expect another order of accuracy, namely that
+with equality at the ``worst-case'' perturbation
 %
 \begin{align*}
 %
-\lim_{t \rightarrow 0} \frac{\norm{\etaopt(t \phi) - \etalin(t\phi)}_2}{t} = 0.
+\phi^*(\theta) \propto \abs{\infl_p(\theta)}^{p/q}.
 %
 \end{align*}
+%
+The constant of proportionality in the preceding display must be adjusted so
+that $\norm{\phi^*(\theta)}_{\lambda,p} = \delta$.  These ``worst-case''
+perturbations are the variational Bayes analogues of the corresponding
+``worst-case'' for exact Bayesian posteriors in \citet{gustafson:1996:local}.
 
-The preceding display is enough if we have a fixed $\phi$ in mind.  However, if
-we want to search over a larger set of candidate $\phi$, we want the derivative
-to provide a {\em uniformly good approximation} to $\etaopt(\phi)$ amonst some
-set of $\phi$, say, all bounded $\phi: \norm{\phi} \le 1$.  One way of
-formalizing the notion of ``uniformaly good approximation'' follows.
+The worst-case perturbation can be difficult to interpret for several reasons.
+First of all, although the ``size'' of a perturbation in $\lp{\lambda,p}$ has
+many attractive theoretical properties, it can be hard to have a subjective
+opinion about.  Note that the predicted effect of the perturbation is linear in
+the $\delta$ in $\ball_p(\delta)$ over which you are taking a supremum; to a
+large extent, whether or not a problem is ``robust'' under the perturbation
+$\phi^*(\theta)$ will depend on how large $\delta$ is allowed to be, and it can
+be difficult to have a strong {\em a priori} opinion about how large $\delta$
+should be.  Additionally, the form of $\phi^*(\theta)$ can appear unreasonably
+adversarial. Note that the influence function $\psi(\theta)$ is proportional to
+the variational posterior $\q(\theta \vert \etaopt)$.  As a result,
+$\phi^*(\theta)$ will tend to add and remove a great deal of prior mass
+immediately in the vicinity of the posterior mass.  For these reasons,
+one might wish to use the influence function more as an informal guide to
+selecting and testing perturbations that are likely to be influential.
+
+Whether formally or informally, however, when using a linear approximation to
+searching over a in infinite dimensional space, one needs to be concerned about
+at least two fundamental properties of your derivative.  First, one must ask
+whether the derivative even exists for every $\phi \in \ball_p(\delta)$. More
+stringenty, one should also ask whether the derivative forms a uniformly good
+approximation to the original function for every $\phi \in \ball_p(\delta)$.
+These two properties are formalized in functional analysis by the following
+definition.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,13 +98,11 @@ $\phi$:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
-\defref{diffable_classes}.  In fact, if a function is compactly differentiable
+\defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
 then the two derivatives must coincide \citep[Proposition
 4.8]{zeidler:2013:functional}, which justifies our presumptuous notation.
 
-% The difference between bounded and directional differentiability is whether the
-% linear approximation holds uniformly in $\phi$.
-
+In order to motivate our concern, let us consider the following simple example.
 It is possible for functions to be directionally but not boundedly
 differentiable even in $\mathbb{R}^2$, as the following example demonstrates.
 
@@ -100,17 +114,6 @@ Consider $(x_1, x_2) \in \mathbb{R}^2$ and the polar coordinates $r :=
 \sqrt{x_1^2 + x_2^2}$ and $\theta := \arctan(x_2 / x_1)$.  Let $\{\pi k: k \in
 \mathbb{Z} \}$ denote integer multiples of $\pi$.  Define
 %
-% \begin{align*}
-% %
-% f(r, \theta) := \begin{cases}
-% \frac{\left(\frac{r}{| \sin \theta |}\right)^2}
-%      {1 + \left(\frac{r}{| \sin \theta |}\right)^2}
-%     & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
-%     \textrm{ and } r > 0 \\
-% 0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
-%     \} \textrm{ or }r = 0
-% %
-% \end{cases}
 \begin{align*}
 %
 f(r, \theta) := \begin{cases}
@@ -138,33 +141,36 @@ f(r, \theta) := \begin{cases}
 \Figref{r2_pathological} contains a plot of $f(r, \theta)$, both over
 $\mathbb{R}^2$ and along paths for particular choices of $\theta$.
 
-Then $f$ has a directional derivative in every direction, but is not Fr{\'e}chet
-differentiable.  By ordinary calculus, for any $\theta$, $\fracat{\partial f(r,
-\theta)}{\partial r}{r=0} = 0$, so the directional derivatives all exist and are
-identically $0$.  However, for any $r$, there exists a $\theta(r)$ such that $r /
-|\sin(\theta(r))| = 1$.  For such a choice of $\theta(r)$, the error in the
-linear approximation is $f(r, \theta(r)) - 0 = 1/2$, which does not go to zero
-as $r \rightarrow 0$.
+We now show that $f$ has a directional derivative in every direction, but is not
+Fr{\'e}chet differentiable.  By ordinary calculus, for any $\theta$,
+$\fracat{\partial f(r, \theta)}{\partial r}{r=0} = 0$, so the directional
+derivatives all exist and are identically $0$.  However, for any $r$, there
+exists a $\theta(r)$ such that $r / |\sin(\theta(r))| = 1$.  For such a choice
+of $\theta(r)$, the error in the linear approximation is $f(r, \theta(r)) - 0 =
+1/2$, which does not go to zero as $r \rightarrow 0$.
 
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Note that the second derivative in a particular direction is given by
-$\fracat{\partial^2 f(r, \theta)}{\partial r^2}{r=0} = \frac{1}{2 |\sin
-\theta|}$, which can be made arbitrarily large by taking $\theta$ close to $0$
-or to $\pi$.  We could modify $f(r, \theta)$ to be Fr{\'e}chet differentiable
-by smoothly ``capping'' $1 / |\sin \theta|$ at some arbitrarily large value.
-However, the ability to meaningfully extrapolate $f(r, \theta)$ in the direction
-of a very large but finite second derivative will still be extremely limited. In
-this sense, Fr{\'e}chet differentiability is a weak necessary but not sufficient
-requirement if we are interested in extrapolating using linear approximations.
-
-
+Fr{\'e}chet differentiability is only concerned with an infinitesimal
+neighborhood.  The function can behave arbitrarily badly in a region just
+outside the point at which the derivative is computed and retain Fr{\'e}che
+differentiability. In this sense, Fr{\'e}chet differentiability is a desirable
+but not sufficient requirement if we are interested in extrapolating using
+linear approximations.  We illustrate this point in the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{r2_pathological_v2}
 %
+In \exref{r2_pathological} second derivative in a particular direction is given
+by $\fracat{\partial^2 f(r, \theta)}{\partial r^2}{r=0} = \frac{1}{2 |\sin
+\theta|}$, which can be made arbitrarily large by taking $\theta$ close to $0$
+or to $\pi$.  We could modify $f(r, \theta)$ to be Fr{\'e}chet differentiable by
+smoothly ``capping'' $1 / |\sin \theta|$ at some arbitrarily large value.
+However, the ability to meaningfully extrapolate $f(r, \theta)$ in the direction
+of a very large but finite second derivative will still be extremely limited.
+
 In the context of \exref{r2_pathological}, fix some $0 < M < \infty$,
 and define
 %
@@ -212,73 +218,108 @@ avoid in infinite-dimensional spaces.  We now give an illustrative example in
 the $\lp{p}$ spaces; since the result will be important for VB prior
 sensitivity, we will state is as a lemma rather than merely an example.
 
-We can define the family of nonlinear perturbations similar to
-\citep{gustafson:1996:local}.
-
-
-%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%
-
-
-Of course, if we relax the constraint that $\phi(\nu) \ge 0$, then we cannot
-guarantee that $\pstick(\nu \vert \phi) \ge 0$ in an open ball around $\phiz$.
-
-It will be notationaly convenient in our discussion to treat the map $x \mapsto
-\log(x)$ as simply discontinuous at $x = 0$, rather than undefined (or
-complex-valued). Define the ``trimmed log'' function as
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}
+\begin{ex}\exlabel{e_log_disocontinuous_v1}
+%
+Let $\q(\theta)$ and $\p(\theta)$ be densities relative to a continuous measure
+$\lambda$.  Let $\gamma \in \lp{\p,p}$ with $1 \le p < \infty$, and define
 %
 \begin{align*}
 %
-\logtrim(x) :=
-\begin{cases}
-    \log x  &\textrm{when }x > 0 \\
-    0       &\textrm{when }x \le 0.
+f(\gamma) = \begin{cases}
+\expect{\q(\theta)}{\log\left(1 + \gamma\right)}
+    & \textrm{when }\inf_\theta \gamma(\theta) > -1 \\
+-\infty & \textrm{otherwise}.
 \end{cases}
 %
 \end{align*}
 %
-% In order for the directional derivative to exist in the direction of
-% functions unbounded below, the value must be \log(1) = zero when undefined
-%
-% Otherwise, the when $x \le 0$ is simply a placeholder; for our purposes, it would
-% ideally be some abstract number that is distant from all real numbers but zero
-% distance to itself.  (Neither $0$ nor $\infty$ quite fit the bill.) Mostly we
-% will require that $\logtrim(x)$ is discontinuous in a neighborhood of $0$.
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Observe, that, for $1 \le p < \infty$, we take the log perturbation given by
-\defref{prior_nl_pert} is
+Then $f(\gamma)$ is trivially discontinuous at $\phiz$ since, for any $\gamma$
+such that $\inf_\theta \gamma(\theta) = -\infty$,
 %
 \begin{align*}
 %
-\logtrim \p(\theta \vert \phi) ={}&
-    \log \pbase(\theta) +
-        \logtrim\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right).
+f(\t \gamma) = -\infty \mathtxt{for any }\t > 0 \mathtxt{but} f(\phiz) = 0.
 %
 \end{align*}
 %
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The problem with \exref{e_log_disocontinuous_v1} is not merely with
+functions unbounded below, however.
 
-We can now state our main results.
-
-
-\begin{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{e_log_disocontinuous_v2}
 %
-Fix $1 \le p < \infty$ and define a prior perturbation as in
-\defref{prior_nl_pert}.
-Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
-stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
-\etaopt$, with $\psi(\zeta, \t) = 1$, and with $\psi(\zeta, \t) = \log\left(1 + \frac{\phi(\nu)}{\pbase(\nu)^{1/p}} \right)$, for all $\k$.
-
+In the setting of \exref{e_log_disocontinuous_v1}, assume further that, for any
+$\epsilon \ge 0$, there exists a set $S_\epsilon$ such that $\p(S_\epsilon) \le
+\epsilon$ and $\q(S_\epsilon) \ge \epsilon$.  Define
 %
-\end{thm}
+\begin{align*}
+%
+\tilde{f}(\gamma) = \begin{cases}
+    f(\gamma) & \textrm{when }\inf_\theta \gamma(\theta) > -\infty \\
+    0 & \textrm{otherwise}.
+\end{cases}
+%
+\end{align*}
+%
+Now, with $\gamma$ such that $\inf_\theta \gamma(\theta) = -\infty$,
+%
+\begin{align*}
+%
+\tilde{f}(\t \gamma) = 0 \mathtxt{for any }\t > 0 \mathtxt{and} f(\phiz) = 0.
+%
+\end{align*}
+
+However, $\tilde{f}$ is still discontinuous.  For any $\epsilon > 0$, let
+$S_\epsilon$ be a set given in the assumption, and for $\delta > 0$, define
+%
+\begin{align*}
+%
+\gamma(\theta, \epsilon, \delta) :=
+\begin{cases}
+    %
+    \delta - 1      & \textrm{ for }\theta\in S_\epsilon \\
+    0      & \textrm{ for }\theta\notin S_\epsilon.
+    %
+\end{cases}
+%
+\end{align*}
+%
+Then $\gamma(\theta; \epsilon, \delta) \in \lp{\p,p}$ with.  Furthermore,
+%
+\begin{align*}
+%
+\norm{\gamma(\cdot;
+\epsilon, \delta)}_{\p,p} =
+    \left( \int_0^1 \phi(\theta)^p \p(\theta
+)\lambda(d\theta)\right)^{1/p} \le{}& \epsilon^{1/p} (\delta - 1)  \mathand\\
+%
+\abs{\tilde{f}(\gamma(\cdot; \epsilon, \delta)) - \tilde{f}(\phiz)} =
+    \expect{\q(\theta)}{\ind{\theta \in S_\epsilon}} \abs{\log(\delta)} \ge{}&
+    \epsilon \abs{\log(\delta)}.
+%
+\end{align*}
+%,
+Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
+\rightarrow 0$,
+%
+\begin{align*}
+%
+\abs{\tilde{f}(\phi(\cdot; \epsilon_n, \delta(\epsilon_n))) -
+     \tilde{f}(\phiz)} \ge{} 1
+\mathtxt{and}
+\norm{\gamma(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{} 0.
+%
+\end{align*}
+%
+So $\tilde{f}$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$,
+and cannot be Fr{\'e}chet differentiable.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

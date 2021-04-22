@@ -673,6 +673,8 @@ The result follows.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Saving this because of the proof that the prior is positive with the
+% log perturbations.
 \begin{prop}\proplabel{pert_well_defined}
 %
 % Linf also in \citet[Section 2.1, Example 5]{luenberger:1997:optimization}
@@ -717,3 +719,43 @@ so that $\int \pstick(\nuk \vert \phi) = 1$ whenever $\norminf{\phi} < \infty$.
 %
 \end{prop}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+It will be notationaly convenient in our discussion to treat the map $x \mapsto
+\log(x)$ as simply discontinuous at $x = 0$, rather than undefined (or
+complex-valued). Define the ``trimmed log'' function as
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}
+%
+\begin{align*}
+%
+\logtrim(x) :=
+\begin{cases}
+    \log x  &\textrm{when }x > 0 \\
+    0       &\textrm{when }x \le 0.
+\end{cases}
+%
+\end{align*}
+%
+% In order for the directional derivative to exist in the direction of
+% functions unbounded below, the value must be \log(1) = zero when undefined
+%
+% Otherwise, the when $x \le 0$ is simply a placeholder; for our purposes, it would
+% ideally be some abstract number that is distant from all real numbers but zero
+% distance to itself.  (Neither $0$ nor $\infty$ quite fit the bill.) Mostly we
+% will require that $\logtrim(x)$ is discontinuous in a neighborhood of $0$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
