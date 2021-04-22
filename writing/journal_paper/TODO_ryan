@@ -5,3 +5,10 @@ Use either vert or commas for \lqgrad and \lqhess
 
 Decide whether you want to simplify the formulas by requiring that
 q be a density.
+
+Put the p back in the perturbation definition.
+
+Fix directionally differnetiable to be only at a particular point, or
+smooth the KL divergence.
+
+Either say Frechet and Gateaux or bounded and directional?

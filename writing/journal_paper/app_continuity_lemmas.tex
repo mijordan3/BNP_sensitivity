@@ -351,37 +351,6 @@ Next, we prove a result for directional derivatives in $\lp{p}$ spaces.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{lp_regular}
-%
-Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
-$\q(\theta)$ be a density defined relative to $\lambda$.  Let $q$ be the real
-number such that $p^{-1} + q^{-1} = 1$.  Fix a function $\psi(\theta): \thetadom
-\mapsto \mathbb{R}$ with $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, and
-assume that
-%
-\begin{align*}
-%
-\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^q
-\pbase(\theta) \lambda(d\theta) < \infty.
-%
-\end{align*}
-%
-or, equivalently, that
-%
-\begin{align*}
-%
-\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
-    \q(\theta) \lambda(d\theta)
-< \infty.
-%
-\end{align*}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}\lemlabel{lp_integral_bound}
 %
 Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$
