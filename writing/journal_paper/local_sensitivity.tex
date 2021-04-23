@@ -1,14 +1,46 @@
 We now turn to the optimization problem \eqref{vb_optimization} where the priors
 $\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a real-valued
 parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing $\pstick(\nuk \vert
-\t)$.
+\t)$.  Starting now, we will state general results in terms of a generic
+parameter $\theta$, specializing to the BNP problem in examples and in the
+experiments below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_t}
+%
+Let $\p(\theta \vert \t)$ be a class of densities relative dominating
+probability measure, $\lambda$ defined for $\t$ in an open set $\ball_\t
+\subseteq \mathbb{R}$ containing $0$.  Assume that the variational densities
+$\q(\theta \vert \eta)$ are defined relative to $\lambda$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The prior depends on $\t$; in turn, the posterior $\p(\theta \vert \x, \t)$
+depends on $\t$; in turn, the KL divergance depends on $\t$; in turn, the
+optimal variational parameters depend on $\t$.  Define the shorthand notation
+%
+\begin{align}\eqlabel{kl_shorthand}
+%
+\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || \p(\x \vert \zeta, \t)}
+\mathand
+\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
+%
+\end{align}
+%
+where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
+In \defref{prior_t}, we take $\t = 0$ at the ``original'' problem,
+\eqref{vb_optimization}, without loss of generality.  We will thus continue to
+use $\etaopt$ with no argument to refer to $\etaopt(0)$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
 %
-When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we
-model
+When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we take
+$\lambda$ to be the Lebesgue measure on $[0,1]$ and model
 %
 \begin{align*}
 %
@@ -26,36 +58,32 @@ the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 \begin{align}\eqlabel{gem_alpha_pert}
 %
 \log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha + \alpha_0 - 1) \log(1 - \nuk) + \const.
+    \log \pstick(\nuk \vert \alpha_0) +
+    (\alpha - \alpha_0) \log(1 - \nuk) + \const.
     %& \constdesc{\nuk}
 %
 \end{align}
 %
+Similarly, the prior on the full $\nu$ vector is given by
+%
+\begin{align*}
+%
+\log \p(\nu \vert \alpha) ={}&
+    \sumkm \log \pstick(\nuk \vert \alpha)
+\\={}&
+    \log \p(\nu \vert \alpha_0) +
+    (\alpha - \alpha_0) \sumkm \log(1 - \nuk) + \const.
+%
+\end{align*}
+%
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Since the posterior in turn depends on the prior parameter $\t$, which we write
-$\p(\zeta \vert \x, \t)$. The $\t$ dependence propagates further to the optimal
-variational parameters as well through the dependence of the KL divergence on
-$\t$.  Define the shorthand notation
-%
-\begin{align}\eqlabel{kl_shorthand}
-%
-\KL{\eta, \t} := \KL{\q(\zeta \vert \eta) || \p(\x \vert \zeta, \t)}
-\mathand
-\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
-%
-\end{align}
-%
-where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
-Without loss of generality, we will continue to use $\etaopt$ with no argument
-to refer to $\etaopt(0)$.  That is, we take $\t = 0$ at the ``original''
-problem, \eqref{vb_optimization}.
-
-If the map $\t \mapsto \etaopt(\t)$ is continuously differentiable, and we have
-already computed the solution $\etaopt$ to the ``original'' problem
-\eqref{vb_optimization}, then we can form a Taylor series approximation to
-$\etaopt(\t)$.  Specifically, we define
+Assuming for the moment that $\t \mapsto \etaopt(\t)$ is continuously
+differentiable (we will consider its differentiability in detail below), and
+that we have already computed the solution $\etaopt$ to the ``original'' problem
+\eqref{vb_optimization} with $\t=0$, then we can form a Taylor series
+approximation to $\etaopt(\t)$.  Specifically, we define
 %
 \begin{align}\eqlabel{etalin_def}
 %
@@ -75,10 +103,10 @@ differentiable, we can use the chain rule to compute
 %
 \begin{align}\eqlabel{vb_g_sens}
 %
-\fracat{d g(\etaopt(\t))}{d\t} ={}&
-    \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt(\t_0)}
-    \fracat{d \etaopt(\t)}{d \t}{\t_0} \\
-\glin(\t) :={}& \g(\etaopt(\t_0)) + \fracat{d g(\etaopt(\t))}{d\t}{\t_0} (\t - \t_0).
+\fracat{d g(\etaopt(\t))}{d\t}{\t=0}&
+    \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt}
+    \fracat{d \etaopt(\t)}{d \t}{\t=0} \\
+\glin(\t) :={}& \g(\etaopt) + \fracat{d g(\etaopt(\t))}{d\t}{\t=0} \t.
 %
 \end{align}
 %
@@ -92,42 +120,18 @@ For non-differentiable functions of $\eta$, we can still form the approximation
 %
 The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
 we can compute influence functions and worst-case perturbations, as we discuss
-below.  Converse, $\gapprox(\t)$ may be expected
-to provide a better approximation in some cases since it retains non-linearities
-in the map $\eta \mapsto \g(\eta)$, linearizing only the computationally
-intensive map $\t \mapsto \etaopt(\t)$.
+below.  Converse, $\gapprox(\t)$ may be expected to provide a better
+approximation in some cases since it retains non-linearities in the map $\eta
+\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
+\mapsto \etaopt(\t)$.
 
-When, then, is $\etaopt(\t)$ continuously differentiable?  We now state some
-sufficient conditions which will allow us to prove that $\t \mapsto \etaopt(\t)$
-is continuously differentiable via the implicit function theorem (e.g.,
-\citet{krantz:2012:implicit}).  We will state general conditions in terms of a
-generic parameter $\theta$, specializing our result to the BNP problem at the
-end.
+When, then, is $\etaopt(\t)$ continuously differentiable?  We will now state
+some sufficient conditions under which we can apply the implicit function
+theorem (e.g., \citet{krantz:2012:implicit}) to prove the continuous
+differentiability of $\etaopt(\t)$.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}\deflabel{prior_t}
-%
-Let $\p(\theta \vert \t)$ be a class of (integrable, possibly non-normalized)
-densities relative to a dominating measure, $\lambda$, defined for $\t$ in an
-open set $\ball_t$ containing $\t_0$.  Assume that the variational densities
-$\q(\theta \vert \eta)$ are defined relative to $\lambda$, and are integrable
-(but possibly unnormalized).
-
-Let $\p(\x \vert \theta)$ define a likelihood for the observed data $\x$, let
-$\p(\theta, \x \vert \t) = \p(\x \vert \theta) \p(\theta \vert \t)$, and define
-%
-\begin{align*}
-%
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || \p(\theta \vert \x, \t)}.
-%
-\end{align*}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In \assuref{kl_opt_ok}, we first require some regularity conditions on the KL
-divergence and its optimum.
+First, in \assuref{kl_opt_ok}, we first require some regularity conditions on
+the KL divergence and its optimum.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,20 +156,54 @@ Let the following conditions on the variational approximation hold.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The next set of assumptions can be stated just as well for unnormalized (but
+normalizable) probablity densities.  Dealing with unnormalized densities can
+save some tedious bookkeeping when verifying the assumptions.  To help clarify
+when a distribution needs to be normalized, we let $\qtil$ and $\ptil$ refer to
+unnormalized (but normalizable) versions of the respectively corresponding $\q$
+and $\p$.  For example,
+%
+\begin{align*}
+%
+\q(\theta \vert \eta) :={}
+    \frac{\qtil(\theta \vert \eta)}
+    {\int \qtil(\theta' \vert \eta) \lambda(d\theta')} \mathand
+\p(\theta \vert \t) :={}
+    \frac{\ptil(\theta \vert \t)}
+    {\int \ptil(\theta' \vert \t) \lambda(d\theta')}.
+%
+\end{align*}
+%
+
+
 Our next set of assumptions, \assuref{dist_fun_nice}, states sufficient
 conditions for which we can apply the dominated convergence theorem to
-variational expectations, allowing us to translate continuity of the variational
-and model densitites into continuity of the variational objective.  The details
-can be found in \lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}.
+variational expectations of some generic function $\psi(\theta, \t)$, allowing
+us to translate continuity of the variational and model densitites into
+continuity of the variational objective.  The details can be found in
+\lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}.
+
+In case \assuref{dist_fun_nice} seems forbidding, observe that, in lieu of
+\assuref{dist_fun_nice} we might equivalently have said that we can exchange
+limits and variational expectations whenever needed.  \Assuref{dist_fun_nice} is
+simply a precise catalogue of what is needed.
+
+Note also that \assuref{dist_fun_nice} and its associated \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}, applied with $\logp(\x \vert \theta)$,
+is one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary
+focus is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
+\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
+for the prior $\logp(\theta \vert \t)$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{dist_fun_nice}
 %
-Let $\q(\theta \vert \eta)$ be a (integrable, but possibly unnormalized) density
-over the random variable $\theta$ parameterized by $\eta$ defined relative to a
-dominating measure $\lambda$.  Assume that the map $\eta \mapsto \log \q(\theta
-\vert \eta)$ is twice continuously differentiable.
+Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
+density over the random variable $\theta$ parameterized by $\eta$ defined
+relative to a dominating measure $\lambda$.  Assume that the map $\eta \mapsto
+\log \qtil(\theta \vert \eta)$ is twice continuously differentiable.
 
 Let $\psi(\theta, \t)$ be a scalar-valued $\lambda$-measurable function of
 $\theta$ and $\t$.  Assume that the map $\t \mapsto \psi(\theta, \t)$ is
@@ -176,10 +214,10 @@ Define the following shorthand notation:
 \begin{align*}
 %
 \lqgrad{\theta \vert \eta} :={}&
-    \fracat{\partial \log \q(\theta \vert \eta)}{\partial \eta}{\eta} \\
+    \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
 %
 \lqhess{\theta \vert \eta} :={}&
-    \fracat{\partial^2 \log \q(\theta \vert \eta)}
+    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
            {\partial \eta \partial \eta^T}{\eta} \\
 %
 \psigrad{\theta, \t} :={}& \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t}.
@@ -195,22 +233,22 @@ $\lambda$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \lambda(d\theta)
 \begin{enumerate}
 %
 \item \itemlabel{fundom}
-$\q(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
+$\qtil(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
 %
 \item \itemlabel{funqgraddom}
-$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
 M_\psi(\theta)$.
 %
 \item \itemlabel{funqhessdom}
-$\q(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+$\qtil(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
 M_\psi(\theta)$.
 %
 \item \itemlabel{fungradqgraddom}
-$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
 \le M_\psi(\theta)$.
 %
 \item \itemlabel{funqgradsqdom}
-$\q(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
 M_\psi(\theta)$.
 %
 \end{enumerate}
@@ -218,16 +256,109 @@ M_\psi(\theta)$.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In lieu of \assuref{dist_fun_nice} we might equivalently have said that we can
-exchange limits and variational expectations whenever needed,
-\assuref{dist_fun_nice} simply being a precise catalogue of what is needed.
 
-Noe that \assuref{dist_fun_nice} and its associated \lemref{logq_derivs,
-logq_continuous} of \appref{cont_lemmas}, applied with $\logp(\x \vert \theta)$,
-is one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary
-focus is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
-\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
-for the prior $\logp(\theta \vert \t)$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{normal_q_is_regular}
+%
+In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$ and let
+$\q(\theta \vert \eta) = \normdist{\theta \vert \eta}$ be a normal distribution
+parameterized by its natural exponential family parameters.  We need the
+dominating measure $\lambda$ to be a probability measure; for a set $A$, take
+$\lambda(A) = \normdist{A \vert 0, 1}$ to be the standard normal measure, so
+that $\q \ll \lambda$.
+
+Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
+Fix $\eta_0$ such that $\sigma(\eta_0) > 0$, and let $\ball_\eta$ be an open set
+containing $\eta_0$ such a that $\sigma_{max} := \sup_{\eta \in \ball_\eta}
+\sigma(\eta) < \infty$.
+
+% Let $\psi(\theta, \t)$ be any function that is differentiable in $\t$
+% for all $\t \in \ball_\t$, where $0 \in \ball_\t$.  Let $\psi(\theta,\t)$
+% grow sub-exponetially in $\abs{\theta}$ for all $\t \in \ball_\t$, i.e.,
+% %
+% \begin{align*}
+% %
+% \lim_{\theta \rightarrow \infty}
+%     \exp(-\theta) \sup_{\t \in \ball_\t}\abs{\psi(\theta, \t)} ={} 0 \mathand
+% \lim_{\theta \rightarrow -\infty}
+%     \exp(-\abs{\theta}) \sup_{\t \in \ball_\t}\abs{\psi(\theta, \t)} ={} 0.
+% %
+% \end{align*}
+% %
+If there exists a neighborhood $\ball_\t$ of $\t_0$ such that $\abs{\psi(\theta,
+\t)}$ and $\abs{\psigrad{\theta, \t}}$ are uniformly bounded by some multiple of
+$\exp(-\abs{\theta})$ for all $\t \in \ball_\t$, then $\q$ and $\psi$ satisfy
+\assuref{dist_fun_nice}.
+
+\begin{proof}
+%
+By properties of the exponential family,
+%
+\begin{align*}
+%
+\lqgrad{\theta, \eta} ={} (\theta, \theta^2)^T \mathand&
+\lqhess{\theta, \eta} ={} 0_{2\times2} \Rightarrow\\
+%
+\norm{\lqgrad{\theta, \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{\lqhess{\theta, \eta}}_2 ={} 0.
+%
+\end{align*}
+%
+Let $\ballclosed_\eta$ denote the closure of $\ball_\eta$, and let
+%
+\begin{align*}
+%
+\eta^* := \argmax_{\eta \in \ballclosed_\eta}
+    \expect{\q(\theta \vert \eta)}{\exp(\abs{\theta})}.
+%
+\end{align*}
+%
+By standard properties of the normal and the boundedness of $\sigma(\eta)$, the
+right hand side of the preceding display is finite.
+%
+Then
+%
+\begin{align*}
+\int \q(\theta \vert \eta) \psi(\theta, \t) \lambda(d \theta) \le{}&
+    \left( \sup_{\theta} \sup_{\t \in \ball_\t}
+        \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
+    \int \q(\theta \vert \eta) \exp(\theta) \lambda(d \theta)
+%
+\\\le{}&
+    \const
+    \expect{\q(\theta \vert \eta^*)}{\exp(\abs{\theta})}.
+    \quad\constdesc{\eta, \t}
+%
+\end{align*}
+%
+Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
+\propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
+similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
+$\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
+of the five constants.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+To analyze \exref{alpha_perturbation}, recall from \secref{model_vb} that we
+take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$
+to be independent normal distributions.  By the 
+%
+\begin{align*}
+%
+1
+%
+\end{align*}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Finally, in \assuref{q_stick_regular} we draw the needed connection between the
 class of prior perturbations and the variational approximation.

@@ -22,6 +22,8 @@
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
 \DeclareMathOperator*{\esssup}{\mathrm{esssup}}
 \DeclareMathOperator*{\essinf}{\mathrm{essinf}}
+\DeclareMathOperator*{\argsup}{\mathrm{argsup}}
+\DeclareMathOperator*{\arginf}{\mathrm{arginf}}
 
 % Variables
 \def\etaopt{\hat\eta} % Optimal vb parameters
@@ -44,6 +46,7 @@
 % Variational parameters
 \def\etatheta{\eta_{\theta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
+\def\etalnu{\eta_{\lnu}}  % VB parameters for certain components
 \def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
 \def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
@@ -58,6 +61,8 @@
 % Distributions central to the story
 \def\p{\mathcal{P}}   % Other distributions
 \def\q{\mathcal{Q}}   % VB dist
+\def\ptil{\tilde{\p}}   % Other distributions
+\def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
 \def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
@@ -102,6 +107,7 @@
 \def\linf{{L_{\infty}[0,1]}}
 \def\lp#1{{L_{#1}}}
 \def\ball{\mathcal{B}}
+\def\ballclosed{\overline{\ball}}
 
 % Annotations
 \def\mathtxt#1{\quad\textrm{#1}\quad}%
