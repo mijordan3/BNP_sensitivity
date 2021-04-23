@@ -11,11 +11,11 @@
 Our final data analysis example is an application of population genetics. 
 Given a database of individuals and their genotypes at selected genetic loci, 
 population geneticists seek to identify the presence of latent populations, 
-infer the populuation of origin for specific loci, 
+infer the population of origin for specific loci, 
 and estimate the degree to which populations are admixed in each individual. 
 
 We consider a publicly available dataset containing 155 samples of an endangered bird species, the Taita thrush CITE. 
-The individuals were collected from four regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual was genotyped at seven microstellite loci. 
+Individuals were collected from four regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual was genotyped at seven microsatellite loci. 
 The four regions were once part of a cohesive cloud forest 
 that has since been fragmented by human development. 
 For this endagered bird species, 
@@ -27,53 +27,52 @@ well-separated populations with little genetic diversity are particularly at ris
 The thrush data set was also studied in~\citet{pritchard:2000:structure}, 
 where they introduced a Bayesian model for such genetic data, called STRUCTURE. 
 Later, \citet{raj:2014:faststructure} introduced fastSTRUCTURE, a variational inference approach to STRUCTURE. 
-Both implmentations of STRUCTURE used a finite mixture model with a 
+Both implmentations used a finite mixture model with a 
 Dirichlet prior on the individual admixture proportions.  
-We adapt the STRUCTURE model by replacing the Dirichlet distributed prior with a GEM prior. 
+We adapt the STRUCTURE model by replacing the Dirichlet prior with a GEM prior. 
 We outline our model below. 
 
-Let $\x_{nli}$ be the genotype for individual $n$ at locus $l$ and chromosme $i$. 
-The Taita thrush is a diploid organism so $i \in \{0, 1\}$. 
+Let $\x_{\n\l\i}$ be the genotype for individual $\n$ at locus $\l$ and chromosme $\i$. 
+The Taita thrush is a diploid organism so $\i \in \{1, 2\}$. 
 In our data set, there are $\nindiv = 155$ individuals genotyped at $\nloci = 7$ loci. 
-Let $\z_{nli}$ be the latent population membership 
-of the observed genotype $\x_{nli}$. 
+Let $\z_{\n\l\i}$ be the latent population membership 
+of the observed genotype $\x_{\n\l\i}$. 
 Then 
 \begin{align}
-p(\x_{nli} \vert \latentpop_{kl}, z_{n\ell ik} = 1) = 
-\categoricaldist{\x_{nli}\vert \latentpop_{k\ell}},
+\p(\x_{\n\l\i} \vert \latentpop_{\k\l}, z_{\n\l\i\k} = 1) = 
+\categoricaldist{\x_{\n\l\i}\vert \latentpop_{\k\l}},
 \end{align}
-where $\latentpop_{kl}\in\Delta^{J_l - 1}$ are the latent frequencies for the $J_l$ possible alleles at locus $l$, under population $k$. 
-The prior on $\theta_{kl}$ is uniform over the $(J_l - 1)$-simplex, 
+where $\latentpop_{\k\l}\in\Delta^{J_\l - 1}$ are the latent frequencies for the $J_l$ possible alleles at locus $\l$, under population $\k$. 
+The prior on $\latentpop_{\k\l}$ is uniform over the $(J_\l - 1)$-simplex, 
 independently for all $k$ and $l$.
 
-Unlike the previous data examples, each individual now has their own stick-breaking process. 
-Draw sticks 
+Unlike the previous data examples, each individual now has their own stick-breaking process. Draw sticks 
 \begin{align*}
-\nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, ..., \nindiv; \k = 1, 2, \cdot
+\nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, ..., \nindiv; \k = 1, 2, \ldots. 
 \end{align*}
-Let $\latentadmix_{n} = (\latentadmix_{n1}, \latentadmix_{n2}, \ldots)$ be the
+Let $\latentadmix_{\n} = (\latentadmix_{\n1}, \latentadmix_{\n2}, \ldots)$ be the
 \textit{admixture} of individual $\n$. 
 These are formed by the usual stick-breaking construction, 
 \begin{align*}
-\latentadmix_{nk} = \nu_{nk} \prod_{k' < k} (1 - \nu_{nk'}).
+\latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).
 \end{align*}
 %
 The latent population memberships are then drawn according to
 \begin{align*}
-p(\z_{nlik} = 1 | \latentadmix_n) = \latentadmix_{nk}.
+p(\z_{\n\l\i\k} = 1 | \latentadmix_\n) = \latentadmix_{\n\k}.
 \end{align*}
 
-The joint log-likelihood is of the form
+The joint log-likelihood decomposes as 
 \begin{align*}
-\logp(\x, \theta, \z, \nu) &=
-\sum_{\n=1}^\nindiv \sum_{\l=1}^\nloci \sum_{\k=1}^{\kmax}
+\logp(\x, \latentpop, \z, \nu) &=
+\sum_{\n=1}^\nindiv \sum_{\l=1}^\nloci \sum_{i = 1}^2 \sum_{\k=1}^{\kmax}
         \z_{\n\l\i\k} \left(
-            \logp(\x_{\n\l\i} \vert \theta_{\k\l}) + \log \pi_{\n\k}
+            \logp(\x_{\n\l\i} \vert \latentpop_{\k\l}) + \log \pi_{\n\k}
         \right)
 \nonumber\\&
     \quad +
     \sum_{\n=1}^\nindiv \sum_{k=1}^{\kmax} \log \pstick(\nu_{\n\k})
-    + \sum_{\l=1}^\nloci \sum_{k=1}^{\kmax} \logp(\theta_{\k\l}).
+    + \sum_{\l=1}^\nloci \sum_{k=1}^{\kmax} \logp(\latentpop_{\k\l}).
 \end{align*}
 
 The variational distribution remains mean-field: 
@@ -83,33 +82,33 @@ The variational distribution remains mean-field:
     \prod_{\n=1}^{\nindiv}\prod_{\k=1}^{\kmax - 1}
     \q(\nu_{nk} \vert \eta) \right)
     \left(\prod_{\k=1}^{\kmax}\prod_{l=1}^{\nloci}
-    \q(\theta_{\k l} \vert \eta) \right)
+    \q(\latentpop_{\k l} \vert \eta) \right)
     \left( \prod_{\n=1}^{\N} \prod_{l=1}^{\nloci} \prod_{i=1}^{2} \q(\z_{\n l i} \vert \eta) \right).
 \end{align*}
 As before, we let the distribution of the sticks $\nu_{nk}$ be logit-normal;
 and we let each membership indicator $\z_{\n l i}$ be multinomial. 
-For each allele frequency $\theta_{\k l}$, we use a Dirichlet distribution. 
+For each allele frequency $\latentpop_{\k l}$, we use a Dirichlet distribution. 
 
-TODO. We still refer to both $\nu$ and $\theta$ as "global" latent variables, 
+TODO. We still refer to both $\nu$ and $\latentpop$ as "global" latent variables, 
 even though the dimension of $\nu$ 
 scales with the number of individuals, $\nindiv$; 
 we call $\z$ the ``local" latent variables because the dimension of $\z$ scales with $\nindiv \times \nloci$. 
 The optimal variational parameters $\eta_\z$ can as usual be solved in closed form ... 
 
 
-We fit the variational distribution with stick distribution
+We fit the initial variational distribution with stick distribution
 $\pstick(\nu_{nk}) = \betadist{\nu_{nk}\vert 1, \alpha_0}$, $\alpha_0 = 6$. 
 \figref{stru_init_fit} shows the inferred
 individual admixtures at this initial fit. 
 There appears to be three dominant latent populations, which we arbitrarily label as populations 1, 2, and 3. 
 The inferred populations generally correspond with the geographic regions: 
-individuals from the Mbololo region have population 1 as the dominant admixture proportion; 
+individuals from the Mbololo region have population 1 as their dominant admixture proportion; 
 individuals from the Ngangao are dominantly population 2; 
-individuals from the Chawia appear to be a mixture of populations 1, 2 and 3. 
+individuals from the Chawia appear to be a mixture of populations 1, 2, and, 3. 
 The four individuals from Yale appear similar to individuals from the Ngangao;
-this is not surprising given that the Yale region is located geographically close to the Ngangao region. 
+this is not surprising given that the Yale region is geographically located in proximity to the Ngangao region. 
 
-The resulting inference from our BNP model is qualitatively similar to the results obtained by STRUCTURE in \citet{pritchard:2000:structure}. 
+The resulting inference from our BNP model is qualitatively similar to the results reported in \citet{pritchard:2000:structure}, who employed STRUCTURE. 
 STRUCTURE uses a Dirichlet prior for the individual admixtures 
 with some fixed number of populations $K$ and does inference with MCMC. 
 To select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
