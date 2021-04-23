@@ -85,17 +85,11 @@ plot_struct_fsens_results <- function(results_list){
   p_logphi <- plot_influence_and_logphi(results_list$infl_df$logit_v, 
                                         results_list$infl_df$infl_x_prior, 
                                         results_list$pert_df$log_phi, 
-                                        results_list$pert_df$logit_v) + 
-    theme(axis.ticks.y.right = element_blank(), 
-          axis.text.y.right = element_blank())
+                                        results_list$pert_df$logit_v)
   
   p_priors <- plot_priors(sigmoid(results_list$pert_df$logit_v),
                           results_list$pert_df$p0,
-                          results_list$pert_df$pc) + 
-    xlab('stick') + 
-    ggtitle('priors') + 
-    theme(legend.title = element_blank(), 
-          legend.position = 'bottom') 
+                          results_list$pert_df$pc) 
   
   
   results_df <- 
@@ -103,11 +97,10 @@ plot_struct_fsens_results <- function(results_list){
                refit = results_list$sensitivity_df$refit, 
                lin = results_list$sensitivity_df$lr)
   
-  p_sens <- plot_post_stat_trace_plot(results_df) + 
-    ggtitle('sensitivity') + 
-    xlab('epsilon') + 
-    theme(legend.title = element_blank(), 
-          legend.position = 'bottom')
+  p_sens <- plot_post_stat_trace_plot(results_df, 
+                                      abbreviate_legend = TRUE) + 
+    ggtitle('Sensitivity') + 
+    xlab('t') 
   
   return(list(p_logphi = p_logphi, 
               p_priors = p_priors, 
@@ -117,6 +110,8 @@ plot_struct_fsens_results <- function(results_list){
 ##########
 # plots for mbololo outliers
 ##########
+panel_size <- 1.5
+
 x_axis_remover <- 
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(), 
@@ -141,7 +136,11 @@ mbololo_plots$p_priors <-
 mbololo_plots$p_sens <-
   mbololo_plots$p_sens + 
   ylab('propn. pop2') + 
-  x_axis_remover 
+  x_axis_remover + 
+  # change axis color
+  theme(panel.border = element_rect(size = panel_size,
+                                    color = pop2_color))
+
 
 mbololo_plots_sum <- 
   mbololo_plots$p_logphi + 
@@ -171,7 +170,10 @@ ngangao_plots$p_sens <-
   ngangao_plots$p_sens + 
   ylab('propn. pop1') + 
   title_remover + 
-  x_axis_remover 
+  x_axis_remover + 
+  # change axis color
+  theme(panel.border = element_rect(size = panel_size,
+                                    color = pop1_color))
 
 ngangao_plots_sum <- 
   ngangao_plots$p_logphi + 
@@ -193,7 +195,9 @@ chawia_plots$p_priors <- chawia_plots$p_priors +
 
 chawia_plots$p_sens <- chawia_plots$p_sens + 
   title_remover + 
-  ylab('propn. pop3')
+  ylab('propn. pop3') + 
+  theme(panel.border = element_rect(size = panel_size,
+                                    color = pop3_color))
 
 chawia_plots_sum <- 
   chawia_plots$p_logphi + 

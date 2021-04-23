@@ -105,7 +105,7 @@ compare_coclust_lr_and_refit_scatter <-
     # 2d density
     # geom_density_2d(breaks = breaks) +
     # scale_fill_brewer(palette = 'PuBu') + 
-    ylab('lr - init') + 
+    ylab('lin. - init') + 
     xlab('refit - init') +
     get_fontsizes()
   
@@ -151,7 +151,7 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
   p_coclust_lr <-
     coclust_diff_lr %>% 
     plot_coclust_diff(vmax = vmax) + 
-    ggtitle('lr - init') + 
+    ggtitle('lin. - init') + 
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
           axis.ticks = element_blank(),

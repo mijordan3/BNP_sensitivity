@@ -65,7 +65,7 @@ weights_lr_df <-
 
 weights_df <- rbind(weights_refit_df, weights_lr_df) %>% 
   gather(key = cluster, value = weight, -c('alpha', 'method')) %>% 
-  mutate(cluster = sub('X', 'population ', cluster)) 
+  mutate(cluster = sub('X', 'Population ', cluster)) 
 
 # we report some of these numbers in the text
 weights_alpha_init <- weights_df %>% 

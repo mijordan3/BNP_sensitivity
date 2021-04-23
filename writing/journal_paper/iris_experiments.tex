@@ -45,8 +45,8 @@ stick-breaking distribution.
 Define the expected number of \textit{in-sample} clusters as
 \begin{align*}
 \gclusters(\eta)
-&= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
-\z_{\n\k} > 0}} \\ 
+&= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
+\z_{\n\k}\right) > 0}} \\ 
 &= \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
 \left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
 \end{align*}

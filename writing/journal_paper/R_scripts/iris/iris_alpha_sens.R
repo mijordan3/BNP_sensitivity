@@ -3,14 +3,14 @@ insample_df <-
   data.frame(t = alpha_sens_df$alpha, 
              refit = alpha_sens_df$n_clusters_refit, 
              lin = alpha_sens_df$n_clusters_lr, 
-             quantity = 'in-sample')
+             quantity = 'In-sample')
 
 # predictive results
 predictive_df <- 
   data.frame(t = alpha_sens_df_pred$alpha, 
              refit = alpha_sens_df_pred$n_clusters_refit, 
              lin = alpha_sens_df_pred$n_clusters_lr, 
-             quantity = 'predictive')
+             quantity = 'Predictive')
 
 # plot
 rbind(insample_df, 
@@ -18,7 +18,7 @@ rbind(insample_df,
   plot_post_stat_trace_plot + 
   facet_wrap(~quantity, nrow = 1) + 
   ylab('E[# clusters]') + 
-  xlab('alpha') + 
+  xlab(TeX('GEM parameter $\\alpha$')) + 
   # add vertical line
   geom_vline(xintercept = 6, 
              color = 'red', 

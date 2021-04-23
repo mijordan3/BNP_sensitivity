@@ -12,7 +12,7 @@ plots_alpha1 <- compare_coclust_lr_and_refit(coclust_refit_alpha1,
                                       min_keep = min_keep)
 
 plots_alpha1$p_scatter <- plots_alpha1$p_scatter + 
-  ggtitle('alpha = 1') + 
+  ggtitle(TeX('$\\alpha = 1$')) + 
   theme(title = element_text(size = title_size))
 
 plots_alpha1_summed <- 
@@ -30,7 +30,7 @@ plots_alpha11 <- compare_coclust_lr_and_refit(coclust_refit_alpha11,
                                               min_keep = min_keep)
 
 plots_alpha11$p_scatter <- plots_alpha11$p_scatter +
-  ggtitle('alpha = 11') + 
+  ggtitle(TeX('$\\alpha = 11$')) + 
   theme(title = element_text(size = title_size))
 
 
