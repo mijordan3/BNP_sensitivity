@@ -1,0 +1,19 @@
+The prior must be defined for t in an open neighborhood of 0; for functional
+perturbations unbounded above we require t to be positive.
+
+Use either vert or commas for \lqgrad and \lqhess
+
+Decide whether you want to simplify the formulas by requiring that
+q be a density.
+
+Put the p back in the perturbation definition.
+
+Fix directionally differnetiable to be only at a particular point, or
+smooth the KL divergence.
+
+Either say Frechet and Gateaux or bounded and directional?
+
+Let's be notationally consistent about whether a distribuiton is normalized.
+Say, take tilde over the density?
+
+When using MoveEqLeft precede lines with the inequalties

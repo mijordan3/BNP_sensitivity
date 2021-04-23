@@ -32,10 +32,18 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{amsthm}
-\usepackage{mathrsfs}
 \usepackage{mathtools}
 \usepackage{colonequals}
 \usepackage{algpseudocode, algorithm} %typical alg typesetting packages
+
+% Math scripts
+\usepackage{mathrsfs}  % For script fonts
+%\usepackage{dutchcal} % Lower-case mathcal
+%\usepackage{mathbbol}  % For lower-case bold fonts
+
+% \DeclareFontFamily{OT1}{pzc}{}
+% \DeclareFontShape{OT1}{pzc}{m}{it}{<-> s * [1.10] pzcmi7t}{}
+% \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
 
 \usepackage{listings}
 \usepackage{pdfpages}
@@ -80,7 +88,7 @@
 \maketitle
 
 \begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
-This is an abstract
+\input{abstract.tex}
 \end{abstract}
 
 \section{Introduction}\seclabel{introduction}
@@ -100,11 +108,15 @@ This is an abstract
 \section{Local sensitivity}\seclabel{local_sensitivity}
 \input{local_sensitivity.tex}
 
-\section{Function-valued prior perturbations}\seclabel{prior_perturbations}
-\input{prior_perturbations.tex}
+\section{Function-valued prior perturbations}\seclabel{funcional_perturbations}
+\input{function_perturbations.tex}
 
-\section{Other norms}\seclabel{other_norms}
-\input{other_norms.tex}
+\section{Differentiability}\seclabel{differentiability}
+\input{differentiability.tex}
+
+% \section{OLD}\seclabel{prior_perturbations}
+% \input{prior_perturbations.tex}
+
 
 \section{Computing the sensitivity}\seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
@@ -145,8 +157,10 @@ Thanks to everyone.
 \section*{Continuity Lemmas}\applabel{cont_lemmas}
 \input{app_continuity_lemmas.tex}
 
-\section*{Proofs}\label{app:proofs}
-\input{proofs.tex}
+\section*{Proofs}\applabel{proofs}
+\input{app_proofs.tex}
 
+\section*{Positive Perturbations Are Counterintuitive}\label{app:positive_pert}
+\input{app_positive_perturbations.tex}
 
 \end{document}

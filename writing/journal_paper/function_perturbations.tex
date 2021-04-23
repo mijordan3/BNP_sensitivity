@@ -1,0 +1,300 @@
+In \corref{gem_approximation_ok} of \secref{local_sensitivity}, we showed that
+we can form a Taylor series approximation to the dependence of a variational
+optimum on the parameter $\alpha$ in a Beta prior. However, there is typically
+no {\em a priori} reason to believe that the stick breaking prior lies within
+the parametric Beta family.  In this section, we follow
+\citet{gustafson:1996:local} and define a class of ways to perturb to the
+functional form of the prior, corresponding to the $\lp{p}$ classes of
+integrable functions (which we will define and discuss below).
+
+For any particular perturbation, \thmref{etat_deriv} can be applied directly by
+verifying \assuref{q_stick_regular}.  However, we will argue that it is
+typically more useful to examine the form of the derivative to find influential
+perturbations, for which one wants a stronger result than can be provided
+by \thmref{etat_deriv} alone---we will require that the derivatives give
+{\em uniformly good linear approximations} within bounded sets.
+We address this question in \secref{differentiability}.
+
+Let us remain with the general problem of inference on a parameter $\theta$.
+Fix for the moment a base stick distribution, $\pbase(\theta)$.  Suppose we have
+found $\etaopt$ using the prior $\pbase(\theta)$, wish to ask what the variational
+optimum would have been had we used some alternative stick distribution,
+$\palt(\theta)$.  Let us write $\etaopt(\pbase)$ and $\etaopt(\palt)$ for these
+two approximations, respectively.  To approximately answer this question using
+the local sensitivity approach of \secref{local_sensitivity}, we must somehow
+define a continuous path from $\pbase(\theta)$ to $\palt(\theta)$ parameterized,
+say, by $\t \in [0, 1]$.
+
+There are, in fact, many ways to do so.  For example, one might form the mixture
+distribution:
+%
+\begin{align*}
+%
+\p_{lin}(\theta \vert \t) =
+    (1- \t) \pbase(\theta) + \t \palt(\theta).
+%
+\end{align*}
+%
+Then $\p_{lin}(\theta \vert \t=0) = \pbase(\theta)$, $\p_{lin}(\theta \vert \t=1) =
+\palt(\theta)$, and $\p_{lin}(\theta \vert \t)$ interpolates smoothly between the
+two.  We could then attempt to apply \thmref{etat_deriv} using $\pstick(\nu \vert
+\t)$ to compute $d\etaopt(\t) / d\t$, and approximate
+%
+\begin{align*}
+%
+\etaopt(\palt) \approx \etaopt(\pbase) + \fracat{d \etaopt(\t)}{d\t}{\t=1}(1 - 0).
+%
+\end{align*}
+%
+However, we might just as well have defined the mixture in the log densities:
+%
+\begin{align*}
+%
+\log \p_{mult}(\theta \vert \t) =
+    (1- \t) \log\pbase(\theta) + \t \log\palt(\theta) -
+    \const. \\ \constdesc{\theta}
+%
+\end{align*}
+%
+Again, $\p_{mult}(\theta \vert \t=0) = \pbase(\theta)$, $\p_{mult}(\theta \vert
+\t=1) = \palt(\theta)$, and $\p_{mult}(\theta \vert \t)$ interpolates smoothly
+between the two.
+
+Indeed, one may define a family of prior perturbations by adding the densities
+after transforming pointwise by any invertible transformation, and then
+transforming back into the original space.  We will consider (a generalization
+of) the family of ``nonlinear'' functional perturbations given by
+\citep{gustafson:1996:local}, corresponding to the power transformations, of
+which our examples $\p_{lin}$ and $\p_{mult}$ are two extremes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_nl_pert}
+%
+Fix $\pbase(\theta)$, a density with respect to a probability measure $\lambda$,
+and fix $1 \le p \le \infty$.  For any $\phi(\theta)$ for which the expressions
+are well-defined, let \footnote{We have dropped a factor of $p^{-1}$ from the
+$\phi(\theta)$ term when $p < \infty$ relative to the definition in
+\citep{gustafson:1996:local}.  The factor of $p^{-1}$ helped show that the
+$p=\infty$ case is the limit of the others but otherwise will not be important
+to our analysis.}
+%
+\begin{align*}
+%
+\rho(\theta \vert \phi) :={}& \begin{cases}
+%
+\pbase(\theta)^{1/p} + \phi(\theta)
+    & \textrm{when }p < \infty \\
+\pbase(\theta)\exp(\phi(\theta))
+    & \textrm{when }p = \infty
+%
+\end{cases}\\
+%
+\tilde{\p}(\theta \vert \phi) :={}&
+    \mathrm{sign}(\rho(\theta \vert \phi)) \abs{\rho(\theta \vert \phi)}^p\\
+\p(\theta \vert \phi) :={}&
+    \frac{\tilde{\p}(\theta \vert \phi)}
+         {\int \tilde{\p}(\theta' \vert \phi) d\theta'}.
+%
+\end{align*}
+%
+\end{defn}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We have specified \defref{prior_nl_pert} in terms of the general function
+$\phi(\theta)$ rather than an alternative $\palt(\theta)$ since then the
+perturbed prior $\p(\theta \vert \phi)$ is well-defined for $\phi$ that may not
+be probabilities densities.  As we now show, this allows us to embed $\phi$ in a
+vector space, in which $\p(\theta \vert \phi)$ is a probability distribution in
+an open neighborhood of the zero function.  Nothing has been lost, however,
+since one can extrapolate to any alternative density $\palt(\theta)$ by taking
+%
+\begin{align}
+%
+\alpha  >{}& 0 \mathand \nonumber\\
+\phi(\theta) ={}&
+\begin{cases}
+\alpha \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
+    & \textrm{when }p < \infty \\
+\alpha \log \palt(\theta) - \log \pbase(\theta)
+    & \textrm{when }p = \infty.
+\end{cases} \eqlabel{phi_for_palt}
+%
+\end{align}
+%
+The fact that we are free to choose $\alpha$ follows from the fact that we
+normalize after perturbing.
+
+The classes of perturbations given in \defref{prior_nl_pert} have a natural
+correspondence with the $\lp{\lambda, p}$ spaces of functions, which we now
+define.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{defn}\deflabel{lp_spaces}
+%
+For a probability measure $\lambda$ on $(0,1)$ and $1 \le p \le \infty$, let
+$\lp{\lambda,p}$ define the space of $\lambda$-integrable functions from
+$(0,1)\mapsto\mathbb{R}$ with
+%
+\begin{align*}
+%
+\left(a \phi_1 + \phi_2 \right)(\theta) :={}&
+    a \phi_1(\theta) + \phi_2(\theta) \\
+\norm{\phi}_{\lambda,p} :={}&
+\begin{cases}
+    \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)\right)^{1/p}
+    & \textrm{when }1\le p < \infty\\
+    \esssup_{\theta} \abs{\phi(\theta)}
+    & \textrm{when }p = \infty.
+\end{cases}
+%
+\end{align*}
+%
+When $\lambda$ is proportional to the  Lebesgue measure on $[0,1]$, we may
+simply write $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
+%
+By \citep[Theorem 5.2.1]{dudley:2018:real}, $\lp{\lambda,p}$ is a Banach
+space (i.e., a complete, normed vector space).
+%
+\end{defn}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For any $p$, the transformation given in \defref{prior_nl_pert} and the norm
+defined in \defref{lp_spaces} jointly specify a ``size'' of a particular
+perturbation.   It turns out that this notion of ``size'' has a number of
+attractive properties: \citep[Result 2]{gustafson:1996:local} observes that this
+notion of ``size'' is a norm, invariant to changes in the base measure, and
+invariant under one-to-one re-parameterizations.
+
+It is also desirable that perturbations which are bounded in
+$\norm{\cdot}_{\lambda,p}$ lead to proper priors.  On this point we deviate from
+\citep{gustafson:1996:local}, who requires $\phi$ to be non-negative
+$\lambda$-almost everywhere.  In contrast, we allow the perturbations $\phi$ to
+be negative. There are two reasons for doing so.  First, if $\phi$ must be
+pointwise positive, then $\p(\theta \vert \phi)$ is not defined in an open ball
+containing $\phiz$, and standard results from functional analysis cannot be
+directly applied to establish properties like Fr{\'e}chet differentiability, a
+central concern of our \secref{differentiability} below.  There are alternative
+priors that cannot be achieved by considering only positive perturbations.
+Additionally, when $\phi$ must be positive, the norm $\norm{\cdot}_{\lambda, p}$
+treats ablating and adding prior mass very asymmetrically when $p < \infty$,
+arguably violating an intutive notions of the ``size'' of perturbation, though
+we defer a detailed discussion of this point to \appref{positive_pert}.
+
+We argue that pointwise negative priors are no substantive problem, as long as
+normalizing integral is neither zero nor infinity, and as long as we do not
+extrapolate to negative alternatives $\palt(\theta)$.  (Indeed, embedding
+statistical problems in non-statisical vectors spaces is a venerable technique
+when applying functional analysis to statistics, see, e.g., \citet[Chapter
+6]{serfling:2009:approximation}.)  In order to permit negative $\phi$, we thus
+state the following generalization of \citep[Result 2]{gustafson:1996:local}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pert_well_defined}
+%
+Fix a $1 \le p \le \infty$ and $\pbase(\theta)$ as in \defref{prior_nl_pert}.
+For any $\phi \in \lp{\lambda,p}$ and $\norm{\phi}_{\lambda,p} < 1$, then
+%
+\begin{align*}
+%
+0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty,
+%
+\end{align*}
+%
+so that $\int p(\theta \vert \phi) \lambda(d\theta) = 1$.
+%
+(For a proof see \appref{proofs} \proofref{pert_well_defined}.)
+%
+\end{lem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+For any particular $\phi$, we can apply \thmref{etat_deriv}.  Note that the
+perturbations are given, for $1 \le p < \infty$, by
+%
+\begin{align}
+%
+\logp(\theta \vert \t \phi) ={}&
+   % p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
+% \\={}&
+   \log \pbase(\theta) +
+       p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+\Rightarrow \nonumber\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+   p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
+   \eqlabel{nl_vb_pert_p}
+%
+\end{align}
+%
+and, for $p = \infty$,
+%
+\begin{align}
+%
+\logp(\theta \vert \t) ={}&
+   \log \pbase(\theta) + \t \phi(\theta)
+\Rightarrow \nonumber\\
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+   \phi(\theta).
+\eqlabel{nl_vb_pert_pinf}
+%
+\end{align}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_deriv_form}
+%
+Let \assuref{kl_opt_ok} hold at $\eta_0 = \etaopt$.
+%
+Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
+\infty$.  Define the influence function
+%
+\begin{align}\eqlabel{infl_defn}
+%
+\infl_p(\theta) :={}&
+\begin{cases}
+    - p \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}}
+& \textrm{when }1 \le p < \infty \\
+%
+    - \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \q(\theta \vert \etaopt).
+& \textrm{when }p = \infty
+%
+\end{cases}
+%
+\end{align}
+%
+If the variational densities $\q(\theta \vert \eta)$ satisfy
+\assuref{dist_fun_nice} for $\t_0 = 0$ with both $\psi(\theta, \t) \equiv 1$ (no
+$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
+\phi)$, then the map $\t \mapsto \etaopt(\t \phi)$ is continuously
+differentiable at $\t=0$ with derivative
+%
+\begin{align}\eqlabel{vb_eta_infl_sens}
+%
+\fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
+    \int \infl_p(\theta) \phi(\theta) \lambda(d\theta).
+%
+\end{align}
+%
+\begin{proof}
+%
+The result follows immediately from \thmref{etat_deriv}, \eqref{nl_vb_pert_p},
+and \eqref{nl_vb_pert_pinf}.
+%
+\end{proof}
+%
+\end{cor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
