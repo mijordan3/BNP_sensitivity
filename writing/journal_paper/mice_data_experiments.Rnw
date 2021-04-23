@@ -250,12 +250,12 @@ where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i = \sum_{j=1}^{\n
 (And recall that the trace of a matrix is equivalent to the sum of its eigenvalues).
 
 Because $\laplacianevsum(\eta)$ is a scalar quantity, we can plot its influence function. 
-We choose a functional perturbation $\log\phi_{\textrm{ev}}$ that has a large, positive inner-product with the influence function.
-In this case, we construct $\log\phi_{\textrm{ev}}$
+We choose a functional perturbation $\phi_{\textrm{ev}}$ that has a large, positive inner-product with the influence function.
+In this case, we construct $\phi_{\textrm{ev}}$
 using two Gaussian bumps aligned with
 the two largest modes of the prior-weighted influence function
 (\figref{gene_fpert_coclustering} top left). 
-We anticipate $\log\phi_{\textrm{ev}}$
+We anticipate $\phi_{\textrm{ev}}$
 to have a large effect on $\laplacianevsum$. 
 With $\laplacianevsum$ a proxy for our actual posterior quantity of interest, 
 the full co-clustering matrix, we then expect that the co-clustering matrix 
@@ -273,7 +273,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.4)
 
 
 Our intuition is confirmed in \figref{gene_fpert_coclustering}. 
-After perturbing by $\log\phi_{\textrm{ev}}$, 
+After perturbing by $\phi_{\textrm{ev}}$, 
 the largest changes in the co-clustering matrix are of now of order $10^{-1}$, 
 compared with changes on the order of $10^{-2}$ after the $\alpha$ perturbations. 
 The linear approximation again able to capture the qualitative changes in the co-clustering matrix after refitting at the perturbed prior. 
@@ -305,13 +305,13 @@ insensitive to $\alpha$.
 The functional perturbation
 that corresponds to a change in $\alpha$ is
 \begin{align*}
-\log \phi_\alpha(\nu_\k) :=
+\phi_\alpha(\nu_\k) :=
 \log\betadist{\nu_\k\vert 1, \alpha} -
 \log\betadist{\nu_\k\vert 1, \alpha_0}.
 \end{align*}
-The function $\log\phi_\alpha(\nu_\k)$ is large when the influence function is small and vice-versa (\figref{alpha_pert_logphi}),
+The function $\phi_\alpha(\nu_\k)$ is large when the influence function is small and vice-versa (\figref{alpha_pert_logphi}),
 resulting in a small inner-product between the influence function
-and $\log\phi_\alpha$. 
+and $\phi_\alpha$. 
 Thus, the linear approximation will predict small changes, and 
 the refitted results confirms the linear approximation predictions. 
 
@@ -361,9 +361,9 @@ Conversely, refitting the model after a prior perturbation can take up to 20 sec
     The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ 
     Hessian solve for $\phi$ perturbation &
         \Sexpr{sprintf('%1.2g', phi_hessian_time)}\\
-    Linear approx. $\eta^{lin}(\epsilon)$ at $\epsilon = 1$ &
+    Linear approx. $\eta^{lin}(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_lr_time)}\\
-    Refit $\eta(\epsilon)$ at $\epsilon = 1$ &
+    Refit $\eta(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_refit_time)}\\
     \hline
 \end{tabular}
