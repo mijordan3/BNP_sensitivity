@@ -36,14 +36,14 @@ The timepoints are unevenly spaced, with more frequent observations at the begin
 Following \citet{Luan:2003:clustering} we apply cubic B-splines to smooth the time course expression data. 
 Specifically, we model the first 11 timepoints using
 cubic B-splines with 7 degrees of freedom.
-For the last three timepoints, $t = 72, 120, 168$ hours,
+For the last three timepoints, $\timeindx = 72, 120, 168$ hours,
 we use indicator functions. 
 That is, if $\tilde \regmatrix$ is the design 
 matrix where each column is a
 B-spline basis vector evaluated at the $\ntimepoints$ measurement times, 
 we append to $\tilde \regmatrix$ three additional columns: 
 in these columns, entries are 1
-if $t = 72, 120,$ or 168, repectively, and 0 otherwise. 
+if $\timeindx = 72, 120,$ or 168, repectively, and 0 otherwise. 
 Call the full design matrix $\regmatrix$. 
 We use indicators for the last three timepoints for numerical stability; 
 without the indicator columns,
@@ -61,14 +61,14 @@ See \figref{example_genes} for an example gene and the B-spline basis.
 }
 
 \caption[(Left) An example gene and its expression measured at 14 unique timepoints
-    with three replicates at each timepoint.
+    with three biological replicates at each timepoint.
      (Right) The cubic B-spline basis with 7 degrees of freedom, 
     along with three indicator functions for the last three timepoints, 
-    $t = 72, 120, 168$]{(Left) An example gene and its expression measured at 14 unique timepoints
-    with three replicates at each timepoint.
+    $\timeindx = 72, 120, 168$]{(Left) An example gene and its expression measured at 14 unique timepoints
+    with three biological replicates at each timepoint.
      (Right) The cubic B-spline basis with 7 degrees of freedom, 
     along with three indicator functions for the last three timepoints, 
-    $t = 72, 120, 168$.}\label{fig:example_genes}
+    $\timeindx = 72, 120, 168$.}\label{fig:example_genes}
 \end{figure}
 
 
@@ -83,7 +83,7 @@ $\beta_k$ and a variance $\tau^{-1}_k$;
 the cluster parameters are $\theta_k = (\beta_k, \tau_k)$. 
 The distribution of the data arising from cluster $k$ is 
 \begin{align*}
-p(\x_\n | \theta_k, \b_{n}) = 
+\p(\x_\n | \theta_k, \b_{n}) = 
 \normdist{\x_\n | \regmatrix\beta_k + \b_{n},
 \tau_k^{-1}I_{\ntimepoints \times \ntimepoints}},
 \end{align*}
@@ -136,7 +136,7 @@ have a closed form given $\q(\nu, \theta \vert \eta)$. See \secref{put_in_append
 
 We fitted the initial approximate posterior at $\alpha_0 = 6$. 
 \figref{gene_centroids} shows the inferred smoothers 
-$\regmatrix\mathbb{E}_q[\beta_k]$ for selected clusters. 
+$\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
 $\coclusteringmatr(\eta)$, whose $(i,j)$-th entry is the
 posterior probability that gene $i$ belongs to the same cluster
@@ -160,7 +160,7 @@ both parametric and functional perturbations to the stick distribution.
 }
 
 \caption[Inferred clusters in the mice gene expression dataset]{Inferred clusters in the mice gene expression dataset. 
-    Shown are the top twelve most occupied clusters. 
+    Shown are the twelve most occupied clusters. 
     In blue, the inferred cluster centroid. 
     In grey, gene expressions averaged over replicates and
     shifted by their inferred intercepts. }\label{fig:gene_centroids}
@@ -216,22 +216,26 @@ approximate the sign and size of the changes in the individual entries of the co
 
 }
 
-\caption[Changes in the 
+\caption[Differences in the 
      co-clustering matrix at $\alpha = 1$ (top row)
      and $\alpha = 11$ (bottom row),
      relative to the co-clustering matrix at $\alpha_0 = 6$.
-     The left column plots differences predicted by the
-     linear approximation against differences from a model refit]{Changes in the 
+     We compare differences obtained with the linearly approximated 
+     variational parameters against changes observed after 
+     refiting]{Differences in the 
      co-clustering matrix at $\alpha = 1$ (top row)
      and $\alpha = 11$ (bottom row),
      relative to the co-clustering matrix at $\alpha_0 = 6$.
-     The left column plots differences predicted by the
-     linear approximation against differences from a model refit; 
+     We compare differences obtained with the linearly approximated 
+     variational parameters against changes observed after 
+     refiting. 
+     (Left) a scatter plot of differences under the linear approximation 
+     against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
-     The middle and right columns display
-     changes in the co-clustering matrix as obtained by the
-     linear approximation and the model refit, respectively.
-     For visualization, the differences in the heatmap 
+     (Middle) the difference in co-clustering matrix observed after refitting. 
+     (Right) the difference observed under the linearly approximated variational
+     parameters. 
+     For visualization, values in the heatmaps
      are clipped at $\pm 10^{-3}$. }\label{fig:gene_alpha_coclustering}
 \end{figure}
 
@@ -289,17 +293,20 @@ The linear approximation again able to capture the qualitative changes in the co
 
 }
 
-\caption[Effect on the co-clustering matrix after a functional perturbation.
-     The perturbation $\log\phi$ (top left, in grey) 
+\caption[Effect on the co-clustering matrix after a multiplicative functional
+     perturbation.
+     The perturbation $\phi$ (top left, in grey) 
      is a difference of two Gaussian bumps 
-     scaled to have L-infinity norm equal to two.
-     $\log\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function]{Effect on the co-clustering matrix after a functional perturbation.
-     The perturbation $\log\phi$ (top left, in grey) 
+     scaled to have $L_\infty$ norm equal to two.
+     $\phi$ is chosen such that the Gaussian bumps roughly align with the 
+     two largest modes of the influence function (top left, purple]{Effect on the co-clustering matrix after a multiplicative functional
+     perturbation.
+     The perturbation $\phi$ (top left, in grey) 
      is a difference of two Gaussian bumps 
-     scaled to have L-infinity norm equal to two.
-     $\log\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function. 
+     scaled to have $L_\infty$ norm equal to two.
+     $\phi$ is chosen such that the Gaussian bumps roughly align with the 
+     two largest modes of the influence function (top left, purple; 
+     the influence function is scaled to also have $L_\infty$ norm equal to two).
      The effect of this perturbation on the prior density in the top right. 
      The bottom row shows the effect of this perturbation on 
     the coclustering matrix.
@@ -333,11 +340,11 @@ the refitted results confirms the linear approximation predictions.
 
 }
 
-\caption[The log multiplicative perturbation $\log \phi_\alpha(\cdot)$ that 
-    corresponds to decreasing the $\alpha$ parameter by five (left) or
-    increasing the $\alpha$ parameter by five (right)]{The log multiplicative perturbation $\log \phi_\alpha(\cdot)$ that 
-    corresponds to decreasing the $\alpha$ parameter by five (left) or
-    increasing the $\alpha$ parameter by five (right). }\label{fig:alpha_pert_logphi}
+\caption[The multiplicative perturbations $\phi_\alpha(\cdot)$ that 
+    corresponds to decreasing (left) or increasing (right) 
+    the $\alpha$ parameter by five]{The multiplicative perturbations $\phi_\alpha(\cdot)$ that 
+    corresponds to decreasing (left) or increasing (right) 
+    the $\alpha$ parameter by five. }\label{fig:alpha_pert_logphi}
 \end{figure}
 
 

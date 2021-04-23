@@ -1,7 +1,7 @@
 ###############
 # plot logit sticks parameter
 ###############
-plot_stick_params <- function(param_df, title = 'population'){
+plot_stick_params <- function(param_df, title = 'Population'){
   
   wide_df <- 
     param_df %>%
@@ -26,7 +26,7 @@ plot_stick_params <- function(param_df, title = 'population'){
 
 
 p0 <- logit_stick_df %>% 
-  plot_stick_params(title = 'stick') + 
+  plot_stick_params(title = 'Stick') + 
   ylab('logit-stick location') + 
   theme(legend.position = 'none', 
         axis.text.x = element_blank(), 

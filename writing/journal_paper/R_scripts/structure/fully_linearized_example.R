@@ -2,7 +2,7 @@
 # plot logit sticks parameter
 ###############
 p0 <- logit_stick_flin_df %>% 
-  plot_stick_params(title = 'stick') + 
+  plot_stick_params(title = 'Stick') + 
   ylab('logit-stick location') + 
   theme(legend.position = 'none', 
         axis.text.x = element_blank(),
@@ -12,7 +12,7 @@ p0 <- logit_stick_flin_df %>%
 # a copy of the data to draw fully linearized lines 
 dummy_df <- 
   admix_flin_df %>% 
-  mutate(population = paste0('population ', population))
+  mutate(population = paste0('Population ', population))
 
 p1 <- admix_flin_df %>% 
   plot_stick_params() + 

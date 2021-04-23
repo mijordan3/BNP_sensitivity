@@ -41,7 +41,7 @@ the BNP model correspondingly identifies three dominant clusters.
 iris_fit_cap <- paste("The iris data in principal component space and 
                       GMM fit at $\\alpha = 6$. 
                       Colors denote inferred memberships and
-                      ellipses are estimated covariances. ")
+                      ellipses represent estimated covariances. ")
 SetImageSize(aspect_ratio = base_aspect_ratio, 
              image_width = 0.6)
 @
@@ -156,12 +156,12 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 0.75)
       iris_alpha_sens_cap <- paste(
 "The expected number of clusters as $\\alpha$ varies in the 
 the GMM fit of the iris data. 
-On the left is the sensitivity of the in-sample quantity $\\gclusters$.  
+On the left is in-sample quantity $\\gclusters$.  
 On the right is the the predictive quantity $\\gclusterspred$. 
-We compute the linear approximation at $\\alpha=6$ and
-extrapolate the expected number of clusters using the
-linear approximation (red).
-We compare against the expected number of clusters obtained by refitting the model at each $\\alpha$ (blue). ")
+We formed the linear approximation at $\\alpha=6$. 
+In red, the expected number of clusters computed under the
+linearly approximated variational parameters (red).
+In blue, the expected number of clusters obtained by refitting the model at each $\\alpha$. ")
 
 SetImageSize(aspect_ratio = 0.7 * base_aspect_ratio, 
              image_width = 0.8)
@@ -242,17 +242,19 @@ We conclude that on the iris data set, $\gclusters$ appears to be a quantity ins
 <<iris_fsens_cap>>=
 iris_fsens_cap <- paste(
         "Sensitivity of
-        the expected number of in-sample clusters in the iris data set
+        the expected number of in-sample clusters 
+        in the iris data set
         to three multiplicative perturbations with 
-        unit $L_{\\infty}$-norm 
-        (Left) The log multiplicative perturbation $\\log\\phi$ in grey.        
-        The prior-weighted influence function in purple, scaled to also have 
-        unit $L_{\\infty}$-norm. 
-        (Middle) The original prior density $p_0$ and 
-        the perturbed prior density $p_1 = p_0\\times \\phi$. 
-        (Right) The effect of the perturbation 
+        unit $L_{\\infty}$-norm.
+        (Left) the multiplicative perturbation $\\phi$ in grey.        
+        The influence function $\\Psi$ in purple, 
+        scaled to also have unit $L_{\\infty}$-norm. 
+        (Middle) the original prior density $\\p_0$ and 
+        the perturbed prior density $\\p_t = \\p_0\\times \\exp(t \\phi)$
+        at $t = 1$. 
+        (Right) the effect of the perturbation 
         on the change in expected number of in-sample clusters 
-        as $\\epsilon$ varies. ")
+        as $t\\rightarrow1$.")
 
 SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio)
 @

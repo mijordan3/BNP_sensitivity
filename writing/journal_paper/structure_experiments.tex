@@ -127,12 +127,12 @@ with each having a loose correspondance with the Chawia, Ngangao, and Mbololo ge
 
 }
 
-\caption[The inferred individual admixtures at $\alpha = 3$]{The inferred individual admixtures at $\alpha = 3$. 
+\caption[The inferred individual admixtures at $\alpha_0 = 3$]{The inferred individual admixtures at $\alpha_0 = 3$. 
     Each vertical strip is an individual and each color
     a latent population.
     Lengths of colored segments represent the inferred admixture proportions.
-    Mbololo, Ngangao, Yale, and Chawia refer to
-    geographic regions from which each individual was collected. 
+    Individuals are ordered by the geographic region from which they were sampled
+    (Mbololo, Ngangao, Yale, and Chawia).
     In the text, we refer to the green, orange, and purple latent populations 
     as population 1, 2, and 3, respectively. }\label{fig:stru_init_fit}
 \end{figure}
@@ -197,9 +197,21 @@ In particular, the linearly approximated variatonal parameters failed to produce
 
 }
 
-\caption[The expected number of populations in the thrush data as $\alpha$ varies.
-    We compute the linear approximation at $\alpha = 3$]{The expected number of populations in the thrush data as $\alpha$ varies.
-    We compute the linear approximation at $\alpha = 3$. In the right plot, the threshold is set at $	au = 20$ (approximately $1\%$ of loci). }\label{fig:stru_alpha_nclusters}
+\caption[The expected number of (thresholded) 
+    populations in the thrush data as $\alpha$ varies.
+    We computed the linear approximation at $\alpha_0 = 3$, and
+    we compare the 
+    results under the linearly approximated variational parameters with the
+    results observed after refitting]{The expected number of (thresholded) 
+    populations in the thrush data as $\alpha$ varies.
+    We computed the linear approximation at $\alpha_0 = 3$, and
+    we compare the 
+    results under the linearly approximated variational parameters with the
+    results observed after refitting. 
+    Thresholds at $\tau = 20$ and $\tau = 40$ corresponding to 
+    approximately 
+    $2\%$ and $4\%$ 
+    of the total number of loci in the data set, respectively. }\label{fig:stru_alpha_nclusters}
 \end{figure}
 
 
@@ -249,10 +261,7 @@ therefore continued to predict three latent populations even at $\alpha = 1$.
 
 }
 
-\caption{The expected number of loci per cluster as $\alpha$ varies. 
-     We compute the linear approximation at $\alpha = 3$. 
-     The horizontal blue line corresponds to the threshold in computing the 
-    expected number of thresholded clusters in Figure~\ref{fig:stru_alpha_nclusters} }\label{fig:stru_alpha_cluster_weights}
+\caption[The expected number of loci per population as $\alpha$ varies]{The expected number of loci per population as $\alpha$ varies. }\label{fig:stru_alpha_cluster_weights}
 \end{figure}
 
 
@@ -308,15 +317,15 @@ However, under the refits, this admixture proportion does not decrease steadily 
 
 \caption[Sensitivity of inferred admixtures for several outlying individuals]{Sensitivity of inferred admixtures for several outlying individuals. 
      For individuals A, 
-     we examine the sensitivity of the inferred mixture proportion of the orange
-     population.
+     we examine the sensitivity of the admixture proportion of population 2.
      For individuals B, 
-     we examine the inferred green proportion.
-     For the individuals C, we examine the inferred purple proportion.
-     (Left column) The worst-case $L_\infty$ negative perturbation in grey,
-     plotted against the prior-weighted influence function
-     (scaled to have $L_\infty$ norm equal to 1). 
-    (Middle column) The effect of this perturbation on the prior density. 
+     we examine the population 1 admixture
+     For the individuals C, we examine the population 3 admixture.
+     (Left column) The worst-case negative perturbation with unit $L_\infty$-norm 
+     in grey,
+     plotted against the influence function in purple
+     (scaled to also have $L_\infty$ norm equal to 1). 
+    (Middle column) The effect of the perturbation on the prior density. 
     (Right column) Effects on the inferred admixture. }\label{fig:stru_func_sens}
 \end{figure}
 
