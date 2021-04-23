@@ -16,11 +16,14 @@
 \def\sumkm{\sum_{\k=1}^{\kmax - 1}}
 \def\dirderiv#1#2{\delta_{#1\rightarrow#2}} % A directional derivative (unused?)
 \def\linop{\mathcal{L}} % A linear operator
+\def\logtrim{\tilde{\log}}
 
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
 \DeclareMathOperator*{\esssup}{\mathrm{esssup}}
 \DeclareMathOperator*{\essinf}{\mathrm{essinf}}
+\DeclareMathOperator*{\argsup}{\mathrm{argsup}}
+\DeclareMathOperator*{\arginf}{\mathrm{arginf}}
 
 % Variables
 \def\etaopt{\hat\eta} % Optimal vb parameters
@@ -33,6 +36,7 @@
 \def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
 \def\const{C}   % Constant
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
+\def\lnuk{\tilde{\nu}_{\k}}   % Unconstrained stick
 \def\lnumean{\eta^{\mu}}   % Unconstrained stick vb mean
 \def\lnusd{\eta^{\sigma}}   % Unconstrained stick vb std
 \def\hess#1{H_{#1}}   % Hessian
@@ -40,8 +44,10 @@
 \def\infl{\Psi}   % The influence function
 \def\inflg{\Psi_{\g}}   % The influence function for a function of interest
 
+% Variational parameters
 \def\etatheta{\eta_{\theta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
+\def\etalnu{\eta_{\lnu}}  % VB parameters for certain components
 \def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
 \def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
@@ -50,17 +56,23 @@
 \def\etaoptnuk{\etaopt_{\nuk}}  % VB parameters for certain components
 \def\etaoptz{\etaopt_{\z}}  % VB parameters for certain components
 \def\etaoptgamma{\etaopt_{\gamma}}  % VB parameters for certain components
+\def\hessopt{\hat{H}}  % VB parameters for certain components
 
 
 % Distributions central to the story
-\def\pstick{p_{\mathrm{stick}}}   % Stick breaking distribution
-\def\q{q}   % VB dist
-\def\logp{\ell}   % Log probabiltty
+\def\p{\mathcal{P}}   % Other distributions
+\def\q{\mathcal{Q}}   % VB dist
+\def\ptil{\tilde{\p}}   % Other distributions
+\def\qtil{\tilde{\q}}   % Unnormalized VB dist
+\def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
+\def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
 \def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
 \def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
 \def\psigrad#1{{\nabla_\t \psi}\left(#1\right)}   % Function of interest grad
+\def\pbase{\p_{0}}   % Base prior
+\def\palt{\p_{1}}   % Alternative prior
 % \def\psigradbar#1{\overline{\psigrad{#1}}\,\,}   % Cenetered function of interest
 % \def\psibar#1{\overline{\psi\left(#1\right)}\,\,}   % Cenetered function of interest
 
@@ -72,8 +84,6 @@
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
-\def\pbase{p_{0}}   % Base prior
-\def\palt{p_{1}}   % Alternative prior
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}
@@ -84,18 +94,21 @@
 \def\N{N}   % Number of datapoints
 \def\K{K}   % Number of components
 \def\kmax{{\K_{\mathrm{max}}}}   % Truncation
-\def\etadim{{D_{\eta}}}
-\def\thetadim{{D_{\theta}}}
-\def\zetadim{{D_{\zeta}}}
+\def\etadim{{D_{\eta}}}     % VB parameter
+\def\betadim{{D_{\beta}}}   % Centroid parameter
+\def\zetadim{{D_{\zeta}}}   % All parameters
 \def\ngh{N_{\mathrm{GH}}}   % Number of GH points
+\def\thetadim{{D_{\theta}}} % A generic parameter
 
 % Domains
 \def\etadom{\Omega_{\eta}}
 \def\thetadom{\Omega_{\theta}}
+\def\betadom{\Omega_{\beta}}
 \def\tdom{\Omega_{\t}}
 \def\linf{{L_{\infty}[0,1]}}
-\def\lp#1{{L_{#1}[0,1]}}
+\def\lp#1{{L_{#1}}}
 \def\ball{\mathcal{B}}
+\def\ballclosed{\overline{\ball}}
 
 % Annotations
 \def\mathtxt#1{\quad\textrm{#1}\quad}%

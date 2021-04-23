@@ -1,0 +1,33 @@
+Two central questions in many probabilistic clustering problems is how many
+distinct clusters are present in a particular dataset, and which observations
+cluster together.  Bayesian nonparametrics (BNP) addresses this question by
+placing a generative process on cluster assignment, making the number of
+distinct clusters present amenable to Bayesian inference. However, like all
+Bayesian approaches, BNP requires the specification of a prior, and this prior
+may favor a greater or fewer number of distinct clusters.  In practice, it is
+important to quantitatively establish that the prior is not too informative,
+particularly when---as is often the case in BNP---the particular form of the
+prior is chosen for mathematical convenience rather than because of a considered
+subjective belief.
+
+We derive local sensitivity measures based on Taylor series approximations for a
+truncated variational Bayes approximation based on the Kullback-Leibler
+divergence.  Using a stick-breaking representation of a Dirichlet process, we
+consider perturbations both to the scalar concentration parameter and to the
+functional form of the stick-breaking distribution by embedding the
+stick-breaking density in the $L_p$ vector spaces of integrable functions.  We
+prove that, though the variational optimum is directional differentiable for all
+$1 \le p \le \infty$, the derivative provides a uniformly good approximation in
+a neighborhood of the original prior only with multiplicative perturbations and
+$p=\infty$.
+
+We apply our methods to several real-world datasets, estimating sensitivity to
+the BNP prior specification of key posterior quantities, and evaluating the
+accuracy of our approximations by comparing to the much more expensive process
+of re-fitting the model.  In the design and evaluation of our local sensitivity
+measures we pay special attention to our ability to accurately extrapolate to
+different priors, rather than treating the sensitivity as a measure of
+robustness {\em per se}.  We show the accuracy of our approximation both for
+particular parametric and non-parametric perturbations, and demonstrate the
+usefulness of the influence function to find maximally influential alternative
+priors.
