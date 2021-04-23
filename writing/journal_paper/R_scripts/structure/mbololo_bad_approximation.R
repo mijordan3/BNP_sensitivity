@@ -13,15 +13,17 @@ plot_stick_params <- function(param_df, title = 'population'){
     wide_df %>%
     plot_post_stat_trace_plot() +
     facet_wrap(~population, nrow = 1, scales = 'free_y') +
-    geom_rect(data = subset(wide_df, population = 'stick 1'),
-              aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf), 
-              color = 'red')
-
+    geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, 
+                  fill = population), 
+              alpha = pop_box_alpha,
+              color = 'white',
+              show.legend = FALSE) + 
+    scale_fill_brewer(palette = 'Set2', type = 'qualitative')
+  
+  p <- move_layers(p, "GeomRect", position = "bottom")
   return(p)
 }
 
-logit_stick_df %>% 
-  plot_stick_params(title = 'stick')
 
 p0 <- logit_stick_df %>% 
   plot_stick_params(title = 'stick') + 
@@ -30,10 +32,9 @@ p0 <- logit_stick_df %>%
         axis.text.x = element_blank(), 
         axis.title.x = element_blank())
 
-p0
-
 p1 <- admix_df %>% 
   plot_stick_params() + 
   ylab('admixture') 
 
 p0 / p1
+

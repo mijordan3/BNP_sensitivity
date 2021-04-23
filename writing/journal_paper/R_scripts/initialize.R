@@ -6,6 +6,8 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(ggforce)
+library(gginnards)
+
 library(xtable)
 
 library(gridExtra)

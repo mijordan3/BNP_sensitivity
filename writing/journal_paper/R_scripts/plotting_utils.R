@@ -27,7 +27,7 @@ plot_post_stat_trace_plot <- function(results_df,
     geom_point() + 
     geom_line() + 
     scale_color_brewer(palette = 'Set1') + 
-    theme(legend.title = element_blank(), 
+    theme(legend.title = element_blank(),
           legend.position = 'bottom') + 
     get_fontsizes()
   

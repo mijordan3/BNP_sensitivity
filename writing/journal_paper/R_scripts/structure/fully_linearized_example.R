@@ -5,7 +5,7 @@ p0 <- logit_stick_flin_df %>%
   plot_stick_params(title = 'stick') + 
   ylab('logit-stick location') + 
   theme(legend.position = 'none', 
-        axis.text.x = element_blank(), 
+        axis.text.x = element_blank(),
         axis.title.x = element_blank())
 
 
@@ -18,9 +18,11 @@ p1 <- admix_flin_df %>%
   plot_stick_params() + 
   ylab('admixture') + 
   # plot the fully-linearized quantity
-  geom_line(data = dummy_df, 
-            aes(x = epsilon, y = fully_lin), 
+  geom_line(data = dummy_df,
+            aes(x = epsilon, y = fully_lin),
             color = 'red', 
-            linetype = 'dashed') 
+            linetype = 'dashed') + 
+  guides(color = FALSE, 
+         shape = FALSE)
 
-p0 / p1
+p0 / p1 + plot_layout(guides = "collect") & theme(legend.position = 'bottom')

@@ -80,7 +80,11 @@ p_admix <- out$p +
 # plot results
 #################
 
-plot_struct_fsens_results <- function(results_list){
+# alpha for population coloring box
+pop_box_alpha <- 0.05
+
+plot_struct_fsens_results <- function(results_list, 
+                                      pop_color){
   
   p_logphi <- plot_influence_and_logphi(results_list$infl_df$logit_v, 
                                         results_list$infl_df$infl_x_prior, 
@@ -100,7 +104,16 @@ plot_struct_fsens_results <- function(results_list){
   p_sens <- plot_post_stat_trace_plot(results_df, 
                                       abbreviate_legend = TRUE) + 
     ggtitle('Sensitivity') + 
-    xlab('t') 
+    xlab('t') + 
+    # add coloring for population 
+    geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf), 
+              alpha = pop_box_alpha,
+              fill = pop_color,
+              color = 'white',
+              show.legend = FALSE) 
+  
+  p_sens <- move_layers(p_sens, 'GeomRect', position = 'bottom')
+    
   
   return(list(p_logphi = p_logphi, 
               p_priors = p_priors, 
@@ -120,7 +133,8 @@ x_axis_remover <-
 title_remover <- ggtitle(NULL)
 
 mbololo_plots <- 
-  plot_struct_fsens_results(mbololo_fsens_results)
+  plot_struct_fsens_results(mbololo_fsens_results, 
+                            pop_color = pop2_color)
 
 mbololo_plots$p_logphi <- 
   mbololo_plots$p_logphi + 
@@ -136,10 +150,7 @@ mbololo_plots$p_priors <-
 mbololo_plots$p_sens <-
   mbololo_plots$p_sens + 
   ylab('propn. pop2') + 
-  x_axis_remover + 
-  # change axis color
-  theme(panel.border = element_rect(size = panel_size,
-                                    color = pop2_color))
+  x_axis_remover 
 
 
 mbololo_plots_sum <- 
@@ -152,7 +163,8 @@ mbololo_plots_sum <-
 # plots for ngangao outliers
 ##########
 ngangao_plots <- 
-  plot_struct_fsens_results(ngangao_fsens_results)
+  plot_struct_fsens_results(ngangao_fsens_results, 
+                            pop_color = pop1_color)
 
 ngangao_plots$p_logphi <- 
   ngangao_plots$p_logphi + 
@@ -170,10 +182,7 @@ ngangao_plots$p_sens <-
   ngangao_plots$p_sens + 
   ylab('propn. pop1') + 
   title_remover + 
-  x_axis_remover + 
-  # change axis color
-  theme(panel.border = element_rect(size = panel_size,
-                                    color = pop1_color))
+  x_axis_remover
 
 ngangao_plots_sum <- 
   ngangao_plots$p_logphi + 
@@ -185,7 +194,8 @@ ngangao_plots_sum <-
 # plots for chawia outliers
 ##########
 chawia_plots <- 
-  plot_struct_fsens_results(chawia_fsens_results)
+  plot_struct_fsens_results(chawia_fsens_results, 
+                            pop_color = pop3_color)
 
 chawia_plots$p_logphi <- chawia_plots$p_logphi + 
   ggtitle('worst-case pert. of C')
@@ -195,9 +205,7 @@ chawia_plots$p_priors <- chawia_plots$p_priors +
 
 chawia_plots$p_sens <- chawia_plots$p_sens + 
   title_remover + 
-  ylab('propn. pop3') + 
-  theme(panel.border = element_rect(size = panel_size,
-                                    color = pop3_color))
+  ylab('propn. pop3')
 
 chawia_plots_sum <- 
   chawia_plots$p_logphi + 
