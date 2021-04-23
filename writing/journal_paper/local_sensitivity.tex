@@ -57,9 +57,9 @@ the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 %
 \begin{align}\eqlabel{gem_alpha_pert}
 %
-\log \pstick(\nuk \vert \alpha) ={}&
+\log \pstick(\nuk \vert \t) ={}&
     \log \pstick(\nuk \vert \alpha_0) +
-    (\alpha - \alpha_0) \log(1 - \nuk) + \const.
+    \t \log(1 - \nuk) + \const.
     %& \constdesc{\nuk}
 %
 \end{align}
@@ -68,11 +68,10 @@ Similarly, the prior on the full $\nu$ vector is given by
 %
 \begin{align*}
 %
-\log \p(\nu \vert \alpha) ={}&
+\log \p(\nu \vert \t) ={}&
     \sumkm \log \pstick(\nuk \vert \alpha)
 \\={}&
-    \log \p(\nu \vert \alpha_0) +
-    (\alpha - \alpha_0) \sumkm \log(1 - \nuk) + \const.
+    \log \p(\nu \vert \alpha_0) + \t \sumkm \log(1 - \nuk) + \const.
 %
 \end{align*}
 %
@@ -348,14 +347,28 @@ of the five constants.
 \begin{ex}
 %
 To analyze \exref{alpha_perturbation}, recall from \secref{model_vb} that we
-take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$
-to be independent normal distributions.  By the 
+take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$ to
+be independent normal distributions.  Expressing the perturbation to the stick
+breaking prior given in \exref{alpha_perturbation} in terms of $\lnuk$
+using \eqref{lnuk_derivatives}, we get
 %
 \begin{align*}
 %
-1
+\MoveEqLeft
+\log \pstick(\lnuk \vert \t) - \log \pstick(\lnuk \vert \t=0)
+\\={}&
+    \t \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) -
+    \log \abs{\fracat{d \nuk}{d \lnuk}{\lnuk}} + \const \\
+% \\={}&
+%     -\t \log\left(1 + \exp(\lnuk)\right) -
+%     \lnuk + 2 \log\left(1 + \exp(\lnuk) \right) + \const.
+\\={}&
+    -(2 + \t) \log\left(1 + \exp(\lnuk)\right) - \lnuk + \const.
 %
 \end{align*}
+%
+So, by \lemref{normal_q_is_regular}, \assuref{dist_fun_nice} is satisfied
+with the VB approximation given in \eqref{lnuk_vb_approximation}. 
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

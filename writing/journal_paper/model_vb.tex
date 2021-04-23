@@ -261,21 +261,32 @@ First, define a version of $\nuk$ that is not constrained to $(0,1)$:
 %
 \lnu_\k :={} \log \left( \frac{\nuk}{1 - \nuk} \right)
 \quad\Leftrightarrow\quad
-\nuk :={} \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
-%\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}&
+\nuk :={} \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}.
+%
+\end{align*}
+%
+It will be useful later to have at hand the transform between densities
+expressed in the space of $\nu$ and $\lnu$, which is given by
+%
+\begin{align}\eqlabel{lnuk_derivatives}
+%
+\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
 %     \frac{1-\nuk}{\nuk}
 %     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
 % \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
 % \\={}&
-%\frac{1}{\nuk (1 - \nuk)}.
+    \frac{1}{\nuk (1 - \nuk)} \mathand
 %
-\end{align*}
+\fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
+    \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
+%
+\end{align}
 %
 We wish to let $\lnu_\k$ be distributed normally under the variational
 distribution.  Let $\lnumean_\k$ and $\lnusd_\k$ be entries of the parameter
 vector $\eta$, and write
 %
-\begin{align*}
+\begin{align}\eqlabel{lnuk_vb_approximation}
 %
 \q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
 \Rightarrow \\
@@ -283,12 +294,13 @@ vector $\eta$, and write
     \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
         \vert \lnumean_\k, \lnusd_\k}
     \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
-\\={}&
+\nonumber\\={}&
 \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
         \vert \lnumean_\k, \lnusd_\k}
     \left|\frac{1}{\nuk (1 - \nuk)}\right|.
+\nonumber
 %
-\end{align*}
+\end{align}
 %
 Given this, we can approximate expectations of smooth functions
 $f(\nuk)$ using GH quadrature with $\ngh$ knots,
