@@ -342,9 +342,23 @@ of the five constants.
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Finally, in \assuref{q_stick_regular} we draw the needed connection between the
+class of prior perturbations and the variational approximation.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}
+\begin{assu}\assulabel{q_stick_regular}
+%
+Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
+\eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
+$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t)$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{gem_pert_ok}
 %
 To analyze \exref{alpha_perturbation}, recall from \secref{model_vb} that we
 take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$ to
@@ -367,25 +381,13 @@ using \eqref{lnuk_derivatives}, we get
 %
 \end{align*}
 %
-So, by \lemref{normal_q_is_regular}, \assuref{dist_fun_nice} is satisfied
-with the VB approximation given in \eqref{lnuk_vb_approximation}. 
+So, by \lemref{normal_q_is_regular}, \assuref{q_stick_regular} is satisfied with
+the VB approximation given in \eqref{lnuk_vb_approximation} and the parametric
+perturbation given in \exref{alpha_perturbation}.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Finally, in \assuref{q_stick_regular} we draw the needed connection between the
-class of prior perturbations and the variational approximation.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_stick_regular}
-%
-Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
-\eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
-$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t)$.
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -439,8 +441,17 @@ with derivative
 For the variational approximation of \secref{model_vb} and perturbation
 given in \exref{alpha_perturbation}, $\alpha \mapsto \etaopt(\alpha)$
 is continuously differentiable.
-
-TODO: finish this up.
+%
+\begin{proof}
+%
+We have already shown in \exref{gem_pert_ok} that \assuref{q_stick_regular} is
+satisfied.  Given that the variational approximations to $\p(\z \vert \x, \beta,
+\nu)$ and $\p(\beta \vert \x, \nu, \z)$ are conjugate exponential family
+approximations, $\eta \mapsto \KL{\eta, 0}$ is continuous.  It remains only to
+numerically find $\etaopt$ and verify \assuitemref{kl_opt_ok}{kl_hess}, i.e.
+that the Hessian is positive definite at the optimum.
+%
+\end{proof}
 %
 \end{cor}
 
