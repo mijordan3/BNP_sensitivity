@@ -104,7 +104,7 @@ There appears to be three dominant latent populations, which we arbitrarily labe
 The inferred populations generally correspond with the geographic regions: 
 individuals from the Mbololo region have population 1 as their dominant admixture proportion; 
 individuals from the Ngangao are dominantly population 2; 
-individuals from the Chawia appear to be a mixture of populations 1, 2, and, 3. 
+individuals from the Chawia are admixed with populations 1, 2, and 3. 
 The four individuals from Yale appear similar to individuals from the Ngangao;
 this is not surprising given that the Yale region is geographically located in proximity to the Ngangao region. 
 
@@ -140,30 +140,33 @@ with each having a loose correspondance with the Chawia, Ngangao, and Mbololo ge
 \end{knitrout}
 
 
-\subsubsection*{Sensitivity: expected number of populations}
+\subsubsection*{Sensitivity: number of populations}
 
-We start by evaluating the sensitivity of the expected number of populations
+We start by evaluating the sensitivity of the inferred number of populations
 to the $\alpha$ parameter in the $\betadist{\nu_{nk}\vert 1, \alpha}$ stick distribution. 
-We focus on the in-sample quantity. 
-Define the expected number of populations containing at least $\tau$ loci as
+Define the posterior quantity
 \begin{align*}
 \gpop(\eta; t)
-&= \expect{\q(\z\vert\eta)}{\sum_{k=1}^\kmax \ind{ 
-\left(\sum_{n=1}^{\nindiv}
-\sum_{l=1}^{\nloci}
-\sum_{i=1}^2
-\z_{\n l i \k}\right) > \tau}}.
+&= \expect{\q(\z\vert\eta)}{\sum_{\k=1}^\kmax \ind{ 
+\left(\sum_{\n=1}^{\nindiv}
+\sum_{\l=1}^{\nloci}
+\sum_{\i=1}^2
+\z_{\n \l \i \k}\right) > \tau}},
 \end{align*}
+which is the expected number of populations in the data set that contains at least $\tau$ loci. 
+We allow the option of setting $\tau > 0$ in order to count only the populations that comprise a non-negligible fraction of the data set. 
+
+
 % 
 % $\gpop$ counts a population as present if they contain at least $\tau$ loci. 
 % When $\tau = 0$, $\gpop$ is equivalent to the expected in-sample number of clusters discussed in \secref{results_iris}, except the summation is now over individuals, loci, and chromosomes. 
 
-At $\tau = 0$, $\gpop$ has a simple closed form expression as a function of the expectations of $\z_{\n l i \k}$; 
+At $\tau = 0$, $\gpop$ has a simple closed form expression as a function of the expectations of $\z_{\n \l \i \k}$; 
 for $\tau > 0$, we resort to Monte Carlo estimates. 
 Like the posterior quantity $\gclusterspred$ discussed in \secref{results_iris},
 we use the re-parameterization trick to sample from $\q(\z\vert\eta)$. 
-This allows us to condition on fixed draws from a distribution that is independent of $\eta$ (in this case the underlying distribution is $\mathrm{Uniform}[0, 1]$); 
-these fixed draws are shared across every computation of $\gpop(\eta; t)$ below. 
+This allows us to condition on fixed draws from a distribution that is independent of $\eta$ (in this case, the underlying distribution is $\mathrm{Uniform}[0, 1]$); 
+these fixed draws are shared across every computation of $\gpop(\eta; \tau)$ below. 
 
 The expected number of latent populations is sensitive to $\alpha$ (\figref{stru_alpha_nclusters}).
 Without any thresholding ($\tau = 0$),
@@ -171,22 +174,30 @@ the expected number of populations quickly increases as $\alpha$ increases;
 in fact, it nearly saturates at $\kmax = 20$ when $\alpha = 7$. 
 This sensitivity is likely due to the fact that the non-thresholded quantity 
 is highly dependent on the behavior of small, nearly unoccupied populations;
-even though the probability of a single locus belonging to these rare populations is small, the probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed genotypes belong to these rare populations is non-negligable.  
+even though the probability of a single locus belonging to these rare populations is small, the probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed genotypes belong to these rare populations is non-negligible.  
 
 This motivates the use of thresholding in reporting the number of populations. 
-We threshold at $\tau = 20$ and $\tau = 40$, corresponding to approximately 
+We consider two thresholds, $\tau = 20$ and $\tau = 40$,
+corresponding to approximately 
 $2\%$ and $4\%$ 
-of the total number of loci in the data set, respectively. 
-In the refits, the thresholded quantities still vary between two and four
+of the total number of loci in the data set, respectively. '
+The thresholded estimates for the number of populations is stil
+moderately sensitive to the value of $\alpha$. 
+When refitting the variational approximation at $\alpha = 1, \ldots, 7$,
+the thresholded quantities vary between two and four
 latent populations. 
 
 The linear approximation imperfectly captures the results observed by refitting. 
 We formed the linear approximation at $\alpha_0 = 3$ and computed 
-$\gpop$ at variational parameters $\etalin(\alpha)$ for $\alpha = 1, \ldots, 7$. 
-For this range of $\alpha$, the linearly approximated and the refitted variational parameters almost perfectly agree on values of $\gpop$ with $\tau = 0$. 
-However, substituting $\etalin(\alpha)$ for the refitted values $\etaopt(\alpha)$
-underestimated the sensitivity of $\gpop$ when $\tau = 20$ and $\tau = 40$.  
-In particular, the linearly approximated variatonal parameters failed to produce the reduction to two latent populations at $\alpha = 1$ observed in the refits.
+$\gpop$ using the linearly approximated variational parameters
+$\etalin(\alpha)$ for $\alpha = 1, \ldots, 7$. 
+For this range of $\alpha$, $\etalin(\alpha)$ and the refitted parameters 
+$\etaopt(\alpha)$ almost perfectly agree on values of $\gpop$ with $\tau = 0$. 
+However, when $\tau = 20$ and $\tau = 40$, 
+the linearly approximated parameters 
+underestimated the true sensitivity of $\gpop$ found by refitting. 
+In particular, the linearly approximated parameters failed to produce
+the reduction to two latent populations at $\alpha = 1$ observed in the refits.
 
 
 \begin{knitrout}
@@ -216,8 +227,9 @@ In particular, the linearly approximated variatonal parameters failed to produce
 
 \end{knitrout}
 
-We provide some more intuition concerning the expected number of populations $\gpop$ with some threshold $\tau > 0$. 
-$\gpop$ is closely related to the expected number of loci belonging to each population, defined as
+We provide some more intuition concerning the thresholded estimate for the number of populations.
+Our posterior quantity $\gpop$ is closely related to the expected number of loci belonging to each population,
+defined as
 \begin{align*}
 \gloci(\eta; k)
 &= \expect{\q(\z\vert\eta)}{\sum_{n=1}^{\nindiv}
@@ -229,28 +241,29 @@ $\gpop$ is closely related to the expected number of loci belonging to each popu
 \figref{stru_alpha_cluster_weights} plots $\gloci$ for the first six populations 
 as $\alpha$ varies.
 The expected number of loci at the initial fit, $\gloci(\etaopt(\alpha_0); k)$,
-is at least 100 for populations $\k = 1, 2,$ and $3$, 
-while $\gloci(\etaopt(\alpha_0); k)$ is less than 
+is at least 100 for populations $\k = 1, 2,$ and $3$ and 
+less than 
 12
 for the remaining populations.  
 A sample of memberships $\z\sim \q(\z\vert\etaopt(\alpha_0))$ will 
 almost always have at least $\tau$ loci allocated to populations 1, 2, and 3, 
 while the allocations to each remaining population will almost always be below $\tau$, for either $\tau = 20$ or $\tau = 40$. 
-Thus, at $\alpha = \alpha_0$ there then are clearly 3 populations as defined by our threshold.  
+Thus, at $\alpha = \alpha_0$ there then are clearly 3 populations by our definition of $\gpop$, for either $\tau$.
 
 At $\alpha = 7$, the expected number of loci belonging to population 4
 increases to 
 $20.7$, 
 a new population emerges above the threshold at $\tau = 20$. 
+Both the linearly approximated and the refitted variational parameters agree on this shift in allocation to population 4. 
 On the other hand, under the refitted variational parameters at $\alpha = 1$, 
 the expected number of loci belonging to population 3 decreases to 
 $6.7$, 
 below the thresholds $\tau = 20$ and $\tau = 40$. 
-Thus, the expected number of latent populations with
-either threshold $\tau = 20$ or $\tau = 40$ decreases to two. 
-The linear approximation under-estimated this decrease in allocation to
-population 3, and 
-therefore continued to predict three latent populations even at $\alpha = 1$. 
+Thus, the expected number of latent populations with allocations above
+either threshold decreases to two. 
+The linearly approximated parameters
+under-estimated this decrease in allocation to population 3, and 
+therefore continued to estimate three latent populations even at $\alpha = 1$. 
 
 
 \begin{knitrout}
@@ -268,42 +281,47 @@ therefore continued to predict three latent populations even at $\alpha = 1$.
 
 \subsubsection*{Sensitivity: individual admixtures}
 
-Examining the inferred admixtures in \figref{stru_init_fit} provide clues into historical migration patterns of the genotyped individuals. 
-For example, while individuals collected from the Mbololo region are inferred to primarily be admixed with population 1, 
-there are a few individuals have abnormally large admixture proportions of population 2 than the rest. 
-Conversely, while individuals collected from the Ngangao region are primarily population 2, several individuals have abnormally large admixture proportions of population 1. 
-This suggests the presence of migration between the Ngangao and Mbololo regions. 
+Examining the inferred admixtures in \figref{stru_init_fit} provides clues into the historical migration patterns of the genotyped individuals. 
+For example, while individuals collected from the Mbololo region are inferred to be admixed primarily with population 1, 
+several individuals from this region have abnormally large admixture proportions of population 2. 
+Conversely, while individuals collected from the Ngangao region are admixed primarily with population 2, a few of these individuals have abnormally large
+admixture proportions of population 1. 
+This suggests that some migration has occured between the Mbololo and Ngangao regions. 
 
-In this subsection, we evaluate the sensitivity of this conclusion to possible prior perturbations. 
-We consider the posterior statistic 
+We evaluate the sensitivity of this conclusion to possible prior perturbations. 
+Consider the posterior statistic 
 \begin{align*}
 \gadmix(\eta; \mathcal{N}, k) = 
- \expect{\q(\z\vert\eta)}{\frac{1}{|\mathcal{N}|}\sum_{n\in\mathcal{N}}
+ \expect{\q(\pi\vert\eta)}{\frac{1}{|\mathcal{N}|}\sum_{n\in\mathcal{N}}
 \pi_{\n\k}},
 \end{align*}
 the average admixture proportion of population $\k$ in a set of 
 individuals $\mathcal{N}$. 
 
 We present results on three variations of $\gadmix$: 
-the six individuals from the Mbololo region with outlying proportions 
-of population 2 ($\mathcal{N} = \{25, ..., 30\}, k = 2$); 
-the four individuals from the Ngangao region with outlying proportions 
-of population 1 ($\mathcal{N} = \{44, ..., 37\}, k = 1$); 
-and all individuals from the Chawia region 
-($\mathcal{N} = \{44, ..., 37\}, k = 3$). 
-The first two cases are related to the question of migration between the Mbololo and Ngangao regions. 
-In the last case, we are examining the sensitivity of the presense of the third population in the Chawia region. 
+$\mathcal{N} = \{26, ..., 31\}$ and $k = 2$, 
+corresponding to the six individuals from the Mbololo region with outlying proportions of population 2; 
+$\mathcal{N} = \{125, ..., 128\}$ and $k = 1$, 
+corresponding to the four individuals from the Ngangao region with outlying proportions of population 1; 
+$\mathcal{N} = \{139, ..., 155\}$ and $k = 3$,
+corresponding to all individuals from the Chawia region. 
+In the last case, we are studying the sensitivity of haing a third latent
+population present, a population which primarily appears in Chawia individuals. 
 
-For each statistic, we construct the worst-case negative perturbation (negative because we are interested in making these patterns disappear). 
-\figref{stru_func_sens} displays the effect of each worst-case perturbation on its respective posterior statistic. 
-The linear approximation $\gadmix(\etalin(\epsilon); \mathcal{N}, k)$ 
-predicts that the presence of population 2 in the outlying Mbololo individuals to be sensitive to this worst-case perturbation:
-the admixture proportion of population 2 is nearly halved after the perturbation. 
-The quantity computed by refitting the model confirms the prediction by the linear approximation. 
-On the other hand, the presence of population 1 in the outlying Ngangao individuals appear to be insensitive, even after a worst-case perturbation. 
-The linear approximation and the refits agree on this conclusion. 
-Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive under the linear approximation, as this admixture proportion steadily decreases as $\epsilon\rightarrow 1$ 
-However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $\epsilon = 0.5$. 
+For each variant of $\gadmix$, 
+we construct its worst-case negative perturbation 
+(negative because we are interested in making these patterns disappear). 
+\figref{stru_func_sens} displays the effect of each 
+worst-case perturbation on its respective posterior quantity. 
+Under the linearly approximated variational parameters, 
+the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved.
+The same quantity computed after refitting the model after the prior perturbation
+confirms the sensitivity predicted by the linear approximation. 
+On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive, even after a worst-case perturbation. 
+The linearly approximated and the refitted variational parameters again
+agree on this conclusion. 
+Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive by the linear approximation, as this admixture proportion steadily decreases as $t\rightarrow 1$. 
+However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $t = 0.5$. 
 
 
 
@@ -390,8 +408,8 @@ The linear approximation failed to detect this change.
 
 }
 
-\caption{Inferred admixtures after the worst-case prior perturbation 
-     to individuals A (second row, Figure~\ref{fig:stru_func_sens}). }\label{fig:stru_func_sens_admix}
+\caption{Inferred admixtures after the worst-case perturbation 
+     to individuals A (see Figure~\ref{fig:stru_func_sens} for perturbation). }\label{fig:stru_func_sens_admix}
 \end{figure}
 
 
@@ -430,9 +448,21 @@ the linear approximation then under-estimates the admixture proportion of popula
 
 }
 
-\caption[An example where the linear approimxation poorly captured the 
-    change in the admixture proportions of individual $n = 25$]{An example where the linear approimxation poorly captured the 
-    change in the admixture proportions of individual $n = 25$.}\label{fig:stru_lin_bad_example}
+\caption[An individual $(\n = 26)$ for which 
+    the linearly approximated variational parameters
+    poorly captured the 
+    change in admixture observed after refitting
+    as $\t \rightarrow 1$]{An individual $(\n = 26)$ for which 
+    the linearly approximated variational parameters
+    poorly captured the 
+    change in admixture observed after refitting
+    as $\t \rightarrow 1$. 
+    (Top row) the change in location parameter of the normally
+    distributed logit-sticks, for the first three sticks. 
+    The response here is a variational parameter, so 
+    the approximation (red) is necessarily linear with respect to $\t$. 
+    (Bottom row) the change in the inferred admixtures for 
+    populations 1, 2, and 3. }\label{fig:stru_lin_bad_example}
 \end{figure}
 
 
@@ -452,12 +482,19 @@ There are exceptions, as we discuss below.
 
 }
 
-\caption[An example where a fully-linearizing the posterior statistic outperforms
-    linearizing only the variational parameters]{An example where a fully-linearizing the posterior statistic outperforms
-    linearizing only the variational parameters. 
-    The fully-linearized approximation in dashed red produced an 
-    accurate prediction of change in this individual's admxture proportion of
-    population 3. }\label{fig:stru_fully_lin_example}
+\caption[An example where 
+    linearizing the posterior quantity itself outperforms 
+    linearizing the variational parameters only]{An example where 
+    linearizing the posterior quantity itself outperforms 
+    linearizing the variational parameters only. 
+    Shown are logit-stick location parameters (top row) and
+    inferred admixtures (bottom row)
+    for individual $n = 74$ and populations $k = 1, 2$ and $3$. 
+    In dashed red is the approximation formed by linearizing the
+    inferred admixture $\mathbb{E}_{\q}[\pi_{\n\k}]$ with respect to prior
+    parameter $t$.
+    On the admixture proportion of population 3, 
+    this approximation outperforms linearizing the variational parameters only. }\label{fig:stru_fully_lin_example}
 \end{figure}
 
 
