@@ -338,7 +338,7 @@ Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
 %
 \infl_p(\theta) :={}&
 \begin{cases}
-    - p \hessopt^{-1}
+    - \hessopt^{-1}
         \lqgradbar{\theta \vert \etaopt}
         \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}}
 & \textrm{when }1 \le p < \infty \\
@@ -362,7 +362,7 @@ $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
 \logp(\theta \vert \t \phi) ={}&
 \begin{cases}
     \log \pbase(\theta) +
-        p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+        \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
     & \textrm{when }p < \infty \\
     \log \pbase(\theta) + \t \phi(\theta)
     & \textrm{when }p = \infty
@@ -393,7 +393,8 @@ and \eqref{nl_vb_pert_pinf}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-Note that, under \eqref{nl_vb_pert_p},
+Note that, under \eqref{nl_vb_pert_p}, the derivatives of the
+log perturbation are given by
 
 \begin{align}
 %
@@ -402,7 +403,7 @@ Note that, under \eqref{nl_vb_pert_p},
    \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
    & \textrm{when }p < \infty \\
    \phi(\theta)
-   & \textrm{when }p = \infty
+   & \textrm{when }p = \infty.
 \end{cases}\eqlabel{nl_vb_pert_pinf}
 %
 \end{align}

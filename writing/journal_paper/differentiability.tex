@@ -334,20 +334,19 @@ cannot be Fr{\'e}chet differentiable for $p < \infty$.
 Assume that $\pbase(\theta)$ and $\q(\theta \vert \eta)$ are defined relative to
 the Lebesgue measure, and that $\etaopt$ it a VB optimum.  For $1 \le p <
 \infty$, the class of perturbations defined in \defref{prior_nl_pert}, and the
-space $\lp{\lambda, p}$, the maps
+space $\lp{\lambda, p}$.  Then the map $\phi \mapsto \KL{\etaopt, \phi}$
+is discontinuous at $\phiz$ on the set $\pertset$, in the sense that, for any
+$\epsilon$, there exists a $\phi \in \pertset$ such that
 %
 \begin{align*}
 %
-\phi \mapsto{}& \KL{\etaopt, \phi} \mathand \\
-\phi \mapsto{}&
-\begin{cases}
-    \KL{\etaopt, \phi} & \textrm{when }\inf \phi > -\infty \\
-    \KL{\etaopt, \phiz} & \textrm{otherwise}.
-\end{cases}
+\norm{\phi}_{\lambda,p} \le \epsilon \mathand
+\abs{\KL{\etaopt, \phiz} - \KL{\etaopt, \phiz}} \ge 1.
 %
 \end{align*}
 %
-are discontinuous at $\phiz$, and so not Fr{\'e}chet differentiable.
+Consequently, any version of $\KL{\eta, \phi}$ that coincides with $\KL{\eta,
+\phi}$ on $\pertset$ is not Fr{\'e}chet differentiable.
 %
 \begin{proof}
 %
@@ -362,9 +361,84 @@ By \eqref{nl_vb_pert_p}, the KL divergence is of the form
 \begin{align*}
 %
 \KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
-    p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right).
+    \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right).
 %
 \end{align*}
+%
+Take $\alpha = 1/p$ and
+%
+\begin{align*}
+%
+\palt(\theta) =
+    \pbase(\theta)\left(
+        \left( \frac{1 - \epsilon\delta}{1 - \epsilon}\right)^{p}
+        \ind{\theta \notin S_{\epsilon}} +
+        \delta^{p} \ind{\theta \in S_{\epsilon}}
+    \right).
+%
+\end{align*}
+%
+Then
+%
+\begin{align*}
+%
+\phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
+\\={}&
+\pbase(\theta)^{1/p} \left(
+    \frac{\epsilon(1 - \delta)}{1 - \epsilon}
+        \ind{\theta \notin S_{\epsilon}} +
+    (\delta - 1) \ind{\theta \in S_{\epsilon}}
+\right) \Rightarrow \\
+%
+\norm{\phi}_{\lambda, p}^p ={}&
+    \int \pbase(\theta) \abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p
+        \ind{\theta \notin S_{\epsilon}} \lambda(d\theta) +
+    \int \pbase(\theta) \abs{\delta - 1}^p \ind{\theta \in S_{\epsilon}}
+        \lambda(d\theta)
+\\={}&
+    (1-\epsilon)\abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p +
+    \epsilon \abs{\delta - 1}^p
+\\={}&
+\epsilon \abs{\delta - 1}^p \left(1 + \frac{1}{(1 - \epsilon)^{p-1}} \right).
+%
+\end{align*}
+%
+And
+%
+\begin{align*}
+%
+\MoveEqLeft
+    \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+\\=&
+    \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+        \ind{\theta \notin S_{\epsilon}} +
+    \log\left(1 + (\delta - 1) \right) \ind{\theta \in S_{\epsilon}}.
+%
+\end{align*}
+%
+So
+%
+\begin{align*}
+%
+\MoveEqLeft
+\KL{\etaopt, \phi} - \KL{\etaopt, \phiz}
+\\={}&
+    \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+        \expect{\q(\theta \vert \etaopt)}{\ind{\theta \notin S_{\epsilon}}} +
+    \log\left( \delta \right)
+        \expect{\q(\theta \vert \etaopt)}{\ind{\theta \in S_{\epsilon}}}
+    \Rightarrow \\
+\MoveEqLeft
+\abs{\KL{\etaopt, \phi} - \KL{\etaopt, \phiz}}
+\\\ge{}&
+\epsilon \abs{\log \delta}
+- (1 - \epsilon) \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right).
+%
+\end{align*}
+%
+
+
+
 %
 Define $\gamma(\theta) = \phi(\theta) / \pbase(\theta)^{1/p}$, and note that
 $\gamma \in \lp{\pbase, p}$ with $\norm{\gamma}_{\pbase, p} =
@@ -375,7 +449,6 @@ $\gamma \in \lp{\pbase, p}$ with $\norm{\gamma}_{\pbase, p} =
 %
 \end{cor}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 Despite \corref{kl_discontinuous}, the directional derivatives exist
 as long as $\inf_\theta \phi(\theta) > -\infty$.
@@ -442,9 +515,9 @@ parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
 \assuref{kl_opt_ok}.
 
 Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
-$\inf_\theta \phi(\theta) > -\infty$, the function $\t \mapsto \etaopt(\t \phi)$
-is differentiable at $\t = 0$ with the derivative given in
-\corref{etafun_deriv_form}.
+$\inf_\theta \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the function $\t
+\mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the derivative
+given in \corref{etafun_deriv_form}.
 %
 \begin{proof}
 %
