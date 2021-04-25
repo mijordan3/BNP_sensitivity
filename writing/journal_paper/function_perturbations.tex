@@ -292,36 +292,37 @@ Furthermore, for any $1 \le p \le \infty$, when $\phi \in \pertset$ and $0 \le
 
 
 
-For any particular $\phi$, we can apply \thmref{etat_deriv}.  Note that the
-perturbations are given, for $1 \le p < \infty$, by
+For any particular $\phi$, we can apply \thmref{etat_deriv}.
+%  Note that the
+% perturbations are given, for $1 \le p < \infty$, by
+% %
+% \begin{align}
+% %
+% \logp(\theta \vert \t \phi) ={}&
+%    % p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
+% % \\={}&
+%    \log \pbase(\theta) +
+%        p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+% \Rightarrow \nonumber\\
+% \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+%    p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
+%    \eqlabel{nl_vb_pert_p}
+% %
+% \end{align}
+% %
+% and, for $p = \infty$,
+% %
+% \begin{align}
+% %
+% \logp(\theta \vert \t) ={}&
+%    \log \pbase(\theta) + \t \phi(\theta)
+% \Rightarrow \nonumber\\
+% \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+%    \phi(\theta).
+% \eqlabel{nl_vb_pert_pinf}
+% %
+% \end{align}
 %
-\begin{align}
-%
-\logp(\theta \vert \t \phi) ={}&
-   % p \log\left(\pbase^{1/p} + \t \phi(\theta) \right) \Rightarrow \nonumber\\
-% \\={}&
-   \log \pbase(\theta) +
-       p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
-\Rightarrow \nonumber\\
-\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
-   p \frac{\phi(\theta)}{\pbase(\theta)^{1/p}},
-   \eqlabel{nl_vb_pert_p}
-%
-\end{align}
-%
-and, for $p = \infty$,
-%
-\begin{align}
-%
-\logp(\theta \vert \t) ={}&
-   \log \pbase(\theta) + \t \phi(\theta)
-\Rightarrow \nonumber\\
-\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
-   \phi(\theta).
-\eqlabel{nl_vb_pert_pinf}
-%
-\end{align}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -351,10 +352,26 @@ Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
 %
 \end{align}
 %
-If the variational densities $\q(\theta \vert \eta)$ satisfy
+Let the variational densities $\q(\theta \vert \eta)$ satisfy
 \assuref{dist_fun_nice} for $\t_0 = 0$ with both $\psi(\theta, \t) \equiv 1$ (no
 $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
-\phi)$, then the map $\t \mapsto \etaopt(\t \phi)$ is continuously
+\phi)$, where
+%
+\begin{align}
+%
+\logp(\theta \vert \t \phi) ={}&
+\begin{cases}
+    \log \pbase(\theta) +
+        p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+    & \textrm{when }p < \infty \\
+    \log \pbase(\theta) + \t \phi(\theta)
+    & \textrm{when }p = \infty
+%
+\end{cases}  \eqlabel{nl_vb_pert_p}
+%
+\end{align}
+%
+Then the map $\t \mapsto \etaopt(\t \phi)$ is continuously
 differentiable at $\t=0$ with derivative
 %
 \begin{align}\eqlabel{vb_eta_infl_sens}
@@ -374,3 +391,18 @@ and \eqref{nl_vb_pert_pinf}.
 \end{cor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Note that, under \eqref{nl_vb_pert_p},
+
+\begin{align}
+%
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+\begin{cases}
+   \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
+   & \textrm{when }p < \infty \\
+   \phi(\theta)
+   & \textrm{when }p = \infty
+\end{cases}\eqlabel{nl_vb_pert_pinf}
+%
+\end{align}
