@@ -17,3 +17,7 @@ Let's be notationally consistent about whether a distribuiton is normalized.
 Say, take tilde over the density?
 
 When using MoveEqLeft precede lines with the inequalties
+
+Put back in the factor of p^{-1} in the NL perturbation
+
+Drop the rho from the defintion of the nonlinear perturbations
