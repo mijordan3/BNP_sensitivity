@@ -33,6 +33,9 @@
 \def\g{g}   % Function of interest
 \def\k{k}   % Cluster index
 \def\n{n}   % Data index
+\def\b{b}   % additive shift for mice model
+\def\l{l}   % index for locus
+\def\i{i}   % index for chromosome
 \def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
 \def\const{C}   % Constant
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
@@ -116,3 +119,25 @@
 \def\mathwhere{\quad\textrm{where}\quad}%
 \def\constdesc#1{\textrm{(}\const\textrm{ does not depend on }#1\textrm{)}}
 \def\assuitemref#1#2{\assuref{#1} (\itemref{#2})}%
+
+% some posterior statistics
+\newcommand{\gclusters}{\g_{\text{cl}}} % number of in-sample clusters
+\newcommand{\gclusterspred}{\g_{\text{p.cl}}} % number of predictive clusters
+\newcommand{\coclusteringmatr}{\zeta} % coclustering matrix
+\newcommand{\laplacianevsum}{\g_{\text{ev}}} % the sum of the eigenvalues of the graph-laplacian (for mice)
+\newcommand{\gpop}{\g_{\text{pop}}} % number of in-sample populations (for structure)
+\newcommand{\gloci}{\g_{\text{loci}}} %  number of loci in a population(for structure)
+\newcommand{\gadmix}{\g_{\text{admix}}} % expected admixture (for structure)
+
+% commands for for mice data
+\newcommand{\ngenes}{N} % number of genes
+\newcommand{\ntimepoints}{M} % number of timepoints
+\newcommand{\regmatrix}{X}
+\newcommand{\timeindx}{T} % would just use \t, but then this parameterizes a distribution ...
+
+% commands for for structure data
+\newcommand{\nindiv}{N} % number of individuals genotyped
+\newcommand{\nloci}{L} % number of loci
+\newcommand{\latentpop}{\beta} % latent population frequencies
+\newcommand{\latentadmix}{\pi} % latent admixtures
+\def\categoricaldist#1{\mathrm{Categorical}\left(#1\right)}

@@ -48,6 +48,11 @@
 \usepackage{listings}
 \usepackage{pdfpages}
 
+% added packages for todo notes
+% pass in option ``disable" to remove notes
+\usepackage[textsize=tiny]{todonotes}
+
+
 % This picks up the knitr boilerplate, allowing us to \input partial knitr
 % documents.
 \input{_knitr_header.tex}
@@ -116,17 +121,20 @@
 \section{Computing the sensitivity}\seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
 
-\section{Results}
+\section{Results}\seclabel{results}
 \input{results_intro.tex}
 
-\subsection{Gaussian mixture modeling on Iris data}
-\input{iris_experiments.tex}
+    \subsection{Gaussian mixture modeling on iris data}
+    \seclabel{results_iris}
+    \input{iris_experiments.tex}
 
-\subsection{Regression mixture modeling}
-\input{mice_data_experiments.tex}
+    \subsection{Regression mixture modeling}
+    \seclabel{results_mice}
+    \input{mice_data_experiments.tex}
 
-\subsection{Genetic admixture modeling with STRUCTURE}
-\input{structure_experiments.tex}
+    \subsection{Genetic admixture modeling with STRUCTURE}
+    \seclabel{results_structure}
+    \input{structure_experiments.tex}
 
 \section{Conclusion}
 This concludes.
