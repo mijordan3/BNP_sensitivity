@@ -709,3 +709,79 @@ complex-valued). Define the ``trimmed log'' function as
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% %
+% \begin{align*}
+% %
+% \phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
+% \\={}&
+% \pbase(\theta)^{1/p} \left(
+%     \frac{\epsilon(1 - \delta)}{1 - \epsilon}
+%         \ind{\theta \notin S_{\epsilon}} +
+%     (\delta - 1) \ind{\theta \in S_{\epsilon}}
+% \right) \Rightarrow \\
+% %
+% \norm{\phi}_{\lambda, p}^p ={}&
+%     \int \pbase(\theta) \abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p
+%         \ind{\theta \notin S_{\epsilon}} \lambda(d\theta) +
+%     \int \pbase(\theta) \abs{\delta - 1}^p \ind{\theta \in S_{\epsilon}}
+%         \lambda(d\theta)
+% \\={}&
+%     (1-\epsilon)\abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p +
+%     \epsilon \abs{\delta - 1}^p
+% \\={}&
+% \epsilon \abs{\delta - 1}^p \left(1 + \frac{1}{(1 - \epsilon)^{p-1}} \right).
+% %
+% \end{align*}
+% %
+% And
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+%     \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+% \\=&
+%     \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+%         \ind{\theta \notin S_{\epsilon}} +
+%     \log\left(1 + (\delta - 1) \right) \ind{\theta \in S_{\epsilon}}.
+% %
+% \end{align*}
+% %
+% So
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+% \KL{\etaopt, \phi} - \KL{\etaopt, \phiz}
+% \\={}&
+%     \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+%         \expect{\q(\theta \vert \etaopt)}{\ind{\theta \notin S_{\epsilon}}} +
+%     \log\left( \delta \right)
+%         \expect{\q(\theta \vert \etaopt)}{\ind{\theta \in S_{\epsilon}}}
+%     \Rightarrow \\
+% \MoveEqLeft
+% \abs{\KL{\etaopt, \phi} - \KL{\etaopt, \phiz}}
+% \\\ge{}&
+% \epsilon \abs{\log \delta}
+% - (1 - \epsilon) \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right).
+% %
+% \end{align*}
+% %
+%
