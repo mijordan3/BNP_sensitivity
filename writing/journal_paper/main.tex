@@ -58,6 +58,7 @@
 % This specifies the formatting for references (sections, theorems, etc.)
 \input{_reference_defs.tex}
 
+
 % Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
 
 %\jmlrheading{1}{2000}{1-48}{4/00}{10/00}{giordano21}{Ryan Giordano and Runjing Liu and Michael I. Jordan and Tamara Broderick}
@@ -68,6 +69,10 @@
 %\firstpageno{1}
 
 \begin{document}
+
+% Output of the knitr file defining certain simulated figures.
+\input{simulation_examples.tex}
+
 
 \title{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}
 
@@ -85,6 +90,7 @@
 \begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
 \input{abstract.tex}
 \end{abstract}
+
 
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
