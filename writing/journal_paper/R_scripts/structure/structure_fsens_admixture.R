@@ -24,7 +24,7 @@ p_admix <- out_init$p +
   trim_plot 
 
 ###################
-# results at epsilon = 0.5
+# results at epsilon = 1.0
 ###################
 
 plot_admix_here <- function(admix_matr){
@@ -50,15 +50,3 @@ p_lr <- plot_admix_here(admix_lr) +
 
 p_admix + p_refit + p_lr
 
-# ###################
-# # results at epsilon = 2
-# ###################
-# p_refit2 <- plot_admix_here(admix2_refit) + 
-#   ggtitle('refit at epsilon = 1')
-# 
-# p_lr2 <- plot_admix_here(admix2_lr) + 
-#   ggtitle('lr at epsilon = 1')
-# 
-# (p_admix + plot_spacer()) / 
-#   (p_refit1 + p_lr1) /
-#   (p_refit2 + p_lr2)

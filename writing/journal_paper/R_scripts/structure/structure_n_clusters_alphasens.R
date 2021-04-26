@@ -1,6 +1,6 @@
 # data frame concerning number of clusters
 
-alpha_sens_df %>% 
+p <- alpha_sens_df %>% 
   rename(t = alpha) %>% 
   mutate(threshold = paste0('Threshold = ', threshold)) %>%
   plot_post_stat_trace_plot() + 
@@ -13,3 +13,4 @@ alpha_sens_df %>%
              color = 'red', 
              linetype = 'dashed')
 
+p
