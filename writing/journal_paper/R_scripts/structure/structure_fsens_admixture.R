@@ -43,10 +43,10 @@ plot_admix_here <- function(admix_matr){
 }
 
 p_refit <- plot_admix_here(admix_refit) + 
-  ggtitle('refit at epsilon = 1')
+  ggtitle('refit at t = 1')
 
 p_lr <- plot_admix_here(admix_lr) + 
-  ggtitle('lin. at epsilon = 1')
+  ggtitle('lin. at t = 1')
 
 p_admix + p_refit + p_lr
 
