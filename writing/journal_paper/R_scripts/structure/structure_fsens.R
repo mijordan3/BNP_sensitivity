@@ -80,31 +80,40 @@ p_admix <- out$p +
 # plot results
 #################
 
-plot_struct_fsens_results <- function(results_list){
+# alpha for population coloring box
+pop_box_alpha <- 0.05
+
+plot_struct_fsens_results <- function(results_list, 
+                                      pop_color){
   
   p_logphi <- plot_influence_and_logphi(results_list$infl_df$logit_v, 
                                         results_list$infl_df$infl_x_prior, 
                                         results_list$pert_df$log_phi, 
-                                        results_list$pert_df$logit_v) + 
-    theme(axis.ticks.y.right = element_blank(), 
-          axis.text.y.right = element_blank())
+                                        results_list$pert_df$logit_v)
   
   p_priors <- plot_priors(sigmoid(results_list$pert_df$logit_v),
                           results_list$pert_df$p0,
-                          results_list$pert_df$pc) + 
-    xlab('stick') + 
-    ggtitle('priors') + 
-    theme(legend.title = element_blank(), 
-          legend.position = 'bottom') 
+                          results_list$pert_df$pc) 
   
   
-  p_sens <- plot_post_stat_trace_plot(results_list$sensitivity_df$epsilon, 
-                                      results_list$sensitivity_df$refit, 
-                                      results_list$sensitivity_df$lr) + 
-    ggtitle('sensitivity') + 
-    xlab('epsilon') + 
-    theme(legend.title = element_blank(), 
-          legend.position = 'bottom')
+  results_df <- 
+    data.frame(t = results_list$sensitivity_df$epsilon, 
+               refit = results_list$sensitivity_df$refit, 
+               lin = results_list$sensitivity_df$lr)
+  
+  p_sens <- plot_post_stat_trace_plot(results_df, 
+                                      abbreviate_legend = TRUE) + 
+    ggtitle('Sensitivity') + 
+    xlab('t') + 
+    # add coloring for population 
+    geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf), 
+              alpha = pop_box_alpha,
+              fill = pop_color,
+              color = 'white',
+              show.legend = FALSE) 
+  
+  p_sens <- move_layers(p_sens, 'GeomRect', position = 'bottom')
+    
   
   return(list(p_logphi = p_logphi, 
               p_priors = p_priors, 
@@ -114,6 +123,8 @@ plot_struct_fsens_results <- function(results_list){
 ##########
 # plots for mbololo outliers
 ##########
+panel_size <- 1.5
+
 x_axis_remover <- 
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(), 
@@ -122,7 +133,8 @@ x_axis_remover <-
 title_remover <- ggtitle(NULL)
 
 mbololo_plots <- 
-  plot_struct_fsens_results(mbololo_fsens_results)
+  plot_struct_fsens_results(mbololo_fsens_results, 
+                            pop_color = pop2_color)
 
 mbololo_plots$p_logphi <- 
   mbololo_plots$p_logphi + 
@@ -137,8 +149,9 @@ mbololo_plots$p_priors <-
 
 mbololo_plots$p_sens <-
   mbololo_plots$p_sens + 
-  ylab('propn. orange') + 
+  ylab('propn. pop2') + 
   x_axis_remover 
+
 
 mbololo_plots_sum <- 
   mbololo_plots$p_logphi + 
@@ -150,7 +163,8 @@ mbololo_plots_sum <-
 # plots for ngangao outliers
 ##########
 ngangao_plots <- 
-  plot_struct_fsens_results(ngangao_fsens_results)
+  plot_struct_fsens_results(ngangao_fsens_results, 
+                            pop_color = pop1_color)
 
 ngangao_plots$p_logphi <- 
   ngangao_plots$p_logphi + 
@@ -166,9 +180,9 @@ ngangao_plots$p_priors <-
 
 ngangao_plots$p_sens <-
   ngangao_plots$p_sens + 
-  ylab('propn. green') + 
+  ylab('propn. pop1') + 
   title_remover + 
-  x_axis_remover 
+  x_axis_remover
 
 ngangao_plots_sum <- 
   ngangao_plots$p_logphi + 
@@ -180,7 +194,8 @@ ngangao_plots_sum <-
 # plots for chawia outliers
 ##########
 chawia_plots <- 
-  plot_struct_fsens_results(chawia_fsens_results)
+  plot_struct_fsens_results(chawia_fsens_results, 
+                            pop_color = pop3_color)
 
 chawia_plots$p_logphi <- chawia_plots$p_logphi + 
   ggtitle('worst-case pert. of C')
@@ -190,13 +205,15 @@ chawia_plots$p_priors <- chawia_plots$p_priors +
 
 chawia_plots$p_sens <- chawia_plots$p_sens + 
   title_remover + 
-  ylab('propn. purple')
+  ylab('propn. pop3')
 
 chawia_plots_sum <- 
   chawia_plots$p_logphi + 
   chawia_plots$p_priors + 
   chawia_plots$p_sens
 
+
+p_admix <- p_admix + theme(legend.position = 'top')
 
 p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum + 
   plot_layout(heights = c(1.25, 1, 1, 1))

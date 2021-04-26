@@ -1,23 +1,18 @@
 ###################
 # results at alpha = 1
 ###################
-# bins for the co-clustering matrix
-limits <- c(1e-5, 1e-4, 1e-3, Inf)
-limit_labels <- construct_limit_labels(limits)
-
+vmax = 0.001
 min_keep = 1e-4 # in the scatter-plot, grey out these values
 breaks = c(1e3, 1e4, 1e5, Inf) # breaks for the contours
 
 plots_alpha1 <- compare_coclust_lr_and_refit(coclust_refit_alpha1, 
                                       coclust_lr_alpha1,
                                       coclust_init, 
-                                      limits,
-                                      limit_labels,
-                                      min_keep,
-                                      breaks)
+                                      vmax = vmax,
+                                      min_keep = min_keep)
 
 plots_alpha1$p_scatter <- plots_alpha1$p_scatter + 
-  ggtitle('alpha = 1') + 
+  ggtitle(TeX('$\\alpha = 1$')) + 
   theme(title = element_text(size = title_size))
 
 plots_alpha1_summed <- 
@@ -31,13 +26,11 @@ plots_alpha1_summed <-
 plots_alpha11 <- compare_coclust_lr_and_refit(coclust_refit_alpha11, 
                                               coclust_lr_alpha11,
                                               coclust_init, 
-                                              limits,
-                                              limit_labels,
-                                              min_keep,
-                                              breaks)
+                                              vmax = vmax,
+                                              min_keep = min_keep)
 
 plots_alpha11$p_scatter <- plots_alpha11$p_scatter +
-  ggtitle('alpha = 11') + 
+  ggtitle(TeX('$\\alpha = 11$')) + 
   theme(title = element_text(size = title_size))
 
 

@@ -6,6 +6,8 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(ggforce)
+library(gginnards)
+
 library(xtable)
 
 library(gridExtra)
@@ -36,7 +38,7 @@ get_fontsizes <- function(scaling = 1){
   axis_ticksize = axis_ticksize * scaling
   axis_title_size = axis_title_size * scaling
   title_size = title_size * scaling
-
+  
   fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
                           axis.text.y = element_text(size = axis_ticksize),
                           axis.title.x = element_text(size = axis_title_size),
@@ -44,8 +46,10 @@ get_fontsizes <- function(scaling = 1){
                           legend.text = element_text(size=axis_title_size),
                           plot.title = element_text(size = title_size),
                           axis.ticks.length = unit(0.05, "cm"),
-                          strip.text = element_text(size = axis_title_size,
-                                                    margin = margin(.05, 0, .05, 0, "cm")),
+                          strip.text = element_text(size = title_size,
+                                                    hjust = 0),
+                          strip.background = element_rect(fill = 'white', 
+                                                          color = 'white'),
                           legend.margin=margin(-10,-10,-10,-10))
 
   return(fontsize_theme)

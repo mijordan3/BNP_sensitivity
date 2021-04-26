@@ -9,7 +9,8 @@ plot_structure_fit <- function(ind_admix_matr){
            # the is the weight of "other" clusters
            # start w z so its the last factor ... 
            z_other = 1 - rowSums(ind_admix_matr)) %>% 
-    gather(key = cluster, value = admix, -c('obs_id'))
+    gather(key = cluster, value = admix, -c('obs_id')) %>% 
+    mutate(population = sub('X', '', cluster))
   
   
   p <- ind_admix_df %>%
@@ -17,10 +18,12 @@ plot_structure_fit <- function(ind_admix_matr){
     # plot the admixture bars
     geom_col(aes(x = obs_id,
                  y = admix, 
-                 fill = cluster, 
-                 color = cluster)) + 
-    scale_fill_brewer(palette = 'Set2') + 
-    scale_color_brewer(palette = 'Set2') + 
+                 fill = population, 
+                 color = population)) + 
+    scale_fill_brewer(palette = 'Set2', 
+                      breaks = c('1', '2', '3')) + 
+    scale_color_brewer(palette = 'Set2', 
+                       breaks = c()) + 
     # flip y-axis and get rid of grey space
     coord_cartesian(xlim = c(0.5, n_obs+0.5), 
                     ylim = c(1, 0), 
@@ -28,7 +31,11 @@ plot_structure_fit <- function(ind_admix_matr){
     scale_y_continuous(breaks=NULL) +
     theme(axis.title = element_blank(), 
           axis.text.y = element_blank(), 
-          legend.position = 'none', 
+          legend.title = element_text(size = axis_title_size),
+          legend.text = element_text(size = axis_title_size),
+          legend.position = 'bottom',
+          legend.key.size = unit(0.4, 'cm'),
+          legend.margin=margin(-6,-6,-6,-6),
           axis.text.x = element_text(angle = 45, 
                                      hjust = 1, 
                                      size = axis_title_size))

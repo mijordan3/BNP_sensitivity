@@ -1,44 +1,38 @@
 ######################
-# Plot priors
+# Plot perturbation
 ######################
+legend.theme <- theme(legend.position = 'right', 
+                      legend.key.width=unit(0.4,"cm"), 
+                      legend.margin=margin(-10,0,-10,-10))
 
 p_logphi <- plot_influence_and_logphi(prior_pert_df$logit_v, 
                                       influence_df$influence_x_prior, 
                                       prior_pert_df$log_phi) + 
-  theme(axis.ticks.y.right = element_blank(), 
-        axis.text.y.right = element_blank())
+  legend.theme
 
-p_priors <- 
-  plot_priors(prior_pert_df$logit_v, 
-              p0 = prior_pert_df$p0_logit, 
-              pc = prior_pert_df$pc_logit) + 
-  theme(legend.position = 'none')
 
+######################
+# Plot priors
+######################
 p_priors_contr <- 
   plot_priors(sigmoid(prior_pert_df$logit_v), 
              p0 = prior_pert_df$p0_constr, 
              pc = prior_pert_df$pc_constr) + 
-  theme(legend.title = element_blank(), 
-        legend.position = c(0.75, 0.85), 
-        legend.key.size = unit(0.2, "cm"))
+  legend.theme
 
 ######################
 # Plot co-clustering results
 ######################
 # bins for the co-clustering matrix
-min_keep <- 1e-3
-limits <- c(1e-3, 1e-2, 1e-1, Inf)
-limit_labels <- construct_limit_labels(limits)
-
 plots <- compare_coclust_lr_and_refit(coclust_refit_fpert, 
                                       coclust_lr_fpert,
                                       coclust_init, 
-                                      limits,
-                                      limit_labels,
-                                      min_keep,
-                                      breaks)
+                                      vmax = 0.1)
 
-top_row <- p_logphi + p_priors + p_priors_contr
+top_row <- p_logphi + p_priors_contr
 bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr 
+
+# grid.arrange(patchworkGrob(top_row), 
+#              patchworkGrob(bottom_row))
 
 top_row / bottom_row

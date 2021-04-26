@@ -105,6 +105,22 @@ coclust_refit_alpha1 <-
 coclust_lr_alpha1 <-
   load_coclust_file(alpha1_coclust_file, 'coclust_lr') 
 
+# some summary statistics to report in the main tex
+get_max_diff <- function(coclust_refit, 
+                         coclust_init){
+  diff_df <- 
+    inner_join(coclust_refit, 
+               coclust_init, 
+               by = c('gene1', 'gene2')) %>%
+    mutate(diff = coclustering.x - coclustering.y)
+  
+  maxdiff <- max(abs(diff_df$diff))
+  
+  return(maxdiff)
+}
+
+maxdiff_alpha1 <- get_max_diff(coclust_refit_alpha1, coclust_init)
+
 ################
 # The coclustering at alpha = 11
 ################
@@ -118,6 +134,8 @@ coclust_refit_alpha11 <-
 coclust_lr_alpha11 <-
   load_coclust_file(alpha11_coclust_file, 'coclust_lr') 
 
+# max change in alpha = 11
+maxdiff_alpha11 <- get_max_diff(coclust_refit_alpha11, coclust_init)
 
 ###################
 # data for the influence function
@@ -136,7 +154,7 @@ influence_df <-
 #################
 # the priors, initial and perturbed
 fpert_coclust_file <-
-  np$load(paste0(data_dir, 'functional_coclustering_gauss_pert1.npz'))
+  np$load(paste0(data_dir, 'functional_coclustering.npz'))
 
 prior_pert_df <- 
   data.frame(logit_v = fpert_coclust_file['logit_v_grid'],
@@ -153,4 +171,28 @@ coclust_refit_fpert <-
 coclust_lr_fpert <-
   load_coclust_file(fpert_coclust_file, 'coclust_lr') 
 
+####################
+# timing results
+####################
+
+# paramametric sensitivity timing results
+alpha_timing_results <- 
+  np$load(paste0(data_dir, 'mice_alphasens_timing.npz'))
+init_fit_time <- alpha_timing_results['init_optim_time']
+alpha_hess_time <- alpha_timing_results['hessian_solve_time']
+refit_time_vec <- alpha_timing_results['refit_time_vec']
+lr_time_vec <- alpha_timing_results['lr_time_vec']
+
+# functional sensitivity timing results
+fsens_timing_results <- np$load(paste0(data_dir, 
+      'functional_coclustering_timing.npz'))
+
+phi_hessian_time <- fsens_timing_results['hess_solve_time']
+
+n <- length(fsens_timing_results['refit_time_vec'])
+phi_refit_time <- fsens_timing_results['refit_time_vec'][n]
+phi_lr_time <- fsens_timing_results['lr_time_vec'][n]
+
+infl_time <- fsens_timing_results['grad_time'] +
+              fsens_timing_results['infl_time']
 save.image('./R_scripts/data_processed/mice.RData') 

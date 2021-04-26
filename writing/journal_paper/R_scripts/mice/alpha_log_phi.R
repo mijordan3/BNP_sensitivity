@@ -11,30 +11,41 @@ log_phi <- function(logit_v, alpha1, alpha0 = 6){
 
 
 ymax <- 15
-scale <- 200
+scale <- 550
 
 p1 <- plot_influence_and_logphi(influence_df$logit_v, 
                           influence_df$influence_x_prior, 
-                          log_phi(influence_df$logit_v, 1), 
-                          y_limits = c(-ymax, ymax), 
+                          log_phi(influence_df$logit_v, 1),
                           scale = scale) + 
-  ggtitle('alpha -5') + 
-  theme(axis.title.y.right = element_blank(),
-        axis.text.y.right = element_blank(),
-        axis.ticks.y.right = element_blank())
-
-
+  ggtitle(TeX('$\\alpha - \\alpha_0 =  -5$')) + 
+  # manually set y-limits (so it matches with p2 below)
+  scale_y_continuous(  
+    # label for log phi
+    name = TeX("$\\varphi$"),
+    limits = c(-ymax, ymax)
+  ) + 
+  theme(legend.position = 'none')
 
 p2 <- plot_influence_and_logphi(influence_df$logit_v, 
                                 influence_df$influence_x_prior, 
                                 log_phi(influence_df$logit_v, 11), 
-                                y_limits = c(-ymax, ymax), 
                                 scale = scale) + 
-  ggtitle('alpha +5')  + 
+  ggtitle(TeX('$\\alpha - \\alpha_0 =  5$')) + 
+  # remove left axis
   theme(axis.title.y.left = element_blank(),
         axis.text.y.left = element_blank(),
-        axis.ticks.y.left = element_blank())
-
-
+        axis.ticks.y.left = element_blank()) + 
+  # add right axis 
+  scale_y_continuous(  
+    # Add a second axis for the influence function
+    sec.axis = sec_axis(~.*1/scale,
+                        TeX("$\\Psi$"))
+  ) + 
+  theme(axis.title.y.right = element_text(color = 'purple', 
+                                          size = axis_title_size), 
+        axis.text.y.right = element_text(color = 'purple', 
+                                         size = axis_ticksize)) + 
+  theme(legend.position = 'none')
+  
 
 p1 + p2
