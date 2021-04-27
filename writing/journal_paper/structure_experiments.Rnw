@@ -309,9 +309,9 @@ robustness of these patterns' existence.
 For each worst-case perturbation, we examine the effect on its respective 
 posterior quantity $\gadmix$
 as $t \rightarrow 1$ in 
-the perturbed prior $\p(\nu\vert \t) = \p_0(\nuk)\exp(\t\phiworstcase(\nuk))$ (\figref{stru_func_sens}).
+the perturbed prior $\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
 Under the linearly approximated variational parameters, 
-the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $t = 1$. 
+the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $\t = 1$. 
 The same quantity computed after refitting the model 
 confirms the sensitivity predicted by the linear approximation. 
 On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive even after this worst-case perturbation. 
@@ -459,7 +459,7 @@ resulting in the later admixture proportions being under-estimated.
 The third admixture proportion was particularly poorly approximated by the linearized variational parameters. 
 Given the recursive nature of the relationship between admixtures and stick-breaking proportions, errors at early sticks affect later admixture proportions. 
 Fully linearizing the mapping from $\t$ to $\g(t)$ and forming the approximation 
-$\glin(t)$ (\eqref{}) avoids this problem. 
+$\glin(t)$ (\eqref{vb_g_sens}) avoids this problem. 
 In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, where $\g$ is the admixture proportion of population 3. 
 In all the previous examples (including the example in \figref{stru_lin_bad_example}), 
 computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mapping from $\eta\mapsto \g$,
