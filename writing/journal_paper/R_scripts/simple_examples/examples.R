@@ -74,7 +74,9 @@ df_line <- do.call(
 ggplot(df_line %>% mutate(f=TruncateForPlot(f, quant=0.7))) +
     geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 
-save(df_line, df, file=file.path(data_path, "nondifferentiable_r2.Rdata"))
+if (FALSE) {
+    save(df_line, df, file=file.path(data_path, "nondifferentiable_r2.Rdata"))
+}
 
 
 #png(file.path(image_path, "pathological_r2_example.png"), units="in", width=6, height=3, res=300)
@@ -129,7 +131,9 @@ df <- data.frame(
 
 phi_range <- max(c(df$phim, df$phip))
 
-save(df, file=file.path(data_path, "positive_pert.Rdata"))
+if (FALSE) {
+    save(df, file=file.path(data_path, "positive_pert.Rdata"))
+}
 
 #png(file.path(image_path, "positive_phi_example.png"), units="in", width=6, height=6, res=300)
 grid.arrange(
@@ -159,5 +163,56 @@ grid.arrange(
     , ncol=2
 )
 #dev.off()
+
+
+
+
+
+
+
+##############################################################################
+# Some examples of lienar interpolation
+
+# dens_min <- 0.
+# theta_max <- 0.95
+
+dens_min <- 0.05
+theta_max <- 1.0
+
+theta_grid <- seq(0, 1, length.out=300)
+p0 <- dbeta(theta_grid, 1, 1) + dens_min
+p1 <- dbeta(theta_grid, 1, 5) + dens_min
+
+num_t <- 5
+
+df <- data.frame(theta=theta_grid, p=p0, logp=log(p0), t=0)
+t_grid <- seq(1 / num_t, 1, length.out=num_t)
+for (t in t_grid) {
+    df <- bind_rows(
+        df,
+        data.frame(theta=theta_grid,
+                   p=p0 * (1 - t) + t * p1,
+                   logp=log(p0) * (1 - t) + t * log(p1), t=t))
+}
+
+BasePlot <- function() {
+    ggplot(df %>% filter(theta <= theta_max), aes(color=t, group=t, x=theta)) +
+        theme(legend.position="none") +
+        scale_color_gradient(low="blue", high="red") +
+        xlab(TeX("$\\theta$"))
+}
+
+
+grid.arrange(
+    BasePlot() + geom_line(aes(y=exp(logp))) + ggtitle("Multiplicative perturbation") + ylab("Densities"),
+    BasePlot() + geom_line(aes(y=logp)) + ggtitle("Multiplicative perturbation") + ylab("Log densities"),
+    BasePlot() + geom_line(aes(y=p)) + ggtitle("Linear perturbation") + ylab("Densities"),  
+    BasePlot() + geom_line(aes(y=log(p))) + ggtitle("Linear perturbation") + ylab("Log densities"),
+    ncol=2 
+)
+
+if (FALSE) {
+    save(dens_min, theta_max, df, file=file.path(data_path, "function_paths.Rdata"))
+}
 
 
