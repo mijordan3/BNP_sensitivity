@@ -122,6 +122,7 @@ rbind(insample_df,
 \newcommand{\IrisAlphaAll}{
 <<iris_alphasens_all, cache=cache, fig.show='hold'>>=
 
+# now plot everything
 rbind(insample_df, 
       predictive_df) %>% 
   plot_alpha_trace_plot + 
@@ -191,8 +192,7 @@ p_prior + p_prior_logit + p_infl_x_prior
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\IrisFpertEx}{
 <<iris_fpertex_size>>=
-SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio, 
-             image_width = 0.8)
+SetImageSize(aspect_ratio = 0.45 * base_aspect_ratio)
 @
 <<iris_fpertex, cache=cache, fig.show='hold'>>=
 
@@ -209,8 +209,7 @@ plot_func_pert_results(fpert2_results,
 
 \newcommand{\IrisFpertAll}{
 <<iris_fpertall_size>>=
-SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio, 
-             image_width = 0.8)
+SetImageSize(aspect_ratio = 0.9 * base_aspect_ratio)
 @
 <<iris_fpertall, cache=cache, fig.show='hold'>>=
 
@@ -227,8 +226,7 @@ g0 / g1 / g2
 %%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\IrisWorstCase}{
 <<iris_worstcase_size>>=
-SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio, 
-             image_width = 0.8)
+SetImageSize(aspect_ratio = 0.45 * base_aspect_ratio)
 @
 <<iris_worstcase, cache=cache, fig.show='hold'>>=
 
@@ -250,7 +248,6 @@ g3_new <- plot_func_pert_results(wc_results,
                                  # ymax = ymax_new)
 
 g3_new
-
 
 @
 }

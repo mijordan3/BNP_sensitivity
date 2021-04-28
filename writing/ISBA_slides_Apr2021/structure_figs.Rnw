@@ -35,3 +35,241 @@ initial_fit$p +
 }
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% alpha sensitivity for structure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\StructureAlphaTreshZero}{
+<<structure_alphasens_size>>=
+SetImageSize(aspect_ratio=0.5 * base_aspect_ratio)
+@
+<<structure_alphasens0, cache=cache, fig.show='hold'>>=
+set_to_na <- function(x, bool_vec){
+  x[bool_vec] <- NA
+  return(x)
+}
+
+# the initial figure with threshold = 0 ONLY
+alpha_sens_df %>% 
+  rename(t = alpha) %>% 
+  mutate(refit = set_to_na(refit, bool_vec = (threshold != 0))) %>% 
+  mutate(lin = set_to_na(lin, bool_vec = (threshold != 0))) %>% 
+  mutate(threshold = paste0('Threshold = ', threshold)) %>%
+  plot_post_stat_trace_plot() + 
+  facet_wrap(~threshold, nrow = 1, scales = 'free_y') + 
+  # add a dummy point so that scales align
+  geom_point(aes(x = 1, 4.5), alpha = 0.) + 
+  ylab('E[# pop.]') + 
+  xlab(TeX('DP parameter $\\alpha$')) + 
+  geom_vline(xintercept = 3, 
+             color = 'red', 
+             linetype = 'dashed')
+
+@
+}
+
+\newcommand{\StructureAlpha}{
+<<structure_alphasens, cache=cache, fig.show='hold'>>=
+source(file.path(r_script_dir, '/structure/structure_n_clusters_alphasens.R'), 
+       print.eval = FALSE)
+
+p + xlab(TeX('DP parameter $\\alpha$')) 
+@
+}
+
+\newcommand{\StructureMigration}{
+<<structure_migration_size>>=
+SetImageSize(aspect_ratio=0.6 * base_aspect_ratio)
+@
+<<structure_migration, cache=cache, fig.show='hold'>>=
+
+out <- plot_initial_fit(add_geographic_labels = FALSE)
+
+# we use Set2  for population colors
+pop1_color <- '#66c2a5'
+pop2_color <- '#fc8d62'
+pop3_color <- '#8da0cb'
+
+source(file.path(r_script_dir, '/structure/structure_fsens.R'))
+
+admix_plot <- plot_initial_fit()$p
+
+admix_plot + 
+  mbololo_box + 
+  ngangao_box + 
+  chawia_box + 
+  # add letter labels 
+  geom_text(aes(x = min(mbololo_outliers$obs_id) - 5, 
+                y = 0.2, 
+                label = 'A'), 
+            size = text_size) + 
+  geom_text(aes(x = min(ngangao_outliers$obs_id) - 5, 
+                y = 0.5,
+                label = 'B'), 
+            size = text_size) +
+  geom_text(aes(x = median(chawia_outliers$obs_id),
+                y = 0.75, 
+                label = 'C'), 
+            size = text_size) + 
+  theme(legend.position = 'top')
+@
+}
+
+
+\newcommand{\MbololoOutliers}{
+<<outlier_admix_size>>=
+SetImageSize(aspect_ratio=0.75 * base_aspect_ratio)
+@
+<<mbololo_outliers, cache=cache, fig.show='hold'>>=
+
+# admixture plot with only mbololo labeled
+p_admix_mbololo <- out$p + 
+  mbololo_box + 
+  # add letter labels 
+  geom_text(aes(x = min(mbololo_outliers$obs_id) - 5, 
+                y = 0.2, 
+                label = 'A'), 
+            size = text_size) + 
+  theme(axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), 
+        legend.position = 'top')
+
+mbololo_plots <- 
+  plot_struct_fsens_results(mbololo_fsens_results, 
+                            pop_color = pop2_color)
+
+mbololo_plots$p_logphi <- 
+  mbololo_plots$p_logphi + 
+  ggtitle('worst-case pert. of A') + 
+  get_fontsizes()
+
+mbololo_plots$p_priors <- 
+  mbololo_plots$p_priors + 
+  get_fontsizes() 
+
+mbololo_plots$p_sens <-
+  mbololo_plots$p_sens + 
+  ylab('propn. pop2')
+
+
+mbololo_plots_sum <- 
+  mbololo_plots$p_logphi + 
+  mbololo_plots$p_priors + 
+  mbololo_plots$p_sens
+
+p_admix_mbololo / mbololo_plots_sum
+@
+}
+
+
+\newcommand{\NgangaoOutliers}{
+<<ngangao_outliers, cache=cache, fig.show='hold'>>=
+
+# admixture plot with only mbololo labeled
+# admixture plot with only ngangao labeled
+p_admix_ngangao <- out$p + 
+  ngangao_box + 
+  # add letter labels 
+  geom_text(aes(x = min(ngangao_outliers$obs_id) - 5, 
+                y = 0.5,
+                label = 'B'), 
+            size = text_size) +
+  theme(axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), 
+        legend.position = 'top')
+
+ngangao_plots <- 
+  plot_struct_fsens_results(ngangao_fsens_results, 
+                            pop_color = pop1_color)
+
+ngangao_plots$p_logphi <- 
+  ngangao_plots$p_logphi + 
+  ggtitle('worst-case pert. of B') + 
+  get_fontsizes()
+
+ngangao_plots$p_priors <- 
+  ngangao_plots$p_priors + 
+  get_fontsizes() + 
+  title_remover  
+
+ngangao_plots$p_sens <-
+  ngangao_plots$p_sens + 
+  ylab('propn. pop1') + 
+  title_remover
+
+ngangao_plots_sum <- 
+  ngangao_plots$p_logphi + 
+  ngangao_plots$p_priors + 
+  ngangao_plots$p_sens
+
+p_admix_ngangao / ngangao_plots_sum
+
+@
+}
+
+
+\newcommand{\ChawiaOutliers}{
+<<chawia_outliers, cache=cache, fig.show='hold'>>=
+p_admix_chawia <- out$p + 
+  chawia_box + 
+  # add letter labels 
+  geom_text(aes(x = median(chawia_outliers$obs_id),
+                y = 0.75, 
+                label = 'C'), 
+            size = text_size) + 
+  theme(axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), 
+        legend.position = 'top')
+
+p_admix_chawia / chawia_plots_sum
+
+@
+}
+
+%%%%%%%%%%%%%%%%%%%%%
+% limitations of local sensitivity 
+%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\BadAdmixExample}{
+<<bad_admix_size>>=
+SetImageSize(aspect_ratio=0.6 * base_aspect_ratio)
+@
+<<bad_admix_ex, cache=cache, fig.show='hold'>>=
+
+source(file.path(r_script_dir, 'structure/structure_fsens_admixture.R'),
+       print.eval = FALSE)
+p_admix + 
+  (p_refit + theme(legend.position = 'bottom')) + 
+  p_lr
+@
+}
+
+
+\newcommand{\BadAdmixExampleTraceAdmix}{
+<<bad_admix_trace_admix_size>>=
+SetImageSize(aspect_ratio= 0.9*base_aspect_ratio)
+@
+<<bad_admix_trace_admix, cache=cache, fig.show='hold'>>=
+
+source(file.path(r_script_dir, '/structure/mbololo_bad_approximation.R'),
+       print.eval = FALSE)
+
+# the plot of the admixture
+(p1 + theme(legend.position = 'top')) / plot_spacer()
+
+@
+}
+
+\newcommand{\BadAdmixExampleTraceAll}{
+<<bad_admix_trace_all, cache=cache, fig.show='hold'>>=
+
+# the plot of the admixture and the sticks
+(p1 + theme(legend.position = 'top', 
+            axis.title.x = element_blank(), 
+            axis.text.x = element_blank())) / 
+  (p0 + get_fontsizes() + theme(legend.position = 'none')) 
+
+@
+}
+
+
+
+
