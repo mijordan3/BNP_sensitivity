@@ -18,7 +18,8 @@ $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$.
 
 In our case, only the prior on stick-breaking proportions
 $\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
-Because $\nu$ fully factorizes under both the prior and the variational distributions,
+Because the elements of $\nu$ fully factorize
+under both the prior and the variational distributions,
 $\crosshessian$ decomposes as
 \begin{align}
   \crosshessian &=
@@ -43,9 +44,9 @@ In all the functional forms for
 $\t \mapsto \pstick(\nuk \vert \t)$ considered below,
 $f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
 The resulting GH approximation is a deteriminstic function of $\eta$,
-and another application of automatic differentiation with respect to $\eta$
-provides the derivative in \eqref{sens_mixed_partial}.
-Observe that $\crosshessian$ is sparse:
+and thus the gradient in \eqref{sens_mixed_partial} can be computed
+with another application of automatic differentiation.
+Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
 it is zero for all entries of
 $\eta$ other than those that parameterize the sticks.
 
@@ -54,29 +55,30 @@ $\eta$ other than those that parameterize the sticks.
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
 $\etadim$ is large.
-In particular, though the dimensions of $\etanu$ and
-$\etabeta$ are of order $\kmax$, the dimension of $\etaz$ is of order $\kmax
+The dimensions of variational parameters $\etanu$ and
+$\etabeta$ are of order $\kmax$,
+while the dimension of $\etaz$ is of order $\kmax
 \times\N$.
 For large $\N$, it may not be possible to even instantiate the Hessian matrix in memory.
 
 Fortunately, the latent variables in our BNP model (\eqref{bnp_model}) factorize
 into a set of ``global" and ``local" latent variables.
-The global latent variables are the cluster latent variables $\beta$ and
-the stick-breaking proportions $\nu$;
-these variables are ``global" because they are shared across the entire data set.
-The local variables are the cluster assignments $z$, which are unique to each data point.
-We take advantage of this structure to more efficiently compute the Hessian,
-as we now describe.
+The cluster latent variables $\beta$ and
+the stick-breaking proportions $\nu$
+are ``global" because they are shared across the entire data set.
+The ``local" variables are the cluster assignments $z$, which are unique to each data point.
+We take advantage of this structure to more efficiently compute the Hessian.
 
-Let $\gamma := (\beta, \nu)$ denote the global latent variables, and
+Let $\gamma := (\beta, \nu)$ denote the global latent variables and
 $\eta_\gamma := (\etabeta, \etanu)$ be the variational parameters for the global latent variables.
 Note that the dimension of $\eta_\gamma$ is of order $\kmax$ and does not scale with
 the number of data points $\N$.
 
-For generic parameters $a$ and $b$
+For generic latent variables $a$ and $b$,
 let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
 \eta_b^T}{\etaopt(0), t=0}$, the Hessian with respect to the variational
-parameters governing $a$ and $b$.  Specifically:
+parameters governing $a$ and $b$.
+We decompose the Hessian matrix $\hessopt$ into four blocks:
 %
 \begin{align*}
 %
@@ -114,11 +116,11 @@ In this notation,
    \hess{\z\gamma}     & \hess{\z\z} \\
 \end{array}
 \right)^{-1}
-\left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right)
+\left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right),
 %
 \end{align*}
 %
-And an application of the Schur complement gives
+and an application of the Schur complement gives
 %
 \begin{align*}
 %
@@ -133,6 +135,7 @@ I_{\gamma\gamma} \\
 \end{align*}
 where $I_{\gamma\gamma}$ is the identity matrix with
 the same dimension as $\eta_\gamma$.
+
 Specifically, observe that the sensitivity of the global parameters
 is given by
 \begin{align}\eqlabel{global_sens}
@@ -143,192 +146,227 @@ is given by
         \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right).
 \end{align}
 
-$\hessopt_\gamma$ is of dimension $D_\gamma \times D_\gamma$,
-with $D_\gamma$ the dimension of $\eta_\gamma$.
-$D_\gamma$ is of order $\kmax$ and
-does not scale with the number of data points $\N$.
+
+Each term of $\hessopt_\gamma$ can be easily computed using automatic differentiation.
+In fact, the $\hess{\z\z}$ is block-diagonal and has a closed form inverse.
+
+Alteratively, we now make an observation that allows us to express $\hessopt_\gamma$
+using only a single Hessian operator.
+Recall from \exref{qz_form} that the optimal local variational parameters $\etaoptz$ can be written
+as a closed-form function of the global variational parameters $\eta_\gamma$.
+We write $\etaoptz(\eta_\gamma; \t)$ to denote the optimal local variational parameters given the
+global variational parameters; that is,
+\begin{align*}
+  \etaoptz(\eta_\gamma; \t) := \argmin_{\eta_\z} \KL{(\eta_\gamma, \eta_z), \t}
+\end{align*}
+Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
+\begin{align}\eqlabel{global_kl}
+\hessopt_{\gamma} &=
+\frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T} \mathrm{KL}_{glob}(\etaopt_\gamma, 0) \\
+& \mathwhere
+% \mathrm{KL}_{glob}(\eta_\gamma) := \evalat{\KL{\eta, \t}}{\eta = (\eta_\gamma, \etaoptz(\eta_\gamma; t))}.
+\mathrm{KL}_{glob}(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
+\notag
+\end{align}
+
+In other words, we form a $\mathrm{KL}$ objective using the global variational parameters only,
+and we do this by implicitly setting the local variational parameters at their optimum
+given the global parameters.
+\eqref{global_kl} is how we calculate $\hessopt_\gamma$ in practice:
+we implement the function $\mathrm{KL}_{glob}$ and we use automatic differentiation to
+compute its Hessian with respect to the global parameters $\eta_\gamma$.
+
+Crucially, the dimension of $\hessopt_\gamma$ is of order $\kmax \times \kmax$
+and does not scale with the number of data points $\N$.
 Hence, $\hessopt_\gamma$ is more memory efficient to store
 and faster to invert
 than the full $\etadim\times\etadim$ Hessian of all the variational parameters.
 
-Each term in \eqref{global_sens} can be easily computed using automatic differentiation.
-Moreover, the $\hess{\z\z}$ term is block-diagonal with $N$ blocks of size $\kmax\times\kmax$;
-the $n$-th block corresponds to the variational parameters governing $z_n$.
-Each block, and resulting matrix $\hess{\z\z}$, has a closed form inverse.
 
-Alternatively, recall that the optimal local variational parameters $\etaoptz$ can be written
-as a closed-form function of the global variational parameters $\eta_\gamma$.
-We write $\etaoptz(\eta_\gamma; \t)$ to denote the optimal local variational parameters given the
-global variational parameters at prior parameter $\t$; that is,
+Now that we can compute the sensitivity of the global parameters in
+\eqref{global_sens}, we produce its linear approximation:
 \begin{align*}
-  \etaoptz(\eta_\gamma; \t) := \argmin_{\eta_\z} \KL{(\eta_\gamma, \eta_z), \t}
-\end{align*}
-
-
-Using \eqref{global_sens}, we can linearize the global parameters:
-\begin{align}\eqlabel{etalin_global_def}
   \etalin_\gamma(\t) := \etaopt_\gamma +
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
+\end{align*}
+
+We have the option of again taking advantage of the fact that the optimal
+local parameters can be found in closed form given global parameters.
+Instead of linearizing both local and variational parameters,
+we linearize only the global parameters and approximate
+the full set of variational parameters at some $\t \not= 0$ using
+\begin{align}\eqlabel{eta_global_only_def}
+\etalinglobal(\t) = \left(\begin{array}{c} \etalin_\gamma(\t) \\
+\etaoptz(\etalin_\gamma(\t); \t)
+\end{array}\right).
 \end{align}
 
-
-
-\subsection*{old text}
-
-
-
-
+The advantage to $\etalinglobal$ is that we can the Hessian
+required for forming the approximation does not scale with $\N$.
+TODO: does retaining the nonlinearities help?
+this also always gives a lower KL value ...
 
 
 
-% However, this Hessian matrix does not depend on $\t$, and
-% so can be computed once and re-used for many different values of $\t$ or many
-% different classes of prior perturbations. In our case, w
-
-  Fortunately, the Hessian of the KL divergence
-is sparse and highly structured in $\etaz$.  In particular, it is
-block-diagonal, with
-%
-\begin{align*}
-%
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta_{\z_{n}} \partial \eta_{\z_{m}}^T}
-       {\etaopt(t = 0), \t_0} ={}& 0 \mathtxt{for}n\ne m.
-%
-\end{align*}
-%
-Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax -
-1$, and that the Hessian of $\expect{\q(\zeta \vert \eta)}{\logp(\x \vert
-\zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
-being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
-
-We propose the following techniques for computing the inverse Hessian when the
-fully matrix is prohibitively large.  To describe the techniques it will be
-useful to use the following compact notation.  Let $\gamma = (\beta, \nu)$
-denote all the parameters besides $\z$, and for generic parameters $a$ and $b$
-let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
-\eta_b^T}{\etaopt(\t_0), \t_0}$, the Hessian with respect to the variational
-parameters governing $a$ and $b$.  Specifically:
-%
-\begin{align*}
-%
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \eta^T}
-       {\etaopt(\t_0), \t_0} ={}&
-\hess{\zeta\zeta} =
-\left(
-\begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
-\end{array}
-\right).
-%
-\end{align*}
-%
-The terms $\hess{\gamma\gamma}$ and $\hess{\z\gamma} = \hess{\gamma\z}^T$ are
-typically dense and easily computed using atuomatic differentiation, and the
-term $\hess{\z\z}$ is block diagonal with a closed-form inverse.
-%
-Analogously, let
-%
-\begin{align*}
-%
-\hess{\zeta\t} :=
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \t}
-       {\etaopt(\t_0), \t_0},
-%
-\end{align*}
-%
-and observe that
-%
-\begin{align*}
-%
-\hess{\zeta\t} ={}& \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right).
-%
-\end{align*}
-
-In this notation,
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
--\left(
-\begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
-\end{array}
-\right)^{-1}
-\left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right)
-%
-\end{align*}
-%
-We can then use the Schur complement to get the computationally tractable
-expression:
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
--\left(\begin{array}{c}
-I_{\gamma\gamma} \\
-\hess{\z\z}^{-1} \hess{\z\gamma}
-\end{array}\right)
-\left(\hess{\gamma\gamma} -
-      \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \hess{\gamma\t}.
-%
-\end{align*}
-
-In fact, the former expression can be computed entirely using automatic
-differentiation using the fact that $\etaoptz$ has an explicit closed form given
-$\etaoptgamma$, as dicussed in \exref{qz_form}.  TODO: is this worth writing
-here?
-
-When even $\hess{\gamma\gamma}$ is too large to form in memory, one can
-use the conjugate gradient algorithm.  TODO: fill in details.
-
-
-
-%
-%  we can evaluate the mixed partial using the derivative of
-% \eqref{gh_integral}.  We will consider particular functional forms for
-% $\t \mapsto \pstick(\nuk \vert \t)$ in below.
+% \subsection*{old text}
 %
 %
-% In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
-% need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
-% the objective function $\KL{\eta, 0}$ and the $\etadim \times 1$ mixed
-% second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
-% $\t$.
-% \todo{Theorem 1 isn't in the form of a mixed partial; maybe this needs more explaining.
-% Perhaps we could put \eqref{sens_mixed_partial} and a discussion about this earlier?
-% e.g. after corollary 1?}
-% We will discuss these two tasks in turn.
 %
-% First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
-% \partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nuk
-% \vert \t)$ depend on $\t$, and so
+%
+%
+% % Moreover, the $\hess{\z\z}$ term is block-diagonal with $N$ blocks of size $\kmax\times\kmax$;
+% % the $n$-th block corresponds to the variational parameters governing $z_n$.
+% % Each block, and resulting matrix $\hess{\z\z}$, has a closed form inverse.
+%
+%
+% % However, this Hessian matrix does not depend on $\t$, and
+% % so can be computed once and re-used for many different values of $\t$ or many
+% % different classes of prior perturbations. In our case, w
+%
+%   Fortunately, the Hessian of the KL divergence
+% is sparse and highly structured in $\etaz$.  In particular, it is
+% block-diagonal, with
 % %
-% \begin{align}\eqlabel{sens_mixed_partial}
+% \begin{align*}
 % %
 % \fracat{\partial^2 \KL{\eta, \t}}
-%        {\partial \eta \partial \t}
-%        {\etaopt(\t_0), \t_0} ={}&
-% \sum_{\k=1}^{\kmax}
-%     \evalat{
-%         \frac{\partial}{\partial\eta}
-%         \expect{\q(\nuk \vert \eta)}
-%                {\fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t_0}
-%                }
-%         }
-%         {\etaopt(\t_0)}.
+%        {\partial \eta_{\z_{n}} \partial \eta_{\z_{m}}^T}
+%        {\etaopt(t = 0), \t_0} ={}& 0 \mathtxt{for}n\ne m.
 % %
-% \end{align}
+% \end{align*}
 % %
-% Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nuk
-% \vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
-% differentiation, we can evaluate the mixed partial using the derivative of
-% \eqref{gh_integral}.  We will consider particular functional forms for
-% $\t \mapsto \pstick(\nuk \vert \t)$ in below.
+% Recall from \exref{qz_unconstrained} that $\eta_{\z_\n}$ is of dimension $\kmax -
+% 1$, and that the Hessian of $\expect{\q(\zeta \vert \eta)}{\logp(\x \vert
+% \zeta)}$ with respect to $\etaz$ may be nonzero despite $\logp(\x \vert \zeta)$
+% being linear in $\z$ due to the unconstrained parameterization of $\etaz$.
 %
-% Observe that \eqref{sens_mixed_partial} will be zero for all entries of
-% $\eta$ other than those that parameterize the sticks.
+% We propose the following techniques for computing the inverse Hessian when the
+% fully matrix is prohibitively large.  To describe the techniques it will be
+% useful to use the following compact notation.  Let $\gamma = (\beta, \nu)$
+% denote all the parameters besides $\z$, and for generic parameters $a$ and $b$
+% let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
+% \eta_b^T}{\etaopt(\t_0), \t_0}$, the Hessian with respect to the variational
+% parameters governing $a$ and $b$.  Specifically:
+% %
+% \begin{align*}
+% %
+% \fracat{\partial^2 \KL{\eta, \t}}
+%        {\partial \eta \partial \eta^T}
+%        {\etaopt(\t_0), \t_0} ={}&
+% \hess{\zeta\zeta} =
+% \left(
+% \begin{array}{cc}
+%    \hess{\gamma\gamma} & \hess{\gamma\z} \\
+%    \hess{\z\gamma}     & \hess{\z\z} \\
+% \end{array}
+% \right).
+% %
+% \end{align*}
+% %
+% The terms $\hess{\gamma\gamma}$ and $\hess{\z\gamma} = \hess{\gamma\z}^T$ are
+% typically dense and easily computed using atuomatic differentiation, and the
+% term $\hess{\z\z}$ is block diagonal with a closed-form inverse.
+% %
+% Analogously, let
+% %
+% \begin{align*}
+% %
+% \hess{\zeta\t} :=
+% \fracat{\partial^2 \KL{\eta, \t}}
+%        {\partial \eta \partial \t}
+%        {\etaopt(\t_0), \t_0},
+% %
+% \end{align*}
+% %
+% and observe that
+% %
+% \begin{align*}
+% %
+% \hess{\zeta\t} ={}& \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right).
+% %
+% \end{align*}
+%
+% In this notation,
+% %
+% \begin{align*}
+% %
+% \fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+% -\left(
+% \begin{array}{cc}
+%    \hess{\gamma\gamma} & \hess{\gamma\z} \\
+%    \hess{\z\gamma}     & \hess{\z\z} \\
+% \end{array}
+% \right)^{-1}
+% \left( \begin{array}{c} \hess{\gamma\t} \\ 0 \end{array}\right)
+% %
+% \end{align*}
+% %
+% We can then use the Schur complement to get the computationally tractable
+% expression:
+% %
+% \begin{align*}
+% %
+% \fracat{d \etaopt(\t)}{d \t}{\t_0} ={}&
+% -\left(\begin{array}{c}
+% I_{\gamma\gamma} \\
+% \hess{\z\z}^{-1} \hess{\z\gamma}
+% \end{array}\right)
+% \left(\hess{\gamma\gamma} -
+%       \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \hess{\gamma\t}.
+% %
+% \end{align*}
+%
+% In fact, the former expression can be computed entirely using automatic
+% differentiation using the fact that $\etaoptz$ has an explicit closed form given
+% $\etaoptgamma$, as dicussed in \exref{qz_form}.  TODO: is this worth writing
+% here?
+%
+% When even $\hess{\gamma\gamma}$ is too large to form in memory, one can
+% use the conjugate gradient algorithm.  TODO: fill in details.
+%
+%
+%
+% %
+% %  we can evaluate the mixed partial using the derivative of
+% % \eqref{gh_integral}.  We will consider particular functional forms for
+% % $\t \mapsto \pstick(\nuk \vert \t)$ in below.
+% %
+% %
+% % In order to evaluate $d\etaopt(\t) / d\t$ as given by \eqref{vb_eta_sens}, we
+% % need to solve a linear system involving the $\etadim \times \etadim$ Hessian of
+% % the objective function $\KL{\eta, 0}$ and the $\etadim \times 1$ mixed
+% % second-order partial derivative of $\KL{\eta, \t}$ with respect to $\eta$ and
+% % $\t$.
+% % \todo{Theorem 1 isn't in the form of a mixed partial; maybe this needs more explaining.
+% % Perhaps we could put \eqref{sens_mixed_partial} and a discussion about this earlier?
+% % e.g. after corollary 1?}
+% % We will discuss these two tasks in turn.
+% %
+% % First, consider the mixed partial derivative $\partial^2 \KL{\eta, \t} /
+% % \partial \eta \partial \t$.  In our case, only the priors $\log \pstick(\nuk
+% % \vert \t)$ depend on $\t$, and so
+% % %
+% % \begin{align}\eqlabel{sens_mixed_partial}
+% % %
+% % \fracat{\partial^2 \KL{\eta, \t}}
+% %        {\partial \eta \partial \t}
+% %        {\etaopt(\t_0), \t_0} ={}&
+% % \sum_{\k=1}^{\kmax}
+% %     \evalat{
+% %         \frac{\partial}{\partial\eta}
+% %         \expect{\q(\nuk \vert \eta)}
+% %                {\fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t_0}
+% %                }
+% %         }
+% %         {\etaopt(\t_0)}.
+% % %
+% % \end{align}
+% % %
+% % Consequently, as long as we can explicitly evaluate $\fracat{\log \pstick(\nuk
+% % \vert \t)}{\partial \t}{\t_0} $, either in closed form or with automatic
+% % differentiation, we can evaluate the mixed partial using the derivative of
+% % \eqref{gh_integral}.  We will consider particular functional forms for
+% % $\t \mapsto \pstick(\nuk \vert \t)$ in below.
+% %
+% % Observe that \eqref{sens_mixed_partial} will be zero for all entries of
+% % $\eta$ other than those that parameterize the sticks.
