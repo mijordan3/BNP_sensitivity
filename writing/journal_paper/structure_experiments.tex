@@ -308,16 +308,18 @@ corresponding to all individuals from the Chawia region.
 In the last case, we are studying the sensitivity of haing a third latent
 population present, a population which primarily appears in Chawia individuals. 
 
-For each variant of $\gadmix$, 
-we construct its worst-case negative perturbation 
-(negative because we are interested in making these patterns disappear). 
-\figref{stru_func_sens} displays the effect of each 
-worst-case perturbation on its respective posterior quantity. 
+We construct the worst-case negative perturbation for each variant of $\gadmix$.
+We consider the negative direction because we are interested in testing the 
+robustness of these patterns' existence.
+For each worst-case perturbation, we examine the effect on its respective 
+posterior quantity $\gadmix$
+as $t \rightarrow 1$ in 
+the perturbed prior $\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
 Under the linearly approximated variational parameters, 
-the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved.
-The same quantity computed after refitting the model after the prior perturbation
+the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $\t = 1$. 
+The same quantity computed after refitting the model 
 confirms the sensitivity predicted by the linear approximation. 
-On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive, even after a worst-case perturbation. 
+On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive even after this worst-case perturbation. 
 The linearly approximated and the refitted variational parameters again
 agree on this conclusion. 
 Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive by the linear approximation, as this admixture proportion steadily decreases as $t\rightarrow 1$. 
@@ -385,19 +387,25 @@ compute time.
 \subsection{Limitations of local sensitivity}
 
 In this final subsection, 
-we discuss some examples where employing local sensitivity fails to reproduce
-the changes in a posterior statistic observed by refitting. 
-The linear approximation $\etalin(t)$, naturally, will be a poor subsitute when prior perturbation produces non-linear changes in $\etaopt(t)$. 
-The examples discussed below use the STRUCTURE model and dataset presented in 
-subsection above, and we consider the first perturbation shown in \figref{stru_func_sens}.
+we discuss some examples where 
+the linear approximation $\etalin(t)$ is a poor subsitute 
+for $\etaopt(t)$.  
+This occurs when $\etaopt(t)$ is highly nonlinear in $t$. 
+The examples discussed below use the STRUCTURE model and 
+dataset presented in the
+subsection above, and 
+we examine results after
+the worst-case perturbation ``A" in \figref{stru_func_sens}.
 
-Recall from \figref{stru_func_sens} that the linear approximation agreed with the refit in predicting the admixture proportion of population 2 
-in the outlying Mbololo individuals. 
-We delve more closely into the inferred admixtures under both the refitted and linearly approximated variational parameters after this perturbation. 
-While the linear approximation was able to capture the overall proportion of population 2 in the Mbololo individuals, 
-the linear approximation does not perform uniformly well over all individuals 
+Recall from \figref{stru_func_sens} that the linear approximation agreed with the refit in predicting the diminished admixture proportion of population 2 
+in the outlying Mbololo individuals (individuals ``A")
+at the perturbed prior $\p_1 = \p_0\exp(\phiworstcase)$. 
+However, while the linear approximation was able to 
+capture the change in overall admixture proportion, 
+it does not perform uniformly well over all individuals 
 (\figref{stru_func_sens_admix}). 
-In particular, the admixture proportion of population 2 in individual $n = 25$ dramatically increased after this perturbation. 
+For example, the admixture proportion of population 2 in individual $n = 25$
+dramatically increased after refitting with the perturbed prior $\p_1$. 
 The linear approximation failed to detect this change. 
 
 
@@ -409,35 +417,31 @@ The linear approximation failed to detect this change.
 }
 
 \caption{Inferred admixtures after the worst-case perturbation 
-     to individuals A (see Figure~\ref{fig:stru_func_sens} for perturbation). }\label{fig:stru_func_sens_admix}
+     to individuals ``A" (see Figure~\ref{fig:stru_func_sens} for perturbation). }\label{fig:stru_func_sens_admix}
 \end{figure}
 
 
 \end{knitrout}
 
-\figref{stru_lin_bad_example_cap} examines this individual more closely. 
-The bottom row plots this individual's admixture proportions as $\epsilon$ varies from 0 to 1. 
-In the refit, the admixture proportion of population 1 decreased from 
-0.53
-to 
-0.29, 
-while the admixture proportion of population 2 increased from            
-0.29
-to 
-0.56. 
-The linearly approximated values failed to detect this change. 
-The reason is because for this perturbation, the mapping from 
-$\epsilon$ to the variational parameter on the stick-distribution governing the inferred admixtures is highly non-linear. 
-The top row plots the location parameter of the logit-normal distribution 
-as $\epsilon$ varies from 0 to 1. 
-In our approximation, the location parameter is linear with respect to $\epsilon$. 
-However, the true relationship between the location parameter of the first stick and $\epsilon$ as obtained by refitting is concave -- the location parameter increases at first, then decreases. 
-Thus, the linear approximation expects the change in this location parameter to be positive when in fact it is negative. 
-The corresponding admixture mixture proportion of population 1 is therefore mis-estimated by the linear approximation. 
-Furthermore, the admixture proportion of population two depends on the first stick length. 
-Because our linear approximation over-estimated the length of the first stick, 
-and the second admixture proportion is a product of the second stick and remaining stick length after the first stick, 
-the linear approximation then under-estimates the admixture proportion of population 2. 
+\figref{stru_lin_bad_example} examines this individual ($n = 25$) more closely. 
+The bottom row plots this individual's 
+admixture proportions as $\t$ varies from 0 to 1 in the perturbed prior
+$\p(\nu\vert \t) = \p_0(\nuk)\exp(\t\phiworstcase(\nuk))$. 
+The linear approximation poorly captured the change in admixture proportions observed after refitting, particularly for values of $\t$ close to 1. 
+Even though our linear approximation retains non-linearities in the mapping from variational parameters to the posterior statistic,
+for this perturbation, the mapping from prior parameter
+$\t$ to the relevant variational parameters
+is highly non-linear. 
+This latter mapping is what we linearize, and thus what causes our approximation to fail in this case. 
+Specifically, the location parameter of the variational distribution 
+on the logit stick-breaking proportions (which recall are Gaussian)
+is concave for the first stick-breaking proportion -- the location parameter increases for small $\t$ at first, then decreases. 
+Our approximation assumes a linear relationship between the location parameter and $\t$. 
+Therefore, the corresponding admixture mixture proportion of population 1 is mis-estimated by the linear approximation. 
+Furthermore, because our linearized variational parameter over-estimated the length of the first stick, 
+and the second admixture proportion being a product of the remaining stick times the second stick-breaking proportion, 
+the linearized variational parameters then under-estimates the admixture proportion of population 2. 
+
 
 
 
@@ -470,9 +474,31 @@ the linear approximation then under-estimates the admixture proportion of popula
 
 
 
-In the examples above, we only linearized the mapping $\epsilon \mapsto \etaopt(\epsilon)$. 
-In most examples, we find that retaining the non-linearities from $\eta\mapsto g$ performed as well, or better than, fully linearizing the mapping from $\epsilon \mapsto \eta$. 
-There are exceptions, as we discuss below. 
+\figref{stru_fully_lin_example} shows a similar situation for individual $n = 74$. 
+The linearized variational parameters grossly over-estimated the length of the first stick,
+resulting in the later admixture proportions being under-estimated. 
+The third admixture proportion was particularly poorly approximated by the linearized variational parameters. 
+Given the recursive nature of the relationship between admixtures and stick-breaking proportions, errors at early sticks affect later admixture proportions. 
+Fully linearizing the mapping from $\t$ to $\g(t)$ and forming the approximation 
+$\glin(t)$ (\eqref{vb_g_sens}) avoids this problem. 
+In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, where $\g$ is the admixture proportion of population 3. 
+In all the previous examples (including the example in \figref{stru_lin_bad_example}), 
+computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mapping from $\eta\mapsto \g$,
+does no worse, and is usually better,
+than the fully linearized version, $\glin(\t)$---as can be seen by drawing tangent lines of the refitted curve at
+$\alpha = \alpha_0$ or $t = 0$
+for 
+\figref{iris_alpha_sens,
+stru_alpha_nclusters, 
+stru_alpha_cluster_weights, 
+stru_lin_bad_example}. 
+It is likely that $\g(\etalin(t))$ outperforms $\glin(\t)$ for most posterior quantities, though as we see in \figref{stru_fully_lin_example},
+this is not guaranteed to always be true.  
+
+
+% In the examples above, we only linearized the mapping $\epsilon \mapsto \etaopt(\epsilon)$. 
+% In most examples, we find that retaining the non-linearities from $\eta\mapsto g$ performed as well, or better than, fully linearizing the mapping from $\epsilon \mapsto \eta$. 
+% There are exceptions, as we discuss below. 
 
 
 \begin{knitrout}
@@ -499,8 +525,6 @@ There are exceptions, as we discuss below.
 
 
 \end{knitrout}
-
-
 
 
 

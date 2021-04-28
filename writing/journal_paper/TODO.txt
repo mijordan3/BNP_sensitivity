@@ -1,2 +1,4 @@
 
-notation for per-cluster distributions: p(x_n | \theta_k) <- p(x_n | \theta_k, z_{nk} = 1)? % Ryan
+notation for per-cluster distributions: p(x_n | \theta_k) <- p(x_n | \theta_k, z_{nk} = 1)?
+
+the beta draws are stick-breaking **proportions**; the resulting stick lengths are the mixture weights. 
