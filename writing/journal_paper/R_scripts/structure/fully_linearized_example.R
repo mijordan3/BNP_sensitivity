@@ -2,7 +2,8 @@
 # plot logit sticks parameter
 ###############
 p0 <- logit_stick_flin_df %>% 
-  plot_stick_params(title = 'Stick') + 
+  plot_stick_params(title = 'Stick', 
+                    color_populations = FALSE) + 
   ylab('logit-stick location') + 
   theme(legend.position = 'none', 
         axis.text.x = element_blank(),

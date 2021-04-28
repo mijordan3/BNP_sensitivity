@@ -89,11 +89,14 @@ plot_struct_fsens_results <- function(results_list,
   p_logphi <- plot_influence_and_logphi(results_list$infl_df$logit_v, 
                                         results_list$infl_df$infl_x_prior, 
                                         results_list$pert_df$log_phi, 
-                                        results_list$pert_df$logit_v)
+                                        results_list$pert_df$logit_v) + 
+    # default won't work bc we want _nk, not just _k
+    xlab(TeX('logit($\\nu_{nk}$)'))
   
   p_priors <- plot_priors(sigmoid(results_list$pert_df$logit_v),
                           results_list$pert_df$p0,
-                          results_list$pert_df$pc) 
+                          results_list$pert_df$pc) + 
+    xlab(TeX('$\\nu_{nk}$'))
   
   
   results_df <- 
