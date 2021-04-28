@@ -38,7 +38,7 @@ get_fontsizes <- function(scaling = 1){
   axis_ticksize = axis_ticksize * scaling
   axis_title_size = axis_title_size * scaling
   title_size = title_size * scaling
-  
+
   fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
                           axis.text.y = element_text(size = axis_ticksize),
                           axis.title.x = element_text(size = axis_title_size),
@@ -48,7 +48,7 @@ get_fontsizes <- function(scaling = 1){
                           axis.ticks.length = unit(0.05, "cm"),
                           strip.text = element_text(size = title_size,
                                                     hjust = 0),
-                          strip.background = element_rect(fill = 'white', 
+                          strip.background = element_rect(fill = 'white',
                                                           color = 'white'),
                           legend.margin=margin(-10,-10,-10,-10))
 

@@ -7,6 +7,10 @@ paper_directory <- file.path(git_repo_loc, "writing/journal_paper")
 image_path <- file.path(paper_directory, "static_images")
 data_path <- file.path(paper_directory, "R_scripts/data_simulated")
 
+
+##########################################################
+# R2 non-differentiable function
+
 FunAverbukh <- function(x, y) {
     r <- sqrt(x^2 + y^2)
     theta <- atan(y / x)
@@ -173,15 +177,21 @@ grid.arrange(
 ##############################################################################
 # Some examples of lienar interpolation
 
-# dens_min <- 0.
-# theta_max <- 0.95
-
-dens_min <- 0.05
+dens_min <- 0.
 theta_max <- 1.0
 
-theta_grid <- seq(0, 1, length.out=300)
-p0 <- dbeta(theta_grid, 1, 1) + dens_min
-p1 <- dbeta(theta_grid, 1, 5) + dens_min
+alpha0 <- 1
+alpha1 <- 5
+# dens_min <- 0.05
+# theta_max <- 1.0
+
+theta_grid <- seq(0, 1-1e-4, length.out=300)
+p0 <- dbeta(theta_grid, 1, alpha0) + dens_min
+p1 <- dbeta(theta_grid, 1, alpha1) + dens_min
+
+log_p0 <- dbeta(theta_grid, 1, alpha0, log=TRUE)
+log_p1 <- dbeta(theta_grid, 1, alpha1, log=TRUE)
+max(abs(log_p1 - log_p0))
 
 num_t <- 5
 
@@ -211,8 +221,45 @@ grid.arrange(
     ncol=2 
 )
 
+
+
+pball <- dbeta(theta_grid, 1, 3) + 0.1
+
+ball_width <- 0.5
+df_ball <-
+    data.frame(theta=theta_grid, p=pball, logp=log(pball)) %>%
+    mutate(logp_upper=logp + ball_width,
+           logp_lower=logp - ball_width,
+           p_upper=exp(logp_upper),
+           p_lower=exp(logp_lower))
+
+
+base_var <- "p"
+base_lower <- paste0(base_var, "_lower")
+base_upper <- paste0(base_var, "_upper")
+
+ggplot(df_ball, aes(x=theta)) +
+    geom_ribbon(aes(ymin=get(base_lower), ymax=get(base_upper)),
+                fill="gray", alpha=0.6, color="dark gray") +
+    geom_line(aes(y=get(base_var)))
+
+
+grid.arrange(
+    ggplot(df_ball, aes(x=theta)) +
+        geom_ribbon(aes(ymin=p_lower, ymax=p_upper), fill="gray", alpha=0.6, color="dark gray") +
+        geom_line(aes(y=p))
+,
+    ggplot(df_ball, aes(x=theta)) +
+        geom_ribbon(aes(ymin=logp_lower, ymax=logp_upper), fill="gray", alpha=0.6, color="dark gray") +
+        geom_line(aes(y=logp))
+, ncol=2
+)
+
+
 if (FALSE) {
-    save(dens_min, theta_max, df, file=file.path(data_path, "function_paths.Rdata"))
+    save(dens_min, theta_max, df,
+         ball_width, df_ball,
+         file=file.path(data_path, "function_paths.Rdata"))
 }
 
 
