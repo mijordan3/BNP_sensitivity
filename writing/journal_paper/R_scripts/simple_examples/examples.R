@@ -5,6 +5,7 @@ library(latex2exp)
 git_repo_loc <- "/home/rgiordan/Documents/git_repos/BNP_sensitivity/"
 paper_directory <- file.path(git_repo_loc, "writing/journal_paper")
 image_path <- file.path(paper_directory, "static_images")
+data_path <- file.path(paper_directory, "R_scripts/data_simulated")
 
 FunAverbukh <- function(x, y) {
     r <- sqrt(x^2 + y^2)
@@ -73,8 +74,10 @@ df_line <- do.call(
 ggplot(df_line %>% mutate(f=TruncateForPlot(f, quant=0.7))) +
     geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 
+save(df_line, df, file=file.path(data_path, "nondifferentiable_r2.Rdata"))
 
-png(file.path(image_path, "pathological_r2_example.png"), units="in", width=6, height=3, res=300)
+
+#png(file.path(image_path, "pathological_r2_example.png"), units="in", width=6, height=3, res=300)
 grid.arrange(
     #ggplot(df) +
     ggplot(df %>% mutate(f=TruncateForPlot(f, quant=0.95, use_na=FALSE))) +
@@ -92,7 +95,7 @@ grid.arrange(
         geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 , ncol=2
 )
-dev.off()
+#dev.off()
 
 
 
@@ -126,8 +129,9 @@ df <- data.frame(
 
 phi_range <- max(c(df$phim, df$phip))
 
+save(df, file=file.path(data_path, "positive_pert.Rdata"))
 
-png(file.path(image_path, "positive_phi_example.png"), units="in", width=6, height=6, res=300)
+#png(file.path(image_path, "positive_phi_example.png"), units="in", width=6, height=6, res=300)
 grid.arrange(
     ggplot(df) +
         geom_area(aes(x=x, y=pp, fill="plus"), alpha=0.1) +
@@ -154,6 +158,6 @@ grid.arrange(
         ylim(-1e-3, phi_range)
     , ncol=2
 )
-dev.off()
+#dev.off()
 
 

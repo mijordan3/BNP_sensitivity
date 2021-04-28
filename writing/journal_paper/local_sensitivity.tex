@@ -55,12 +55,22 @@ $\lambda$ to be the Lebesgue measure on $[0,1]$ and model
 Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from
 the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 %
+\begin{align*}
+%
+\log \pstick(\nuk \vert \alpha) ={}&
+    (\alpha - \alpha_0 + \alpha_0 - 1) \log(1 - \nuk) + \const \\
+%
+ ={}&
+    \log \pstick(\nuk \vert \alpha_0) +
+    \t \log(1 - \nuk) + \const,
+\end{align*}
+%
+so that
+%
 \begin{align}\eqlabel{gem_alpha_pert}
 %
-\log \pstick(\nuk \vert \t) ={}&
-    \log \pstick(\nuk \vert \alpha_0) +
-    \t \log(1 - \nuk) + \const.
-    %& \constdesc{\nuk}
+\log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
+    \t \log(1 - \nuk).
 %
 \end{align}
 %

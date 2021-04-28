@@ -1,3 +1,5 @@
+% Load tex files defining the some graphics.
+
 Although \corref{etafun_deriv_form} is explicitly about a fixed $\phi$,
 it suggests an intriguing result if it is taken to hold for all $\phi$ in some
 ball, $\ball_p(\delta) := \{\phi: \norm{\phi}_{\lambda,p} \le \delta \}$.
@@ -129,13 +131,15 @@ f(r, \theta) := \begin{cases}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[h!]
+\SimPathologicalRTwoFig{}
 
-\includegraphics[width=0.980\linewidth,height=0.490\linewidth]{static_images/pathological_r2_example.png}
-\caption{A plot of $f(x_1, x_2)$ from \exref{r2_pathological}.}
-\figlabel{r2_pathological}
-\centering
-\end{figure}
+% \begin{figure}[h!]
+%
+% \includegraphics[width=0.980\linewidth,height=0.490\linewidth]{static_images/pathological_r2_example.png}
+% \caption{A plot of $f(x_1, x_2)$ from \exref{r2_pathological}.}
+% \figlabel{r2_pathological}
+% \centering
+% \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \Figref{r2_pathological} contains a plot of $f(r, \theta)$, both over
@@ -254,9 +258,10 @@ functions unbounded below, however.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{e_log_disocontinuous_v2}
 %
-In the setting of \exref{e_log_disocontinuous_v1}, assume further that, for any
-$\epsilon \ge 0$, there exists a set $S_\epsilon$ such that $\p(S_\epsilon) \le
-\epsilon$ and $\q(S_\epsilon) \ge \epsilon$.  Define
+In the setting of \exref{e_log_disocontinuous_v1}, assume further that there
+exists a sequence $\epsilon_n \rightarrow 0$, such that for each $\epsilon_n$ in
+the sequence $\epsilon_n > 0$ and there exists a set $S_{\epsilon_n}$ such that
+$\p(S_{\epsilon_n}) = \epsilon_n$ and $\q(S_{\epsilon_n}) > 0$. Define
 %
 \begin{align*}
 %
@@ -274,108 +279,146 @@ Now, with $\gamma$ such that $\inf_\theta \gamma(\theta) = -\infty$,
 \tilde{f}(\t \gamma) = 0 \mathtxt{for any }\t > 0 \mathtxt{and} f(\phiz) = 0.
 %
 \end{align*}
+%
+So the discontinuity of \exref{e_log_disocontinuous_v1} no longer applies.
+However, $\tilde{f}$ is still discontinuous.
 
-However, $\tilde{f}$ is still discontinuous.  For any $\epsilon > 0$, let
-$S_\epsilon$ be a set given in the assumption, and for $\delta > 0$, define
+For each $\epsilon_n$, and for a given $\c_n > 0$ and $0 < \delta_n < 1$, define
 %
 \begin{align*}
 %
-\gamma(\theta, \epsilon, \delta) :=
-\begin{cases}
-    %
-    \delta - 1      & \textrm{ for }\theta\in S_\epsilon \\
-    0      & \textrm{ for }\theta\notin S_\epsilon.
-    %
-\end{cases}
+\gamma_n(\theta) :=
+(\delta_n - 1)\ind{\theta \in S_{\epsilon_n}} +
+\c_n \ind{\theta \notin S_{\epsilon_n}}.
 %
 \end{align*}
 %
-Then $\gamma(\theta; \epsilon, \delta) \in \lp{\p,p}$ with.  Furthermore,
+Then $\gamma_n(\theta) \in \lp{\p,p}$ with
 %
 \begin{align*}
 %
-\norm{\gamma(\cdot;
-\epsilon, \delta)}_{\p,p} =
-    \left( \int_0^1 \phi(\theta)^p \p(\theta
-)\lambda(d\theta)\right)^{1/p} \le{}& \epsilon^{1/p} (\delta - 1)  \mathand\\
+\norm{\gamma_n}_{\p,p} ={}&
+\norm{(\delta_n - 1) \ind{\theta \in S_{\epsilon_n}} +
+      \c_n \ind{\theta \notin S_{\epsilon_n}}}_{\p,p}
+\\\le{}&
+    \abs{\delta_n - 1} \epsilon_n^{1/p} +
+    \c_n ( 1 - \epsilon_n)^{1/p}
+\mathand\\
 %
-\abs{\tilde{f}(\gamma(\cdot; \epsilon, \delta)) - \tilde{f}(\phiz)} =
-    \expect{\q(\theta)}{\ind{\theta \in S_\epsilon}} \abs{\log(\delta)} \ge{}&
-    \epsilon \abs{\log(\delta)}.
+\abs{\tilde{f}(\gamma_n) - \tilde{f}(\phiz)}
+={}&
+% \abs{
+%     \q(S_\epsilon) \log(\delta) +
+%     (1 - \q(S_\epsilon)) \log(1 + \c)
+% }
+% \\={}&
+    \q(\epsilon_n) \abs{\log(\delta_n)} +
+    (1 - \q(S_{\epsilon_n})) \log(1 + \c_n)
+\\\ge{}&
+    \q(S_{\epsilon_n}) \abs{\log(\delta_n)}.
 %
 \end{align*}
 %,
-Take $\delta(\epsilon) = \exp(-\epsilon)$.  Then, for any sequence $\epsilon_n
-\rightarrow 0$,
+Take $\delta_n = \exp(-1 / \q(S_{\epsilon_n}))$ and let $\c_n$ converge to a
+finite constant.  Then, for all $n$, $\q(S_{\epsilon_n}) \abs{\log(\delta_n)}
+= \q(S_{\epsilon_n}) / \q(S_{\epsilon_n}) = 1$, so
 %
 \begin{align*}
 %
-\abs{\tilde{f}(\phi(\cdot; \epsilon_n, \delta(\epsilon_n))) -
-     \tilde{f}(\phiz)} \ge{} 1
+\abs{\tilde{f}(\gamma_n) - \tilde{f}(\phiz)} \ge{} 1
 \mathtxt{and}
-\norm{\gamma(\cdot; \epsilon_n, \delta(\epsilon_n))}_p \rightarrow{} 0.
+\norm{\gamma_n}_p \rightarrow{} 0.
 %
 \end{align*}
 %
-So $\tilde{f}$ is discontinuous on an $\norm{\cdot}_p$ ball containing $\phiz$,
-and cannot be Fr{\'e}chet differentiable.
+So $\tilde{f}$ is discontinuous at $\phiz$ in $\norm{\cdot}_{\p, p}$.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Indeed, \exref{e_log_disocontinuous_v2} shows that the KL divergence
-cannot be Fr{\'e}chet differentiable for $p < \infty$.
+Indeed, \exref{e_log_disocontinuous_v2} shows that the KL divergence cannot be
+Fr{\'e}chet differentiable for $p < \infty$, even if it could somehow be safely
+extended to functions outside $\pertset$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{cor}\corlabel{kl_discontinuous}
 %
-Assume that $\pbase(\theta)$ and $\q(\theta \vert \eta)$ are defined relative to
-the Lebesgue measure, and that $\etaopt$ it a VB optimum.  For $1 \le p <
-\infty$, the class of perturbations defined in \defref{prior_nl_pert}, and the
-space $\lp{\lambda, p}$, the maps
+Assume that $\pbase(\theta)$ is defined relative to the Lebesgue measure, that
+that $\etaopt$ it a VB optimum, and that $\KL{\q(\theta \vert \etaopt) ||
+\pbase(\theta)}$ is well-defined.
+
+Take $1 \le p < \infty$ and the class of perturbations defined in
+\defref{prior_nl_pert}, and the space $\lp{\lambda, p}$.  Then the map $\phi
+\mapsto \KL{\etaopt, \phi}$ is discontinuous at $\phiz$ on the set $\pertset$,
+in the sense that, for any $\epsilon$, there exists a $\phi \in \pertset$ such
+that
 %
 \begin{align*}
 %
-\phi \mapsto{}& \KL{\etaopt, \phi} \mathand \\
-\phi \mapsto{}&
-\begin{cases}
-    \KL{\etaopt, \phi} & \textrm{when }\inf \phi > -\infty \\
-    \KL{\etaopt, \phiz} & \textrm{otherwise}.
-\end{cases}
+\norm{\phi}_{\lambda,p} \le \epsilon \mathand
+\abs{\KL{\etaopt, \phiz} - \KL{\etaopt, \phiz}} \ge 1.
 %
 \end{align*}
 %
-are discontinuous at $\phiz$, and so not Fr{\'e}chet differentiable.
+Consequently, any version of $\KL{\eta, \phi}$ that coincides with $\KL{\eta,
+\phi}$ on $\pertset$ is not Fr{\'e}chet differentiable at $\etaopt, \phiz$.
 %
 \begin{proof}
 %
-For any $\etaopt$, for any set $\S$ with $\expect{\pbase(\theta)}{\ind{S}} > 0$,
-$\expect{\q(\theta \vert \etaopt)}{\ind{S}} > 0$ as well, since otherwise
-the KL divergence would be infinite and $\etaopt$ cannot be a VB optimum.
-Since $\lambda$ is the Lebesgue measure, there exist sets $S_\epsilon$...
-TODO a little more work here.
+Since $\pbase$ is defined relative to the Lebesgue measure, there exists a
+sequence $\epsilon_n \rightarrow 0$ and sets $S_{\epsilon_n}$ such that
+$\pbase(S_{\epsilon_n}) = \epsilon_n$.  $\KL{\q(\theta \vert \etaopt) ||
+\pbase(\theta)}$ is well-defined, $\q(\theta \vert \etaopt)$ and
+$\pbase(\theta)$ are mutually absolutely continuous, so $\q(S_{\epsilon_n}) >
+0$.
 
-By \eqref{nl_vb_pert_p}, the KL divergence is of the form
+By \eqref{nl_vb_pert_p}, the KL divergence $\KL{\etaopt, \phi}$ is of the form
 %
 \begin{align*}
 %
 \KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
-    p \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right).
+\expect{\q(\theta \vert \etaopt)}{
+    \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+}.
 %
 \end{align*}
 %
-Define $\gamma(\theta) = \phi(\theta) / \pbase(\theta)^{1/p}$, and note that
-$\gamma \in \lp{\pbase, p}$ with $\norm{\gamma}_{\pbase, p} =
-\norm{\phi}_{\lambda, p}$.  The results then follow from
-\exref{e_log_disocontinuous_v1, e_log_disocontinuous_v2}.
+Take $\alpha = 1/p$ and
+%
+\begin{align*}
+%
+\palt(\theta) ={}&
+    \pbase(\theta)\left(
+        \left( \frac{1 - \epsilon\delta}{1 - \epsilon}\right)^{p}
+        \ind{\theta \notin S_{\epsilon}} +
+        \delta^{p} \ind{\theta \in S_{\epsilon}}
+    \right) \mathand
+\\
+\phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}.
+%
+\end{align*}
+%
+Then $\phi \in \pertset$.   Define $\gamma(\theta) = \phi(\theta) /
+\pbase(\theta)^{1/p}$, and note that $\gamma \in \lp{\pbase, p}$ with
+$\norm{\gamma}_{\pbase, p} = \norm{\phi}_{\lambda, p}$, and
+%
+\begin{align*}
+%
+\KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
+\expect{\q(\theta \vert \etaopt)}{\log\left(1 + \gamma(\theta)\right)}.
+%
+\end{align*}
+%
+The result then follows from \exref{e_log_disocontinuous_v2}, with $\p =
+\pbase$,  $\q = \q(\theta \vert \etaopt)$, and $\c_n = (1 - \epsilon_n \delta_n) /
+(1 - \epsilon_n)$.
 %
 \end{proof}
 %
 \end{cor}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 Despite \corref{kl_discontinuous}, the directional derivatives exist
 as long as $\inf_\theta \phi(\theta) > -\infty$.
@@ -397,15 +440,15 @@ assume that
 %
 \end{align*}
 %
-or, equivalently, that
-%
-\begin{align*}
-%
-\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
-    \q(\theta) \lambda(d\theta)
-< \infty.
-%
-\end{align*}
+% or, equivalently, that
+% %
+% \begin{align*}
+% %
+% \int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
+%     \q(\theta) \lambda(d\theta)
+% < \infty.
+% %
+% \end{align*}
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -420,9 +463,9 @@ $\psi(\theta)$ equal to each of the following functions:
 %
 \begin{align*}
 %
-& \norm{\lqgrad{\theta, \eta}}_2 \\
-& \norm{\lqgrad{\theta, \eta}}^2_2 \\
-& \norm{\lqhess{\theta, \eta}}^2.
+ \norm{\lqgrad{\theta, \eta}}_2 \textrm{, }
+ \norm{\lqgrad{\theta, \eta}}^2_2 \textrm{ and }
+ \norm{\lqhess{\theta, \eta}}^2.
 %
 \end{align*}
 %
@@ -442,9 +485,9 @@ parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
 \assuref{kl_opt_ok}.
 
 Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
-$\inf_\theta \phi(\theta) > -\infty$, the function $\t \mapsto \etaopt(\t \phi)$
-is differentiable at $\t = 0$ with the derivative given in
-\corref{etafun_deriv_form}.
+$\inf_\theta \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the function $\t
+\mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the derivative
+given in \corref{etafun_deriv_form}.
 %
 \begin{proof}
 %

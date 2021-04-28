@@ -11,7 +11,7 @@ library(gginnards)
 library(xtable)
 
 library(gridExtra)
-library(patchwork) 
+library(patchwork)
 
 library(latex2exp)
 
@@ -29,10 +29,10 @@ opts_chunk$set(echo=knitr_debug, message=knitr_debug, warning=knitr_debug)
 # Set the default ggplot theme
 theme_set(theme_bw())
 
-# set fontsizes 
-axis_ticksize = 4 
+# set fontsizes
+axis_ticksize = 4
 axis_title_size = 7
-title_size = 7 
+title_size = 7
 
 get_fontsizes <- function(scaling = 1){
   axis_ticksize = axis_ticksize * scaling
@@ -40,18 +40,18 @@ get_fontsizes <- function(scaling = 1){
   title_size = title_size * scaling
   
   fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
-                          axis.text.y = element_text(size = axis_ticksize),  
+                          axis.text.y = element_text(size = axis_ticksize),
                           axis.title.x = element_text(size = axis_title_size),
-                          axis.title.y = element_text(size = axis_title_size), 
-                          legend.text = element_text(size=axis_title_size), 
-                          plot.title = element_text(size = title_size), 
-                          axis.ticks.length = unit(0.05, "cm"), 
-                          strip.text = element_text(size = title_size, 
+                          axis.title.y = element_text(size = axis_title_size),
+                          legend.text = element_text(size=axis_title_size),
+                          plot.title = element_text(size = title_size),
+                          axis.ticks.length = unit(0.05, "cm"),
+                          strip.text = element_text(size = title_size,
                                                     hjust = 0),
                           strip.background = element_rect(fill = 'white', 
                                                           color = 'white'),
                           legend.margin=margin(-10,-10,-10,-10))
-  
+
   return(fontsize_theme)
 }
 
@@ -73,26 +73,22 @@ DefineMacro <- function(macro_name, value, digits=3) {
 base_aspect_ratio <- 8 / (5 * 2)
 base_image_width <- 4.
 
-SetImageSize <- function(aspect_ratio, image_width=1.0) {
-  
+SetImageSize <- function(aspect_ratio=base_aspect_ratio, image_width=1.0) {
+
   ow <- sprintf("%0.3f\\linewidth", image_width * 0.98)
   oh <- sprintf("%0.3f\\linewidth", aspect_ratio * image_width * 0.98)
-  
+
   fw <- base_image_width * image_width
   fh <- fw * aspect_ratio
-  
+
   opts_chunk$set(out.width=ow,
                  out.height=oh,
                  fig.width=fw,
                  fig.height=fh)
 }
 
+SetImageSize()
 
-SetFullImageSize <- function() SetImageSize(
-    aspect_ratio=base_aspect_ratio, image_width=base_image_width)
-
-# Default to a full image.
-SetFullImageSize()
 
 # A convenient funciton for extracting only the legend from a ggplot.
 # Taken from
