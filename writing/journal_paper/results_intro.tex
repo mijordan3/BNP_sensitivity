@@ -10,7 +10,7 @@ result of the prior specification.
 
 We consider both the effects of varying the parameter $\alpha$
 in the $\betadist{\nuk \vert 1, \alpha}$ stick distribution, as well as
-the effects of changing the functional form the the Beta prior itself.
+the effects of changing the functional form the Beta prior itself.
 For a given prior perturbation,
 we validate the performace of the linear approximation against
 the more expensive process of re-fitting the model.
@@ -24,10 +24,29 @@ followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-qu
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
 
-To compute local sensitivity,
-we inverted the Hessian in~\eqref{vb_eta_sens} using
-the conjugate gradient algorithm, thus avoiding the need for
-instatiating the Hessian matrix in memory.
+For our linear approximation,
+we take advantage of the global/local structure.
+As described in \secref{computing_sensitivity}, we linearize only the
+global variational parameters (\eqref{global_lin_approx}) and
+approximate all variational parameters (both global and local)
+with $\etalinglobal$ (\eqref{global_lin_approx_all}).
+
+We solved the linear system in~\eqref{global_sens} using
+the conjugate gradient algorithm, which requires only Hessian-vector products;
+this avoids instatiating the full Hessian matrix in memory.
+If memory were not limited,
+we could have computed the full Hessian and
+either factorized it (e.g. with a Cholesky decomposition) or inverted it directly.
+Then, the Hessian inverse (or its Cholesky decomposition) can
+be re-used for different perturbations
+(since different choices of prior perturbation
+results in a different $\crosshessian$).
+By using conjugate gradient, we have to re-solve the linear system (\eqref{global_sens})
+for each choice of prior perturbation.
+On our data sets, the conjugate graient algorithm was at least
+an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
+to exploring different perturbations.
+
 The conjugate gradient algorithm along with the optimizers BFGS and trust-ncg
 are implemented in SciPy~\citep{scipy}.
 All derivatives were computed using the Python

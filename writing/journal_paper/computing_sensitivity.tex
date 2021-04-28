@@ -36,6 +36,8 @@ $\crosshessian$ decomposes as
                 }}{\eta = \etaopt(0)}
 \eqlabel{sens_mixed_partial}
 \end{align}
+\todo{say why can we exchange derivatives and expectations here}
+
 We approximate the expectation using GH quadrature (\eqref{gh_integral}),
 with
 % $f(\nuk) = \frac{\partial}{\partial t}[\log \pstick(\nuk \vert \t)]\vert_{t =0}$.
@@ -61,13 +63,13 @@ while the dimension of $\etaz$ is of order $\kmax
 \times\N$.
 For large $\N$, it may not be possible to even instantiate the Hessian matrix in memory.
 
-Fortunately, the latent variables in our BNP model (\eqref{bnp_model}) factorize
-into a set of ``global" and ``local" latent variables.
+To compute the Hessian, we take advantage of the fact that the latent variables
+in our BNP model (\eqref{bnp_model})
+factorize into a set of ``global" and ``local" latent variables.
 The cluster latent variables $\beta$ and
 the stick-breaking proportions $\nu$
 are ``global" because they are shared across the entire data set.
 The ``local" variables are the cluster assignments $z$, which are unique to each data point.
-We take advantage of this structure to more efficiently compute the Hessian.
 
 Let $\gamma := (\beta, \nu)$ denote the global latent variables and
 $\eta_\gamma := (\etabeta, \etanu)$ be the variational parameters for the global latent variables.
@@ -82,6 +84,7 @@ We decompose the Hessian matrix $\hessopt$ into four blocks:
 %
 \begin{align*}
 %
+\hessopt =
 \fracat{\partial^2 \KL{\eta, \t}}
        {\partial \eta \partial \eta^T}
        {\etaopt(0), t= 0} ={}&
@@ -154,11 +157,11 @@ Alteratively, we now make an observation that allows us to express $\hessopt_\ga
 using only a single Hessian operator.
 Recall from \exref{qz_form} that the optimal local variational parameters $\etaoptz$ can be written
 as a closed-form function of the global variational parameters $\eta_\gamma$.
-We write $\etaoptz(\eta_\gamma; \t)$ to denote the optimal local variational parameters given the
-global variational parameters; that is,
+Let $\etaoptz(\eta_\gamma; \t)$ denote this mapping; that is,
 \begin{align*}
-  \etaoptz(\eta_\gamma; \t) := \argmin_{\eta_\z} \KL{(\eta_\gamma, \eta_z), \t}
+  \etaoptz(\eta_\gamma; \t) := \argmin_{\eta_\z} \KL{(\eta_\gamma, \eta_z), \t}.
 \end{align*}
+
 Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
@@ -169,12 +172,12 @@ Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule,
 \notag
 \end{align}
 
-In other words, we form a $\mathrm{KL}$ objective using the global variational parameters only,
-and we do this by implicitly setting the local variational parameters at their optimum
-given the global parameters.
 \eqref{global_kl} is how we calculate $\hessopt_\gamma$ in practice:
-we implement the function $\mathrm{KL}_{glob}$ and we use automatic differentiation to
-compute its Hessian with respect to the global parameters $\eta_\gamma$.
+we implement $\mathrm{KL}_{glob}$, which returns the $\mathrm{KL}$ as a function of only global parameters
+by implicitly setting local parameters at their optimum;
+we then use automatic differentiation to
+compute the Hessian of $\mathrm{KL}_{glob}$
+with respect to the global parameters $\eta_\gamma$.
 
 Crucially, the dimension of $\hessopt_\gamma$ is of order $\kmax \times \kmax$
 and does not scale with the number of data points $\N$.
@@ -185,26 +188,32 @@ than the full $\etadim\times\etadim$ Hessian of all the variational parameters.
 
 Now that we can compute the sensitivity of the global parameters in
 \eqref{global_sens}, we produce its linear approximation:
-\begin{align*}
+\begin{align}\eqlabel{global_lin_approx}
   \etalin_\gamma(\t) := \etaopt_\gamma +
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
-\end{align*}
+\end{align}
 
 We have the option of again taking advantage of the fact that the optimal
 local parameters can be found in closed form given global parameters.
-Instead of linearizing both local and variational parameters,
+We assume that $\etaoptz(\eta_\gamma; \t)$ is inexpensive to compute.
+Then, instead of linearizing both local and variational parameters,
 we linearize only the global parameters and approximate
-the full set of variational parameters at some $\t \not= 0$ using
-\begin{align}\eqlabel{eta_global_only_def}
+the full set of variational parameters at $\t \not= 0$ using
+\begin{align}\eqlabel{global_lin_approx_all}
 \etalinglobal(\t) = \left(\begin{array}{c} \etalin_\gamma(\t) \\
 \etaoptz(\etalin_\gamma(\t); \t)
 \end{array}\right).
 \end{align}
 
-The advantage to $\etalinglobal$ is that we can the Hessian
+The advantage to $\etalinglobal$ is that the Hessian
 required for forming the approximation does not scale with $\N$.
-TODO: does retaining the nonlinearities help?
-this also always gives a lower KL value ...
+Note also that the $\mathrm{KL}$ evaluated at $\etalinglobal$
+will always be smaller than the $\mathrm{KL}$ evaluated at $\etalin$ obtained by
+linearizing all variational parameters,
+and thus $\etalinglobal$ may be a better approximator
+to the actual refitted variational parameters.
+
+
 
 
 
