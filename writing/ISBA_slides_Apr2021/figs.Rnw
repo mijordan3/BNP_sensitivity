@@ -1,0 +1,56 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache <- FALSE # Set to true to cache knitr output for this analysis.
+r_script_dir <- "../journal_paper/R_scripts/"
+source(file.path(r_script_dir, "initialize.R"), echo=FALSE)
+source(file.path(r_script_dir, "plotting_utils.R"))
+
+# load data.  Paths are annoying, need to do this here.
+path_env  <- LoadIntoEnvironment(file.path(r_script_dir, 'data_simulated/function_paths.Rdata'))
+@
+
+
+\newcommand{\FunctionPathsMultFig}{
+<<path_mult_cap>>=
+fig_cap <- paste("Multiplicative mixture paths between two densities.", sep="")
+SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
+@
+%<<mult_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+<<mult_path, cache=cache, fig.show='hold'>>=
+source(file.path(r_script_dir, 'simple_examples/function_paths_mult.R'),
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+
+\newcommand{\FunctionPathsLinFig}{
+<<path_lin_cap>>=
+fig_cap <- paste("Linear mixture paths between two densities.", sep="")
+SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
+@
+%<<lin_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+<<lin_path, cache=cache, fig.show='hold'>>=
+source(file.path(r_script_dir, 'simple_examples/function_paths_lin.R'),
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+
+\newcommand{\FunctionBallFig}{
+<<func_ball_cap>>=
+fig_cap <- paste("An $\\linf{\\cdot}$ ball.", sep="")
+SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
+@
+<<func_ball, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+source(file.path(r_script_dir, 'simple_examples/function_ball.R'),
+       echo=knitr_debug, print.eval=TRUE)
+@
+}

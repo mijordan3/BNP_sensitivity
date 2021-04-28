@@ -19,8 +19,9 @@ library(latex2exp)
 # This must be run from within the git repo, obviously.
 git_repo_loc <- system("git rev-parse --show-toplevel", intern=TRUE)
 
-paper_directory <- file.path(git_repo_loc, "writing/")
+paper_directory <- file.path(git_repo_loc, "writing/journal_paper")
 data_path <- file.path(paper_directory, "data/")
+r_script_path <- file.path(paper_directory, "R_scripts")
 
 # opts_chunk$set(fig.width=4.9, fig.height=3)
 opts_chunk$set(fig.pos='!h', fig.align='center', dev='png', dpi=300)
@@ -38,7 +39,7 @@ get_fontsizes <- function(scaling = 1){
   axis_ticksize = axis_ticksize * scaling
   axis_title_size = axis_title_size * scaling
   title_size = title_size * scaling
-  
+
   fontsize_theme <- theme(axis.text.x = element_text(size = axis_ticksize),
                           axis.text.y = element_text(size = axis_ticksize),
                           axis.title.x = element_text(size = axis_title_size),
@@ -48,7 +49,7 @@ get_fontsizes <- function(scaling = 1){
                           axis.ticks.length = unit(0.05, "cm"),
                           strip.text = element_text(size = title_size,
                                                     hjust = 0),
-                          strip.background = element_rect(fill = 'white', 
+                          strip.background = element_rect(fill = 'white',
                                                           color = 'white'),
                           legend.margin=margin(-10,-10,-10,-10))
 

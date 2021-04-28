@@ -32,3 +32,4 @@ grid.arrange(
         ylim(-1e-3, phi_range) + theme(legend.position = "none")
     , ncol=2
 )
+
