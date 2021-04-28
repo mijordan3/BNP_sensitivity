@@ -9,6 +9,7 @@ source('../plotting_utils.R')
 load('../data_processed/iris.RData')
 
 # initialization file for slides
+outfolder <- '/home/rliu/Documents/BNP/student_seminar2021/figures/'
 source('./initialize_figures_for_slides.R')
 
 # construct iris plots

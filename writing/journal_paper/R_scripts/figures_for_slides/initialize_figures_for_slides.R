@@ -7,7 +7,6 @@ source('../plotting_utils.R')
 # function to save figures as png file
 
 baseline_width <- 5
-outfolder <- '/home/rliu/Documents/BNP/student_seminar2021/figures/'
 
 save_last_fig <- function(outfile, 
                           base_factor = 1.0, 
