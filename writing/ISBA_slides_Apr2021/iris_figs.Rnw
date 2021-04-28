@@ -1,0 +1,257 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache <- FALSE # Set to true to cache knitr output for this analysis.
+r_script_dir <- "../journal_paper/R_scripts/"
+source(file.path(r_script_dir, "initialize.R"), echo=FALSE)
+source(file.path(r_script_dir, "plotting_utils.R"))
+
+# load data for iris
+load(file.path(r_script_dir, 'data_processed/iris.RData'))
+
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% initial fit for iris
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\IrisFit}{
+<<iris_init_size>>=
+SetImageSize(aspect_ratio = base_aspect_ratio, 
+             image_width = 0.65)
+@
+<<iris_init, cache=cache, fig.show='hold'>>=
+source(file.path(r_script_dir, '/iris/iris_init_fit.R'), print.eval = TRUE)
+
+@
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% iris alpha sensitivity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\IrisAlphaRefit}{
+<<iris_alpha_size>>=
+SetImageSize(aspect_ratio = 0.45)
+@
+
+<<iris_alphasens_refit, cache=cache, fig.show='hold'>>=
+
+# in-sample results
+insample_df <- 
+  data.frame(t = alpha_sens_df$alpha, 
+             refit = alpha_sens_df$n_clusters_refit, 
+             lin = alpha_sens_df$n_clusters_lr, 
+             quantity = 'In-sample')
+
+# predictive results
+predictive_df <- 
+  data.frame(t = alpha_sens_df_pred$alpha, 
+             refit = alpha_sens_df_pred$n_clusters_refit, 
+             lin = alpha_sens_df_pred$n_clusters_lr, 
+             quantity = 'Predictive')
+
+##################
+# wrapper to plot
+##################
+plot_alpha_trace_plot <- function(results_df){
+  p <- results_df %>% 
+    plot_post_stat_trace_plot + 
+    facet_wrap(~quantity, nrow = 1) + 
+    ylab('E[# clusters]') + 
+    xlab(TeX('DP parameter $\\alpha$')) + 
+    # add vertical line
+    geom_vline(xintercept = 6, 
+               color = 'red', 
+               linetype = 'dashed')
+  
+  return(p)
+}
+
+set_condition_to_nan <- function(x, bool_vec){
+  x[bool_vec] <- NA
+  return(x)
+}
+
+
+
+# refit, in-sample only 
+rbind(insample_df, 
+      predictive_df) %>% 
+  mutate(lin = lin * NA) %>% 
+  mutate(refit = set_condition_to_nan(refit, quantity == 'Predictive')) %>% 
+  plot_alpha_trace_plot + 
+  # keep axes conistent 
+  geom_point(aes(x = min(insample_df$t), 
+                 y = max(insample_df$lin)), 
+             alpha = 0) + 
+  geom_point(aes(x =min(insample_df$t), 
+                 y = min(insample_df$lin)), 
+             alpha = 0)
+
+
+@
+}
+
+\newcommand{\IrisAlphaInSample}{
+<<iris_alphasens_insample, cache=cache, fig.show='hold'>>=
+
+# refit + lr in-sample only 
+rbind(insample_df, 
+      predictive_df) %>% 
+  mutate(refit = set_condition_to_nan(refit, quantity == 'Predictive')) %>% 
+  mutate(lin = set_condition_to_nan(lin, quantity == 'Predictive')) %>% 
+  plot_alpha_trace_plot + 
+  # keep axes conistent 
+  geom_point(aes(x = min(insample_df$t), 
+                 y = max(insample_df$lin)), 
+             alpha = 0) + 
+  geom_point(aes(x =min(insample_df$t), 
+                 y = min(insample_df$lin)), 
+             alpha = 0)
+
+@
+}
+
+\newcommand{\IrisAlphaAll}{
+<<iris_alphasens_all, cache=cache, fig.show='hold'>>=
+
+rbind(insample_df, 
+      predictive_df) %>% 
+  plot_alpha_trace_plot + 
+  # keep axes conistent 
+  geom_point(aes(x = min(insample_df$t), 
+                 y = max(insample_df$lin)), 
+             alpha = 0) + 
+  geom_point(aes(x =min(insample_df$t), 
+                 y = min(insample_df$lin)), 
+             alpha = 0)
+
+@
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% iris influence function
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\IrisInfluence}{
+<<iris_infl_size>>=
+SetImageSize(aspect_ratio = 0.35)
+@
+<<iris_infl, cache=cache, fig.show='hold'>>=
+
+#############
+# Plot priors
+#############
+p_prior_logit <- 
+  wc_results$priors_df %>%
+  mutate(p0_logit = p0 * v * (1 - v)) %>% 
+  ggplot() + 
+  geom_line(aes(x = logit_v, y = p0_logit), 
+            color = 'lightblue') + 
+  xlab(TeX('logit$(\\nu_k)$')) + 
+  ylab('p0') + 
+  get_fontsizes()
+
+p_prior <- 
+  wc_results$priors_df %>%
+  ggplot() + 
+  geom_line(aes(x = v, y = p0), 
+            color = 'lightblue') + 
+  xlab(TeX('$\\nu_k$')) + 
+  ylab('p0') + 
+  get_fontsizes()
+
+#############
+# Plot influnce times prior
+#############
+
+p_infl_x_prior <- 
+  influence_df %>%
+  ggplot() + 
+  geom_line(aes(x = logit_v, y = influence_x_prior), 
+            color = 'purple') + 
+  xlab(TeX('logit$(\\nu_k)$')) + 
+  ylab(TeX("$\\Phi$")) + 
+  get_fontsizes()
+
+p_prior + p_prior_logit + p_infl_x_prior
+@
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% iris function perturbations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\IrisFpertEx}{
+<<iris_fpertex_size>>=
+SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio, 
+             image_width = 0.8)
+@
+<<iris_fpertex, cache=cache, fig.show='hold'>>=
+
+# contains some functions to plot perturbations
+source(file.path(r_script_dir, 'iris/iris_func_sens.R'))
+
+plot_func_pert_results(fpert2_results,
+                             remove_legend = FALSE,
+                             remove_xlab = FALSE,
+                             remove_title = FALSE,
+                             ymax = ymax)
+@
+}
+
+\newcommand{\IrisFpertAll}{
+<<iris_fpertall_size>>=
+SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio, 
+             image_width = 0.8)
+@
+<<iris_fpertall, cache=cache, fig.show='hold'>>=
+
+# contains some functions to plot perturbations
+# these plots were sourced from "iris_fsens.R"
+g0 / g1 / g2
+
+@
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% iris worst-case
+%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\IrisWorstCase}{
+<<iris_worstcase_size>>=
+SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio, 
+             image_width = 0.8)
+@
+<<iris_worstcase, cache=cache, fig.show='hold'>>=
+
+# ymax_new <- 0.07
+# g0_new <- plot_func_pert_results(fpert1_results, 
+#                                  remove_legend = TRUE, 
+#                                  remove_xlab = TRUE, 
+#                                  remove_title = TRUE, 
+#                                  ymax = ymax_new)
+#   
+# g2_new <- plot_func_pert_results(fpert2_results, 
+#                           remove_legend = TRUE, 
+#                           remove_xlab = TRUE, 
+#                           remove_title = TRUE, 
+#                           ymax = ymax_new)
+
+g3_new <- plot_func_pert_results(wc_results, 
+                                 remove_title = TRUE)
+                                 # ymax = ymax_new)
+
+g3_new
+
+
+@
+}
+

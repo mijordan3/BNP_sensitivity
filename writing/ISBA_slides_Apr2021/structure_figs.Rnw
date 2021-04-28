@@ -1,0 +1,37 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+cache <- FALSE # Set to true to cache knitr output for this analysis.
+r_script_dir <- "../journal_paper/R_scripts/"
+source(file.path(r_script_dir, "initialize.R"), echo=FALSE)
+source(file.path(r_script_dir, "plotting_utils.R"))
+
+# load data for structure
+load(file.path(r_script_dir, 'data_processed/structure.RData'))
+source(file.path(r_script_dir, '/structure/structure_plotting_utils.R'))
+
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% initial fit for structure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\StructureFit}{
+<<structure_init_cap>>=
+SetImageSize(aspect_ratio=0.6 * base_aspect_ratio)
+@
+<<structure_init, cache=cache, fig.show='hold'>>=
+initial_fit <- plot_initial_fit() 
+
+initial_fit$p + 
+  theme(legend.position = 'none')
+@
+}
+
+
