@@ -187,7 +187,10 @@ alpha1 <- 5
 
 theta_grid <- seq(0, 1-1e-4, length.out=300)
 p0 <- dbeta(theta_grid, 1, alpha0) + dens_min
-p1 <- dbeta(theta_grid, 1, alpha1) + dens_min
+#p1 <- dbeta(theta_grid, 1, alpha1) + dens_min
+#p1 <- cos((theta_grid - 0.5) * 2* pi) + 1.03
+p1 <- cos(theta_grid * pi) + 1.03
+p1 <- p1 / (sum(p1) * min(diff(theta_grid)))
 
 log_p0 <- dbeta(theta_grid, 1, alpha0, log=TRUE)
 log_p1 <- dbeta(theta_grid, 1, alpha1, log=TRUE)

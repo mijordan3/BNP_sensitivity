@@ -1,1 +1,2 @@
-path_env  <- LoadIntoEnvironment('./R_scripts/data_simulated/function_paths.Rdata')
+path_env  <- LoadIntoEnvironment(
+  file.path(r_script_lib, 'data_simulated/function_paths.Rdata'))

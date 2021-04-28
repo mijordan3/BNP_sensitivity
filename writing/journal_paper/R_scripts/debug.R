@@ -13,5 +13,6 @@ source("R_scripts/plotting_utils.R")
 source('./R_scripts/simple_examples/load_data.R', echo=knitr_debug, print.eval=TRUE)
 
 #source('./R_scripts/simple_examples/function_paths.R', echo=knitr_debug, print.eval=TRUE)
-#source('./R_scripts/simple_examples/function_paths_mult.R', echo=knitr_debug, print.eval=TRUE)
-source('./R_scripts/simple_examples/function_ball.R', echo=knitr_debug, print.eval=TRUE)
+source('./R_scripts/simple_examples/function_paths_mult.R', echo=knitr_debug, print.eval=TRUE)
+source('./R_scripts/simple_examples/function_paths_lin.R', echo=knitr_debug, print.eval=TRUE)
+#source('./R_scripts/simple_examples/function_ball.R', echo=knitr_debug, print.eval=TRUE)

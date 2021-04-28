@@ -19,8 +19,9 @@ library(latex2exp)
 # This must be run from within the git repo, obviously.
 git_repo_loc <- system("git rev-parse --show-toplevel", intern=TRUE)
 
-paper_directory <- file.path(git_repo_loc, "writing/")
+paper_directory <- file.path(git_repo_loc, "writing/journal_paper")
 data_path <- file.path(paper_directory, "data/")
+r_script_path <- file.path(paper_directory, "R_scripts")
 
 # opts_chunk$set(fig.width=4.9, fig.height=3)
 opts_chunk$set(fig.pos='!h', fig.align='center', dev='png', dpi=300)

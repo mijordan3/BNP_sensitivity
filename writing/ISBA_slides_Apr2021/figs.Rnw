@@ -23,7 +23,8 @@ path_env  <- LoadIntoEnvironment(file.path(r_script_dir, 'data_simulated/functio
 fig_cap <- paste("Multiplicative mixture paths between two densities.", sep="")
 SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
 @
-<<mult_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+%<<mult_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+<<mult_path, cache=cache, fig.show='hold'>>=
 source(file.path(r_script_dir, 'simple_examples/function_paths_mult.R'),
        echo=knitr_debug, print.eval=TRUE)
 @
@@ -35,7 +36,8 @@ source(file.path(r_script_dir, 'simple_examples/function_paths_mult.R'),
 fig_cap <- paste("Linear mixture paths between two densities.", sep="")
 SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
 @
-<<lin_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+%<<lin_path, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+<<lin_path, cache=cache, fig.show='hold'>>=
 source(file.path(r_script_dir, 'simple_examples/function_paths_lin.R'),
        echo=knitr_debug, print.eval=TRUE)
 @
