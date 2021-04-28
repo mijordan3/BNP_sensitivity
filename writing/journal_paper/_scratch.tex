@@ -671,56 +671,6 @@ The result follows.
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Saving this because of the proof that the prior is positive with the
-% log perturbations.
-\begin{prop}\proplabel{pert_well_defined}
-%
-% Linf also in \citet[Section 2.1, Example 5]{luenberger:1997:optimization}
-Let $\linf$ denote the Banach space of functions on $[0,1]$ with the norm
-$\norminf{\cdot}$ \citep[Theorem 5.2.1]{dudley:2018:real}.
-There exists a $\norminf{\cdot}$-neighborhood of $\phiz$, denoted $\ball_\phi
-\subset \linf$, such that $\pstick(\nuk \vert \phi)$ as defined in
-\eqref{phi_perturbation} is a valid probability density for all $\phi \in
-\ball_\phi$
-%
-\begin{proof}
-%
-The function $\pstick(\nuk \vert \phi)$ is a valid density whenever
-$\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one, and $\int
-\pstick(\nuk \vert \phi) = 1$. Since $\pbase(\nuk) \ge 0$,
-%
-\begin{align*}
-%
-\essinf_{\nuk \in [0,1]} \exp\left(\log \pbase(\nuk) + \phi(\nuk)\right)
-    \ge{}&
-\essinf_{\nuk \in [0,1]} \pbase(\nuk)
-\essinf_{\nuk \in [0,1]} \exp\left(\phi(\nuk)\right)
-\ge{}0,
-%
-\end{align*}
-%
-so $\pstick(\nuk \vert \phi) \ge 0$ with Lebesgue probability one. Similarly,
-since $\int \pbase(\nuk) d\nuk = 1$,
-%
-\begin{align*}
-%
-\exp(-\norminf{\phi}) \le{}
-\abs{\int_0^1 \exp\left(\log \pbase(\nuk) + \phi(\nuk)\right) d\nuk}
-\le{}
-\exp(\norminf{\phi}).
-%
-\end{align*}
-%
-so that $\int \pstick(\nuk \vert \phi) = 1$ whenever $\norminf{\phi} < \infty$.
-%
-\end{proof}
-%
-\end{prop}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 
 
@@ -759,3 +709,79 @@ complex-valued). Define the ``trimmed log'' function as
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% %
+% \begin{align*}
+% %
+% \phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
+% \\={}&
+% \pbase(\theta)^{1/p} \left(
+%     \frac{\epsilon(1 - \delta)}{1 - \epsilon}
+%         \ind{\theta \notin S_{\epsilon}} +
+%     (\delta - 1) \ind{\theta \in S_{\epsilon}}
+% \right) \Rightarrow \\
+% %
+% \norm{\phi}_{\lambda, p}^p ={}&
+%     \int \pbase(\theta) \abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p
+%         \ind{\theta \notin S_{\epsilon}} \lambda(d\theta) +
+%     \int \pbase(\theta) \abs{\delta - 1}^p \ind{\theta \in S_{\epsilon}}
+%         \lambda(d\theta)
+% \\={}&
+%     (1-\epsilon)\abs{\frac{\epsilon(1 - \delta)}{1 - \epsilon}}^p +
+%     \epsilon \abs{\delta - 1}^p
+% \\={}&
+% \epsilon \abs{\delta - 1}^p \left(1 + \frac{1}{(1 - \epsilon)^{p-1}} \right).
+% %
+% \end{align*}
+% %
+% And
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+%     \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+% \\=&
+%     \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+%         \ind{\theta \notin S_{\epsilon}} +
+%     \log\left(1 + (\delta - 1) \right) \ind{\theta \in S_{\epsilon}}.
+% %
+% \end{align*}
+% %
+% So
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+% \KL{\etaopt, \phi} - \KL{\etaopt, \phiz}
+% \\={}&
+%     \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right)
+%         \expect{\q(\theta \vert \etaopt)}{\ind{\theta \notin S_{\epsilon}}} +
+%     \log\left( \delta \right)
+%         \expect{\q(\theta \vert \etaopt)}{\ind{\theta \in S_{\epsilon}}}
+%     \Rightarrow \\
+% \MoveEqLeft
+% \abs{\KL{\etaopt, \phi} - \KL{\etaopt, \phiz}}
+% \\\ge{}&
+% \epsilon \abs{\log \delta}
+% - (1 - \epsilon) \log\left(1 + \frac{\epsilon(1 - \delta)}{1 - \epsilon}\right).
+% %
+% \end{align*}
+% %
+%
