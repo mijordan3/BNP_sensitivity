@@ -79,13 +79,13 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 Let $\x_\n$ be the vector of observations for gene $\n$,
 $(\x_{\n 1}, ..., \x_{\n \ntimepoints})^T$.
 Each cluster is characterized by a vector of regression coefficients 
-$\beta_k$ and a variance $\tau^{-1}_k$; 
-the cluster parameters are $\theta_k = (\beta_k, \tau_k)$. 
+$\mu_\k$ and a variance $\tau^{-1}_\k$; 
+the cluster parameters are $\beta_k = (\mu_\k, \tau_\k)$. 
 The distribution of the data arising from cluster $k$ is 
 \begin{align*}
-\p(\x_\n | \theta_k, \b_{n}) = 
-\normdist{\x_\n | \regmatrix\beta_k + \b_{n},
-\tau_k^{-1}I_{\ntimepoints \times \ntimepoints}},
+\p(\x_\n | \beta_\k, \b_\n) = 
+\normdist{\x_\n | \regmatrix\mu_\k + \b_\n,
+\tau_\k^{-1}I_{\ntimepoints \times \ntimepoints}},
 \end{align*}
 where $\b_{n}$ is a gene-specific additive offset. 
 We include the additive offset because we 
@@ -93,22 +93,20 @@ are interested in clustering the pattern of gene expression,
 not the absolute level. 
 
 The joint distribution can be written in the same form as~\eqref{bnp_model}, 
-except that the conditional log-likelihood also conditions on $b_n$, 
+except that the conditional log-likelihood also conditions on $\b_n$, 
 and we also include an additional prior term:
 \begin{align*}
-\MoveEqLeft
-\logp(\x, \theta, \z, \nu) ={}
-\nonumber\\&
-    \sum_{n=1}^N \sum_{k=1}^{\kmax}
+\logp(\x, \beta, \z, \nu) =
+    \sum_{n=1}^N \sum_{k=1}^{\kmax}&
         \z_{\n\k} \left(
-            \logp(\x_n \vert \theta_\k, \b_n) + \logp(\b_n) + \log \pi_\k
-        \right) +
-    \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \logp(\theta_\k)
+            \logp(\x_n \vert \beta_\k, \b_n) + \logp(\b_n) + \log \pi_\k
+        \right) +\notag \\
+    & \quad \ldots + \sum_{k=1}^{\kmax} \left(
+        \log \pstick(\nuk) + \logp(\beta_\k)
     \right).
 \end{align*}
-We use a normal prior for the shifts $\b_n$, 
-a multivariate normal prior for the coefficients $\beta_n$,
+We use a normal prior for the shifts $\b_\n$, 
+a multivariate normal prior for the coefficients $\mu_\n$,
 and a gamma prior for the inverse variance $\tau$. 
 
 Our variational distribution factorizes as~\eqref{vb_mf}
@@ -117,7 +115,7 @@ of a factor for the additive shift:
 \begin{align*}
 \q(\zeta \vert \eta) =
     \left( \prod_{\k=1}^{\kmax - 1} \q(\nuk \vert \eta) \right)
-    \left( \prod_{\k=1}^{\kmax} \q(\theta_\k \vert \eta) \right)
+    \left( \prod_{\k=1}^{\kmax} \q(\beta_\k \vert \eta) \right)
     \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) 
     \q(\b_{\n} \vert \z_{\n}, \eta)\right).
 \end{align*}
@@ -125,14 +123,24 @@ Note that the variational distribution for $\b_\n$ conditions on $\z$.
 We set $\q(\b_{\n} \vert \z_{\n} = k, \eta)$ to be Gaussian
 with variational parameters dependent on $\k$. 
 For simplicity in this application,
-we let $\q(\theta_\k \vert \eta) = \delta (\theta_k \vert \eta)$, 
+we let $\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$, 
 where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location. 
 
 By parameterizing 
-$\q(\z_{\n}, \b_{\n} \vert \eta) = \q(\z_{\n} \vert \eta)  \q(\b_{\n} \vert \z_{\n}, \eta)$ 
-the optimal variational parameters for $\q(\z_{\n}, \b_{\n} \vert \eta)$ 
-have a closed form given $\q(\nu, \theta \vert \eta)$. See \secref{put_in_appendix}. Therefore, our model fits the global/local framework as discussed in ... 
-\todo{need to work on a section that talks about this}
+$\q(\z_{\n}, \b_{\n} \vert \eta) = 
+\q(\z_{\n} \vert \eta)  \q(\b_{\n} \vert \z_{\n}, \eta)$ ,
+the optimal variational parameters for $\z_\n$ and $\b_{\n}$ 
+have a closed form given $\q(\nu, \beta \vert \eta)$. 
+See \appref{put_in_appendix}. 
+Therefore, our model fits the global/local framework as discussed in
+\secref{computing_sensitivity}; 
+the global latent variables are still $\gamma = (\beta, \nu)$, 
+but the local latent variables now include the shifts $\b$ in addition 
+to the cluster assignments $\z$. 
+Our approximation $\etalinglobal(t)$ is formed by 
+linearizing the global parameters as before,
+and we now set both $\eta_\z$ and $\eta_\b$ optimally as a function of 
+the linearized global parameters.
 
 We fitted the initial approximate posterior at $\alpha_0 = 6$. 
 \figref{gene_centroids} shows the inferred smoothers 
@@ -191,17 +199,18 @@ and let $\Delta\coclusteringmatr(\eta) :=
 \coclusteringmatr(\eta) - \coclusteringmatr_0$ be 
 the difference in co-clustering matices after a change in the variational parameters $\eta$. 
 We formed the linear approximation at $\alpha_0$ and computed
-the change in co-clustering under the linearly approximated 
-variational parameters, 
-$\Delta\coclusteringmatr(\etalin(\alpha))$, at $\alpha = 1$ and $\alpha = 11$. 
-For either $\alpha$, the change in the co-clustering matrix 
+$\Delta\coclusteringmatr(\etalinglobal(\alpha))$, the 
+the change in co-clustering under the linearized 
+variational parameters, at $\alpha = 1$ and $\alpha = 11$. 
+For either $\alpha$, the change in co-clustering matrix 
 is miniscule (\figref{gene_alpha_coclustering}):
-the largest entry of either matrix $\Delta\coclusteringmatr(\etalin(1))$ 
-or $\Delta\coclusteringmatr(\etalin(11))$ is of order $10^{-2}$. 
+the largest entry of either matrix $\Delta\coclusteringmatr(\etalinglobal(1))$ 
+or $\Delta\coclusteringmatr(\etalinglobal(11))$ is of order $10^{-2}$. 
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
 and computing $\Delta\coclusteringmatr(\etaopt(\alpha))$
-confirms the insensitivity predicted by the linear approximation. 
-Beyond capturing insensitivity, the linear approximation was also able to
+confirms the insensitivity predicted by the linearized variational parameters.  
+Beyond capturing insensitivity, the linearized variational parameters 
+were also able to
 approximate the sign and size of the changes in the individual entries of the coclustering matrix (these changes abeit small).  
 
 <<gene_alpha_coclustering_cap>>=
@@ -334,7 +343,9 @@ The co-clustering matrix appears insensitive to perturbations in the stick-break
 
 Finally, we note that the computational cost of the linear approximation is again favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
-took 3-4 seconds; subsequent evaluations of $\etalin$ take milliseconds. 
+took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds
+(this includes setting both $\eta_\z$ and $\eta_\b$ in closed form after
+linearizing $\eta_\gamma$). 
 Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
 \begin{table}[tb]

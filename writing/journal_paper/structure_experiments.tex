@@ -187,11 +187,12 @@ When refitting the variational approximation at $\alpha = 1, \ldots, 7$,
 the thresholded quantities vary between two and four
 latent populations. 
 
-The linear approximation imperfectly captures the results observed by refitting. 
+The linearized variational parameters $\etalinglobal(\t)$
+imperfectly captures the results observed by refitting. 
 We formed the linear approximation at $\alpha_0 = 3$ and computed 
 $\gpop$ using the linearly approximated variational parameters
-$\etalin(\alpha)$ for $\alpha = 1, \ldots, 7$. 
-For this range of $\alpha$, $\etalin(\alpha)$ and the refitted parameters 
+$\etalinglobal(\alpha)$ for $\alpha = 1, \ldots, 7$. 
+For this range of $\alpha$, $\etalinglobal(\alpha)$ and the refitted parameters 
 $\etaopt(\alpha)$ almost perfectly agree on values of $\gpop$ with $\tau = 0$. 
 However, when $\tau = 20$ and $\tau = 40$, 
 the linearly approximated parameters 
@@ -315,14 +316,15 @@ For each worst-case perturbation, we examine the effect on its respective
 posterior quantity $\gadmix$
 as $t \rightarrow 1$ in 
 the perturbed prior $\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
-Under the linearly approximated variational parameters, 
+Under the (globally) linearized variational parameters $\etalinglobal(\t)$, 
 the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $\t = 1$. 
 The same quantity computed after refitting the model 
-confirms the sensitivity predicted by the linear approximation. 
+confirms the sensitivity predicted by the linearized variational parameters 
 On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive even after this worst-case perturbation. 
-The linearly approximated and the refitted variational parameters again
+The linearized and the refitted variational parameters again
 agree on this conclusion. 
-Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive by the linear approximation, as this admixture proportion steadily decreases as $t\rightarrow 1$. 
+Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive by the linearized parameters,
+as this admixture proportion steadily decreases as $t\rightarrow 1$. 
 However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $t = 0.5$. 
 
 
@@ -388,12 +390,16 @@ compute time.
 
 In this final subsection, 
 we discuss some examples where 
-the linear approximation $\etalin(t)$ is a poor subsitute 
-for $\etaopt(t)$.  
-This occurs when $\etaopt(t)$ is highly nonlinear in $t$. 
+the linear approximation $\etalin(t)$ 
+is a poor subsitute for the refitted parameters $\etaopt(t)$ 
+(in this subsection, the only posterior quantities considered 
+are functions of global parameters, so we do not make a distinction 
+between $\etalin$ and $\etalinglobal$).  
+Naturally, the linear approximation 
+$\etalin(t)$ will be a poor substitute for $\etaopt(t)$ when 
+the mapping $\t\mapsto\etaopt(\t)$. 
 The examples discussed below use the STRUCTURE model and 
-dataset presented in the
-subsection above, and 
+dataset presented in \secref{results_structure}, and 
 we examine results after
 the worst-case perturbation ``A" in \figref{stru_func_sens}.
 
