@@ -103,21 +103,22 @@ conditional on the same $m = 10,000$ draws $u_1, \ldots, u_m$, fixed a priori.
 We first evaluate the sensitivity of the posterior quantities 
 $\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$. 
 We fit the initial variational posterior at $\alpha_0 = 6$,
-and we formed the linear approximation (\eqref{vb_eta_sens}) at this initial fit. 
+and we formed the linear approximation at this initial fit. 
 Without further optimization, we use the linear approximation to quickly evaluate 
-$\etalin(\alpha)$ for all $\alpha = 1, \ldots, 16$ (\eqref{etalin_def}),
-and produce posterior quantites $g(\etalin(\alpha))$. 
+$\etalinglobal(\alpha)$ for all $\alpha = 1, \ldots, 16$ 
+(\eqref{global_lin_approx, global_lin_approx_all}),
+and produce posterior quantites $g(\etalinglobal(\alpha))$. 
 
 The in-sample quantity appears insensitive to changes in the $\alpha$ parameter
 (\figref{iris_alpha_sens}). 
 As $\alpha$ varies from $\alpha = 1, \ldots, 16$,
-the quantity $\gclusters(\etalin(\alpha))$
+the quantity $\gclusters(\etalinglobal(\alpha))$
 varies only from \Sexpr{sprintf("%2.1f", min_enum_clust)} to
 \Sexpr{sprintf("%2.1f", max_enum_clust)}
 (recall that the true number of iris species is three). 
 On the other hand, the posterior preditive quantity is sensitive 
 to changes in $\alpha$.
-Over the same range of $\alpha$, $\gclusterspred(\etalin(\alpha))$
+Over the same range of $\alpha$, $\gclusterspred(\etalinglobal(\alpha))$
 varies from 
 \Sexpr{sprintf("%2.1f", min_enum_clust_pred)} to 
 \Sexpr{sprintf("%2.1f", max_enum_clust_pred)}. 
@@ -125,7 +126,7 @@ varies from
 
 Subsequent refits at $\alpha\not=\alpha_0$ confirm sensitivity conclusions of the linear approximation. 
 Over the range $\alpha = 1, \ldots, 16$,
-the values $g(\etalin(\alpha))$ closely mimic the 
+the values $\g(\etalinglobal(\alpha))$ closely mimic the 
 values $g(\etaopt(\alpha))$ found by refitting 
 the variational parameters at each $\alpha$ (\figref{iris_alpha_sens}).
 Importantly, 
@@ -133,7 +134,7 @@ the linear approximation is an order of magnitude faster than refitting.
 Forming the linear approximation at $\alpha = \alpha_0$, 
 required \Sexpr{sprintf('%1.1g', alpha_hess_time)} seconds. 
 After forming the linear approximation,
-computing $\etalin(\alpha)$ for all $\alpha = 1, \ldots, 16$ took another 
+computing $\etalinglobal(\alpha)$ for all $\alpha = 1, \ldots, 16$ took another 
 \Sexpr{sprintf('%1.1g', total_alpha_lr_time)} seconds.
 On the other hand, to refit $\etaopt(\alpha)$ for the same range of
 $\alpha$'s took a total of \Sexpr{sprintf('%2.0f', total_alpha_refit_time)} seconds, with a median refit time of \Sexpr{sprintf('%1.1g', median_alpha_refit_time)} seconds. 
@@ -198,14 +199,16 @@ Each perturbation $\phi_\mu$ with a different choice of $\mu$
 produces distinct changes in the expected number
 of in-sample clusters $\gclusters$. 
 The right column of \figref{iris_fsens} plots the differences
-$\gclusters(\etaopt(\t)) - \gclusters(\etaopt(0))$ 
-for $\t\in[0,1]$, where $\etaopt(\t)$ are variational parameters
-fitted under the perturbed stick-distribution $p(\nu_k|\t)$.
+$\Delta\gclusters(\eta(\t)) := 
+\gclusters(\eta(\t)) - \gclusters(\etaopt(0))$ 
+for $\t\in[0,1]$. 
 Depending on the perturbation, 
-the change in $\gclusters$ can be positive, negative, or nearly zero. 
+$\Delta\gclusters$ can be positive, negative, or nearly zero. 
 In each case, the approximation 
-$\gclusters(\etalin(\t)) - \gclusters(\etalin(0))$
-is able to mirror the qualitative behavior observed under refitting.
+$\Delta\gclusters(\etalinglobal(\t))$
+is able to mirror the qualitative behavior of 
+$\Delta\gclusters(\etaopt(\t))$
+observed by refitting. 
 
 \todo{depending on what has been said about influence functions before, we may need a more thorough discussion below}
 
