@@ -165,10 +165,11 @@ Let $\etaoptz(\eta_\gamma; \t)$ denote this mapping; that is,
 Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
-\frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T} \mathrm{KL}_{glob}(\etaopt_\gamma, 0) \\
+\frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
+\KLglobal(\etaopt_\gamma, 0) \\
 & \mathwhere
 % \mathrm{KL}_{glob}(\eta_\gamma) := \evalat{\KL{\eta, \t}}{\eta = (\eta_\gamma, \etaoptz(\eta_\gamma; t))}.
-\mathrm{KL}_{glob}(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
+\KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
 \notag
 \end{align}
 

@@ -127,14 +127,18 @@ we let $\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$,
 where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location. 
 
 By parameterizing 
-$\q(\z_{\n}, \b_{\n} \vert \eta) = \q(\z_{\n} \vert \eta)  \q(\b_{\n} \vert \z_{\n}, \eta)$ 
-the optimal variational parameters for $\q(\z_{\n}, \b_{\n} \vert \eta)$ 
-have a closed form given $\q(\nu, \beta \vert \eta)$. See \secref{put_in_appendix}. 
+$\q(\z_{\n}, \b_{\n} \vert \eta) = 
+\q(\z_{\n} \vert \eta)  \q(\b_{\n} \vert \z_{\n}, \eta)$ ,
+the optimal variational parameters for $\z_\n$ and $\b_{\n}$ 
+have a closed form given $\q(\nu, \beta \vert \eta)$. 
+See \appref{put_in_appendix}. 
 Therefore, our model fits the global/local framework as discussed in
 \secref{computing_sensitivity}; 
-the global latent variables are $\gamma = (\beta, \nu)$ as before, 
-but the local latent variables $(\z, \b_\n)$ now include the shifts. 
-Our approximation is formed by linearizing the global parameters as before,
+the global latent variables are still $\gamma = (\beta, \nu)$, 
+but the local latent variables now include the shifts $\b$ in addition 
+to the cluster assignments $\z$. 
+Our approximation $\etalinglobal(t)$ is formed by 
+linearizing the global parameters as before,
 and we now set both $\eta_\z$ and $\eta_\b$ optimally as a function of 
 the linearized global parameters.
 
@@ -199,10 +203,10 @@ and let $\Delta\coclusteringmatr(\eta) :=
 \coclusteringmatr(\eta) - \coclusteringmatr_0$ be 
 the difference in co-clustering matices after a change in the variational parameters $\eta$. 
 We formed the linear approximation at $\alpha_0$ and computed
+$\Delta\coclusteringmatr(\etalinglobal(\alpha))$, the 
 the change in co-clustering under the linearly approximated 
-variational parameters, 
-$\Delta\coclusteringmatr(\etalinglobal(\alpha))$, at $\alpha = 1$ and $\alpha = 11$. 
-For either $\alpha$, the change in the co-clustering matrix 
+variational parameters, at $\alpha = 1$ and $\alpha = 11$. 
+For either $\alpha$, the change in co-clustering matrix 
 is miniscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\coclusteringmatr(\etalinglobal(1))$ 
 or $\Delta\coclusteringmatr(\etalinglobal(11))$ is of order $10^{-2}$. 
@@ -362,7 +366,8 @@ The co-clustering matrix appears insensitive to perturbations in the stick-break
 Finally, we note that the computational cost of the linear approximation is again favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
 took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds
-(this includes setting both $\eta_\z$ and $\eta_\b$ in closed form). 
+(this includes setting both $\eta_\z$ and $\eta_\b$ in closed form after
+linearizing $\eta_\gamma$). 
 Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
 \begin{table}[tb]
