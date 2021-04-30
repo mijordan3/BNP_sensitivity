@@ -344,7 +344,7 @@ the size of the differences in the co-clustering matrix remains modest.
 It is unlikely that any conclusions derived from the co-clustering matrix would have changed after the functional perturbation. 
 The co-clustering matrix appears insensitive to perturbations in the stick-breaking distribution. 
 
-Finally, we note that the computational cost of linearizing the variational parameters is again favorable compared with refitting (\tabref{mice_timing}). 
+Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
 took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
@@ -360,21 +360,21 @@ took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. C
     \hline 
     Hessian solve for $\alpha$ sensitivity & 
         \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 1$ & 
         \Sexpr{sprintf('%1.2g', lr_time_vec[1])}\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 11$ & 
         \Sexpr{sprintf('%1.2g', lr_time_vec[2])}\\
-    Refit $\eta(\alpha)$ for $\alpha = 1$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 1$ & 
         \Sexpr{sprintf('%1.2g', refit_time_vec[1])}\\
-    Refit $\eta(\alpha)$ for $\alpha = 11$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 11$ & 
         \Sexpr{sprintf('%1.2g', refit_time_vec[2])}\\
     \hline
     The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ 
     Hessian solve for $\phi$ perturbation &
         \Sexpr{sprintf('%1.2g', phi_hessian_time)}\\
-    Linear approx. $\eta^{lin}(\t)$ at $\t = 1$ &
+    Linear approx. $\etalin(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_lr_time)}\\
-    Refit $\eta(\t)$ at $\t = 1$ &
+    Refit $\etaopt(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_refit_time)}\\
     \hline
 \end{tabular}

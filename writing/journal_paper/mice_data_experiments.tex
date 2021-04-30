@@ -367,7 +367,7 @@ the size of the differences in the co-clustering matrix remains modest.
 It is unlikely that any conclusions derived from the co-clustering matrix would have changed after the functional perturbation. 
 The co-clustering matrix appears insensitive to perturbations in the stick-breaking distribution. 
 
-Finally, we note that the computational cost of linearizing the variational parameters is again favorable compared with refitting (\tabref{mice_timing}). 
+Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
 took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
@@ -383,21 +383,21 @@ took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. C
     \hline 
     Hessian solve for $\alpha$ sensitivity & 
         3.9\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 1$ & 
         0.0013\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 11$ & 
         0.0012\\
-    Refit $\eta(\alpha)$ for $\alpha = 1$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 1$ & 
         14\\
-    Refit $\eta(\alpha)$ for $\alpha = 11$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 11$ & 
         13\\
     \hline
     The influence function & 4.3\\ 
     Hessian solve for $\phi$ perturbation &
         3.3\\
-    Linear approx. $\eta^{lin}(\t)$ at $\t = 1$ &
+    Linear approx. $\etalin(\t)$ at $\t = 1$ &
         0.00099\\
-    Refit $\eta(\t)$ at $\t = 1$ &
+    Refit $\etaopt(\t)$ at $\t = 1$ &
         22\\
     \hline
 \end{tabular}
