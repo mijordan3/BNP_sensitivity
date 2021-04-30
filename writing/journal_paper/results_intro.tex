@@ -32,11 +32,13 @@ we speed up the optimization by minimizing $\KLglobal(\etaglob)$ (\eqref{global_
 over global parameters only---thus keeping the dimension of the optimization parameter independent of $N$.
 After the optimzation terminates at the optimal $\etaglob$,
 the local parameters can be set optimally in closed form
-to form the optimal variational parameters $\etaopt$.
+to produce the optimal variational parameters $\etaopt$.
 
-In our results below, the ``linearized variational parameters" refers to
-the approximation defined by \eqref{global_lin_approx, global_lin_approx_all},
-where the local parameters are set optimally as a function of the linearized global parameters. 
+In our results below, we use
+the approximation defined by \eqref{global_sens, global_lin_approx},
+where only the global parameters are linearized and
+the local parameters are set implicitly as part of the
+computation of the posterior statistic $\g$.
 We solved the linear system in~\eqref{global_sens} using
 the conjugate gradient algorithm, which requires only Hessian-vector products;
 this avoids instatiating the full Hessian matrix in memory.
