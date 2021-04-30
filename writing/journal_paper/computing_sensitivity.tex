@@ -199,13 +199,13 @@ we again take advantage of the fact that the optimal
 local parameters can be found in closed form given global parameters.
 In the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
 and is a function of only global parameters and the prior parameter $\t$,
-we can construct the mapping for $\g$,
+we can construct an analagous mapping for $\g$,
 \begin{align}\eqlabel{g_as_global}
-(\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big)
+(\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big).
 \end{align}
 
 This mapping can be used for any posterior quantity.
-Therefore linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient;
+Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient;
 we do not need to invert the full $\etadim\times\etadim$ Hessian
 and to linearize the entire set of variational parameters, global and local.
 As a shorthand, we will use $\g(\etalin_\gamma(t))$ to

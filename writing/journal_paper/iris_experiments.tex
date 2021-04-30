@@ -93,9 +93,9 @@ We first evaluate the sensitivity of the posterior quantities
 $\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$. 
 We fit the initial variational posterior at $\alpha_0 = 6$,
 and we formed the linear approximation at this initial fit. 
-Without further optimization, we use the linear approximation to quickly evaluate 
-$\etalinglobal(\alpha)$ for all $\alpha = 1, \ldots, 16$ 
-(\eqref{global_lin_approx, global_lin_approx_all}),
+Without further optimization, we use the linear approximation 
+(\eqref{global_sens, global_lin_approx}) to quickly evaluate 
+$\etalinglobal(\alpha)$ for all $\alpha = 1, \ldots, 16$,
 and produce posterior quantites $g(\etalinglobal(\alpha))$. 
 
 The in-sample quantity appears insensitive to changes in the $\alpha$ parameter
@@ -113,7 +113,8 @@ varies from
 8.1. 
 
 
-Subsequent refits at $\alpha\not=\alpha_0$ confirm sensitivity conclusions of the linear approximation. 
+Subsequent refits at $\alpha\not=\alpha_0$ confirm the sensitivity conclusions 
+of our linearized variational parameters. 
 Over the range $\alpha = 1, \ldots, 16$,
 the values $\g(\etalinglobal(\alpha))$ closely mimic the 
 values $g(\etaopt(\alpha))$ found by refitting 

@@ -94,7 +94,7 @@ we sampled $u_1, \dots, u_m\stackrel{iid}{\sim}\normdist{0, I}$
 and then averaged the expression inside the expectation evaluated at points 
 $f(u_1, \eta), \ldots, f(u_m, \eta)$.
 We used the reparameterization trick so that conditional on $u_1, \ldots, u_m$,
-our Monte Carlo estimate of $\gclusterspred$ is a determinstic function of 
+our Monte Carlo estimate of $\gclusterspred$ is a deterministic function of 
 the variational parameters $\eta$. 
 In our experiments below, all displayed values of $\gclusterspred(\eta)$ are
 Monte Carlo approximations, 
@@ -104,9 +104,10 @@ We first evaluate the sensitivity of the posterior quantities
 $\gclusters$ and $\gclusterspred$ to the prior parameter $\alpha$. 
 We fit the initial variational posterior at $\alpha_0 = 6$,
 and we formed the linear approximation at this initial fit. 
-Without further optimization, we use the linear approximation (\eqref{global_lin_approx, global_lin_approx_all}) to quickly evaluate 
+Without further optimization, we use the linear approximation 
+(\eqref{global_sens, global_lin_approx}) to quickly evaluate 
 $\etalinglobal(\alpha)$ for all $\alpha = 1, \ldots, 16$,
-and produce posterior quantites $g(\etalinglobal(\alpha))$. 
+and produce posterior quantities $g(\etalinglobal(\alpha))$. 
 
 The in-sample quantity appears insensitive to changes in the $\alpha$ parameter
 (\figref{iris_alpha_sens}). 
@@ -115,7 +116,7 @@ the quantity $\gclusters(\etalinglobal(\alpha))$
 varies only from \Sexpr{sprintf("%2.1f", min_enum_clust)} to
 \Sexpr{sprintf("%2.1f", max_enum_clust)}
 (recall that the true number of iris species is three). 
-On the other hand, the posterior preditive quantity is sensitive 
+On the other hand, the posterior predictive quantity is sensitive 
 to changes in $\alpha$.
 Over the same range of $\alpha$, $\gclusterspred(\etalinglobal(\alpha))$
 varies from 
@@ -124,7 +125,7 @@ varies from
 
 
 Subsequent refits at $\alpha\not=\alpha_0$ confirm the sensitivity conclusions 
-of our linearized variational parameters. 
+of our linearized variational (global) parameters. 
 Over the range $\alpha = 1, \ldots, 16$,
 the values $\g(\etalinglobal(\alpha))$ closely mimic the 
 values $g(\etaopt(\alpha))$ found by refitting 
@@ -213,9 +214,9 @@ observed by refitting.
 \todo{depending on what has been said about influence functions before, we may need a more thorough discussion below}
 
 While each perturbation produces distinct changes in $\gclusters$, 
-it is difficult to anticipate the effect of the perturbation 
+it is unclear how to anticipate the effect of a perturbation 
 by comparing the original and perturbed densities alone. 
-However, the sign and magnitude of the change in $\gclusters$ after 
+On the other hand, the sign and magnitude of the change in $\gclusters$ after 
 prior perturbation are well-explained by its influence function
 (\figref{iris_fsens} left column). 
 When $\phi_\mu$ is centered at a location where the influence function is negative, the effect of the perturbation on $\gclusters$ 
@@ -225,7 +226,7 @@ finally, when $\phi_\mu$ is centered at a location where the influence transitio
 $\gclusters$ is roughly zero (middle row). 
 In the last case, $\phi_\mu$ placed approximately equal weight on the negative and positive portions of the prior-weighted influence function, resulting in an approximately zero inner-product (\eqref{TODO}). 
 In the other data applications below, 
-the influence function will guide our choice of functional perturbaton and explain why some perturbations result in greater sensitivity than others. 
+the influence function will guide our choice of functional perturbation and explain why some perturbations result in greater sensitivity than others. 
 
 Finally, we consider the 
 worst-case multiplicative perturbation with unit $L_\infty$ norm.
