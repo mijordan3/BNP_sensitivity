@@ -54,3 +54,16 @@ source(file.path(r_script_dir, 'simple_examples/function_ball.R'),
        echo=knitr_debug, print.eval=TRUE)
 @
 }
+
+
+
+
+\newcommand{\FunctionDistFig}{
+<<func_dist_cap>>=
+SetImageSize(aspect_ratio=1.5 * base_aspect_ratio, image_width=0.5)
+@
+<<func_dist, cache=cache, fig.show='hold'>>=
+source(file.path(r_script_dir, 'simple_examples/distant_distributions.R'),
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
