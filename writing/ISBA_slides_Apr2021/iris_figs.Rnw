@@ -179,7 +179,7 @@ p_infl_x_prior <-
   geom_line(aes(x = logit_v, y = influence_x_prior), 
             color = 'purple') + 
   geom_hline(yintercept = 0., alpha = 0.5) + 
-  xlab('stick propn') + 
+  xlab('logit(stick propn)') + 
   ylab(TeX("$\\Phi$")) + 
   get_fontsizes()
 
