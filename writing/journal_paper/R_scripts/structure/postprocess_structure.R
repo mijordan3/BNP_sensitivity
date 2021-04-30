@@ -87,7 +87,7 @@ weights_alpha_lr <- weights_df %>%
 #################
 # functional sensitivity results
 #################
-load_fsens_data <- function(input_file){
+load_infl_prior_data <- function(input_file){
   fsens_results <- np$load(input_file)
   
   infl_df <- data.frame(logit_v = fsens_results['logit_v_grid'], 
@@ -97,13 +97,21 @@ load_fsens_data <- function(input_file){
                         log_phi = fsens_results['log_phi'], 
                         p0 = exp(fsens_results['log_p0']), 
                         pc = exp(fsens_results['log_pc']))
+  return(list(infl_df = infl_df, 
+              pert_df = pert_df))
+}
+load_fsens_data <- function(input_file){
+  
+  infl_prior_data <- load_infl_prior_data(input_file)
+  
+  fsens_results <- np$load(input_file)
   
   sensitivity_df <- data.frame(epsilon = fsens_results['epsilon_vec'], 
                                refit = fsens_results['refit_vec'], 
                                lr = fsens_results['lr_vec'])
   
-  return(list(infl_df = infl_df, 
-              pert_df = pert_df, 
+  return(list(infl_df = infl_prior_data$infl_df, 
+              pert_df = infl_prior_data$pert_df, 
               sensitivity_df = sensitivity_df))
 }
 
@@ -170,4 +178,31 @@ fsens_lr_time <- mbololo_data_file['lr_time_vec'][n]
 
 infl_time <- mbololo_data_file['grad_g_time'] + mbololo_data_file['infl_time']
 
+##############
+# more mbololo examples admixture: mainly for slides
+##############
+
+# the gaussian pertrubation
+mbololo_admix_gausspert_file <- np$load(paste0(data_dir, 
+                                     'mbololo_fpert_gaussian_null.npz'))
+
+mbololo_admix_gausspert_priors <- 
+  load_infl_prior_data(paste0(data_dir,
+                              'mbololo_fpert_gaussian_null.npz'))
+
+mbololo_admix_gausspert_admix <- 
+  mbololo_admix_gausspert_file['admix_refit']
+
+# the sigmoidal perturbation
+mbololo_admix_sigmoidal_file <- np$load(paste0(data_dir, 
+                                              'mbololo_fpert_sigmoidal_large.npz'))
+
+mbololo_admix_sigmoidal_priors <- 
+  load_infl_prior_data(paste0(data_dir,
+                              'mbololo_fpert_sigmoidal_large.npz'))
+
+mbololo_admix_sigmoidal_admix <- 
+  mbololo_admix_sigmoidal_file['admix_refit']
+
 save.image('./R_scripts/data_processed/structure.RData') 
+
