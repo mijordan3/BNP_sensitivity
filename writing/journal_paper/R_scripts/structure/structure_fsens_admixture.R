@@ -10,9 +10,13 @@ add_label <- geom_text(aes(x = min(mbololo_outliers$obs_id) - 6,
 # only plot the mbololo region
 n_mbololo <- out_init$intercepts[1]
 
-trim_plot <- coord_cartesian(xlim = c(0.5, 10 + n_mbololo), 
-                             ylim = c(1, 0), 
+# trim_plot <- coord_cartesian(xlim = c(0.5, 10 + n_mbololo), 
+#                              ylim = c(1, 0), 
+#                              expand = FALSE)
+trim_plot <- coord_cartesian(xlim = c(0.5, 50),
+                             ylim = c(1, 0),
                              expand = FALSE)
+
 
 # initial fit
 p_admix <- out_init$p +

@@ -109,7 +109,7 @@ plot_influence_and_logphi <- function(logit_v_grid,
     # x-axis
     geom_hline(yintercept = 0., alpha = 0.5) + 
     ylab('value') + 
-    xlab(TeX('logit(stick propn.)')) +
+    xlab(TeX('logit(stick propn)')) +
     # xlab(TeX('logit($\\nu_k$)')) +
     ggtitle('Perturbation') +
     get_fontsizes() + 
@@ -133,7 +133,7 @@ plot_priors <- function(logit_v_grid, p0, pc){
                   y = P, 
                   color = prior)) + 
     scale_color_manual(values = c('lightblue', 'blue')) + 
-    xlab('stick propn.') + 
+    xlab('stick propn') + 
     # xlab(TeX('$\\nu_k$')) + 
     ggtitle('Priors') + 
     get_fontsizes() + 

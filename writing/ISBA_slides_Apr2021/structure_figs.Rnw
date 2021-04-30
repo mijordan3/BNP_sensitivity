@@ -112,7 +112,7 @@ admix_plot +
 
 \newcommand{\MbololoOutliers}{
 <<outlier_admix_size>>=
-SetImageSize(aspect_ratio=0.75 * base_aspect_ratio)
+SetImageSize(aspect_ratio=0.85 * base_aspect_ratio)
 @
 <<mbololo_outliers, cache=cache, fig.show='hold'>>=
 
@@ -151,7 +151,8 @@ mbololo_plots_sum <-
   mbololo_plots$p_priors + 
   mbololo_plots$p_sens
 
-p_admix_mbololo / mbololo_plots_sum
+p_admix_mbololo / mbololo_plots_sum +
+plot_layout(heights = c(1.2, 1)) 
 @
 }
 
@@ -196,8 +197,8 @@ ngangao_plots_sum <-
   ngangao_plots$p_priors + 
   ngangao_plots$p_sens
 
-p_admix_ngangao / ngangao_plots_sum
-
+p_admix_ngangao / ngangao_plots_sum +
+  plot_layout(heights = c(1.2, 1)) 
 @
 }
 
@@ -213,10 +214,10 @@ p_admix_chawia <- out$p +
             size = text_size) + 
   theme(axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(), 
-        legend.position = 'top')
+        legend.position = 'none')
 
-p_admix_chawia / chawia_plots_sum
-
+p_admix_chawia / chawia_plots_sum + 
+  plot_layout(heights = c(1.2, 1)) 
 @
 }
 
@@ -232,8 +233,9 @@ SetImageSize(aspect_ratio=0.6 * base_aspect_ratio)
 source(file.path(r_script_dir, 'structure/structure_fsens_admixture.R'),
        print.eval = FALSE)
 p_admix + 
-  (p_refit + theme(legend.position = 'bottom')) + 
-  p_lr
+  p_refit + theme(legend.position = 'bottom') + labs(fill = "pop.")  + 
+  p_lr 
+
 @
 }
 
@@ -271,75 +273,61 @@ source(file.path(r_script_dir, '/structure/mbololo_bad_approximation.R'),
 %%%%%%%%%%%%%%%%%%%
 \newcommand{\MbololoMotivatingExample}{
 <<mbololo_motivating_ex_size>>=
-SetImageSize(aspect_ratio = 1.4 * base_aspect_ratio, 
-             image_width = 0.65)
+SetImageSize(aspect_ratio = 0.9 * base_aspect_ratio)
 @
 <<mbololo_motivating_ex, cache=cache, fig.show='hold'>>=
-
-# zoom in on those mbololo individuals
-# these next two variables are defined globally ... 
-# we overwrite them here. 
-# this is gonna get confusing ... 
-trim_plot <- coord_cartesian(xlim = c(22, 33), 
-                             ylim = c(1, 0), 
-                             expand = FALSE)
-add_label <- geom_text(aes(x = min(mbololo_outliers$obs_id) - 3, 
-                y = 0.2, 
-                label = 'A'), 
-            size = text_size)
 
 
 priors0 <- plot_priors(sigmoid(mbololo_admix_sigmoidal_priors$pert_df$logit_v),
             mbololo_admix_sigmoidal_priors$pert_df$p0,
-            mbololo_admix_sigmoidal_priors$pert_df$pc * NA) +
-  theme(legend.position = 'none', 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_blank())
+            mbololo_admix_sigmoidal_priors$pert_df$pc * NA) + 
+  ggtitle('Initial') + 
+  theme(legend.position = 'none')
 
 # this variable was source from "structure_fsens_admixture.R"
-p0 <- p_admix + 
+admix0 <- p_admix + 
   trim_plot + 
-  add_label + 
-  ggtitle('Admixture (refit)') + 
-  theme(plot.title = element_text(size = title_size))
+  ggtitle(NULL) 
 
 # a perturbation with small effect 
 priors1 <- plot_priors(sigmoid(mbololo_admix_gausspert_priors$pert_df$logit_v),
             mbololo_admix_gausspert_priors$pert_df$p0,
             mbololo_admix_gausspert_priors$pert_df$pc) + 
+  ggtitle('Perturbation 1') + 
   theme(legend.position = 'none', 
-        axis.title.x = element_blank(), 
-        axis.text.x = element_blank()) + 
-  ggtitle(NULL) 
-
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank())
 
 # this function was sourced from "structure_fsens_admixture.R" above
 admix1 <- plot_admix_here(mbololo_admix_gausspert_admix) + 
-  # ggtitle('Refit') + 
-  theme(plot.title = element_text(size = axis_title_size))
+  ggtitle(NULL) 
+  
 
 
 # a perturbation with larger effect 
 priors2 <- plot_priors(sigmoid(mbololo_admix_sigmoidal_priors$pert_df$logit_v),
             mbololo_admix_sigmoidal_priors$pert_df$p0,
             mbololo_admix_sigmoidal_priors$pert_df$pc) + 
-  ggtitle(NULL) + 
-  theme(legend.position = 'none')
+  ggtitle('Perturbation 2') + 
+  theme(legend.position = 'none', 
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank()) 
 
 admix2 <- plot_admix_here(mbololo_admix_sigmoidal_admix) + 
   theme(plot.title = element_text(size = axis_title_size))
 
-((priors0 + p0) / (priors1 + admix1) / (priors2 + admix2)) 
+(priors0 + priors1 + priors2) / 
+  (admix0 + admix1 + admix2) + 
+  plot_layout(heights = c(2, 3.5))
 
 @
 }
 
 \newcommand{\MbololoMotivatingExampleInfluenceA}{
 <<mbololo_motivating_ex_infl_size>>=
-SetImageSize(aspect_ratio = base_aspect_ratio, 
-             image_width = 0.95)
+SetImageSize(aspect_ratio = 0.9 * base_aspect_ratio)
 @
-<<mbololo_motivating_ex_infl, cache=cache, fig.show='hold'>>=
+<<mbololo_motivating_ex_inflA, cache=cache, fig.show='hold'>>=
 
 # just plot the influence function
 p0_logphi <- 
@@ -361,26 +349,60 @@ p1_logphi <-
                             mbololo_admix_gausspert_priors$infl_df$infl_x_prior, 
                             mbololo_admix_gausspert_priors$pert_df$log_phi,
                             mbololo_admix_gausspert_priors$pert_df$logit_v) + 
-  theme(axis.title.x = element_blank(), 
-        axis.text.x = element_blank(),
-        plot.title = element_blank(),
-        legend.position = 'none')
+  theme(plot.title = element_blank(), 
+        legend.position = 'bottom') 
 
-# the second perturbation
-p2_logphi <- 
-  plot_influence_and_logphi(mbololo_admix_sigmoidal_priors$infl_df$logit_v,
-                            mbololo_admix_sigmoidal_priors$infl_df$infl_x_prior, 
-                            mbololo_admix_sigmoidal_priors$pert_df$log_phi,
-                            mbololo_admix_sigmoidal_priors$pert_df$logit_v) + 
-    theme(plot.title = element_blank())
 
 # we borrow the variables from the previous chunk ... 
-(p0_logphi + priors0 + p0) / 
-  (p1_logphi + priors1 + admix1) 
+priors0 <- priors0 + ggtitle('Priors') + 
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(), 
+        legend.position = 'none')
 
-# / 
-  # (p2_logphi + priors2 + admix2)
+admix0 <- admix0 + ggtitle('Admixture') +
+  theme(plot.title = element_text(size = title_size), 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
 
+priors1 <- priors1 + theme(plot.title = element_blank(), 
+                           axis.text.y = element_text(size = axis_ticksize), 
+                           axis.title.y = element_text(size = axis_title_size), 
+                           legend.position = 'bottom') 
+
+width_scale <- 1.5
+
+toprow <- (p0_logphi + priors0 +admix0 + 
+             plot_layout(widths = c(width_scale, width_scale, 1)))  
+bottomrow <- (p1_logphi + priors1 +admix1 + 
+                plot_layout(widths = c(width_scale, width_scale, 1)))  
+
+toprow / bottomrow
+  
+
+
+@
+}
+
+
+\newcommand{\MbololoMotivatingExampleInfluenceB}{
+<<mbololo_motivating_ex_inflB, cache=cache, fig.show='hold'>>=
+# the second perturbation
+p2_logphi <-
+  plot_influence_and_logphi(mbololo_admix_sigmoidal_priors$infl_df$logit_v,
+                            mbololo_admix_sigmoidal_priors$infl_df$infl_x_prior,
+                            mbololo_admix_sigmoidal_priors$pert_df$log_phi,
+                            mbololo_admix_sigmoidal_priors$pert_df$logit_v) +
+    theme(plot.title = element_blank(), 
+          legend.position = 'bottom')
+
+priors2 <- priors2 + theme(plot.title = element_blank(), 
+                           axis.text.y = element_text(size = axis_ticksize), 
+                           axis.title.y = element_text(size = axis_title_size), 
+                           legend.position = 'bottom') 
+bottomrow <- (p2_logphi + priors2 +admix2 + 
+                plot_layout(widths = c(width_scale, width_scale, 1)))  
+
+toprow / bottomrow
 @
 }
 
