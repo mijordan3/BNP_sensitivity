@@ -131,7 +131,7 @@ with respect to $\lambda$, with $\palt \ll \pbase$. For a given $\beta > 0$, let
 \begin{cases}
 \beta \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}
     & \textrm{when }p \in [1, \infty) \\
-\log \palt(\theta) - \log \pbase(\theta)
+\log \palt(\theta) - \log \pbase(\theta) + \log \beta
     & \textrm{when }p = \infty.
 \end{cases} \eqlabel{phi_for_palt}
 %
@@ -179,7 +179,10 @@ cannot produce alternatives $\palt(\theta)$ that are not mutually absolutely
 continuous with $\pbase(\theta)$.
 
 
-\begin{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}\exlabel{phi_for_beta}
 %
 Take $\pbase(\theta) = \betadist{\theta \vert 1, \alpha_0}$ and
 $\palt(\theta) = \betadist{\theta \vert 1, \alpha_1}$.  Then
@@ -194,14 +197,14 @@ $\thetadom=[0,1]$ and $\lambda$ is the Lebesgue measure on $[0,1]$, so
 %
 Then, for $p = 1$,
 
-\begin{align*}
+\begin{align}\eqlabel{phi_beta_p1}
 %
 \phi(\theta \vert \beta, \palt) ={}&
     \frac{\Gamma(\alpha_1)\beta}{\Gamma(1 + \alpha_1)} (1 - \theta)^{\alpha_1 - 1} -
     \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
         (1 - \theta)^{\alpha_0 - 1}.
 %
-\end{align*}
+\end{align}
 %
 Note that, when $\t = 1$, the normalizing constant and $\beta$ cancel in the
 normalization of $\p(\theta \vert \t \phi)$:
@@ -223,38 +226,39 @@ and still extrapolate to the same $\palt$ when $\t = 1$.
 
 When $p = \infty$,
 %
-\begin{align*}
+\begin{align}
 %
 \phi(\theta \vert \beta, \palt) ={}&
     \log \left(
         \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
-    \right)  + (\alpha_1 - 1) \log (1 - \theta) - \\
+    \right)  + (\alpha_1 - 1) \log (1 - \theta) - \nonumber\\
 {}&
     \log \left(
         \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
-    \right) + (\alpha_0 - 1) \log (1 - \theta) \\
+    \right) + (\alpha_0 - 1) \log (1 - \theta)  + \log \beta \nonumber\\
 ={}&
 \log \left(
     \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
 \right) -
 \log \left(
     \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
-\right) + (\alpha_1 - \alpha_0) \log(1 - \theta).
+\right) + \log \beta + (\alpha_1 - \alpha_0) \log(1 - \theta).
+\eqlabel{phi_beta_pinf}
 %
-\end{align*}
+\end{align}
 %
-For $p = \infty$, the normalizing constant cancels for all $\t$:
+For $p = \infty$, the normalizing constant and $\beta$ cancel for all $\t$:
 %
 \begin{align*}
 %
 \p(\theta \vert \t \phi(\theta \vert \beta, \palt)) ={}&
-\frac{    \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
-               {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+\frac{  \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
         (1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}
     }
-     {
-     \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
-          {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+    {
+        \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
              \int_0^1 (1-\theta')^{\alpha_0 (1 - \t) +
                                    \alpha_1 \t} \lambda(d\theta')
      }
@@ -274,28 +278,89 @@ and $\palt(\theta) = \frac{1}{2} \ind{\theta > 1/2}$ are disallowed
 by \defref{prior_pert_class} because we do not have $\palt \ll \pbase$.
 %
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}
 %
-Equivalent densities can be given in different spaces via invertible
-transformations.  Since the base measure of \defref{prior_nl_pert}
-is fixed to the Lebesgue measure, the corresponding $\phi$ may be different.
-
-Consider the logistic transform given by \eqref{lnuk_transform}. Let
-$\p_{\nuk}(\nuk)$ be a density with respect to the Lebesgue measure on $[0,1]$,
-and let $\p_{\lnuk}(\lnuk)$ be the corresponding density with respect to the
-Lebesgue measure on $(-\infty, \infty)$.  By the ordinary rule for
-transformation of densities and \eqref{lnuk_derivatives},
+The perturbation $\phi(\theta)$ as given by \defref{prior_pert_class} can be
+negative. Take $\thetadom = [0,1]$ and let $\pbase(\theta) = 1$. Let us choose a
+$\palt(\theta)$ that shifts mass away from a small region next to zero.
+Specifically, for  $\delta \in (0, 1)$ and $\epsilon \in (0, 1)$, let
 %
 \begin{align*}
 %
-\p_{\lnuk}(\lnuk) = \p_{\nuk}(\nuk(\lnuk)) \frac{\exp(\lnuk)}{(1 +
-\exp(\lnuk))^2}.
+\palt(\theta) :={}&
+    \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right)
+        \ind{\epsilon \le \nu \le 1} +
+    \delta \ind{0 \le \nu \le \epsilon}.
 %
 \end{align*}
 %
+% where the final approximation is due to the smallness of $\epsilon$.
+Then \eqref{phi_for_palt} gives, for $p \in [0, \infty)$ and any $\beta > 0$,
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \left( p \beta\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p}
+        - 1
+    \right)
+        \ind{\epsilon \le \theta \le 1} +
+    \left(p \beta \delta^{1/p} - 1 \right) \ind{0 \le \theta \le \epsilon}.
+%
+\end{align*}
+%
+When $\beta < \frac{1}{p} \delta^{-1/p}$, then $\phi(\theta)$ is negative for
+$\theta \in (0, \epsilon)$.  Similarly, when $p = \infty$,
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \ind{\epsilon \le \nu \le 1}
+        \log \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right) +
+    \ind{0 \le \nu \le \epsilon} \log \delta + \log \beta,
+%
+\end{align*}
+%
+so $\phi(\theta)$ is negative for $\theta \in (0, \epsilon)$ when
+$\beta < \delta$.
+
+In the previous example, one could choose $\beta$ sufficiently large that
+$\phi(\theta)$ is non-negative everywhere, but at the cost of making
+$\phi(\theta)$ large on $\theta \in (\epsilon, 1)$. However, it is not always
+possible to choose $\beta$ large enough to guarantee positive $\phi(\theta)$.
+For example, again take $\thetadom=[0,1]$, and let
+%
+\begin{align*}
+%
+\pbase(\theta) ={} 2 \theta^{-1/2} \mathand
+\palt(\theta) ={} 1.
+%
+\end{align*}
+%
+Then
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+\begin{cases}
+        p\beta - 2 \theta^{-1/2} & \textrm{for }p \in [0, \infty) \\
+        \frac{1}{2} \log \theta + \log 2 + \log \beta
+            & \textrm{for }p = \infty
+\end{cases}.
+%
+\end{align*}
+%
+For this perturbation, $\inf_\theta \phi(\theta) = -\infty$ irrespective
+of $p$ or $\beta$, and no choice of $\beta$ can induce a change from
+$\pbase$ to $\palt$ with a positive $\phi(\theta)$.
+%
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 The classes of perturbations given in \defref{prior_nl_pert} have a natural
 correspondence with the $\lp{\lambda, p}$ spaces of functions, which we now
@@ -422,18 +487,25 @@ space (i.e., a complete, normed vector space).
 \begin{lem}\lemlabel{pert_well_defined}
 %
 Fix the quantities given in \defref{prior_nl_pert}.  We have the following
-relations between $\pertset$, $\lp{p}$, and the space of valid
-prior densitites:
+relations between $\pertset$, $\lp{p}$, and the space of valid (non-negative and
+normalizable) prior densitites:
 %
 \begin{enumerate}
 %
-    \item If $\phi \in \pertset$, then $\p(\theta \vert \t \phi)$ is a valid
-    density (non-negative and normalizable) for all $0 \le \t \le 1$.
+    \item \itemlabel{priors_are_pert}
+    For any $p \in [0, \infty]$, any valid densitity $\palt \ll \pbase$
+    is expressible in the form $\palt = \p(\theta \vert \phi)$ for some
+    $\phi \in \pertset$.
 %
-    \item If $p \in [1, \infty)$, then $\pertset \subset
-        \ball_{p}(p)$.
+    \item \itemlabel{perts_are_priors}
+    If $\phi \in \pertset$, then $\p(\theta \vert \t \phi)$ is a valid
+    density  for all $0 \le \t \le 1$.
 %
-    \item If $p = \infty$, $\lp{\infty} \subset \pertset[\infty]$.
+    \item \itemlabel{perts_vs_ball_p}
+    If $p \in [1, \infty)$, then $\pertset \subset \ball_{p}(p)$.
+%
+    \item \itemlabel{perts_vs_ball_pinf}
+    If $p = \infty$, $\lp{\infty} \subset \pertset[\infty]$.
 %
     % \item If $1 \le p < \infty$ and $\phi \in \pertset$, then
     % $\essinf_{\theta} \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \ge 0$.
