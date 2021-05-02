@@ -141,11 +141,6 @@ Similarly, define
 %
 \begin{align*}
 %
-% \pertset := \bigg\{&
-%     \phi:     \phi \in \lp{\lambda, p} \textrm{ and }
-%     \phi(\theta) = \beta \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}\\&
-%     \textrm{ for some }\beta > 0\textrm{ and some density }\palt
-% \bigg\}.
 \pertset := \bigg\{&
     \phi:  \phi(\theta | \beta, \palt) %\\&
     \textrm{ for some }\beta > 0\textrm{ and some density }\palt
@@ -153,22 +148,6 @@ Similarly, define
 \bigg\}.
 %
 \end{align*}
-%
-% For notational convenience, when $p = \infty$, we simply take $\pertset =
-% \lp{\lambda, \infty}$.\footnote{
-% Observe that
-% %
-% %\begin{align*}
-% %
-% $\phi(\theta) = \beta \log \palt(\theta) - \log \pbase(\theta) \Rightarrow
-% \palt(\theta) = \exp(\phi(\theta) / \beta) \pbase(\theta)^{1/\beta}.$
-% %
-% %\end{align*}
-% %
-% Since $\int \pbase(\theta)^{1/\beta} \lambda(d\theta)$ may be $\infty$, in
-% general, there exist $\phi(\theta)$ which are of the form \eqref{phi_for_palt}
-% when $p=\infty$.  It turns out that a restricted $\pertset$ will not be a useful
-% concept when $p=\infty$, however.}
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -409,103 +388,43 @@ space (i.e., a complete, normed vector space).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
-
-
-% We argue that pointwise negative priors are no substantive problem, as long as
-% normalizing integral is neither zero nor infinity, and as long as we do not
-% extrapolate to negative alternatives $\palt(\theta)$.  (Indeed, embedding
-% statistical problems in non-statisical vectors spaces is a venerable technique
-% when applying functional analysis to statistics, see, e.g., \citet[Chapter
-% 6]{serfling:2009:approximation}.)  In order to permit negative $\phi$, we thus
-% state the following generalization of \citep[Result 2]{gustafson:1996:local}.
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{lem}\lemlabel{pert_well_defined}
-% %
-% Fix a $1 \le p < \infty$ and $\pbase(\theta)$ as in \defref{prior_nl_pert}.
-% For any $\phi \in \lp{\lambda,p}$ and $\norm{\phi}_{\lambda,p} < p$, then
-% %
-% \begin{align*}
-% %
-% 0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty,
-% %
-% \end{align*}
-% %
-% so that $\int p(\theta \vert \phi) \lambda(d\theta) = 1$.
-%
-% Furthermore, for any $1 \le p \le \infty$, when $\phi \in \pertset$ and $0 \le
-% \t \le 1$, then
-% %
-% \begin{align*}
-% %
-% \ptil(\theta \vert \t \phi) \ge{}& 0 \mathand\\
-% 0 < \int \ptil(\theta \vert \t \phi) \lambda(d\theta) < \infty.
-% %
-% \end{align*}
-% %
-% (For a proof see \appref{proofs} \proofref{pert_well_defined}.)
-% %
-% \end{lem}
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{lem}\lemlabel{pert_well_defined}
-% %
-% Fix the quantities given in \defref{prior_nl_pert}, and let $0 \le \t \le 1$.
-%
-% First, consider $1 \le p < \infty$.  If $\phi \in \pertset$, then
-% $\norm{\phi}_{\lambda,p} < \infty$, $\p(\theta \vert \t \phi) \ge 0$, and
-% $\essinf_{\theta} \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \ge 0$. Furthermore,
-% if $\phi \in \ball_{\lambda,p}(p)$ or if $\phi \in \pertset$, then $0 < \int
-% \ptil(\theta \vert \phi) \lambda(d\theta) <{} \infty$.
-%
-% % However,
-% % there may be $\phi$ with arbitrarily small $\norm{\phi}_{\lambda,p}$
-% % and $\essinf_\theta \p(\theta \vert \phi) < 0$.
-%
-% For $p = \infty$, $\norm{\phi}_{\lambda,p} < \infty$ implies that $\p(\theta
-% \vert \phi) \ge 0$ and $0 < \int \ptil(\theta \vert \phi) \lambda(d\theta) <{}
-% \infty$.
-%
-% % However, there may be $\phi \in \pertset$ with $\norminf{\phi} =
-% % \infty$.
-%
-% (For a proof see \appref{proofs} \proofref{pert_well_defined}.)
-% %
-% \end{lem}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \begin{lem}\lemlabel{pert_well_defined}
 %
-Fix the quantities given in \defref{prior_nl_pert}.  We have the following
-relations between $\pertset$, $\lp{p}$, and the space of valid (non-negative and
-normalizable) prior densitites:
+Fix the quantities given in \defref{prior_nl_pert}.  Let
+%
+\begin{align*}
+%
+\mathscr{P}_{\pbase,p} :={}&
+    \left\{ \ptil: \ptil = \ptil(\theta \vert \t \phi) \textrm{ for some }
+        \phi \in \pertset \mathtxt{ and } \t \in [0, 1]
+    \right\} \\
+\mathscr{P}_{\mathrm{valid}} :={}&
+    \left\{ \ptil:
+        \ptil \ll \pbase \mathtxt{, }
+        \ptil(\theta) \ge 0 \mathtxt{ and }
+        0 < \int \ptil(\theta) \lambda(d\theta) < \infty
+    \right\}.
+%
+\end{align*}
+%
+$\mathscr{P}_{\pbase,p}$ is equivalent to the set of all unnormalized priors
+that can be formed from $\phi \in \pertset$, and $\mathscr{P}_{\mathrm{valid}}$,
+and $\mathscr{P}_{\pbase,p}$ is the set of all valid unnormalized priors---i.e.,
+priors that are non-negative and can be normalized.
+
+We have the following relations:
 %
 \begin{enumerate}
 %
-    \item \itemlabel{priors_are_pert}
-    For any $p \in [0, \infty]$, any valid densitity $\palt \ll \pbase$
-    is expressible in the form $\palt = \p(\theta \vert \phi)$ for some
-    $\phi \in \pertset$.
-%
     \item \itemlabel{perts_are_priors}
-    If $\phi \in \pertset$, then $\p(\theta \vert \t \phi)$ is a valid
-    density  for all $0 \le \t \le 1$.
+    For all $p \in [0, \infty]$,
+    $\mathscr{P}_{\mathrm{valid}} = \mathscr{P}_{\pbase,p}$.
 %
     \item \itemlabel{perts_vs_ball_p}
-    If $p \in [1, \infty)$, then $\pertset \subset \ball_{p}(p)$.
+    If $p \in [1, \infty)$, then $\mathscr{P}_{\pbase,p} \subset \ball_{p}(p)$.
 %
     \item \itemlabel{perts_vs_ball_pinf}
-    If $p = \infty$, $\lp{\infty} \subset \pertset[\infty]$.
+    If $p = \infty$, $\lp{\infty} \subset \mathscr{P}_{\pbase,\infty}$.
 %
     % \item If $1 \le p < \infty$ and $\phi \in \pertset$, then
     % $\essinf_{\theta} \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \ge 0$.
@@ -581,6 +500,15 @@ $\pertset{\infty} \supset \ball_{\lambda,\infty}(\epsilon)$ for all $\epsilon >
 \infty$.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+Transformations.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -----------------------------
 -----------------------------
 
@@ -592,10 +520,6 @@ attractive properties: \citep[Result 2]{gustafson:1996:local} observes that this
 notion of ``size'' is a norm, invariant to changes in the base measure, and
 invariant under measurable one-to-one re-parameterizations (where the measure
 $\lambda$ is transformed to the push-forward measure of the reparameterization).
-
-% In a sense, we don't care about all of $\lp{\lambda,p}$, nor do we even care
-% about a unit ball of $\lp{\lambda,p}$; we care about $\phi$ that can be
-% used to interpolate from one prior to another.
 
 It is also desirable that perturbations which are bounded in
 $\norm{\cdot}_{\lambda,p}$ lead to proper priors.  On this point we deviate from
