@@ -119,6 +119,81 @@ The form of the derivative is given by combining \eqref{kl_pert} with
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{proof}\prooflabel{pert_invariance}\proofof{\lemref{pert_invariance}}
+%
+Let $\mu$ and $\mu'$ denote two mutually absolutely continuous candidate
+dominating measures for $\pbase$, with respective densities (Radon-Nikodym
+derivatives) $\pbase(\theta)$ and $\pbase'(\theta)$.  Let the respective
+densities of the measure $\p$ be denoted $\palt(\theta)$ and $\palt'(\theta)$ as
+well.  Let $R(\theta) = \fracat{d\mu}{d\mu'}{\theta}$ denote the Radon-Nikodym
+derivative of $\mu$ with respect to $\mu'$, and note that $\pbase'(\theta) =
+R(\theta) \pbase(\theta)$ and $\palt'(\theta) = R(\theta) \palt(\theta)$.
+
+First, take $p \in [1, \infty)$.  By \defref{prior_nl_pert}, the perturbations
+for $\mu$ and $\mu'$ are given respectively by
+%
+\begin{align*}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+    \beta p \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}\\
+\phi'(\theta \vert \beta, \palt') ={}&
+    \beta p \palt'(\theta)^{1/p} - \pbase'(\theta)^{1/p},
+%
+\end{align*}
+%
+so
+%
+\begin{align*}
+%
+\norm{\phi(\theta \vert \beta, \palt)}_{\mu,p}^p ={}&
+\int \abs{\beta p \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}}^p
+    \mu(d\theta)
+%
+\\={}&
+\int \abs{\beta p \left(R(\theta) \palt(\theta)\right)^{1/p} -
+          \left(R(\theta) \pbase(\theta)\right)^{1/p}}^p
+     \mu'(d\theta)
+%
+\\={}&
+\norm{\phi'(\theta \vert \beta, \palt')}_{\mu',p}^p.
+%
+\end{align*}
+%
+Next, for $p = \infty$, we have that the perturbations for $\mu$ and $\mu'$ are
+given respectively by
+%
+\begin{align*}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+  \log \palt(\theta) - \log \pbase(\theta) + \log \beta \\
+\phi'(\theta \vert \beta, \palt') ={}&
+    \log \palt'(\theta) - \log \pbase'(\theta) + \log \beta
+\\={}&
+\log \palt(\theta) - \log R(\theta)
+    - \log \pbase(\theta) + \log R(\theta)+ \log \beta
+\\={}&
+\phi(\theta \vert \beta, \palt).
+%
+\end{align*}
+%
+It follows that $\norminf{\phi(\cdot \vert \beta, \palt)} = \norminf{\phi'(\cdot
+\vert \beta, \palt')}$.
+
+Next, let $\tau := \tau(\theta)$ be an invertible transformation with Jacobian
+$J(\theta) := \mathrm{det}\left(\fracat{d\tau}{d\theta^T}{\theta}\right)$. For
+the dominating measure $\mu$, let $\pbase(\theta)$ and $\palt(\theta)$ denote
+the densities of $\theta$ and $\pbase'(\tau)$ and $\palt'(\tau)$ denote the
+densities of $\tau$.  The desired result follows by the exact same formal
+argument as for the change of measure, except with $J(\theta) \mu(d\theta)$
+and $\mu(d\tau)$ taking the place of $R(\theta) \mu(d\theta)$ and
+$\mu'(d\theta)$, respectively.
+%
+\end{proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 
