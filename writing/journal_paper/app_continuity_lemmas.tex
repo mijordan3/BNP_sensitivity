@@ -489,18 +489,21 @@ The next lemma is a different kind of continuity lemma.
 
 \begin{lem}\lemlabel{continuity_partition}
 %
-Let $\epsilon'_n = n^{-1}$.  Since $\pbase \ll \lambda$, by \citet[Proposition
-15.5]{nielsen:1997:measure}, for each $n$ there exists a $\delta_n$ such that,
-for any measureable set $A$ with $\lambda(A) < \delta_n$, $\pbase(A) <
-\epsilon'_n$.
+Let $\epsilon'_n = n^{-1}$.  Since $\pbase \ll \mu \ll \lambda$, by applying
+\citet[Proposition 15.5]{nielsen:1997:measure}, for each $n$ there exists a
+$\delta'_n$ such that, for any measureable set $A$ with $\mu(A) <
+\delta'_n$, $\pbase(A) < \epsilon'_n$.  Again applying
+\citet[Proposition 15.5]{nielsen:1997:measure}, there similarly exists
+a $\delta_n$ such that for any measureable set $A$ with $\lambda(A) <
+\delta_n$, $\mu(A) < \delta'_n \Rightarrow \pbase(A) < \epsilon'_n$.
 
 For each $n$, partition $\thetadom$ into a countable number of sets $A_{m}$ such
 that $\sum_{m} \lambda(A_{m}) = 1$ and $\lambda(A_{m}) < \delta_n$. (This is
 possible by dividing $\thetadom$ into sufficiently small rectangles, for
 example.)  Then $\pbase(A_{m}) < \epsilon'_n$ for all $m$.  Since $\pbase$ is a
 probability measure, $\sum_m \pbase(A_{m}) = 1$, so there must exist at least $1 /
-\epsilon'_n$ indices $m'$ such that $\pbase(A_{m'}) > 0$. Take any such set and
-let $\epsilon_n = \pbase(A_{m'})$ and $\epsilon_n = \pbase(A_{m'})$.
+\epsilon'_n$ indices $m'$ such that $\pbase(A_{m'}) > 0$. Take any such $m'$ and
+let $\epsilon_n = \pbase(A_{m'})$ and $S_n = A_{m'}$.
 
 %
 \end{lem}
