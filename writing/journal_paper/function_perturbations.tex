@@ -297,8 +297,13 @@ so $\phi(\theta)$ is negative for $\theta \in (0, \epsilon)$ when
 $\beta < \delta$.
 
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}\exlabel{phi_necessarily_negative}
 %
 In \exref{phi_negative}, one could choose $\beta$ sufficiently large that
 $\phi(\theta)$ is non-negative everywhere, but at the cost of making
@@ -415,23 +420,25 @@ of $\theta$.
 
 \begin{lem}\lemlabel{pert_well_defined}
 %
-Fix the quantities given in \defref{prior_nl_pert}.  An unnormalized prior
-$\ptil$ is valid if $\ptil \ll \pbase$ that is non-negative $\mu$-almost
-everywhere and normalizable in the sense that $0 < \int \ptil(\theta)
-\mu(d\theta) < \infty$.
+Fix the quantities given in \defref{prior_nl_pert}.  Say that an unnormalized
+prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$ is non-negative
+$\mu$-almost everywhere and normalizable in the sense that $0 < \int
+\ptil(\theta) \mu(d\theta) < \infty$.
 
-Furthermore, the following table summarizes properties of priors derived from
+The following table summarizes properties of priors derived from
 $\phi \in \ball_{\mu,p}$ and from $\phi \in \pertset$.  The columns are
-shorthand for the following properites:
+shorthand for the following properties:
 %
 \begin{align*}
 %
 \int \ptil < \infty \Rightarrow{}&
-    \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty\\
+    \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty   &\quad
+%
 \int \ptil > \infty \Rightarrow{}&
     \int \ptil(\theta \vert \phi) \mu(d\theta) > 0\\
+%
 \ptil \ge 0 \Rightarrow{}&
-    \essinf_\theta^\mu \ptil(\theta \vert \phi) \ge 0\\
+    \essinf_{\theta \sim \mu} \ptil(\theta \vert \phi) \ge 0  &\quad
 % \norm{\phi} < \infty \Rightarrow{}&
 %     \exists M < \infty \textrm{ independent of }\phi\textrm{ such that }
 %     \sup_\phi \norm{\phi}_{\mu,p} < M.
@@ -467,7 +474,7 @@ $p = \infty$   &     $\phi \in \ball_{\mu,\infty}(\delta)$ &
     Y & Y & Y & Y (by defn) \\ \hline
 \end{tabular}
 \caption{The relationships between $\pertset$, $\ball_{\mu,p}$, and valid priors.
-The ball radius $\delta > 0$ can be any positive number.}
+The properties hold for any ball radius $\delta > 0$.}
 \tablabel{pert_well_defined}
 \end{centering}
 %\vspace{1em}
@@ -477,17 +484,21 @@ The ball radius $\delta > 0$ can be any positive number.}
 
 \begin{enumerate}
 %
-\item For all $p \in [1, \infty]$, the set of priors that can be formed from
+\item \itemlabel{pertset_is_valid}
+For all $p \in [1, \infty]$, the set of priors that can be formed from
 $\phi \in \pertset$ is identical to the set of all valid priors.
 %
-\item For $p \in [1, \infty)$, all valid priors can be formed from
+\item \itemlabel{pball_is_valid}
+For $p \in [1, \infty)$, all valid priors can be formed from
 some $\phi \in \lp{\mu,p}$.
 %
-\item For $p \in [1, \infty)$, one can form invalid (negative) priors from
+\item \itemlabel{pball_is_invalid}
+For $p \in [1, \infty)$, one can form invalid (negative) priors from
 some $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily small $\delta$.
 (\Exref{lp_negative}.)
 %
-\item For $p = \infty$, there exist valid priors not formed from any
+\item \itemlabel{pinfball_is_invalid}
+For $p = \infty$, there exist valid priors not formed from any
 $\phi \in \lp{\mu,\infty}$.  (\Exref{beta_inf_norm}.)
 %
 \end{enumerate}
@@ -505,7 +516,7 @@ $\phi \in \lp{\mu,\infty}$.  (\Exref{beta_inf_norm}.)
 For $1 \le p < \infty$, it is possible for $\phi \in
 \ball_{\mu,p}(\epsilon)$ for arbitrarily small $\epsilon$ and yet have
 $\essinf^\mu_{\theta} \p(\theta \vert \phi) < 0$.
-
+%
 Since $\pbase \ll \mu \ll \lambda$, there exists a
 sequence $\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a sequence of
 corresponding sets such that $\pbase(S_n) = \epsilon_n$. (See
@@ -539,6 +550,21 @@ so $\essinf_\theta \p(\theta \vert \phi_n) < 0$ for all $n$.
 
 
 
+Note that \citep{gustafson:1996:local} avoids the difficulty of
+\exref{lp_negative} by restricting to positive $\phi(\theta)$, i.e. $\phi$ such
+that $\essinf_\theta^\mu \phi(\theta) \ge 0$.  Of course, \exref{lp_negative}
+implies that there exist negative $\phi$ in any neighborhood of $\phiz$,
+prohibiting the use of standard functional analysis results requiring open
+neighborhoods, such as the implicit function theorem in Banach spaces, (our key
+tool proving \thmref{eta_phi_deriv} below). Furthermore, \exref{phi_negative,
+phi_necessarily_negative} shows that restricting $\phi$ to be positive
+sacrifices \lemref{pert_well_defined} \itemref{pertset_is_valid}.  Perhaps more
+importantly, restricting to positive $\phi$ induces counterintutive notions of
+the ``size'' of perturbations that ablate mass, detailed discussion of which we
+provid in \appref{positive_pert}.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
 \begin{ex}\exlabel{beta_inf_norm}
@@ -566,36 +592,7 @@ Consequently, $\phi \notin \lp{\mu,\infty}$.
 % /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
------------------------------
------------------------------
 
-
-For any $p$, the transformation given in \defref{prior_nl_pert} and the norm
-defined in \defref{lp_spaces} jointly specify a ``size'' of a particular
-perturbation.   It turns out that this notion of ``size'' has a number of
-attractive properties: \citep[Result 2]{gustafson:1996:local} observes that this
-notion of ``size'' is a norm, invariant to changes in the base measure, and
-invariant under measurable one-to-one re-parameterizations (where the measure
-$\lambda$ is transformed to the push-forward measure of the reparameterization).
-
-It is also desirable that perturbations which are bounded in
-$\norm{\cdot}_{\lambda,p}$ lead to proper priors.  On this point we deviate from
-\citep{gustafson:1996:local}, who requires $\phi$ to be non-negative
-$\lambda$-almost everywhere.  In contrast, we allow the perturbations $\phi$ to
-be negative. There are two reasons for doing so.  First, if $\phi$ must be
-pointwise positive, then $\p(\theta \vert \phi)$ is not defined in an open ball
-containing $\phiz$, and standard results from functional analysis cannot be
-directly applied to establish properties like Fr{\'e}chet differentiability, a
-central concern of our \secref{differentiability} below.  There are alternative
-priors that cannot be achieved by considering only positive perturbations.
-Additionally, when $\phi$ must be positive, the norm $\norm{\cdot}_{\lambda, p}$
-treats ablating and adding prior mass very asymmetrically when $p < \infty$,
-arguably violating an intutive notions of the ``size'' of perturbation, though
-we defer a detailed discussion of this point to \appref{positive_pert}.
-
-
------------------------------
------------------------------
 
 For any particular $\phi$, we can apply \thmref{etat_deriv}.
 %  Note that the
@@ -636,8 +633,8 @@ For any particular $\phi$, we can apply \thmref{etat_deriv}.
 %
 Let \assuref{kl_opt_ok} hold at $\eta_0 = \etaopt$.
 %
-Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
-\infty$.  Define the influence function
+Fix the quantities given in \defref{prior_nl_pert}, and assume that
+$\norm{\phi}_{\lambda,p} < \infty$.  Define the influence function
 %
 \begin{align}\eqlabel{infl_defn}
 %
@@ -646,7 +643,7 @@ Fix $\phi$ and $p$ in \defref{prior_nl_pert}, with $\norm{\phi}_{\lambda,p} <
     - \hessopt^{-1}
         \lqgradbar{\theta \vert \etaopt}
         \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}}
-& \textrm{when }1 \le p < \infty \\
+& \textrm{when }p \in [1, \infty) \\
 %
     - \hessopt^{-1}
         \lqgradbar{\theta \vert \etaopt}
@@ -664,15 +661,22 @@ $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
 %
 \begin{align}
 %
-\logp(\theta \vert \t \phi) ={}&
+\logp(\theta \vert \t \phi) - \log \pbase(\theta) ={}&
 \begin{cases}
-    \log \pbase(\theta) +
-        \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
-    & \textrm{when }p < \infty \\
-    \log \pbase(\theta) + \t \phi(\theta)
+    \log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+    & \textrm{when }p \in [1, \infty) \\
+    \t \phi(\theta)
     & \textrm{when }p = \infty
 %
-\end{cases}  \eqlabel{nl_vb_pert_p}
+\end{cases}  \eqlabel{nl_vb_pert_p}\\
+%
+\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
+\begin{cases}
+   \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
+   & \textrm{when }p < \infty \\
+   \phi(\theta)
+   & \textrm{when }p = \infty.
+\end{cases}\eqlabel{nl_vb_pert_pinf}
 %
 \end{align}
 %
@@ -682,7 +686,7 @@ differentiable at $\t=0$ with derivative
 \begin{align}\eqlabel{vb_eta_infl_sens}
 %
 \fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
-    \int \infl_p(\theta) \phi(\theta) \lambda(d\theta).
+    \int \infl_p(\theta) \phi(\theta) \mu(d\theta).
 %
 \end{align}
 %
@@ -696,19 +700,3 @@ and \eqref{nl_vb_pert_pinf}.
 \end{cor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-Note that, under \eqref{nl_vb_pert_p}, the derivatives of the
-log perturbation are given by
-
-\begin{align}
-%
-\fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0} ={}&
-\begin{cases}
-   \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
-   & \textrm{when }p < \infty \\
-   \phi(\theta)
-   & \textrm{when }p = \infty.
-\end{cases}\eqlabel{nl_vb_pert_pinf}
-%
-\end{align}
