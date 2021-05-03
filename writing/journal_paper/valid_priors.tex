@@ -1,0 +1,263 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The classes of perturbations given in \defref{prior_nl_pert} have a natural
+correspondence with the $\lp{\lambda, p}$ spaces of functions, which we now
+define.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{defn}\deflabel{lp_spaces}
+\citep[Sections 5.1-5.2]{dudley:2018:real}
+%
+For a measure $\mu$ and $p \in [1, \infty]$, let $\lp{\mu,p}$ define the
+space of equivalence classes of real-valued $\mu$-measurable functions,
+where two functions are equivalent if they disagree only on a set of
+$\mu$-measure zero.
+
+Let $\esssup_\theta^\mu$ denote the essential supremum over $\theta$ with
+respect to the measure $\mu$. The norm on $\lp{\mu,p}$ is given by
+%
+\begin{align*}
+%
+\norm{\phi}_{\mu,p} :={}&
+\begin{cases}
+    \left(\int \abs{\phi(\theta)}^p \mu(d\theta)\right)^{1/p}
+    & \textrm{when }p \in [1, \infty)\\
+    \esssup_{\theta} \abs{\phi(\theta)}
+    & \textrm{when }p = \infty
+\end{cases}\\
+%
+\phi \in \lp{\lambda,p} \Leftrightarrow{}& \norm{\phi}_{\lambda,p} < \infty.
+%
+\end{align*}
+%
+When $\mu$ is the Lebesgue measure, we may simply write $\lp{\lambda,p} =
+\lp{p}$ and $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
+%
+Let $\ball_{\mu,p}(\epsilon) := \{\phi: \phi \in \lp{\mu, p},
+\norm{\phi}_p < \epsilon \}$ denote the $\epsilon$-ball in $\lp{\mu, p}$.
+%
+\end{defn}
+
+By \citep[Theorem 5.2.1]{dudley:2018:real}, $\lp{\mu,p}$ is a Banach
+space (i.e., a complete, normed vector space).
+
+The following lemma is due to \citep{gustafson:1996:local}, and provides
+a key part of the motivation for the use of $\norm{\cdot}_{\mu,p}$ to measure
+the size of prior perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pert_invariance}
+%
+(\citet{gustafson:1996:local})
+%
+Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
+measure $\p \ll \mu$, the map $\p \mapsto \norm{\phi(\cdot \vert \beta,
+\p)}_p$ does not depend on $\mu$, and is invariant to invertible transformations
+of $\theta$.
+%
+\seeproof{pert_invariance}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{pert_well_defined}
+%
+Fix the quantities given in \defref{prior_nl_pert}.  Say that an unnormalized
+prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$ is non-negative
+$\mu$-almost everywhere and normalizable in the sense that $0 < \int
+\ptil(\theta) \mu(d\theta) < \infty$.
+
+The following table summarizes properties of priors derived from
+$\phi \in \ball_{\mu,p}$ and from $\phi \in \pertset$.  The columns are
+shorthand for the following properties:
+%
+\begin{align*}
+%
+\int \ptil < \infty \Rightarrow{}&
+    \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty   &\quad
+%
+\int \ptil > \infty \Rightarrow{}&
+    \int \ptil(\theta \vert \phi) \mu(d\theta) > 0\\
+%
+\ptil \ge 0 \Rightarrow{}&
+    \essinf_{\theta \sim \mu} \ptil(\theta \vert \phi) \ge 0  &\quad
+% \norm{\phi} < \infty \Rightarrow{}&
+%     \exists M < \infty \textrm{ independent of }\phi\textrm{ such that }
+%     \sup_\phi \norm{\phi}_{\mu,p} < M.
+\norm{\phi} < \infty \Rightarrow{}& \norm{\phi}_{\mu,p} < \infty.
+%
+\end{align*}
+
+A ``Y'' indicates that the columns property is satisfied for all $\phi$ in the
+corresponding set.  For example, the ``Y'' in the first row and first column
+means that, for all $\phi \in \pertset$ with $p \in [1, \infty)$, $\int
+\ptil(\theta \vert \phi) \mu(d\theta) < \infty$.  A ``N'' means the converse,
+i.e., that there exists, in general, some $\phi$ in the corresponding set that
+does not have the column's property.
+
+\begin{table}[h!]
+%\vspace{1em}
+\begin{centering}
+%\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{cccccc}
+    %\hline
+    && $\int \ptil < \infty$
+    & $\int \ptil > 0$
+    & $\ptil \ge 0$
+    & $\norm{\phi} < \infty$\\[0.5em] \hline
+$p \in [1, \infty)$   &     $\phi \in \pertset$ &
+%    Y & Y & Y & Y, if $\beta < \infty$ \\ \hline
+    Y & Y & Y & Y \\ \hline
+$p \in [1, \infty)$   &     $\phi \in \ball_{\mu,p}(\delta)$ &
+    Y & Y, if $\delta < p$ & N & Y (by defn) \\ \hline
+$p = \infty$   &     $\phi \in \pertset[\infty]$ &
+    Y & Y & Y & N \\ \hline
+$p = \infty$   &     $\phi \in \ball_{\mu,\infty}(\delta)$ &
+    Y & Y & Y & Y (by defn) \\ \hline
+\end{tabular}
+\caption{The relationships between $\pertset$, $\ball_{\mu,p}$, and valid priors.
+The properties hold for any ball radius $\delta > 0$.}
+\tablabel{pert_well_defined}
+\end{centering}
+%\vspace{1em}
+\end{table}
+
+\Tabref{pert_well_defined} has the following implications:
+
+\begin{enumerate}
+%
+\item \itemlabel{pertset_is_valid}
+For all $p \in [1, \infty]$, the set of priors that can be formed from
+$\phi \in \pertset$ is identical to the set of all valid priors.
+%
+\item \itemlabel{pball_is_valid}
+For $p \in [1, \infty)$, all valid priors can be formed from
+some $\phi \in \lp{\mu,p}$.
+%
+\item \itemlabel{pball_is_invalid}
+For $p \in [1, \infty)$, one can form invalid (negative) priors from
+some $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily small $\delta$.
+(\Exref{lp_negative}.)
+%
+\item \itemlabel{pinfball_is_invalid}
+For $p = \infty$, there exist valid priors not formed from any
+$\phi \in \lp{\mu,\infty}$.  (\Exref{beta_inf_norm}.)
+%
+\end{enumerate}
+
+\seeproof{pert_well_defined}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
+\begin{ex}\exlabel{lp_negative}
+%
+For $1 \le p < \infty$, it is possible for $\phi \in
+\ball_{\mu,p}(\epsilon)$ for arbitrarily small $\epsilon$ and yet have
+$\essinf^\mu_{\theta} \p(\theta \vert \phi) < 0$.
+%
+Since $\pbase \ll \mu \ll \lambda$, there exists a
+sequence $\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a sequence of
+corresponding sets such that $\pbase(S_n) = \epsilon_n$. (See
+\lemref{continuity_partition} for a proof of this fact, which is a
+straightforward consequence of \citet[Proposition 15.5]{nielsen:1997:measure}
+and the continuity of the Lebesgue measure.)  Take
+%
+%\begin{align*}
+%
+$\phi_n(\theta) := - \frac{2}{p} \pbase(\theta)^{1/p} \ind{\theta \in S_n}$.
+%
+%\end{align*}
+%
+Then $\norm{\phi_n}_{\lambda, p} = \frac{2}{p} \epsilon_n^{1/p} \rightarrow 0$
+and
+%
+\begin{align*}
+%
+\pbase(\theta)^{1/p} + p \phi(\theta) ={}
+\pbase(\theta)^{1/p}
+\left(\ind{\theta \notin S_n} - \ind{\theta \in S_n} \right)
+%
+\end{align*}
+%
+so $\essinf_\theta \p(\theta \vert \phi_n) < 0$ for all $n$.
+%
+\end{ex}
+% /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+Note that \citep{gustafson:1996:local} avoids the difficulty of
+\exref{lp_negative} by restricting to positive $\phi(\theta)$, i.e. $\phi$ such
+that $\essinf_\theta^\mu \phi(\theta) \ge 0$.  Of course, \exref{lp_negative}
+implies that there exist negative $\phi$ in any neighborhood of $\phiz$,
+prohibiting the use of standard functional analysis results requiring open
+neighborhoods, such as the implicit function theorem in Banach spaces, (our key
+tool proving \thmref{eta_phi_deriv} below). Furthermore, \exref{phi_negative,
+phi_necessarily_negative} shows that restricting $\phi$ to be positive
+sacrifices \lemref{pert_well_defined} \itemref{pertset_is_valid}.  Perhaps more
+importantly, restricting to positive $\phi$ induces counterintutive notions of
+the ``size'' of perturbations that ablate mass, detailed discussion of which we
+provid in \appref{positive_pert}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
+\begin{ex}\exlabel{beta_inf_norm}
+%
+It is possible for $\phi \in \pertset[\infty]$ to have $\norminf{\phi} =
+\infty$, and so $\phi \notin \lp{\lambda,\infty}$.  Take $\mu$ to be the
+Lebesgue measure on $[0,1]$, let $\pbase(\theta) = \betadist{\theta \vert 1,
+\alpha_0}$ and $\palt(\theta) = \betadist{\theta \vert 1, \alpha_1}$ for
+$\alpha_0 \ne \alpha_1$.  Then we can choose $\beta$ such that $\phi(\theta) =
+(\alpha_1 - \alpha_0) \log(1 - \theta)$
+%
+and
+%
+\begin{align*}
+%
+\norminf{\phi} =
+    \abs{\alpha_1 - \alpha_0} \sup_{\theta \in [0,1]} \abs{\log(1 - \theta)} =
+    \infty.
+%
+\end{align*}
+%
+Consequently, $\phi \notin \lp{\mu,\infty}$.
+%
+\end{ex}
+% /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
