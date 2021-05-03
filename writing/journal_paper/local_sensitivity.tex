@@ -361,7 +361,8 @@ class of prior perturbations and the variational approximation.
 %
 Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
 \eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
-$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t)$.
+$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
+\log \p(\theta \vert \t=0)$.
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -379,15 +380,31 @@ using \eqref{lnuk_derivatives}, we get
 \begin{align*}
 %
 \MoveEqLeft
-\log \pstick(\lnuk \vert \t) - \log \pstick(\lnuk \vert \t=0)
+\log \pstick(\lnuk \vert \alpha)
 \\={}&
-    \t \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) -
-    \log \abs{\fracat{d \nuk}{d \lnuk}{\lnuk}} + \const \\
-% \\={}&
-%     -\t \log\left(1 + \exp(\lnuk)\right) -
-%     \lnuk + 2 \log\left(1 + \exp(\lnuk) \right) + \const.
+%
+(\alpha - 1) \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) +
+\log \abs{\fracat{d \nuk}{d \lnuk}{\lnuk}} +
+\const
 \\={}&
-    -(2 + \t) \log\left(1 + \exp(\lnuk)\right) - \lnuk + \const.
+(\alpha - 1) \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) +
+\log\left(\frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}\right) +
+    \const
+\\={}&
+(1 - \alpha) \log\left(1 + \exp(\lnuk)\right) +
+\lnuk - 2 \log\left(1 + \exp(\lnuk)\right) + \const
+\\={}&
+-(1 + \alpha) \log\left(1 + \exp(\lnuk)\right) + \lnuk + \const.
+%
+\end{align*}
+
+We thus have
+%
+\begin{align*}
+%
+\log \pstick(\lnuk \vert \alpha) - \log \pstick(\lnuk \vert \alpha_0)
+={}&
+    -(\alpha - \alpha_0) \log\left(1 + \exp(\lnuk)\right) + \const.
 %
 \end{align*}
 %
