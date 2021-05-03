@@ -194,29 +194,53 @@ Now that we can compute the sensitivity of the global parameters in
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
 \end{align}
 
-We have the option of again taking advantage of the fact that the optimal
+Finally, given a posterior quantity $\g$,
+we again take advantage of the fact that the optimal
 local parameters can be found in closed form given global parameters.
-We assume that $\etaoptz(\eta_\gamma; \t)$ is inexpensive to compute.
-Then, instead of linearizing both local and variational parameters,
-we linearize only the global parameters and approximate
-the full set of variational parameters at $\t \not= 0$ using
-%
-\begin{align}\eqlabel{global_lin_approx_all}
-\etalinglobal(\t) = \left(\begin{array}{c} \etalin_\gamma(\t) \\
-\etaoptz(\etalin_\gamma(\t); \t)
-\end{array}\right).
+In the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
+and is a function of only global parameters and the prior parameter $\t$,
+we can construct an analagous mapping for $\g$,
+\begin{align}\eqlabel{g_as_global}
+(\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big).
 \end{align}
 
-The advantage to $\etalinglobal$ is that the Hessian
-required for forming the approximation does not scale with $\N$.
-Note also that the $\mathrm{KL}$ evaluated at $\etalinglobal$
-will always be smaller than the $\mathrm{KL}$ evaluated at $\etalin$ obtained by
-linearizing all variational parameters,
-and thus $\etalinglobal$ may be a better approximator
-to the actual refitted variational parameters.
+This mapping can be used for any posterior quantity.
+Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient;
+we do not need to invert the full $\etadim\times\etadim$ Hessian
+and to linearize the entire set of variational parameters, global and local.
+As a shorthand, we will use $\g(\etalin_\gamma(t))$ to
+denote the posterior computed under our linearized global parameters
+at prior parameter $\t$ using the mapping \eqref{g_as_global}.
 
 
-
+% We have the option of again taking advantage of the fact that the optimal
+% local parameters can be found in closed form given global parameters
+% to compute any posterior statistic $\g$.
+% In the same way that
+%
+%
+%
+% We assume that $\etaoptz(\eta_\gamma; \t)$ is inexpensive to compute.
+% Then, instead of linearizing both local and variational parameters,
+% we linearize only the global parameters and approximate
+% the full set of variational parameters at $\t \not= 0$ using
+% %
+% \begin{align}\eqlabel{global_lin_approx_all}
+% \etalinglobal(\t) = \left(\begin{array}{c} \etalin_\gamma(\t) \\
+% \etaoptz(\etalin_\gamma(\t); \t)
+% \end{array}\right).
+% \end{align}
+%
+% The advantage to $\etalinglobal$ is that the Hessian
+% required for forming the approximation does not scale with $\N$.
+% Note also that the $\mathrm{KL}$ evaluated at $\etalinglobal$
+% will always be smaller than the $\mathrm{KL}$ evaluated at $\etalin$ obtained by
+% linearizing all variational parameters,
+% and thus $\etalinglobal$ may be a better approximator
+% to the actual refitted variational parameters.
+%
+%
+%
 
 
 % \subsection*{old text}

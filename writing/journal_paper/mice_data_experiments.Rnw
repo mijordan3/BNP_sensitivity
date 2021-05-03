@@ -26,7 +26,7 @@ is one way to reduce the dimensionality of a complex data set
 and to facilitate scientific interpretations of intricate biological processes. 
 Often, such dimensionality reduction is used for exploratory analysis and
 is a first step before further downstream investigation.  
-It is important, therefore, to acertain the stability of the 
+It is important, therefore, to ascertain the stability of the 
 discovered clusters. 
  
 We study a publicly available data set of mice gene expression
@@ -40,33 +40,33 @@ We fit a BNP model and run our analysis below on the top $\ngenes = 1000$ genes.
 
 \subsubsection*{The model}
 
-Each gene consists of $\ntimepoints = 42$ measurements of expression: three measurements (called biological replicates) at 14 unique timepoints.
-The timepoints are unevenly spaced, with more frequent observations at the beginning. 
+Each gene consists of $\ntimepoints = 42$ measurements of expression: three measurements (called biological replicates) at 14 unique time points.
+The time points are unevenly spaced, with more frequent observations at the beginning. 
 Following \citet{Luan:2003:clustering} we apply cubic B-splines to smooth the time course expression data. 
-Specifically, we model the first 11 timepoints using
+Specifically, we model the first 11 time points using
 cubic B-splines with 7 degrees of freedom.
-For the last three timepoints, $\timeindx = 72, 120, 168$ hours,
+For the last three time points, $\timeindx = 72, 120, 168$ hours,
 we use indicator functions. 
 That is, if $\tilde \regmatrix$ is the design 
 matrix where each column is a
 B-spline basis vector evaluated at the $\ntimepoints$ measurement times, 
 we append to $\tilde \regmatrix$ three additional columns: 
 in these columns, entries are 1
-if $\timeindx = 72, 120,$ or 168, repectively, and 0 otherwise. 
+if $\timeindx = 72, 120,$ or 168, receptively, and 0 otherwise. 
 Call the full design matrix $\regmatrix$. 
-We use indicators for the last three timepoints for numerical stability; 
+We use indicators for the last three time points for numerical stability; 
 without the indicator columns,
 the matrix $\tilde \regmatrix^T \tilde \regmatrix$ is nearly singular
-because the later timepoints are more spread out. 
+because the later time points are more spread out. 
 See \figref{example_genes} for an example gene and the B-spline basis. 
 
 %
 <<example_genes_cap>>=
 example_genes_cap <- paste(
-    "(Left) An example gene and its expression measured at 14 unique timepoints
-    with three biological replicates at each timepoint.
+    "(Left) An example gene and its expression measured at 14 unique time points
+    with three biological replicates at each time point.
      (Right) The cubic B-spline basis with 7 degrees of freedom, 
-    along with three indicator functions for the last three timepoints, 
+    along with three indicator functions for the last three time points, 
     $\\timeindx = 72, 120, 168$.")
 SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
 @
@@ -140,7 +140,7 @@ to the cluster assignments $\z$.
 Our approximation $\etalinglobal(t)$ is formed by 
 linearizing the global parameters as before,
 and we now set both $\eta_\z$ and $\eta_\b$ optimally as a function of 
-the linearized global parameters.
+the linearized global parameters when computing a posterior statistic $\g$. 
 
 We fitted the initial approximate posterior at $\alpha_0 = 6$. 
 \figref{gene_centroids} shows the inferred smoothers 
@@ -197,21 +197,24 @@ $\betadist{\nuk \vert 1, \alpha}$ stick distribution.
 Let $\coclusteringmatr_0 := \coclusteringmatr(\etaopt(\alpha_0))$ be the co-clustering matrix inferred at $\alpha_0$, 
 and let $\Delta\coclusteringmatr(\eta) := 
 \coclusteringmatr(\eta) - \coclusteringmatr_0$ be 
-the difference in co-clustering matices after a change in the variational parameters $\eta$. 
+the difference in co-clustering matrices after a change in the variational parameters $\eta$. 
 We formed the linear approximation at $\alpha_0$ and computed
 $\Delta\coclusteringmatr(\etalinglobal(\alpha))$, the 
 the change in co-clustering under the linearized 
 variational parameters, at $\alpha = 1$ and $\alpha = 11$. 
+(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
+We write $\coclusteringmatr(\etalinglobal)$ with the understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
 For either $\alpha$, the change in co-clustering matrix 
-is miniscule (\figref{gene_alpha_coclustering}):
+is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\coclusteringmatr(\etalinglobal(1))$ 
 or $\Delta\coclusteringmatr(\etalinglobal(11))$ is of order $10^{-2}$. 
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
 and computing $\Delta\coclusteringmatr(\etaopt(\alpha))$
-confirms the insensitivity predicted by the linearized variational parameters.  
-Beyond capturing insensitivity, the linearized variational parameters 
+confirms the insensitivity predicted by the 
+linearized variational global parameters.  
+Beyond capturing insensitivity, the linearized parameters 
 were also able to
-approximate the sign and size of the changes in the individual entries of the coclustering matrix (these changes abeit small).  
+approximate the sign and size of the changes in the individual entries of the coclustering matrix (these changes albeit small).  
 
 <<gene_alpha_coclustering_cap>>=
 gene_alpha_coclustering_cap <-
@@ -285,7 +288,7 @@ Our intuition is confirmed in \figref{gene_fpert_coclustering}.
 After perturbing by $\phi_{\textrm{ev}}$, 
 the largest changes in the co-clustering matrix are of now of order $10^{-1}$, 
 compared with changes on the order of $10^{-2}$ after the $\alpha$ perturbations. 
-The linear approximation again able to capture the qualitative changes in the co-clustering matrix after refitting at the perturbed prior. 
+The linearized variational parameters are again able to capture the qualitative changes in the co-clustering matrix after refitting at the perturbed prior. 
 
 <<gene_fpert_coclustering_cap>>=
 gene_fpert_coclustering_cap <- paste(
@@ -322,7 +325,7 @@ The function $\phi_\alpha(\nu_\k)$ is large when the influence function is small
 resulting in a small inner-product between the influence function
 and $\phi_\alpha$. 
 Thus, the linear approximation will predict small changes, and 
-the refitted results confirms the linear approximation predictions. 
+the refitted results confirms the predictions.  
 
 <<alpha_pert_logphi_cap>>=
 alpha_pert_logphi_cap <- paste(
@@ -341,12 +344,9 @@ the size of the differences in the co-clustering matrix remains modest.
 It is unlikely that any conclusions derived from the co-clustering matrix would have changed after the functional perturbation. 
 The co-clustering matrix appears insensitive to perturbations in the stick-breaking distribution. 
 
-Finally, we note that the computational cost of the linear approximation is again favorable compared with refitting (\tabref{mice_timing}). 
+Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
-took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds
-(this includes setting both $\eta_\z$ and $\eta_\b$ in closed form after
-linearizing $\eta_\gamma$). 
-Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
+took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
 
 \begin{table}[tb]
 \centering
@@ -360,21 +360,21 @@ Conversely, refitting the model after a prior perturbation can take up to 20 sec
     \hline 
     Hessian solve for $\alpha$ sensitivity & 
         \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 1$ & 
         \Sexpr{sprintf('%1.2g', lr_time_vec[1])}\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 11$ & 
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 11$ & 
         \Sexpr{sprintf('%1.2g', lr_time_vec[2])}\\
-    Refit $\eta(\alpha)$ for $\alpha = 1$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 1$ & 
         \Sexpr{sprintf('%1.2g', refit_time_vec[1])}\\
-    Refit $\eta(\alpha)$ for $\alpha = 11$ & 
+    Refit $\etaopt(\alpha)$ for $\alpha = 11$ & 
         \Sexpr{sprintf('%1.2g', refit_time_vec[2])}\\
     \hline
     The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\ 
     Hessian solve for $\phi$ perturbation &
         \Sexpr{sprintf('%1.2g', phi_hessian_time)}\\
-    Linear approx. $\eta^{lin}(\t)$ at $\t = 1$ &
+    Linear approx. $\etalin(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_lr_time)}\\
-    Refit $\eta(\t)$ at $\t = 1$ &
+    Refit $\etaopt(\t)$ at $\t = 1$ &
         \Sexpr{sprintf('%1.2g', phi_refit_time)}\\
     \hline
 \end{tabular}

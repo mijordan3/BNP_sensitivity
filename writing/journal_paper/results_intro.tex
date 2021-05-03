@@ -27,27 +27,31 @@ using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an ini
 We take advantage of the global/local structure described in \secref{computing_sensitivity}
 for both optimization and the
 linear approximation.
-Instead of minimizing the $\mathrm{KL}$ over all variational parameters,
-we speed up the optimization by minimizing $\KLglobal(\etaglob)$ (\eqref{global_kl})
-over global parameters only---thus keeping the dimension of the optimization parameter independent of $N$.
-After the optimzation terminates at the optimal $\etaglob$,
-the local parameters can be set optimally in closed form
-to form the optimal variational parameters $\etaopt$.
+We speed up the optimization by minimizing $\KLglobal(\etaglob)$ (\eqref{global_kl}),
+which is a function of only global parameters; the local parameters are set implicitly.
+Minimizing $\KLglobal(\etaglob)$, rather than minimizing the $\mathrm{KL}$ as a function of
+both global and local parameters, keeps the
+dimension of the optimization parameter independent of $N$.
+After the optimzation terminates at an optimal $\etaoptglob$,
+the optimal local parameters $\etaoptz$ can be set in closed form
+to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptz)$.
 
-In our results below, the ``linearized variational parameters" refers to
-the approximation defined by \eqref{global_lin_approx, global_lin_approx_all},
-where the local parameters are set optimally as a function of the linearized global parameters. 
+In our results below, we use
+the approximation defined by \eqref{global_sens, global_lin_approx},
+where only the global parameters are linearized;
+the local parameters are set implicitly as part of the
+computation of the posterior statistic $\g$.
 We solved the linear system in~\eqref{global_sens} using
 the conjugate gradient algorithm, which requires only Hessian-vector products;
 this avoids instatiating the full Hessian matrix in memory.
 If memory were not limited,
 we could have computed the full Hessian and
-either factorized it (e.g. with a Cholesky decomposition) or inverted it directly.
+either factorized it (e.g. with a Cholesky decomposition) or found its inverse directly.
 Then, the Hessian inverse (or its Cholesky decomposition) can
 be re-used for different perturbations
 (since different choices of prior perturbation
-results in a different $\crosshessian$).
-By using conjugate gradient, we have to re-solve the linear system (\eqref{global_sens})
+require solving different $\crosshessian$).
+By using conjugate gradient, we need to re-solve the linear system (\eqref{global_sens})
 for each choice of prior perturbation.
 On our data sets, the conjugate graient algorithm was at least
 an order of magnitude faster than refitting, and did not pose a meaningful bottleneck

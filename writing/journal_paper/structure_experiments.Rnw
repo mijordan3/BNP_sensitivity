@@ -1,10 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Do not edit the TeX file your work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
 % will be overwritten.  Edit the RnW
 % file instead.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
@@ -29,10 +29,10 @@ infer the population of origin for specific loci,
 and estimate the degree to which populations are admixed in each individual. 
 
 We consider a publicly available dataset containing 155 samples of an endangered bird species, the Taita thrush CITE. 
-Individuals were collected from four regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual was genotyped at seven microsatellite loci. 
+Individuals were collected from four regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual was genotyped at seven micro-satellite loci. 
 The four regions were once part of a cohesive cloud forest 
 that has since been fragmented by human development. 
-For this endagered bird species, 
+For this endangered bird species, 
 understanding the degree to which populations have grown genetically distinct is important for conservation efforts: 
 well-separated populations with little genetic diversity are particularly at risk of extinction. 
 
@@ -41,12 +41,12 @@ well-separated populations with little genetic diversity are particularly at ris
 The thrush data set was also studied in~\citet{pritchard:2000:structure}, 
 where they introduced a Bayesian model for such genetic data, called STRUCTURE. 
 Later, \citet{raj:2014:faststructure} introduced fastSTRUCTURE, a variational inference approach to STRUCTURE. 
-Both implmentations used a finite mixture model with a 
+Both implementations used a finite mixture model with a 
 Dirichlet prior on the individual admixture proportions.  
 We adapt the STRUCTURE model by replacing the Dirichlet prior with a GEM prior. 
 We outline our model below. 
 
-Let $\x_{\n\l\i}$ be the genotype for individual $\n$ at locus $\l$ and chromosme $\i$. 
+Let $\x_{\n\l\i}$ be the genotype for individual $\n$ at locus $\l$ and chromosome $\i$. 
 The Taita thrush is a diploid organism so $\i \in \{1, 2\}$. 
 In our data set, there are $\nindiv = 155$ individuals genotyped at $\nloci = 7$ loci. 
 Let $\z_{\n\l\i}$ be the latent population membership 
@@ -103,18 +103,18 @@ As before, we let the distribution of the sticks $\nu_{nk}$ be logit-normal;
 and we let each membership indicator $\z_{\n l i}$ be multinomial. 
 For each allele frequency $\latentpop_{\k l}$, we use a Dirichlet distribution. 
 
-TODO. We still refer to both $\nu$ and $\latentpop$ as "global" latent variables, 
-even though the dimension of $\nu$ 
-scales with the number of individuals, $\nindiv$; 
-we call $\z$ the ``local" latent variables because the dimension of $\z$ scales with $\nindiv \times \nloci$. 
-The optimal variational parameters $\eta_\z$ can as usual be solved in closed form ... 
+We still refer to $\gamma = (\nu, \latentpop)$ as global latent variables, even though the dimension of $\nu$ 
+scales with the number of individuals, $\nindiv$. 
+We call $\nu$ ``global" in this model because it does not scale 
+with $\nindiv \times \nloci$ as $\z$ does. 
+As usual, the optimal parameters $\eta_\z$ be solved in closed form as a function of the parameters $\etaglob$. 
 
 
 We fit the initial variational distribution with stick distribution
 $\pstick(\nu_{nk}) = \betadist{\nu_{nk}\vert 1, \alpha_0}$, $\alpha_0 = 6$. 
 \figref{stru_init_fit} shows the inferred
 individual admixtures at this initial fit. 
-There appears to be three dominant latent populations, which we arbitrarily label as populations 1, 2, and 3. 
+There appears to be three dominant latent populations, which we arbitrarily label as populations 1, 2, and 3 (see \figref{stru_init_fit}). 
 The inferred populations generally correspond with the geographic regions: 
 individuals from the Mbololo region have population 1 as their dominant admixture proportion; 
 individuals from the Ngangao are dominantly population 2; 
@@ -129,7 +129,7 @@ To select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 
 $p(K | \x)$, under the assumption of a uniformly distributed prior on $K$. 
 Their algorithm selected $K = 3$. 
 At $\alpha_0 = 3$, our BNP model agrees with \citet{pritchard:2000:structure} in that we also uncover three dominant latent populations, 
-with each having a loose correspondance with the Chawia, Ngangao, and Mbololo geographical regions.  
+with each having a loose correspondence with the Chawia, Ngangao, and Mbololo geographical regions.  
 
 
 <<stru_init_fit_cap>>=
@@ -190,8 +190,8 @@ This motivates the use of thresholding in reporting the number of populations.
 We consider two thresholds, $\tau = 20$ and $\tau = 40$,
 corresponding to approximately 
 $2\%$ and $4\%$ 
-of the total number of loci in the data set, respectively. '
-The thresholded estimates for the number of populations is stil
+of the total number of loci in the data set, respectively. 
+The thresholded estimates for the number of populations is still
 moderately sensitive to the value of $\alpha$. 
 When refitting the variational approximation at $\alpha = 1, \ldots, 7$,
 the thresholded quantities vary between two and four
@@ -200,14 +200,13 @@ latent populations.
 The linearized variational parameters $\etalinglobal(\t)$
 imperfectly captures the results observed by refitting. 
 We formed the linear approximation at $\alpha_0 = 3$ and computed 
-$\gpop$ using the linearly approximated variational parameters
-$\etalinglobal(\alpha)$ for $\alpha = 1, \ldots, 7$. 
-For this range of $\alpha$, $\etalinglobal(\alpha)$ and the refitted parameters 
-$\etaopt(\alpha)$ almost perfectly agree on values of $\gpop$ with $\tau = 0$. 
+$\gpop(\etalinglobal(\alpha))$ for $\alpha = 1, \ldots, 7$. 
+For this range of $\alpha$, the linearized parameters and the refitted parameters 
+almost perfectly agree on values of $\gpop$ with $\tau = 0$. 
 However, when $\tau = 20$ and $\tau = 40$, 
-the linearly approximated parameters 
+the linearized parameters 
 underestimated the true sensitivity of $\gpop$ found by refitting. 
-In particular, the linearly approximated parameters failed to produce
+In particular, the linearized parameters failed to produce
 the reduction to two latent populations at $\alpha = 1$ observed in the refits.
 
 <<stru_alpha_nclusters_cap>>=
@@ -229,7 +228,7 @@ source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug,
 @
 
 We provide some more intuition concerning the thresholded estimate for the number of populations.
-Our posterior quantity $\gpop$ is closely related to the expected number of loci belonging to each population,
+The posterior quantity $\gpop$ is closely related to the expected number of loci belonging to each population,
 defined as
 \begin{align*}
 \gloci(\eta; k)
@@ -255,14 +254,14 @@ At $\alpha = 7$, the expected number of loci belonging to population 4
 increases to 
 $\Sexpr{sprintf('%.1f', weights_alpha_large$weight[4])}$, 
 a new population emerges above the threshold at $\tau = 20$. 
-Both the linearly approximated and the refitted variational parameters agree on this shift in allocation to population 4. 
+Both the linearized and the refitted variational parameters agree on this shift in allocation to population 4. 
 On the other hand, under the refitted variational parameters at $\alpha = 1$, 
 the expected number of loci belonging to population 3 decreases to 
 $\Sexpr{sprintf('%.1f', weights_alpha_small$weight[3])}$, 
 below the thresholds $\tau = 20$ and $\tau = 40$. 
 Thus, the expected number of latent populations with allocations above
 either threshold decreases to two. 
-The linearly approximated parameters
+The linearized parameters
 under-estimated this decrease in allocation to population 3, and 
 therefore continued to estimate three latent populations even at $\alpha = 1$. 
 
@@ -282,7 +281,7 @@ For example, while individuals collected from the Mbololo region are inferred to
 several individuals from this region have abnormally large admixture proportions of population 2. 
 Conversely, while individuals collected from the Ngangao region are admixed primarily with population 2, a few of these individuals have abnormally large
 admixture proportions of population 1. 
-This suggests that some migration has occured between the Mbololo and Ngangao regions. 
+This suggests that some migration has occurred between the Mbololo and Ngangao regions. 
 
 We evaluate the sensitivity of this conclusion to possible prior perturbations. 
 Consider the posterior statistic 
@@ -301,17 +300,20 @@ $\mathcal{N} = \{125, ..., 128\}$ and $k = 1$,
 corresponding to the four individuals from the Ngangao region with outlying proportions of population 1; 
 $\mathcal{N} = \{139, ..., 155\}$ and $k = 3$,
 corresponding to all individuals from the Chawia region. 
-In the last case, we are studying the sensitivity of haing a third latent
+The first two posterior quantities relate to the inferred mixing between 
+Mbololo and Ngangao. 
+In the last case, we are studying the sensitivity of having a third latent
 population present, a population which primarily appears in Chawia individuals. 
 
 We construct the worst-case negative perturbation for each variant of $\gadmix$.
 We consider the negative direction because we are interested in testing the 
 robustness of these patterns' existence.
 For each worst-case perturbation, we examine the effect on its respective 
-posterior quantity $\gadmix$
+posterior quantity
 as $t \rightarrow 1$ in 
-the perturbed prior $\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
-Under the (globally) linearized variational parameters $\etalinglobal(\t)$, 
+the multiplicatively perturbed prior 
+$\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
+Under the linearized variational parameters $\etalinglobal(\t)$, 
 the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $\t = 1$. 
 The same quantity computed after refitting the model 
 confirms the sensitivity predicted by the linearized variational parameters 
@@ -344,13 +346,22 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 1.4)
 source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-discussion of overall findings
+Our sensitivity analysis suggests that the inferred migration from Mbololo to Ngangao based on the outlying Ngangao admixtures 
+appears robust to our stick-breaking prior. 
+On the other had, the the outlying Mbololo admixtures appears to be more sensitive to the stick-breaking prior, and conclusions about migration from Ngangao to Mbololo may be dependent on prior choices. 
 
-compute time. 
+
+Finally, the computational cost of linearizing the variational parameters is again favorable compared with refitting (\tabref{stru_timing}). 
+Forming the linear approximation took less than half a second; 
+as usual, subsequent evaluations of $\etalinglobal$ take milliseconds.
+On the other hand, refitting the model after a prior perturbation can take more than ten seconds. 
 
 \begin{table}[tb]
 \centering
-\caption{Compute time of results on the structure dataset. }
+\caption{Compute time of results on the thrush dataset. Timing results 
+on perturbation $\phi$ are reported for the worst-case perturbation ``A" 
+in  \figref{stru_func_sens}. Timing on other considered $\phi$ are similar. }
+\tablabel{stru_timing}
 \begin{tabular}{|r|r|}
 \hline 
     & time (seconds) \\ 
@@ -359,19 +370,19 @@ compute time.
     \hline
     Hessian solve for $\alpha$ sensitivity & 
         \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
-    Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, ..., 10$ & 
+    Linear approx. $\etalinglobal (\alpha)$ for $\alpha = 1, ..., 10$ & 
         \Sexpr{sprintf('%1.2g', total_alpha_lr_time)}\\
-    Refits $\eta(\alpha)$ for $\alpha = 1, ..., 10$ & 
+    Refits $\etaopt(\alpha)$ for $\alpha = 1, ..., 10$ & 
         \Sexpr{sprintf('%1.2g', total_alpha_refit_time)}\\
     \hline
     The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\
-    Hessian solve for worst-case $\phi$ &
+    Hessian solve for $\phi$ &
         \Sexpr{sprintf('%1.2g', fsens_hess_time)}\\
-    Linear approx. $\eta^{lin}(\epsilon)|_{\epsilon = 1}$ 
-      for worst-case $\phi$ &
+    Linear approx. $\etalinglobal(\epsilon)|_{\epsilon = 1}$ 
+      for $\phi$ &
         \Sexpr{sprintf('%1.2g', fsens_lr_time)}\\
-    Refit $\eta(\epsilon)|_{\epsilon = 1}$ 
-      for worst-case $\phi$ &
+    Refit $\etaopt(\epsilon)|_{\epsilon = 1}$ 
+      for $\phi$ &
         \Sexpr{sprintf('%1.2g', fsens_refit_time)}\\
     \hline
 \end{tabular}
@@ -381,29 +392,31 @@ compute time.
 
 In this final subsection, 
 we discuss some examples where 
-the linear approximation $\etalin(t)$ 
-is a poor subsitute for the refitted parameters $\etaopt(t)$ 
+the linearized variational parameters $\etalin(t)$ 
+are a poor substitute for the refitted variational parameters $\etaopt(t)$ 
 (in this subsection, the only posterior quantities considered 
-are functions of global parameters, so we do not make a distinction 
-between $\etalin$ and $\etalinglobal$).  
-Naturally, the linear approximation 
+are functions of global parameters, so we will not make a distinction 
+between $\etalin$ and $\etalinglobal$ here).  
+Naturally, the linearized parameters 
 $\etalin(t)$ will be a poor substitute for $\etaopt(t)$ when 
-the mapping $\t\mapsto\etaopt(\t)$. 
+the mapping $\t\mapsto\etaopt(\t)$ is highly nonlinear. 
 The examples discussed below use the STRUCTURE model and 
 dataset presented in \secref{results_structure}, and 
 we examine results after
 the worst-case perturbation ``A" in \figref{stru_func_sens}.
 
-Recall from \figref{stru_func_sens} that the linear approximation agreed with the refit in predicting the diminished admixture proportion of population 2 
+Recall from \figref{stru_func_sens} that the linearized parameters 
+agreed with the refitted parameters
+in predicting the diminished admixture proportion of population 2 
 in the outlying Mbololo individuals (individuals ``A")
 at the perturbed prior $\p_1 = \p_0\exp(\phiworstcase)$. 
-However, while the linear approximation was able to 
+However, while the linearized parameters were able to 
 capture the change in overall admixture proportion, 
-it does not perform uniformly well over all individuals 
+it does not perform uniformly well over all individual admixtures
 (\figref{stru_func_sens_admix}). 
 For example, the admixture proportion of population 2 in individual $n = 25$
-dramatically increased after refitting with the perturbed prior $\p_1$. 
-The linear approximation failed to detect this change. 
+dramatically increased after refitting with the perturbed prior $\p_1$;
+the linearized parameters failed to reproduce this change. 
 
 <<stru_func_sens_admix_cap>>=
   stru_func_sens_admix_cap <- paste(
@@ -416,24 +429,32 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
 source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-\figref{stru_lin_bad_example} examines this individual ($n = 25$) more closely. 
+\figref{stru_lin_bad_example} examines individual $n = 25$ more closely. 
 The bottom row plots this individual's 
 admixture proportions as $\t$ varies from 0 to 1 in the perturbed prior
 $\p(\nu\vert \t) = \p_0(\nuk)\exp(\t\phiworstcase(\nuk))$. 
-The linear approximation poorly captured the change in admixture proportions observed after refitting, particularly for values of $\t$ close to 1. 
-Even though our linear approximation retains non-linearities in the mapping from variational parameters to the posterior statistic,
+The linearized parameters poorly captured the change in admixture proportions observed after refitting, particularly 
+for populations 1 and 2, for values of $\t$ close to 1. 
+Even though we retain non-linearities 
+in the mapping from variational parameters to the posterior statistic,
 for this perturbation, the mapping from prior parameter
 $\t$ to the relevant variational parameters
 is highly non-linear. 
-This latter mapping is what we linearize, and thus what causes our approximation to fail in this case. 
-Specifically, the location parameter of the variational distribution 
-on the logit stick-breaking proportions (which recall are Gaussian)
-is concave for the first stick-breaking proportion -- the location parameter increases for small $\t$ at first, then decreases. 
-Our approximation assumes a linear relationship between the location parameter and $\t$. 
-Therefore, the corresponding admixture mixture proportion of population 1 is mis-estimated by the linear approximation. 
-Furthermore, because our linearized variational parameter over-estimated the length of the first stick, 
-and the second admixture proportion being a product of the remaining stick times the second stick-breaking proportion, 
-the linearized variational parameters then under-estimates the admixture proportion of population 2. 
+This latter mapping is what we linearize 
+and what causes our approximation to fail in this case. 
+Specifically, the variational location parameter on the first stick-breaking proportion is concave as a function of $\t$ ---
+the location parameter increases for small $\t$,
+then decreases as $\t\rightarrow1$. 
+However, 
+$\etalin(\t)$ linearizes the relationship between the location parameter and $\t$. 
+Therefore, the corresponding admixture mixture proportion of
+population 1 is over-estimated under the linearized variational parameters. 
+Furthermore, because our linearized variational parameters 
+over-estimated the length of the first stick, 
+and the second admixture proportion is a product of the 
+remaining stick times the second stick-breaking proportion, 
+the linearized variational parameters then under-estimates 
+the admixture proportion of population 2. 
 
 
 
@@ -462,13 +483,14 @@ source("R_scripts/structure/mbololo_bad_approximation.R", echo=knitr_debug, prin
 \figref{stru_fully_lin_example} shows a similar situation for individual $n = 74$. 
 The linearized variational parameters grossly over-estimated the length of the first stick,
 resulting in the later admixture proportions being under-estimated. 
-The third admixture proportion was particularly poorly approximated by the linearized variational parameters. 
+The third admixture proportion was particularly poorly approximated under the linearized variational parameters. 
 Given the recursive nature of the relationship between admixtures and stick-breaking proportions, errors at early sticks affect later admixture proportions. 
-Fully linearizing the mapping from $\t$ to $\g(t)$ and forming the approximation 
+Fully linearizing the mapping $\t\mapsto\g(\etaopt(\t))$ to form the approximation 
 $\glin(t)$ (\eqref{vb_g_sens}) avoids this problem. 
-In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, where $\g$ is the admixture proportion of population 3. 
-In all the previous examples (including the example in \figref{stru_lin_bad_example}), 
-computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mapping from $\eta\mapsto \g$,
+In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, with $\g$ being the admixture proportion of population 3. 
+In all the previous examples 
+(including the example in \figref{stru_lin_bad_example}), 
+computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mapping from $\eta\mapsto\g(\eta)$,
 does no worse, and is usually better,
 than the fully linearized version, $\glin(\t)$---as can be seen by drawing tangent lines of the refitted curve at
 $\alpha = \alpha_0$ or $t = 0$
@@ -493,11 +515,11 @@ this is not guaranteed to always be true.
     Shown are logit-stick location parameters (top row) and
     inferred admixtures (bottom row)
     for individual $n = 74$ and populations $k = 1, 2$ and $3$. 
-    In dashed red is the approximation formed by linearizing the
+    Dashed red is the approximation $\\glin(\\t)$ formed by linearizing the
     inferred admixture $\\mathbb{E}_{\\q}[\\pi_{\\n\\k}]$ with respect to prior
-    parameter $t$.
+    parameter $t$. 
     On the admixture proportion of population 3, 
-    this approximation outperforms linearizing the variational parameters only. ")
+    $\\glin(\\t)$ outperforms $\\g(\\etalin(\\t))$ (solid red). ")
 
 SetImageSize(aspect_ratio = base_aspect_ratio * 0.85)
 @
