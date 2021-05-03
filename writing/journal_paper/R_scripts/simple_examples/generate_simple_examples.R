@@ -259,9 +259,32 @@ grid.arrange(
 )
 
 
+df_distant <-
+    data.frame(theta=theta_grid, p=pball) %>%
+    mutate(p1=ifelse(abs(theta - 0.25) > 0.005, p, 0.01)) %>%
+    mutate(p1=p1 * sum(p) / sum(p1))
+
+
+if (FALSE) {
+    grid.arrange(
+        ggplot(df_distant, aes(x=theta)) +
+            geom_line(aes(y=p), color="blue"),
+        ggplot(df_distant, aes(x=theta)) +
+            geom_line(aes(y=p1), color="blue"),
+        ncol=2
+    )
+
+    ggplot(df_distant, aes(x=theta)) +
+        geom_line(aes(y=0.96 * p), color="blue") +
+        geom_line(aes(y=p1), color="red") + ylab(NULL)
+}
+
+
+
 if (FALSE) {
     save(dens_min, theta_max, df,
          ball_width, df_ball,
+         df_distant,
          file=file.path(data_path, "function_paths.Rdata"))
 }
 

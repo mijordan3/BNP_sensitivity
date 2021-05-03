@@ -45,7 +45,7 @@ two.  We could then attempt to apply \thmref{etat_deriv} using $\pstick(\nu \ver
 %
 \end{align*}
 %
-However, we might just as well have defined the mixture in the log densities:
+However, we might alternatively have defined the mixture in the log densities:
 %
 \begin{align*}
 %
@@ -59,32 +59,38 @@ Again, $\p_{mult}(\theta \vert \t=0) = \pbase(\theta)$, $\p_{mult}(\theta \vert
 \t=1) = \palt(\theta)$, and $\p_{mult}(\theta \vert \t)$ interpolates smoothly
 between the two.
 
-\FunctionPathsFig{}
-\FunctionPathsMultFig{}
-\FunctionPathsLinFig{}
-
 Indeed, one may define a family of prior perturbations by adding the densities
 after transforming pointwise by any invertible transformation, and then
 transforming back into the original space.  We will consider (a generalization
 of) the family of ``nonlinear'' functional perturbations given by
-\citep{gustafson:1996:local}, corresponding to the power transformations, of
-which our examples $\p_{lin}$ and $\p_{mult}$ are the two extremes,
-corresponding to $p=1$ and $p=\infty$, respectively.
+\citep{gustafson:1996:local}, of which our examples $\p_{lin}$ and $\p_{mult}$
+are the two extremes, corresponding to $p=1$ and $p=\infty$, respectively.
+
+Below, we will take $\lambda$ to denote the Lebesgue measure on the Borel sets
+of $\thetadom \subseteq \mathbb{R}^{\thetadim}$.  We will be interested in
+densities with respect to $\lambda$, expressed as Radon-Nikodym derivatives,
+though it will be convenient to use the same notation for a density and for the
+measure induced by the density.  Specifically, for a $\lambda$-measurable set
+$S$, and a Radon-Nikodym derivative $f$ defined with respect to $\lambda$, we
+will write $f(S) = \int_{\theta \in S} f(\theta) \lambda(d\theta)$.  Similarly,
+for two densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
+\Rightarrow f(S) = 0$ for all $\lambda$-measurable sets $S$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_nl_pert}
 %
-Fix $\pbase(\theta)$, a density with respect to a probability measure $\lambda$,
-and fix $1 \le p \le \infty$.  For any $\phi(\theta)$ for which the expressions
-are well-defined, let
+Let $\mu$ denote a measure with $\mu \ll \lambda$, and fix $\pbase(\theta)$, a
+density with respect to $\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$.
+Let $p \in [1, \infty]$.  For any $\phi(\theta)$ for which the expressions are
+well-defined, let
 %
 \begin{align*}
 %
 \rho(\theta \vert \phi) :={}& \begin{cases}
 %
 \pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)
-    & \textrm{when }p < \infty \\
+    & \textrm{when }p \in [1, \infty) \\
 \pbase(\theta)\exp(\phi(\theta))
     & \textrm{when }p = \infty
 %
@@ -105,26 +111,238 @@ are well-defined, let
 We have specified \defref{prior_nl_pert} in terms of the general function
 $\phi(\theta)$ rather than an alternative $\palt(\theta)$.  The reason is so
 that the perturbed prior $\p(\theta \vert \phi)$ is well-defined for $\phi$ that
-may not be probabilities densities.  As we now show, this allows us to embed
-$\phi$ in a vector space, in which $\p(\theta \vert \phi)$ is well-defined in an
-open neighborhood of the zero function.  Nothing has been lost, however, since
-one can extrapolate to any alternative density $\palt(\theta)$ by taking
+may not be probabilities densities.  As we will soon show, this allows us to
+embed $\phi$ in a vector space, in which $\p(\theta \vert \phi)$ is well-defined
+in an open neighborhood of the zero function.
+
+Nothing has been lost, however, since one can extrapolate to any alternative
+density $\palt(\theta)$ by taking $\phi$ as given in the following definition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{defn}\deflabel{prior_pert_class}
+%
+Fix the quantities in \defref{prior_nl_pert}.  Fix a density $\palt(\theta)$
+with respect to $\mu$, with $\palt \ll \pbase$. For a given $\beta > 0$, let
 %
 \begin{align}
 %
-\alpha  >{} 0 \mathand
-\phi(\theta) ={}
+\phi(\theta | \beta, \palt) :={}
 \begin{cases}
-\alpha \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}
-    & \textrm{when }p < \infty \\
-\alpha \log \palt(\theta) - \log \pbase(\theta)
+\beta \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}
+    & \textrm{when }p \in [1, \infty) \\
+\log \palt(\theta) - \log \pbase(\theta) + \log \beta
     & \textrm{when }p = \infty.
 \end{cases} \eqlabel{phi_for_palt}
 %
 \end{align}
 %
-The fact that we are free to choose $\alpha$ follows from the fact that we
-normalize after perturbing.
+Similarly, define
+%
+\begin{align*}
+%
+\pertset := \bigg\{&
+    \phi:  \phi(\theta | \beta, \palt) %\\&
+    \textrm{ for some }\beta > 0\textrm{ and some density }\palt \ll \pbase
+\bigg\}.
+%
+\end{align*}
+%
+Then $\p(\theta \vert \t \phi(\cdot \vert \beta, \palt))$ equals $\pbase$
+at $\t = 0$ and $\palt$ at $\t = 1$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}\exlabel{phi_for_beta}
+%
+Take $\pbase(\theta) = \betadist{\theta \vert 1, \alpha_0}$ and
+$\palt(\theta) = \betadist{\theta \vert 1, \alpha_1}$.  Then
+$\thetadom=[0,1]$ and $\lambda$ is the Lebesgue measure on $[0,1]$, so
+%
+\begin{align*}
+%
+\pbase(\theta) ={}&
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)} (1 - \theta)^{\alpha_0 - 1}.
+%
+\end{align*}
+%
+Then, for $p = 1$,
+
+\begin{align}\eqlabel{phi_beta_p1}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+    p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+        (1 - \theta)^{\alpha_1 - 1} -
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+        (1 - \theta)^{\alpha_0 - 1}.
+%
+\end{align}
+%
+Note that, when $\t = 1$, the normalizing constant and $\beta$ cancel in the
+normalization of $\p(\theta \vert \t \phi)$:
+%
+\begin{align*}
+%
+\p(\theta \vert \phi(\theta \vert \beta, \palt)) =
+\frac{p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+        (1 - \theta)^{\alpha_1 - 1}}
+     {p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+       \int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}
+=
+\frac{(1 - \theta)^{\alpha_1 - 1}}
+     {\int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}.
+%
+\end{align*}
+%
+For this reason, we are free to choose $\beta > 0$ in \defref{prior_pert_class}
+and still extrapolate to the same $\palt$ when $\t = 1$.
+
+When $p = \infty$,
+%
+\begin{align}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+    \log \left(
+        \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
+    \right)  + (\alpha_1 - 1) \log (1 - \theta) - \nonumber\\
+{}&
+    \log \left(
+        \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+    \right) + (\alpha_0 - 1) \log (1 - \theta)  + \log \beta \nonumber\\
+={}&
+\log \left(
+    \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
+\right) -
+\log \left(
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+\right) + \log \beta + (\alpha_1 - \alpha_0) \log(1 - \theta).
+\eqlabel{phi_beta_pinf}
+%
+\end{align}
+%
+For $p = \infty$, the normalizing constant and $\beta$ cancel for all $\t$:
+%
+\begin{align*}
+%
+\p(\theta \vert \t \phi(\theta \vert \beta, \palt)) ={}&
+\frac{  \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+        (1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}
+    }
+    {
+        \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+             \int_0^1 (1-\theta')^{\alpha_0 (1 - \t) +
+                                   \alpha_1 \t} \lambda(d\theta')
+     }
+\\={}&
+\frac{(1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}}
+     {\int_0^1 (1-\theta')^{\alpha_0 (1 - \t) + \alpha_1 \t} \lambda(d\theta')}.
+%
+\end{align*}
+%
+\end{ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{phi_negative}
+%
+The perturbation $\phi(\theta)$ as given by \defref{prior_pert_class} can be
+negative. Take $\thetadom = [0,1]$ and let $\pbase(\theta) = 1$. Let us choose a
+$\palt(\theta)$ that shifts mass away from a small region next to zero.
+Specifically, for  $\delta \in (0, 1)$ and $\epsilon \in (0, 1)$, let
+%
+\begin{align*}
+%
+\palt(\theta) :={}&
+    \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right)
+        \ind{\epsilon \le \nu \le 1} +
+    \delta \ind{0 \le \nu \le \epsilon}.
+%
+\end{align*}
+%
+% where the final approximation is due to the smallness of $\epsilon$.
+Then \eqref{phi_for_palt} gives, for $p \in [0, \infty)$ and any $\beta > 0$,
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \left( p \beta\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p}
+        - 1
+    \right)
+        \ind{\epsilon \le \theta \le 1} +
+    \left(p \beta \delta^{1/p} - 1 \right) \ind{0 \le \theta \le \epsilon}.
+%
+\end{align*}
+%
+When $\beta < \frac{1}{p} \delta^{-1/p}$, then $\phi(\theta)$ is negative for
+$\theta \in (0, \epsilon)$.  Similarly, when $p = \infty$,
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \ind{\epsilon \le \nu \le 1}
+        \log \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right) +
+    \ind{0 \le \nu \le \epsilon} \log \delta + \log \beta,
+%
+\end{align*}
+%
+so $\phi(\theta)$ is negative for $\theta \in (0, \epsilon)$ when
+$\beta < \delta$.
+
+\end{ex}
+
+\begin{ex}
+%
+In \exref{phi_negative}, one could choose $\beta$ sufficiently large that
+$\phi(\theta)$ is non-negative everywhere, but at the cost of making
+$\phi(\theta)$ large on $\theta \in (\epsilon, 1)$. However, it is not always
+possible to choose $\beta$ large enough to guarantee positive $\phi(\theta)$.
+For example, again take $\thetadom=[0,1]$, and let
+%
+\begin{align*}
+%
+\pbase(\theta) ={} 2 \theta^{-1/2} \mathand
+\palt(\theta) ={} 1.
+%
+\end{align*}
+%
+Then
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+\begin{cases}
+        p\beta - 2 \theta^{-1/2} & \textrm{for }p \in [0, \infty) \\
+        \frac{1}{2} \log \theta + \log 2 + \log \beta
+            & \textrm{for }p = \infty
+\end{cases}.
+%
+\end{align*}
+%
+For this perturbation, $\inf_\theta \phi(\theta) = -\infty$ irrespective
+of $p$ or $\beta$, and no choice of $\beta$ can induce a change from
+$\pbase$ to $\palt$ with a positive $\phi(\theta)$.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}
+%
+Take $\thetadom = [0,1]$.  The pair $\pbase(\theta)  = \frac{1}{2}\ind{\theta < 1/2}$
+and $\palt(\theta) = \frac{1}{2} \ind{\theta > 1/2}$ are disallowed
+by \defref{prior_pert_class} because we do not have $\palt \ll \pbase$.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 The classes of perturbations given in \defref{prior_nl_pert} have a natural
@@ -135,32 +353,185 @@ define.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{defn}\deflabel{lp_spaces}
+\citep[Sections 5.1-5.2]{dudley:2018:real}
 %
-For a probability measure $\lambda$ on $(0,1)$ and $1 \le p \le \infty$, let
-$\lp{\lambda,p}$ define the space of $\lambda$-integrable functions from
-$(0,1)\mapsto\mathbb{R}$ with
+For a measure $\mu$ and $p \in [1, \infty]$, let $\lp{\mu,p}$ define the
+space of equivalence classes of real-valued $\mu$-measurable functions,
+where two functions are equivalent if they disagree only on a set of
+$\mu$-measure zero.
+
+Let $\esssup_\theta^\mu$ denote the essential supremum over $\theta$ with
+respect to the measure $\mu$. The norm on $\lp{\mu,p}$ is given by
 %
 \begin{align*}
 %
-\norm{\phi}_{\lambda,p} :={}&
+\norm{\phi}_{\mu,p} :={}&
 \begin{cases}
-    \left(\int \abs{\phi(\theta)}^p \lambda(d\theta)\right)^{1/p}
-    & \textrm{when }1\le p < \infty\\
+    \left(\int \abs{\phi(\theta)}^p \mu(d\theta)\right)^{1/p}
+    & \textrm{when }p \in [1, \infty)\\
     \esssup_{\theta} \abs{\phi(\theta)}
-    & \textrm{when }p = \infty.
-\end{cases}
+    & \textrm{when }p = \infty
+\end{cases}\\
+%
+\phi \in \lp{\lambda,p} \Leftrightarrow{}& \norm{\phi}_{\lambda,p} < \infty.
 %
 \end{align*}
 %
-When $\lambda$ is proportional to the  Lebesgue measure on $[0,1]$, we may
-simply write $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
+When $\mu$ is the Lebesgue measure, we may simply write $\lp{\lambda,p} =
+\lp{p}$ and $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
 %
-By \citep[Theorem 5.2.1]{dudley:2018:real}, $\lp{\lambda,p}$ is a Banach
-space (i.e., a complete, normed vector space).
+Let $\ball_{\mu,p}(\epsilon) := \{\phi: \phi \in \lp{\mu, p},
+\norm{\phi}_p < \epsilon \}$ denote the $\epsilon$-ball in $\lp{\mu, p}$.
 %
 \end{defn}
 
+By \citep[Theorem 5.2.1]{dudley:2018:real}, $\lp{\mu,p}$ is a Banach
+space (i.e., a complete, normed vector space).
+
+The following lemma is due to \citep{gustafson:1996:local}, and provides
+a key part of the motivation for the use of $\norm{\cdot}_{\mu,p}$ to measure
+the size of prior perturbations.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pert_invariance}
+%
+(\citet{gustafson:1996:local})
+%
+Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
+measure $\p \ll \mu$, the map $\p \mapsto \norm{\phi(\cdot \vert \beta,
+\p)}_p$ does not depend on $\mu$, and is invariant to invertible transformations
+of $\theta$.
+%
+\seeproof{pert_invariance}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{pert_well_defined}
+%
+Fix the quantities given in \defref{prior_nl_pert}.  Let
+%
+\begin{align*}
+%
+\mathscr{P}_{\pbase,p} :={}&
+    \left\{ \ptil: \ptil = \ptil(\theta \vert \t \phi) \textrm{ for some }
+        \phi \in \pertset \textrm{ and } \t \in [0, 1]
+    \right\} \\
+\mathscr{P}_{\mathrm{valid}} :={}&
+    \left\{ \ptil:
+        \ptil \ll \pbase \textrm{, }
+        \ptil(\theta) \ge 0 \textrm{ and }
+        0 < \int \ptil(\theta) \lambda(d\theta) < \infty
+    \right\}.
+%
+\end{align*}
+%
+$\mathscr{P}_{\pbase,p}$ is equivalent to the set of all unnormalized priors
+that can be formed from $\phi \in \pertset$.  $\mathscr{P}_{\mathrm{valid}}$ is
+the set of all valid unnormalized priors---i.e., priors that are non-negative
+and can be normalized.
+
+We have the following relations:
+%
+\begin{enumerate}
+%
+    \item \itemlabel{perts_are_priors}
+    For all $p \in [0, \infty]$,
+    $\mathscr{P}_{\mathrm{valid}} = \mathscr{P}_{\pbase,p}$.
+%
+    \item \itemlabel{perts_vs_ball_p}
+    TODO: this is not right.  The point is that the ball is normalizable
+    but not positive, and the perturbations have finite norm.
+    If $p \in [1, \infty)$, then $\mathscr{P}_{\pbase,p} \subset \ball_{p}(p)$.
+%
+    \item \itemlabel{perts_vs_ball_pinf}
+    If $p = \infty$, $\lp{\infty} \subset \mathscr{P}_{\pbase,\infty}$.
+%
+\end{enumerate}
+%
+\seeproof{pert_well_defined}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
+\begin{ex}\exlabel{beta_inf_norm}
+%
+It is possible for $\phi \in \pertset[\infty]$ to have $\norminf{\phi} =
+\infty$, and so $\phi \notin \lp{\lambda,\infty}$.  Take $\lambda$ to be the
+Lebesgue measure on $[0,1]$, let $\pbase(\theta) = \betadist{\theta \vert 1,
+\alpha_0}$ and $\palt(\theta) = \betadist{\theta \vert 1, \alpha_1}$ for
+$\alpha_0 \ne \alpha_1$.  Then $\phi(\theta) = (\alpha_1 - \alpha_0) \log(1 -
+\theta) \log(1 - \theta)$
+%
+and
+%
+\begin{align*}
+%
+\norminf{\phi} =
+    \abs{\alpha_1 - \alpha_0} \sup_{\theta \in [0,1]} \abs{\log(1 - \theta)} =
+    \infty.
+%
+\end{align*}
+%
+\end{ex}
+% /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
+\begin{ex}\exlabel{lp_negative}
+%
+Suppose $\pbase$ induces a continuous measure, i.e., there exists a sequence
+$\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a sequence of corresponding
+sets such that $\pbase(S_n) = \epsilon_n$.  Then, for $1 \le p < \infty$, it is
+possible for $\phi \in \ball_{\lambda,p}(\epsilon)$ for arbitrarily small
+$\epsilon$ and yet have $\essinf_{\theta} \p(\theta \vert \phi) < 0$.
+
+Take
+%
+%\begin{align*}
+%
+$\phi_n(\theta) := - \frac{2}{p} \pbase(\theta)^{1/p} \ind{\theta \in S_n}$.
+%
+%\end{align*}
+%
+Then $\norm{\phi_n}_{\lambda, p} = \frac{2}{p} \epsilon_n^{1/p} \rightarrow 0$
+and
+%
+\begin{align*}
+%
+\pbase(\theta)^{1/p} + p \phi(\theta) ={}
+\pbase(\theta)^{1/p}
+\left(\ind{\theta \notin S_n} - \ind{\theta \in S_n} \right)
+%
+\end{align*}
+%
+so $\essinf_\theta \p(\theta \vert \phi_n) < 0$ for all $n$.
+%
+\end{ex}
+% /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In view of \exref{beta_inf_norm} and \lemref{pert_well_defined},
+$\pertset{\infty} \supset \ball_{\lambda,\infty}(\epsilon)$ for all $\epsilon >
+0$. In view of \exref{lp_negative} and \lemref{pert_well_defined}, $\pertset
+\subset \ball_{\lambda,\infty}(\epsilon)$ for all $\epsilon > 0$ and $p <
+\infty$.
+
+
+-----------------------------
+-----------------------------
+
 
 For any $p$, the transformation given in \defref{prior_nl_pert} and the norm
 defined in \defref{lp_spaces} jointly specify a ``size'' of a particular
@@ -169,48 +540,6 @@ attractive properties: \citep[Result 2]{gustafson:1996:local} observes that this
 notion of ``size'' is a norm, invariant to changes in the base measure, and
 invariant under measurable one-to-one re-parameterizations (where the measure
 $\lambda$ is transformed to the push-forward measure of the reparameterization).
-
-In a sense, we don't care about all of $\lp{\lambda,p}$, nor do we even care
-about a unit ball of $\lp{\lambda,p}$; we care about $\phi$ that can be
-used to interpolate from one prior to another.  To that end, define
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{defn}
-%
-Fix $1 \le p < \infty$, $\lambda$ and $\pbase$ as in \defref{prior_nl_pert}.
-If $p < \infty$ define
-%
-\begin{align*}
-%
-\pertset := \bigg\{&
-    \phi:     \phi \in \lp{\lambda, p} \textrm{ and }
-    \phi(\theta) = \alpha \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}\\&
-    \textrm{ for some }\alpha > 0\textrm{ and some density }\palt
-\bigg\}.
-%
-\end{align*}
-%
-For notational convenience, when $p = \infty$, we simply take $\pertset =
-\lp{\lambda, \infty}$.\footnote{
-Observe that
-%
-%\begin{align*}
-%
-$\phi(\theta) = \alpha \log \palt(\theta) - \log \pbase(\theta) \Rightarrow
-\palt(\theta) = \exp(\phi(\theta) / \alpha) \pbase(\theta)^{1/\alpha}.$
-%
-%\end{align*}
-%
-Since $\int \pbase(\theta)^{1/\alpha} \lambda(d\theta)$ may be $\infty$, in
-general, there exist $\phi(\theta)$ which are of the form \eqref{phi_for_palt}
-when $p=\infty$.  It turns out that a restricted $\pertset$ will not be a useful
-concept when $p=\infty$, however.}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 It is also desirable that perturbations which are bounded in
 $\norm{\cdot}_{\lambda,p}$ lead to proper priors.  On this point we deviate from
@@ -227,74 +556,9 @@ treats ablating and adding prior mass very asymmetrically when $p < \infty$,
 arguably violating an intutive notions of the ``size'' of perturbation, though
 we defer a detailed discussion of this point to \appref{positive_pert}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
-\begin{ex}
-%
-When $\lambda$ is a continuous measure, then for any $1 \le p < \infty$, any
-$\t > 0$, and any $0 < M < \infty$, and we can find a $\phi$ such
-that
-%
-\begin{align*}
-%
-\norm{\phi}_{\lambda, p} \le \epsilon
-\mathand
-\essinf_{\theta} \phi(\theta) = -M.
-%
-\end{align*}
-%
-Since $\lambda$ is a continuous measure, for any $\epsilon' > 0$, there exists
-an $S_{\epsilon'}$ such that $\lambda(S_{\epsilon'}) = \epsilon'$.  For any such
-$\epsilon'$, take $\phi(\theta) = \ind{\theta \in S_{\epsilon'}} M$, so that
-$\essinf_{\theta} \phi(\theta) = -M$. Take $\epsilon' = (\epsilon / \abs{M})^p$.
-Then $\norm{\phi}_{\lambda,p} = (\epsilon \abs{M})^{1/p} = \epsilon$.
-%
-\end{ex}
-% /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We argue that pointwise negative priors are no substantive problem, as long as
-normalizing integral is neither zero nor infinity, and as long as we do not
-extrapolate to negative alternatives $\palt(\theta)$.  (Indeed, embedding
-statistical problems in non-statisical vectors spaces is a venerable technique
-when applying functional analysis to statistics, see, e.g., \citet[Chapter
-6]{serfling:2009:approximation}.)  In order to permit negative $\phi$, we thus
-state the following generalization of \citep[Result 2]{gustafson:1996:local}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}\lemlabel{pert_well_defined}
-%
-Fix a $1 \le p < \infty$ and $\pbase(\theta)$ as in \defref{prior_nl_pert}.
-For any $\phi \in \lp{\lambda,p}$ and $\norm{\phi}_{\lambda,p} < p$, then
-%
-\begin{align*}
-%
-0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty,
-%
-\end{align*}
-%
-so that $\int p(\theta \vert \phi) \lambda(d\theta) = 1$.
-
-Furthermore, for any $1 \le p \le \infty$, when $\phi \in \pertset$ and $0 \le
-\t \le 1$, then
-%
-\begin{align*}
-%
-\ptil(\theta \vert \t \phi) \ge{}& 0 \mathand\\
-0 < \int \ptil(\theta \vert \t \phi) \lambda(d\theta) < \infty.
-%
-\end{align*}
-%
-(For a proof see \appref{proofs} \proofref{pert_well_defined}.)
-%
-\end{lem}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
+-----------------------------
+-----------------------------
 
 For any particular $\phi$, we can apply \thmref{etat_deriv}.
 %  Note that the

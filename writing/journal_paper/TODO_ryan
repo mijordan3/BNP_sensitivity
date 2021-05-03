@@ -21,3 +21,5 @@ When using MoveEqLeft precede lines with the inequalties
 Put back in the factor of p^{-1} in the NL perturbation
 
 Drop the rho from the defintion of the nonlinear perturbations
+
+Don't use alpha in \pertset; reserve it for stick breaking

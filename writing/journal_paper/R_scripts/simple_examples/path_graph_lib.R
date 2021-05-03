@@ -34,6 +34,6 @@ FuncPathPlot <- function() {
   ggplot(df, aes(color=t, group=t, x=theta)) +
     theme(legend.position="none") +
     scale_color_gradient(low="light blue", high="blue") +
-    xlab("stick length") +
+    xlab("stick propn") +
     get_fontsizes()
 }

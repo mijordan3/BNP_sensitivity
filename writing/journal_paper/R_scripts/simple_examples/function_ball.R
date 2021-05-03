@@ -8,7 +8,7 @@ BaseBallPlot <- function(base_var) {
   ggplot(df_ball, aes(x=theta)) +
       geom_ribbon(aes(ymin=get(base_lower), ymax=get(base_upper)),
                   fill="gray", alpha=0.6, color="dark gray") +
-      xlab("stick length") +
+      xlab("stick propn") +
       geom_line(aes(y=get(base_var))) +
       get_fontsizes()
 }
