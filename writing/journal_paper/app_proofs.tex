@@ -203,7 +203,90 @@ $\mu'(d\theta)$, respectively.
 \begin{proof}\prooflabel{pert_well_defined}
 \proofof{\lemref{pert_well_defined}}
 %
-First, consider the case of general $\phi$ with $1 \le p < \infty$. By Jensen's
+First, consider \itemref{perts_are_priors}. It is clear that
+$\mathscr{P}_{\mathrm{valid}} \subseteq \mathscr{P}_{\pbase,p}$, since one can
+simply take $\t = 1$ for any $\palt \in \mathscr{P}_{\mathrm{valid}}$.  To show
+that $\mathscr{P}_{\pbase,p} \subseteq \mathscr{P}_{\mathrm{valid}}$, it will
+suffice to show that any element of $\mathscr{P}_{\pbase,p}$ is non-negative and
+can be normalized.
+
+Take $p \in [1, \infty)$ with $\phi \in \pertset$.  By definition, for $\phi \in
+\pertset$, there exist $\beta > 0$, $\t \in [0,1]$, and $\palt(\theta)$ such
+that
+%
+\begin{align*}
+%
+\pbase(\theta)^{1/p} + \frac{1}{p} \phi(\theta) ={}&
+    \t \beta \palt(\theta)^{1/p} + (1- \t) \pbase(\theta)^{1/p}.
+%
+\end{align*}
+%
+From this it follows that $\ptil(\theta \vert \t \phi) \ge 0$, since $\t \in
+[0,1]$.  Furthermore, for the same $\phi$,
+%
+\begin{align*}
+%
+\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
+\int \left(\t \beta \palt(\theta)^{1/p} +
+           (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
+\\\ge{}&
+\t^p \beta^p \int \palt(\theta) \mu(d\theta) +
+    (1- \t)^p \int \pbase(\theta) \mu(d\theta)
+\\={}& \t^p \beta^p + (1- \t)^p > 0,
+%
+\end{align*}
+%
+and, by Jensen's inequality,
+%
+\begin{align*}
+%
+\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
+2^p \int \left(\frac{1}{2} \t \beta \palt(\theta)^{1/p} +
+           \frac{1}{2} (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
+\\\le{}&
+%
+2^{p-1} \left(
+    \t^p \beta^p \int \palt(\theta) \mu(d\theta) +
+    (1- \t)^p \int  \pbase(\theta)\mu(d\theta)
+\right)
+\\={}& 2^{p-1} \left( \t^p \beta^p + (1- \t)^p\right) < \infty.
+%
+\end{align*}
+
+For $p = \infty$ and $\phi \in \pertset[\infty]$, it is clear that $\ptil(\theta
+\vert \phi) = \pbase(\theta) \exp(\phi(\theta)) \ge 0$. As above, since $\phi
+\in \pertset[\infty]$, there exist $\palt$, $\beta > 0$, and $\t \in [0,1]$ such
+that
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \t \log \palt(\theta) - (1-\t)\log \pbase(\theta) + \log \beta \Rightarrow\\
+%
+\int \ptil(\theta \vert \phi)\mu(d\theta) ={}&
+    \beta \int \palt(\theta)^\t \pbase(\theta)^{1 - \t}\mu(d\theta)
+\\={}&
+\beta \int \pbase(\theta)
+    \left( \frac{\palt(\theta)}{\pbase(\theta)}\right)^\t \mu(d\theta)
+\\\le{}&
+\beta \int \pbase(\theta)
+    \frac{\palt(\theta)}{\pbase(\theta)}
+    \ind{\palt(\theta) \ge \pbase(\theta)} \mu(d\theta) +
+\\&
+  \beta \int \pbase(\theta)
+    \ind{\palt(\theta) < \pbase(\theta)} \mu(d\theta)
+\\\le{}& 2\beta.
+%
+\end{align*}
+%
+This concludes the proof of \itemref{perts_are_priors}.
+
+For \itemref{perts_vs_ball_p}, we show that, when $p \in [1, \infty)$ and
+$\norm{\phi}_{\mu,p} < p$, then $\p(\theta \vert \phi)$ is normalizable. Um but
+that is not necessary.  All we need to do is show that if $\phi \in \pertset$
+then $\norm{\phi}_{\mu,p} < \infty$.
+
+First, consider the case of general $\phi$ with $p \in [1, \infty)$. By Jensen's
 inequality applied pointwise to the convex function $x \mapsto x^p$,
 %
 \begin{align*}
@@ -287,48 +370,9 @@ We can thus write
 %
 The final line is non-negative when $\norm{\phi}_p \le p$.
 
-Next, consider $1 \le p < \infty$ with $\phi \in \pertset$.  By definition,
-for $\phi \in \pertset$, there exist $\alpha$ and $\palt(\theta)$ such that
-%
-\begin{align*}
-%
-\rho(\theta \vert \t \phi) ={}&
-    \pbase(\theta)^{1/p} + \t \phi(\theta)
-\\={}& \t \alpha \palt(\theta)^{1/p} + (1- \t) \pbase(\theta)^{1/p}.
-%
-\end{align*}
-%
-From this it follows that $\ptil(\theta \vert \t \phi) \ge 0$, since $0 \le t
-\le 1$.  Furthermore,
-%
-\begin{align*}
-%
-\int \palt(\theta \vert \t \theta) \lambda(d\theta) ={}&
-\int \left(\t \alpha \palt(\theta)^{1/p} +
-           (1- \t) \pbase(\theta)^{1/p} \right)^{p} \lambda(d\theta)
-\\\ge{}&
-\t^p \alpha^p \int \palt(\theta) \lambda(d\theta) +
-    (1- \t)^p \int \pbase(\theta) \lambda(d\theta)
-\\={}& \t^p \alpha^p + (1- \t)^p > 0,
-%
-\end{align*}
-%
-and, by Jensen's inequality,
-%
-\begin{align*}
-%
-\int \palt(\theta \vert \t \theta) \lambda(d\theta) ={}&
-2^p \int \left(\frac{1}{2} \t \alpha \palt(\theta)^{1/p} +
-           \frac{1}{2} (1- \t) \pbase(\theta)^{1/p} \right)^{p} \lambda(d\theta)
-\\\le{}&
-%
-2^{p-1} \left(
-    \t^p \alpha^p \int \palt(\theta) \lambda(d\theta) +
-    (1- \t)^p \int  \pbase(\theta)\lambda(d\theta)
-\right)
-\\={}& 2^{p-1} \left( \t^p \alpha^p + (1- \t)^p\right) < \infty.
-%
-\end{align*}
+
+
+
 
 Finally, consider $p = \infty$.  Since $\int \pbase(\theta) \lambda(d\theta) = 1$,
 %

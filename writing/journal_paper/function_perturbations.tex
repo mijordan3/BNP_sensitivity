@@ -421,21 +421,21 @@ Fix the quantities given in \defref{prior_nl_pert}.  Let
 %
 \mathscr{P}_{\pbase,p} :={}&
     \left\{ \ptil: \ptil = \ptil(\theta \vert \t \phi) \textrm{ for some }
-        \phi \in \pertset \mathtxt{ and } \t \in [0, 1]
+        \phi \in \pertset \textrm{ and } \t \in [0, 1]
     \right\} \\
 \mathscr{P}_{\mathrm{valid}} :={}&
     \left\{ \ptil:
-        \ptil \ll \pbase \mathtxt{, }
-        \ptil(\theta) \ge 0 \mathtxt{ and }
+        \ptil \ll \pbase \textrm{, }
+        \ptil(\theta) \ge 0 \textrm{ and }
         0 < \int \ptil(\theta) \lambda(d\theta) < \infty
     \right\}.
 %
 \end{align*}
 %
 $\mathscr{P}_{\pbase,p}$ is equivalent to the set of all unnormalized priors
-that can be formed from $\phi \in \pertset$, and $\mathscr{P}_{\mathrm{valid}}$,
-and $\mathscr{P}_{\pbase,p}$ is the set of all valid unnormalized priors---i.e.,
-priors that are non-negative and can be normalized.
+that can be formed from $\phi \in \pertset$.  $\mathscr{P}_{\mathrm{valid}}$ is
+the set of all valid unnormalized priors---i.e., priors that are non-negative
+and can be normalized.
 
 We have the following relations:
 %
@@ -446,12 +446,16 @@ We have the following relations:
     $\mathscr{P}_{\mathrm{valid}} = \mathscr{P}_{\pbase,p}$.
 %
     \item \itemlabel{perts_vs_ball_p}
+    TODO: this is not right.  The point is that the ball is normalizable
+    but not positive, and the perturbations have finite norm.
     If $p \in [1, \infty)$, then $\mathscr{P}_{\pbase,p} \subset \ball_{p}(p)$.
 %
     \item \itemlabel{perts_vs_ball_pinf}
     If $p = \infty$, $\lp{\infty} \subset \mathscr{P}_{\pbase,\infty}$.
 %
 \end{enumerate}
+%
+\seeproof{pert_well_defined}
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
