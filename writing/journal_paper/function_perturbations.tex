@@ -501,11 +501,11 @@ from any $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily large $\delta$.
 \begin{ex}\exlabel{beta_inf_norm}
 %
 It is possible for $\phi \in \pertset[\infty]$ to have $\norminf{\phi} =
-\infty$, and so $\phi \notin \lp{\lambda,\infty}$.  Take $\lambda$ to be the
+\infty$, and so $\phi \notin \lp{\lambda,\infty}$.  Take $\mu$ to be the
 Lebesgue measure on $[0,1]$, let $\pbase(\theta) = \betadist{\theta \vert 1,
 \alpha_0}$ and $\palt(\theta) = \betadist{\theta \vert 1, \alpha_1}$ for
-$\alpha_0 \ne \alpha_1$.  Then $\phi(\theta) = (\alpha_1 - \alpha_0) \log(1 -
-\theta) \log(1 - \theta)$
+$\alpha_0 \ne \alpha_1$.  Then we can choose $\beta$ such that $\phi(\theta) =
+(\alpha_1 - \alpha_0) \log(1 - \theta)$
 %
 and
 %
@@ -525,13 +525,17 @@ and
 % \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/
 \begin{ex}\exlabel{lp_negative}
 %
-Suppose $\pbase$ induces a continuous measure, i.e., there exists a sequence
-$\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a sequence of corresponding
-sets such that $\pbase(S_n) = \epsilon_n$.  Then, for $1 \le p < \infty$, it is
-possible for $\phi \in \ball_{\lambda,p}(\epsilon)$ for arbitrarily small
-$\epsilon$ and yet have $\essinf_{\theta} \p(\theta \vert \phi) < 0$.
+For $1 \le p < \infty$, it is possible for $\phi \in
+\ball_{\mu,p}(\epsilon)$ for arbitrarily small $\epsilon$ and yet have
+$\essinf^\mu_{\theta} \p(\theta \vert \phi) < 0$.
 
-Take
+Take $\mu$ to be the Lebesgue measure, $\lambda$ (by \lemref{pert_invariance},
+this is no loss of generality).  Since $\pbase \ll \lambda$, there exists a
+sequence $\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a sequence of
+corresponding sets such that $\pbase(S_n) = \epsilon_n$. (See
+\lemref{continuity_partition} for a proof of this fact, which is a
+straightforward consequence of \citet[Proposition 15.5]{nielsen:1997:measure}
+and the continuity of the Lebesgue measure.)  Take
 %
 %\begin{align*}
 %
