@@ -415,46 +415,80 @@ of $\theta$.
 
 \begin{lem}\lemlabel{pert_well_defined}
 %
-Fix the quantities given in \defref{prior_nl_pert}.  Let
+Fix the quantities given in \defref{prior_nl_pert}.  An unnormalized prior
+$\ptil$ is valid if $\ptil \ll \pbase$ that is non-negative $\mu$-almost
+everywhere and normalizable in the sense that $0 < \int \ptil(\theta)
+\mu(d\theta) < \infty$.
+
+Furthermore, the following table summarizes properties of priors derived from
+$\phi \in \ball_{\mu,p}$ and from $\phi \in \pertset$.  The columns are
+shorthand for the following properites:
 %
 \begin{align*}
 %
-\mathscr{P}_{\pbase,p} :={}&
-    \left\{ \ptil: \ptil = \ptil(\theta \vert \t \phi) \textrm{ for some }
-        \phi \in \pertset \textrm{ and } \t \in [0, 1]
-    \right\} \\
-\mathscr{P}_{\mathrm{valid}} :={}&
-    \left\{ \ptil:
-        \ptil \ll \pbase \textrm{, }
-        \ptil(\theta) \ge 0 \textrm{ and }
-        0 < \int \ptil(\theta) \lambda(d\theta) < \infty
-    \right\}.
+\int \ptil < \infty \Rightarrow{}&
+    \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty\\
+\int \ptil > \infty \Rightarrow{}&
+    \int \ptil(\theta \vert \phi) \mu(d\theta) > 0\\
+\ptil \ge 0 \Rightarrow{}&
+    \essinf_\theta^\mu \ptil(\theta \vert \phi) \ge 0\\
+\norm{\phi} < \infty \Rightarrow{}&
+    \exists M < \infty \textrm{ independent of }\phi\textrm{ such that }
+    \sup_\phi \norm{\phi}_{\mu,p} < M.
 %
 \end{align*}
-%
-$\mathscr{P}_{\pbase,p}$ is equivalent to the set of all unnormalized priors
-that can be formed from $\phi \in \pertset$.  $\mathscr{P}_{\mathrm{valid}}$ is
-the set of all valid unnormalized priors---i.e., priors that are non-negative
-and can be normalized.
 
-We have the following relations:
-%
+A ``Y'' indicates that the columns property is satisfied for all $\phi$
+in the corresponding set.  For example, the ``Y'' in the first row and first
+column means that, for all $\phi \in \pertset$ with $p \in [1, \infty)$,
+$\int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$.  A ``N'' means the
+converse, i.e., that there exists some $\phi$ in the corresponding set
+that does not have the column's property.
+
+\begin{table}[h!]
+%\vspace{1em}
+\begin{centering}
+%\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{cccccc}
+    %\hline
+    && $\int \ptil < \infty$
+    & $\int \ptil > 0$
+    & $\ptil \ge 0$
+    & $\norm{\phi} < \infty$\\[0.5em] \hline
+$p \in [1, \infty)$   &     $\phi \in \pertset$ &
+    Y & Y & Y & Y, if $\beta < \infty$ \\ \hline
+$p \in [1, \infty)$   &     $\phi \in \ball_{\mu,p}(\delta)$ &
+    Y & Y, if $\delta < p$ & N & Y (by defn) \\ \hline
+$p = \infty$   &     $\phi \in \pertset[\infty]$ &
+    Y & Y & Y & N \\ \hline
+$p = \infty$   &     $\phi \in \ball_{\mu,\infty}(\delta)$ &
+    Y & Y & Y & Y (by defn) \\ \hline
+\end{tabular}
+\caption{The relationships between $\pertset$, $\ball_{\mu,p}$, and valid priors.
+The ball radius $\delta > 0$ can be any positive number.}
+\tablabel{pert_well_defined}
+\end{centering}
+%\vspace{1em}
+\end{table}
+
+\Tabref{pert_well_defined} has the following implications:
+
 \begin{enumerate}
 %
-    \item \itemlabel{perts_are_priors}
-    For all $p \in [0, \infty]$,
-    $\mathscr{P}_{\mathrm{valid}} = \mathscr{P}_{\pbase,p}$.
+\item For all $p \in [1, \infty]$, the set of priors that can be formed from
+$\phi \in \pertset$ is identical to the set of all valid priors.
 %
-    \item \itemlabel{perts_vs_ball_p}
-    TODO: this is not right.  The point is that the ball is normalizable
-    but not positive, and the perturbations have finite norm.
-    If $p \in [1, \infty)$, then $\mathscr{P}_{\pbase,p} \subset \ball_{p}(p)$.
+\item For $p \in [1, \infty)$, all valid priors can be formed from
+some $\phi \in \ball_{\mu,p}(\delta)$ for sufficiently large $\delta$.
 %
-    \item \itemlabel{perts_vs_ball_pinf}
-    If $p = \infty$, $\lp{\infty} \subset \mathscr{P}_{\pbase,\infty}$.
+\item For $p \in [1, \infty)$, one can form invalid (negative) priors from
+some $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily small $\delta$.
+%
+\item For $p = \infty$, there exist valid priors that cannot be formed
+from any $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily large $\delta$.
 %
 \end{enumerate}
-%
+
 \seeproof{pert_well_defined}
 %
 \end{lem}
