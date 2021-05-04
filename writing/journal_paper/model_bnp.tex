@@ -1,17 +1,16 @@
 We will consider discrete Bayesian nonparametric (BNP) generative models which
-draw data points $\x_n$ from one of a certain number of clusters indexed by $\k =
-1, \ldots, \kmax$, where in principle $\kmax$ might be infinity.  Each cluster
-is characterized by a vector $\beta_\k \in \betadom \subseteq
+draw data points $\x_n$ from one of a certain number of components indexed by $\k =
+1, \ldots, \kmax$, where in principle $\kmax$ might be infinity.
+Each component is characterized by a vector $\beta_\k \in \betadom \subseteq
 \mathbb{R}^{\betadim}$, with $\p(\x_n \vert \beta_\k)$ denoting the
-distribution of data arising from  cluster $\k$. We will model the $\beta_\k$
-as arising IID from a known prior $\beta_\k \iid \p(\beta_\k)$, and write
+distribution of data arising from  component $\k$. We will model the $\beta_\k$
+as arising IID from a known prior $\beta_\k \iid \pbeta(\beta_\k)$, and write
 $\beta = (\beta_1, \beta_2, \ldots)$.
 
-The cluster assignments are represented by indicator variables $\z_{\n\k} \in
-\{0, 1\}$, where $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise.  Let
-$\z_\n$ with a single index denote all the cluster indicators for a given
-datapoint, $\z_\n = (\z_{\n1}, \ldots, \z_{\n\kmax})$, and let $\z$ with no
-index denote the collection $\z = (\z_1, \ldots, \z_\N)$.  With $\z$ defined in
+Assignment of data point $\n$ to a mixture component is represented by a vector
+$\z_\n = (\z_{\n1}, \ldots, \z_{\n\kmax})$,
+where $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise.
+With $\z_\n$ defined in
 this way, we can write
 %
 \begin{align*}
@@ -22,10 +21,10 @@ this way, we can write
 \end{align*}
 
 
-The cluster assignments $\z_{\n}$ will be drawn according to the following
+The assignments $\z_{\n}$ are drawn according to the following
 ``stick-breaking process.''  Fix a density $\pstick(\cdot)$, with respect to the
-Lebesgue measure, over stick lengths $\nuk \in (0, 1)$ and draw $\nuk \iid
-\pstick(\nuk)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
+Lebesgue measure, over stick-breaking proportions $\nuk \in (0, 1)$ and
+draw $\nuk\iid\pstick(\nuk)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
 infinite number of IID sticks and the $\kmax - 1$ can be ignored; if $\kmax <
 \infty$, then we set $\nu_{\kmax} = 1$ for notational convenience below.  Given
 these stick lengths, we compute indicator probabilities by
@@ -45,14 +44,16 @@ where the empty product is taken to be equal to $1$. The convention $\nu_{\kmax}
 1$ allows us to use the same formula for all $\pi_\k$ when $\kmax < \infty$.
 Write $\nu := (\nu_1, \ldots, \nu_{\kmax})$ for the vector of all stick lengths
 and $\pi := (\pi_1, \ldots, \pi_\kmax)$ for the corresponding vector of
-proabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax =
-\infty$, and we draw $\z_\n$ according to
+probabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax =
+\infty$.  We draw $\z_\n$ according to
 %
 \begin{align*}
 %
-\p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \\
+% \p(\z_{\n\k} = 1 \vert \pi) ={}& \pi_\k \\
+% \p(\z_\n \vert \pi) ={}&
+%     \ind{\sum_{\k=1}^{\kmax} \z_{\n\k} = 1}
+%     \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
 \p(\z_\n \vert \pi) ={}&
-    \ind{\sum_{\k=1}^{\kmax} \z_{\n\k} = 1}
     \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
 %
 \end{align*}
@@ -60,25 +61,42 @@ proabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax
 Since $\pi$ is a deterministic function of $\nu$, we can also write
 $\p(\z_\n \vert \nu)$ with no ambiguity.
 
-The stick-breaking process can be though of as a map from  the stick
-distibution, $\pstick(\cdot)$, to a vector of probabilities, $\pi$. Different
-stick distributions will give different indicator probabilities, with different
-implied degrees of concentration.  A particularly common choice for
-$\pstick(\cdot)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
+The stick-breaking distribution $\pstick$ can be thought of as inducing a
+a distribution on the vector of probabilities $\pi$. Different
+stick-breaking distributions will favor different indicator probabilities
+with different implied degrees of concentration.
+A particularly common choice for
+$\pstick(\nuk)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
 %
 \begin{align*}
 %
 \mathrm{Beta}(\nuk \vert 1, \alpha) =
     \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
-         {\Gamma(\alpha)}
+         {\Gamma(\alpha)}.
 %
 \end{align*}
 %
-since this choice is equivalent to drawing $\pi$ from a Dirichlet process.
-In this case we can write $\pi \sim \mathrm{GEM}(\alpha)$.  TODO: probably
-this is not precisely correct.
+When $\pstick$ is Beta distributed
+and $\kmax=\infty$, the resulting distribution on $\pi$  is known as the
+$\textit{GEM distribution}$, and we write $\pi \sim \mathrm{GEM}(\alpha)$.
 
-For a fixed $\pstick(\cdot)$, we can thus write the joint distribution of
+The GEM distribution is closely related to the Dirichlet process.
+When $\pi \sim \mathrm{GEM}(\alpha)$ and
+$\beta_\k \iid \pbeta(\beta_\k)$,
+the random measure on $\betadom$
+\begin{align*}
+  \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
+\end{align*}
+with $\delta_{\beta_\k}$ denoting point mass at $\beta_\k$,
+is a draw from a Dirichlet process with concentration parameter $\alpha$
+and base measure $\pbeta$.
+
+We keep our notation for stick-breaking distributions $\pstick$ general however,
+because in our sensitivity analysis,
+we will consider stick-breaking distributions that are outside the
+family of Beta distributions.
+
+In this notation, we can write the joint distribution of
 the data and parameters as:
 %
 \begin{align}\eqlabel{bnp_model}
@@ -92,15 +110,15 @@ the data and parameters as:
 %     \sum_{k=1}^{\kmax} \left(
 %         \log \pstick(\nuk) + \logp(\beta_\k)
 %     \right).
-\MoveEqLeft
-\logp(\x, \beta, \z, \nu) ={}
-\nonumber\\&
-    \sum_{n=1}^N \sum_{k=1}^{\kmax}
-        \z_{\n\k} \left(
-            \logp(\x_n \vert \beta_\k) + \log \pi_\k
-        \right) +
+\logp(\x, \beta, \z, \nu) =&
+\sum_{n=1}^N \sum_{k=1}^{\kmax}
+    \z_{\n\k} \left(
+        \logp(\x_n \vert \beta_\k) + \log \pi_\k
+    \right)
+\nonumber\\
+   & +
     \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \logp(\beta_\k)
+        \log \pstick(\nuk) + \log \pbeta(\beta_\k)
     \right).
 %
 \end{align}
@@ -108,11 +126,12 @@ the data and parameters as:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}[Generative process]\exlabel{iris_bnp_process}
+\begin{ex}[Gaussian mixture model]\exlabel{iris_bnp_process}
 %
-For the iris data, $\x_\n \in \mathbb{R}^4$, and we will model the clusters as
-four dimensional Gaussians.  In this case, $\beta_\k = (\mu_k, \Sigma_\k)$,
-where $\mu_\k \in \mathbb{R}^4$, $\Sigma_\k$ is a a four by four positive
+The observations are vectors $\x_\n \in \mathbb{R}^\d$,
+and we model each component with multivariate Gaussians.
+In this case, $\beta_\k = (\mu_k, \Sigma_\k)$,
+where $\mu_\k \in \mathbb{R}^4$, $\Sigma_\k$ is a $\d\times\d$ positive
 definite covariance matrix, and
 %
 \begin{align*}
@@ -124,14 +143,140 @@ definite covariance matrix, and
     & \constdesc{\beta_\k}
 %
 \end{align*}
+Below, we fit a
+Gaussian mixture model (GMM) to the Fisher's iris data set CITE.
+Each observation is an iris flower with
+four measurements:
+sepal length, sepal width, petal length, and petal width.
+The components in this model can be interpreted as latent iris species;
+the inferential goal is to estimate $\z_\n$ and thus assign each
+observed flower to an iris species.
 
-For the iris data, we might imagine that each cluster corresponds to a different
-species with a different distribution of flower dimensions.  The BNP model
-implies that there are a potentially infinite number of differet iris species
-that we might observe.  Then $\z_{\n\k} = 1$ would mean that observation $\n$
-was a member of species $\k$, and $\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
-\z_{\n\k} > 1}$ is the number of distinct species observed in our particular
-dataset.
+% For the iris data, we might imagine that each cluster corresponds to a different
+% species with a different distribution of flower dimensions.  The BNP model
+% implies that there are a potentially infinite number of differet iris species
+% that we might observe.  Then $\z_{\n\k} = 1$ would mean that observation $\n$
+% was a member of species $\k$, and $\sum_{k=1}^\kmax \ind{ \sum_{n=1}^{N}
+% \z_{\n\k} > 1}$ is the number of distinct species observed in our particular
+% dataset.
 %
 \end{ex}
+
+We started with a Gaussian mixture model
+because it is the most generic model that fits cleanly into the
+generative process culminating in \eqref{bnp_model}.
+The next two examples on real data sets require more careful modeling considerations,
+and we adjust the factorization in in \eqref{bnp_model} to suit our purposes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}[Regression mixture model]\exlabel{mice_bnp_process}
+We cluster time-course gene expression data using a BNP model.
+An observation $\x_\n\in\mathbb{R}^\ntimepoints$ is a vector of expression levels at $\ntimepoints$
+time points.
+Let $\regmatrix$ be a $\ntimepoints \times \d$ regressor matrix;
+in our case, we use a cubic B-spline, so the entry $ij$ of $\regmatrix$
+is the $j$-th basis vector evaluated at the $i$-th time point (\secref{}).
+
+Each cluster is characterized by a vector of regression coefficients
+$\mu_\k$ and a variance $\tau^{-1}_\k$, so
+in this model, $\beta_k = (\mu_\k, \tau_\k)$.
+The distribution of the data arising from cluster $k$ is
+\begin{align*}
+\p(\x_\n | \beta_\k, \b_\n) =
+\normdist{\x_\n | \regmatrix\mu_\k + \b_\n,
+\tau_\k^{-1}I_{\ntimepoints \times \ntimepoints}},
+\end{align*}
+%
+where $\b_{n}$ is a gene-specific additive offset.
+We include the additive offset because we
+are interested in clustering gene expressions based on their patterns over time,
+not their absolute level.
+
+The joint distribution can be written in the same form as~\eqref{bnp_model},
+except that the conditional log-likelihood also conditions on $\b_n$,
+and we also include an additional prior term:
+\begin{align*}
+\logp(\x, \beta, \z, \nu) =
+    \sum_{n=1}^N \sum_{k=1}^{\kmax}&
+        \z_{\n\k} \left(
+            \logp(\x_n \vert \beta_\k, \b_n) + \logp(\b_n) + \log \pi_\k
+        \right) +\notag \\
+    & \quad \ldots + \sum_{k=1}^{\kmax} \left(
+        \log \pstick(\nuk) + \log \pbeta(\beta_\k)
+    \right).
+\end{align*}
+
+\todo{kmax in these examples should all be infinity}
+\end{ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Our last example is a topic model applied to genetic data.
+Genotypes at selected genetic markers of individuals take the place of
+words in a document; in lieu of inferring ``topics," we infer latent populations.
+
+\begin{ex}[A topic model for population structure]\exlabel{structure_bnp_process}
+
+The data set consists of $\nindiv$ individuals genotyped at $\nloci$ loci.
+For diploid species, there are two observations at each loci.
+Let $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ be the genotype for individual $\n$ at locus $\l$ and chromosome $\i$,
+where $J_\l$ is the number of possible genotypes at locus $\l$
+(for example, if the measurements are single nucleotides, either A, T, C or G,
+then $J_\l = 4$ for all $\l$).
+
+Each latent population is characterized by the collection
+$\beta_k = (\latentpop_{\k1}, \ldots, \latentpop_{\k\nloci})$ where
+$\latentpop_{\k\l}\in\Delta^{J_\l - 1}$ are the latent frequencies for the $J_l$
+possible alleles at locus $\l$ under population $\k$.
+The distribution of $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ arising from population $\k$ is
+\begin{align*}
+\p(\x_{\n\l\i} \vert \latentpop_{\k}) =
+\categoricaldist{\x_{\n\l\i}\vert \latentpop_{\k\l}}.
+\end{align*}
+
+
+Unlike the previous data examples, each individual now has their own stick-breaking process. Draw sticks
+\begin{align*}
+\nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, ..., \nindiv; \k = 1, 2, \ldots.
+\end{align*}
+In this application,
+we call the mixture weights
+$\latentadmix_{\n} = (\latentadmix_{\n1}, \latentadmix_{\n2}, \ldots)$ the
+\textit{admixture} of individual $\n$.
+These are formed by the usual stick-breaking construction,
+\begin{align*}
+\latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).
+\end{align*}
+%
+The latent population membership $\z_{\n\l\i}$ of the observed genotype
+$\x_{\n\l\i}$ is then drawn according to the usual multinomial distribution
+\begin{align*}
+p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\kmax} \latentadmix_{\n\k}^{\z_{\n\l\i\k}}.
+\end{align*}
+
+The joint log-likelihood decomposes as
+\begin{align*}
+\logp(\x, \latentpop, \z, \nu) &=
+\sum_{\n=1}^\nindiv \sum_{\l=1}^\nloci \sum_{i = 1}^2 \sum_{\k=1}^{\kmax}
+        \z_{\n\l\i\k} \left(
+            \logp(\x_{\n\l\i} \vert \latentpop_{\k}) + \log \pi_{\n\k}
+        \right)
+\nonumber\\&
+    \quad +
+    \sum_{\n=1}^\nindiv \sum_{k=1}^{\kmax} \log \pstick(\nu_{\n\k})
+    + \sum_{k=1}^{\kmax} \log \pbeta(\latentpop_{\k}).
+\end{align*}
+\end{ex}
+
+This model is identical to STRUCTURE,
+a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure},
+except that we replace the Dirichlet prior in STRUCTURE
+with an infinite stick-breaking process.
+The result is a model similar to a heirchical Dirichlet process CITE,
+but without the top-level Dirichlet process.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
