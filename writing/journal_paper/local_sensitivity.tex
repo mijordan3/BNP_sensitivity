@@ -9,10 +9,11 @@ experiments below.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_t}
 %
-Let $\p(\theta \vert \t)$ be a class of densities relative dominating
-probability measure, $\lambda$ defined for $\t$ in an open set $\ball_\t
-\subseteq \mathbb{R}$ containing $0$.  Assume that the variational densities
-$\q(\theta \vert \eta)$ are defined relative to $\lambda$.
+Let $\mu$ denote a sigma finite measure, and let $\p(\theta \vert \t)$ denote a
+class of probability densities relative $\mu$.  Let $\p(\theta \vert \t)$ be
+defined for $\t$ in an open set $\ball_\t \subseteq \mathbb{R}$ containing $0$.
+Assume that the variational densities $\q(\theta \vert \eta)$ are also defined
+relative to $\mu$.
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,7 +41,7 @@ use $\etaopt$ with no argument to refer to $\etaopt(0)$.
 \begin{ex}\exlabel{alpha_perturbation}
 %
 When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we take
-$\lambda$ to be the Lebesgue measure on $[0,1]$ and model
+$\mu$ to be the Lebesgue measure on $[0,1]$ and model
 %
 \begin{align*}
 %
@@ -176,10 +177,10 @@ and $\p$.  For example,
 %
 \q(\theta \vert \eta) :={}
     \frac{\qtil(\theta \vert \eta)}
-    {\int \qtil(\theta' \vert \eta) \lambda(d\theta')} \mathand
+    {\int \qtil(\theta' \vert \eta) \mu(d\theta')} \mathand
 \p(\theta \vert \t) :={}
     \frac{\ptil(\theta \vert \t)}
-    {\int \ptil(\theta' \vert \t) \lambda(d\theta')}.
+    {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
 %
 \end{align*}
 %
@@ -211,10 +212,10 @@ for the prior $\logp(\theta \vert \t)$.
 %
 Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
 density over the random variable $\theta$ parameterized by $\eta$ defined
-relative to a dominating measure $\lambda$.  Assume that the map $\eta \mapsto
+relative to a dominating measure $\mu$.  Assume that the map $\eta \mapsto
 \log \qtil(\theta \vert \eta)$ is twice continuously differentiable.
 
-Let $\psi(\theta, \t)$ be a scalar-valued $\lambda$-measurable function of
+Let $\psi(\theta, \t)$ be a scalar-valued $\mu$-measurable function of
 $\theta$ and $\t$.  Assume that the map $\t \mapsto \psi(\theta, \t)$ is
 continuously differentiable.
 
@@ -235,7 +236,7 @@ Define the following shorthand notation:
 %
 For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
 $\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
-$\lambda$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \lambda(d\theta) <
+$\mu$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \mu(d\theta) <
 \infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
 \times \ball_\t$:
 %
@@ -270,31 +271,16 @@ M_\psi(\theta)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}\lemlabel{normal_q_is_regular}
 %
-In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$ and let
-$\q(\theta \vert \eta) = \normdist{\theta \vert \eta}$ be a normal distribution
-parameterized by its natural exponential family parameters.  We need the
-dominating measure $\lambda$ to be a probability measure; for a set $A$, take
-$\lambda(A) = \normdist{A \vert 0, 1}$ to be the standard normal measure, so
-that $\q \ll \lambda$.
+In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$, let
+$\mu$ be the Lebesgue measure, and let $\q(\theta \vert \eta) = \normdist{\theta
+\vert \eta}$ be a normal distribution parameterized by its natural exponential
+family parameters.
 
 Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
 Fix $\eta_0$ such that $\sigma(\eta_0) > 0$, and let $\ball_\eta$ be an open set
 containing $\eta_0$ such a that $\sigma_{max} := \sup_{\eta \in \ball_\eta}
 \sigma(\eta) < \infty$.
 
-% Let $\psi(\theta, \t)$ be any function that is differentiable in $\t$
-% for all $\t \in \ball_\t$, where $0 \in \ball_\t$.  Let $\psi(\theta,\t)$
-% grow sub-exponetially in $\abs{\theta}$ for all $\t \in \ball_\t$, i.e.,
-% %
-% \begin{align*}
-% %
-% \lim_{\theta \rightarrow \infty}
-%     \exp(-\theta) \sup_{\t \in \ball_\t}\abs{\psi(\theta, \t)} ={} 0 \mathand
-% \lim_{\theta \rightarrow -\infty}
-%     \exp(-\abs{\theta}) \sup_{\t \in \ball_\t}\abs{\psi(\theta, \t)} ={} 0.
-% %
-% \end{align*}
-% %
 If there exists a neighborhood $\ball_\t$ of $\t_0$ such that $\abs{\psi(\theta,
 \t)}$ and $\abs{\psigrad{\theta, \t}}$ are uniformly bounded by some multiple of
 $\exp(-\abs{\theta})$ for all $\t \in \ball_\t$, then $\q$ and $\psi$ satisfy
@@ -329,10 +315,10 @@ right hand side of the preceding display is finite.
 Then
 %
 \begin{align*}
-\int \q(\theta \vert \eta) \psi(\theta, \t) \lambda(d \theta) \le{}&
+\int \q(\theta \vert \eta) \psi(\theta, \t) \mu(d \theta) \le{}&
     \left( \sup_{\theta} \sup_{\t \in \ball_\t}
         \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
-    \int \q(\theta \vert \eta) \exp(\theta) \lambda(d \theta)
+    \int \q(\theta \vert \eta) \exp(\theta) \mu(d \theta)
 %
 \\\le{}&
     \const
@@ -373,9 +359,10 @@ $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
 %
 To analyze \exref{alpha_perturbation}, recall from \secref{model_vb} that we
 take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$ to
-be independent normal distributions.  Expressing the perturbation to the stick
-breaking prior given in \exref{alpha_perturbation} in terms of $\lnuk$
-using \eqref{lnuk_derivatives}, we get
+be independent normal distributions.  Let us take $\theta$ to be $\lnuk$ and
+$\mu$ to be the Lebesgue measure on $\mathbb{R}$.  Expressing the perturbation
+to the stick breaking prior given in \exref{alpha_perturbation} in terms of
+$\lnuk$ using \eqref{lnuk_derivatives}, we get
 %
 \begin{align*}
 %

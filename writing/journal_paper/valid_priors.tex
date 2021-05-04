@@ -1,28 +1,18 @@
+\Corref{etafun_deriv_form} is explicitly about a particular $\phi$ derived from
+some fixed alternative $\palt$.  As stated, each perturbation must be checked
+individually, as in \exref{gem_fun_pert}.  However, the form of the influence
+function motivates {\em searching} for $\phi$ that have large influence. In
+particular, if we can define a notion of ``size'' of a perturbation, we might
+use \eqref{vb_eta_infl_sens} to find the most influential prior perturbation of
+a given ``size''.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The classes of perturbations given in \defref{prior_nl_pert} have a natural
-correspondence with the $\lp{\lambda, p}$ spaces of functions, which we now
-define.
+To formally justify using \corref{etafun_deriv_form} in this way, we must at
+least establish that \corref{etafun_deriv_form} applies to ``small'' $\phi$. We
+now follow \citet{gustafson:1996:local} and define ``size'' in terms of the
+$\lp{\mu, p}$ spaces of measurable functions, which we now define.  It turns
+out that each class of perturbations defined in \defref{prior_nl_pert}
+pairs naturally with the corresponding $\lp{\mu,p}$ space.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,8 +25,8 @@ space of equivalence classes of real-valued $\mu$-measurable functions,
 where two functions are equivalent if they disagree only on a set of
 $\mu$-measure zero.
 
-Let $\esssup_\theta^\mu$ denote the essential supremum over $\theta$ with
-respect to the measure $\mu$. The norm on $\lp{\mu,p}$ is given by
+Let $\esssup_{\theta\sim\mu}$ denote the essential supremum over $\theta$ with
+respect to the measure $\mu$. The norm of $\phi \in \lp{\mu,p}$ is given by
 %
 \begin{align*}
 %
@@ -44,15 +34,14 @@ respect to the measure $\mu$. The norm on $\lp{\mu,p}$ is given by
 \begin{cases}
     \left(\int \abs{\phi(\theta)}^p \mu(d\theta)\right)^{1/p}
     & \textrm{when }p \in [1, \infty)\\
-    \esssup_{\theta} \abs{\phi(\theta)}
+    \esssup_{\theta\sim\mu} \abs{\phi(\theta)}
     & \textrm{when }p = \infty
-\end{cases}\\
-%
-\phi \in \lp{\lambda,p} \Leftrightarrow{}& \norm{\phi}_{\lambda,p} < \infty.
+\end{cases}.
 %
 \end{align*}
 %
-When $\mu$ is the Lebesgue measure, we may simply write $\lp{\lambda,p} =
+Note that $\phi \in \lp{\lambda,p} \Leftrightarrow{} \norm{\phi}_{\lambda,p} <
+\infty$. When $\mu$ is the Lebesgue measure, we may simply write $\lp{\lambda,p} =
 \lp{p}$ and $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
 %
 Let $\ball_{\mu,p}(\epsilon) := \{\phi: \phi \in \lp{\mu, p},
@@ -74,21 +63,68 @@ the size of prior perturbations.
 (\citet{gustafson:1996:local})
 %
 Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
-measure $\p \ll \mu$, the map $\p \mapsto \norm{\phi(\cdot \vert \beta,
-\p)}_p$ does not depend on $\mu$, and is invariant to invertible transformations
-of $\theta$.
+measure $\p \ll \mu$, the map $\p \mapsto \norm{\phi(\cdot \vert \p)}_p$ with
+$\beta = 1$ is a norm, does not depend on $\mu$, and is invariant to invertible
+transformations of $\theta$.
 %
 \seeproof{pert_invariance}
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\Corref{etafun_deriv_form} suggests an intriguing result if it is taken to hold
+for all $\phi$ in some ball, $\ball_p(\delta) := \{\phi: \norm{\phi}_{\lambda,p}
+\le \delta \}$. Specifically, let $q^{-1} + p^{-1} = 1$ and observe that, by
+H{\"o}lder's inequality \citep[Theorem 5.1.2 and subsequent
+disscussion]{dudley:2018:real},
+%
+\begin{align*}
+%
+\sup_{\phi \in \ball_p(\delta)} \fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
+    \sup_{\phi \in \ball_p(\delta)}
+        \int \infl_p(\theta) \phi(\theta) \mu(d\theta)
+% \\\le{}&
+%     \sup_{\phi \in \ball_p(\delta)}
+%         \left( \int \abs{\infl_p(\theta)}^{1/q} \mu(d\theta) \right)^q
+%         \left( \int \abs{\phi(\theta)}^{1/p} \mu(d\theta)\right)^p
+\\={}&
+\begin{cases}
+\delta \left( \int \abs{\infl_p(\theta)}^{1/q} \mu(d\theta) \right)^q
+    & \textrm{ when }p \in [1, \infty)\\
+\delta \int \abs{\infl_p(\theta)} \mu(d\theta)
+    & \textrm{ when }p = \infty,
+\end{cases}
+%
+\end{align*}
+%
+with equality at the ``worst-case'' perturbation
+%
+\begin{align*}
+%
+\phi^*(\theta) \propto
+\begin{cases}
+\mathrm{sign}(\infl_p(\theta)) \abs{\infl_p(\theta)}^{p/q}.
+& \textrm{ when }p \in [1, \infty)\\
+\mathrm{sign}(\infl_p(\theta))
+& \textrm{ when }p = \infty.
+\end{cases}
+%
+\end{align*}
+%
+(For the most negative ``worst-case'', simply apply the preceding result to
+$-g$.) The constant of proportionality in the preceding display must be adjusted
+so that $\norm{\phi^*(\theta)}_{\lambda,p} = \delta$.  These ``worst-case''
+perturbations are the variational Bayes analogues of the corresponding
+``worst-case'' for exact Bayesian posteriors in \citet{gustafson:1996:local}.
 
-
+We must ask however: do all $\phi \in \ball_{\mu,p}(\delta)$ correspond to
+valid priors?  Indeed, what is the relationship between
+$\ball_{\mu,p}(\delta)$ and the class of perturbations given in
+$\pertset$?  The following theorem answers these questions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{lem}\lemlabel{pert_well_defined}
+\begin{thm}\thmlabel{pert_well_defined}
 %
 Fix the quantities given in \defref{prior_nl_pert}.  Say that an unnormalized
 prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$ is non-negative
@@ -175,7 +211,7 @@ $\phi \in \lp{\mu,\infty}$.  (\Exref{beta_inf_norm}.)
 
 \seeproof{pert_well_defined}
 %
-\end{lem}
+\end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -218,8 +254,6 @@ so $\essinf_\theta \p(\theta \vert \phi_n) < 0$ for all $n$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
 Note that \citep{gustafson:1996:local} avoids the difficulty of
 \exref{lp_negative} by restricting to positive $\phi(\theta)$, i.e. $\phi$ such
 that $\essinf_\theta^\mu \phi(\theta) \ge 0$.  Of course, \exref{lp_negative}
@@ -228,11 +262,10 @@ prohibiting the use of standard functional analysis results requiring open
 neighborhoods, such as the implicit function theorem in Banach spaces, (our key
 tool proving \thmref{eta_phi_deriv} below). Furthermore, \exref{phi_negative,
 phi_necessarily_negative} shows that restricting $\phi$ to be positive
-sacrifices \lemref{pert_well_defined} \itemref{pertset_is_valid}.  Perhaps more
+sacrifices \thmref{pert_well_defined} \itemref{pertset_is_valid}.  Perhaps more
 importantly, restricting to positive $\phi$ induces counterintutive notions of
 the ``size'' of perturbations that ablate mass, detailed discussion of which we
 provid in \appref{positive_pert}.
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -261,3 +294,168 @@ Consequently, $\phi \notin \lp{\mu,\infty}$.
 \end{ex}
 % /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\Thmref{pert_well_defined}, together with \exref{lp_negative, beta_inf_norm},
+illustrate very different phenomena for $p \in [1, \infty)$ and $p = \infty$.
+For all $p \in [1, \infty]$, the priors are normalizable within sufficiently
+small balls.  But, for $p \in [1, \infty)$, there exist invalid, negative priors
+in $\ball_{\mu,p}(\delta)$, no matter how small $\delta$ is taken to be.  In
+constrast, when $p = \infty$, all priors arising from $\phi \in
+\ball_{\mu,\infty}$ are valid, but there exist valid priors which are not
+contained in $\ball_{\mu,\infty}(\delta)$.  The fact that $\phi \in
+\ball_{\mu,p}(\delta)$ for $p \in [1, \infty)$ can be negative no matter how
+small $\delta$ is not necessarily a problem for the full Bayesian posterior, but
+it is fatal for variational approximations, as we now discuss.  This difference
+will lead below to very different results for the differentiability of $\t
+\mapsto \etaopt(\t \phi)$ for $p \in [1, \infty)$ and for $p = \infty$.
+
+Negative priors are anathema to VB approximations because the term
+$\expect{\q(\theta \vert \eta)}{\log \p(\theta \vert \t \phi)}$ enters the KL
+divergence $\KL{\theta, \t}$, and if $\p(\theta \vert \t \phi) \le 0$ on any set
+with nonzero $\q(\theta \vert \eta)$-measure, then the KL divergence will be
+infinite.  Equivalently, observe that, by
+\eqref{nl_vb_pert_p}, for a fixed $\phi$ and $p \in [1, \infty)$
+%
+\begin{align*}
+%
+\KL{\eta, \t} = \KL{\eta, 0} +
+\expect{\q(\theta \vert \eta)}
+       {\log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)}.
+%
+\end{align*}
+%
+Again, if $1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \le 0$ on any set
+with nonzero $\q(\theta \vert \eta)$-measure, then the KL divergence is
+infinite.  If $\essinf_{\theta \sim
+\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} = -\infty$, then $\KL{\eta, \t}$
+is undefined for all $\t > 0$.  In constrast, if $\essinf_{\theta \sim
+\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$, then there exists a
+$\t$ sufficiently small that $\KL{\eta, \t}$ will be defined in a neighborhood
+of $\t = 0$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pertset_bounded_below}
+%
+Fix the quantites in \defref{prior_nl_pert} with $p \in [1, \infty)$, and let
+$\q(\theta)$ be a density defined relative to $\mu$.  If $\phi \in \pertset$,
+then $\essinf_{\theta \sim \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} >
+-\infty$.
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Indeed, as the following theorem states, $\essinf_{\theta \sim
+\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$ is a sufficient
+condition for the derivative to exist under some additional conditions on the
+variational distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{lp_regular}
+%
+Fix the quantites in \defref{prior_nl_pert} with $p \in [1, \infty)$, and let
+$\q(\theta)$ be a density defined relative to $\mu$.  For a given function
+$\psi(\theta): \thetadom \mapsto \mathbb{R}$ with
+$\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, assume that
+%
+\begin{align*}
+%
+\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^q
+\pbase(\theta) \mu(d\theta) <& \infty
+    & \textrm{for }q^{-1} + p^{-1} = 1\textrm{ if }p > 1 \\
+\esssup_{\theta \sim \pbase} \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}
+ <& \infty
+    & \textrm{ if }p = 1.
+%
+\end{align*}
+%
+% or, equivalently, that
+% %
+% \begin{align*}
+% %
+% \int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
+%     \q(\theta) \lambda(d\theta)
+% < \infty.
+% %
+% \end{align*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_regular_lp}
+%
+For each $\eta$ in an open set $\ball_\eta$, let \assuref{lp_regular} hold with
+$\psi(\theta)$ equal to each of the following functions:
+%
+\begin{align*}
+%
+ \norm{\lqgrad{\theta, \eta}}_2 \textrm{, }
+ \norm{\lqgrad{\theta, \eta}}^2_2 \textrm{ and }
+ \norm{\lqhess{\theta, \eta}}^2.
+%
+\end{align*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thm}\lemlabel{lp_derivative}
+%
+Fix the quantities \defref{prior_nl_pert} with $p \in [1, \infty)$.
+Let $\q(\theta \vert \eta)$ define a class of densities relative to $\mu$
+parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
+\assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
+\assuref{kl_opt_ok}.
+
+Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
+$\inf_\theta \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the function $\t
+\mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the derivative
+given in \corref{etafun_deriv_form}.
+%
+\begin{proof}
+%
+The KL divergence is given by
+%
+\begin{align*}
+%
+\KL{\eta, \t} ={}&
+    \KL{\eta, 0} +
+    \expect{\q(\theta \vert \eta)}
+           {\log \left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right)}.
+%
+\end{align*}
+%
+Define $\gamma(\theta) := \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}$, and note
+that $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{\mu,p}$, so
+$\norm{\gamma}_{\pbase, p} \le \infty$ and $\inf_\theta \gamma(\theta) >
+-\infty$.  By \assuref{q_regular_lp} and \lemref{lp_integral_bound}, we have
+that that \assuref{dist_fun_nice} holds with $\psi(\theta, \t) = \log \left(1 +
+\t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)$, and \thmref{etat_deriv}
+holds.
+%
+\end{proof}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Thmref{lp_derivative}, together with \lemref{pertset_bounded_below}, tells us
+that we can at least form a linear approximation to $\t \mapsto \etaopt(\t
+\phi)$ for $\phi \in \pertset$ formed from particular priors.  In a sense, we
+only care about $\phi \in \pertset$ in the sense that we only care about real
+priors.  In this sense, one might be tempted to employ \thmref{lp_derivative}
+and somehow ignore $\phi \notin \pertset$.  As we discuss in the next section,
+however, although the derivative exists for any particular $\phi \in \pertset$,
+it provides an arbitrarily poor linear approximation to the actual function
+$\etaopt(\t \phi)$ as $\phi$ ranges over $\pertset$.  In contrast, for the
+restrictive $p=\infty$ case we can prove a strong result for the uniform quality
+of the linear approxiation to the  map $\phi \mapsto \etaopt(\phi)$ for $p =
+\infty$ that is unavailable for $p \in [1, \infty)$, though, of course, at the
+cost of expressiveness of the set of prior perturbations.

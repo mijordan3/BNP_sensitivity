@@ -160,106 +160,14 @@ $\p(\theta \vert \phi)$ for some $\phi \in \pertset$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{ex}\exlabel{phi_for_beta}
+\begin{ex}\exlabel{zero_phi}
 %
-Take $\pbase(\theta) = \betadist{\theta \vert 1, \alpha_0}$ and $\palt(\theta) =
-\betadist{\theta \vert 1, \alpha_1}$.  Then $\thetadom=[0,1]$, and we can let
-$\mu$ be the Lebesgue measure on $[0,1]$, so
-%
-\begin{align*}
-%
-\pbase(\theta) ={}&
-    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)} (1 - \theta)^{\alpha_0 - 1}.
-%
-\end{align*}
-%
-Then, for $p = 1$,
-
-\begin{align}\eqlabel{phi_beta_p1}
-%
-\phi(\theta \vert \beta, \palt) ={}&
-    p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
-        (1 - \theta)^{\alpha_1 - 1} -
-    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
-        (1 - \theta)^{\alpha_0 - 1}.
-%
-\end{align}
-%
-Note that, when $\t = 1$, the normalizing constant and $\beta$ cancel in the
-normalization of $\p(\theta \vert \t \phi)$:
-%
-\begin{align*}
-%
-\p(\theta \vert \phi(\theta \vert \beta, \palt)) =
-\frac{p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
-        (1 - \theta)^{\alpha_1 - 1}}
-     {p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
-       \int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}
-=
-\frac{(1 - \theta)^{\alpha_1 - 1}}
-     {\int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}.
-%
-\end{align*}
-%
-For this reason, we are free to choose $\beta > 0$ in \defref{prior_pert_class}
-and still extrapolate to the same $\palt$ when $\t = 1$.
-
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{ex}\exlabel{phi_for_beta_pinf}
-
-When $p = \infty$,
-%
-\begin{align}
-%
-\phi(\theta \vert \beta, \palt) ={}&
-    \log \left(
-        \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
-    \right)  + (\alpha_1 - 1) \log (1 - \theta) - \nonumber\\
-{}&
-    \log \left(
-        \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
-    \right) + (\alpha_0 - 1) \log (1 - \theta)  + \log \beta \nonumber\\
-={}&
-\log \left(
-    \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
-\right) -
-\log \left(
-    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
-\right) + \log \beta + (\alpha_1 - \alpha_0) \log(1 - \theta).
-\eqlabel{phi_beta_pinf}
-%
-\end{align}
-%
-For $p = \infty$, the normalizing constant and $\beta$ cancel for all $\t$:
-%
-\begin{align*}
-%
-\p(\theta \vert \t \phi(\theta \vert \beta, \palt)) ={}&
-\frac{  \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
-                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
-        (1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}
-    }
-    {
-        \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
-                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
-             \int_0^1 (1-\theta')^{\alpha_0 (1 - \t) +
-                                   \alpha_1 \t} \lambda(d\theta')
-     }
-\\={}&
-\frac{(1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}}
-     {\int_0^1 (1-\theta')^{\alpha_0 (1 - \t) + \alpha_1 \t} \lambda(d\theta')}.
-%
-\end{align*}
+Taking $\palt = \pbase$, we have that $\phi = \phiz$ if and only if
+$\beta = p$ for $p \in [1, \infty)$ or $\beta = 0$ for $p = \infty$.
+For that reason it might make sense to restrict to $\beta = p$.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -367,41 +275,14 @@ Take $\thetadom = [0,1]$.  The pair $\pbase(\theta)  = \frac{1}{2}\ind{\theta <
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-For any particular $\phi$, we can apply \thmref{etat_deriv}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{cor}\corlabel{etafun_deriv_form}
+In order to approximate the effect of replacing $\pbase$ with $\palt$, we can
+choose a $p$, choose a $\beta$, compute the corresponding $\phi(\cdot \vert
+\beta, \palt)$ using \defref{prior_nl_pert}, and apply \thmref{etat_deriv} with
+$\p(\theta \vert \t) = \p(\theta \vert \t \phi(\cdot \vert \beta, \palt))$.
+To do so, we will require that \assuref{dist_fun_nice} holds with
+$\psi(\theta, \t) = \log \p(\theta \vert \t \phi(\cdot \vert \beta, \palt))$.
+Plugging in \defref{prior_nl_pert}, we see that
 %
-Let \assuref{kl_opt_ok} hold at $\eta_0 = \etaopt$.
-%
-Fix the quantities given in \defref{prior_nl_pert} and define the influence
-function
-%
-\begin{align}\eqlabel{infl_defn}
-%
-\infl_p(\theta) :={}&
-\begin{cases}
-    - \hessopt^{-1}
-        \lqgradbar{\theta \vert \etaopt}
-        \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}}
-& \textrm{when }p \in [1, \infty) \\
-%
-    - \hessopt^{-1}
-        \lqgradbar{\theta \vert \etaopt}
-        \q(\theta \vert \etaopt).
-& \textrm{when }p = \infty
-%
-\end{cases}
-%
-\end{align}
-%
-Let the variational densities $\q(\theta \vert \eta)$ satisfy
-\assuref{dist_fun_nice} for $\t_0 = 0$ with both $\psi(\theta, \t) \equiv 1$ (no
-$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
-\phi)$, where
 %
 \begin{align}
 %
@@ -424,20 +305,57 @@ $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
 %
 \end{align}
 %
-Then the map $\t \mapsto \etaopt(\t \phi)$ is continuously
+It turns out that the derivative takes the form of an integral against
+$\phi$, as we state in the following corollary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_deriv_form}
+%
+Let \assuref{kl_opt_ok} hold at $\eta_0 = \etaopt$.
+%
+Fix $p$ and the quantities given in \defref{prior_nl_pert}, and let $g(\eta):
+\etadom \mapsto \mathbb{R}$ denote a continuously differentiable real-valued
+function of interest.  Define the influence function
+%
+\begin{align}\eqlabel{infl_defn}
+%
+\infl_p(\theta) :={}&
+% \begin{cases}
+    - \fracat{d g(\eta)}{ d \eta^T}{\etaopt} \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \frac{\q(\theta \vert \etaopt)}{\pbase(\theta)^{1/p}},
+% & \textrm{when }p \in [1, \infty) \\
+%
+%     - \fracat{d g(\eta)}{ d \eta^T}{\etaopt} \hessopt^{-1}
+%         \lqgradbar{\theta \vert \etaopt}
+%         \q(\theta \vert \etaopt).
+% & \textrm{when }p = \infty
+%
+% \end{cases}
+%
+\end{align}
+%
+where we take $\pbase(\theta)^{1/p}=1$ when $p = \infty$.
+
+Let the variational densities $\q(\theta \vert \eta)$ satisfy
+\assuref{dist_fun_nice} for $\t_0 = 0$ with both $\psi(\theta, \t) \equiv 1$ (no
+$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t
+\phi)$. Then the map $\t \mapsto g(\etaopt(\t \phi))$ is continuously
 differentiable at $\t=0$ with derivative
 %
 \begin{align}\eqlabel{vb_eta_infl_sens}
 %
-\fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
     \int \infl_p(\theta) \phi(\theta) \mu(d\theta).
 %
 \end{align}
 %
 \begin{proof}
 %
-The result follows immediately from \thmref{etat_deriv}, \eqref{nl_vb_pert_p},
-and \eqref{nl_vb_pert_pinf}.
+This follows immediately from \thmref{etat_deriv}, \eqref{nl_vb_pert_p}, and
+\eqref{nl_vb_pert_pinf}.
 %
 \end{proof}
 %
@@ -447,20 +365,119 @@ and \eqref{nl_vb_pert_pinf}.
 
 
 
-\begin{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}\exlabel{phi_for_beta}
+%
+Take $\pbase(\theta) = \betadist{\theta \vert 1, \alpha_0}$ and $\palt(\theta) =
+\betadist{\theta \vert 1, \alpha_1}$.  Then $\thetadom=[0,1]$, and we can let
+$\mu$ be the Lebesgue measure on $[0,1]$, so
+%
+\begin{align*}
+%
+\pbase(\theta) ={}&
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)} (1 - \theta)^{\alpha_0 - 1}.
+%
+\end{align*}
+%
+Then, for $p = 1$,
+
+\begin{align}\eqlabel{phi_beta_p1}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+    p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+        (1 - \theta)^{\alpha_1 - 1} -
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+        (1 - \theta)^{\alpha_0 - 1}.
+%
+\end{align}
+%
+Note that, when $\t = 1$, the normalizing constant and $\beta$ cancel in the
+normalization of $\p(\theta \vert \t \phi)$:
+%
+\begin{align*}
+%
+\p(\theta \vert \phi(\theta \vert \beta, \palt)) =
+\frac{p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+        (1 - \theta)^{\alpha_1 - 1}}
+     {p \beta \frac{\Gamma(\alpha_1)}{\Gamma(1 + \alpha_1)}
+       \int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}
+=
+\frac{(1 - \theta)^{\alpha_1 - 1}}
+     {\int_0^1 (1 - \theta')^{\alpha_1 - 1} \lambda(d\theta')}.
+%
+\end{align*}
+%
+For this reason, we are free to choose $\beta > 0$ in \defref{prior_pert_class}
+and still extrapolate to the same $\palt$ when $\t = 1$.
+
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{ex}\exlabel{phi_for_beta_pinf}
+
+When $p = \infty$,
+%
+\begin{align}
+%
+\phi(\theta \vert \beta, \palt) ={}&
+    \log \left(
+        \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
+    \right)  + (\alpha_1 - 1) \log (1 - \theta) - \nonumber\\
+{}&
+    \log \left(
+        \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+    \right) + (\alpha_0 - 1) \log (1 - \theta)  + \log \beta \nonumber\\
+={}&
+\log \left(
+    \frac{\Gamma(\alpha_1) }{\Gamma(1 + \alpha_1)}
+\right) -
+\log \left(
+    \frac{\Gamma(\alpha_0)}{\Gamma(1 + \alpha_0)}
+\right) + \log \beta + (\alpha_1 - \alpha_0) \log(1 - \theta).
+\eqlabel{phi_beta_pinf}
+%
+\end{align}
+%
+For $p = \infty$, the normalizing constant and $\beta$ cancel for all $\t$:
+%
+\begin{align*}
+%
+\p(\theta \vert \t \phi(\theta \vert \beta, \palt)) ={}&
+\frac{  \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+        (1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}
+    }
+    {
+        \beta \frac{\Gamma(\alpha_1) \Gamma(1 + \alpha_0) }
+                   {\Gamma(1 + \alpha_1) \Gamma(\alpha_0)}
+             \int_0^1 (1-\theta')^{\alpha_0 (1 - \t) +
+                                   \alpha_1 \t} \lambda(d\theta')
+     }
+\\={}&
+\frac{(1-\theta)^{\alpha_0 (1 - \t) + \alpha_1 \t}}
+     {\int_0^1 (1-\theta')^{\alpha_0 (1 - \t) + \alpha_1 \t} \lambda(d\theta')}.
+%
+\end{align*}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{gem_fun_pert}
 %
 Let us apply \corref{etafun_deriv_form} to the GEM stick-breaking priors with
 $p=1$, following \exref{phi_for_beta}.  In order  to use
 \lemref{normal_q_is_regular}, it will be helpful to express the priors
 in the logit stick space as in \exref{gem_pert_ok}.  We thus take
-$\theta = \lnuk$, $\thetadom = \mathbb{R}$, and
-%
-\begin{align*}
-%
-\pbase(\lnuk) = \const \left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right)^{\alpha_0 - 1}
-%
-\end{align*}
-%
-
+$\theta = \lnuk$, $\thetadom = \mathbb{R}$, and...
 %
 \end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
