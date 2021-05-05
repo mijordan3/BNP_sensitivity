@@ -295,7 +295,6 @@ Consequently, $\phi \notin \lp{\mu,\infty}$.
 % /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 \Thmref{pert_well_defined}, together with \exref{lp_negative, beta_inf_norm},
 illustrate very different phenomena for $p \in [1, \infty)$ and $p = \infty$.
 For all $p \in [1, \infty]$, the priors are normalizable within sufficiently
@@ -310,12 +309,16 @@ it is fatal for variational approximations, as we now discuss.  This difference
 will lead below to very different results for the differentiability of $\t
 \mapsto \etaopt(\t \phi)$ for $p \in [1, \infty)$ and for $p = \infty$.
 
+For the remainder of this section, we will discuss only the more difficult case
+of $p \in [1, \infty)$.  For $p=\infty$, we will prove a stronger result, using
+a more general set of tools, in \secref{differentiability} below.
+
 Negative priors are anathema to VB approximations because the term
 $\expect{\q(\theta \vert \eta)}{\log \p(\theta \vert \t \phi)}$ enters the KL
 divergence $\KL{\theta, \t}$, and if $\p(\theta \vert \t \phi) \le 0$ on any set
 with nonzero $\q(\theta \vert \eta)$-measure, then the KL divergence will be
-infinite.  Equivalently, observe that, by
-\eqref{nl_vb_pert_p}, for a fixed $\phi$ and $p \in [1, \infty)$
+infinite.  Equivalently, observe that, by \eqref{nl_vb_pert_p}, for a fixed
+$\phi$ and $p \in [1, \infty)$
 %
 \begin{align*}
 %
@@ -329,24 +332,38 @@ Again, if $1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \le 0$ on any set
 with nonzero $\q(\theta \vert \eta)$-measure, then the KL divergence is
 infinite.  If $\essinf_{\theta \sim
 \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} = -\infty$, then $\KL{\eta, \t}$
-is undefined for all $\t > 0$.  In constrast, if $\essinf_{\theta \sim
+is undefined for all $\t > 0$.  The following example compactly illustrates
+the problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{e_log_disocontinuous_v1}
+%
+Let $\q(\theta)$ be a density relative to a measure $\mu$. For a given
+$\mu$-measurable function $\gamma$, define
+%
+\begin{align*}
+%
+f(\gamma) = \begin{cases}
+\expect{\q(\theta)}{\log\left(1 + \gamma(\theta)\right)}
+    & \textrm{when }\essinf_{\theta \sim \mu} \gamma(\theta) > -1 \\
+-\infty & \textrm{otherwise}.
+\end{cases}
+%
+\end{align*}
+%
+Then the map $\t \mapsto f(\t \gamma)$ is not differentiable at $\t=0$ if
+$\essinf_{\theta \sim \mu} \gamma(\theta) = -\infty$ since we then have $f (\t
+\gamma) = -\infty$ for all $\t > 0$, but $f(0) = 0$.  Therefore $\t \mapsto f(\t
+\gamma)$ is discontinuous and so not differentiable.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In constrast, if $\essinf_{\theta \sim
 \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$, then there exists a
 $\t$ sufficiently small that $\KL{\eta, \t}$ will be defined in a neighborhood
-of $\t = 0$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}\lemlabel{pertset_bounded_below}
-%
-Fix the quantites in \defref{prior_nl_pert} with $p \in [1, \infty)$, and let
-$\q(\theta)$ be a density defined relative to $\mu$.  If $\phi \in \pertset$,
-then $\essinf_{\theta \sim \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} >
--\infty$.
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Indeed, as the following theorem states, $\essinf_{\theta \sim
+of $\t = 0$. Indeed, as the following theorem states, $\essinf_{\theta \sim
 \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$ is a sufficient
 condition for the derivative to exist under some additional conditions on the
 variational distribution.
@@ -370,16 +387,6 @@ $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, assume that
     & \textrm{ if }p = 1.
 %
 \end{align*}
-%
-% or, equivalently, that
-% %
-% \begin{align*}
-% %
-% \int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
-%     \q(\theta) \lambda(d\theta)
-% < \infty.
-% %
-% \end{align*}
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -407,7 +414,7 @@ $\psi(\theta)$ equal to each of the following functions:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{thm}\lemlabel{lp_derivative}
+\begin{thm}\thmlabel{lp_derivative}
 %
 Fix the quantities \defref{prior_nl_pert} with $p \in [1, \infty)$.
 Let $\q(\theta \vert \eta)$ define a class of densities relative to $\mu$
@@ -416,9 +423,9 @@ parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
 \assuref{kl_opt_ok}.
 
 Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
-$\inf_\theta \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the function $\t
-\mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the derivative
-given in \corref{etafun_deriv_form}.
+$\essinf_{\theta\sim\mu} \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the
+function $\t \mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the
+derivative given in \corref{etafun_deriv_form}.
 %
 \begin{proof}
 %
@@ -446,16 +453,49 @@ holds.
 \end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\Thmref{lp_derivative}, together with \lemref{pertset_bounded_below}, tells us
-that we can at least form a linear approximation to $\t \mapsto \etaopt(\t
-\phi)$ for $\phi \in \pertset$ formed from particular priors.  In a sense, we
-only care about $\phi \in \pertset$ in the sense that we only care about real
-priors.  In this sense, one might be tempted to employ \thmref{lp_derivative}
-and somehow ignore $\phi \notin \pertset$.  As we discuss in the next section,
-however, although the derivative exists for any particular $\phi \in \pertset$,
-it provides an arbitrarily poor linear approximation to the actual function
-$\etaopt(\t \phi)$ as $\phi$ ranges over $\pertset$.  In contrast, for the
-restrictive $p=\infty$ case we can prove a strong result for the uniform quality
-of the linear approxiation to the  map $\phi \mapsto \etaopt(\phi)$ for $p =
-\infty$ that is unavailable for $p \in [1, \infty)$, though, of course, at the
-cost of expressiveness of the set of prior perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{cor}\corlabel{pertset_bounded_below}
+%
+If $p \in [1, \infty)$ and  $\phi \in \pertset$, then $\norm{\phi}_p < \infty$
+$\essinf_{\theta \sim \mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$.
+Under the other regularity conditions given in \thmref{lp_derivative}, the
+function $\t \mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the
+derivative given in \corref{etafun_deriv_form}.
+%
+\begin{proof}
+%
+The fact that $\norm{\phi}_p < \infty$ follows from \thmref{pert_well_defined}.
+If $\phi \in \pertset$, there exists a valid prior $\palt$, a $\beta > 0$,
+and a $\t \in [0,1]$ such that
+%
+\begin{align*}
+%
+\essinf_{\theta \sim \mu}  \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}
+ ={}&
+ \essinf_{\theta \sim \mu} \left(
+    \t p\beta \frac{\palt(\theta)^{1/p}}{\pbase(\theta)^{1/p}} - (1-\t) p
+    \right)
+    \ge{} - (1-\t) p > -\infty.
+%
+\end{align*}
+%
+\end{proof}
+%
+\end{cor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Corref{pertset_bounded_below}, tells us that we can at least form a linear
+approximation to $\t \mapsto \etaopt(\t \phi)$ for $\phi \in \pertset$ formed
+from particular priors.  In a sense, we only care about $\phi \in \pertset$ in
+the sense that we only care about real priors.  In this sense, one might be
+tempted to employ \thmref{lp_derivative} and somehow ignore $\phi \notin
+\pertset$.  As we discuss in the next section, however, although the derivative
+exists for any particular $\phi \in \pertset$, it provides an arbitrarily poor
+linear approximation to the actual function $\etaopt(\t \phi)$ as $\phi$ ranges
+over $\pertset$.  In contrast, for the restrictive $p=\infty$ case we can prove
+a strong result for the uniform quality of the linear approxiation to the  map
+$\phi \mapsto \etaopt(\phi)$ for $p = \infty$ that is unavailable for $p \in [1,
+\infty)$, though, of course, at the cost of expressiveness of the set of prior
+perturbations.

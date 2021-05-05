@@ -4,6 +4,7 @@ setwd(paper_directory)
 knitr_debug <- TRUE # Set to true to see error output
 simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 r_script_lib <- file.path(paper_directory, "R_scripts")
+r_script_dir <- file.path(paper_directory, "R_scripts")
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 

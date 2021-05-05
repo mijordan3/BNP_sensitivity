@@ -8,7 +8,8 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-cache <- TRUE # Set to true to cache knitr output for this analysis.
+cache <- FALSE # Set to true to cache knitr output for this analysis.
+r_script_dir <- "./R_scripts/"
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 
@@ -88,6 +89,22 @@ SetImageSize(aspect_ratio=0.35 * base_aspect_ratio)
 @
 <<func_ball, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
 source('./R_scripts/simple_examples/function_ball.R',
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+
+
+\newcommand{\FunctionDistFig}{
+<<func_dist_cap>>=
+fig_cap <- paste("Two densities which are distant according to KL divergence and ",
+                 "$\\norminf{\\cdot}$ but close according to $\\norm{\\cdot}_p$ ",
+                 "for $p \\in [1, \\infty)$.",
+                 sep="")
+SetImageSize(aspect_ratio=0.6 * base_aspect_ratio, image_width=1.0)
+@
+<<func_dist, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+source(file.path(r_script_dir, 'simple_examples/distant_distributions.R'),
        echo=knitr_debug, print.eval=TRUE)
 @
 }

@@ -29,3 +29,6 @@ Fix your essinf notation, maybe \theta \sim \mu
 Do not scale the set of phi produced by priors by beta
 
 Fix the sign on KL divergence --- the prior enters with a negative sign
+
+Go through and check carefully that the perturbations are the difference
+in priors not the new prior.
