@@ -4,22 +4,16 @@ optimum on the parameter $\alpha$ in a Beta prior. However, there is typically
 no {\em a priori} reason to believe that the stick breaking prior lies within
 the parametric Beta family.  In this section, we follow
 \citet{gustafson:1996:local} and define a class of ways to perturb to the
-functional form of the prior, corresponding to the $\lp{p}$ classes of
-integrable functions (which we will define and discuss below).
+functional form of the prior.  These classes of nonparametric perturbations will
+allow us to employ \thmref{etat_deriv} for any given alternative  prior.  We
+will take on the more difficult task of the existence and accuracy of the
+derivative in nonparameteric spaces of priors in \secref{valid_priors,
+differentiability} below.
 
-For any particular perturbation, \thmref{etat_deriv} can be applied directly by
-verifying \assuref{q_stick_regular}.  However, we will argue that it is
-typically more useful to examine the form of the derivative to find influential
-perturbations, for which one wants a stronger result than can be provided
-by \thmref{etat_deriv} alone---we will require that the derivatives give
-{\em uniformly good linear approximations} within bounded sets.
-We address this question in \secref{differentiability}.
-
-Let us remain with the general problem of inference on a parameter $\theta$. Fix
-a base prior density, $\pbase(\theta)$, at which we have computed a VB
-approximation.  Suppose we wish to ask what the variational optimum would have
-been had we used some alternative prior density, $\palt(\theta)$.  Let us write
-$\etaopt(\pbase)$ and $\etaopt(\palt)$ for these two approximations,
+Let us fix a base prior density, $\pbase(\theta)$, at which we have computed a
+VB approximation, and suppose we wish to ask what the variational optimum would
+have been had we used some alternative prior density, $\palt(\theta)$.  Let us
+write $\etaopt(\pbase)$ and $\etaopt(\palt)$ for these two approximations,
 respectively.  To approximately answer this question using the local sensitivity
 approach of \secref{local_sensitivity}, we must somehow define a continuous path
 from $\pbase(\theta)$ to $\palt(\theta)$ parameterized, say, by $\t \in [0, 1]$.
@@ -66,15 +60,16 @@ of) the family of ``nonlinear'' functional perturbations given by
 \citep{gustafson:1996:local}, of which our examples $\p_{lin}$ and $\p_{mult}$
 are the two extremes, corresponding to $p=1$ and $p=\infty$, respectively.
 
-Below, we will take $\lambda$ to denote the Lebesgue measure on the Borel sets
-of $\thetadom \subseteq \mathbb{R}^{\thetadim}$.  We will be interested in
-densities with respect to $\lambda$, expressed as Radon-Nikodym derivatives,
-though it will be convenient to use the same notation for a density and for the
-measure induced by the density.  Specifically, for a $\lambda$-measurable set
-$S$, and a Radon-Nikodym derivative $f$ defined with respect to $\lambda$, we
-will write $f(S) = \int_{\theta \in S} f(\theta) \lambda(d\theta)$.  Similarly,
-for two densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
-\Rightarrow f(S) = 0$ for all $\lambda$-measurable sets $S$.
+First, some necessary measure theory notation. Below, we will take $\lambda$ to
+denote the Lebesgue measure on the Borel sets of $\thetadom \subseteq
+\mathbb{R}^{\thetadim}$.  We will be interested in densities with respect to
+$\lambda$, expressed as Radon-Nikodym derivatives, though it will be convenient
+to use the same notation for a density and for the measure induced by the
+density.  Specifically, for a $\lambda$-measurable set $S$, and a Radon-Nikodym
+derivative $f$ defined with respect to $\lambda$, we will write $f(S) =
+\int_{\theta \in S} f(\theta) \lambda(d\theta)$.  Similarly, for two densities
+$f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0 \Rightarrow f(S) =
+0$ for all $\lambda$-measurable sets $S$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -165,9 +160,10 @@ $\p(\theta \vert \phi)$ for some $\phi \in \pertset$.
 
 \begin{ex}\exlabel{zero_phi}
 %
-Taking $\palt = \pbase$, we have that $\phi = \phiz$ if and only if
-$\beta = p$ for $p \in [1, \infty)$ or $\beta = 0$ for $p = \infty$.
-For that reason it might make sense to restrict to $\beta = p$.
+Taking $\palt = \pbase$, we have that $\phi = \phiz$ if and only if $\beta = p$
+for $p \in [1, \infty)$ or $\beta = 0$ for $p = \infty$. In this sense, one
+might wish to restrict to $\beta = p$.  However, it will cost us little to keep
+the notation general.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,9 +300,9 @@ Plugging in \defref{prior_nl_pert}, we see that
 \end{cases}\eqlabel{nl_vb_pert_pinf}
 %
 \end{align}
-%
-It turns out that the derivative takes the form of an integral against
-$\phi$, as we state in the following corollary.
+
+When \thmref{etat_deriv} can be applied,  it turns out that the derivative takes
+the form of an integral against $\phi$, as we state in the following corollary.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -117,18 +117,20 @@ so that $\norm{\phi^*(\theta)}_{\lambda,p} = \delta$.  These ``worst-case''
 perturbations are the variational Bayes analogues of the corresponding
 ``worst-case'' for exact Bayesian posteriors in \citet{gustafson:1996:local}.
 
-We must ask however: do all $\phi \in \ball_{\mu,p}(\delta)$ correspond to
-valid priors?  Indeed, what is the relationship between
-$\ball_{\mu,p}(\delta)$ and the class of perturbations given in
-$\pertset$?  The following theorem answers these questions.
+Before proceeding, however, we must ask: do all $\phi \in \ball_{\mu,p}(\delta)$
+correspond to valid priors?  Are there valid priors that cannot be produced by
+$\phi \in \ball_{\mu,p}(\delta)$ for any $\delta$?  More generally, what is the
+relationship between $\ball_{\mu,p}(\delta)$, the class of perturbations given
+in $\pertset$, and the set of all valid priors?  The following theorem answers
+these questions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{thm}\thmlabel{pert_well_defined}
 %
 Fix the quantities given in \defref{prior_nl_pert}.  Say that an unnormalized
-prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$ is non-negative
-$\mu$-almost everywhere and normalizable in the sense that $0 < \int
+prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$, $\ptil$ is non-negative
+$\mu$-almost everywhere, and $\ptil$ is normalizable in the sense that $0 < \int
 \ptil(\theta) \mu(d\theta) < \infty$.
 
 The following table summarizes properties of priors derived from
@@ -265,7 +267,7 @@ phi_necessarily_negative} shows that restricting $\phi$ to be positive
 sacrifices \thmref{pert_well_defined} \itemref{pertset_is_valid}.  Perhaps more
 importantly, restricting to positive $\phi$ induces counterintutive notions of
 the ``size'' of perturbations that ablate mass, detailed discussion of which we
-provid in \appref{positive_pert}.
+provide in \appref{positive_pert}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -298,17 +300,19 @@ Consequently, $\phi \notin \lp{\mu,\infty}$.
 \Thmref{pert_well_defined}, together with \exref{lp_negative, beta_inf_norm},
 illustrate very different phenomena for $p \in [1, \infty)$ and $p = \infty$.
 For all $p \in [1, \infty]$, the priors are normalizable within sufficiently
-small balls.  But, for $p \in [1, \infty)$, there exist invalid, negative priors
-in $\ball_{\mu,p}(\delta)$, no matter how small $\delta$ is taken to be.  In
-constrast, when $p = \infty$, all priors arising from $\phi \in
+small balls, but there exist invalid, negative priors in
+$\ball_{\mu,p}(\delta)$, no matter how small $\delta$ is taken to be.   For
+$p=\infty$, the opposite situation obtains: all priors arising from $\phi \in
 \ball_{\mu,\infty}$ are valid, but there exist valid priors which are not
-contained in $\ball_{\mu,\infty}(\delta)$.  The fact that $\phi \in
-\ball_{\mu,p}(\delta)$ for $p \in [1, \infty)$ can be negative no matter how
-small $\delta$ is not necessarily a problem for the full Bayesian posterior, but
-it is fatal for variational approximations, as we now discuss.  This difference
-will lead below to very different results for the differentiability of $\t
-\mapsto \etaopt(\t \phi)$ for $p \in [1, \infty)$ and for $p = \infty$.
+contained in $\ball_{\mu,\infty}(\delta)$, no matter how large $\delta$ is.
 
+The fact that $\phi \in \ball_{\mu,p}(\delta)$ for $p \in [1, \infty)$ can be
+negative no matter how small $\delta$ is not necessarily a problem for the full
+Bayesian posterior, but it is fatal for variational approximations, as we now
+discuss.  This difference will lead below to very different results for the
+differentiability of $\t \mapsto \etaopt(\t \phi)$ for $p \in [1, \infty)$ and
+for $p = \infty$.
+%
 For the remainder of this section, we will discuss only the more difficult case
 of $p \in [1, \infty)$.  For $p=\infty$, we will prove a stronger result, using
 a more general set of tools, in \secref{differentiability} below.
