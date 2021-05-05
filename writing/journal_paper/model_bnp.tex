@@ -1,22 +1,21 @@
 We will consider discrete Bayesian nonparametric (BNP) generative models which
-draw data points $\x_n$ from one of a certain number of components indexed by $\k =
-1, \ldots, \kmax$, where in principle $\kmax$ might be infinity.
+draw data points $\x_n$ from one of an infinite number of components indexed by
+$\k = 1, 2, \ldots, \infty$.
 Each component is characterized by a vector $\beta_\k \in \betadom \subseteq
 \mathbb{R}^{\betadim}$, with $\p(\x_n \vert \beta_\k)$ denoting the
 distribution of data arising from  component $\k$. We will model the $\beta_\k$
-as arising IID from a known prior $\beta_\k \iid \pbeta(\beta_\k)$, and write
+as arising IID from a known prior $\beta_\k \iid \pbetaprior(\beta_\k)$, and write
 $\beta = (\beta_1, \beta_2, \ldots)$.
 
-Assignment of data point $\n$ to a mixture component is represented by a vector
-$\z_\n = (\z_{\n1}, \ldots, \z_{\n\kmax})$,
+Assignment of data point $\n$ to a mixture component is represented by an
+(infinite dimensional) vector $\z_\n$ with elements $\z_{\n\k}$
 where $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise.
-With $\z_\n$ defined in
-this way, we can write
+With $\z_\n$ defined in this way, we can write
 %
 \begin{align*}
 %
 \p(\x_n \vert \z_\n, \beta) =
-    \prod_{k=1}^\kmax \p(\x_n \vert \beta_\k)^{\z_{\n\k}}.
+    \prod_{k=1}^\infty \p(\x_n \vert \beta_\k)^{\z_{\n\k}}.
 %
 \end{align*}
 
@@ -24,28 +23,25 @@ this way, we can write
 The assignments $\z_{\n}$ are drawn according to the following
 ``stick-breaking process.''  Fix a density $\pstick(\cdot)$, with respect to the
 Lebesgue measure, over stick-breaking proportions $\nuk \in (0, 1)$ and
-draw $\nuk\iid\pstick(\nuk)$ for $\k=1,\ldots,\kmax - 1$.  If $\kmax = \infty$, there are an
-infinite number of IID sticks and the $\kmax - 1$ can be ignored; if $\kmax <
-\infty$, then we set $\nu_{\kmax} = 1$ for notational convenience below.  Given
-these stick lengths, we compute indicator probabilities by
+draw $\nuk\iid\pstick(\nuk)$ for $\k=1,2,\ldots$.
+Given these stick lengths, we compute indicator probabilities by
 %
-\begin{align*}
+\begin{align}\eqlabel{stick_breaking}
 %
 % \pi_\k := \begin{cases}
-% \nuk \prod_{\k' < \k} (1 - \nu_{\k'}) & \textrm{For }k < \kmax
-%     \textrm{ (all }k\textrm{ when }\kmax = \infty\textrm{)}\\
-% \prod_{\k' < \k} (1 - \nu_{\k'}). & \textrm{For }k = \kmax \\
+% \nuk \prod_{\k' < \k} (1 - \nu_{\k'}) & \textrm{For }k < \infty
+%     \textrm{ (all }k\textrm{ when }\infty = \infty\textrm{)}\\
+% \prod_{\k' < \k} (1 - \nu_{\k'}). & \textrm{For }k = \infty \\
 % \end{cases}
 \pi_\k := \nuk \prod_{\k' < \k} (1 - \nu_{\k'})
 %
-\end{align*}
+\end{align}
 %
-where the empty product is taken to be equal to $1$. The convention $\nu_{\kmax} =
-1$ allows us to use the same formula for all $\pi_\k$ when $\kmax < \infty$.
-Write $\nu := (\nu_1, \ldots, \nu_{\kmax})$ for the vector of all stick lengths
-and $\pi := (\pi_1, \ldots, \pi_\kmax)$ for the corresponding vector of
-probabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kmax =
-\infty$.  We draw $\z_\n$ according to
+where the empty product is taken to be equal to $1$.
+Write $\nu := (\nu_1, nu_2, \ldots)$ for the vector of all stick lengths
+and $\pi := (\pi_1, \pi_2, \ldots)$ for the corresponding vector of
+probabilities. By construction, $\sum_{\k=1}^{\infty} \pi_\k = 1$.
+ We draw $\z_\n$ according to
 %
 \begin{align*}
 %
@@ -54,7 +50,7 @@ probabilities. By construction, $\sum_{\k=1}^{\kmax} \pi_\k = 1$ even when $\kma
 %     \ind{\sum_{\k=1}^{\kmax} \z_{\n\k} = 1}
 %     \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
 \p(\z_\n \vert \pi) ={}&
-    \prod_{k=1}^{\kmax} \pi_\k^{\z_{\n\k}}.
+    \prod_{k=1}^{\infty} \pi_\k^{\z_{\n\k}}.
 %
 \end{align*}
 %
@@ -76,22 +72,21 @@ $\pstick(\nuk)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
 %
 \end{align*}
 %
-When $\pstick$ is Beta distributed
-and $\kmax=\infty$, the resulting distribution on $\pi$  is known as the
+When $\pstick$ is Beta distributed, the resulting distribution on $\pi$ is known as the
 $\textit{GEM distribution}$, and we write $\pi \sim \mathrm{GEM}(\alpha)$.
 
 The GEM distribution is closely related to the Dirichlet process.
 When $\pi \sim \mathrm{GEM}(\alpha)$ and
-$\beta_\k \iid \pbeta(\beta_\k)$,
+$\beta_\k \iid \pbetaprior(\beta_\k)$,
 the random measure on $\betadom$
 \begin{align*}
   \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
 \end{align*}
 with $\delta_{\beta_\k}$ denoting point mass at $\beta_\k$,
 is a draw from a Dirichlet process with concentration parameter $\alpha$
-and base measure $\pbeta$.
+and base measure $\pbetaprior$.
 
-We keep our notation for stick-breaking distributions $\pstick$ general however,
+We keep the generic notation $\pstick$ for stick-breaking distributions,
 because in our sensitivity analysis,
 we will consider stick-breaking distributions that are outside the
 family of Beta distributions.
@@ -111,14 +106,14 @@ the data and parameters as:
 %         \log \pstick(\nuk) + \logp(\beta_\k)
 %     \right).
 \logp(\x, \beta, \z, \nu) =&
-\sum_{n=1}^N \sum_{k=1}^{\kmax}
+\sum_{n=1}^N \sum_{k=1}^{\infty}
     \z_{\n\k} \left(
         \logp(\x_n \vert \beta_\k) + \log \pi_\k
     \right)
 \nonumber\\
    & +
-    \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \log \pbeta(\beta_\k)
+    \sum_{k=1}^{\infty} \left(
+        \log \pstick(\nuk) + \log \pbetaprior(\beta_\k)
     \right).
 %
 \end{align}
@@ -130,27 +125,37 @@ the data and parameters as:
 %
 The observations are vectors $\x_\n \in \mathbb{R}^\d$,
 and we model each component with multivariate Gaussians.
-In this case, $\beta_\k = (\mu_k, \Sigma_\k)$,
-where $\mu_\k \in \mathbb{R}^4$, $\Sigma_\k$ is a $\d\times\d$ positive
-definite covariance matrix, and
+In this case, $\beta_\k = (\mu_k, \Lambda_\k)$,
+where $\mu_\k \in \mathbb{R}^\d$, $\Lambda_\k$ is a $\d\times\d$ positive
+definite information matrix, and
 %
 \begin{align*}
 %
-\p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Sigma_\k} \\
+\p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Lambda_\k} \\
 \logp(\x_\n \vert \beta_\k) ={}&
-    -\frac{1}{2}(\x_n - \mu_k)^T \Sigma_\k^{-1} (\x_n - \mu_k)
-    -\frac{1}{2} \log |\Sigma_\k| + \const.\\
+    -\frac{1}{2}(\x_n - \mu_k)^T \Lambda_\k (\x_n - \mu_k)
+    + \frac{1}{2} \log |\Lambda_\k| + \const.\\
     & \constdesc{\beta_\k}
 %
 \end{align*}
+We let $\pbetaprior$ to be the conjugate prior which in this case is normal-Wishart:
+\begin{align*}
+  \pbetaprior(\beta_\k) &= \normalwishart{\beta_\k \vert \tau_0, n_0, p_0, V_0}\\
+  \log\pbetaprior(\beta_\k) &=
+      -\frac{\tau_0}{2}(\mu_\k - \mu_0)^T \Lambda_\k (\mu_\k - \mu_0)\\
+      &{} + \frac{n_0 - p_0 - 1}{2} \log |\Lambda_\k| -
+      \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
+\end{align*}
+where $(\tau_0, n_0, p_0, V_0)$ are prior parameters.
+
 Below, we fit a
 Gaussian mixture model (GMM) to the Fisher's iris data set CITE.
 Each observation is an iris flower with
 four measurements:
 sepal length, sepal width, petal length, and petal width.
 The components in this model can be interpreted as latent iris species;
-the inferential goal is to estimate $\z_\n$ and thus assign each
-observed flower to an iris species.
+the inferential goal is to estimate $\z_\n$ and assign each
+observed flower to a latent species.
 
 % For the iris data, we might imagine that each cluster corresponds to a different
 % species with a different distribution of flower dimensions.  The BNP model
@@ -172,12 +177,13 @@ and we adjust the factorization in in \eqref{bnp_model} to suit our purposes.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{ex}[Regression mixture model]\exlabel{mice_bnp_process}
+
 We cluster time-course gene expression data using a BNP model.
 An observation $\x_\n\in\mathbb{R}^\ntimepoints$ is a vector of expression levels at $\ntimepoints$
 time points.
 Let $\regmatrix$ be a $\ntimepoints \times \d$ regressor matrix;
 in our case, we use a cubic B-spline, so the entry $ij$ of $\regmatrix$
-is the $j$-th basis vector evaluated at the $i$-th time point (\secref{}).
+is the $j$-th basis vector evaluated at the $i$-th time point (\secref{results_mice}).
 
 Each cluster is characterized by a vector of regression coefficients
 $\mu_\k$ and a variance $\tau^{-1}_\k$, so
@@ -199,16 +205,15 @@ except that the conditional log-likelihood also conditions on $\b_n$,
 and we also include an additional prior term:
 \begin{align*}
 \logp(\x, \beta, \z, \nu) =
-    \sum_{n=1}^N \sum_{k=1}^{\kmax}&
+    \sum_{n=1}^N \sum_{k=1}^{\infty}&
         \z_{\n\k} \left(
             \logp(\x_n \vert \beta_\k, \b_n) + \logp(\b_n) + \log \pi_\k
         \right) +\notag \\
-    & \quad \ldots + \sum_{k=1}^{\kmax} \left(
-        \log \pstick(\nuk) + \log \pbeta(\beta_\k)
+    & \quad \ldots + \sum_{k=1}^{\infty} \left(
+        \log \pstick(\nuk) + \log \pbetaprior(\beta_\k)
     \right).
 \end{align*}
 
-\todo{kmax in these examples should all be infinity}
 \end{ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -254,20 +259,20 @@ These are formed by the usual stick-breaking construction,
 The latent population membership $\z_{\n\l\i}$ of the observed genotype
 $\x_{\n\l\i}$ is then drawn according to the usual multinomial distribution
 \begin{align*}
-p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\kmax} \latentadmix_{\n\k}^{\z_{\n\l\i\k}}.
+p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\infty} \latentadmix_{\n\k}^{\z_{\n\l\i\k}}.
 \end{align*}
 
 The joint log-likelihood decomposes as
 \begin{align*}
 \logp(\x, \latentpop, \z, \nu) &=
-\sum_{\n=1}^\nindiv \sum_{\l=1}^\nloci \sum_{i = 1}^2 \sum_{\k=1}^{\kmax}
+\sum_{\n=1}^\nindiv \sum_{\l=1}^\nloci \sum_{i = 1}^2 \sum_{\k=1}^{\infty}
         \z_{\n\l\i\k} \left(
             \logp(\x_{\n\l\i} \vert \latentpop_{\k}) + \log \pi_{\n\k}
         \right)
 \nonumber\\&
     \quad +
-    \sum_{\n=1}^\nindiv \sum_{k=1}^{\kmax} \log \pstick(\nu_{\n\k})
-    + \sum_{k=1}^{\kmax} \log \pbeta(\latentpop_{\k}).
+    \sum_{\n=1}^\nindiv \sum_{k=1}^{\infty} \log \pstick(\nu_{\n\k})
+    + \sum_{k=1}^{\infty} \log \pbetaprior(\latentpop_{\k}).
 \end{align*}
 \end{ex}
 

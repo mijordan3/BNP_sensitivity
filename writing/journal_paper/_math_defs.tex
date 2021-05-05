@@ -51,7 +51,6 @@
 \def\inflg{\Psi_{\g}}   % The influence function for a function of interest
 
 % Variational parameters
-\def\etatheta{\eta_{\theta}}  % VB parameters for certain components: TODO delete this. using \thetabeta now
 \def\etabeta{\eta_{\beta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
 \def\etalnu{\eta_{\lnu}}  % VB parameters for certain components
@@ -73,7 +72,7 @@
 \def\ptil{\tilde{\p}}   % Other distributions
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
-\def\pbeta{\p_{0}}   % distribution on cluster centroids
+\def\pbetaprior{\p_{0}}   % distribution on cluster centroids
 \def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
@@ -90,9 +89,10 @@
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
 \def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
-\def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
+\def\normalwishart#1{\mathcal{N}\mathcal{W}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
+
 
 \newcommand{\KLglobal}{\mathrm{KL}_{\mathrm{glob}}}   % KL divergence as function of global parameters only
 
