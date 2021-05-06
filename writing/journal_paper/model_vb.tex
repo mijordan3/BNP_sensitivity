@@ -233,7 +233,7 @@ the expectations
 %
 \end{align}
 The first two expectations come from decomposing the mixture weights
-$\expect{\q(\nu \vert \eta)}{\log \pi}$ into its component stick-breaking proportions.
+$\expect{}{\log \pi}$ into its component stick-breaking proportions.
 
 If the prior $\pstick(\nuk)$ were Beta-distributed like in the standard GEM construction,
 then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would also be Beta.
@@ -250,88 +250,138 @@ Each expectation is a univariate integral.
 A particularly easy approximation method is
 Gauss-Hermite (GH) quadrature, which we now describe.
 
-
-In order to optimize the variational objective \eqref{vb_optimization} we see
-from \eqref{stick_log_post} that we need to evaluate or approximate expectations
-of the form
-%
+To take advantage of GH quadrature, we first logit transform the stick-breaking
+proportion $\nuk$ so that the transformed variable
 \begin{align*}
-%
-\expect{\q(\nuk \vert \eta)}{\log \nuk}
-\textrm{,}\quad
-\expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}
-\textrm{,}\quad\textrm{and}\quad
-\expect{\q(\nuk \vert \eta)}{\log \pstick(\nuk)}.
-%
+  \lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right)
+\end{align*}
+is not contrained to be between $(0, 1)$. Let $\s$ be the sigmoid function,
+which provides the inverse transformation,
+\begin{align*}
+  \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 
+We let $\q(\tilde\nuk \vert \eta)$ be normally distributed with
+location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
+This then induces a distribution on our original variable of interest $\nuk$.
 
-
-
-First, define a version of $\nuk$ that is not constrained to $(0,1)$:
-%
-\begin{align}\eqlabel{lnuk_transform}
-%
-\lnuk :={} \log \left( \frac{\nuk}{1 - \nuk} \right)
-\quad\Leftrightarrow\quad
-\nuk :={} \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}.
-%
-\end{align}
-%
-It will be useful later to have at hand the transform between densities
-expressed in the space of $\nu$ and $\lnu$, which is given by
-%
-\begin{align}\eqlabel{lnuk_derivatives}
-%
-\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
-%     \frac{1-\nuk}{\nuk}
-%     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
-% \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
-% \\={}&
-    \frac{1}{\nuk (1 - \nuk)} \mathand
-%
-\fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
-    \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
-%
-\end{align}
-%
-We wish to let $\lnu_\k$ be distributed normally under the variational
-distribution.  Let $\lnumean_\k$ and $\lnusd_\k$ be entries of the parameter
-vector $\eta$, and write
-%
-\begin{align}\eqlabel{lnuk_vb_approximation}
-%
-\q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
-\Rightarrow \\
-\q(\nuk \vert \eta) ={}&
-    \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-        \vert \lnumean_\k, \lnusd_\k}
-    \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
-\nonumber\\={}&
-\normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-        \vert \lnumean_\k, \lnusd_\k}
-    \left|\frac{1}{\nuk (1 - \nuk)}\right|.
-\nonumber
-%
-\end{align}
-%
-Given this, we can approximate expectations of smooth functions
-$f(\nuk)$ using GH quadrature with $\ngh$ knots,
+With this construction, we can approximate expectations of smooth functions
+$f(\nuk)$ (such as $\pstick(\nuk)$) using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %
 \begin{align}\eqlabel{gh_integral}
 %
 \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
 \expect{\q(\lnu_\k \vert \eta)}
-       {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
+       {f\circ \s\left(\lnu_\k\right)}
 \nonumber\\\approx{}&
-    \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
+    \sum_{g=1}^{\ngh} \omega_g f\circ \s \left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
  \nonumber\\=:{}&
 \expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
 %
 \end{align}
 %
-Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a differentiable
+Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a deteriministic, differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
 technique is similar to the ``reparameterization trick,'' only using
-GH points rather than standard normal draws.)
+GH points rather than standard normal draws).
+
+% \subsection*{subsection name}
+%
+% we choose $\q(\nuk \vert \eta)$ to be logit-normally distributed,
+% and express the expectations in \eqref{stick_expectations} as Gaussian integrals.
+% Define
+% \begin{align*}
+%   \tilde \nuk := \log\left(\frac{\nuk}{1 - \nuk}\right),
+% \end{align*}
+% which will be normally distributed under our choice of a
+% logit-normal $\q(\nuk \vert \eta)$.
+%
+% Let $\lnumean_\k$ and $\lnusd_\k$ be entries of $\eta$ corresponding to
+% the logit-normal parameters of $\nuk$.
+%
+%
+% In order to optimize the variational objective \eqref{vb_optimization} we see
+% from \eqref{stick_log_post} that we need to evaluate or approximate expectations
+% of the form
+% %
+% \begin{align*}
+% %
+% \expect{\q(\nuk \vert \eta)}{\log \nuk}
+% \textrm{,}\quad
+% \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}
+% \textrm{,}\quad\textrm{and}\quad
+% \expect{\q(\nuk \vert \eta)}{\log \pstick(\nuk)}.
+% %
+% \end{align*}
+%
+%
+%
+%
+% First, define a version of $\nuk$ that is not constrained to $(0,1)$:
+% %
+% \begin{align}\eqlabel{lnuk_transform}
+% %
+% \lnuk :={} \log \left( \frac{\nuk}{1 - \nuk} \right)
+% \quad\Leftrightarrow\quad
+% \nuk :={} \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}.
+% %
+% \end{align}
+% %
+% It will be useful later to have at hand the transform between densities
+% expressed in the space of $\nu$ and $\lnu$, which is given by
+% %
+% \begin{align}\eqlabel{lnuk_derivatives}
+% %
+% \fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
+% %     \frac{1-\nuk}{\nuk}
+% %     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
+% % \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
+% % \\={}&
+%     \frac{1}{\nuk (1 - \nuk)} \mathand
+% %
+% \fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
+%     \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
+% %
+% \end{align}
+% %
+% We wish to let $\lnu_\k$ be distributed normally under the variational
+% distribution.  Let $\lnumean_\k$ and $\lnusd_\k$ be entries of the parameter
+% vector $\eta$, and write
+% %
+% \begin{align}\eqlabel{lnuk_vb_approximation}
+% %
+% \q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
+% \Rightarrow \\
+% \q(\nuk \vert \eta) ={}&
+%     \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
+%         \vert \lnumean_\k, \lnusd_\k}
+%     \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
+% \nonumber\\={}&
+% \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
+%         \vert \lnumean_\k, \lnusd_\k}
+%     \left|\frac{1}{\nuk (1 - \nuk)}\right|.
+% \nonumber
+% %
+% \end{align}
+% %
+% Given this, we can approximate expectations of smooth functions
+% $f(\nuk)$ using GH quadrature with $\ngh$ knots,
+% located at $\xi_g$, weighted by $\omega_g$:
+% %
+% \begin{align}\eqlabel{gh_integral}
+% %
+% \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
+% \expect{\q(\lnu_\k \vert \eta)}
+%        {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
+% \nonumber\\\approx{}&
+%     \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
+%  \nonumber\\=:{}&
+% \expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
+% %
+% \end{align}
+% %
+% Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a differentiable
+% function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
+% technique is similar to the ``reparameterization trick,'' only using
+% GH points rather than standard normal draws.)
