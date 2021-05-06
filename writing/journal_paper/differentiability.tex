@@ -1,61 +1,13 @@
 % Load tex files defining the some graphics.
 
-Although \corref{etafun_deriv_form} is explicitly about a fixed $\phi$,
-it suggests an intriguing result if it is taken to hold for all $\phi$ in some
-ball, $\ball_p(\delta) := \{\phi: \norm{\phi}_{\lambda,p} \le \delta \}$.
-Specifically, let $q^{-1} + p^{-1} = 1$ and observe that, by Holder's inequality,
-%
-\begin{align*}
-%
-\sup_{\phi \in \ball_p(\delta)} \fracat{d \etaopt(\t \phi)}{d \t}{0} ={}&
-    \sup_{\phi \in \ball_p(\delta)}
-        \int \infl_p(\theta) \phi(\theta) \lambda(d\theta)
-\\\le{}&
-    \sup_{\phi \in \ball_p(\delta)}
-        \left( \int \abs{\infl_p(\theta)}^{1/q} \lambda(d\theta) \right)^q
-        \left( \int \abs{\phi(\theta)}^{1/p} \lambda(d\theta)\right)^p
-\\={}&
-\delta \left( \int \abs{\infl_p(\theta)}^{1/q} \lambda(d\theta) \right)^q,
-%
-\end{align*}
-%
-with equality at the ``worst-case'' perturbation
-%
-\begin{align*}
-%
-\phi^*(\theta) \propto \abs{\infl_p(\theta)}^{p/q}.
-%
-\end{align*}
-%
-The constant of proportionality in the preceding display must be adjusted so
-that $\norm{\phi^*(\theta)}_{\lambda,p} = \delta$.  These ``worst-case''
-perturbations are the variational Bayes analogues of the corresponding
-``worst-case'' for exact Bayesian posteriors in \citet{gustafson:1996:local}.
-
-The worst-case perturbation can be difficult to interpret for several reasons.
-First of all, although the ``size'' of a perturbation in $\lp{\lambda,p}$ has
-many attractive theoretical properties, it can be hard to have a subjective
-opinion about.  Note that the predicted effect of the perturbation is linear in
-the $\delta$ in $\ball_p(\delta)$ over which you are taking a supremum; to a
-large extent, whether or not a problem is ``robust'' under the perturbation
-$\phi^*(\theta)$ will depend on how large $\delta$ is allowed to be, and it can
-be difficult to have a strong {\em a priori} opinion about how large $\delta$
-should be.  Additionally, the form of $\phi^*(\theta)$ can appear unreasonably
-adversarial. Note that the influence function $\psi(\theta)$ is proportional to
-the variational posterior $\q(\theta \vert \etaopt)$.  As a result,
-$\phi^*(\theta)$ will tend to add and remove a great deal of prior mass
-immediately in the vicinity of the posterior mass.  For these reasons,
-one might wish to use the influence function more as an informal guide to
-selecting and testing perturbations that are likely to be influential.
-
-Whether formally or informally, however, when using a linear approximation to
-searching over a in infinite dimensional space, one needs to be concerned about
-at least two fundamental properties of your derivative.  First, one must ask
-whether the derivative even exists for every $\phi \in \ball_p(\delta)$. More
-stringenty, one should also ask whether the derivative forms a uniformly good
-approximation to the original function for every $\phi \in \ball_p(\delta)$.
-These two properties are formalized in functional analysis by the following
-definition.
+In the \secref{valid_priors}, we proved that directional derivatives exist for
+$p \in [1, \infty)$, at least for all perturbations of the form given by
+\defref{prior_nl_pert}. However, when using a linear approximation to searching
+over a in infinite dimensional space, one needs to ask not only whether the
+derivative exists, but also whether the derivative forms a uniformly good
+approximation to the original function for every $\phi \in \ball_p(\delta)$. In
+functionaly analysis, one way to characterize the uniform accuracy of the
+derivative is through the concept of Fr{\'e}chet, or bounded, differentiability.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,11 +54,72 @@ $\phi$:
 Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
 \defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
 then the two derivatives must coincide \citep[Proposition
-4.8]{zeidler:2013:functional}, which justifies our presumptuous notation.
+4.8]{zeidler:2013:functional}, which justifies our notation.
 
-In order to motivate our concern, let us consider the following simple example.
-It is possible for functions to be directionally but not boundedly
-differentiable even in $\mathbb{R}^2$, as the following example demonstrates.
+Before proceeding with the more complicated discussion of $p \in [1, \infty)$,
+we observe that the stringent requirements of the $\lp{\mu,\infty}$ ball
+are sufficient to guarantee Fr{\'e}chet differentiability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_fun_stick_regular}
+%
+Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
+stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
+\etaopt$ and with $\psi(\zeta, \t) = 1$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{eta_phi_deriv}
+%
+Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
+\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
+neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
+with the derivative given in \corref{etafun_deriv_form}.
+
+(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
+
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As observed in \thmref{pert_well_defined} and \exref{beta_inf_norm}, the
+$\ball_{\mu,\infty}(\delta)$ is a restrictive set.  No matter how large
+$\delta$ is, there exist valid priors outside of $\ball_{\mu,\infty}(\delta)$.
+\Thmref{eta_phi_deriv} rewards this restrictiveness with differentiability---at
+the expense of considering a limited set of priors, we are guaranteed that
+the derivatives satisfy the minimal requirements in a ball around $\phiz$.
+
+We now turn to the more expressive unit ball with $p \in [1, \infty)$. Note that
+\thmref{lp_derivative} and \corref{pertset_bounded_below} above proved that {\em
+directional derivatives} exits for all $\phi \in \pertset$ when $p \in [1,
+\infty)$.  We also showed in \thmref{pert_well_defined} and \exref{lp_negative}
+that $\KL{\eta, \phi}$ cannot be defined, at least not naiveley, for all $\phi
+\in \ball_{\mu,p}(\delta)$, no matter how small $\delta$. Since, in a sense, we
+are only interested in $\phi \in \pertset$, we might as whether we cannot form
+some smooth, Fr{\'e}chet differentiable extension of the KL divergence to $\phi$
+outside $\pertset$, e.g. of the form
+%
+\begin{align*}
+%
+\KLhat{\eta, \phi} :=
+\begin{cases}
+    \KL{\eta, \phi} & \textrm{when }\essinf_{\theta \sim \mu}
+        \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty\\
+    \KL{\eta, \phiz} & \textrm{otherwise}.
+\end{cases}
+%
+\end{align*}
+%
+Our key result below is be that no such extension will be Fr{\'e}chet
+differentiable.
+
+In order to motivate our concern about differentiability, it will be useful to
+consider the following example in $\mathbb{R}^2$ of a function that is
+directionally differentiable but not Fr{\'e}chet differentiable.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,8 +135,8 @@ f(r, \theta) := \begin{cases}
     \left(\frac{r}{| \sin \theta |}\right)^2
         & \textrm{when } \theta \notin \{\pi k: k \in \mathbb{Z}\}
         \textrm{ and } r > 0 \\
-    0. & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
-        \} \textrm{ or }r = 0
+    0 & \textrm{when } \theta \in \{\pi k: k \in \mathbb{Z}
+        \} \textrm{ or }r = 0.
 %
 \end{cases}
 %
@@ -158,10 +171,10 @@ of $\theta(r)$, the error in the linear approximation is $f(r, \theta(r)) - 0 =
 
 Fr{\'e}chet differentiability is only concerned with an infinitesimal
 neighborhood.  The function can behave arbitrarily badly in a region just
-outside the point at which the derivative is computed and retain Fr{\'e}che
+outside the point at which the derivative is computed and retain Fr{\'e}chet
 differentiability. In this sense, Fr{\'e}chet differentiability is a desirable
 but not sufficient requirement if we are interested in extrapolating using
-linear approximations.  We illustrate this point in the
+linear approximations.  The next example illustrates this fact.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,7 +186,7 @@ by $\fracat{\partial^2 f(r, \theta)}{\partial r^2}{r=0} = \frac{1}{2 |\sin
 or to $\pi$.  We could modify $f(r, \theta)$ to be Fr{\'e}chet differentiable by
 smoothly ``capping'' $1 / |\sin \theta|$ at some arbitrarily large value.
 However, the ability to meaningfully extrapolate $f(r, \theta)$ in the direction
-of a very large but finite second derivative will still be extremely limited.
+of a very large but finite second derivative remains limited.
 
 In the context of \exref{r2_pathological}, fix some $0 < M < \infty$,
 and define
@@ -205,13 +218,13 @@ differentiable functions.
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-\Exref{r2_pathological} is neither Fr{\'e}chet differentiable nor continuous,
-whereas \exref{r2_pathological} is both Fr{\'e}chet differentiable and
-continuous.  In general, however, Fr{\'e}chet differentiability is stronger than
-continuity, in the sense that Fr{\'e}chet differentiability implies continuity,
-but continuity does not imply Fr{\'e}chet differentiability \citep[Proposition
-4.8 (d)]{zeidler:2013:functional}.  See also \citet[Example
+Given that \exref{r2_pathological} is neither Fr{\'e}chet differentiable nor
+continuous, whereas \exref{r2_pathological} is both Fr{\'e}chet differentiable
+and continuous, one might wonder whether Fr{\'e}chet differentiability is
+equivalent to continuity.  In general, Fr{\'e}chet differentiability is stronger
+than continuity, in the sense that Fr{\'e}chet differentiability implies
+continuity, but continuity does not imply Fr{\'e}chet differentiability
+\citep[Proposition 4.8 (d)]{zeidler:2013:functional}.  See also \citet[Example
 1.9]{averbukh:1967:theory} for a simple example of a function on $\mathbb{R}^2$
 that is continuous and directionally differentiable but not Fr{\'e}chet
 differentiable.
@@ -219,49 +232,15 @@ differentiable.
 The sort of pathology exhibited by \exref{r2_pathological, r2_pathological_v2}
 requires some care to construct in $\mathbb{R}^2$, but requires some care to
 avoid in infinite-dimensional spaces.  We now give an illustrative example in
-the $\lp{p}$ spaces.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}\exlabel{e_log_disocontinuous_v1}
-%
-Let $\q(\theta)$ and $\p(\theta)$ be densities relative to a continuous measure
-$\lambda$.  Let $\gamma \in \lp{\p,p}$ with $1 \le p < \infty$, and define
-%
-\begin{align*}
-%
-f(\gamma) = \begin{cases}
-\expect{\q(\theta)}{\log\left(1 + \gamma\right)}
-    & \textrm{when }\inf_\theta \gamma(\theta) > -1 \\
--\infty & \textrm{otherwise}.
-\end{cases}
-%
-\end{align*}
-%
-Then $f(\gamma)$ is trivially discontinuous at $\phiz$ since, for any $\gamma$
-such that $\inf_\theta \gamma(\theta) = -\infty$,
-%
-\begin{align*}
-%
-f(\t \gamma) = -\infty \mathtxt{for any }\t > 0 \mathtxt{but} f(\phiz) = 0.
-%
-\end{align*}
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The problem with \exref{e_log_disocontinuous_v1} is not merely with
-functions unbounded below, however.
+the $\lp{p}$ spaces, which is closely related to the difficulties we encounter
+analyzing $\KL{\eta, \phi}$ for $p \in [1, \infty)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{e_log_disocontinuous_v2}
 %
-In the setting of \exref{e_log_disocontinuous_v1}, assume further that there
-exists a sequence $\epsilon_n \rightarrow 0$, such that for each $\epsilon_n$ in
-the sequence $\epsilon_n > 0$ and there exists a set $S_{\epsilon_n}$ such that
-$\p(S_{\epsilon_n}) = \epsilon_n$ and $\q(S_{\epsilon_n}) > 0$. Define
+Let us try to smooth the example \exref{e_log_disocontinuous_v1} by excising its
+behavior on the pathological arguments that are unbounded below. Define
 %
 \begin{align*}
 %
@@ -271,8 +250,8 @@ $\p(S_{\epsilon_n}) = \epsilon_n$ and $\q(S_{\epsilon_n}) > 0$. Define
 \end{cases}
 %
 \end{align*}
-%
-Now, with $\gamma$ such that $\inf_\theta \gamma(\theta) = -\infty$,
+
+Note that if $\gamma$ satisfies $\inf_\theta \gamma(\theta) = -\infty$,
 %
 \begin{align*}
 %
@@ -281,7 +260,14 @@ Now, with $\gamma$ such that $\inf_\theta \gamma(\theta) = -\infty$,
 \end{align*}
 %
 So the discontinuity of \exref{e_log_disocontinuous_v1} no longer applies.
-However, $\tilde{f}$ is still discontinuous.
+However, we will show that $\tilde{f}$ remains discontinuous in an $\lp{\mu,p}$
+space under some mild conditions. Assume that $\mu \ll \lambda$, and that for a
+given measure $\gamma \in \lp{\p,p}$ with $1 \le p < \infty$ and  $\p \ll \q$.
+
+By continuity of the dominating Lebesgue measure (\lemref{continuity_partition})
+there exists a positive sequence $\epsilon_n \rightarrow 0$, such that for each
+$\epsilon_n$ there exists a set $S_n$ with $\p(S_n) = \epsilon_n$.
+Since $\p \ll \q$, $\q(S_{\epsilon_n}) > 0$ as well.
 
 For each $\epsilon_n$, and for a given $\c_n > 0$ and $0 < \delta_n < 1$, define
 %
@@ -343,36 +329,33 @@ extended to functions outside $\pertset$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\begin{cor}\corlabel{kl_discontinuous}
+\begin{thm}\thmlabel{kl_discontinuous}
 %
-Assume that $\pbase(\theta)$ is defined relative to the Lebesgue measure, that
-that $\etaopt$ it a VB optimum, and that $\KL{\q(\theta \vert \etaopt) ||
-\pbase(\theta)}$ is well-defined.
-
-Take $1 \le p < \infty$ and the class of perturbations defined in
-\defref{prior_nl_pert}, and the space $\lp{\lambda, p}$.  Then the map $\phi
-\mapsto \KL{\etaopt, \phi}$ is discontinuous at $\phiz$ on the set $\pertset$,
-in the sense that, for any $\epsilon$, there exists a $\phi \in \pertset$ such
-that
+Fix the quantities in \defref{prior_nl_pert} with $p \in [1, \infty)$.  Let
+$\etaopt$ denote a VB optimum, and that $\KL{\q(\theta \vert \etaopt) ||
+\pbase(\theta)}$ is well-defined. Then the map $\phi \mapsto \KL{\etaopt, \phi}$
+is discontinuous at $\phiz$ on the set $\pertset$, in the sense that, for any
+$\epsilon$, there exists a $\phi \in \pertset$ such that
 %
 \begin{align*}
 %
-\norm{\phi}_{\lambda,p} \le \epsilon \mathand
+\norm{\phi}_{\mu,p} \le \epsilon \mathand
 \abs{\KL{\etaopt, \phiz} - \KL{\etaopt, \phiz}} \ge 1.
 %
 \end{align*}
 %
-Consequently, any version of $\KL{\eta, \phi}$ that coincides with $\KL{\eta,
-\phi}$ on $\pertset$ is not Fr{\'e}chet differentiable at $\etaopt, \phiz$.
+Consequently, any version $\KLhat{\eta, \phi}$ of the KL divergence that
+coincides with $\KL{\eta, \phi}$ on $\pertset$ is not, in general, Fr{\'e}chet
+differentiable at $\etaopt, \phiz$.
 %
 \begin{proof}
 %
-Since $\pbase$ is defined relative to the Lebesgue measure, there exists a
-sequence $\epsilon_n \rightarrow 0$ and sets $S_{\epsilon_n}$ such that
-$\pbase(S_{\epsilon_n}) = \epsilon_n$.  $\KL{\q(\theta \vert \etaopt) ||
-\pbase(\theta)}$ is well-defined, $\q(\theta \vert \etaopt)$ and
-$\pbase(\theta)$ are mutually absolutely continuous, so $\q(S_{\epsilon_n}) >
-0$.
+% By continuity of the dominating Lebesgue measure
+% (\lemref{continuity_partition}), there exists a sequence $\epsilon_n \rightarrow
+% 0$ and sets $S_n$ such that $\pbase(S_{\epsilon_n}) = \epsilon_n$.
+% $\KL{\q(\theta \vert \etaopt) || \pbase(\theta)}$ is well-defined, $\q(\theta
+% \vert \etaopt)$ and $\pbase(\theta)$ are mutually absolutely continuous, so
+% $\q(S_{\epsilon_n}) > 0$.
 
 By \eqref{nl_vb_pert_p}, the KL divergence $\KL{\etaopt, \phi}$ is of the form
 %
@@ -380,12 +363,12 @@ By \eqref{nl_vb_pert_p}, the KL divergence $\KL{\etaopt, \phi}$ is of the form
 %
 \KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
 \expect{\q(\theta \vert \etaopt)}{
-    \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+    \log\left(1 + \frac{\phi(\theta)}{p \pbase(\theta)^{1/p}}\right)
 }.
 %
 \end{align*}
 %
-Take $\alpha = 1/p$ and
+Let us choose a $\phi \in \pertset$.  Take $\beta = p$ and
 %
 \begin{align*}
 %
@@ -394,14 +377,14 @@ Take $\alpha = 1/p$ and
         \left( \frac{1 - \epsilon\delta}{1 - \epsilon}\right)^{p}
         \ind{\theta \notin S_{\epsilon}} +
         \delta^{p} \ind{\theta \in S_{\epsilon}}
-    \right) \mathand
+    \right) \textrm{ so that}
 \\
-\phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}.
+\phi(\theta) ={}& p \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}.
 %
 \end{align*}
 %
-Then $\phi \in \pertset$.   Define $\gamma(\theta) = \phi(\theta) /
-\pbase(\theta)^{1/p}$, and note that $\gamma \in \lp{\pbase, p}$ with
+So $\phi \in \pertset$.  Define $\gamma(\theta) = \phi(\theta) /
+p \pbase(\theta)^{1/p}$, and note that $\gamma \in \lp{\pbase, p}$ with
 $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{\lambda, p}$, and
 %
 \begin{align*}
@@ -417,152 +400,39 @@ The result then follows from \exref{e_log_disocontinuous_v2}, with $\p =
 %
 \end{proof}
 %
-\end{cor}
+\end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Despite \corref{kl_discontinuous}, the directional derivatives exist
-as long as $\inf_\theta \phi(\theta) > -\infty$.
+Combinging \thmref{lp_derivative} and \thmref{kl_discontinuous}, we see that the
+case of $p \in [1, \infty)$ is quite similar to \exref{r2_pathological}. Though
+every directional derivative exists, the quality of the linear approximation can
+be arbitrarily poor; in the $\lp{\mu,p}$ space, the role of $\theta$ near
+integer multiples of $\pi$ is played by prior perturbations with density near
+zero in small sets of nonzero measure.  To carry the analogy futher, one might
+be tempted to further restrict $\phi$ so that $\p(\theta \vert \phi)$ is bounded
+away from zero.  Even if it were possible to do so smoothly,
+\exref{r2_pathological_v2} provides a cautionary warning.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{lp_regular}
-%
-Fix $p$, $\pbase$, and $\lambda$ as in \defref{prior_nl_pert}, and let
-$\q(\theta)$ be a density defined relative to $\lambda$.  Let $q$ be the real
-number such that $p^{-1} + q^{-1} = 1$.  Fix a function $\psi(\theta): \thetadom
-\mapsto \mathbb{R}$ with $\expect{\q(\theta)}{\abs{\psi(\theta)}} < \infty$, and
-assume that
-%
-\begin{align*}
-%
-\int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^q
-\pbase(\theta) \lambda(d\theta) < \infty.
-%
-\end{align*}
-%
-% or, equivalently, that
-% %
-% \begin{align*}
-% %
-% \int \abs{\frac{\psi(\theta) \q(\theta)}{\pbase(\theta)}}^{q-1}
-%     \q(\theta) \lambda(d\theta)
-% < \infty.
-% %
-% \end{align*}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Indeed, the tension between differentiability and expressiveness appears
+fundamental.  Consider \figref{func_dist}.  These two densities are far from one
+another according to KL divergence (from blue to red) since the red density has
+nearly zero mass where the blue does not.  They are also distant from one
+another in $\norminf{\cdot}$, since it takes a large multiplicative change to
+turn a nonzero number into a nearly zero number.  However, the two densities are
+close in $\norm{\cdot}_{p}$, since the region where the red density is nearly
+zero has a small measure. In order for VB approximations to be continuous (a
+necessary condition for Fr{\'e}chet differentiability), one must consider a
+topology on priors that is no coarser than the topology induced by KL
+divergence.  But since valid priors can take values close to zero, a sacrifice
+in expressiveness of the neighborhood of zero must be made in order to induce a
+topology that works with KL divergence.  Multiplicative changes and the
+$\norminf{\cdot}$ norm make such a tradeoff in a natural, easy-to-understand
+way.  If one desires a more expressive prior space, it seems to the authors more
+fruitful to investigate variational divergences other than KL rather than
+attempt to adapt the space of prior perturbations.
 
+\FunctionDistFig{}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_regular_lp}
-%
-For each $\eta$ in an open set $\ball_\eta$, let \assuref{lp_regular} hold with
-$\psi(\theta)$ equal to each of the following functions:
-%
-\begin{align*}
-%
- \norm{\lqgrad{\theta, \eta}}_2 \textrm{, }
- \norm{\lqgrad{\theta, \eta}}^2_2 \textrm{ and }
- \norm{\lqhess{\theta, \eta}}^2.
-%
-\end{align*}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{thm}\lemlabel{lp_derivative}
-%
-Fix $\pbase$, $\lambda$, and $1 \le p < \infty$ as in \defref{prior_nl_pert}.
-Let $\q(\theta \vert \eta)$ define a class of densities relative to $\lambda$
-parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
-\assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
-\assuref{kl_opt_ok}.
-
-Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
-$\inf_\theta \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the function $\t
-\mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the derivative
-given in \corref{etafun_deriv_form}.
-%
-\begin{proof}
-%
-The KL divergence is given by
-%
-\begin{align*}
-%
-\KL{\eta, \t} ={}&
-    \KL{\eta, 0} +
-    \expect{\q(\theta \vert \eta)}
-           {\log \left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \right)}.
-%
-\end{align*}
-%
-Define $\gamma(\theta) := \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}$, and note
-that $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{p}$, so $\norm{\gamma}_{\pbase,
-p} \le \infty$ and $\inf_\theta \gamma(\theta) > -\infty$.  By
-\assuref{q_regular_lp} and \lemref{lp_integral_bound}, we have that that
-\assuref{dist_fun_nice} holds with $\psi(\theta, \t) = \log \left(1 + \t
-\frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)$, and \thmref{etat_deriv}
-holds.
-%
-\end{proof}
-%
-\end{thm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-The problems are only with priors near zero, which are not possible for
-the log perturbation.  Indeed, we have:
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_fun_stick_regular}
-%
-Assume that the variational approximations $\q(\nu \vert \etanuk)$ to the
-stick-breaking posteriors satisfy \assuref{dist_fun_nice} with $\eta_0 =
-\etaopt$ and with $\psi(\zeta, \t) = 1$.
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}\thmlabel{eta_phi_deriv}
-%
-Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
-\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
-neighborhood of $\phiz$ as a map from $\linf$ to $\mathbb{R}^\etadim$,
-with the derivative given in \corref{etafun_deriv_form}.
-
-(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
-% Furthermore, the derivative at $\phiz$ in the direction $\phi$ is of the form
-% %
-% \begin{align}
-% %
-% \fracat{d \etaopt(\phi)}{d\phi}{\phiz} \phi ={}&
-%     \int \infl(\nu) \phi(\nu) d\nu \mathtxt{where} \eqlabel{infl_defn}\\
-% %
-% \infl(\nu) :={}&
-% -\left(\fracat{\partial^2 \KL{\eta, \phiz}}
-%                 {\partial \eta \partial \eta^T}
-%                 {\etaopt}\right)^{-1}
-% \left(
-%     \sumkm
-%     \q(\nu \vert \etaoptnuk) \lqgradbar{\nuk \vert \etanuk}
-% \right). \nonumber
-% %
-% \end{align}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\end{thm}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In light of the strong result of \thmref{eta_phi_deriv} and the negative result
+of \thmref{kl_discontinuous}, we consider only $p = \infty$ and multiplicative
+perturbations for our real-world experiments.

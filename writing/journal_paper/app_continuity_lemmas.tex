@@ -8,24 +8,24 @@ frequently, we state it here in our own notation as \thmref{dct}.
 \begin{thm}\thmlabel{dct}
 \citep[Theorem 16.8]{billingsley:1986:probability}
 %
-Let $\lambda$ be a probability measure on $\thetadom$, and let $S_\t \subseteq
+Let $\mu$ be sigma-finite measure on $\thetadom$, and let $S_\t \subseteq
 \mathbb{R}$.  Let $f:\thetadom \times S_\t \mapsto \mathbb{R}$.
 
-If there exists a function $M(\theta)$ with $\int M(\theta) \lambda(d\theta) <
-\infty$ such that $\abs{f(\theta, \t)} \le M(\theta)$, $\lambda$-almost surely,
+If there exists a function $M(\theta)$ with $\int M(\theta) \mu(d\theta) <
+\infty$ such that $\abs{f(\theta, \t)} \le M(\theta)$, $\mu$-almost surely,
 for all $\t \in S_\t$, then the map $\t \mapsto \int f(\theta, \t)
-\lambda(d\theta)$ is continuous.
+\mu(d\theta)$ is continuous.
 
 Further, suppose that the derivative $\fracat{\partial f(\theta, \t)}{\partial
-\t}{\t}$ exist $\lambda$-almost surely for $\t \in S_\t$.  If there exists
-an $M'(\theta)$ such that $\int M'(\theta) \lambda(d\theta) < \infty$ and
+\t}{\t}$ exist $\mu$-almost surely for $\t \in S_\t$.  If there exists
+an $M'(\theta)$ such that $\int M'(\theta) \mu(d\theta) < \infty$ and
 $\abs{\fracat{\partial f(\theta, \t)}{\partial \t}{\t}} \le M'(\theta)$,
-$\lambda$-almost surely and for all $\t \in S_\t$, then
+$\mu$-almost surely and for all $\t \in S_\t$, then
 %
 \begin{align*}
 %
-\fracat{\partial \int f(\theta, \t) \lambda(d\theta)}{\partial \t}{\t} =
-     \int \fracat{\partial f(\theta, \t)}{\partial \t}{\t} \lambda(d\theta).
+\fracat{\partial \int f(\theta, \t) \mu(d\theta)}{\partial \t}{\t} =
+     \int \fracat{\partial f(\theta, \t)}{\partial \t}{\t} \mu(d\theta).
 %
 \end{align*}
 %
@@ -101,14 +101,14 @@ integration and differentiation as in \citep[Theorem
 \begin{align*}
 %
 \MoveEqLeft
-\fracat{\partial \int \q(\theta \vert \nu) \psi(\theta \vert \t) \lambda(d\theta)}
+\fracat{\partial \int \q(\theta \vert \nu) \psi(\theta \vert \t) \mu(d\theta)}
        {\partial \eta}{\eta}
 ={}\\&
 \int \fracat{\partial \q(\theta \vert \nu) \psi(\theta \vert \t) }
-          {\partial \eta}{\eta} \lambda(d\theta)={}
+          {\partial \eta}{\eta} \mu(d\theta)={}
 &\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and \thmref{dct})}
 \\&
-\int \lqgrad{\theta, \eta} \psi(\theta \vert \t) \q(\theta, \eta) \lambda(d\theta) ={}
+\int \lqgrad{\theta, \eta} \psi(\theta \vert \t) \q(\theta, \eta) \mu(d\theta) ={}
 \\&
 \expect{\q(\theta, \eta)}{\lqgrad{\theta, \eta} \psi(\theta \vert \t) }.
 %
@@ -119,8 +119,8 @@ Applying analogous reasoning to the denominator of
 \begin{align*}
 %
 \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)} =
-\frac{\int \psi(\theta, \t) \q(\theta \vert \eta) \lambda(d\theta)}
-     {\int \q(\theta \vert \eta) \lambda(d\theta)}
+\frac{\int \psi(\theta, \t) \q(\theta \vert \eta) \mu(d\theta)}
+     {\int \q(\theta \vert \eta) \mu(d\theta)}
 %
 \end{align*}
 %
@@ -253,29 +253,29 @@ are continuous.  For example,
 \norm{\int \left(
 \q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
 \q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
-\right)\lambda(d\theta)
+\right)\mu(d\theta)
 }_2  \le\\&
 %
 \int \norm{
 \q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
 \q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
-}_2 \lambda(d\theta) \le\\&
+}_2 \mu(d\theta) \le\\&
 %
 \int \norm{
 \left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
     \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
-}_2 \lambda(d\theta) + \\&\quad
+}_2 \mu(d\theta) + \\&\quad
 %
 \int \norm{
 \q(\theta \vert \eta')
     \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
     \psigrad{\theta, \t}
-}_2 \lambda(d\theta) + \\&\quad
+}_2 \mu(d\theta) + \\&\quad
 %
 \int \norm{
 \q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
     \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
-}_2 \lambda(d\theta).
+}_2 \mu(d\theta).
 %
 \end{align*}
 %
@@ -295,18 +295,18 @@ each term in the final line of the preceding display, giving
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
 \left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
     \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
-}_2 \lambda(d\theta) + \\&\quad
+}_2 \mu(d\theta) + \\&\quad
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
 \q(\theta \vert \eta')
     \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
     \psigrad{\theta, \t}
-}_2 \lambda(d\theta) + \\&\quad
+}_2 \mu(d\theta) + \\&\quad
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
 \q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
     \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
-}_2 \lambda(d\theta) = 0,
+}_2 \mu(d\theta) = 0,
 %
 \end{align*}
 %
@@ -356,7 +356,7 @@ Next, we prove a result for directional derivatives in $\lp{p}$ spaces.
 %
 Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$
 and $\inf_\theta \gamma(\theta) > -\infty$, then there
-exists an $M(\theta)$ with $\int M(\theta) \lambda(d\theta) < \infty$
+exists an $M(\theta)$ with $\int M(\theta) \mu(d\theta) < \infty$
 such that, for all $0 \le \t \le (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$,
 %
 \begin{align}
@@ -389,17 +389,17 @@ Expanding the integral,
 \MoveEqLeft
 \int \abs{\psi(\theta)}
     \abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
-    \lambda(d\theta) ={}
+    \mu(d\theta) ={}
 \\&
 \int \abs{\psi(\theta)}
     \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) \le 0}
-    \q(\theta)\lambda(d\theta)  +
+    \q(\theta)\mu(d\theta)  +
 \\&
 \int \abs{\psi(\theta)}
     \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) > 0}
-    \q(\theta)\lambda(d\theta).
+    \q(\theta)\mu(d\theta).
 %
 \end{align*}
 %
@@ -417,40 +417,40 @@ and Holder's inequality with respect to $\pbase(\theta)$,
 \int \abs{\psi(\theta)}
     \abs{\log\left(1 + \t \gamma(\theta)\right)}
     \ind{\gamma(\theta) > 0}
-    \q(\theta)\lambda(d\theta)
+    \q(\theta)\mu(d\theta)
 \\\le{}&
 \t
 \int \abs{\psi(\theta)}
     \abs{\gamma(\theta)}
     \ind{\gamma(\theta) > 0}
-    \q(\theta)\lambda(d\theta)
+    \q(\theta)\mu(d\theta)
 \\={}&
 \t
 \int \abs{\psi(\theta)}
     \abs{\gamma(\theta)}
     \ind{\gamma(\theta) > 0}
-    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \lambda(d\theta)
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
 \\\le{}&
 \t
 \int \abs{\psi(\theta)}
     \abs{\gamma(\theta)}
-    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \lambda(d\theta)
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
 \\\le{}&
 \t_{max}
 \left(
 \int
     \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
-    \pbase(\theta) \lambda(d\theta)
+    \pbase(\theta) \mu(d\theta)
 \right)^{1/q}
 \left(
-\int\abs{\gamma(\theta)}^p \pbase(\theta) \lambda(d\theta)
+\int\abs{\gamma(\theta)}^p \pbase(\theta) \mu(d\theta)
 \right)^{1/p}
 \\\le{}&
 \t_{max}
 \left(
 \int
     \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
-    \pbase(\theta) \lambda(d\theta)
+    \pbase(\theta) \mu(d\theta)
 \right)^{1/q}
 \norm{\gamma}_{\pbase,p}.
 %
@@ -475,6 +475,37 @@ Thus \eqref{lp_integral_deriv_bound} was proven along the way to
 proving \eqref{lp_integral_bound}.
 %
 \end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+The next lemma is a different kind of continuity lemma.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{continuity_partition}
+%
+Let $\epsilon'_n = n^{-1}$.  Since $\pbase \ll \mu \ll \lambda$ (where $\lambda$
+is the Lebesgue measure), by applying \citet[Proposition
+15.5]{nielsen:1997:measure}, for each $n$ there exists a $\delta'_n$ such that,
+for any measureable set $A$ with $\mu(A) < \delta'_n$, $\pbase(A) <
+\epsilon'_n$.  Again applying \citet[Proposition 15.5]{nielsen:1997:measure},
+there similarly exists a $\delta_n$ such that for any measureable set $A$ with
+$\lambda(A) < \delta_n$, $\mu(A) < \delta'_n \Rightarrow \pbase(A) <
+\epsilon'_n$.
+
+For each $n$, partition $\thetadom$ into a countable number of sets $A_{m}$ such
+that $\sum_{m} \lambda(A_{m}) = 1$ and $\lambda(A_{m}) < \delta_n$. (This is
+possible by dividing $\thetadom$ into sufficiently small rectangles, for
+example.)  Then $\pbase(A_{m}) < \epsilon'_n$ for all $m$.  Since $\pbase$ is a
+probability measure, $\sum_m \pbase(A_{m}) = 1$, so there must exist at least $1 /
+\epsilon'_n$ indices $m'$ such that $\pbase(A_{m'}) > 0$. Take any such $m'$ and
+let $\epsilon_n = \pbase(A_{m'})$ and $S_n = A_{m'}$.
+
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
