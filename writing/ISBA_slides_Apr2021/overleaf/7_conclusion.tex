@@ -1,0 +1,50 @@
+\begin{frame}{Conclusions}
+
+\begin{itemize}
+\item We provide a tool to efficiently evaluate the sensitivity of the variational posterior to prior choices.
+\item Linearizing the variational parameters provides a reasonable alternative to
+re-optimizing the variational approximation
+after model perturbations.
+\item For variational approximations based on KL divergence, one should express
+functional perturbations multiplicatively.
+\item The influence function can provide guidance for finding particularly sensitive model perturbations which can be investigated by re-fitting.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Links and references}
+
+\footnotesize
+
+% {\bf A workshop paper: }\newline
+Runjing Liu, Ryan Giordano, Michael I. Jordan, Tamara Broderick. \newline
+“Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics.”
+\newline {\color{blue}\url{https://arxiv.org/pdf/1810.06587.pdf}}
+
+% \vspace{0.5em}
+
+% {\bf Code: }\newline
+% Paragami: parameter folding and flattening for optimization problems \newline
+% {\color{blue}\url{https://github.com/rgiordan/paragami}}
+%
+% Vittles: library for sensitivity analysis in optimization problems \newline
+% {\color{blue}\url{https://pypi.org/project/vittles/}}
+%
+JAX: composable transformations of Python+NumPy programs \newline
+{\color{blue}\url{https://github.com/google/jax}}
+\vspace{-0.5em}
+
+\par\noindent\rule{\textwidth}{0.4pt}
+
+\vspace{-0.5em}
+
+\bibliographystyle{plainnat}
+% Hide the references header
+% https://tex.stackexchange.com/questions/22645/hiding-the-title-of-the-bibliography/370784
+\begingroup
+\renewcommand{\section}[2]{}%
+\bibliography{references}
+\endgroup
+
+\end{frame}

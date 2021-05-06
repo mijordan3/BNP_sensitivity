@@ -73,8 +73,8 @@
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
 \def\logp{\log \p}   % Log probabiltty
-\def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
-\def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
+\def\lqgrad#1{{\nabla_\eta \log \qtil}\left(#1\right)}   % Log VB distribution gradient
+\def\lqhess#1{{\nabla_\eta^2 \log \qtil}\left(#1\right)}   % Log VB distribution Hessian
 \def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
 \def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
 \def\psigrad#1{{\nabla_\t \psi}\left(#1\right)}   % Function of interest grad
@@ -86,6 +86,7 @@
 % Less commonly used distributions
 \def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
+\def\KLhat#1{\widetilde{\mathrm{KL}}\left(#1\right)}   % KL divergence smoothed
 \def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
 \def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
 \def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
