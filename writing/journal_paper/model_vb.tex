@@ -1,17 +1,17 @@
 In each of the BNP models described in the examples above,
 the exact posterior distribution $\p(\beta, \nu, \z \vert \x)$
 is intractable.
-Variational inference is an approach that seeks an approximating distribution
+Variational Bayes (VB) is an approach that seeks an approximate posterior
 through solving a numerical optimization problem
 \citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review}.
 Let $\zeta := (\beta, \z, \nu)$ denote the full vector of
 latent variables.
-We specify a
+VB specifies a
 family of approximating distributions $\q(\zeta \vert \eta)$
 parameterized by a finite-dimensional vector $\eta \in \etadom \subseteq
-\mathbb{R}^{\etadim}$.
-Given our family of variational approximations, we wish to find the member of
-the family that is closest to the posterior $\p(\zeta \vert \x)$ in
+\mathbb{R}^{\etadim}$
+and solves for $\q(\zeta\vert\etaopt)$
+that is closest to the posterior $\p(\zeta \vert \x)$ in
 Kullback-Leibler (KL) divergence:
 %
 \begin{align}\eqlabel{vb_optimization}
@@ -32,8 +32,7 @@ as a closed-form function of $\eta$.
 Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and
 so can be negelcted in the optimziation.
 
-In practice, forming an approximating posterior for the models in
-\exref{iris_bnp_process, mice_bnp_process, structure_bnp_process}
+In practice, forming an approximating posterior for BNP
 can be challenging since the latent variables $\nu$ and $\beta$ are
 (countably) infinite dimensional.
 We would like to keep dimension of the variational parameter $\eta$ finite
@@ -43,10 +42,10 @@ use a truncated stick-breaking representation in
 the variational distribution.
 We choose a truncation parameter $\kmax$ large but finite,
 and we set $\q(\nu_\k = 1 | \eta) = 1$ for all $\k > \kmax$.
-This implies that under the variational distribution, $\pi_\k = 0$ with probability one
+This implies that under $\q$, $\pi_\k = 0$ with probability one
 for all $\k > \kmax$
 (\eqref{stick_breaking}).
-Correspondingly, we also set $\z_{\n\k} = 0$ with probability one for $\k > \kmax$.
+Correspondingly, we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
 
 For the generic BNP model in \eqref{bnp_model},
 we propose a mean-field variational approximating family of the following form:
@@ -66,19 +65,24 @@ defining our variational approximation.
 Notice that the model (\eqref{bnp_model}) itself is not finite. The truncation
 parameter $\kmax$ only appears in our variational approximation.
 We set $\kmax$ large enough to ensure that a large
-proportion of the components are unoccupied with high posterior probability,
+proportion of the components are unoccupied with high probability under $\q$,
 in which case the truncation approximates the fully nonparametric model with $\kmax = \infty$.
 
 The variational approximation for the topic model (\exref{structure_bnp_process})
 is similarly mean-field: the distribution on stick-breaking proportions $\nu$
 factorizes over
-both individuals $\n$ and components $\k$, while the distribution
-cluster memberships $\z$
-factorizes over individuals $\n$, loci $\l$, and chromosomes $\i$.
-For the regression model (\exref{mice_bnp_process}), all terms are fully-factorize,
-except for the additive shifts.
-We will allow conditional dependence between the
-individual shifts and the cluster assignments, for purposes that will be clear below.
+both individuals $\n$ and components $\k$, while the
+assignments $\z$
+factorize over individuals $\n$, loci $\l$, and chromosomes $\i$.
+For the regression model (\exref{mice_bnp_process}), all terms in the
+variational approximation fully-factorize
+except for the cluster assignments $\z$ and additive shifts $\b$.
+We allow for conditional dependence so that
+$\q(\z, \b \vert \eta)$ does not factorize into
+$\q(\z \vert \eta)\q(\b \vert \eta)$,
+for purposes that will be clear below.
+
+\subsubsection{Conditional conjugacy}
 
 For $\z$ and $\beta$ in all models we consider, we will be always be able to
 take advantage of conditional conjugacy. Specifically, we will take $\q(\z_{\n}
@@ -110,10 +114,10 @@ all have closed form expressions as functions of $\eta$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Under the mean-field parameterization (\eqref{vb_mf}),
+Under the mean-field factorization,
 the vector $\eta$ will partition into parameters
-governing $\nu$, $\beta$, and $\z$. Let the VB parameters governing a
-particular parameter vector be denoted with a subscript: for example,
+governing $\nu$, $\beta$, and $\z$. Let the parameters governing a
+particular latent variable or latent vector be denoted with a subscript: for example,
 $\q(\beta \vert \eta) = \q(\beta \vert \etabeta)$,
 $\q(\z_\n \vert \eta) = \q(\z \vert \eta_{\z_{\n}})$, and so on.
 With conditionally conjugate distributions and our mean-field assumption,
@@ -138,7 +142,7 @@ We parameterize the the multinomial distribution using the natural parameterizat
 in its exponential family form. That is,
 we let $\eta_{\z_\n} = (\rho_{\n1}, \rho_{\n2}, ..., \rho_{\n(\kmax-1)})$
 be an unconstrained vector in $\mathbb{R}^{\kmax-1}$;
-then, from $\eta_{\z_\n}$, we compute the multinomial expectations as
+in this parameterization, the multinomial expectations are
 %
 \begin{align*}
   p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
@@ -146,14 +150,15 @@ then, from $\eta_{\z_\n}$, we compute the multinomial expectations as
 \end{align*}
 %
 We use the exponential family parameterization because
-we will require $\etaopt$ to be interior to $\etadom$ in our sensitivity analysis
+we will require the optimal variational parameters $\etaopt$
+to be interior to $\etadom$ in our sensitivity analysis
 (\secref{local_sensitivity}).
 In the mean parameterization,
 $\sum_{\k=1}^\kmax p_{\n\k} = 1$, and so the
 optimal mean parameters $p_{\n}$ cannot be
 interior to $\Delta^{\kmax - 1}$.
-On the other hand, $\eta_{\z_\n}$ as defined using the
-exponential family parameterization is unconstrained in $\mathbb{R}^{\kmax - 1}$.
+On the other hand, $\eta_{\z_\n}$ as defined
+is unconstrained in $\mathbb{R}^{\kmax - 1}$.
 
 Moreover, for fixed $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
 the parameter vector $\eta_{\z_\n}$ that minimizes \eqref{vb_optimization}
@@ -165,6 +170,8 @@ has a closed form. Define
 \end{align*}
 %
 Then the optimal $\eta_{\z_\n}$ is given by
+\todo{probably needs more discussion here. we can probably cite BLEI VI review for stats
+and still ignore a lot of details}
 %
 \begin{align*}
 %
@@ -180,25 +187,26 @@ a function of $(\etabeta, \etanu)$.
 %
 \end{ex}
 
-The option of setting $\etaz$ at its optimum for fixed $(\etabeta, \etanu)$
-extends beyond the GMM example.
-Each of our models
-(\exref{iris_bnp_process, mice_bnp_process, structure_bnp_process})
-decomposes into a ``global" and ``local" stucture.
+For fixed $(\etabeta, \etanu)$, the option of setting $\etaz$ at its optimum
+extends beyond the GMM example and will play
+a key role in computing our local sensitivity
+measures in practice (\secref{computing_sensitivity}).
+In greater generality, each of our example models
+has latent variables that factorize in a global/local structure.
 In the GMM example discussed above, we call the variables $(\beta, \nu)$ ``global"
-because they are shared across all data points; the $\z$ is local latent variable
+because they are shared across all data points; the $\z$ is ``local"
 because each $\z_\n$ is unique to a single data point.
 In the regression model (\exref{mice_bnp_process}),
 the global variables are again $(\beta, \nu)$,
-but the local variables comprise of both the cluster allocations $\z$ and additive shifts $\b$.
-In these two models, notice that the global variables scale with only $\kmax$, while
-local variables scale with both $\kmax$ and the number of observations $\N$.
+but the local variables comprise of both the cluster assignments $\z$ and additive shifts $\b$.
+In these two models, notice that the global variables scale with $\kmax$, while
+local variables scale with the number of observations $\N$.
 
 In the topic model (\exref{structure_bnp_process}),
 we still call $(\beta, \nu)$ the global latent variables, even though they scale
 with the number of individuals $\N$;
 they do not, however, scale with both the number of individuals and the number of loci
-like $\z$ does. In this model, we call $\z$ the local latent variables.
+like $\z$ does. In the topic model, we call $\z$ the local latent variables.
 
 Let $\gamma = (\beta,\nu)$ be the global latent variables
 and let $\etaglob = (\etabeta, \etanu)$ be their variational parameters.
@@ -206,20 +214,18 @@ Let $\etalocal$ be the local variational parameters. In \exref{iris_bnp_process}
 \exref{structure_bnp_process}, $\etalocal = \etaz$, while
 in \exref{mice_bnp_process}, $\etalocal = (\etaz, \eta_\b)$.
 
-In each case, the optimal local variational parameters can be set in closed form
-as a function of the global variational parameters.
+In each case, for $\etaglob$ fixed, the optimal $\etalocal$ that minimizes
+the $\mathrm{KL}$ can be set in closed form as a function of $\etaglob$.
 The multinomial parameters for $\eta_{\z_\n}$ in the regression and topic models
 can be set in an analagous way as described in \exref{qz_form}.
 For more details concerning the optimal shift parameters $\eta_\b$
 in the regression model, see \appref{put_in_appendix}.
-This global/local structure will play a key role in computing our local sensitivity
-measures in practice (\secref{computing_sensitivity}).
 
 
 
 
 
-\subsubsection*{Evaluating stick expectations}
+\subsubsection{Evaluating stick expectations}
 
 To evaluate the $\mathrm{KL}$ in \eqref{vb_optimization}, we also need
 the expectations
@@ -255,17 +261,20 @@ proportion $\nuk$ so that the transformed variable
 \begin{align*}
   \lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right)
 \end{align*}
-is not contrained to be between $(0, 1)$. Let $\s$ be the sigmoid function,
+is not contrained to be between $(0, 1)$ and can take values in all of $\mathbb{R}$.
+Let $\s$ be the sigmoid function,
 which provides the inverse transformation,
 \begin{align*}
   \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 
-We let $\q(\tilde\nuk \vert \eta)$ be normally distributed with
+We let $\q(\lnu_\k \vert \eta)$ be normally distributed with
 location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
-This then induces a distribution on our original variable of interest $\nuk$.
+This then induces a logit-normal
+distribution on our original variable of interest, $\nuk$.
 
-With this construction, we can approximate expectations of smooth functions
+With this choice of a logit-normal $\q(\nuk \vert \eta)$,
+we can approximate expectations of smooth functions
 $f(\nuk)$ (such as $\pstick(\nuk)$) using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %

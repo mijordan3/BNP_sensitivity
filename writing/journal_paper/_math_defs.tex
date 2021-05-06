@@ -74,7 +74,7 @@
 \def\ptil{\tilde{\p}}   % Other distributions
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
-\def\pbetaprior{\p_{\mathrm{clust}}}   % distribution on cluster centroids
+\def\pbetaprior{\p_{\mathrm{base}}}   % distribution on cluster centroids
 \def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
@@ -146,7 +146,7 @@
 % commands for for mice data
 \newcommand{\ngenes}{N} % number of genes
 \newcommand{\ntimepoints}{M} % number of timepoints
-\newcommand{\regmatrix}{X}
+\newcommand{\regmatrix}{A}
 \newcommand{\timeindx}{T} % would just use \t, but then this parameterizes a distribution ...
 \newcommand{\pshift}{\p_{\mathrm{shift}}}
 
