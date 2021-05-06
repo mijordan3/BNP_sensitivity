@@ -40,12 +40,15 @@ respect to the measure $\mu$. The norm of $\phi \in \lp{\mu,p}$ is given by
 %
 \end{align*}
 %
-Note that $\phi \in \lp{\lambda,p} \Leftrightarrow{} \norm{\phi}_{\lambda,p} <
-\infty$. When $\mu$ is the Lebesgue measure, we may simply write $\lp{\lambda,p} =
-\lp{p}$ and $\norm{\cdot}_{p} = \norm{\cdot}_{\lambda,p}$.
+By defintiion, $\phi \in \lp{\lambda,p} \Leftrightarrow{}
+\norm{\phi}_{\lambda,p} < \infty$.
 %
 Let $\ball_{\mu,p}(\epsilon) := \{\phi: \phi \in \lp{\mu, p},
 \norm{\phi}_p < \epsilon \}$ denote the $\epsilon$-ball in $\lp{\mu, p}$.
+
+When $\mu$ is the Lebesgue measure, we may
+simply write $\lp{\lambda,p} = \lp{p}$ and $\norm{\cdot}_{p} =
+\norm{\cdot}_{\lambda,p}$.
 %
 \end{defn}
 
@@ -74,9 +77,9 @@ transformations of $\theta$.
 
 \Corref{etafun_deriv_form} suggests an intriguing result if it is taken to hold
 for all $\phi$ in some ball, $\ball_p(\delta) := \{\phi: \norm{\phi}_{\lambda,p}
-\le \delta \}$. Specifically, let $q^{-1} + p^{-1} = 1$ and observe that, by
-H{\"o}lder's inequality \citep[Theorem 5.1.2 and subsequent
-disscussion]{dudley:2018:real},
+\le \delta \}$. Specifically, let $q = (1 - p^{-1})^{-1}$ so that $q^{-1} +
+p^{-1} = 1$ (or let $\q=\infty$ when $p=1$) and observe that, by H{\"o}lder's
+inequality \citep[Theorem 5.1.2 and subsequent disscussion]{dudley:2018:real},
 %
 \begin{align*}
 %
@@ -117,12 +120,12 @@ so that $\norm{\phi^*(\theta)}_{\lambda,p} = \delta$.  These ``worst-case''
 perturbations are the variational Bayes analogues of the corresponding
 ``worst-case'' for exact Bayesian posteriors in \citet{gustafson:1996:local}.
 
-Before proceeding, however, we must ask: do all $\phi \in \ball_{\mu,p}(\delta)$
-correspond to valid priors?  Are there valid priors that cannot be produced by
-$\phi \in \ball_{\mu,p}(\delta)$ for any $\delta$?  More generally, what is the
-relationship between $\ball_{\mu,p}(\delta)$, the class of perturbations given
-in $\pertset$, and the set of all valid priors?  The following theorem answers
-these questions.
+Before proceeding to use the influence function in this way, however, we must
+ask: do all $\phi \in \ball_{\mu,p}(\delta)$ correspond to valid priors?  Are
+there valid priors that cannot be produced by $\phi \in \ball_{\mu,p}(\delta)$
+for any $\delta$?  More generally, what is the relationship between
+$\ball_{\mu,p}(\delta)$, the class of perturbations given in $\pertset$, and the
+set of all valid priors?  The following theorem answers these questions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -133,9 +136,9 @@ prior $\ptil$ is ``valid'' if $\ptil \ll \pbase$, $\ptil$ is non-negative
 $\mu$-almost everywhere, and $\ptil$ is normalizable in the sense that $0 < \int
 \ptil(\theta) \mu(d\theta) < \infty$.
 
-The following table summarizes properties of priors derived from
-$\phi \in \ball_{\mu,p}$ and from $\phi \in \pertset$.  The columns are
-shorthand for the following properties:
+The following table summarizes properties of densitites derived from $\phi \in
+\ball_{\mu,p}$ and from $\phi \in \pertset$.  The columns are shorthand for the
+following properties:
 %
 \begin{align*}
 %
@@ -193,7 +196,7 @@ The properties hold for any ball radius $\delta > 0$.}
 \begin{enumerate}
 %
 \item \itemlabel{pertset_is_valid}
-For all $p \in [1, \infty]$, the set of priors that can be formed from
+For all $p \in [1, \infty]$, the set of densitites that can be formed from
 $\phi \in \pertset$ is identical to the set of all valid priors.
 %
 \item \itemlabel{pball_is_valid}
@@ -201,13 +204,17 @@ For $p \in [1, \infty)$, all valid priors can be formed from
 some $\phi \in \lp{\mu,p}$.
 %
 \item \itemlabel{pball_is_invalid}
-For $p \in [1, \infty)$, one can form invalid (negative) priors from
+For $p \in [1, \infty)$, one can form invalid (negative) densities from
 some $\phi \in \ball_{\mu,p}(\delta)$ even for arbitrarily small $\delta$.
-(\Exref{lp_negative}.)
+(See \exref{lp_negative}.)
+%
+\item \itemlabel{pinfball_is_valid}
+For $p = \infty$, all densities formed from
+$\phi \in \lp{\mu,\infty}$ are valid.
 %
 \item \itemlabel{pinfball_is_invalid}
 For $p = \infty$, there exist valid priors not formed from any
-$\phi \in \lp{\mu,\infty}$.  (\Exref{beta_inf_norm}.)
+$\phi \in \lp{\mu,\infty}$.  (See \exref{beta_inf_norm}.)
 %
 \end{enumerate}
 
@@ -307,11 +314,11 @@ $p=\infty$, the opposite situation obtains: all priors arising from $\phi \in
 contained in $\ball_{\mu,\infty}(\delta)$, no matter how large $\delta$ is.
 
 The fact that $\phi \in \ball_{\mu,p}(\delta)$ for $p \in [1, \infty)$ can be
-negative no matter how small $\delta$ is not necessarily a problem for the full
-Bayesian posterior, but it is fatal for variational approximations, as we now
-discuss.  This difference will lead below to very different results for the
-differentiability of $\t \mapsto \etaopt(\t \phi)$ for $p \in [1, \infty)$ and
-for $p = \infty$.
+negative no matter how small $\delta$ is (arguably) not necessarily a problem
+for the formal definition of a full Bayesian posterior, but it is fatal for
+variational approximations, as we now discuss.  This difference will lead below
+to very different results for the differentiability of $\t \mapsto \etaopt(\t
+\phi)$ for $p \in [1, \infty)$ and for $p = \infty$.
 %
 For the remainder of this section, we will discuss only the more difficult case
 of $p \in [1, \infty)$.  For $p=\infty$, we will prove a stronger result, using
@@ -328,16 +335,16 @@ $\phi$ and $p \in [1, \infty)$
 %
 \KL{\eta, \t} = \KL{\eta, 0} +
 \expect{\q(\theta \vert \eta)}
-       {\log\left(1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)}.
+       {\log\left(1 + \t \frac{\phi(\theta)}{p \pbase(\theta)^{1/p}}\right)}.
 %
 \end{align*}
 %
-Again, if $1 + \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}} \le 0$ on any set
+Again, if $1 + \t \frac{\phi(\theta)}{p \pbase(\theta)^{1/p}} \le 0$ on any set
 with nonzero $\q(\theta \vert \eta)$-measure, then the KL divergence is
-infinite.  If $\essinf_{\theta \sim
-\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} = -\infty$, then $\KL{\eta, \t}$
-is undefined for all $\t > 0$.  The following example compactly illustrates
-the problem.
+infinite.  If $\essinf_{\theta \sim \mu}\frac{\phi(\theta)}{p
+\pbase(\theta)^{1/p}} = -\infty$, then $\KL{\eta, \t}$ is undefined for all $\t >
+0$.  The following example compactly illustrates the problem, and will be useful
+in our subsequent discussion in \secref{differentiability}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -364,11 +371,11 @@ $\essinf_{\theta \sim \mu} \gamma(\theta) = -\infty$ since we then have $f (\t
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In constrast, if $\essinf_{\theta \sim
-\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$, then there exists a
-$\t$ sufficiently small that $\KL{\eta, \t}$ will be defined in a neighborhood
-of $\t = 0$. Indeed, as the following theorem states, $\essinf_{\theta \sim
-\mu}\frac{\phi(\theta)}{\pbase(\theta)^{1/p}} > -\infty$ is a sufficient
+In constrast, if $\essinf_{\theta \sim \mu}\frac{\phi(\theta)}{p
+\pbase(\theta)^{1/p}} > -\infty$, then there exists a $\t$ sufficiently small
+that $\KL{\eta, \t}$ will be defined in a neighborhood of $\t = 0$. Indeed, as
+the following theorem states, $\essinf_{\theta \sim
+\mu}\frac{\phi(\theta)}{p \pbase(\theta)^{1/p}} > -\infty$ is a sufficient
 condition for the derivative to exist under some additional conditions on the
 variational distribution.
 
@@ -420,20 +427,20 @@ $\psi(\theta)$ equal to each of the following functions:
 
 \begin{thm}\thmlabel{lp_derivative}
 %
-Fix the quantities \defref{prior_nl_pert} with $p \in [1, \infty)$.
-Let $\q(\theta \vert \eta)$ define a class of densities relative to $\mu$
-parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
-\assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
-\assuref{kl_opt_ok}.
-
+Fix the quantities \defref{prior_nl_pert}, let $p \in [1, \infty)$,
+and let \assuref{kl_opt_ok, q_regular_lp} hold.
+% Let $\q(\theta \vert \eta)$ define a class of densities relative to $\mu$
+% parameterized by $\eta$ in an open ball $\ball_\eta$ satisfying
+% \assuref{q_regular_lp}.  Let $\etaopt$ be a variational optimum satisfying
+% \assuref{kl_opt_ok}.
 Then, for each $\phi \in \lp{p}$ with $\norm{\phi}_p \le \infty$ and
-$\essinf_{\theta\sim\mu} \phi(\theta) / (\pbase(\theta)^{1/p})> -\infty$, the
+$\essinf_{\theta\sim\mu} \phi(\theta) / (p \pbase(\theta)^{1/p})> -\infty$, the
 function $\t \mapsto \etaopt(\t \phi)$ is differentiable at $\t = 0$ with the
 derivative given in \corref{etafun_deriv_form}.
 %
 \begin{proof}
 %
-The KL divergence is given by
+When $p \in [1, \infty)$, the KL divergence is given by
 %
 \begin{align*}
 %
@@ -451,6 +458,9 @@ $\norm{\gamma}_{\pbase, p} \le \infty$ and $\inf_\theta \gamma(\theta) >
 that that \assuref{dist_fun_nice} holds with $\psi(\theta, \t) = \log \left(1 +
 \t \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)$, and \thmref{etat_deriv}
 holds.
+
+% The $p=\infty$ case is dealt with below by the stronger result
+% \thmref{eta_phi_deriv}.
 %
 \end{proof}
 %

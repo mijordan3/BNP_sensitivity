@@ -1,11 +1,13 @@
 % Load tex files defining the some graphics.
 
-In the \secref{valid_priors}, we proved that directional derivatives exist, at
-least for all perturbations of the form given by \defref{prior_nl_pert}.
-However, when using a linear approximation to searching over a in infinite
-dimensional space, one needs to ask not only whether the derivative exists, but
-also whether the derivative forms a uniformly good approximation to the original
-function for every $\phi \in \ball_p(\delta)$.
+In the \secref{valid_priors}, we proved that directional derivatives exist for
+$p \in [1, \infty)$, at least for all perturbations of the form given by
+\defref{prior_nl_pert}. However, when using a linear approximation to searching
+over a in infinite dimensional space, one needs to ask not only whether the
+derivative exists, but also whether the derivative forms a uniformly good
+approximation to the original function for every $\phi \in \ball_p(\delta)$. In
+functionaly analysis, one way to characterize the uniform accuracy of the
+derivative is through the concept of Fr{\'e}chet, or bounded, differentiability.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,7 +54,7 @@ $\phi$:
 Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
 \defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
 then the two derivatives must coincide \citep[Proposition
-4.8]{zeidler:2013:functional}, which justifies our presumptuous notation.
+4.8]{zeidler:2013:functional}, which justifies our notation.
 
 Before proceeding with the more complicated discussion of $p \in [1, \infty)$,
 we observe that the stringent requirements of the $\lp{\mu,\infty}$ ball
@@ -91,7 +93,7 @@ $\delta$ is, there exist valid priors outside of $\ball_{\mu,\infty}(\delta)$.
 the expense of considering a limited set of priors, we are guaranteed that
 the derivatives satisfy the minimal requirements in a ball around $\phiz$.
 
-We now turn to the more expressive case when $p \in [1, \infty)$. Note that
+We now turn to the more expressive unit ball with $p \in [1, \infty)$. Note that
 \thmref{lp_derivative} and \corref{pertset_bounded_below} above proved that {\em
 directional derivatives} exits for all $\phi \in \pertset$ when $p \in [1,
 \infty)$.  We also showed in \thmref{pert_well_defined} and \exref{lp_negative}
@@ -361,12 +363,12 @@ By \eqref{nl_vb_pert_p}, the KL divergence $\KL{\etaopt, \phi}$ is of the form
 %
 \KL{\etaopt, \phi} = \KL{\etaopt, \phiz} +
 \expect{\q(\theta \vert \etaopt)}{
-    \log\left(1 + \frac{\phi(\theta)}{\pbase(\theta)^{1/p}}\right)
+    \log\left(1 + \frac{\phi(\theta)}{p \pbase(\theta)^{1/p}}\right)
 }.
 %
 \end{align*}
 %
-Let us choose a $\phi \in \pertset$.  Take $\beta = 1/p$ and
+Let us choose a $\phi \in \pertset$.  Take $\beta = p$ and
 %
 \begin{align*}
 %
@@ -377,12 +379,12 @@ Let us choose a $\phi \in \pertset$.  Take $\beta = 1/p$ and
         \delta^{p} \ind{\theta \in S_{\epsilon}}
     \right) \textrm{ so that}
 \\
-\phi(\theta) ={}& \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}.
+\phi(\theta) ={}& p \palt(\theta)^{1/p} - p \pbase(\theta)^{1/p}.
 %
 \end{align*}
 %
-Then $\phi \in \pertset$.   Define $\gamma(\theta) = \phi(\theta) /
-\pbase(\theta)^{1/p}$, and note that $\gamma \in \lp{\pbase, p}$ with
+So $\phi \in \pertset$.  Define $\gamma(\theta) = \phi(\theta) /
+p \pbase(\theta)^{1/p}$, and note that $\gamma \in \lp{\pbase, p}$ with
 $\norm{\gamma}_{\pbase, p} = \norm{\phi}_{\lambda, p}$, and
 %
 \begin{align*}

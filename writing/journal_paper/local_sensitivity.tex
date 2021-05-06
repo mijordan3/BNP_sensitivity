@@ -5,6 +5,8 @@ parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing $\pstick(\nuk \vert
 parameter $\theta$, specializing to the BNP problem in examples and in the
 experiments below.
 
+%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_t}
@@ -14,6 +16,21 @@ class of probability densities relative $\mu$.  Let $\p(\theta \vert \t)$ be
 defined for $\t$ in an open set $\ball_\t \subseteq \mathbb{R}$ containing $0$.
 Assume that the variational densities $\q(\theta \vert \eta)$ are also defined
 relative to $\mu$.
+
+Let $\qtil$ and $\ptil$ refer to potentially
+unnormalized (but normalizable) versions of the respectively corresponding $\q$
+and $\p$, so that,
+%
+\begin{align*}
+%
+\q(\theta \vert \eta) :={}
+    \frac{\qtil(\theta \vert \eta)}
+    {\int \qtil(\theta' \vert \eta) \mu(d\theta')} \mathand
+\p(\theta \vert \t) :={}
+    \frac{\ptil(\theta \vert \t)}
+    {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
+%
+\end{align*}
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,84 +157,30 @@ some sufficient conditions under which we can apply the implicit function
 theorem (e.g., \citet{krantz:2012:implicit}) to prove the continuous
 differentiability of $\etaopt(\t)$.
 
-First, in \assuref{kl_opt_ok}, we first require some regularity conditions on
-the KL divergence and its optimum.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_opt_ok}
+The first key assumption, \assuref{dist_fun_nice}, states sufficient conditions
+for which we can apply the dominated convergence theorem to variational
+expectations of some generic function $\psi(\theta, \t)$, allowing us to
+translate continuity of the variational and model densitites into continuity of
+the variational objective.  The details can be found in \lemref{logq_derivs,
+logq_continuous} of \appref{cont_lemmas}.
 %
-Let the following conditions on the variational approximation hold.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-%
-    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
-    continuously differentiable at $\etaopt$.
-
-    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
-    to $\etadom$.
-
-    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
-    0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
-%
-\end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The next set of assumptions can be stated just as well for unnormalized (but
-normalizable) probablity densities.  Dealing with unnormalized densities can
-save some tedious bookkeeping when verifying the assumptions.  To help clarify
-when a distribution needs to be normalized, we let $\qtil$ and $\ptil$ refer to
-unnormalized (but normalizable) versions of the respectively corresponding $\q$
-and $\p$.  For example,
-%
-\begin{align*}
-%
-\q(\theta \vert \eta) :={}
-    \frac{\qtil(\theta \vert \eta)}
-    {\int \qtil(\theta' \vert \eta) \mu(d\theta')} \mathand
-\p(\theta \vert \t) :={}
-    \frac{\ptil(\theta \vert \t)}
-    {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
-%
-\end{align*}
-%
-
-
-Our next set of assumptions, \assuref{dist_fun_nice}, states sufficient
-conditions for which we can apply the dominated convergence theorem to
-variational expectations of some generic function $\psi(\theta, \t)$, allowing
-us to translate continuity of the variational and model densitites into
-continuity of the variational objective.  The details can be found in
-\lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}.
-
 In case \assuref{dist_fun_nice} seems forbidding, observe that, in lieu of
 \assuref{dist_fun_nice} we might equivalently have said that we can exchange
 limits and variational expectations whenever needed.  \Assuref{dist_fun_nice} is
 simply a precise catalogue of what is needed.
 
-Note also that \assuref{dist_fun_nice} and its associated \lemref{logq_derivs,
-logq_continuous} of \appref{cont_lemmas}, applied with $\logp(\x \vert \theta)$,
-is one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary
-focus is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
-\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
-for the prior $\logp(\theta \vert \t)$.
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{dist_fun_nice}
 %
-Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
-density over the random variable $\theta$ parameterized by $\eta$ defined
-relative to a dominating measure $\mu$.  Assume that the map $\eta \mapsto
-\log \qtil(\theta \vert \eta)$ is twice continuously differentiable.
-
-Let $\psi(\theta, \t)$ be a scalar-valued $\mu$-measurable function of
-$\theta$ and $\t$.  Assume that the map $\t \mapsto \psi(\theta, \t)$ is
-continuously differentiable.
+% Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
+% density over the random variable $\theta$ parameterized by $\eta$ defined
+% relative to a dominating measure $\mu$.
+%
+Assume that the map $\eta \mapsto \log \qtil(\theta \vert \eta)$ is twice
+continuously differentiable. Let $\psi(\theta, \t)$ be a scalar-valued
+$\mu$-measurable function of $\theta$ and $\t$.  Assume that the map $\t \mapsto
+\psi(\theta, \t)$ is continuously differentiable.
 
 Define the following shorthand notation:
 %
@@ -266,6 +229,140 @@ M_\psi(\theta)$.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}
+%
+Under \assuref{dist_fun_nice}, we can exchange the order of integration
+and differentiation in
+%
+\begin{align*}
+%
+\fracat{\partial\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta}{\etaopt, \t=0}
+\textrm{, }
+\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta \partial\eta}{\etaopt, \t=0}
+\textrm{, and }
+\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta \partial \t}{\etaopt, \t=0}.
+%
+\end{align*}
+%
+(See also \lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}
+for a more detailed statement.)
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Next, in \assuref{kl_opt_ok}, we first require some regularity conditions on
+the KL divergence and its optimum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Let the following conditions on the variational approximation hold.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
+    continuously differentiable at $\etaopt$.
+
+    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
+    to $\etadom$.
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
+    0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
+
+    \item\itemlabel{kl_dct} The unnormalized variational densities $\qtil(\theta
+    \vert \eta)$ satisfy \assuref{dist_fun_nice} with $\psi(\theta, \t) \equiv
+    1$ (no $\theta$ dependence).
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Observe that \assuref{dist_fun_nice}, applied with $\logp(\x \vert \theta)$, is
+one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary focus
+is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
+\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
+for the prior $\logp(\theta \vert \t)$.
+
+Finally, in \assuref{q_stick_regular} we draw the needed connection between the
+class of prior perturbations and the variational approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{q_stick_regular}
+%
+Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
+\eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
+$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
+\log \p(\theta \vert \t=0)$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{etat_deriv}
+%
+Under the conditions of \defref{prior_t}, let \assuref{kl_opt_ok} hold at
+$\eta_0 = \etaopt$.  Further, let \assuref{dist_fun_nice} hold with
+%
+\begin{align*}
+%
+\psi(\theta, \t) = \log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)
+%
+\end{align*}
+%
+at $\t_0 = 0$.
+%
+Define\footnote{Note that if $\qtil(\theta \vert \eta)$ is already normalized
+($\qtil = \q$), then $\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} =
+0$ for all $\eta$ and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert
+\etaopt}$. Since it can sometimes be more convenient to work with unnormalized
+distributions, we keep the notation general.}
+%
+\begin{align*}
+%
+\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
+                {\partial \eta \partial \eta^T}
+                {\etaopt} \mathand \\
+\lqgradbar{\theta \vert \etaopt} :={}&
+    \lqgrad{\theta \vert \etaopt} -
+    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
+%
+\end{align*}
+%
+Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
+with derivative
+%
+\begin{align}\eqlabel{vb_eta_sens}
+%
+\fracat{d \etaopt(\t)}{d \t}{0} ={}&
+    - \hessopt^{-1}
+    \expect{\q(\theta \vert \etaopt)}{
+        \lqgradbar{\theta \vert \etaopt}
+        \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
+    }.
+    % \fracat{\partial^2 \KL{\eta, \t}}
+    %        {\partial \eta \partial \t}
+    %        {\etaopt, 0}.
+%
+\end{align}
+%
+(For a proof, see \appref{proofs} \proofref{etat_deriv}.)
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We conclude this section by showing that \thmref{etat_deriv} applies to the
+setting of BNP stick-breaking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -338,20 +435,6 @@ of the five constants.
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Finally, in \assuref{q_stick_regular} we draw the needed connection between the
-class of prior perturbations and the variational approximation.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_stick_regular}
-%
-Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
-\eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
-$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
-\log \p(\theta \vert \t=0)$.
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,50 +486,6 @@ perturbation given in \exref{alpha_perturbation}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}\thmlabel{etat_deriv}
-%
-Under the conditions of \defref{prior_t}, let \assuref{kl_opt_ok,
-q_stick_regular} hold at $\eta_0 = \etaopt$ and $\t_0 = 0$.
-Define\footnote{Note that if $\qtil(\theta \vert \eta)$ is normalized, then
-$\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} = 0$ for all $\eta$
-and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$.
-Since it can sometimes be more convenient to work with unnormalized distributions,
-we keep the notation general.}
-%
-\begin{align*}
-%
-\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
-                {\partial \eta \partial \eta^T}
-                {\etaopt} \\
-\lqgradbar{\theta \vert \etaopt} :={}&
-    \lqgrad{\theta \vert \etaopt} -
-    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
-%
-\end{align*}
-%
-Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
-with derivative
-%
-\begin{align}\eqlabel{vb_eta_sens}
-%
-\fracat{d \etaopt(\t)}{d \t}{0} ={}&
-    - \hessopt^{-1}
-    \expect{\q(\theta \vert \etaopt)}{
-        \lqgradbar{\theta \vert \etaopt}
-        \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-    }.
-    % \fracat{\partial^2 \KL{\eta, \t}}
-    %        {\partial \eta \partial \t}
-    %        {\etaopt, 0}.
-%
-\end{align}
-%
-(For a proof, see \appref{proofs} \proofref{etat_deriv}.)
-%
-\end{thm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
