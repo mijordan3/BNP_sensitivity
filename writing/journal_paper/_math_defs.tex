@@ -57,6 +57,7 @@
 \def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
 \def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
+\def\etalocal{\eta_{\ell}}  % VB parameters for local variables
 \def\etaoptglob{\etaopt_{\gamma}}  % optimal VB parameters for theta and nu
 \def\etaopttheta{\etaopt_{\theta}}  % VB parameters for certain components
 \def\etaoptnu{\etaopt_{\nu}}  % VB parameters for certain components
@@ -72,7 +73,7 @@
 \def\ptil{\tilde{\p}}   % Other distributions
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
-\def\pbetaprior{\p_{0}}   % distribution on cluster centroids
+\def\pbetaprior{\p_{\mathrm{clust}}}   % distribution on cluster centroids
 \def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \q}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \q}\left(#1\right)}   % Log VB distribution Hessian
@@ -146,6 +147,7 @@
 \newcommand{\ntimepoints}{M} % number of timepoints
 \newcommand{\regmatrix}{X}
 \newcommand{\timeindx}{T} % would just use \t, but then this parameterizes a distribution ...
+\newcommand{\pshift}{\p_{\mathrm{shift}}}
 
 % commands for for structure data
 \newcommand{\nindiv}{N} % number of individuals genotyped
