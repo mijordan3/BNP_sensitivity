@@ -136,13 +136,17 @@
 \def\assuitemref#1#2{\assuref{#1} (\itemref{#2})}%
 
 % some posterior statistics
-\newcommand{\gclusters}{\g_{\text{cl}}} % number of in-sample clusters
-\newcommand{\gclusterspred}{\g_{\text{p.cl}}} % number of predictive clusters
-\newcommand{\coclusteringmatr}{\zeta} % coclustering matrix
+\newcommand{\gclusters}{\g_{\text{cl},\tau}} % number of in-sample clusters (thresholded)
+\newcommand{\gclusterszero}{\g_{\text{cl},0}} % number of in-sample clusters (not thresholded)
+\newcommand{\gclusterspred}{\g_{\text{p.cl},\tau}} % number of predictive clusters
+\newcommand{\gclusterspredzero}{\g_{\text{p.cl},0}} % number of predictive clusters
+\newcommand{\coclusteringmatr}{\zeta} % coclustering matrix: TODO: delete this; changed notation
+\newcommand{\gcoclustering}{\g_{\text{coc}}} % coclustering matrix: TODO: delete this; changed notation
 \newcommand{\laplacianevsum}{\g_{\text{ev}}} % the sum of the eigenvalues of the graph-laplacian (for mice)
 \newcommand{\gpop}{\g_{\text{pop}}} % number of in-sample populations (for structure)
 \newcommand{\gloci}{\g_{\text{loci}}} %  number of loci in a population(for structure)
 \newcommand{\gadmix}{\g_{\text{admix}}} % expected admixture (for structure)
+\newcommand{\nclusters}{G} % random variable for number of clusters
 
 % commands for for mice data
 \newcommand{\ngenes}{N} % number of genes

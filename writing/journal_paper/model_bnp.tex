@@ -76,17 +76,17 @@ $\pstick(\nuk)$ is the $\mathrm{Beta}(\nuk \vert 1, \alpha)$ distribution,
 %
 \end{align*}
 %
-When $\pstick$ is Beta distributed, the resulting distribution on $\pi$ is known as the
+When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting distribution on $\pi$ is known as the
 $\textit{GEM distribution}$, and we write $\pi \sim \mathrm{GEM}(\alpha)$.
 
 The GEM distribution is closely related to the Dirichlet process (DP).
-When $\pi \sim \mathrm{GEM}(\alpha)$ and
-$\beta_\k \iid \pbetaprior(\beta_\k)$,
-the random measure on $\betadom$
+Define a measure on $\betadom$ as
 \begin{align*}
-  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k}
+  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
 \end{align*}
-which places atoms at $\beta_k$ with weight $\pi_\k$,
+which places atoms at points $\beta_k$ with weight $\pi_\k$.
+When $\pi \sim \mathrm{GEM}(\alpha)$ and
+$\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$ is a random measure
 is distributed according to Dirichlet process with concentration parameter
 $\alpha$ and base measure $\pbetaprior$.
 
@@ -172,11 +172,14 @@ where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
 \end{ex}
 
 We started with a Gaussian mixture model (GMM)
-because it fits cleanly into the
+because it conforms cleanly to the
 generative process culminating in \eqref{bnp_model}.
-In \secref{results}, we fit a GMM to Fisher's iris data set CITE and
+In \secref{results_iris}, we fit a GMM to Fisher's iris data set
+\citep{anderson:1936:iris, fisher:1936:iris} and
 cluster irises into latent species based on morphological measurements.
-The next two examples on real data sets require more careful modeling considerations,
+The next two examples, which we will apply to real data sets
+(\secref{results_mice, results_structure}),
+require more careful modeling considerations,
 and we adjust the factorization in \eqref{bnp_model} to suit our purposes.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,7 +192,7 @@ An observation $\x_\n\in\mathbb{R}^\ntimepoints$ is a vector of
 expression levels at $\ntimepoints$
 time points.
 Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix;
-in our case, we will use a cubic B-spline, so the entry $ij$ of $\regmatrix$
+in our case, we will use a cubic B-spline, so the $ij$-th entry of $\regmatrix$
 is the $j$-th B-spline basis vector evaluated at the
 $i$-th time point (\secref{results_mice}).
 
@@ -209,19 +212,19 @@ are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
 
 The joint distribution can be written in the same form as~\eqref{bnp_model},
-except that the conditional data likelihood now conditions on $\b_\n$
-and there is an additional prior term for $\b_\n$:
-\begin{align*}
-\logp(\x, \beta, \z, \nu) =&
-    \sum_{n=1}^N \sum_{k=1}^{\infty}
-        \z_{\n\k} \left(
-            \logp(\x_n \vert \beta_\k, \b_n) + \log \pshift(\b_n) + \log \pi_\k
-        \right)  \\
-    &{} + \sum_{k=1}^{\infty} \left(
-        \log \pstick(\nuk) + \log \pbetaprior(\beta_\k)
-    \right).
-\end{align*}
-
+except that the conditional data likelihood now depends on $\b_\n$ in addition to $\beta_\k$,
+and we include an additional prior term for $\b_\n$. 
+% \begin{align*}
+% \logp(\x, \beta, \z, \nu, \b) =&
+%     \sum_{n=1}^N \sum_{k=1}^{\infty}
+%         \z_{\n\k} \left(
+%             \logp(\x_n \vert \beta_\k, \b_n) + \log \pshift(\b_n) + \log \pi_\k
+%         \right)  \\
+%     &{} + \sum_{k=1}^{\infty} \left(
+%         \log \pstick(\nuk) + \log \pbetaprior(\beta_\k)
+%     \right).
+% \end{align*}
+%
 \end{ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -233,7 +236,8 @@ words in a document; in lieu of inferring ``topics," we infer latent populations
 
 \begin{ex}[A topic model for population structure]\exlabel{structure_bnp_process}
 
-The data set consists of $\nindiv$ individuals genotyped at $\nloci$ loci.
+We consider genetic data where the
+data set consists of $\nindiv$ individuals genotyped at $\nloci$ loci.
 For diploid organisms, there are two observations at each loci, one at each chromosome.
 Let $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ be the observed genotype for
 individual $\n$ at locus $\l$ and chromosome $\i$;
@@ -298,9 +302,10 @@ This model is identical to STRUCTURE,
 a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure},
 except that we replace the Dirichlet prior in STRUCTURE
 with an infinite stick-breaking process.
-The result is a model similar to a heirchical Dirichlet process CITE,
+The result is a model similar to a heirchical Dirichlet process for topic modeling,
+\citep{teh:2006:hdp},
 but without the top-level Dirichlet process.
-
+%
 \end{ex}
 
 
