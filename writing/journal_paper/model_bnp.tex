@@ -88,15 +88,17 @@ which places atoms at points $\beta_k$ with weight $\pi_\k$.
 When $\pi \sim \mathrm{GEM}(\alpha)$ and
 $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$ is a random measure
 is distributed according to Dirichlet process with concentration parameter
-$\alpha$ and base measure $\pbetaprior$.
+$\alpha$ and base measure $\pbetaprior$
+\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}.
 
 We keep the generic notation $\pstick$ for stick-breaking distributions
 because in our sensitivity analysis,
 we will consider stick-breaking distributions that are outside the
 family of Beta distributions.
 
-In this notation, we can write the joint distribution of
-the observed data and latent variables in a basic DP mixture model as:
+In the generative process we have just oulined,
+the joint distribution of
+the observed data and latent variables in a basic BNP mixture model is
 %
 \begin{align}\eqlabel{bnp_model}
 %
@@ -142,7 +144,7 @@ definite information matrix, and
     & \constdesc{\beta_\k}
 %
 \end{align*}
-We let $\pbetaprior$ to be the conjugate prior, which in this case is normal-Wishart:
+We let $\pbetaprior(\beta_\k)$ be the conjugate prior, which in this case is normal-Wishart:
 \begin{align*}
   \pbetaprior(\beta_\k) &= \normalwishart{\beta_\k \vert \tau_0, n_0, p_0, V_0}\\
   \log\pbetaprior(\beta_\k) &=
@@ -151,7 +153,7 @@ We let $\pbetaprior$ to be the conjugate prior, which in this case is normal-Wis
       \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
 \end{align*}
 where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
-
+%
 % Below, we fit a
 % Gaussian mixture model (GMM) to Fisher's iris data set CITE.
 % Each observation is an iris flower with
@@ -171,14 +173,13 @@ where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
 %
 \end{ex}
 
-We started with a Gaussian mixture model (GMM)
+We start with a Gaussian mixture model (GMM)
 because it conforms cleanly to the
 generative process culminating in \eqref{bnp_model}.
-In \secref{results_iris}, we fit a GMM to Fisher's iris data set
+In \secref{results}, we fit a GMM to Fisher's iris data set
 \citep{anderson:1936:iris, fisher:1936:iris} and
 cluster irises into latent species based on morphological measurements.
-The next two examples, which we will apply to real data sets
-(\secref{results_mice, results_structure}),
+The next two examples, which we will apply to real data sets,
 require more careful modeling considerations,
 and we adjust the factorization in \eqref{bnp_model} to suit our purposes.
 
@@ -191,9 +192,10 @@ We cluster time-course gene expression data.
 An observation $\x_\n\in\mathbb{R}^\ntimepoints$ is a vector of
 expression levels at $\ntimepoints$
 time points.
-Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix;
-in our case, we will use a cubic B-spline, so the $ij$-th entry of $\regmatrix$
-is the $j$-th B-spline basis vector evaluated at the
+Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix.
+In our case, we will use cubic B-splines to smooth the time-course observations,
+so the $ij$-th entry of $\regmatrix$
+will be the $j$-th B-spline basis vector evaluated at the
 $i$-th time point (\secref{results_mice}).
 
 Each component is characterized by a vector of regression coefficients
@@ -206,14 +208,14 @@ The distribution of the data arising from component $k$ is
 \tau_\k^{-1}I_{\ntimepoints \times \ntimepoints}},
 \end{align*}
 %
-where $\b_{n}$ is a gene-specific additive offset.
+where $\b_{n}$ is a gene-specific additive offset and $I$ is the identity matrix.
 We include the additive offset because we
 are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
 
 The joint distribution can be written in the same form as~\eqref{bnp_model},
-except that the conditional data likelihood now depends on $\b_\n$ in addition to $\beta_\k$,
-and we include an additional prior term for $\b_\n$. 
+except that the conditional data likelihood now depends on $\b_\n$ as well as $\beta_\k$,
+and we include an additional prior term for $\b_\n$.
 % \begin{align*}
 % \logp(\x, \beta, \z, \nu, \b) =&
 %     \sum_{n=1}^N \sum_{k=1}^{\infty}
@@ -250,9 +252,9 @@ $\beta_k = (\latentpop_{\k1}, \ldots, \latentpop_{\k\nloci})$ where
 $\latentpop_{\k\l}\in\Delta^{J_\l - 1}$ are the latent frequencies for the $J_l$
 possible genotypes at locus $\l$.
 Let $\z_{\n\l\i}$ be the assigment of observation $\x_{\n\l\i}$ to a latent population.
-Note that for a given individual $\n$,
-different loci, and even different chromosomes at a given locus,
-may be assigned to different populations.
+Notice that for a given individual $\n$,
+different loci, or even different chromosomes at a given locus,
+may have different population assignments.
 The distribution of $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ arising from population $\k$ is
 \begin{align*}
 \p(\x_{\n\l\i} \vert \latentpop_{\k}) =
@@ -265,15 +267,17 @@ Draw sticks
 \begin{align*}
 \nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, \ldots, \nindiv; \k = 1, 2, \ldots \infty.
 \end{align*}
-The prior assignment probabilities
-$\latentadmix_{\n} = (\latentadmix_{\n1}, \latentadmix_{\n2}, \ldots)$
-are formed by the usual stick-breaking construction,
+The prior assignment probability vector
+$\latentadmix_{\n} = (\latentadmix_{\n1}, \latentadmix_{\n2}, \ldots)$,
+now unique to each individual,
+is formed by the same stick-breaking construction as before,
 %
 \begin{align*}
-\latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).,
+\latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).
 \end{align*}
 %
-from which the population assignment $\z_{\n\l\i}$ is drawn according to the
+The population assignment $\z_{\n\l\i}$
+is drawn from the
 usual multinomial distribution
 %
 \begin{align*}

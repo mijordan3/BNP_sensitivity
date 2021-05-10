@@ -4,7 +4,7 @@ In the GMM and topic model (\exref{iris_bnp_process, structure_bnp_process}),
 $\zeta := (\beta, \z, \nu)$;
 in the regression example (\exref{mice_bnp_process}),
 $\zeta$ includes the additive shifts, $\zeta := (\beta, \z, \nu, \b)$.
-In each of the BNP models,
+In each model,
 the exact posterior distribution $\p(\zeta \vert \x)$
 is intractable.
 Variational Bayes (VB) is an approach that seeks an approximate posterior
@@ -32,7 +32,7 @@ Kullback-Leibler (KL) divergence:
 %
 As we discuss
 below, we will choose $\q(\zeta \vert \eta)$ so that we can easily evaluate (or approximate)
-the expectation with respect to $\q(\zeta \vert \eta)$
+the above expectation with respect to $\q(\zeta \vert \eta)$
 as a closed-form function of $\eta$.
 Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and
 so can be negelcted in the optimziation.
@@ -41,7 +41,7 @@ In practice, forming an approximating posterior for BNP
 can be challenging since the latent variables $\nu$ and $\beta$ are
 (countably) infinite dimensional.
 We would like to keep dimension of the variational parameter $\eta$ finite
-in order for the optimizization in \eqref{vb_optimization} to be tractable.
+in order for the optimization in \eqref{vb_optimization} to be tractable.
 In the present paper, we will follow \citet{blei:2006:vi_for_dp} and
 use a truncated stick-breaking representation in
 the variational distribution.
@@ -83,14 +83,16 @@ For the regression model (\exref{mice_bnp_process}), all terms in the
 variational approximation fully-factorize
 except for the cluster assignments $\z$ and additive shifts $\b$.
 While we assume $(\z, \b)$ to be independent from all other latent variables
-under $\q$, we will allow conditional dependence between $\z$ and $\b$ \secref{appendix}.
+under $\q$, we will allow conditional dependence between $\z$ and $\b$ (\appref{appendix}).
 
 \subsubsection{Conditional conjugacy}\seclabel{vb_conjugacy}
 
-For $\z$ and $\beta$ in all models we consider, we will be always be able to
-take advantage of conditional conjugacy. Specifically, we will take $\q(\z_{\n}
-\vert \eta_{\z_\n})$ to be multinomial, matching $\p(\z_{\n}
-\vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta_{\beta_\k})$
+For $\z$ and $\beta$ in all models we consider, we will
+take advantage of conditional conjugacy to choose distributions
+$\q(\z_\n\vert\eta)$ and $\q(\beta_k\vert\eta)$, unless otherwise stated.
+This means that we will take $\q(\z_{\n}
+\vert \eta)$ to be multinomial, matching $\p(\z_{\n}
+\vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$
 to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
 
 
@@ -100,7 +102,7 @@ to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
 \begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
 %
 To evaluate the expectation in \eqref{vb_optimization}, we need to compute
-the expected joint density
+the expected joint log-likelihood
 \begin{align*}
   \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n, \beta_\k)}. % , \quad
   % \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}.
@@ -110,8 +112,8 @@ In \exref{iris_bnp_process}, $\beta_\k = (\mu_\k, \Lambda_\k)$,
 and the likelihoods are Gaussian,
 $\p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}}$.
 The prior $\pbetaprior(\beta_\k)$ a normal-Wishart.
-Using the densities displayed in \exref{iris_bnp_process},
-observe that $\beta_\k$ enters the expected joint density only through the
+Using the log densities displayed in \exref{iris_bnp_process},
+observe that $\beta_\k$ enters the expected joint log-likelihood only through the
 expected moments
 %
 \begin{align*}
@@ -160,9 +162,7 @@ The conditionally conjugate variational distribution for $\z_\n$
 is multinomial.
 Our variational approximation is truncated at $\kmax$ so
 $\z_{\n\k} = 0$ for all $\k > \kmax$;
-as a result,
-the multinomial distribution on $\z_\n$ has $\kmax$ discrete categories.
-
+the multinomial distribution under $\q$ has $\kmax$ discrete categories.
 
 We parameterize the the multinomial distribution
 using its natural parameterization
@@ -181,7 +181,7 @@ we will require the optimal variational parameters $\etaopt$
 to be interior to $\etadom$ in our sensitivity analysis
 (\secref{local_sensitivity}).
 In the mean parameterization,
-$\sum_{\k=1}^\kmax p_{\n\k} = 1$, and so the
+$\sum_{\k=1}^\kmax p_{\n\k} = 1$, so the
 optimal mean parameters $\hat p_{\n}$ cannot be
 interior to $\Delta^{\kmax - 1}$.
 On the other hand, $\eta_{\z_\n}$ as defined
@@ -207,7 +207,7 @@ we set the optimal $\etaopt_{\z_\n}$ to be
 %
 \etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
 \log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
-\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right)
+\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
 %
 \end{align*}
 %
@@ -229,8 +229,8 @@ because each $\z_\n$ is unique to a single data point.
 In the regression model (\exref{mice_bnp_process}),
 the global variables are again $(\beta, \nu)$,
 but the local variables comprise of both the cluster assignments $\z$ and additive shifts $\b$.
-In these two models, notice that the global variables scale with $\kmax$, while
-local variables scale with the number of observations $\N$.
+In these two models, notice that the dimension of global variables scale with $\kmax$, while
+the dimension of local variables scale with the number of observations $\N$.
 
 In the topic model (\exref{structure_bnp_process}),
 we still call $(\beta, \nu)$ the global latent variables, even though they scale
@@ -244,7 +244,7 @@ Let $\etalocal$ be the local variational parameters. In \exref{iris_bnp_process}
 \exref{structure_bnp_process}, $\etalocal = \etaz$, while
 in \exref{mice_bnp_process}, $\etalocal = (\etaz, \eta_\b)$.
 
-In each case, for $\etaglob$ fixed, the optimal $\etalocal$ that minimizes
+In each model we consider, for $\etaglob$ fixed, the optimal $\etalocal$ that minimizes
 the $\mathrm{KL}$ can be set in closed form as a function of $\etaglob$.
 The multinomial parameters for $\eta_{\z_\n}$ in the regression and topic models
 can be set in the same way as described in \exref{qz_form}.
@@ -287,7 +287,7 @@ To accomodate a generic prior $\pstick(\nuk)$,
 we approximate the expecations in \eqref{stick_expectations} numerically.
 Each expectation is a univariate integral.
 A particularly easy approximation method is
-Gauss-Hermite (GH) quadrature CITE, which we now describe.
+Gauss-Hermite (GH) quadrature, which we now describe.
 
 To take advantage of GH quadrature, we first logit transform the stick-breaking
 proportion $\nuk$ so that the transformed variable
@@ -335,22 +335,23 @@ GH points rather than standard normal draws).
 
 In a VB approach, all posterior quantities of interest can be expressed as
 functions of the variational parameter $\eta$. We will use $\g(\eta)$ to denote
-such quantities. Typically, $\g(\eta)$ takes the form of an expectation over $\q$,
+such quantities. Often, $\g(\eta)$ takes the form of an expectation over $\q$,
 \begin{align*}
   g(\eta) = \expect{q(\zeta\vert\eta)}{f(\zeta)}
 \end{align*}
-for some function $\eta$.
+for some function $f(\eta)$.
 
 In the next few examples, we define some posterior quantities that we will
-study more closely in \secref{results}. We will evaluate the sensitivity
+consider in \secref{results}. We will evaluate the sensitivity
 of these quantities to the prior specification $\pstick$.
 
 \begin{ex}[The in-sample number of clusters]\exlabel{insample_nclusters}
 
 One might ask, \textit{how many clusters are present in the data set}?
-For example, in the iris data set, this corresponds to estimating the number of
-species present.
-To estimate this quantity in the context of a BNP model, define the random variable
+For example, in the iris data set, answering this question has the interpretation
+of counting the number of iris species present.
+To estimate the number of clusters in the context of a BNP model,
+define the random variable
 \begin{align*}
   \nclusters_\tau := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
   \z_{\n\k}\right) > \tau},
@@ -358,13 +359,13 @@ To estimate this quantity in the context of a BNP model, define the random varia
 where $\ind{\cdot}$ is the indicator function.
 $\nclusters_\tau$ counts the number of clusters with at least $\tau$
 observations in a set of assignments $\z$.
-The expected number of clusters under the posterior is
+The expected number of clusters under the variational posterior is
 \begin{align*}
   \gclusters(\eta) := \expect{\q(\z\vert\eta)}{\nclusters_\tau}.
 \end{align*}
 
 When $\tau = 0$, $\gclusterszero$ can be written as a function with respect to
-the means of $\z_{\n\k}$
+the assignment probabilities
 \begin{align*}
   \gclusterszero(\eta) = \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
   \left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
@@ -376,22 +377,29 @@ the means of $\z_{\n\k}$
 
 In the Bayesian approach, we can formulate the posterior predictive question,
 \textit{how many clusters would be present if a new data set were collected}?
-In the iris example, this corresponds to estimating the number of species
+In the iris example, this can interpreted as predicting the number of species
 one might see if a fresh sample of iris flowers were collected.
 Under the BNP model, the expected number of predictive clusters is defined as
 \begin{align*}
-  \gclusterspred(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters_\tau}}\\
-  &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
-  \sum_{i=1}^{\lfloor\tau\rfloor} {\N \choose \tau} (1 - \pi_k)^\N \right)},
+  \gclusterspred(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters_\tau}}.
 \end{align*}
+Notice that the inner expectation conditions on $\pi$ and the randomness is
+over $\z$ sampled from the generative model $\z\sim\p(\z\vert\pi)$.
+We can write out the inner expectation:
+%
+\begin{align*}
+  \gclusterspred(\eta) &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
+  \sum_{i=0}^{\lfloor\tau\rfloor} {\N \choose i} (1 - \pi_k)^\N \right)},
+\end{align*}
+where we use the convention that ${\N\choose 0} = 1$.
+%
 \end{ex}
 
 \begin{ex}[Co-clustering]\exlabel{posterior_coclustering}
 
 Finally, in a clustering problem, we are often interested in understanding
 which observations group with each other.
-One way to visualize the clusterings is to construct the co-clustering matrix.
-Define
+One way to visualize the clusters is to construct the co-clustering matrix,
 \begin{align*}
 \gcoclustering(\eta) := \expect{\q(\z\vert\eta)}{\z\z^{T}},
 \end{align*}
@@ -403,11 +411,11 @@ $\gcoclustering$ is a matrix quantity, not a scalar quantity.
 
 For some posterior quantities, the expectation over $\q$ will not be a simple
 closed-form function of $\eta$.
-For example, computing $\gclusters$ with an integer threshold $\tau > 0$
-requires forming all ${\N\choose\tau}$ combination of products
-$\expect{}{\z_{\n_1\k}}\cdot \ldots \cdot \expect{}{\z_{\n_\tau\k}}$
+For example, computing $\gclusters$ with a threshold $\tau > 0$
+requires forming all ${\N\choose\tau}$ combination of $\tau$-length products
+$\expect{}{\z_{\n_1\k}}\times \ldots \times \expect{}{\z_{\n_\tau\k}}$
 for each $\k$.
-In such cases, we resort to Monte-Carlo approximations of the expectation.
+In such cases, we resorted to Monte-Carlo approximations of the expectation.
 Specifically, we used the ``reparameterization trick"
 to sample from the variational distribution.
 In the case of $\gclusters$,
@@ -424,9 +432,9 @@ $f(u_1, \eta), \ldots, f(u_m, \eta)$.
 The uniform draws $u_1, \dots, u_m$ can be fixed beforehand.
 This is important for two reasons.
 First, we will be evaluating the same $\g$ at different parameter vectors $\eta$;
-conditional on the fixed $m$ uniform draws, $\g$ will be a deteriministic
+conditional on the fixed $m$ uniform draws, $\g$ will be a deteriministic function
 of $\eta$, and we can compare how $\g$ changes without stochasticity.
-Secondly, in \secref{influnce_section}, it will be useful to evaluate the
+Secondly, in \secref{funcional_perturbations}, it will be useful to evaluate the
 gradient of $\g$ with respect to $\eta$; conditional on the random draws,
 $\g$ (or more precisely, our Monte Carlo approximation of $\g$), will be
 differentiable with respect to $\eta$.
