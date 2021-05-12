@@ -1,14 +1,13 @@
 We evaluate the prior sensitivity in BNP models applied to three distinct data analysis examples.
-We first demonstrate local sensitivity in a Gaussian mixture model of the canonical iris data set.
-Secondly, we use BNP to cluster time-course gene expression data
-and evaluate the sensitivity of the resulting co-clustering matrix to prior perturbations.
-Finally, we adapt STRUCTURE~\citep{pritchard:2000:structure}, a Bayesian population genetics model,
-to incorporate a BNP prior, thus allowing for
-an infinite number latent populations.
-We study how the estimated population structure may change as a
-result of the prior specification.
+We first fit a Gaussian mixture model (\exref{iris_bnp_process}) to the canonical iris data set.
+Secondly, we cluster time-course gene expression data using our regression model
+(\exref{mice_bnp_process}) and study the resulting co-clustering matrix.
+Finally, we fit our topic model (\exref{structure_bnp_process})
+on a data set of sampled genotypes in an endangered thrush species;
+from our model fit, we estimate the number of latent populations in this
+bird species and reconstruct ancestral migration patterns.
 
-We consider both the effects of varying the parameter $\alpha$
+In each of our models, we consider both the effects of varying the parameter $\alpha$
 in the $\betadist{\nuk \vert 1, \alpha}$ stick distribution, as well as
 the effects of changing the functional form the Beta prior itself.
 For a given prior perturbation,
@@ -24,21 +23,9 @@ followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-qu
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
 
-We take advantage of the global/local structure described in \secref{computing_sensitivity}
-for both optimization and the
-linear approximation.
-We speed up the optimization by minimizing $\KLglobal(\etaglob)$ (\eqref{global_kl}),
-which is a function of only global parameters; the local parameters are set implicitly.
-Minimizing $\KLglobal(\etaglob)$, rather than minimizing the $\mathrm{KL}$ as a function of
-both global and local parameters, keeps the
-dimension of the optimization parameter independent of $N$.
-After the optimzation terminates at an optimal $\etaoptglob$,
-the optimal local parameters $\etaoptz$ can be set in closed form
-to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptz)$.
-
 In our results below, we use
 the approximation defined by \eqref{global_sens, global_lin_approx},
-where only the global parameters are linearized;
+where only the global variational parameters are linearized;
 the local parameters are set implicitly as part of the
 computation of the posterior statistic $\g$.
 We solved the linear system in~\eqref{global_sens} using
@@ -53,7 +40,7 @@ be re-used for different perturbations
 require solving different $\crosshessian$).
 By using conjugate gradient, we need to re-solve the linear system (\eqref{global_sens})
 for each choice of prior perturbation.
-On our data sets, the conjugate graient algorithm was at least
+On our data sets, the conjugate gradient algorithm was at least
 an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
 to exploring different perturbations.
 

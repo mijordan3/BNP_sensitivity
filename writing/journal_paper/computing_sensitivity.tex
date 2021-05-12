@@ -1,3 +1,56 @@
+Before computing any sensitivity measures, we first need to find $\etaopt(0)$
+by optimizing the $\mathrm{KL}$ objective (\eqref{vb_optimization}).
+In the optimization, we take advantage of the global/local structure in our models
+(\secref{vb_conjugacy}).
+Recall that we partitioned the variational parameter vector $\eta$
+into global variational parameters $\etaglob$ and local variational
+parameters $\etalocal$.
+The global variational parameters govern the distribution on
+latent variables shared across multiple data points,
+such as stick-breaking proportions $\nu$ and component variables $\beta$;
+the local variational parameters govern the collection of latent variables
+unique to each data point, such as the cluster assignments $\z$.
+
+In \secref{vb_conjugacy}, we noted that the optimal local variational parameters
+$\etaoptlocal$ can be written
+as a closed-form function of the global variational parameters $\etaglob$.
+Let $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping; that is,
+\begin{align*}
+  \etaoptlocal(\etaglob; \t) := \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
+\end{align*}
+With this minimizer available in closed-form, we can define
+\begin{align}\eqlabel{kl_global}
+\KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptlocal(\eta_\gamma; \t)), \t\Big),
+\end{align}
+which returns the $\mathrm{KL}$ as a function of only global parameters
+by implicitly setting local parameters at their optimum.
+
+Rather than optimizing the $\mathrm{KL}$ over all variational paramters, both global and local,
+we optimize $\KLglobal$, which is a function of global parameters only.
+Minimizing $\KLglobal(\etaglob)$ keeps the
+dimension of the optimization parameter independent of the number of data points.
+After the optimzation terminates at an optimal $\etaoptglob$,
+the optimal local parameters $\etaoptlocal$ can be set in closed form
+to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
+The construction of $\KLglobal$ will play a role in computing our sensitivity measures in practice,
+as we detail below.
+
+
+% Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
+% \begin{align}\eqlabel{global_kl}
+% \hessopt_{\gamma} &=
+% \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
+% \KLglobal(\etaopt_\gamma, 0) \\
+% & \mathwhere
+% % \mathrm{KL}_{glob}(\eta_\gamma) := \evalat{\KL{\eta, \t}}{\eta = (\eta_\gamma, \etaoptz(\eta_\gamma; t))}.
+% \KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
+% \notag
+% \end{align}
+
+% the global latent variables $\gamma := (\nu, \beta)$.
+% We also defined local variational parameters $\eta_\ell$ which parameterize
+% the local latent variables $\z$ (or $(\z, \b)$ in the regression model).
+% Instead of optimizing
 
 \subsubsection*{the cross-hessian}
 
@@ -56,26 +109,16 @@ $\eta$ other than those that parameterize the sticks.
 
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
-$\etadim$ is large.
-The dimensions of variational parameters $\etanu$ and
-$\etabeta$ are of order $\kmax$,
-while the dimension of $\etaz$ is of order $\kmax
-\times\N$.
-For large $\N$, it may not be possible to even instantiate the Hessian matrix in memory.
+the dimension of $\eta$, is large.
+The dimension of $\etaglob$ scales with $\kmax$,
+while the dimension of $\etalocal$ scales with $\kmax
+\times\N$. (the scaling of the topic model is slightly different; but the point remains
+that the dimension of $\etalocal$ grows faster than the dimension of $\etaglob$).
+Depending on the size of $\eta$, instatiating the full Hessian in memory
+may be impossible.
 
-To compute the Hessian, we take advantage of the fact that the latent variables
-in our BNP model (\eqref{bnp_model})
-factorize into a set of ``global" and ``local" latent variables.
-The cluster latent variables $\beta$ and
-the stick-breaking proportions $\nu$
-are ``global" because they are shared across the entire data set.
-The ``local" variables are the cluster assignments $z$, which are unique to each data point.
-
-Let $\gamma := (\beta, \nu)$ denote the global latent variables and
-$\eta_\gamma := (\etabeta, \etanu)$ be the variational parameters for the global latent variables.
-Note that the dimension of $\eta_\gamma$ is of order $\kmax$ and does not scale with
-the number of data points $\N$.
-
+We again take advantage of the fact that the latent variables
+factorize into a set of global and local latent variables.
 For generic latent variables $a$ and $b$,
 let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
 \eta_b^T}{\etaopt(0), t=0}$, the Hessian with respect to the variational
@@ -90,18 +133,19 @@ We decompose the Hessian matrix $\hessopt$ into four blocks:
        {\etaopt(0), t= 0} ={}&
 \left(
 \begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
+   \hess{\gamma\gamma} & \hess{\gamma\ell} \\
+   \hess{\ell\gamma}     & \hess{\ell\ell} \\
 \end{array}
 \right).
 %
 \end{align*}
 
 Next, let $\crosshessian_\gamma$ be the components of
-$\crosshessian$ corresponding to the variational parameters of
-$\gamma$---that is, $\crosshessian_\gamma$ is given by replacing
+$\crosshessian$ corresponding to the variational parameters
+$\etaglob$---that is, $\crosshessian_\gamma$ is given by replacing
 the operator $\nabla_\eta$ with $\nabla_{\eta_\gamma}$ in \eqref{sens_mixed_partial}.
-The analagous quantity for $z$, $\crosshessian_\z$, is zero, since $\z$ does not enter the expectation in \eqref{sens_mixed_partial}.
+The analagous quantity for the local parameters, $\crosshessian_\ell$,
+is zero, since no local variables enter the expectation in \eqref{sens_mixed_partial}.
 We can thus write
 \begin{align*}
   \crosshessian = \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right).
@@ -115,8 +159,8 @@ In this notation,
 \fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
 -\left(
 \begin{array}{cc}
-   \hess{\gamma\gamma} & \hess{\gamma\z} \\
-   \hess{\z\gamma}     & \hess{\z\z} \\
+   \hess{\gamma\gamma} & \hess{\gamma\ell} \\
+   \hess{\ell\gamma}     & \hess{\ell\ell} \\
 \end{array}
 \right)^{-1}
 \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right),
@@ -130,10 +174,10 @@ and an application of the Schur complement gives
 \fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
 -\left(\begin{array}{c}
 I_{\gamma\gamma} \\
-\hess{\z\z}^{-1} \hess{\z\gamma}
+\hess{\ell\ell}^{-1} \hess{\ell\gamma}
 \end{array}\right)
 \left(\hess{\gamma\gamma} -
-      \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right)^{-1} \crosshessian_\gamma,
+      \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right)^{-1} \crosshessian_\gamma,
 %
 \end{align*}
 where $I_{\gamma\gamma}$ is the identity matrix with
@@ -146,31 +190,19 @@ is given by
   - \hessopt_\gamma^{-1}\crosshessian_\gamma
   \mathwhere
   \hessopt_\gamma := \left(\hess{\gamma\gamma} -
-        \hess{\gamma\z} \hess{\z\z}^{-1} \hess{\z\gamma}\right).
+        \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right).
 \end{align}
 
 
 Each term of $\hessopt_\gamma$ can be easily computed using automatic differentiation.
-In fact, the $\hess{\z\z}$ is block-diagonal and has a closed form inverse.
+In fact, the $\hess{\ell\ell}$ is block-diagonal and has a closed form inverse.
 
-Alteratively, we now make an observation that allows us to express $\hessopt_\gamma$
-using only a single Hessian operator.
-Recall from \exref{qz_form} that the optimal local variational parameters $\etaoptz$ can be written
-as a closed-form function of the global variational parameters $\eta_\gamma$.
-Let $\etaoptz(\eta_\gamma; \t)$ denote this mapping; that is,
-\begin{align*}
-  \etaoptz(\eta_\gamma; \t) := \argmin_{\eta_\z} \KL{(\eta_\gamma, \eta_z), \t}.
-\end{align*}
-
-Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
+Alteratively, using the optimality of $\etaoptz(\eta_\gamma; \t)$ and
+applying the chain rule, one can check that
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
 \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
-\KLglobal(\etaopt_\gamma, 0) \\
-& \mathwhere
-% \mathrm{KL}_{glob}(\eta_\gamma) := \evalat{\KL{\eta, \t}}{\eta = (\eta_\gamma, \etaoptz(\eta_\gamma; t))}.
-\KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
-\notag
+\KLglobal(\etaopt_\gamma, 0)
 \end{align}
 
 \eqref{global_kl} is how we calculate $\hessopt_\gamma$ in practice:
@@ -180,11 +212,13 @@ we then use automatic differentiation to
 compute the Hessian of $\mathrm{KL}_{glob}$
 with respect to the global parameters $\eta_\gamma$.
 
-Crucially, the dimension of $\hessopt_\gamma$ is of order $\kmax \times \kmax$
-and does not scale with the number of data points $\N$.
+Crucially, the size of $\hessopt_\gamma$ scales with $(\kmax)^2$,
+while the full Hessian scales with both $(\kmax)^2$
+and the squared number of data points $\N^2$
+(in the topic model, the Hessians scale as $(\N\kmax)^2$ and $(\N\kmax\nloci)^2)$).
 Hence, $\hessopt_\gamma$ is more memory efficient to store
 and faster to invert
-than the full $\etadim\times\etadim$ Hessian of all the variational parameters.
+than the full Hessian of all the variational parameters.
 
 
 Now that we can compute the sensitivity of the global parameters in
@@ -206,8 +240,8 @@ we can construct an analagous mapping for $\g$,
 
 This mapping can be used for any posterior quantity.
 Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient;
-we do not need to invert the full $\etadim\times\etadim$ Hessian
-and to linearize the entire set of variational parameters, global and local.
+we do not need to invert the full Hessian
+and linearize the entire set of variational parameters, global and local.
 As a shorthand, we will use $\g(\etalin_\gamma(t))$ to
 denote the posterior computed under our linearized global parameters
 at prior parameter $\t$ using the mapping \eqref{g_as_global}.
