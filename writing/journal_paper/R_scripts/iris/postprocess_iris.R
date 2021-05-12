@@ -30,17 +30,13 @@ alpha_sens_df <-
   data.frame(
     alpha = alpha_sens_file['alpha_list'],
     n_clusters_refit = alpha_sens_file['n_clusters_refit'],
-    n_clusters_lr = alpha_sens_file['n_clusters_lr'], 
-    n_clusters_thresh_refit = alpha_sens_file['n_clusters_thresh_refit'],
-    n_clusters_thresh_lr = alpha_sens_file['n_clusters_thresh_lr'])
+    n_clusters_lr = alpha_sens_file['n_clusters_lr'])
 
 alpha_sens_df_pred <- 
   data.frame(
     alpha = alpha_sens_file['alpha_list'],
     n_clusters_refit = alpha_sens_file['n_clusters_pred_refit'],
-    n_clusters_lr = alpha_sens_file['n_clusters_pred_lr'], 
-    n_clusters_thresh_refit = alpha_sens_file['n_clusters_pred_thresh_refit'],
-    n_clusters_thresh_lr = alpha_sens_file['n_clusters_pred_thresh_lr'])
+    n_clusters_lr = alpha_sens_file['n_clusters_pred_lr'])
 
 ####################
 # Load data functional sensitivity

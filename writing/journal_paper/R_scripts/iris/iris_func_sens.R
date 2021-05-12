@@ -64,7 +64,7 @@ plot_func_pert_results <- function(results_list,
 }
 
 # TODO this is set manually ... 
-ymax = 0.018
+ymax = 0.005
 
 g0 <- plot_func_pert_results(fpert1_results, 
                              remove_legend = TRUE, 
@@ -72,13 +72,13 @@ g0 <- plot_func_pert_results(fpert1_results,
                              remove_title = FALSE, 
                              ymax = ymax)
 
-g1 <- plot_func_pert_results(fpert3_results, 
+g1 <- plot_func_pert_results(fpert2_results, 
                              remove_legend = TRUE, 
                              remove_xlab = TRUE, 
                              remove_title = TRUE, 
                              ymax = ymax)
 
-g2 <- plot_func_pert_results(fpert2_results, 
+g2 <- plot_func_pert_results(fpert3_results, 
                              remove_legend = FALSE, 
                              remove_xlab = FALSE, 
                              remove_title = TRUE, 
