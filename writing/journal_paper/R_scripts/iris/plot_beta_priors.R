@@ -2,7 +2,7 @@ beta_prior <- function(x, alpha){
   return(dbeta(x, shape1 = 1, shape = alpha))
 }
 
-alpha_vec <- 1:8 * 2
+alpha_vec <- c(0.1, 1, 2, 4)
 
 alpha_density_df <- 
   data.frame(x = seq(0, 1, length.out = 100))
@@ -21,7 +21,7 @@ alpha_density_df %>%
                              alpha_num)) %>% 
   ggplot() + 
   geom_line(aes(x = x, y = pdf)) + 
-  facet_wrap(~alpha, nrow = 2) + 
+  facet_wrap(~alpha, nrow = 1, scales = 'free_y') + 
   ylab('p.d.f.') + 
-  xlab('stick length') +
+  xlab('stick propn') +
   get_fontsizes()

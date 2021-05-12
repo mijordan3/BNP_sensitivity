@@ -37,6 +37,8 @@
 \def\b{b}   % additive shift for mice model
 \def\l{l}   % index for locus
 \def\i{i}   % index for chromosome
+\def\d{d}   % data dimension for GMM
+\def\s{s}   % sigmoid function
 \def\nuk{\nu_{\k}}   % K-th stick.  Have to type this a lot.
 \def\const{C}   % Constant
 \def\lnu{\tilde{\nu}}   % Unconstrained stick
@@ -50,14 +52,15 @@
 \def\inflg{\Psi_{\g}}   % The influence function for a function of interest
 
 % Variational parameters
-\def\etatheta{\eta_{\theta}}  % VB parameters for certain components: TODO delete this. using \thetabeta now
 \def\etabeta{\eta_{\beta}}  % VB parameters for certain components
 \def\etanu{\eta_{\nu}}  % VB parameters for certain components
 \def\etalnu{\eta_{\lnu}}  % VB parameters for certain components
 \def\etanuk{\eta_{\nuk}}  % VB parameters for certain components
 \def\etaz{\eta_{\z}}  % VB parameters for certain components
 \def\etaglob{\eta_{\gamma}}  % VB parameters for theta and nu
+\def\etalocal{\eta_{\ell}}  % VB parameters for local variables
 \def\etaoptglob{\etaopt_{\gamma}}  % optimal VB parameters for theta and nu
+\def\etaoptlocal{\etaopt_{\ell}}  % optimal VB parameters for local variables
 \def\etaopttheta{\etaopt_{\theta}}  % VB parameters for certain components
 \def\etaoptnu{\etaopt_{\nu}}  % VB parameters for certain components
 \def\etaoptnuk{\etaopt_{\nuk}}  % VB parameters for certain components
@@ -72,6 +75,7 @@
 \def\ptil{\tilde{\p}}   % Other distributions
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}}   % Stick breaking distribution
+\def\pbetaprior{\p_{\mathrm{base}}}   % distribution on cluster centroids
 \def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \qtil}\left(#1\right)}   % Log VB distribution gradient
 \def\lqhess#1{{\nabla_\eta^2 \log \qtil}\left(#1\right)}   % Log VB distribution Hessian
@@ -89,9 +93,10 @@
 \def\KLhat#1{\widetilde{\mathrm{KL}}\left(#1\right)}   % KL divergence smoothed
 \def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
 \def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
-\def\wishart#1{\mathrm{Wishart}\left(#1\right)}   % Wishart distribution
+\def\normalwishart#1{\mathcal{N}\mathcal{W}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
+
 
 \newcommand{\KLglobal}{\mathrm{KL}_{\mathrm{glob}}}   % KL divergence as function of global parameters only
 
@@ -132,19 +137,25 @@
 \def\assuitemref#1#2{\assuref{#1} (\itemref{#2})}%
 
 % some posterior statistics
-\newcommand{\gclusters}{\g_{\text{cl}}} % number of in-sample clusters
-\newcommand{\gclusterspred}{\g_{\text{p.cl}}} % number of predictive clusters
-\newcommand{\coclusteringmatr}{\zeta} % coclustering matrix
+\newcommand{\gclusters}{\g_{\text{cl},\tau}} % number of in-sample clusters (thresholded)
+\newcommand{\gclusterszero}{\g_{\text{cl},0}} % number of in-sample clusters (not thresholded)
+\newcommand{\gclustersabbr}{\g_{\text{cl}}} % number of in-sample clusters (not thresholded)
+\newcommand{\gclusterspred}{\g_{\text{p.cl},\tau}} % number of predictive clusters
+\newcommand{\gclusterspredzero}{\g_{\text{p.cl},0}} % number of predictive clusters
+\newcommand{\gclusterspredabbr}{\g_{\text{p.cl}}} % number of predictive clusters
+\newcommand{\gcoclustering}{\g_{\text{cc}}} % coclustering matrix
 \newcommand{\laplacianevsum}{\g_{\text{ev}}} % the sum of the eigenvalues of the graph-laplacian (for mice)
 \newcommand{\gpop}{\g_{\text{pop}}} % number of in-sample populations (for structure)
 \newcommand{\gloci}{\g_{\text{loci}}} %  number of loci in a population(for structure)
 \newcommand{\gadmix}{\g_{\text{admix}}} % expected admixture (for structure)
+\newcommand{\nclusters}{G} % random variable for number of clusters
 
 % commands for for mice data
 \newcommand{\ngenes}{N} % number of genes
 \newcommand{\ntimepoints}{M} % number of timepoints
-\newcommand{\regmatrix}{X}
+\newcommand{\regmatrix}{A}
 \newcommand{\timeindx}{T} % would just use \t, but then this parameterizes a distribution ...
+\newcommand{\pshift}{\p_{\mathrm{shift}}}
 
 % commands for for structure data
 \newcommand{\nindiv}{N} % number of individuals genotyped
