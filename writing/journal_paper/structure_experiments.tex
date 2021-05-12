@@ -26,9 +26,9 @@ For this endangered bird species,
 understanding the degree to which populations have grown genetically distinct is important for conservation efforts: 
 well-separated populations with little genetic diversity are particularly at risk of extinction. 
 
-We employ the topic model from \exref{structure_generative_process}. 
+We employ the topic model from \exref{structure_bnp_process}. 
 \figref{stru_init_fit} shows the inferred
-individual admixtures the initital fit with
+individual admixtures the initial fit with
 stick-breaking distribution is
 $\pstick(\nu_{nk}) = \betadist{\nu_{nk}\vert 1, \alpha_0}$, $\alpha_0 = 6$. 
 In this fit, there appears to be three dominant latent populations, 
@@ -288,10 +288,17 @@ appears robust to our stick-breaking prior.
 On the other had, the the outlying Mbololo admixtures appears to be more sensitive to the stick-breaking prior, and conclusions about migration from Ngangao to Mbololo may be dependent on prior choices. 
 
 
-Finally, the computational cost of linearizing the variational parameters is again favorable compared with refitting (\tabref{stru_timing}). 
-Forming the linear approximation took less than half a second; 
-as usual, subsequent evaluations of $\etalinglobal$ take milliseconds.
+Finally, the computational cost of linearizing the variational parameters is again favorable compared with the cost of refitting (\tabref{stru_timing}). 
+The linear approximation allows us to quickly explore all the
+functional perturbations presented here, and many more: 
+computing the linearized variational parameters (including the Hessian inversion) $\etalinglobal$ takes about half a second for a given perturbation. 
 On the other hand, refitting the model after a prior perturbation can take more than ten seconds. 
+While exploring \textit{all} the possible functional perturbations is impossible, the linear approximation allows rapid exploration of the space of perturbations. 
+Notice also that computing the influence function only takes half a second.
+As we have demonstrated, the influence function provides an informative guide 
+for uncovering which perturbations might result in greater sensitivity than others.
+These perturbations can be more explored either by either linearizing in 
+the direction of the perturbation, or by refitting. 
 
 \begin{table}[tb]
 \centering
