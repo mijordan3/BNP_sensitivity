@@ -25,11 +25,11 @@ With this minimizer available in closed-form, we can define
 which returns the $\mathrm{KL}$ as a function of only global parameters
 by implicitly setting local parameters at their optimum.
 
-Rather than optimizing the $\mathrm{KL}$ over all variational paramters, both global and local,
+Rather than optimizing the $\mathrm{KL}$ over all variational parameters, both global and local,
 we optimize $\KLglobal$, which is a function of global parameters only.
 Minimizing $\KLglobal(\etaglob)$ keeps the
 dimension of the optimization parameter independent of the number of data points.
-After the optimzation terminates at an optimal $\etaoptglob$,
+After the optimization terminates at an optimal $\etaoptglob$,
 the optimal local parameters $\etaoptlocal$ can be set in closed form
 to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
 The construction of $\KLglobal$ will play a role in computing our sensitivity measures in practice,
@@ -52,24 +52,24 @@ as we detail below.
 % the local latent variables $\z$ (or $(\z, \b)$ in the regression model).
 % Instead of optimizing
 
-\subsubsection*{the cross-hessian}
+\subsubsection*{The Jacobian term}
 
 \todo{Move the discussion about the cross-hessian earlier: maybe after corollary 1.}
 
-Define
+We give the expectation in the local sensitivity computation
+(\eqref{vb_eta_sens}) a name. Define
 \begin{align*}
 \crosshessian :=   \expect{\q(\theta \vert \etaopt)}{
       \lqgradbar{\theta \vert \etaopt}
       \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-  }
+  },
 \end{align*}
-
-\todo{maybe define $\crosshessian$ in theorem 1?}
-
+and we write out this expectation in the context of a stick-breaking prior.
 We assume that $\q(\theta \vert \eta)$ is normalized, so
 $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$.
+\todo{maybe define $\crosshessian$ in theorem 1?}
 
-In our case, only the prior on stick-breaking proportions
+Only the prior on stick-breaking proportions
 $\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
 Because the elements of $\nu$ fully factorize
 under both the prior and the variational distributions,
@@ -98,14 +98,14 @@ $f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
 In all the functional forms for
 $\t \mapsto \pstick(\nuk \vert \t)$ considered below,
 $f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
-The resulting GH approximation is a deteriminstic function of $\eta$,
+The resulting GH approximation is a deterministic function of $\eta$,
 and thus the gradient in \eqref{sens_mixed_partial} can be computed
 with another application of automatic differentiation.
 Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
 it is zero for all entries of
 $\eta$ other than those that parameterize the sticks.
 
-\subsubsection*{The hessian}
+\subsubsection*{The Hessian}
 
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
@@ -114,7 +114,7 @@ The dimension of $\etaglob$ scales with $\kmax$,
 while the dimension of $\etalocal$ scales with $\kmax
 \times\N$. (the scaling of the topic model is slightly different; but the point remains
 that the dimension of $\etalocal$ grows faster than the dimension of $\etaglob$).
-Depending on the size of $\eta$, instatiating the full Hessian in memory
+Depending on the size of $\eta$, instantiating the full Hessian in memory
 may be impossible.
 
 We again take advantage of the fact that the latent variables
@@ -144,7 +144,7 @@ Next, let $\crosshessian_\gamma$ be the components of
 $\crosshessian$ corresponding to the variational parameters
 $\etaglob$---that is, $\crosshessian_\gamma$ is given by replacing
 the operator $\nabla_\eta$ with $\nabla_{\eta_\gamma}$ in \eqref{sens_mixed_partial}.
-The analagous quantity for the local parameters, $\crosshessian_\ell$,
+The analogous quantity for the local parameters, $\crosshessian_\ell$,
 is zero, since no local variables enter the expectation in \eqref{sens_mixed_partial}.
 We can thus write
 \begin{align*}
@@ -197,7 +197,7 @@ is given by
 Each term of $\hessopt_\gamma$ can be easily computed using automatic differentiation.
 In fact, the $\hess{\ell\ell}$ is block-diagonal and has a closed form inverse.
 
-Alteratively, using the optimality of $\etaoptz(\eta_\gamma; \t)$ and
+Alternatively, using the optimality of $\etaoptz(\eta_\gamma; \t)$ and
 applying the chain rule, one can check that
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
@@ -215,7 +215,7 @@ with respect to the global parameters $\eta_\gamma$.
 Crucially, the size of $\hessopt_\gamma$ scales with $(\kmax)^2$,
 while the full Hessian scales with both $(\kmax)^2$
 and the squared number of data points $\N^2$
-(in the topic model, the Hessians scale as $(\N\kmax)^2$ and $(\N\kmax\nloci)^2)$).
+(in the topic model, the Hessian scale as $(\N\kmax)^2$ and $(\N\kmax\nloci)^2)$).
 Hence, $\hessopt_\gamma$ is more memory efficient to store
 and faster to invert
 than the full Hessian of all the variational parameters.
@@ -233,7 +233,7 @@ we again take advantage of the fact that the optimal
 local parameters can be found in closed form given global parameters.
 In the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
 and is a function of only global parameters and the prior parameter $\t$,
-we can construct an analagous mapping for $\g$,
+we can construct an analogous mapping for $\g$,
 \begin{align}\eqlabel{g_as_global}
 (\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big).
 \end{align}

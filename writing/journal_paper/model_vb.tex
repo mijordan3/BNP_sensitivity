@@ -35,7 +35,7 @@ below, we will choose $\q(\zeta \vert \eta)$ so that we can easily evaluate (or 
 the above expectation with respect to $\q(\zeta \vert \eta)$
 as a closed-form function of $\eta$.
 Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and
-so can be negelcted in the optimziation.
+so can be neglected in the optimization.
 
 In practice, forming an approximating posterior for BNP
 can be challenging since the latent variables $\nu$ and $\beta$ are
@@ -127,7 +127,7 @@ The conditionally conjugate variational distribution on $\beta_\k$ is
 normal-Wishart, which we denote as
 $\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta}$.
 With this choice of $\q(\beta_\k \vert \eta)$,
-all the preceeding expected moments
+all the preceding expected moments
 can be provided as closed-form functions of $\eta$.
 %
 % With this choice of $\q$, the expectations
@@ -191,7 +191,7 @@ Moreover, with the distributions $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu
 the parameter vector $\eta_{\z_\n}$ that minimizes \eqref{vb_optimization}
 has a closed form.
 Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
-the optimal $\etaopt_{\z_\n}$ must satisfiy
+the optimal $\etaopt_{\z_\n}$ must satisfy
 %
 \begin{align*}
 & \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
@@ -279,12 +279,12 @@ If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
 then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would also be Beta.
 In this case, all the displayed expectations in \eqref{stick_expectations}
 can be computed analytically as a function of
-the Beta parameters in the variataional approximation.
+the Beta parameters in the variational approximation.
 
 However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
 are outside the family of Beta distributions.
-To accomodate a generic prior $\pstick(\nuk)$,
-we approximate the expecations in \eqref{stick_expectations} numerically.
+To accommodate a generic prior $\pstick(\nuk)$,
+we approximate the expectations in \eqref{stick_expectations} numerically.
 Each expectation is a univariate integral.
 A particularly easy approximation method is
 Gauss-Hermite (GH) quadrature, which we now describe.
@@ -294,17 +294,52 @@ proportion $\nuk$ so that the transformed variable
 \begin{align*}
   \lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right)
 \end{align*}
-is not contrained to be between $(0, 1)$ and can take values in all of $\mathbb{R}$.
+is not constrained to be between $(0, 1)$ and can take values in all of $\mathbb{R}$.
 Let $\s$ be the sigmoid function,
 which provides the inverse transformation,
 \begin{align*}
   \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 
+It will be useful later to have at hand the following
+derivatives of the transforms between $\nu$ and $\lnu$,
+%
+\begin{align}\eqlabel{lnuk_derivatives}
+%
+\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
+%     \frac{1-\nuk}{\nuk}
+%     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
+% \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
+% \\={}&
+    \frac{1}{\nuk (1 - \nuk)} \mathand
+%
+\fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
+    \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
+%
+\end{align}
+
+
 We let $\q(\lnu_\k \vert \eta)$ be normally distributed with
 location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
 This then induces a logit-normal
 distribution on our original variable of interest, $\nuk$.
+In other words,
+\begin{align}\eqlabel{lnuk_vb_approximation}
+%
+\q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
+\Rightarrow \\
+\q(\nuk \vert \eta) ={}&
+    \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
+        \vert \lnumean_\k, \lnusd_\k}
+    \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
+\nonumber\\={}&
+\normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
+        \vert \lnumean_\k, \lnusd_\k}
+    \left|\frac{1}{\nuk (1 - \nuk)}\right|.
+\nonumber
+%
+\end{align}
+
 
 With this choice of a logit-normal $\q(\nuk \vert \eta)$,
 we can approximate expectations of smooth functions
@@ -323,7 +358,7 @@ located at $\xi_g$, weighted by $\omega_g$:
 %
 \end{align}
 %
-Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a deteriministic, differentiable
+Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a deterministic, differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
 technique is similar to the ``reparameterization trick,'' only using
 GH points rather than standard normal draws).
@@ -432,9 +467,10 @@ $f(u_1, \eta), \ldots, f(u_m, \eta)$.
 The uniform draws $u_1, \dots, u_m$ can be fixed beforehand.
 This is important for two reasons.
 First, we will be evaluating the same $\g$ at different parameter vectors $\eta$;
-conditional on the fixed $m$ uniform draws, $\g$ will be a deteriministic function
+conditional on the fixed $m$ uniform draws, $\g$ will be a deterministic function
 of $\eta$, and we can compare how $\g$ changes without stochasticity.
-Secondly, in \secref{funcional_perturbations}, it will be useful to evaluate the
+Secondly, in the construction of our ``influence function" (\secref{functional_perturbations}),
+it will be useful to evaluate the
 gradient of $\g$ with respect to $\eta$; conditional on the random draws,
 $\g$ (or more precisely, our Monte Carlo approximation of $\g$), will be
 differentiable with respect to $\eta$.
