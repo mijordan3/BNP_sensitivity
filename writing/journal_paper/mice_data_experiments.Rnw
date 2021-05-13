@@ -154,17 +154,16 @@ gene_alpha_coclustering_cap <-
      co-clustering matrix at $\\alpha = 1$ (top row)
      and $\\alpha = 11$ (bottom row),
      relative to the co-clustering matrix at $\\alpha_0 = 6$.
-     We compare differences obtained with the linearly approximated 
-     variational parameters against changes observed after 
-     refiting. 
      (Left) a scatter plot of differences under the linear approximation 
      against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
-     (Middle) the difference in co-clustering matrix observed after refitting. 
-     (Right) the difference observed under the linearly approximated variational
+     Note the scales of the axes: 
+     the largest change in an entry of the co-clustering matrix is 
+     $\\approx 0.03$.  
+     (Middle) sign changes in the co-clustering matrix observed after refitting. 
+     (Right) the changes under the linearly approximated variational
      parameters. 
-     For visualization, values in the heatmaps
-     are clipped at $\\pm 10^{-3}$. ")
+     For visualization, changes with absolute value $< 1e-5$ are not colored. ")
 
 SetImageSize(aspect_ratio=base_aspect_ratio)
 @
@@ -227,17 +226,13 @@ The linearized variational parameters are again able to capture the qualitative 
 gene_fpert_coclustering_cap <- paste(
     "Effect on the co-clustering matrix after a multiplicative functional
      perturbation.
-     The perturbation $\\phi$ (top left, in grey) 
-     is a difference of two Gaussian bumps 
-     scaled to have $L_\\infty$ norm equal to two.
-     $\\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function (top left, purple; 
-     the influence function is scaled to also have $L_\\infty$ norm equal to two).
-     The effect of this perturbation on the prior density in the top right. 
-     The bottom row shows the effect of this perturbation on 
+     (Top left) the perturbation $\\phi$ in grey, 
+     and the influence function in purple. 
+     (Top right) the effect of this perturbation on the prior density. 
+     (Bottom) the effect of this perturbation on 
     the coclustering matrix.
-    For visualization, the differences in the heatmap 
-     are clipped at $\\pm 10^{-1}$.")
+    Note the scale of the scatterplot axes compared with
+    the scatterplots in \\figref{gene_alpha_coclustering}. ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 1.05)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=

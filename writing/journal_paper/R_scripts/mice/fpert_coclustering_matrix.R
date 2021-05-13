@@ -1,15 +1,9 @@
 ######################
 # Plot perturbation
 ######################
-# legend.theme <- theme(legend.position = 'right', 
-#                       legend.key.width=unit(0.4,"cm"), 
-#                       legend.margin=margin(-10,0,-10,-10))
-
 p_logphi <- plot_influence_and_logphi(prior_pert_df$logit_v, 
                                       influence_df$influence_x_prior, 
-                                      prior_pert_df$log_phi) # + 
-  # legend.theme
-
+                                      prior_pert_df$log_phi)
 
 ######################
 # Plot priors
@@ -24,10 +18,11 @@ p_priors_contr <-
 # Plot co-clustering results
 ######################
 # bins for the co-clustering matrix
+vmin = 1e-5
 plots <- compare_coclust_lr_and_refit(coclust_refit_fpert, 
                                       coclust_lr_fpert,
                                       coclust_init, 
-                                      vmax = 0.1)
+                                      vmin = vmin)
 
 top_row <- p_logphi + p_priors_contr
 bottom_row <- plots$p_scatter + plots$p_coclust_refit + plots$p_coclust_lr 
