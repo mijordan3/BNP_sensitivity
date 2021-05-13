@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -79,6 +79,7 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 %
 
 We fitted the initial approximate posterior at $\alpha_0 = 6$. 
+We will evaluate the senstivity of this choice of $\alpha$ below. 
 \figref{gene_centroids} shows the inferred smoothers 
 $\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
@@ -106,15 +107,15 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 <<gene_initial_coclustering_cap>>=
 gene_initial_coclustering_cap <- paste(
     "The inferred co-clustering matrix of gene expressions at $\\alpha_0 = 6.$ ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
+SetImageSize(aspect_ratio=base_aspect_ratio,
              image_width = 0.6)
 @
 <<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
 p <- plot_coclustering(coclust_init) +
-  theme(axis.title = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        legend.text = element_text(size = axis_ticksize))
+  theme(legend.text = element_text(size = axis_ticksize), 
+        legend.margin=margin(-4,-4,-4,-4), 
+        legend.key.width = unit(0.2, 'cm'), 
+        legend.key.height = unit(0.4, 'cm'))
 p
 @
 
@@ -134,8 +135,9 @@ variational parameters, at $\alpha = 1$ and $\alpha = 11$.
 %(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
 % We write $\gcoclustering(\etalinglobal)$ with the 
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
-For either $\alpha$, the change in co-clustering matrix 
-is minuscule (\figref{gene_alpha_coclustering}):
+
+For either $\alpha$, the change in the posterior co-clustering 
+matrix is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
 or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$. 
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
@@ -236,7 +238,7 @@ gene_fpert_coclustering_cap <- paste(
     the coclustering matrix.
     For visualization, the differences in the heatmap 
      are clipped at $\\pm 10^{-1}$.")
-SetImageSize(aspect_ratio=base_aspect_ratio)
+SetImageSize(aspect_ratio=base_aspect_ratio * 1.05)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)

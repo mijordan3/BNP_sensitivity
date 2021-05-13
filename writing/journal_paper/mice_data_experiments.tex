@@ -79,6 +79,7 @@ because the later time points are more spread out.
 %
 
 We fitted the initial approximate posterior at $\alpha_0 = 6$. 
+We will evaluate the senstivity of this choice of $\alpha$ below. 
 \figref{gene_centroids} shows the inferred smoothers 
 $\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
@@ -112,7 +113,7 @@ both parametric and functional perturbations to the stick distribution.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.588\linewidth,height=0.400\linewidth]{figure/gene_initial_coclustering-1} 
+{\centering \includegraphics[width=0.588\linewidth,height=0.470\linewidth]{figure/gene_initial_coclustering-1} 
 
 }
 
@@ -138,8 +139,9 @@ variational parameters, at $\alpha = 1$ and $\alpha = 11$.
 %(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
 % We write $\gcoclustering(\etalinglobal)$ with the 
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
-For either $\alpha$, the change in co-clustering matrix 
-is minuscule (\figref{gene_alpha_coclustering}):
+
+For either $\alpha$, the change in the posterior co-clustering 
+matrix is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
 or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$. 
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
@@ -232,7 +234,7 @@ The linearized variational parameters are again able to capture the qualitative 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.784\linewidth]{figure/gene_fpert_coclustering-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.823\linewidth]{figure/gene_fpert_coclustering-1} 
 
 }
 

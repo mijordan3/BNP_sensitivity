@@ -1,14 +1,14 @@
 ######################
 # Plot perturbation
 ######################
-legend.theme <- theme(legend.position = 'right', 
-                      legend.key.width=unit(0.4,"cm"), 
-                      legend.margin=margin(-10,0,-10,-10))
+# legend.theme <- theme(legend.position = 'right', 
+#                       legend.key.width=unit(0.4,"cm"), 
+#                       legend.margin=margin(-10,0,-10,-10))
 
 p_logphi <- plot_influence_and_logphi(prior_pert_df$logit_v, 
                                       influence_df$influence_x_prior, 
-                                      prior_pert_df$log_phi) + 
-  legend.theme
+                                      prior_pert_df$log_phi) # + 
+  # legend.theme
 
 
 ######################
@@ -17,8 +17,8 @@ p_logphi <- plot_influence_and_logphi(prior_pert_df$logit_v,
 p_priors_contr <- 
   plot_priors(sigmoid(prior_pert_df$logit_v), 
              p0 = prior_pert_df$p0_constr, 
-             pc = prior_pert_df$pc_constr) + 
-  legend.theme
+             pc = prior_pert_df$pc_constr) # + 
+  # legend.theme
 
 ######################
 # Plot co-clustering results

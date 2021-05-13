@@ -17,7 +17,7 @@ plots_alpha1$p_scatter <- plots_alpha1$p_scatter +
 
 plots_alpha1_summed <- 
   plots_alpha1$p_scatter + 
-  plots_alpha1$p_coclust_refit + 
+  plots_alpha1$p_coclust_refit + theme(legend.position = 'none') + 
   plots_alpha1$p_coclust_lr
   
 ###################
@@ -41,15 +41,3 @@ plots_alpha11_summed <-
 
 plots_alpha1_summed / plots_alpha11_summed
 
-# layout_matrix <- matrix(c(1, 3, 2, 4, 2, 4), ncol = 3)
-# 
-# # grid.arrange(plots$p_scatter, plots$p_coclust, 
-# #               plots11$p_scatter, plots11$p_coclust, 
-# #               layout_matrix = layout_matrix)
-# 
-# g <- arrangeGrob(plots$p_scatter, plots$p_coclust, 
-#                  plots11$p_scatter, plots11$p_coclust,
-#                  layout_matrix = layout_matrix)
-# 
-# ggsave('./R_scripts/mice/figures_tmp/alpha_coclust_sensitivity.png', 
-#        g, width = 6, height = 4.5)

@@ -24,9 +24,11 @@ plot_coclustering <- function(coclustering_df,
     coord_cartesian(xlim = c(0, n_obs1), 
                     ylim = c(0, n_obs2), 
                     expand = FALSE) + 
+    ylab('gene') + 
+    xlab('gene') + 
     theme_bw() + 
-    theme(legend.title = element_blank(), 
-          legend.key.width = unit(0.2,"cm"))
+    get_fontsizes() + 
+    theme(legend.title = element_blank())
   
   return(p)
 }
@@ -61,7 +63,8 @@ plot_coclust_diff <- function(coclust_diff, vmax){
                          palette = 'RdBu', 
                          direction = -1, 
                          limits = c(-vmax * 1.01, 
-                                    vmax * 1.01))
+                                    vmax * 1.01), 
+                         breaks = c(-vmax, 0, vmax))
   
   return(p)
 }
@@ -142,24 +145,18 @@ compare_coclust_lr_and_refit <- function(coclust_refit,
     coclust_diff_refit %>% 
     plot_coclust_diff(vmax = vmax) + 
     ggtitle('refit - init') + 
-    theme(axis.text = element_blank(),
-          axis.title = element_blank(),
-          axis.ticks = element_blank(),
-          plot.title = element_text(size = title_size), 
-          legend.position = 'none')
+    theme(legend.position = 'bottom', 
+          legend.key.height = unit(0.2, 'cm'),
+          legend.key.width = unit(0.4, 'cm'))
   
   p_coclust_lr <-
     coclust_diff_lr %>% 
     plot_coclust_diff(vmax = vmax) + 
     ggtitle('lin. - init') + 
-    theme(axis.text = element_blank(),
-          axis.title = element_blank(),
-          axis.ticks = element_blank(),
-          legend.key.width = unit(0.2,"cm"),
-          legend.key.height = unit(0.25, "cm"),
-          legend.margin=margin(-8,-8,-8,-8),
-          plot.title = element_text(size = title_size), 
-          legend.text = element_text(size = axis_ticksize))
+    theme(axis.title.y = element_blank(), 
+          axis.ticks.y = element_blank(), 
+          axis.text.y = element_blank(),
+          legend.position = 'none') 
   
   return(list(p_scatter = p_scatter,
               p_coclust_refit = p_coclust_refit, 
