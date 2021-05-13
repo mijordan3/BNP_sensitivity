@@ -120,7 +120,7 @@ p
 @
 
 
-\subsubsection*{Parametric sensitivity}
+\subsubsection*{Sensitivity of co-clustering to $\alpha$}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$ 
 to the choice of $\alpha$ in the
@@ -172,7 +172,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio)
 source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-\subsubsection*{Functional sensitivity}
+\subsubsection*{Sensitivity of co-clustering to a functional perturbation}
 
 Insensitivity to $\alpha$ does not necessarily rule out insensitivity to other prior perturbations, however. 
 As demonstrated in \secref{results_iris},

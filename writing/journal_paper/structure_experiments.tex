@@ -27,11 +27,15 @@ understanding the degree to which populations have grown genetically distinct is
 well-separated populations with little genetic diversity are particularly at risk of extinction. 
 
 We employ the topic model from \exref{structure_bnp_process}. 
+Since we know that there are four geographic regions, 
+we pick $\alpha_0 = 3$ so that \textit{a priori} 
+there are $\approx 4$ populations expected under the 
+GEM prior (\eqref{prior_num_clusters}). 
 \figref{stru_init_fit} shows the inferred
-individual admixtures the initial fit with
-stick-breaking distribution is
-$\pstick(\nu_{nk}) = \betadist{\nu_{nk}\vert 1, \alpha_0}$, $\alpha_0 = 6$. 
-In this fit, there appears to be three dominant latent populations, 
+individual admixtures in the initial fit with a
+$\betadist{1, \alpha_0}$ stick-breaking distribution.
+
+In the posterior, there appears to be three dominant latent populations, 
 which we arbitrarily label as populations 1, 2, and 3
 (see \figref{stru_init_fit}). 
 The inferred populations generally correspond with the geographic regions: 
@@ -47,8 +51,8 @@ with some fixed number of populations $K$ and does inference with MCMC.
 To select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
 $p(K | \x)$, under the assumption of a uniformly distributed prior on $K$. 
 Their algorithm selected $K = 3$. 
-At $\alpha_0 = 3$, our BNP model agrees with \citet{pritchard:2000:structure} in that we also uncover three dominant latent populations, 
-with each having a loose correspondence with the Chawia, Ngangao, and Mbololo geographical regions.  
+At $\alpha_0 = 3$, the BNP model agrees with \citet{pritchard:2000:structure} in that we both uncover three genetically distinct clusters,
+corresponding with the Chawia, Ngangao, and Mbololo geographical regions.
 
 
 
@@ -73,14 +77,18 @@ with each having a loose correspondence with the Chawia, Ngangao, and Mbololo ge
 \end{knitrout}
 
 
-\subsubsection*{Sensitivity: number of populations}
+\subsubsection*{Sensitivity of the number of populations to $\alpha$}
 
 We start by evaluating the sensitivity of the inferred number of populations 
 to the $\alpha$ parameter in the $\betadist{\nu_{nk}\vert 1, \alpha}$ stick distribution. 
-The expected number of in-sample clusters was 
+We consider the range $\alpha = 0.5, 1, 2, \ldots 7$. 
+For this range of $\alpha$, there can be anywhere from two to seven expected populations per individual under the GEM prior (\eqref{prior_num_clusters}). 
+
+The expected number of in-sample clusters in the data set was 
 defined in \exref{insample_nclusters}, 
 except in this model, the summation is over the indices for individual $n$, locus $\l$ and chromosome $i$. 
-(We also often use ``population" instead of ``cluster", in this application). 
+(We also will use ``population" interchangably with ``cluster",
+in this application). 
 We will allow the option of setting $\tau > 0$ in order to count only the
 populations that comprise a non-negligible fraction of the data set. 
 
@@ -96,7 +104,8 @@ populations that comprise a non-negligible fraction of the data set.
 % This allows us to condition on fixed draws from a distribution that is independent of $\eta$ (in this case, the underlying distribution is $\mathrm{Uniform}[0, 1]$); 
 % these fixed draws are shared across every computation of $\gpop(\eta; \tau)$ below. 
 
-The expected number of latent populations is sensitive to $\alpha$ (\figref{stru_alpha_nclusters}).
+The expected number of latent populations is sensitive to $\alpha$
+(\figref{stru_alpha_nclusters}).
 Without any thresholding ($\tau = 0$),
 the expected number of populations quickly increases as $\alpha$ increases; 
 in fact, it nearly saturates at $\kmax = 20$ when $\alpha = 7$. 
@@ -111,7 +120,7 @@ $2\%$ and $4\%$
 of the total number of loci in the data set, respectively. 
 The thresholded estimates for the number of populations is still
 moderately sensitive to the value of $\alpha$. 
-When refitting the variational approximation at $\alpha = 1, \ldots, 7$,
+When refitting the variational approximation at $\alpha = 0.5, 1, \ldots, 7$,
 the thresholded quantities vary between two and four
 latent populations. 
 
@@ -121,7 +130,7 @@ We formed the linear approximation at $\alpha_0 = 3$ and computed
 $\gclusters(\etalinglobal(\alpha))$ for $\alpha = 1, \ldots, 7$. 
 For this range of $\alpha$, the linearized parameters and the refitted parameters 
 almost perfectly agree on values of $\gclusters$ with $\tau = 0$. 
-However, when $\tau = 20$ and $\tau = 40$, 
+However, when $\tau = 20$,
 the linearized parameters 
 underestimated the true sensitivity of $\gclusters$ found by refitting. 
 In particular, the linearized parameters failed to produce
@@ -186,9 +195,9 @@ Both the linearized and the refitted variational parameters agree on this shift 
 On the other hand, under the refitted variational parameters at $\alpha = 1$, 
 the expected number of loci belonging to population 3 decreases to 
 $6.7$, 
-below the thresholds $\tau = 20$ and $\tau = 40$. 
+below the threshold $\tau = 20$. 
 Thus, the expected number of latent populations with allocations above
-either threshold decreases to two. 
+the threshold $\tau = 20$ decreases to two. 
 The linearized parameters
 under-estimated this decrease in allocation to population 3, and 
 therefore continued to estimate three latent populations even at $\alpha = 1$. 
@@ -207,7 +216,7 @@ therefore continued to estimate three latent populations even at $\alpha = 1$.
 
 \end{knitrout}
 
-\subsubsection*{Sensitivity: individual admixtures}
+\subsubsection*{Sensitivity of individual admixtures to functional perturbations}
 
 Examining the inferred admixtures in \figref{stru_init_fit} provides clues into the historical migration patterns of the genotyped individuals. 
 For example, while individuals collected from the Mbololo region are inferred to be admixed primarily with population 1, 
@@ -315,9 +324,9 @@ in  \figref{stru_func_sens}. Timing on other considered $\phi$ are similar. }
     Hessian solve for $\alpha$ sensitivity & 
         0.32\\
     Linear approx. $\etalinglobal (\alpha)$ for $\alpha = 1, ..., 10$ & 
-        0.0059\\
+        0.007\\
     Refits $\etaopt(\alpha)$ for $\alpha = 1, ..., 10$ & 
-        34\\
+        43\\
     \hline
     The influence function & 0.59\\
     Hessian solve for $\phi$ &
