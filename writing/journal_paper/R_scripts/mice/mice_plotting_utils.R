@@ -95,6 +95,9 @@ compare_coclust_lr_and_refit_scatter <-
                       by = c('gene1', 'gene2')) %>%
     filter(abs(refit_diff) > min_keep | abs(lr_diff) > min_keep)
   
+  limit_min <- min(c(diffs$refit_diff, diffs$lr_diff))
+  limit_max <- max(c(diffs$refit_diff, diffs$lr_diff))
+  
   p <- ggplot(data = diffs, 
               aes(x = refit_diff, y = lr_diff)) +
     # the area we excluded
@@ -110,6 +113,8 @@ compare_coclust_lr_and_refit_scatter <-
     # scale_fill_brewer(palette = 'PuBu') + 
     ylab('lin. - init') + 
     xlab('refit - init') +
+    ylim(c(limit_min, limit_max)) + 
+    xlim(c(limit_min, limit_max)) + 
     get_fontsizes()
   
   return(p)
