@@ -78,7 +78,8 @@ because the later time points are more spread out.
 \end{knitrout}
 %
 
-We fitted the initial approximate posterior at $\alpha_0 = 6$. 
+In this application, we expect to uncover finer structure than the iris data set, so we start with a larger $\alpha$ and set $\alpha_0 = 6$. 
+We will evaluate the senstivity to this choice of $\alpha$ below. 
 \figref{gene_centroids} shows the inferred smoothers 
 $\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
@@ -112,7 +113,7 @@ both parametric and functional perturbations to the stick distribution.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.588\linewidth,height=0.400\linewidth]{figure/gene_initial_coclustering-1} 
+{\centering \includegraphics[width=0.588\linewidth,height=0.470\linewidth]{figure/gene_initial_coclustering-1} 
 
 }
 
@@ -123,7 +124,7 @@ both parametric and functional perturbations to the stick distribution.
 \end{knitrout}
 
 
-\subsubsection*{Parametric sensitivity}
+\subsubsection*{Sensitivity of co-clustering to $\alpha$}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$ 
 to the choice of $\alpha$ in the
@@ -138,10 +139,11 @@ variational parameters, at $\alpha = 1$ and $\alpha = 11$.
 %(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
 % We write $\gcoclustering(\etalinglobal)$ with the 
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
-For either $\alpha$, the change in co-clustering matrix 
-is minuscule (\figref{gene_alpha_coclustering}):
+
+For either $\alpha$, the change in the posterior co-clustering 
+matrix is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
-or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$. 
+or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$.
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
 and computing $\Delta\gcoclustering(\etaopt(\alpha))$
 confirms the insensitivity predicted by the 
@@ -162,29 +164,29 @@ approximate the sign and size of the changes in the individual entries of the co
      co-clustering matrix at $\alpha = 1$ (top row)
      and $\alpha = 11$ (bottom row),
      relative to the co-clustering matrix at $\alpha_0 = 6$.
-     We compare differences obtained with the linearly approximated 
-     variational parameters against changes observed after 
-     refiting]{Differences in the 
-     co-clustering matrix at $\alpha = 1$ (top row)
-     and $\alpha = 11$ (bottom row),
-     relative to the co-clustering matrix at $\alpha_0 = 6$.
-     We compare differences obtained with the linearly approximated 
-     variational parameters against changes observed after 
-     refiting. 
      (Left) a scatter plot of differences under the linear approximation 
      against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
-     (Middle) the difference in co-clustering matrix observed after refitting. 
-     (Right) the difference observed under the linearly approximated variational
+     Note the scales of the axes]{Differences in the 
+     co-clustering matrix at $\alpha = 1$ (top row)
+     and $\alpha = 11$ (bottom row),
+     relative to the co-clustering matrix at $\alpha_0 = 6$.
+     (Left) a scatter plot of differences under the linear approximation 
+     against differences after refitting, where
+     each point represents an entry of the co-coclustering matrix.
+     Note the scales of the axes: 
+     the largest change in an entry of the co-clustering matrix is 
+     $\approx 0.03$.  
+     (Middle) sign changes in the co-clustering matrix observed after refitting. 
+     (Right) the changes under the linearly approximated variational
      parameters. 
-     For visualization, values in the heatmaps
-     are clipped at $\pm 10^{-3}$. }\label{fig:gene_alpha_coclustering}
+     For visualization, changes with absolute value $< 1e-5$ are not colored. }\label{fig:gene_alpha_coclustering}
 \end{figure}
 
 
 \end{knitrout}
 
-\subsubsection*{Functional sensitivity}
+\subsubsection*{Sensitivity of co-clustering to a functional perturbation}
 
 Insensitivity to $\alpha$ does not necessarily rule out insensitivity to other prior perturbations, however. 
 As demonstrated in \secref{results_iris},
@@ -232,29 +234,22 @@ The linearized variational parameters are again able to capture the qualitative 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.784\linewidth]{figure/gene_fpert_coclustering-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.823\linewidth]{figure/gene_fpert_coclustering-1} 
 
 }
 
 \caption[Effect on the co-clustering matrix after a multiplicative functional
      perturbation.
-     The perturbation $\phi$ (top left, in grey) 
-     is a difference of two Gaussian bumps 
-     scaled to have $L_\infty$ norm equal to two.
-     $\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function (top left, purple]{Effect on the co-clustering matrix after a multiplicative functional
+     (Top left) the perturbation $\phi$ in grey, 
+     and the influence function in purple]{Effect on the co-clustering matrix after a multiplicative functional
      perturbation.
-     The perturbation $\phi$ (top left, in grey) 
-     is a difference of two Gaussian bumps 
-     scaled to have $L_\infty$ norm equal to two.
-     $\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function (top left, purple; 
-     the influence function is scaled to also have $L_\infty$ norm equal to two).
-     The effect of this perturbation on the prior density in the top right. 
-     The bottom row shows the effect of this perturbation on 
+     (Top left) the perturbation $\phi$ in grey, 
+     and the influence function in purple. 
+     (Top right) the effect of this perturbation on the prior density. 
+     (Bottom) the effect of this perturbation on 
     the coclustering matrix.
-    For visualization, the differences in the heatmap 
-     are clipped at $\pm 10^{-1}$.}\label{fig:gene_fpert_coclustering}
+    Note the scale of the scatterplot axes compared with
+    the scatterplots in \figref{gene_alpha_coclustering}. }\label{fig:gene_fpert_coclustering}
 \end{figure}
 
 

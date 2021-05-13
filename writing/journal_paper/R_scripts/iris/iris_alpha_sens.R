@@ -20,7 +20,7 @@ rbind(insample_df,
   ylab('E[# clusters]') + 
   xlab(TeX('GEM parameter $\\alpha$')) + 
   # add vertical line
-  geom_vline(xintercept = 6, 
+  geom_vline(xintercept = alpha0, 
              color = 'red', 
              linetype = 'dashed')
 

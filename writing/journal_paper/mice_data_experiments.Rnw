@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -78,7 +78,8 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
-We fitted the initial approximate posterior at $\alpha_0 = 6$. 
+In this application, we expect to uncover finer structure than the iris data set, so we start with a larger $\alpha$ and set $\alpha_0 = 6$. 
+We will evaluate the senstivity to this choice of $\alpha$ below. 
 \figref{gene_centroids} shows the inferred smoothers 
 $\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
@@ -106,20 +107,20 @@ source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 <<gene_initial_coclustering_cap>>=
 gene_initial_coclustering_cap <- paste(
     "The inferred co-clustering matrix of gene expressions at $\\alpha_0 = 6.$ ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.85,
+SetImageSize(aspect_ratio=base_aspect_ratio,
              image_width = 0.6)
 @
 <<gene_initial_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_initial_coclustering_cap>>=
 p <- plot_coclustering(coclust_init) +
-  theme(axis.title = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        legend.text = element_text(size = axis_ticksize))
+  theme(legend.text = element_text(size = axis_ticksize), 
+        legend.margin=margin(-4,-4,-4,-4), 
+        legend.key.width = unit(0.2, 'cm'), 
+        legend.key.height = unit(0.4, 'cm'))
 p
 @
 
 
-\subsubsection*{Parametric sensitivity}
+\subsubsection*{Sensitivity of co-clustering to $\alpha$}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$ 
 to the choice of $\alpha$ in the
@@ -134,10 +135,11 @@ variational parameters, at $\alpha = 1$ and $\alpha = 11$.
 %(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
 % We write $\gcoclustering(\etalinglobal)$ with the 
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
-For either $\alpha$, the change in co-clustering matrix 
-is minuscule (\figref{gene_alpha_coclustering}):
+
+For either $\alpha$, the change in the posterior co-clustering 
+matrix is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
-or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$. 
+or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$.
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
 and computing $\Delta\gcoclustering(\etaopt(\alpha))$
 confirms the insensitivity predicted by the 
@@ -152,17 +154,16 @@ gene_alpha_coclustering_cap <-
      co-clustering matrix at $\\alpha = 1$ (top row)
      and $\\alpha = 11$ (bottom row),
      relative to the co-clustering matrix at $\\alpha_0 = 6$.
-     We compare differences obtained with the linearly approximated 
-     variational parameters against changes observed after 
-     refiting. 
      (Left) a scatter plot of differences under the linear approximation 
      against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
-     (Middle) the difference in co-clustering matrix observed after refitting. 
-     (Right) the difference observed under the linearly approximated variational
+     Note the scales of the axes: 
+     the largest change in an entry of the co-clustering matrix is 
+     $\\approx 0.03$.  
+     (Middle) sign changes in the co-clustering matrix observed after refitting. 
+     (Right) the changes under the linearly approximated variational
      parameters. 
-     For visualization, values in the heatmaps
-     are clipped at $\\pm 10^{-3}$. ")
+     For visualization, changes with absolute value $< 1e-5$ are not colored. ")
 
 SetImageSize(aspect_ratio=base_aspect_ratio)
 @
@@ -170,7 +171,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio)
 source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-\subsubsection*{Functional sensitivity}
+\subsubsection*{Sensitivity of co-clustering to a functional perturbation}
 
 Insensitivity to $\alpha$ does not necessarily rule out insensitivity to other prior perturbations, however. 
 As demonstrated in \secref{results_iris},
@@ -225,18 +226,14 @@ The linearized variational parameters are again able to capture the qualitative 
 gene_fpert_coclustering_cap <- paste(
     "Effect on the co-clustering matrix after a multiplicative functional
      perturbation.
-     The perturbation $\\phi$ (top left, in grey) 
-     is a difference of two Gaussian bumps 
-     scaled to have $L_\\infty$ norm equal to two.
-     $\\phi$ is chosen such that the Gaussian bumps roughly align with the 
-     two largest modes of the influence function (top left, purple; 
-     the influence function is scaled to also have $L_\\infty$ norm equal to two).
-     The effect of this perturbation on the prior density in the top right. 
-     The bottom row shows the effect of this perturbation on 
+     (Top left) the perturbation $\\phi$ in grey, 
+     and the influence function in purple. 
+     (Top right) the effect of this perturbation on the prior density. 
+     (Bottom) the effect of this perturbation on 
     the coclustering matrix.
-    For visualization, the differences in the heatmap 
-     are clipped at $\\pm 10^{-1}$.")
-SetImageSize(aspect_ratio=base_aspect_ratio)
+    Note the scale of the scatterplot axes compared with
+    the scatterplots in \\figref{gene_alpha_coclustering}. ")
+SetImageSize(aspect_ratio=base_aspect_ratio * 1.05)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)
