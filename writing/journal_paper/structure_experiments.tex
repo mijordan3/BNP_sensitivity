@@ -81,7 +81,7 @@ corresponding with the Chawia, Ngangao, and Mbololo geographical regions.
 
 We start by evaluating the sensitivity of the inferred number of populations 
 to the $\alpha$ parameter in the $\betadist{\nu_{nk}\vert 1, \alpha}$ stick distribution. 
-We consider the range $\alpha = 0.5, 1, 2, \ldots 7$. 
+We consider the range $\alpha = 0.5, 1, \ldots 7$. 
 For this range of $\alpha$, there can be anywhere from two to seven expected populations per individual under the GEM prior (\eqref{prior_num_clusters}). 
 
 The expected number of in-sample clusters in the data set was 
@@ -127,14 +127,14 @@ latent populations.
 The linearized variational parameters $\etalinglobal(\t)$
 imperfectly captures the results observed by refitting. 
 We formed the linear approximation at $\alpha_0 = 3$ and computed 
-$\gclusters(\etalinglobal(\alpha))$ for $\alpha = 1, \ldots, 7$. 
-For this range of $\alpha$, the linearized parameters and the refitted parameters 
+$\gclusters(\etalinglobal(\alpha))$ for $\alpha = 0.5, 1, \ldots, 7$. 
+For our choices of $\alpha$, the linearized parameters and the refitted parameters 
 almost perfectly agree on values of $\gclusters$ with $\tau = 0$. 
 However, when $\tau = 20$,
 the linearized parameters 
 underestimated the true sensitivity of $\gclusters$ found by refitting. 
 In particular, the linearized parameters failed to produce
-the reduction to two latent populations at $\alpha = 1$ observed in the refits.
+the reduction to two latent populations at $\alpha = 0.5$ observed in the refits.
 
 
 \begin{knitrout}
@@ -182,7 +182,7 @@ is at least 100 for populations $\k = 1, 2,$ and $3$ and
 less than 
 12
 for the remaining populations.  
-A sample of memberships $\z\sim \q(\z\vert\etaopt(\alpha_0))$ will 
+A sample of assignments $\z\sim \q(\z\vert\etaopt(\alpha_0))$ will 
 almost always have at least $\tau$ loci allocated to populations 1, 2, and 3, 
 while the allocations to each remaining population will almost always be below $\tau$, for either $\tau = 20$ or $\tau = 40$. 
 Thus, at $\alpha = \alpha_0$ there then are clearly 3 populations by our definition of $\gclusters$, for either $\tau$.
@@ -192,7 +192,7 @@ increases to
 $20.7$, 
 a new population emerges above the threshold at $\tau = 20$. 
 Both the linearized and the refitted variational parameters agree on this shift in allocation to population 4. 
-On the other hand, under the refitted variational parameters at $\alpha = 1$, 
+On the other hand, under the refitted variational parameters at $\alpha = 0.5$, 
 the expected number of loci belonging to population 3 decreases to 
 $6.7$, 
 below the threshold $\tau = 20$. 
@@ -200,7 +200,7 @@ Thus, the expected number of latent populations with allocations above
 the threshold $\tau = 20$ decreases to two. 
 The linearized parameters
 under-estimated this decrease in allocation to population 3, and 
-therefore continued to estimate three latent populations even at $\alpha = 1$. 
+therefore continued to estimate three latent populations even at $\alpha = 0.5$. 
 
 
 \begin{knitrout}
@@ -296,8 +296,9 @@ Our sensitivity analysis suggests that the inferred migration from Mbololo to Ng
 appears robust to our stick-breaking prior. 
 On the other had, the the outlying Mbololo admixtures appears to be more sensitive to the stick-breaking prior, and conclusions about migration from Ngangao to Mbololo may be dependent on prior choices. 
 
+\subsubsection*{Computation time}
 
-Finally, the computational cost of linearizing the variational parameters is again favorable compared with the cost of refitting (\tabref{stru_timing}). 
+The computational cost of linearizing the variational parameters is again favorable compared with the cost of refitting (\tabref{stru_timing}). 
 The linear approximation allows us to quickly explore all the
 functional perturbations presented here, and many more: 
 computing the linearized variational parameters (including the Hessian inversion) $\etalinglobal$ takes about half a second for a given perturbation. 
@@ -453,17 +454,15 @@ Given the recursive nature of the relationship between admixtures and stick-brea
 Fully linearizing the mapping $\t\mapsto\g(\etaopt(\t))$ to form the approximation 
 $\glin(t)$ (\eqref{vb_g_sens}) avoids this problem. 
 In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, with $\g$ being the admixture proportion of population 3. 
-In all the previous examples 
+In previous examples 
 (including the example in \figref{stru_lin_bad_example}), 
 computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mapping from $\eta\mapsto\g(\eta)$,
 does no worse, and is usually better,
 than the fully linearized version, $\glin(\t)$---as can be seen by drawing tangent lines of the refitted curve at
 $\alpha = \alpha_0$ or $t = 0$
 for 
-\figref{iris_alpha_sens,
-stru_alpha_nclusters, 
-stru_alpha_cluster_weights, 
-stru_lin_bad_example}. 
+\figref{stru_alpha_nclusters, 
+stru_alpha_cluster_weights}. 
 It is likely that $\g(\etalin(t))$ outperforms $\glin(\t)$ for most posterior quantities, though as we see in \figref{stru_fully_lin_example},
 this is not guaranteed to always be true.  
 

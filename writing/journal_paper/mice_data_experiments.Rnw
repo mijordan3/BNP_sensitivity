@@ -139,7 +139,7 @@ variational parameters, at $\alpha = 1$ and $\alpha = 11$.
 For either $\alpha$, the change in the posterior co-clustering 
 matrix is minuscule (\figref{gene_alpha_coclustering}):
 the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
-or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$. 
+or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$.
 Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
 and computing $\Delta\gcoclustering(\etaopt(\alpha))$
 confirms the insensitivity predicted by the 
