@@ -77,33 +77,15 @@ the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 \begin{align*}
 %
 \log \pstick(\nuk \vert \t) ={}&
-    \log \pstick(\nuk \vert \alpha) - \log \pstick(\nuk \vert \alpha_0)\\
-%
-% ={}&
-% (\alpha - \alpha_0 + \alpha_0 - 1) \log(1 - \nuk) + \const \\
-%
- ={}&
-    (\alpha_0 - 1) \log(1 - \nuk) +
-    \t \log(1 - \nuk) + \const,
+(\t + \alpha_0 - 1) \log(1 - \nuk) + \const.
 \end{align*}
 %
-so that
-%
-\begin{align*}
-%
-\log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
-    \t \log(1 - \nuk).
-%
-\end{align*}
-%
-Similarly, the prior on the full $\nu$ vector is given by
+The prior on the full $\nu$ vector is given by
 %
 \begin{align*}
 %
 \log \pstick(\nu \vert \t) ={}&
-    \sumkm (\alpha_0 - 1) \log(1 - \nuk)
-\\={}&
-    \log \pstick(\nu \vert \alpha_0) + \t \sumkm \log(1 - \nuk) + \const.
+    \sumkm (t + \alpha_0 - 1) \log(1 - \nuk)+ \const.
 %
 \end{align*}
 %
@@ -448,20 +430,29 @@ of the five constants.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{gem_pert_ok}
 %
-To analyze \exref{alpha_perturbation}, recall from \secref{stick_expectations}
-that we take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$ to
-be independent normal distributions.  Let us take $\theta$ to be $\lnuk$ and
-$\mu$ to be the Lebesgue measure on $\mathbb{R}$.  Expressing the perturbation
-to the stick breaking prior given in \exref{alpha_perturbation} in terms of
-$\lnuk$, we get
+To analyze \exref{alpha_perturbation}, we take $\theta$
+in \lemref{normal_q_is_regular}
+be the unconstrained stick-breaking proportion $\lnuk$, which
+recall from \secref{stick_expectations}
+was normally distributed under $\q$.
+Let $\mu$ be the Lebesgue measure on $\mathbb{R}$.
+
+In \exref{alpha_perturbation},
+the parameterization of the stick-breaking distribution was given by
+\begin{align*}
+  \log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
+  \t \log(1 - \nuk).
+\end{align*}
+%
+Expressing the perturbation in terms of
+$\lnuk$,
 %
 \begin{align*}
 %
 \log \pstick(\lnuk \vert \t) - \log \pstick(\lnuk \vert \t=0) ={}&
-%
 \t \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right)
 \\={}&
--\t \log\left(1 + \exp(\lnuk)\right)
+-\t \log\left(1 + \exp(\lnuk)\right).
 %
 \end{align*}
 %
@@ -498,7 +489,7 @@ that the Hessian is positive definite at the optimum.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We conclude the section with a brief remark about computing the expectation
+We conclude this section with a brief remark about computing the expectation
 $\crosshessian$ in our BNP sensitivity analysis.
 We are interested in sensitivity to the stick-breaking distribution,
 so only the prior terms on stick-breaking proportions

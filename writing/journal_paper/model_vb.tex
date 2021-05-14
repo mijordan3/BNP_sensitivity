@@ -295,26 +295,25 @@ proportion $\nuk$ so that the transformed variable
   \lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right)
 \end{align*}
 is not constrained to be between $(0, 1)$ and can take values in all of $\mathbb{R}$.
-
 Let $\s$ be the sigmoid function,
 which provides the inverse transformation,
 \begin{align*}
   \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 
-We let $\q(\lnu_\k \vert \eta)$ be normally distributed with
+We choose $\q(\lnu_\k \vert \eta)$ to be normally distributed with
 location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
 This then induces a logit-normal
 distribution on our original variable of interest, $\nuk$.
-Given a smooth function
+To compute expectations of a smooth function
 $f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$),
-the law of the unconscious statistician provides the equivalence,
+the law of the unconscious statistician states that,
 \begin{align*}
   \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
   \expect{\q(\lnu_\k \vert \eta)}
          {f\circ \s\left(\lnu_\k\right)}.
 \end{align*}
-By our choice of $\q(\lnu_\k \vert \eta)$,
+By choosing $\q(\lnu_\k \vert \eta)$ to be Gaussian,
 the right-hand side is a Gaussian integral,
 which we approximate
 using GH quadrature with $\ngh$ knots,
@@ -331,10 +330,13 @@ located at $\xi_g$, weighted by $\omega_g$:
 %
 \end{align}
 %
-Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a deterministic, differentiable
-function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
-technique is similar to the ``reparameterization trick,'' only using
-GH points rather than standard normal draws).
+Using GH quadrature to approximate the expectation
+is similar to the ``reparameterization trick,'' only using
+GH points rather than standard normal draws.
+Conveniently, the approximation $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$
+is a deterministic, differentiable
+function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.
+This will be useful in our sensitivity computations in the next section.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
