@@ -256,7 +256,7 @@ in the regression model, see \appref{put_in_appendix}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{Evaluating stick expectations}
+\subsubsection{Evaluating stick expectations}\seclabel{stick_expectations}
 
 To evaluate the $\mathrm{KL}$ in \eqref{vb_optimization}, we also need
 the expectations over stick-breaking proportions,
@@ -301,67 +301,42 @@ which provides the inverse transformation,
   \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 
-It will be useful later to have at hand the following
-derivatives of the transforms between $\nu$ and $\lnu$,
-%
-\begin{align}\eqlabel{lnuk_derivatives}
-%
-\fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
-%     \frac{1-\nuk}{\nuk}
-%     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
-% \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
-% \\={}&
-    \frac{1}{\nuk (1 - \nuk)} \mathand
-%
-\fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
-    \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
-%
-\end{align}
-
-
-We let $\q(\lnu_\k \vert \eta)$ be normally distributed with
+We choose $\q(\lnu_\k \vert \eta)$ to be normally distributed with
 location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
 This then induces a logit-normal
 distribution on our original variable of interest, $\nuk$.
-In other words,
-\begin{align}\eqlabel{lnuk_vb_approximation}
-%
-\q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
-\Rightarrow \\
-\q(\nuk \vert \eta) ={}&
-    \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-        \vert \lnumean_\k, \lnusd_\k}
-    \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
-\nonumber\\={}&
-\normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-        \vert \lnumean_\k, \lnusd_\k}
-    \left|\frac{1}{\nuk (1 - \nuk)}\right|.
-\nonumber
-%
-\end{align}
-
-
-With this choice of a logit-normal $\q(\nuk \vert \eta)$,
-we can approximate expectations of smooth functions
-$f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$) using GH quadrature with $\ngh$ knots,
+To compute expectations of a smooth function
+$f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$),
+the law of the unconscious statistician states that,
+\begin{align*}
+  \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
+  \expect{\q(\lnu_\k \vert \eta)}
+         {f\circ \s\left(\lnu_\k\right)}.
+\end{align*}
+By choosing $\q(\lnu_\k \vert \eta)$ to be Gaussian,
+the right-hand side is a Gaussian integral,
+which we approximate
+using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %
 \begin{align}\eqlabel{gh_integral}
 %
-\expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
 \expect{\q(\lnu_\k \vert \eta)}
        {f\circ \s\left(\lnu_\k\right)}
-\nonumber\\\approx{}&
+\approx{}&
     \sum_{g=1}^{\ngh} \omega_g f\circ \s \left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
  \nonumber\\=:{}&
 \expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
 %
 \end{align}
 %
-Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a deterministic, differentiable
-function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
-technique is similar to the ``reparameterization trick,'' only using
-GH points rather than standard normal draws).
+Using GH quadrature to approximate the expectation
+is similar to the ``reparameterization trick,'' only using
+GH points rather than standard normal draws.
+Conveniently, the approximation $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$
+is a deterministic, differentiable
+function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.
+This will be useful in our sensitivity computations in the next section.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

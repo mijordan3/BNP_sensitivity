@@ -16,6 +16,7 @@ class of probability densities relative $\mu$.  Let $\p(\theta \vert \t)$ be
 defined for $\t$ in an open set $\ball_\t \subseteq \mathbb{R}$ containing $0$.
 Assume that the variational densities $\q(\theta \vert \eta)$ are also defined
 relative to $\mu$.
+\todo{need a note about how the truncated approximation uses point masses}
 
 Let $\qtil$ and $\ptil$ refer to potentially
 unnormalized (but normalizable) versions of the respectively corresponding $\q$
@@ -75,31 +76,16 @@ the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
 %
 \begin{align*}
 %
-\log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha - \alpha_0 + \alpha_0 - 1) \log(1 - \nuk) + \const \\
-%
- ={}&
-    \log \pstick(\nuk \vert \alpha_0) +
-    \t \log(1 - \nuk) + \const,
+\log \pstick(\nuk \vert \t) ={}&
+(\t + \alpha_0 - 1) \log(1 - \nuk) + \const.
 \end{align*}
 %
-so that
-%
-\begin{align}\eqlabel{gem_alpha_pert}
-%
-\log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
-    \t \log(1 - \nuk).
-%
-\end{align}
-%
-Similarly, the prior on the full $\nu$ vector is given by
+The prior on the full $\nu$ vector is given by
 %
 \begin{align*}
 %
-\log \p(\nu \vert \t) ={}&
-    \sumkm \log \pstick(\nuk \vert \alpha)
-\\={}&
-    \log \p(\nu \vert \alpha_0) + \t \sumkm \log(1 - \nuk) + \const.
+\log \pstick(\nu \vert \t) ={}&
+    \sumkm (t + \alpha_0 - 1) \log(1 - \nuk)+ \const.
 %
 \end{align*}
 %
@@ -330,12 +316,15 @@ distributions, we keep the notation general.}
 %
 \begin{align*}
 %
-\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
-                {\partial \eta \partial \eta^T}
-                {\etaopt} \mathand \\
 \lqgradbar{\theta \vert \etaopt} :={}&
     \lqgrad{\theta \vert \etaopt} -
-    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
+    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}, \\
+\crosshessian :={}&   \expect{\q(\theta \vert \etaopt)}{
+      \lqgradbar{\theta \vert \etaopt}
+      \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}} \mathand \\
+\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
+                      {\partial \eta \partial \eta^T}
+                      {\etaopt}.
 %
 \end{align*}
 %
@@ -346,10 +335,11 @@ with derivative
 %
 \fracat{d \etaopt(\t)}{d \t}{0} ={}&
     - \hessopt^{-1}
-    \expect{\q(\theta \vert \etaopt)}{
-        \lqgradbar{\theta \vert \etaopt}
-        \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-    }.
+    \crosshessian
+    % \expect{\q(\theta \vert \etaopt)}{
+    %     \lqgradbar{\theta \vert \etaopt}
+    %     \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
+    % }.
     % \fracat{\partial^2 \KL{\eta, \t}}
     %        {\partial \eta \partial \t}
     %        {\etaopt, 0}.
@@ -440,46 +430,34 @@ of the five constants.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{gem_pert_ok}
 %
-To analyze \exref{alpha_perturbation}, recall from \secref{model_vb} that we
-take $\theta = \lnu \in \mathbb{R}^{\kmax - 1}$ and $\q(\lnu \vert \etalnu)$ to
-be independent normal distributions.  Let us take $\theta$ to be $\lnuk$ and
-$\mu$ to be the Lebesgue measure on $\mathbb{R}$.  Expressing the perturbation
-to the stick breaking prior given in \exref{alpha_perturbation} in terms of
-$\lnuk$ using \eqref{lnuk_derivatives}, we get
-%
-\begin{align*}
-%
-\MoveEqLeft
-\log \pstick(\lnuk \vert \alpha)
-\\={}&
-%
-(\alpha - 1) \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) +
-\log \abs{\fracat{d \nuk}{d \lnuk}{\lnuk}} +
-\const
-\\={}&
-(\alpha - 1) \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right) +
-\log\left(\frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}\right) +
-    \const
-\\={}&
-(1 - \alpha) \log\left(1 + \exp(\lnuk)\right) +
-\lnuk - 2 \log\left(1 + \exp(\lnuk)\right) + \const
-\\={}&
--(1 + \alpha) \log\left(1 + \exp(\lnuk)\right) + \lnuk + \const.
-%
-\end{align*}
+To analyze \exref{alpha_perturbation}, we take $\theta$
+in \lemref{normal_q_is_regular}
+be the unconstrained stick-breaking proportion $\lnuk$, which
+recall from \secref{stick_expectations}
+was normally distributed under $\q$.
+Let $\mu$ be the Lebesgue measure on $\mathbb{R}$.
 
-We thus have
+In \exref{alpha_perturbation},
+the parameterization of the stick-breaking distribution was given by
+\begin{align*}
+  \log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
+  \t \log(1 - \nuk).
+\end{align*}
+%
+Expressing the perturbation in terms of
+$\lnuk$,
 %
 \begin{align*}
 %
-\log \pstick(\lnuk \vert \alpha) - \log \pstick(\lnuk \vert \alpha_0)
-={}&
-    -(\alpha - \alpha_0) \log\left(1 + \exp(\lnuk)\right) + \const.
+\log \pstick(\lnuk \vert \t) - \log \pstick(\lnuk \vert \t=0) ={}&
+\t \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right)
+\\={}&
+-\t \log\left(1 + \exp(\lnuk)\right).
 %
 \end{align*}
 %
 So, by \lemref{normal_q_is_regular}, \assuref{q_stick_regular} is satisfied with
-the VB approximation given in \eqref{lnuk_vb_approximation} and the parametric
+the VB approximation given in \secref{stick_expectations} and the parametric
 perturbation given in \exref{alpha_perturbation}.
 %
 \end{ex}
@@ -510,3 +488,44 @@ that the Hessian is positive definite at the optimum.
 \end{cor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We conclude this section with a brief remark about computing the expectation
+$\crosshessian$ in our BNP sensitivity analysis.
+We are interested in sensitivity to the stick-breaking distribution,
+so only the prior terms on stick-breaking proportions
+$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
+Because the elements of $\nu$ fully factorize
+under both the prior and the variational distributions,
+$\crosshessian$ decomposes as
+\begin{align}
+  \crosshessian &=
+  \sum_{\k=1}^{\kmax - 1}
+          \expect{\q(\nuk \vert \eta)}
+                 {
+                 \lqgrad{\nuk \vert \etaopt}
+                 \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+                 } \notag\\
+  &= \sum_{\k=1}^{\kmax - 1}
+         \evalat{\nabla_\eta \expect{\q(\nuk \vert \eta)}
+                {
+                \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+                }}{\eta = \etaopt(0)},
+\eqlabel{sens_mixed_partial}
+\end{align}
+where we assumed that $\q(\theta \vert \eta)$ is normalized, so
+$\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$,
+and that the assumptions of \thmref{etat_deriv} hold, so we
+can freely exchange derivatives with expectations.
+
+We approximate the expectation using GH quadrature (\eqref{gh_integral}),
+with
+$f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
+In all the functional forms for
+$\t \mapsto \pstick(\nuk \vert \t)$ considered below,
+$f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
+The resulting GH approximation is a deterministic function of $\eta$,
+and thus the gradient in \eqref{sens_mixed_partial} can be computed
+with another application of automatic differentiation.
+Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
+it is zero for all entries of
+$\eta$ other than those that parameterize the sticks.
