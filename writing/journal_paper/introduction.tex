@@ -8,7 +8,7 @@ on cluster assignment,
 and inference about any quantity of interest,
 such as number of distinct clusters present in a data set,
 is entirely defined by the posterior distribution.
-However, like all Bayesian approaches, BNP requires the specification
+Like all Bayesian approaches, BNP requires the specification
 of a prior, and this prior may favor a greater or fewer number of distinct clusters.
 In practice, it is important to establish that the prior is not too informative, particularly
 when---as is often the case in BNP---the particular form of the prior is chosen for
@@ -19,16 +19,13 @@ and thus approximate methods are required in practice.
 We do inference using variational Bayes (VB), which posits a constrained
 family of distributions, and uses optimization to find
 the member of the family that is closest to the true posterior in
-Kullback-Leibler ($\mathrm{KL}$) divergence.
-Typically, the family of distributions is parameterized by a real-valued vector,
-in which case minimizing distribution can be found using
-standard numerical optimization techniques.
+Kullback-Leibler ($\mathrm{KL}$) divergence
+\citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review}.
 VB is a popular method on large-scale data sets
-because solving the numerical optimization problem can be much faster than
+because solving the optimization problem can be much faster than
 running Markov chain Monte Carlo (MCMC).
-VB is particularly apt in the applications we consider,
-as they are primarily exploratory in nature, and quick, approximate solutions
-suffice.
+VB is particularly apt for data analysis problems that are
+exploratory in nature, and where quick, approximate solutions suffice.
 For these applications, we thus would like a similarly quick, possibly approximate,
 method to assess
 the sensitivity of the VB posterior to prior choices.
@@ -36,14 +33,14 @@ Assessing sensitivity is especially important
 when the results of these exploratory analyses will be guiding further
 downstream investigation.
 
-A simple way to assess sensitivity would be to refit the VB posterior for
-several different prior choices.
+A conceptually straightforward way to assess sensitivity would be to refit the
+VB posterior for several different prior choices.
 However, repeatedly solving for variational optima after each prior choice
-may be unnecessarily expensive, particularly for exploratory settings where
+may be unnecessarily expensive, particularly for the settings we consider where
 approximate optima might suffice.
 In this work, we derive local sensitivity measures which
 approximate the nonlinear dependence of the VB optimum on prior parameters
-using a Taylor series expansion.
+using a first-order Taylor series expansion.
 We use the Taylor expansion to quickly extrapolate,
 from an initial variational optimum,
 the posterior quantities that would be obtained after a model perturbation,
@@ -75,19 +72,18 @@ influential prior perturbations, the derivative needs to be a
 uniformly good approximation in
 a neighborhood of the original prior: that is, the VB optimum must be
 \textit{Fre{\'e}chet differentiable} with respect to the prior perturbation.
-We prove that, though the variational optimum is directional differentiable for all
-$1 \le p \le \infty$,  only with multiplicative perturbations and
-$p=\infty$ satisfies the stronger condition of Fre{\'e}chet differentiability.
+We prove that, though the VB optimum is directional differentiable for all
+$1 \le p \le \infty$,  only for multiplicative perturbations and
+$p=\infty$ does the stronger condition of Fre{\'e}chet differentiability hold.
 The differentiability properties of the VB posterior is distnct from the
 exact Bayesian posterior, whose Fre{\'e}chet differentiability
 holds irrespective of the choice of $p$.
-With this in mind, we employ function sensitivty only with multiplicative
+With this in mind, we employ function sensitivity with only with multiplicative
 perturbations.
 
 The variational approach is particularly suitable for the
 sensitivity calculations we derive.
-Because the approximate posterior is characterized by a real-valued vector,
-which in turn is characterized as a fixed point to an optimization
+Because the approximate posterior is characterized as a fixed point to an optimization
 objective, the derivative of the VB optimum with respect to any prior
 parameter can be computed in closed form.
 Using modern automatic differentiation tools, computing local sensitivity
@@ -95,13 +91,6 @@ in practice requires almost no additional code beyond
 implementing the optimization objective itself.
 The computation time of forming the local approximation can be
 more than an order of magnitude faster than refitting the VB posterior.
-
-We apply our methods to several real-world datasets, estimating the sensitivity
-of key posterior quantities to
-the BNP prior specification.
-We show the accuracy of our local approximation both for
-parametric and nonparametric perturbations by comparing
-against the much more expensive process of refitting the variational posterior.
 
 \secref{model_bnp} details the stick-breaking construction of Dirichlet process priors.
 \secref{model_vb} outlines our truncated variational approximation.
@@ -111,12 +100,12 @@ and functional perturbations, respectively.
 \secref{computing_sensitivity} discusses how computing the sensitivity is done in practice.
 
 In our results (\secref{results}),
-we first demonstrate our local sensitivity methodology on
-a toy example, a Gaussian mixture model
-of Fisher's iris data set.
-Then, we apply local sensitivity to real data analysis problems, which include a
-regression model of time-course gene expression data,
-and a topic model for studying population structure in a genetic database.
+we apply our methods to several real-world datasets, estimating the sensitivity
+of key posterior quantities to
+the BNP prior specification.
+We show the accuracy of our local approximation both for
+parametric and nonparametric perturbations by comparing
+against the much more expensive process of refitting the variational posterior.
 We find that posterior quantities can be sensitive or non-sensitive,
 depending on both the application and the quantity of interest.
 In most cases, the local approximation well-approximates the results found under
