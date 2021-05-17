@@ -216,8 +216,41 @@ def load_genomics_data(genomic_time_series_dir,
 
 # Wrapper to load the data, regressors, and initial regression coefficients
 def load_data_and_run_regressions(genomic_time_series_dir, 
-                                 df=7, 
-                                 degree=3): 
+                                  df=7, 
+                                  degree=3): 
+    
+    """
+    Parameters
+    ----------
+    genomic_time_series_dir: `str`
+        A local location of a clone of the git repo
+        https://github.com/NelleV/genomic_time_series_bnp.  This function
+        assumes that you have run ``make`` in the ``data`` directory of the
+        repo to download and pre-process the raw dataset.
+    
+    df : `int`
+        The degrees of freedom of the spline basis.
+    degree : `int`
+        The degree of the spline basis.
+        
+    Returns
+    -------
+    y : `numpy.ndarray` (genes, timepoints)
+        Data in the form of an array of gene expression levels where
+        the rows are genes and the columns are timepoints.
+    timepoints: `numpy.ndarray` 
+        The timepoints of the gene expressions.
+    regressors: `numpy.ndarray` (timepoints, dim)
+        The B-spline regressor matrix. 
+    beta : `numpy.ndarray` (genes, dim)
+        An array of the ``N`` regression coefficients.
+    beta_infos : `numpy.ndarray` (genes, dim, dim)
+        An array of the "information" matrices, i.e. the inverse
+        covariance matrices, of ``beta``.
+    y_infos : `numpy.ndarray` (genes, )
+        An array of the inverse residual variances for each regression.
+    """
+    
     
     # load raw data and time-points
     y, _, _, timepoints = load_genomics_data(genomic_time_series_dir, 

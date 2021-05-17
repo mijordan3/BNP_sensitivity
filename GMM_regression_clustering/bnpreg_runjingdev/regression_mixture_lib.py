@@ -18,15 +18,15 @@ def get_vb_params_paragami_object(dim, k_approx):
     Parameters
     ----------
     dim : int
-        Dimension of the datapoints.
+        Dimension of the regression coefficients.
     k_approx : int
         Number of components in the model.
     Returns
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
-    vb_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational parameters.
+    vb_params_paragami : paragami pattern
+        A paragami pattern that contains the variational parameters.
     """
 
     vb_params_paragami = paragami.PatternDict()
@@ -60,8 +60,8 @@ def get_default_prior_params():
     -------
     prior_params_dict : dictionary
         A dictionary that contains the prior parameters.
-    prior_params_paragami : paragami Patterned Dictionary
-        A paragami patterned dictionary that contains the prior parameters.
+    prior_params_paragami : paragami pattern
+        A paragami pattern that contains the prior parameters.
     """
 
     prior_params_dict = dict()
@@ -298,10 +298,10 @@ def get_kl(y, x,
 
     Parameters
     ----------
-    gamma : ndarray
-        The array of observations (num_genes x n_timepoints) 
+    y : ndarray
+        The array of observations shape (num_obs x n_timepoints) 
     x : ndarray 
-        The b-spline regression matrix, shape = (n_timepoints, n_basis).
+        The b-spline regression matrix, shape = (n_timepoints, dim).
     vb_params_dict : dictionary
         Dictionary of variational parameters.
     prior_params_dict : dictionary
@@ -317,9 +317,11 @@ def get_kl(y, x,
         parameters, stored in an array whose (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k.
         If ``None``, we set the optimal z.
-    use_bnp_prior : boolean
-        Whether or not to use a prior on the cluster mixture weights.
-        If True, a DP prior is used.
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
 
     Returns
     -------

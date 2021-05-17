@@ -98,6 +98,9 @@ def optimize_gmm(y,
                  run_newton = True): 
     
     """
+    Runs (quasi) second order optimization to minimize 
+    the KL and returns the optimal variational parameters. 
+    
     Parameters 
     ----------
     y : ndarray

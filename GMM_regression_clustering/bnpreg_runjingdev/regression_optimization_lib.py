@@ -29,6 +29,37 @@ def set_params_w_kmeans(y, regressors,
                         gh_loc, gh_weights, 
                         seed = 4353): 
     
+    """
+    Runs k-means to initialize the variational parameters.
+    We first fit each data point to the regressor matrix to obtain 
+    regresssion coefficients; we then run k-means on the coefficients. 
+
+    Parameters
+    ----------
+    y : array
+        The array of datapoints, one observation per row. shape = (n_obs, n_timepoints)
+    regressors : array 
+        The b-spline regression matrix, shape = (n_timepoints, dim).
+    vb_params_paragami : paragami pattern
+        A paragami pattern that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    seed : integer 
+        Random seed. 
+        
+    Returns
+    -------
+    vb_params_dict : dictionary
+        Dictionary of initialized variational parameters. 
+    """
+
+    
     onp.random.seed(seed)
     
     # run initial regressions
@@ -82,10 +113,6 @@ def set_params_w_kmeans(y, regressors,
         prior_params_dict['prior_data_info_scale'] * \
         prior_params_dict['prior_data_info_shape'] * onp.ones(k_approx)
     
-#     stick_shape = vb_params_dict['stick_params']['stick_means'].shape
-#     vb_params_dict['stick_params']['stick_means'] = np.ones(stick_shape)
-#     vb_params_dict['stick_params']['stick_infos'] = np.ones(stick_shape)
-    
     return vb_params_dict
 
 
@@ -102,6 +129,44 @@ def optimize_regression_mixture(y, regressors,
                                 run_lbfgs = True,
                                 run_newton = True): 
         
+    """
+    Runs (quasi) second order optimization to minimize 
+    the KL and returns the optimal variational parameters. 
+
+    Parameters
+    ----------
+    y : array
+        The array of datapoints, one observation per row. shape = (n_obs, n_timepoints)
+    regressors : array 
+        The b-spline regression matrix, shape = (n_timepoints, dim).
+    vb_params_paragami : paragami pattern
+        A paragami pattern that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
+    run_lbfgs : boolean, optional
+        Whether to run LBFGS. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+    run_newton : boolean, optional
+        Whether to run newton-ncg. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+        
+    Returns
+    -------
+    vb_params_dict : dictionary
+        Dictionary of optimized variational parameters. 
+    """
+
     ###################
     # Define loss
     ###################
