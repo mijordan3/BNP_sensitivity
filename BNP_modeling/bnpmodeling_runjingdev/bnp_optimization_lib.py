@@ -22,7 +22,30 @@ def init_centroids_w_kmeans(y,
                             n_kmeans_init = 10, 
                             seed = 1): 
     
+    """
+    Runs k-means on data set to initialize centroids
     
+    Parameters
+    ----------
+    y : array
+        The array of data, where each row is an observation. 
+    k_approx : integer
+        The number of cluster with which to run k-means. 
+    n_kmeans_init : integer
+        A number of times to run k-means, each with a 
+        different random initialization. We return the run 
+        with the smallest inertia. 
+    seed : integer
+        random seed. 
+        
+    Returns
+    -------
+    init_centroids : dictionary
+        k_approx x dim of centroids
+    km_best : 
+        sklearn.cluster.KMeans output 
+    """
+
     n_obs = np.shape(y)[0]
     dim = np.shape(y)[1]
 
@@ -30,12 +53,12 @@ def init_centroids_w_kmeans(y,
     for i in range(n_kmeans_init):
         km = KMeans(n_clusters = k_approx, 
                     random_state = seed).fit(y)
-        enertia = km.inertia_
+        inertia = km.inertia_
         if (i == 0):
-            enertia_best = enertia
+            inertia_best = inertia
             km_best = deepcopy(km)
-        elif (enertia < enertia_best):
-            enertia_best = enertia
+        elif (inertia < inertia_best):
+            inertia_best = inertia
             km_best = deepcopy(km)
     
     init_centroids = np.array(km_best.cluster_centers_)
@@ -163,6 +186,43 @@ def optimize_kl(get_kl_loss,
                get_hvp = None,
                run_lbfgs = True,
                run_newton = True): 
+    """
+    Parameters 
+    ----------
+    get_kl_loss : callable
+        Objective as function of vb parameters (in flattened space)
+        and prior parameter. 
+    vb_params_dict : dictionary
+        A dictionary that contains the initial variational parameters.
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    get_grad : callable, optional
+         Returns the gradient of `get_kl_loss` as 
+         function of vb parameters (in flattened space). 
+         If none, this is computed automatically using jax derivatives.
+    get_hvp : callable, optional
+        Returns the hessian vector product as 
+        function of vb parameters (in flattened space) and 
+        and some vector of equal length as the vb parameters.
+        If none, this is computed automatically using jax derivatives.
+    run_lbfgs : boolean, optional
+        Whether to run LBFGS. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+    run_newton : boolean, optional
+        Whether to run newton-ncg. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+        
+    Returns
+    ----------
+    vb_opt_dict : dictionary
+        A dictionary that contains the optimized variational parameters.
+    vb_opt : array 
+        The unconstrained vector of optimized variational parameters.
+    out : 
+        The output of scipy.optimize.minimize.
+    optim_time : 
+        The time elapsed, not including compile times. 
+    """
     
     # at least one should be true
     assert run_lbfgs or run_newton

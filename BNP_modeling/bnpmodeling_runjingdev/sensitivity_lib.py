@@ -176,6 +176,11 @@ class ScipyCgSolver():
                  cg_tol = 1e-3, 
                  cg_maxiter = None): 
         
+        """
+        a wrapper on scipy's CG solver that prints 
+        the residuals: useful for debugging / studying convergence rates.
+        """
+        
         self.vb_dim = len(opt_par_value)
         self.hvp = jax.jit(lambda x : obj_fun_hvp(opt_par_value, x))
         

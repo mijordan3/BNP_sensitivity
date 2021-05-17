@@ -16,8 +16,8 @@ from bnpmodeling_runjingdev.functional_sensitivity_lib import PriorPerturbation
 from bnpmodeling_runjingdev.log_phi_lib import LogPhiPerturbations
 
 
-refit_color = '#d95f02'
-lr_color = '#1b9e77'
+refit_color = '#377eb8'
+lr_color = '#e41a1c'
 
 #################
 # Function to load files
