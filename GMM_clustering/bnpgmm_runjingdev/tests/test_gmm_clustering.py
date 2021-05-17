@@ -44,16 +44,14 @@ class TestGMMClustering(unittest.TestCase):
             return gmm_lib.get_kl(y, vb_params_dict, prior_params_dict,
                             gh_loc, gh_weights,
                             e_z = e_z)
+                
+        e_log_wishart_det, log_wishart_det = \
+            gmm_lib._get_e_log_wishart_determinant(vb_params_dict['centroid_params'])
         
-        stick_propn_mean = vb_params_dict['stick_params']['stick_means']
-        stick_propn_info = vb_params_dict['stick_params']['stick_infos']
-        centroids = vb_params_dict['cluster_params']['centroids']
-        cluster_info = vb_params_dict['cluster_params']['cluster_info']
-
         z_nat_param = \
             gmm_lib.get_z_nat_params(y, 
-                                     stick_propn_mean, stick_propn_info, 
-                                     centroids, cluster_info,
+                                     vb_params_dict,
+                                     e_log_wishart_det,
                                      gh_loc, gh_weights)
 
         get_grad = jax.grad(get_kl_from_z_nat_param)

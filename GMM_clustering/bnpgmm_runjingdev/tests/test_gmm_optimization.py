@@ -77,7 +77,7 @@ class TestGMMOptimization(unittest.TestCase):
         # match estimated w truth
         which_clusters = np.unique(e_z_opt.argmax(1))
         est_ez = e_z_opt[:, which_clusters]
-        est_centroids = vb_opt_dict['cluster_params']['centroids'][which_clusters, :]
+        est_centroids = vb_opt_dict['centroid_params']['means'][which_clusters, :]
         
         diffs = ((est_centroids[None, :, :] - \
           true_centroids[:, None, :])**2).sum(-1)

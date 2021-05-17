@@ -7,12 +7,12 @@ import jax
 import jax.numpy as np
 
 from bnpmodeling_runjingdev import modeling_lib
-from bnpmodeling_runjingdev import exponential_families as ef
-from bnpmodeling_runjingdev.bnp_optimization_lib import update_stick_beta_params
+from bnpmodeling_runjingdev.bnp_optimization_lib import _update_stick_beta_params
 
 import unittest
 
 class TestBNPOptimization(unittest.TestCase):
+    
     def test_update_stick_beta_params(self): 
 
         # test our stick updates 
@@ -42,7 +42,7 @@ class TestBNPOptimization(unittest.TestCase):
             dp_prior = (dp_prior_alpha - 1) * e_log_1m_sticks.sum()
 
             # entropy term 
-            stick_entropy = ef.beta_entropy(tau = beta_params)
+            stick_entropy = modeling_lib.dirichlet_entropy(beta_params)
 
             # log-likelihood term 
             e_log_cluster_probs = \
@@ -73,7 +73,7 @@ class TestBNPOptimization(unittest.TestCase):
         opt_beta = fold_beta_params(out.x)
         
         # my closed form update
-        beta_update1, beta_update2 = update_stick_beta_params(ez, dp_prior_alpha)
+        beta_update1, beta_update2 = _update_stick_beta_params(ez, dp_prior_alpha)
         
         diff1 = np.abs(opt_beta[:, 0] - beta_update1).max()
         diff2 = np.abs(opt_beta[:, 1] - beta_update2).max()
