@@ -17,7 +17,7 @@ def cluster_and_get_k_means_inits(y,
 
     Parameters
     ----------
-    y : ndarray
+    y : array
         The array of datapoints, one observation per row.
     vb_params_paragami : paragami Patterned Dictionary
         A paragami patterned dictionary that contains the variational parameters.
@@ -27,11 +27,11 @@ def cluster_and_get_k_means_inits(y,
     Returns
     -------
     vb_params_dict : dictionary
-        Dictionary of variational parameters.
+        Dictionary of initialized variational parameters. 
     init_free_par : vector
-        Vector of the free variational parameters
+        Vector of the initialized variational parameters, unconstrained. 
     e_z_init : ndarray
-        Array encoding cluster belongings as found by kmeans
+        Array encoding cluster assignments as found by kmeans
     """
 
     # get dictionary of vb parameters
@@ -96,6 +96,44 @@ def optimize_gmm(y,
                  e_log_phi = None, 
                  run_lbfgs = True,
                  run_newton = True): 
+    
+    """
+    Parameters 
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_dict : dictionary
+        A dictionary that contains the initial variational parameters.
+    vb_params_paragami : paragami patterned dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    get_grad : callable, optional
+         Returns the gradient of `get_kl_loss` as 
+         function of vb parameters (in flattened space). 
+         If none, this is computed automatically using jax derivatives.
+    get_hvp : callable, optional
+        Returns the hessian vector product as 
+        function of vb parameters (in flattened space) and 
+        and some vector of equal length as the vb parameters.
+        If none, this is computed automatically using jax derivatives.
+    run_lbfgs : boolean, optional
+        Whether to run LBFGS. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+    run_newton : boolean, optional
+        Whether to run newton-ncg. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+        
+    Returns
+    ----------
+    vb_opt_dict : dictionary
+        A dictionary that contains the optimized variational parameters.
+    vb_opt : array 
+        The unconstrained vector of optimized variational parameters.
+    out : 
+        The output of scipy.optimize.minimize.
+    optim_time : 
+        The time elapsed, not including compile times. 
+    """
+
     
     ###################
     # Define loss

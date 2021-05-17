@@ -61,9 +61,11 @@ class HyperparameterSensitivityLinearApproximation(object):
         cg_precond : callable, optional
             Function that takes in a vector `v` of same length as `opt_par_value`
             and returns a preconditioner times `v` for the cg solver
-            (this is the argument `M`)
+            (this is the argument `M` in jax.sparse.linalg.cg)
         cg_tol : float
             The input to the `tol` argument in jax.sparse.linalg.cg
+        cg_maxiter : integer 
+            Maximum number of iterations to run CG. 
         use_scipy_cgsolve : boolean
             If `True`, we compile HVPs and use the scipy solver (which 
             has richer callback functions we can use for printing values
@@ -106,9 +108,11 @@ class HyperparameterSensitivityLinearApproximation(object):
         # note to myself: 
         # this method can be called to reset the functional perturbation 
         # without re-compiling the linear system (which is expensive)
-
+        
+        # the cross hessian
         self.dobj_dhyper_dinput = jax.jit(get_cross_hess(hyper_par_objective_fun))
-
+        
+        # compile 
         print('Compiling cross hessian...')
         t0 = time.time()
         out = self.dobj_dhyper_dinput(self.opt_par_value,
@@ -125,9 +129,11 @@ class HyperparameterSensitivityLinearApproximation(object):
     def _set_dinput_dhyper(self):
 
         t0 = time.time()
+        # get cross hessian
         self.cross_hess = self.dobj_dhyper_dinput(self.opt_par_value,
                                                   self.hyper_par_value0)
-
+        
+        # solve the linear system to get sensitivity
         self.dinput_dhyper = -self.hessian_solver(self.cross_hess.squeeze()).\
                                     block_until_ready()
         
@@ -136,6 +142,7 @@ class HyperparameterSensitivityLinearApproximation(object):
         print('LR sensitivity time: {0:3g}sec\n'.format(self.lr_time))
 
     def _set_hessian_solver(self):
+        # this defines and compiles the hessian solver
         
         if self.use_scipy_cgsolve: 
             self.cg_solver = ScipyCgSolver(self.obj_fun_hvp, 
@@ -161,6 +168,10 @@ class HyperparameterSensitivityLinearApproximation(object):
 
 
     def predict_opt_par_from_hyper_par(self, hyper_par_value):
+        
+        # uses the linear approximation to predict the 
+        # variatoinal parameters at prior parameter `hyper_par_value`
+        
         delta = (hyper_par_value - self.hyper_par_value0)
 
         if len(self.dinput_dhyper.shape) == 1:

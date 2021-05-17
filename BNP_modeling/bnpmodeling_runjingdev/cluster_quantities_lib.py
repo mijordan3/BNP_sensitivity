@@ -47,10 +47,12 @@ def get_mixture_weights_from_stick_break_propns(stick_break_propns):
 
     return mixture_weights
 
-def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
-                                gh_loc, gh_weights):
+def get_mixture_weights_from_logitnorm_params(stick_propn_mean, 
+                                              stick_propn_info,
+                                              gh_loc,
+                                              gh_weights):
     """
-    Computes the expected number of cluster weights from logit-normal 
+    Computes the mixture weights from stick breaking proportions from logit-normal 
     parameters. 
 
     Parameters
@@ -59,8 +61,15 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
         Mean parameters for the logit of the
         stick-breaking proportions, of shape ...  x (k_approx-1)
     stick_propn_info : ndarray
-        parameters for the logit of the
+        Info parameters for the logit of the
         stick-breaking proportions, of shape ...  x (k_approx-1)
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this to compute the
+        expectations wrt to stick-breaking proportions.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this to compute the
+        expectations wrt to stick-breaking proportions.
+
     
     Returns
     -------
@@ -75,8 +84,10 @@ def get_e_cluster_probabilities(stick_propn_mean, stick_propn_info,
     # are independent 
     return get_mixture_weights_from_stick_break_propns(e_stick_lengths)
 
-def sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, 
+def _sample_stick_propn(stick_propn_mean, stick_propn_info, n_samples, 
                        prng_key = jax.random.PRNGKey(0)): 
+    
+    # sample stick breaking-proportions from logitnormal parameters
     
     shape = (n_samples, ) + stick_propn_mean.shape 
     normal_samples = jax.random.normal(key = prng_key,
@@ -114,7 +125,7 @@ def sample_weights_from_logitnormal_sticks(stick_propn_mean,
     Returns
     -------
     ndarray
-        a n_samples x k_approx array of mixture weights.
+        a n_samples x k_approx array of sampled mixture weights.
     """
     
     assert stick_propn_mean.shape == stick_propn_info.shape
@@ -122,7 +133,7 @@ def sample_weights_from_logitnormal_sticks(stick_propn_mean,
     
     # sample sticks proportions from logitnormal
     # this is n_samples x (k_approx - 1)
-    stick_propn_samples = sample_stick_propn(stick_propn_mean,
+    stick_propn_samples = _sample_stick_propn(stick_propn_mean,
                                              stick_propn_info,
                                              n_samples, 
                                              prng_key)

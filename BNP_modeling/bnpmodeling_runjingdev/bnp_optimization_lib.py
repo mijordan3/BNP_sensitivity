@@ -23,12 +23,12 @@ def init_centroids_w_kmeans(y,
                             seed = 1): 
     
     """
-    Runs k-means on data set to initialize centroids
+    Runs k-means to initialize centroids.
     
     Parameters
     ----------
     y : array
-        The array of data, where each row is an observation. 
+        The array of datapoints, one observation per row.
     k_approx : integer
         The number of cluster with which to run k-means. 
     n_kmeans_init : integer
@@ -65,7 +65,7 @@ def init_centroids_w_kmeans(y,
     
     return init_centroids, km_best
 
-def update_stick_beta_params(ez, dp_prior_alpha): 
+def _update_stick_beta_params(ez, dp_prior_alpha): 
     
     # conditional on ez, returns the optimal beta parameters 
     # for the stick-breaking process. 
@@ -92,7 +92,6 @@ def update_stick_beta_params(ez, dp_prior_alpha):
 # logitnormal sticks
 #########################
 def convert_beta_sticks_to_logitnormal(stick_betas, 
-                                       logitnorm_stick_params_dict,
                                        logitnorm_stick_params_paragami, 
                                        gh_loc, gh_weights): 
     """
@@ -103,15 +102,10 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     Parameters
     ----------
     stick_betas : array
-        array (... x 2) of beta parameters 
-        on individual admixture stick-breaking proportions.
-    logitnorm_stick_params_dict : dictionary
-        parameter dictionary of logitnormal parameters
-        (stick_means, stick_infos) for individual admixture
-        stick-breaking proportions
-    logitnorm_stick_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational
-        parameters
+        array with dimensions (... x 2) of beta parameters 
+        for the stick-breaking proportions.
+    logitnorm_stick_params_paragami : paragami pattern
+        A paragami pattern for the stick parameter dictionary
     gh_loc : vector
         Locations for gauss-hermite quadrature. 
     gh_weights : vector
@@ -120,7 +114,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     Returns
     -------
     opt_logitnorm_stick_params : dictionary
-        A dictionary that contains the variational parameters
+        A dictionary that contains the logit-normal parameters
         for individual admixture stick-breaking
         proportions. 
     out : scipy.optimize.minimize output
@@ -161,7 +155,7 @@ def convert_beta_sticks_to_logitnormal(stick_betas,
     loss_hvp = jax.jit(get_jac_hvp_fun(_loss))
     
     stick_params_free = \
-        logitnorm_stick_params_paragami.flatten(logitnorm_stick_params_dict, 
+        logitnorm_stick_params_paragami.flatten(logitnorm_stick_params_paragami.random(), 
                                                 free = True)
     
     out = minimize(fun = lambda x : onp.array(loss(x)), 
@@ -187,15 +181,18 @@ def optimize_kl(get_kl_loss,
                run_lbfgs = True,
                run_newton = True): 
     """
+    
+    Runs (quasi) second-order optimization to minimize the 
+    KL and return the optimal variational parameters. 
+    
     Parameters 
     ----------
     get_kl_loss : callable
-        Objective as function of vb parameters (in flattened space)
-        and prior parameter. 
+        Objective as function of vb parameters (in flattened space). 
     vb_params_dict : dictionary
         A dictionary that contains the initial variational parameters.
-    vb_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational parameters.
+    vb_params_paragami : paragami pattern
+        A paragami pattern for the variational parameters.
     get_grad : callable, optional
          Returns the gradient of `get_kl_loss` as 
          function of vb parameters (in flattened space). 

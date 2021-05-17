@@ -15,11 +15,24 @@ class InfluenceOperator(object):
                  hessian_solver,
                  alpha0, 
                  stick_key = 'stick_params'):
+        """
+        A class containing methods to compute the influence function 
         
-        # vb_opt is the vector of optimal vb parameters
-        # hessian solver is a function that takes an input vector of len(vb_opt)
-        # and returns H^{-1}v
-        # alpha0 is the DP prior parameter
+        Parameters 
+        ----------
+        vb_params_dict : array
+            A vector that contains the optimized, unconstrained variational parameters.
+        vb_params_paragami : paragami pattern
+            A paragami pattern for the variational parameters.
+        hessian_solver : callable
+            hessian solver is a function that takes an input vector of len(vb_opt)
+            and returns H^{-1}v
+        alpha0 : float
+            The GEM parameter of the initial prior. 
+            
+        stick_key : string 
+            Key name of the stick parameters in `vb_params_paragami`
+        """
 
         self.vb_opt = vb_opt
         self.vb_params_paragami = vb_params_paragami
@@ -30,7 +43,7 @@ class InfluenceOperator(object):
         # this returns the per stick density
         # (first dimension is k, the stick index)
         self.get_log_qk = lambda logit_stick, vb_free_params : \
-                        get_log_qk_from_free_params(logit_stick,
+                        _get_log_qk_from_free_params(logit_stick,
                                                     vb_free_params,
                                                     self.vb_params_paragami, 
                                                     stick_key)
@@ -42,14 +55,14 @@ class InfluenceOperator(object):
         self.grad_log_q = jax.jacobian(self.get_log_q, argnums = 1)
         
         # prior density
-        self.get_log_logitstick_prior = lambda x: get_log_logitstick_prior(x,
-                                                                           self.alpha0)
+        self.get_log_logitstick_prior = lambda x: _get_log_logitstick_prior(x,
+                                                                            self.alpha0)
         
         # a len(vb_opt) x (k_approx - 1) binary matrix
         # with 1 if the ith vb free parameter affects the jth stick distribution.
         self.stick_params_mapping = \
-                get_stick_params_mapping(self.vb_params_paragami, 
-                                         stick_key)
+                _get_stick_params_mapping(self.vb_params_paragami, 
+                                          stick_key)
         
         # define the grad_g x prior ratio terms 
         self.get_grad_log_q_prior_rat_normed = \
@@ -61,9 +74,26 @@ class InfluenceOperator(object):
     def get_influence(self,
                       logit_stick,
                       grad_g = None, 
-                      normalize_by_prior = True):
+                      weight_by_prior = True):
+        """
+        evaluates the influence function at `logit_stick`. 
+        
+        Parameters: 
+        ----------
+        logit_v : array 
+            vector of locations at which to evaluate the influence function
+        grad_g : array, optional 
+            The gradient of the posterior quantity wrt to the vb parameters. 
+            If `None`, we return the influence on the unconstrained vb parameters 
+            themselves (this might be slow!). 
+        weight_by_prior: boolean, optional 
+            whether or not to pre-multiply the influence function 
+            by the prior (default = True)
+        """
 
-        if normalize_by_prior: 
+        # 
+
+        if weight_by_prior: 
             grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_normed(logit_stick)
         else: 
             grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_unnormed(logit_stick)
@@ -81,19 +111,22 @@ class InfluenceOperator(object):
             return influence
             
         else: 
+            # given a grad g, solve H^{-1}grad_g first. 
             assert len(grad_g) == len(self.vb_opt)
             grad_g_hess_inv = self.hessian_solver(grad_g)
+            
+            # the pre-multiply by those prior terms
             influence = np.dot(grad_g_hess_inv, grad_log_q_prior_rat)
 
             return influence, grad_g_hess_inv
     
-    def _get_grad_log_q_prior_rat(self, logit_stick, normalize_by_prior = True): 
+    def _get_grad_log_q_prior_rat(self, logit_stick, weight_by_prior = True): 
         
         # this is len(vb_opt) x len(logit_stick)
         grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
 
         # this is (k_approx - 1) x len(logit_stick)
-        prior_ratio = np.exp(self.get_q_prior_log_ratio(logit_stick, normalize_by_prior))
+        prior_ratio = np.exp(self._get_q_prior_log_ratio(logit_stick, weight_by_prior))
         
         # map each stick to appropriate vb free param
         # this is len(vb_opt) x len(logit_stick)
@@ -105,11 +138,11 @@ class InfluenceOperator(object):
         return grad_log_q_prior_rat
 
     
-    def get_q_prior_log_ratio(self, logit_stick, normalize_by_prior = True):
+    def _get_q_prior_log_ratio(self, logit_stick, weight_by_prior = True):
         # this is log q(logit_stick)  - log p_0(logit_stick)
         # returns a matrix of (k_approx - 1) x length(logit_stick)
         
-        if normalize_by_prior: 
+        if weight_by_prior: 
             log_beta_prior = self.get_log_logitstick_prior(logit_stick)
             log_beta_prior = np.expand_dims(log_beta_prior, 0)
         else: 
@@ -121,7 +154,7 @@ class InfluenceOperator(object):
 
 # TODO implemented for structure model (with 2d sticks)
 # needs to be tested for 1d sticks
-def get_stick_params_mapping(vb_params_paragami, stick_key): 
+def _get_stick_params_mapping(vb_params_paragami, stick_key): 
 
     vb_bool_dict = vb_params_paragami.empty_bool(False)    
     
@@ -148,7 +181,7 @@ def get_stick_params_mapping(vb_params_paragami, stick_key):
 
 # get explicit density (not expectations) for logit-sticks
 # log p_0
-def get_log_logitstick_prior(logit_stick, alpha):
+def _get_log_logitstick_prior(logit_stick, alpha):
     # pi are the stick lengths
     # alpha is the DP parameter
 
@@ -157,7 +190,7 @@ def get_log_logitstick_prior(logit_stick, alpha):
                 np.log(stick) + np.log(1 - stick)
 
 
-def get_log_qk_from_free_params(logit_stick, vb_free_params, 
+def _get_log_qk_from_free_params(logit_stick, vb_free_params, 
                                 vb_params_paragami, stick_key):
     
     vb_params_dict = vb_params_paragami.fold(vb_free_params, free = True)
@@ -179,9 +212,25 @@ class WorstCasePerturbation(object):
                  logit_v_grid, 
                  delta = 1.,
                  cached_influence_grid = None):
+        """
+        A class containing methods to compute the worst-case perturbations 
+        and its expectations. 
         
-        # influence function is a function that takes logit-sticks
-        # and returns a scalar value for the influence
+        Parameters 
+        ----------
+        influence_fun : callable 
+            influence function is a function that takes logit-sticks
+            and returns a scalar value for the influence. 
+        logit_v_grid : array 
+            Vector of points at which to evaluate the influence function. 
+            We will use these points to search for places where the
+            influence function changes sign. 
+        delta : float
+            The L-infinity norm of the worst-case perturbation 
+        cached_influence_grid : array, optional 
+            A pre-computed influence function evaluated at points 
+            `logit_v_grid
+        """
 
         self.logit_v_grid = logit_v_grid
         self.v_grid = sp.special.expit(self.logit_v_grid)
@@ -220,7 +269,24 @@ class WorstCasePerturbation(object):
         self.sign_diffs = self._sign_diffs[self.change_bool]
 
     def get_e_log_linf_perturbation(self, means, infos):
-        # the expectation of the worst case perturbation
+        """
+        compute the expectation of the worst case perturbation, 
+        under logitnormally distributed stick proportions, 
+        with parameters means, infos. 
+        
+        Parameters: 
+        ----------
+        means : array 
+            Array of logit-stick locations. 
+        infos : array 
+            Array of logit-stick informations (1/scale**2). 
+            
+        Returns: 
+        -------
+        array the same size as `means`, giving the 
+        expectatoin of the worst-case log_phi
+        
+        """
         
         # in structure, means are 2d. 
         # flatten them (shouldn't matter for iris)
@@ -240,7 +306,21 @@ class WorstCasePerturbation(object):
         return  (e_log_pert + self.signs[-1] * len(means)) * self.delta
     
     def influence_fun_interp(self, logit_v): 
-        # interpolated influence function. 
+        """
+        interpolated influence function, for plotting. 
+        
+        Parameters: 
+        ----------
+        logit_v : array 
+            vector of locations at which to evaluate the influence function
+            
+        Returns: 
+        -------
+        array the same size as logit_v, giving the influence function
+        
+        """
+        # 
+        # logit stick-proportion. 
         # for plotting only!
         
         # find index of logit_v_grid 
@@ -251,8 +331,24 @@ class WorstCasePerturbation(object):
         return self.influence_grid[indx]
     
     def log_phi(self, logit_v):
-        # the worst case perturbation. 
-        # for plotting only!
+        """
+        The worst case perturbation as function of logit-sticks. 
+        For plotting only -- do not use this to compute expectations. 
+        
+        Parameters: 
+        ----------
+        logit_v : array 
+            vector of locations at which to evaluate the the worst-case log_phi
+        
+        Returns: 
+        -------
+        array the same size as logit_v, giving the worst-case log_phi
+        
+        """
+
+        # the worst case perturbation as function of 
+        # logit stick-proportion. 
+        # for plotting only -- do not use this to compute expectations. 
         
         return np.sign(self.influence_fun_interp(logit_v)) * self.delta
 

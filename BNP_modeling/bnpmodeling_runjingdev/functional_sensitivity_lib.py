@@ -13,16 +13,36 @@ from copy import deepcopy
 
 
 ########################
-# Functions to evaluate expectations
+# Functions to evaluate densities
 # given a functional perturbation
 ########################
 class PriorPerturbation(object):
-    def __init__(self, alpha0,
-                        log_phi,
-                        epsilon=1.0,
-                        logit_v_ub = 4,
-                        logit_v_lb = -4,
-                        quad_maxiter = 50):
+    def __init__(self,
+                 alpha0,
+                 log_phi,
+                 epsilon=1.0,
+                 logit_v_ub = 4,
+                 logit_v_lb = -4,
+                 quad_maxiter = 50):
+        """
+        Class used to compute densities of perturbed priors. 
+        Useful for plotting. 
+
+        Parameters
+        ----------
+        alpha0 : float
+            The GEM parameter of the initial prior. 
+        log_phi : Callable function
+            The log of the multiplicative perturbation in logit space. 
+        epsilon : float 
+            Factor multiplying log_phi in the perturbation. 
+        logit_v_ub : float 
+            Upper bound for the integral in computing normalizatoin constants. 
+        logit_v_lb : float 
+            Upper bound for the integral in computing normalizatoin constants. 
+        quad_maxiter : integer 
+            maxiters for scipy.integrate.quadrature 
+        """
 
         self.logit_v_lb = logit_v_lb
         self.logit_v_ub = logit_v_ub
@@ -37,8 +57,9 @@ class PriorPerturbation(object):
 
         self.set_log_phi(log_phi)
 
-    #################
-    # Functions that are used for graphing and the influence function.
+    #############################
+    # methods returning the densities 
+    #############################
 
     def get_log_p0(self, v):
         alpha = self.alpha0
@@ -90,8 +111,9 @@ class PriorPerturbation(object):
                 self.log_norm_pc_logit
 
     ###################################
-    # Setting functions for initialization
-
+    # Setting methods for initialization
+    #############################
+    
     def set_epsilon(self, epsilon):
         self.epsilon_param = epsilon
         self.set_log_phi(self.log_phi)
@@ -131,7 +153,7 @@ class PriorPerturbation(object):
         self.log_norm_pc_logit = np.log(norm_pc_logit)
     
     #############################
-    # Functions for plotting
+    # methods for plotting
     #############################
     def _plot_log_phi(self, ax): 
         
@@ -150,6 +172,7 @@ class PriorPerturbation(object):
         ax.set_ylabel(r'log $\phi$')
         
     def _plot_log_priors(self, ax): 
+        # plots log priors in logit space
         
         # x-axis
         logit_v_grid = np.linspace(self.logit_v_lb, 
@@ -174,6 +197,7 @@ class PriorPerturbation(object):
     
     
     def _plot_priors(self, ax): 
+        # plots priors in logit-space
         
         # x-axis
         logit_v_grid = np.linspace(self.logit_v_lb, 
@@ -198,6 +222,7 @@ class PriorPerturbation(object):
     
     
     def _plot_priors_constrained(self, ax): 
+        # plots priors in constrained space
         
         # x-axis
         logit_v_grid = np.linspace(self.logit_v_lb, 
@@ -245,17 +270,19 @@ def get_e_log_perturbation(log_phi, stick_propn_mean, stick_propn_info,
     Parameters
     ----------
     log_phi : Callable function
-        The log of the multiplicative perturbation in logit space
-    vb_params_dict : dictionary
-        A dictionary that contains the variational parameters
-    epsilon : float
-        The 'epsilon' specififying the multiplicative perturbation
+        The multiplicative perturbation in logit space.
+    stick_propn_mean : ndarray
+        Mean parameters for the logit of the
+        stick-breaking proportions, of length (k_approx - 1)
+    stick_propn_info : ndarray
+        parameters for the logit of the
+        stick-breaking proportions, of length (k_approx - 1)
     gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
+        Locations for gauss-hermite quadrature. We need this to compute the
+        expectations wrt to stick-breaking proportions.
     gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
+        Weights for gauss-hermite quadrature. We need this to compute the
+        expectations wrt to stick-breaking proportions.
     sum_vector : boolean
         whether to sum the expectation over the k sticks
 
@@ -284,17 +311,35 @@ class FunctionalPerturbationObjective():
                  e_log_phi = None, 
                  delta = 1.0,
                  stick_key = 'stick_params'): 
-
-        # log_phi (or e_log_phi) returns the additve
-        # perturbation to the **ELBO** 
+        """
+        A class with methods for computing the expectation of log-phi. 
+        Methods are useful as arguments to optimizers (`optimize_kl`) or the 
+        sensitivity class (`HyperparameterSensitivityLinearApproximation`).
         
-        # log_phi takes input as logit-stick and returns the 
-        # perturbation. 
-        # e_log_phi (optional) takes input means and infos 
-        # and returns the expectation of log-phi under the 
-        # logit-normal variational distribution
-        # if e_log_phi is not provided, we compute the expectation 
-        # using gauss-hermite quadrature
+        Parameters
+        ----------
+        log_phi : Callable function
+            The multiplicative perturbation in logit space. 
+            Note the signs. This is an additive perturbation to the ELBO (not the KL). 
+        vb_params_paragami : paragami patterned dictionary
+            A paragami patterned dictionary that contains the variational parameters.
+        gh_loc : vector
+            Locations for gauss-hermite quadrature. We need this to compute the
+            expectations wrt to stick-breaking proportions.
+        gh_weights : vector
+            Weights for gauss-hermite quadrature. We need this to compute the
+            expectations wrt to stick-breaking proportions.
+        e_log_phi : callable, optional
+            A function that takes input means and infos 
+            and returns the expectation of log-phi under the 
+            logit-normal variational distribution. 
+            If e_log_phi is not provided, we compute the expectation 
+            using Gauss-Hermite quadrature. 
+        delta : float 
+            Factor multiplying log_phi in the perturbation. 
+        stick_key : string 
+            Key name of the stick parameters in `vb_params_paragami`
+        """
         
         self.vb_params_paragami = vb_params_paragami
         self.stick_key = stick_key 
@@ -318,6 +363,8 @@ class FunctionalPerturbationObjective():
                                         self.delta
         
     def _set_e_log_phi_with_gh(self): 
+        # set the expected log-perturbation 
+        # using gauss-hermite quadrature
         
         self.e_log_phi = lambda means, infos : \
                             get_e_log_perturbation(self.log_phi, 
