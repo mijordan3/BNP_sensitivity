@@ -74,7 +74,7 @@ class InfluenceOperator(object):
     def get_influence(self,
                       logit_stick,
                       grad_g = None, 
-                      weight_by_prior = True):
+                      weight_by_inv_prior = True):
         """
         evaluates the influence function at `logit_stick`. 
         
@@ -86,14 +86,14 @@ class InfluenceOperator(object):
             The gradient of the posterior quantity wrt to the vb parameters. 
             If `None`, we return the influence on the unconstrained vb parameters 
             themselves (this might be slow!). 
-        weight_by_prior: boolean, optional 
-            whether or not to pre-multiply the influence function 
-            by the prior (default = True)
+        weight_by_inv_prior: boolean, optional 
+            whether or not to weight the influence function 
+            by the inverse prior (default = True)
         """
 
         # 
 
-        if weight_by_prior: 
+        if weight_by_inv_prior: 
             grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_normed(logit_stick)
         else: 
             grad_log_q_prior_rat = self.get_grad_log_q_prior_rat_unnormed(logit_stick)
@@ -120,13 +120,13 @@ class InfluenceOperator(object):
 
             return influence, grad_g_hess_inv
     
-    def _get_grad_log_q_prior_rat(self, logit_stick, weight_by_prior = True): 
+    def _get_grad_log_q_prior_rat(self, logit_stick, weight_by_inv_prior = True): 
         
         # this is len(vb_opt) x len(logit_stick)
         grad_log_q = self.grad_log_q(logit_stick, self.vb_opt).transpose()
 
         # this is (k_approx - 1) x len(logit_stick)
-        prior_ratio = np.exp(self._get_q_prior_log_ratio(logit_stick, weight_by_prior))
+        prior_ratio = np.exp(self._get_q_prior_log_ratio(logit_stick, weight_by_inv_prior))
         
         # map each stick to appropriate vb free param
         # this is len(vb_opt) x len(logit_stick)
@@ -138,11 +138,11 @@ class InfluenceOperator(object):
         return grad_log_q_prior_rat
 
     
-    def _get_q_prior_log_ratio(self, logit_stick, weight_by_prior = True):
+    def _get_q_prior_log_ratio(self, logit_stick, weight_by_inv_prior = True):
         # this is log q(logit_stick)  - log p_0(logit_stick)
         # returns a matrix of (k_approx - 1) x length(logit_stick)
         
-        if weight_by_prior: 
+        if weight_by_inv_prior: 
             log_beta_prior = self.get_log_logitstick_prior(logit_stick)
             log_beta_prior = np.expand_dims(log_beta_prior, 0)
         else: 

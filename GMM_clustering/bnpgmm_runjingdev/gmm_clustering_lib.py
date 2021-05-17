@@ -21,15 +21,15 @@ def get_vb_params_paragami_object(dim, k_approx):
     dim : int
         Dimension of the datapoints.
     k_approx : int
-        Number of components in the model.
+        Number of components in the truncated variational parameters.
 
     Returns
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
 
-    vb_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational parameters.
+    vb_params_paragami : paragami pattern
+        A paragami pattern dictionary for the variational parameters.
 
     """
 
@@ -73,10 +73,6 @@ def get_default_prior_params(dim):
     Returns a paragami patterned dictionary
     that stores the prior parameters.
 
-    Default prior parameters are those set for the experiments in
-    "Evaluating Sensitivity to the Stick Breaking Prior in
-    Bayesian Nonparametrics"
-    https://arxiv.org/abs/1810.06587
 
     Parameters
     ----------
@@ -88,8 +84,8 @@ def get_default_prior_params(dim):
     prior_params_dict : dictionary
         A dictionary that contains the prior parameters.
 
-    prior_params_paragami : paragami Patterned Dictionary
-        A paragami patterned dictionary that contains the prior parameters.
+    prior_params_paragami : paragami pattern
+        A paragami pattern that for the prior parameters.
 
     """
 
@@ -337,18 +333,23 @@ def get_kl(y,
         The optimal cluster belongings as a function of the variational
         parameters, stored in an array whose (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k.
-        If ``None``, we set the optimal z.
+        If ``None``, we set the optimal z implicitly.
     use_bnp_prior : boolean
         Whether or not to use a prior on the cluster mixture weights.
         If True, a DP prior is used.
-
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
+        
     Returns
     -------
     kl : float
         The negative elbo.
     """
 
-    # an expensive moment: only compute once here
+    # an expensive expected moment: only compute once here
     e_log_wishart_det, log_wishart_det = \
         _get_e_log_wishart_determinant(vb_params_dict['centroid_params'])
 
@@ -362,7 +363,8 @@ def get_kl(y,
                           use_bnp_prior = use_bnp_prior)
     if e_z is None:
         e_z = e_z_opt
-
+    
+    # log-likelihood term
     e_loglik = np.sum(e_z * z_nat_param)
 
     # entropy term
@@ -378,6 +380,7 @@ def get_kl(y,
 
     elbo = e_log_prior + entropy + e_loglik
     
+    # add pertubation
     if e_log_phi is not None:
 
         e_log_pert = e_log_phi(vb_params_dict['stick_params']['stick_means'],

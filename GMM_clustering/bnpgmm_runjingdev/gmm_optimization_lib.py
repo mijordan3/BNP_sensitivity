@@ -103,18 +103,20 @@ def optimize_gmm(y,
     y : ndarray
         The array of datapoints, one observation per row.
     vb_params_dict : dictionary
-        A dictionary that contains the initial variational parameters.
-    vb_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational parameters.
-    get_grad : callable, optional
-         Returns the gradient of `get_kl_loss` as 
-         function of vb parameters (in flattened space). 
-         If none, this is computed automatically using jax derivatives.
-    get_hvp : callable, optional
-        Returns the hessian vector product as 
-        function of vb parameters (in flattened space) and 
-        and some vector of equal length as the vb parameters.
-        If none, this is computed automatically using jax derivatives.
+        Dictionary of variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. We need this compute the
+        expected prior terms.
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
     run_lbfgs : boolean, optional
         Whether to run LBFGS. At least one of `run_blfgs` and 
         `run_newton` must be true. 

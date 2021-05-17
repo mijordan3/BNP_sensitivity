@@ -13,7 +13,7 @@ def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
                                use_bnp_prior = True):
 
     """
-    Returns the optimal cluster belonging probabilities, given the
+    Returns the optimal cluster assignment probabilities, given the
     variational parameters.
 
     Parameters
@@ -23,11 +23,9 @@ def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
     vb_params_dict : dictionary
         Dictionary of variational parameters.
     gh_loc : vector
-        Locations for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
+        Locations for gauss-hermite quadrature. 
     gh_weights : vector
-        Weights for gauss-hermite quadrature. We need this compute the
-        expected prior terms.
+        Weights for gauss-hermite quadrature. 
     use_bnp_prior : boolean
         Whether or not to use a prior on the cluster mixture weights.
         If True, a DP prior is used.
@@ -56,13 +54,35 @@ def get_optimal_z_from_vb_dict(y, vb_params_dict, gh_loc, gh_weights,
     return e_z
 
 def get_e_mixture_weights_from_vb_dict(vb_params_dict, gh_loc, gh_weights): 
+    
+    """
+    Returns the mixture weights
+
+    Parameters
+    ----------
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. 
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    
+    Returns
+    -------
+    weights : ndarray
+        a vector of lenght `k_approx` of mixture weights 
+        under the variational approximation. 
+
+    """
+
     stick_means = vb_params_dict['stick_params']['stick_means']
     stick_infos = vb_params_dict['stick_params']['stick_infos']
     
-    weights = cluster_lib.get_e_cluster_probabilities(stick_means, 
-                                                      stick_infos,
-                                                      gh_loc,
-                                                      gh_weights)
+    weights = \
+        cluster_lib.get_mixture_weights_from_logitnorm_params(stick_means, 
+                                                              stick_infos,
+                                                              gh_loc,
+                                                              gh_weights)
     
     return weights
 
@@ -73,6 +93,31 @@ def get_e_num_pred_clusters_from_vb_dict(vb_params_dict,
                                          threshold = 0,
                                          n_samples = 10000,
                                          prng_key = jax.random.PRNGKey(0)):
+    
+    """
+    Returns a monte-carlo estimate of the expected number of posterior 
+    predictive number of clusters
+
+    Parameters
+    ----------
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    n_obs : integer
+        Number of observations in a new data set. 
+    threshold : integer
+        Minimum number of observations required to count as a ``cluster"
+    n_samples : integer 
+        Number of samples in a monte-carlo estimate 
+    prng_key : 
+        A jax.random.PRNGKey 
+    
+    Returns
+    -------
+    float 
+        the expected number of posterior predictive clusters
+
+    """
+
     
     # get posterior predicted number of clusters
 
@@ -94,7 +139,37 @@ def get_e_num_clusters_from_vb_dict(y,
                                     threshold = 0,
                                     n_samples = 10000,
                                     prng_key = jax.random.PRNGKey(0)):
+    
+    """
+    Returns a monte-carlo estimate of the expected number of posterior 
+    in-sample number of clusters
 
+    Parameters
+    ----------
+    y : ndarray
+        The array of datapoints, one observation per row.
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature. 
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    threshold : integer
+        Minimum number of observations required to count as a ``cluster". 
+        If zero, we actually compute the expectation analytically
+    n_samples : integer 
+        Number of samples in a monte-carlo estimate 
+    prng_key : 
+        A jax.random.PRNGKey 
+    
+    Returns
+    -------
+    float 
+        the expected number of posterior in-sample clusters
+
+    """
+
+        
     e_z  = get_optimal_z_from_vb_dict(y, 
                                       vb_params_dict,
                                       gh_loc,

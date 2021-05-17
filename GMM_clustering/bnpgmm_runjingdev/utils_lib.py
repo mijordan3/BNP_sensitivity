@@ -1,3 +1,5 @@
+# utilities to load and plot iris data
+
 import numpy as np
 
 import jax.numpy as jnp
@@ -94,16 +96,4 @@ def get_plotting_data(iris_features):
     colors2 = [cmap(k * 25) for k in range(12)]
     return pca_fit, pc_features, colors1, colors2
 
-
-
-def get_param_indices(param_str, vb_params_dict, vb_params_paragami):
-    bool_dict = deepcopy(vb_params_dict)
-    for k in vb_params_dict.keys():
-        for j in vb_params_dict[k].keys():
-            if j == param_str:
-                bool_dict[k][j] = (vb_params_dict[k][j] == vb_params_dict[k][j])
-            else:
-                bool_dict[k][j] = (vb_params_dict[k][j] != vb_params_dict[k][j])
-
-    return vb_params_paragami.flat_indices(bool_dict, free = True)
 
