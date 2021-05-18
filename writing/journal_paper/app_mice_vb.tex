@@ -1,0 +1,35 @@
+We detail the variational approximation for the local
+latent variables in the regression mixture model (\exref{mice_bnp_process}).
+All latent variables fully factorize, except for the cluster assignments $\z$
+and the addtive shifts $\b$. Under $\q$, their distribution factorizes as
+\begin{align*}
+  \q(\z, \b \vert \eta) = \prod_{\n = 1}^{\N}\q(\z_\n\vert\eta)
+  \prod_{\k = 1}^{\kmax} \q(\b_\n\vert \z_{\n\k} = 1, \eta).
+\end{align*}
+
+As discussed in \secref{model_vb},
+the optimal distribution $\q(\z_\n\vert\eta)$ is multinomial whose parameters
+can be set in closed form as a function of the global variational parameters only.
+We allow the distribution of $\beta_\n$ to depend on $\z_{\n\k}$ so that
+the its optimal distribution can also be set in closed form as a function of
+global parameters as well.
+
+The optimal distribution $q(\b_\n\vert \z_{\n\k} = 1, \eta)$ is Gaussian,
+\begin{align*}
+q(\b_\n\vert \z_{\n\k} = 1, \eta) = \normdist{\b_\n \vert \hat\mu_{\b_{\n\k}}, \hat\sigma^2_{\b_{\n\k}}}.
+\end{align*}
+Let
+\begin{align*}
+  \rho^{(1)}_{\n\k} &= \expect{\q(\beta_k|\eta)}{\sum_{m=1}^\ntimepoints \tau_{k}(x_{nm} - \regmatrix_m\mu_\k)} +
+  \tau_0 \mu_0 \\
+  \rho^{(2)}_{\n\k} &= \ntimepoints \expect{\q(\beta_k|\eta)}{\tau_{k}} + \tau_0,
+\end{align*}
+where $\mu_0$ and $\tau_0$ are the prior mean and information on $\b_n$, respectively.
+
+The optimal parameters for the Gaussian distribution on $\b_\n$ is given by
+\begin{align*}
+  \hat\mu_{\b_{\n\k}} &= \rho^{(1)}_{\n\k} / \rho^{(2)}_{\n\k}\\
+  \hat\sigma^2_{\b_{\n\k}} &= 1 / \rho^{(2)}_{\n\k}.
+\end{align*}
+
+% with parameters $\hat\mu_{\b_{\n\k}}, \hat\mu_{\b_{\n\k}}:
