@@ -111,7 +111,6 @@ def get_shift_entropy(e_b, e_b2):
     return 0.5 * np.log(shift_var)
 
 def get_entropy(stick_means, stick_infos, e_z,
-                e_b, e_b2, 
                 gh_loc, gh_weights):
     
     # entropy on memberships
@@ -119,8 +118,10 @@ def get_entropy(stick_means, stick_infos, e_z,
     
     # entropy on sticks
     stick_entropy = \
-        modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
-                                gh_loc, gh_weights)
+        modeling_lib.get_stick_breaking_entropy(stick_means, 
+                                                stick_infos,
+                                                gh_loc,
+                                                gh_weights)
     
     return z_entropy + stick_entropy 
 
@@ -354,7 +355,6 @@ def get_kl(y, x,
 
     # entropy term
     entropy = get_entropy(stick_means, stick_infos, e_z,
-                          e_b, e_b2, 
                           gh_loc, gh_weights)
 
     # prior term

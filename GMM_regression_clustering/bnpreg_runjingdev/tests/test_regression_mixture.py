@@ -153,16 +153,12 @@ class TestRegressionMixture(unittest.TestCase):
                                   e_b, e_b2, 
                                   gh_loc, gh_weights, 
                                   prior_params_dict)[1]
-            
-            print(np.abs(ez_free - z_nat_param).max())
-            
+                        
             e_loglik = np.sum(e_z * z_nat_param) 
 
             # entropy term
-#             entropy = regression_mixture_lib.get_entropy(stick_means, stick_infos, e_z,
-#                                                          e_b, e_b2, 
-#                                                          gh_loc, gh_weights)
-            entropy = (- e_z * np.log(e_z + 1e-8)).sum()
+            entropy = regression_mixture_lib.get_entropy(stick_means, stick_infos, e_z,
+                                                         gh_loc, gh_weights)
 
             # prior term
             e_log_prior = regression_mixture_lib.get_e_log_prior(stick_means, stick_infos, 

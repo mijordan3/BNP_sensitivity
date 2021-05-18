@@ -104,7 +104,6 @@ def set_params_w_kmeans(y, regressors,
     beta_params = np.stack((stick_beta1, stick_beta2), axis = -1)
     
     vb_params_dict['stick_params'] = convert_beta_sticks_to_logitnormal(beta_params, 
-                                                                        vb_params_dict['stick_params'],
                                                                         vb_params_paragami['stick_params'], 
                                                                         gh_loc, gh_weights)[0]
     
