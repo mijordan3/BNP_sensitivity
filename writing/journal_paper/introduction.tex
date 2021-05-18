@@ -51,21 +51,17 @@ rather, in the design and evaluation of our local sensitivity
 measures we pay special attention to our ability
 to accurately extrapolate posterior inferences to different priors.
 
-Using a stick-breaking representation of a Dirichlet process, we
-consider perturbations both to the scalar concentration parameter and to the
-functional form of the stick-breaking distribution.
-To evaluate functional perturbations, we follow \cite{gustafson:1996:local}
-and embed the
-stick-breaking density in the $L_p$ vector spaces of integrable functions.
-In considering functional sensitivity however, it is impossible to
-evaluate senstivity to all possible perturbations.
-To uncover potentially influential perturbations,
-we also show that the local sensitivity takes the form of an inner product,
-in the $L_p$ space, between an \textit{influence function}
-and a prior perturbation.
-Using H{\"o}lder's inequality,
-we can use the influence function to construct maximally influential alternative
-priors.
+Using a stick-breaking representation of a Dirichlet process, we consider
+perturbations both to the scalar concentration parameter and to the functional
+form of the stick-breaking distribution. To evaluate functional perturbations,
+we follow \cite{gustafson:1996:local} and embed the stick-breaking density in
+the $L_p$ vector spaces of integrable functions. In considering functional
+sensitivity however, it is impossible to evaluate senstivity to all possible
+perturbations. To uncover potentially influential perturbations, we also show
+that the local sensitivity takes the form of an integral of the prior
+perturbation times an \textit{influence function}. Using H{\"o}lder's
+inequality, we can use the influence function to construct maximally influential
+alternative priors.
 
 Importantly, in order to use the influence function to search for
 influential prior perturbations, the derivative needs to be a
@@ -75,7 +71,7 @@ a neighborhood of the original prior: that is, the VB optimum must be
 We prove that, though the VB optimum is directional differentiable for all
 $1 \le p \le \infty$,  only for multiplicative perturbations and
 $p=\infty$ does the stronger condition of Fre{\'e}chet differentiability hold.
-The differentiability properties of the VB posterior is distnct from the
+The differentiability properties of the VB posterior is distinct from the
 exact Bayesian posterior, whose Fre{\'e}chet differentiability
 holds irrespective of the choice of $p$.
 With this in mind, we employ function sensitivity with only with multiplicative
