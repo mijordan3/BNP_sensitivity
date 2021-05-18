@@ -153,13 +153,16 @@ class TestRegressionMixture(unittest.TestCase):
                                   e_b, e_b2, 
                                   gh_loc, gh_weights, 
                                   prior_params_dict)[1]
-
+            
+            print(np.abs(ez_free - z_nat_param).max())
+            
             e_loglik = np.sum(e_z * z_nat_param) 
 
             # entropy term
-            entropy = regression_mixture_lib.get_entropy(stick_means, stick_infos, e_z,
-                                                         e_b, e_b2, 
-                                                         gh_loc, gh_weights)
+#             entropy = regression_mixture_lib.get_entropy(stick_means, stick_infos, e_z,
+#                                                          e_b, e_b2, 
+#                                                          gh_loc, gh_weights)
+            entropy = (- e_z * np.log(e_z + 1e-8)).sum()
 
             # prior term
             e_log_prior = regression_mixture_lib.get_e_log_prior(stick_means, stick_infos, 
@@ -174,6 +177,9 @@ class TestRegressionMixture(unittest.TestCase):
         
         local_params_free = local_params_paragami.flatten(local_params_dict, free = True)
         local_grad = jax.grad(get_local_kl)(local_params_free)
+        
+        foo = local_params_paragami.fold(local_grad, free = False, validate_value = False)
+        print(np.abs(foo['ez_free']).max())
 
         assert np.abs(local_grad).max() < 1e-6
     

@@ -121,10 +121,8 @@ def get_entropy(stick_means, stick_infos, e_z,
     stick_entropy = \
         modeling_lib.get_stick_breaking_entropy(stick_means, stick_infos,
                                 gh_loc, gh_weights)
-    # add entropy on shifts 
-    shift_entropy = (get_shift_entropy(e_b, e_b2) * e_z).sum()
     
-    return z_entropy + stick_entropy + shift_entropy
+    return z_entropy + stick_entropy 
 
 ##########################
 # prior term 
@@ -262,7 +260,10 @@ def get_z_nat_params(y, x,
     prior_shift_info = prior_params_dict['prior_shift_info']
     shift_prior = get_shift_prior(e_b, e_b2, prior_shift_mean, prior_shift_info)
     
-    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior
+    # entropy on shifts 
+    shift_entropy = get_shift_entropy(e_b, e_b2) 
+    
+    z_nat_param = loglik_obs_by_nk + e_log_cluster_probs + shift_prior + shift_entropy
 
     return z_nat_param
 

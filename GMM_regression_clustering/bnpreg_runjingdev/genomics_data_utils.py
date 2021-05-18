@@ -23,7 +23,7 @@ import pandas as pd
 import warnings
 
 from bnpreg_runjingdev.genomics_utils import \
-    spline_bases_lib, regression_lib, transform_regression_lib
+    spline_bases_lib, regression_lib
 
 def _load_raw_data(
         condition="C",

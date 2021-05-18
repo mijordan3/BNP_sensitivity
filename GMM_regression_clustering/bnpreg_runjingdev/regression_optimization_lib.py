@@ -7,7 +7,7 @@ import time
 
 from bnpmodeling_runjingdev.sensitivity_lib import get_jac_hvp_fun
 from bnpmodeling_runjingdev.bnp_optimization_lib import optimize_kl, \
-    update_stick_beta_params, convert_beta_sticks_to_logitnormal
+    _update_stick_beta_params, convert_beta_sticks_to_logitnormal
 
 from bnpgmm_runjingdev.gmm_optimization_lib import init_centroids_w_kmeans
 
@@ -100,7 +100,7 @@ def set_params_w_kmeans(y, regressors,
 
     # initialize sticks
     print('initializing sticks ...')
-    stick_beta1, stick_beta2 = update_stick_beta_params(ez_init, prior_params_dict['dp_prior_alpha'])
+    stick_beta1, stick_beta2 = _update_stick_beta_params(ez_init, prior_params_dict['dp_prior_alpha'])
     beta_params = np.stack((stick_beta1, stick_beta2), axis = -1)
     
     vb_params_dict['stick_params'] = convert_beta_sticks_to_logitnormal(beta_params, 
