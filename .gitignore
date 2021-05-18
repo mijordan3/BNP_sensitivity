@@ -23,6 +23,7 @@
 *.nav
 *.snm
 
+*.str
 
 *.out
 *.err
