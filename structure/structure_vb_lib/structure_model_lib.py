@@ -22,19 +22,23 @@ def get_vb_params_paragami_object(n_obs, n_loci, n_allele, k_approx,
     Parameters
     ----------
     n_obs : integer
-        The number of observations
+        The number of observations.
     n_loci : integer
-        The number of loci per observation
+        The number of loci per observation.
+    n_allele : integer 
+        The number of possible alleles per locus.
     k_approx : integer
         The number of components in the model
+    prng_key : jax.random.PRNGKey
+        random seed
 
     Returns
     -------
     vb_params_dict : dictionary
         A dictionary that contains the variational parameters.
 
-    vb_params_paragami : paragami patterned dictionary
-        A paragami patterned dictionary that contains the variational parameters.
+    vb_params_paragami : paragami pattern
+        A paragami pattern that contains the variational parameters.
 
     """
 
@@ -64,7 +68,12 @@ def get_default_prior_params(n_allele):
     """
     Returns a paragami patterned dictionary
     that stores the prior parameters.
-
+    
+    Parameters 
+    ----------
+    n_allele : integer
+        The number of possible alleles per locus.
+    
     Returns
     -------
     prior_params_dict : dictionary
@@ -182,28 +191,32 @@ def get_kl(g_obs,
            e_z = None):
 
     """
-    Computes the negative ELBO using the data y, at the current variational
-    parameters and at the current prior parameters
+    Computes the negative ELBO
 
     Parameters
     ----------
     g_obs : ndarray
-        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, 3)
+        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, n_allele)
     vb_params_dict : dictionary
         Dictionary of variational parameters.
     prior_params_dict : dictionary
         Dictionary of prior parameters.
     gh_loc : vector
         Locations for gauss-hermite quadrature.
-        Required if sticks are modeled using a logit-normal.
     gh_weights : vector
         Weights for gauss-hermite quadrature. 
-        Required if sticks are modeled using a logit-normal.
-    e_log_phi : callable
-        Function with arguments stick_means and stick_infos 
-        and returns the expected log-multiplicative perturbation.
-        If not None, sticks must be modeled using a logit-normal.
-        
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
+    e_z : ndarray, optional
+        The cluster assignments, stored in an array 
+        whose (n, l, i, k)th entry is the probability
+        of the nth individual's lth loci's ith chromosome 
+        belonging to cluster k.
+        If ``None``, we set the optimal z implicitly.
+
     Returns
     -------
     kl : float

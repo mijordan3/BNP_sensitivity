@@ -185,6 +185,33 @@ def cluster_admix_get_indx_within_labels(e_ind_admix, labels):
 # Function to load thrush data
 ################
 def load_thrush_data(data_filename = '../data/thrush_data/thrush-data.str'): 
+    
+    """
+    Loads the thrush data set. 
+    
+    Parameters
+    ----------
+    data_filename : str
+        the file where the thrush data is located. 
+
+    Returns
+    -------
+    genotypes_one_hot : ndarray 
+        An (n_obs x n_loci x 2 x n_allele) dimensional array, 
+        of a one-hot encoding of the observed genotypes. 
+    genotypes : ndarray 
+        An (n_obs x n_loci x 2) dimensional array, 
+        of the observed genotypes. The observations 
+        are integer-valued categories. 
+    labels : ndarray 
+        A vector of length n_obs, with entries one of 
+        "Chawia", "Mbololo", "Ngangao", or "Yale", 
+        giving the region from which the individual 
+        was sampled. 
+    unique_allels : ndarray 
+        A vector listing the possible alleles at a locus. 
+
+    """
     print('loading thrush data from : ')
     print(data_filename)
     

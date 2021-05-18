@@ -18,7 +18,35 @@ def initialize_structure(g_obs,
                          gh_loc, 
                          gh_weights, 
                          seed = 1): 
+    """
+    Runs k-means on the raw data to initialize the variational parameters.
     
+    Parameters
+    ----------
+    g_obs : ndarray
+        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, n_allele)
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    vb_params_paragami : paragami Patterned Dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    seed : int
+        random seed
+    Returns
+    -------
+    vb_params_dict : dictionary
+        Dictionary of initialized variational parameters. 
+    init_free_par : vector
+        Vector of the initialized variational parameters, unconstrained. 
+    e_z_init : ndarray
+        Array encoding cluster assignments as found by kmeans
+    """
+
     n_obs = g_obs.shape[0]
     k_approx = vb_params_dict['pop_freq_dirichlet_params'].shape[0]
     
@@ -77,7 +105,50 @@ def optimize_structure(g_obs,
                        e_log_phi = None, 
                        run_lbfgs = True,
                        run_newton = True): 
+    """
+    Runs k-means on the raw data to initialize the variational parameters.
     
+    Parameters
+    ----------
+    g_obs : ndarray
+        The array of one-hot encoded genotypes, of shape (n_obs, n_loci, n_allele)
+    vb_params_dict : dictionary
+        Dictionary of variational parameters.
+    vb_params_paragami : paragami Patterned Dictionary
+        A paragami patterned dictionary that contains the variational parameters.
+    prior_params_dict : dictionary
+        Dictionary of prior parameters.
+    gh_loc : vector
+        Locations for gauss-hermite quadrature.
+    gh_weights : vector
+        Weights for gauss-hermite quadrature. 
+    e_log_phi : callable, optional
+        A function that returns the (scalar) expectation of the
+        perturbation `log_phi` as a function of the 
+        logit-normal mean and info parameters.
+        if `None`, no perturbation is considered. 
+    run_lbfgs : boolean, optional
+        Whether to run LBFGS. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+    run_newton : boolean, optional
+        Whether to run newton-ncg. At least one of `run_blfgs` and 
+        `run_newton` must be true. 
+        
+    Returns
+    ----------
+    vb_opt_dict : dictionary
+        A dictionary that contains the optimized variational parameters.
+    vb_opt : array 
+        The unconstrained vector of optimized variational parameters.
+    ez_opt : array 
+        The (n_obs x n_loci x 2 x k) array optimal cluster assignments.
+    out : 
+        The output of scipy.optimize.minimize.
+    optim_time : 
+        The time elapsed, not including compile times. 
+    """
+
+
     ###################
     # Define loss
     ###################

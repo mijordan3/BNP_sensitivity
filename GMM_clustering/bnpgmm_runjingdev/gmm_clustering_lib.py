@@ -312,8 +312,7 @@ def get_kl(y,
            e_log_phi = None):
 
     """
-    Computes the negative ELBO using the data y, at the current variational
-    parameters and at the current prior parameters
+    Computes the negative ELBO 
 
     Parameters
     ----------
@@ -330,8 +329,8 @@ def get_kl(y,
         Weights for gauss-hermite quadrature. We need this compute the
         expected prior terms.
     e_z : ndarray (optional)
-        The optimal cluster belongings as a function of the variational
-        parameters, stored in an array whose (n, k)th entry is the probability
+        The cluster belongings , stored in an array whose
+        (n, k)th entry is the probability
         of the nth datapoint belonging to cluster k.
         If ``None``, we set the optimal z implicitly.
     use_bnp_prior : boolean
