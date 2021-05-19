@@ -221,21 +221,26 @@ differentiable with respect to $\eta$.
 
 \subsection{A global and local factorization}
 
-Before computing any sensitivity measures, we first need to find $\etaopt(0)$
-by optimizing the $\mathrm{KL}$ objective (\eqref{vb_optimization}).
-In the optimization, we take advantage of the global/local structure in our models
-(\secref{vb_conjugacy}).
-Recall that we partitioned the variational parameter vector $\eta$
-into global variational parameters $\etaglob$ and local variational
-parameters $\etalocal$.
-The global variational parameters govern the distribution on
-latent variables shared across multiple data points,
-such as stick-breaking proportions $\nu$ and component variables $\beta$;
-the local variational parameters govern the collection of latent variables
-unique to each data point, such as the cluster assignments $\z$.
+All the models we consider will factorize into a set \textit{global} latent
+variables and a setof \textit{local} latent variables.
+The global variables are common to all data points, while the local variables
+are unique to each data point.
+In the GMM example, the global variables are $(\beta, \nu)$,
+while $\z_1, ..., \z_\N$ are local variables.
 
-In \secref{vb_conjugacy}, we noted that the optimal local variational parameters
-$\etaoptlocal$ can be written
+Let $\gamma = (\beta,\nu)$ be the global latent variables
+and let $\etaglob = (\etabeta, \etanu)$ be their variational parameters.
+Similarly, let $\ell$ be the local latent variables and
+let $\etalocal$ be the local variational parameters.
+In the GMM example, $\ell = \z$ and $\etalocal = \etaz$,
+but in later models, the local variables will include more than just $\z$.
+Thus, we keep the notation general.
+Notice that the dimension of the global variational parameters scale
+with only $\kmax$, while the local parameters scale with the number of
+data points $\N$.
+
+In all models we will consider,
+the optimal local variational parameters $\etaoptlocal$ can be written
 as a closed-form function of the global variational parameters $\etaglob$.
 Let $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping; that is,
 \begin{align*}
@@ -248,15 +253,50 @@ With this minimizer available in closed-form, we can define
 which returns the $\mathrm{KL}$ as a function of only global parameters
 by implicitly setting local parameters at their optimum.
 
+\begin{ex}[Optimalility of $\etalocal$ in a GMM]\exlabel{qz_optimality}
+Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
+the optimal $\etaopt_{\z_\n}$ must satisfy
+%
+\begin{align*}
+& \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
+& \mathwhere \tilde \rho_{\n\k} := \expect{\q(\beta, \nu \vert \eta)}
+       {\logp(\x_n \vert \beta_\k) + \log \pi_\k}.
+\end{align*}
+%
+See \citet{bishop:2006:PRML} and \citet{blei:2017:vi_review} for details.
+Recall from \exref{qz_form}
+that the multinomial distribution on $\z_\n$
+is parameterized using the natural exponential family parameterization,
+with parameters $\etaopt_{\z_\n}$.
+To satisfy this optimality condition,
+we set $\etaopt_{\z_\n}$ to be
+%
+\begin{align*}
+%
+\etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
+\log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
+\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
+%
+\end{align*}
+%
+Thus, as long as the expectation $\tilde\rho_{\n\k}$ has a closed-form as a function of
+$(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
+a function of $(\etabeta, \etanu)$.
+%
+\end{ex}
+
+
+
 Rather than optimizing the $\mathrm{KL}$ over all variational parameters, both global and local,
-we optimize $\KLglobal$, which is a function of global parameters only.
+we optimize $\KLglobal$ (\eqref{kl_global}), which is a function of global parameters only.
 Minimizing $\KLglobal(\etaglob)$ keeps the
 dimension of the optimization parameter independent of the number of data points.
 After the optimization terminates at an optimal $\etaoptglob$,
 the optimal local parameters $\etaoptlocal$ can be set in closed form
 to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
-The construction of $\KLglobal$ will play a role in computing our sensitivity measures in practice,
-as we detail below.
+The construction of $\KLglobal$ will also play an
+important role in computing the local sensitivity in practice,
+which we now detail.
 
 
 % Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
@@ -276,15 +316,14 @@ as we detail below.
 % Instead of optimizing
 
 
-\subsubsection*{The Hessian}
+\subsubsection{The Hessian inversion}
 
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
 the dimension of $\eta$, is large.
 The dimension of $\etaglob$ scales with $\kmax$,
-while the dimension of $\etalocal$ scales with $\kmax
-\times\N$. (the scaling of the topic model is slightly different; but the point remains
-that the dimension of $\etalocal$ grows faster than the dimension of $\etaglob$).
+while the dimension of $\etalocal$ scales with the number
+of data points $\N$.
 Depending on the size of $\eta$, instantiating the full Hessian in memory
 may be impossible.
 
@@ -386,7 +425,6 @@ with respect to the global parameters $\eta_\gamma$.
 Crucially, the size of $\hessopt_\gamma$ scales with $(\kmax)^2$,
 while the full Hessian scales with both $(\kmax)^2$
 and the squared number of data points $\N^2$
-(in the topic model, the Hessian scale as $(\N\kmax)^2$ and $(\N\kmax\nloci)^2)$).
 Hence, $\hessopt_\gamma$ is more memory efficient to store
 and faster to invert
 than the full Hessian of all the variational parameters.
