@@ -1,23 +1,16 @@
-Let $\zeta$ denote the full vector of
-latent variables.
-In the GMM and topic model (\exref{iris_bnp_process, structure_bnp_process}),
-$\zeta := (\beta, \z, \nu)$;
-in the regression example (\exref{mice_bnp_process}),
-$\zeta$ includes the additive shifts, $\zeta := (\beta, \z, \nu, \b)$.
-In each model,
-the exact posterior distribution $\p(\zeta \vert \x)$
-is intractable.
-Variational Bayes (VB) is an approach that seeks an approximate posterior
-through solving a numerical optimization problem
-\citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review}.
+Let $\zeta$ denote the full vector of latent variables. In the GMM and topic
+model (\exref{iris_bnp_process, structure_bnp_process}), $\zeta := (\beta, \z,
+\nu)$; in the regression example (\exref{mice_bnp_process}), $\zeta$ includes
+the additive shifts, $\zeta := (\beta, \z, \nu, \b)$. In each model, the exact
+posterior distribution $\p(\zeta \vert \x)$ is intractable. Variational Bayes
+(VB) is an approach that seeks an approximate posterior through solving a
+numerical optimization problem \citep{jordan:1999:vi,
+wainwright:2008:graphical_models, blei:2017:vi_review}.
 
-VB specifies a
-family of approximating distributions $\q(\zeta \vert \eta)$
+VB specifies a family of approximating distributions $\q(\zeta \vert \eta)$
 parameterized by a finite-dimensional vector $\eta \in \etadom \subseteq
-\mathbb{R}^{\etadim}$
-and solves for $\q(\zeta\vert\etaopt)$
-that is closest to the posterior $\p(\zeta \vert \x)$ in
-Kullback-Leibler (KL) divergence:
+\mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$ that is closest to
+the posterior $\p(\zeta \vert \x)$ in Kullback-Leibler (KL) divergence:
 %
 \begin{align}\eqlabel{vb_optimization}
 %
@@ -342,6 +335,7 @@ This will be useful in our sensitivity computations in the next section.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Posterior quantities}
+\seclabel{posterior_quantities}
 
 In a VB approach, all posterior quantities of interest can be expressed as
 functions of the variational parameter $\eta$. We will use $\g(\eta)$ to denote
