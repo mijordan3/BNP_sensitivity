@@ -48,9 +48,43 @@ ambiguity.
 The stick-breaking density $\pstick$ can thus be thought of as inducing a a
 distribution on the vector of probabilities $\pi$.  Different choices of
 $\pstick$ will favor different assignment probabilities, each with different
-implied prior degrees of concentration. In the generative process we have just
-outlined, the joint distribution of the observed data and latent variables in a
-basic BNP mixture model
+implied prior degrees of concentration.
+%
+Typically, many different choices for $\pstick$ may be {\em a priori}
+reasonable.  A particularly common set of candidates for $\pstick$ is the class
+of densities given by $\mathrm{Beta}(\nuk \vert 1, \alpha)$ density, which we
+write as
+%
+\begin{align}\eqlabel{beta_density}
+%
+\pstick(\nuk \vert \alpha) :=
+\mathrm{Beta}(\nuk \vert 1, \alpha) =
+    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
+         {\Gamma(\alpha)},
+%
+\end{align}
+%
+When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting
+distribution on $\pi$ is known as the $\textit{GEM distribution}$, and we write
+$\pi \sim \mathrm{GEM}(\alpha)$.
+%
+The GEM distribution is closely related to the Dirichlet process (DP).
+Define a measure on $\betadom$ as
+%
+\begin{align*}
+  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
+\end{align*}
+%
+which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
+\mathrm{GEM}(\alpha)$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
+is a random measure is distributed according to Dirichlet process with
+concentration parameter $\alpha$ and base measure $\pbetaprior$
+\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}. Below, we will
+give special attention to stick-breaking densities in the Beta family, though we
+will also consider deviations from the Beta family to generic densities.
+
+In the generative process we have just outlined, the joint distribution of the
+observed data and latent variables in a basic BNP mixture model
 %
 \footnote{ Our other experiments on real data sets in \secref{results_mice,
 results_structure} require slightly different modeling considerations, and we
@@ -79,7 +113,9 @@ is given by
 Different choices of $\pstick$ will thus, in general, lead to different
 posterior distributions via the application of Bayes' rule to \eqref{bnp_model},
 and so lead to different values for posterior expectations of quantities of
-interest.  For concreteness, let us consider the following motivational example
+interest.
+
+For concreteness, let us consider the following motivational example
 based on the Fisher iris datset \citep{anderson:1936:iris, fisher:1936:iris}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

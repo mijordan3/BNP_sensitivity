@@ -84,25 +84,57 @@ variational approximating family of the following form:
 Because $\pi_\k = 0$ for all $\k > \kmax$, we can ignore the latent variables
 $\beta_\k$ for $\k > \kmax$ in defining our variational approximation.
 
-% This is necessary here becuase it is a condition under which we have
-% differentiability.
-The KL divergence of \eqref{kl_def} contains a term of the form $\expect{\q(\nuk
-\vert \eta)}{\log \pstick(\nuk)}$.  Since we will be considering generic
-densities $\pstick(\nuk)$, we will need to compute this integral numerically.
-To facilitate numerical integration, we model the sticks using a logit-normal
-distribution as follows.  Define
+Given an expected posterior quantity of interest as in
+\exref{insample_nclusters_simple}, we can simply approximate it with the
+corresponding variational expectation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{insample_nclusters_simple}
+%
+Given a solution $\etaopt$ to \eqref{vb_optimization}, the intractable posterior
+expectation in \exref{insample_nclusters_simple} can be approximated as
+a funciton of $\etaopt$:
 %
 \begin{align*}
 %
-\lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right),
+\g(\etaopt) :={}
+    \expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)} \approx
+    \expect{\p(\z\vert\x)}{\nclusters_0(\z)}.
 %
 \end{align*}
 %
-and choose $\q(\lnu_\k \vert \eta)$ to be normally distributed.  This then
-induces a logit-normal distribution on our original variable of interest,
-$\nuk$.  See \secref{stick_expectations} below for more details.
+In fact, given the mean field factorization of \eqref{vb_mf}, the function
+$\g(\etaopt)$ has a particularly simple form.  Since each $\z_{\n\k}$ is either
+zero or one, $\sum_{\n=1}^N \z_{\n\k} > 0$ if and only if $\prod_{\n=1}^\N (1 -
+\z_{\n\k}) = 0$, so we can re-write the quantity of interest as
+%
+\begin{align*}
+%
+\nclusters_0(\z) ={}&
+    \sumk \left(1 -  \prod_{\n=1}^\N (1 - \z_{\n\k})\right).
+%
+\end{align*}
+%
+Then, by the mean field assumption,
+%
+\begin{align*}
+%
+g(\etaopt) ={}
+\expect{\q(\z \vert \etaopt)}{\nclusters_0(\z)} ={}
+    \sumk \left(1 -  \prod_{\n=1}^\N
+        (1 - \expect{\q(\z \vert \etaopt)}{\z_{\n\k}})\right).
+%
+\end{align*}
+%
+It will be useful later to observe that the map $\eta \mapsto \g(\eta)$ is
+differentiable whenever $\eta \mapsto \expect{\q(\z \vert \eta)}{\z_{\n\k}}$
+is differentiable.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We will discuss the VB approximation, including the form of $\q(\beta_\k \vert
-\eta)$, of $\q(\z\n \vert \eta)$, and the evaluation of $\KL{\eta}$ in more
-detail below in \secref{computing_sensitivity}, as well as in the experiments of
+We will discuss more details of the VB approximation, including the form of the
+mean field factors and the evaluation of $\KL{\eta}$ in more detail below in
+\secref{computing_sensitivity}, as well as in the experiments of
 \secref{results}.

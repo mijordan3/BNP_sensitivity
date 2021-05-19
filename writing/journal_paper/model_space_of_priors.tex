@@ -1,65 +1,103 @@
-Typically, many different choices for $\pstick$ may be {\em a priori}
-reasonable.  A particularly common choice for $\pstick$ is the
-$\mathrm{Beta}(\nuk \vert 1, \alpha)$ density, which we write as
+Suppose we have committed to using a Beta distribution for $\pstick$ as in
+\eqref{beta_density}. Since $\pstick(\nuk \vert \alpha)$ depends on $\alpha$,
+the posterior depends on $\alpha$ through Bayes rule; in turn, the KL divergence
+depends on $\alpha$; in turn the optimal VB parameters depend on $\alpha$; in
+turn, the quantity of interest depends on $\alpha$ as well. Typically, the
+$\alpha$ may {\em a priori} plausibly lie within some reasonable range.  Let us
+notate the dependence of the optimal VB parameters on $\alpha$ as
+$\etaopt(\alpha)$.  If $\g(\etaopt(\alpha))$ varies meaningfully as $\alpha$
+ranges over its plausible values, we say that a the quantity of interest $\g$ is
+{\em not robust} to changes of $\alpha$.  In any particular problem, some
+posterior quantities of interest may be robust while others are not.
+
+Note that non-robustness is to some extent subjective, in that it depends on a
+decision about what a ``reasonable'' range of $\alpha$ might be.  In the present
+paper we will primarily focus on the task of approximating the computation of
+$\g(\etaopt(\alpha))$, leaving the context-specific decision of what priors are
+reasonable up to the the reader.  However, when considering non-parametric
+perturbations to the prior, we will explicitly consider whether the
+nonparametric neighborhoods correspond to intuitively reasonable sets of prior
+perturbations.
+
+In a world with no computational costs, we could simply evaluate
+$\g(\etaopt(\alpha))$ for a large number of candidate $\alpha$ and directly
+check for robustness.  Unfortunately, the evaluation of $\etaopt(\alpha)$
+requires solving an optimization problem, which is often computationally
+expensive for even a single $\alpha$, much less many different $\alpha$.
+
+We propose avoiding the need to repeatedly re-optimize by forming a {\em linear
+approximation} to the map $\alpha \mapsto \etaopt(\alpha)$ as follows. Supposing
+for the moment that the map $\alpha \mapsto \etaopt(\alpha)$ is continuously
+differentiable (we will establish precise conditions below), and that we have
+found $\etaopt(\alpha_0)$ for some ``base value,'' $\alpha_0$.  If we can
+compute the derivative $d \etaopt(\alpha) / d\alpha$ (which is a
+$\etadim$-length vector), we can form the first-order Taylor series
+approximation
 %
 \begin{align*}
 %
-\pstick(\nuk \vert \alpha) :=
-\mathrm{Beta}(\nuk \vert 1, \alpha) =
-    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
-         {\Gamma(\alpha)},
+\etaopt(\alpha) \approx \etalin(\alpha) :={}
+    \etaopt(\alpha_0) +
+    \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
 %
 \end{align*}
 %
-When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting
-distribution on $\pi$ is known as the $\textit{GEM distribution}$, and we write
-$\pi \sim \mathrm{GEM}(\alpha)$.
-%
-The GEM distribution is closely related to the Dirichlet process (DP).
-Define a measure on $\betadom$ as
+Given the derivative $d \etaopt(\alpha) / d\alpha$, the cost of evaluating
+$\etalin(\alpha)$ for any $\alpha$ is only that of vector multiplication, not
+that of solving a new optimization problem.
+
+We can then use the approximation $\etalin(\alpha)$ to approximate our quantity
+of interest, $\g(\etaopt(\alpha))$.  For this, we can either use the
+approximation
 %
 \begin{align*}
-  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
+%
+\g(\etaopt(\alpha)) \approx{} \g(\etalin(\alpha))
+%
 \end{align*}
 %
-which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
-\mathrm{GEM}(\alpha)$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
-is a random measure is distributed according to Dirichlet process with
-concentration parameter $\alpha$ and base measure $\pbetaprior$
-\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}.
-
-Typically, the concentration parameter $\alpha$ is not known in advance.
-Rather, $\alpha$ may {\em a priori} plausibly lie within some reasonable range.
-Since the prior $\pstick(\nuk \vert \alpha)$ depends on $\alpha$, the posterior
-the posterior expectation $\expect{\p(\z \vert \x, \alpha)}{\nclusters_0(\z)}$
-depends on $\alpha$ as well.  If $\expect{\p(\z \vert \x,
-\alpha)}{\nclusters_0(\z)}$ varies meaningfully as $\alpha$ varies over its
-plausible values, then the quantity of interest $\expect{\p(\z \vert \x,
-\alpha)}{\nclusters_0(\z)}$ is not robust to the choice of $\alpha$.
-
-In practice, one chooses some ``base value,'' $\alpha_0$, and runs a
-computationally expensive posterior approximation procedure such variational
-Bayes (VB), giving an approximate value for $\expect{\p(\z \vert \x,
-\alpha_0)}{\nclusters_0(\z)}$.
-
-
-More generally, there may be no {\em a priori} reason to believe that $\pstick$
-lies in the Beta family at all (other than computational convenience). By
-$\pbase$ and $\palt$ denote two candidate stick-breaking densities, we can
-. Suppose that
-parameterizing one-dimensional paths in the space of prior densities.  Let
-$\pbase$
-
-
+or, when $\eta \mapsto \g(\eta)$ is continuously differentiable, using the chain
+rule to form
 %
+\begin{align*}
 %
+%\g(\etaopt(\alpha)) \approx{}& \g(\etaopt(\alpha)) \quad \textrm{or}\\
+\g(\etaopt(\alpha)) \approx{}&
+    \glin(\alpha) :=
+        \g(\etaopt(\alpha_0)) +
+            \fracat{d \g(\eta)}{ d\eta^T}{\etaopt(\alpha_0)}
+            \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
 %
+\end{align*}
 %
-% Even if one is willing to restrict However, there is typically no {\em a priori}
-% reason to assume that $\pi \sim \mathrm{GEM}(\alpha)$ is a realistic summary of
-% our prior beliefs for any particular $\alpha$.
-%
-%
-% We keep the generic notation $\pstick$ for stick-breaking distributions because
-% in our sensitivity analysis, we will consider stick-breaking distributions that
-% are outside the family of Beta distributions.
+We will discuss the relative advantages of $\g(\etalin(\alpha))$ and
+$\glin(\alpha)$ below.  In short, the advantage of $\g(\etalin(\alpha))$ is that
+the approximation retains nonlinearities in the map from $\eta \mapsto
+\g(\eta)$, but the full linear approximation $\glin(\alpha)$ allows the
+computation of helpful quantities such worst-case nonparametric prior
+perturbations.
+
+In order for $\etalin(\alpha)$ to be useful, three necessary conditions must be
+met.  First, the map $\alpha \mapsto \etaopt(\alpha)$ must be continuously
+differentiable; if it is not differentiable, then the derivative does not even
+exist, and if it is not continuously differentiable, then small $\abs{\alpha -
+\alpha_0}$ may not guarantee a good approximation to $\etaopt(\alpha)$. Second,
+the derivative $d \etaopt(\alpha) / d\alpha$ must be relatively easy to
+compute---in particular, it must be easier to compute than solving a new
+optimization problem.  Finally, the derivative must {\em extrapolate}
+meaningfully over a meaningful range of alternative values of $\alpha$, i.e.,
+the map $\alpha \mapsto \etaopt(\alpha)$ must be shown to be smooth enough in
+practical problems to be useful.
+
+The remainder of the paper addresses these desiderata in turn, both for
+parametric perturbations to the concentration parameter as well as a particular
+family of nonparametric perturbations.  First, we provide theoretical conditions
+under which we have continuously differentiability of the VB optimum in
+\secref{local_sensitivity}, and show that they are satisfied for our BNP model.
+In \secref{computing_sensitivity}, we use the theoretical results of
+\secref{local_sensitivity} to show that the derivative can be computed
+efficiently in the BNP problems we are considering, with an emphasis on how
+modern automatic differentiation tools render many of the computations automatic
+\citep{jax2018github}.  Finally, in \secref{results}, we demonstrate the
+practical usefulness of the approximation on a set of three real-world BNP
+problems of increasing complexity.

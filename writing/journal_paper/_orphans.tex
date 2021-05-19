@@ -357,6 +357,7 @@ We choose $\q(\lnu_\k \vert \eta)$ to be normally distributed with
 location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
 This then induces a logit-normal
 distribution on our original variable of interest, $\nuk$.
+
 To compute expectations of a smooth function
 $f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$),
 the law of the unconscious statistician states that,
@@ -616,3 +617,28 @@ fully-factorize except for the cluster assignments $\z$ and additive shifts
 $\b$. While we assume $(\z, \b)$ to be independent from all other latent
 variables under $\q$, we will allow conditional dependence between $\z$ and $\b$
 (\appref{app_mice}).
+
+
+
+
+\hrulefill
+
+
+% This is necessary here becuase it is a condition under which we have
+% differentiability.  Alternatively, we could define it later when
+% stating our differentiability theorem...
+The KL divergence of \eqref{kl_def} contains a term of the form $\expect{\q(\nuk
+\vert \eta)}{\log \pstick(\nuk)}$.  Since we will be considering generic
+densities $\pstick(\nuk)$, we will need to compute this integral numerically.
+To facilitate numerical integration, we model the sticks using a logit-normal
+distribution as follows.  Define
+%
+\begin{align*}
+%
+\lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right),
+%
+\end{align*}
+%
+and choose $\q(\lnu_\k \vert \eta)$ to be normally distributed.  This then
+induces a logit-normal distribution on our original variable of interest,
+$\nuk$.  See \secref{stick_expectations} below for more details.
