@@ -329,18 +329,17 @@ when decomposing the mixture weights
 $\expect{}{\log \pi}$ into its component stick-breaking proportions (\eqref{stick_breaking}).
 
 If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
-then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would also be Beta.
-In this case, all the displayed expectations in \eqref{stick_expectations}
-can be computed analytically as a function of
-the Beta parameters in the variational approximation.
+then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would
+also be Beta. In this case, all the displayed expectations in
+\eqref{stick_expectations} can be computed analytically as a function of the
+Beta parameters in the variational approximation.
 
-However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
-are outside the family of Beta distributions.
-To accommodate a generic prior $\pstick(\nuk)$,
-we approximate the expectations in \eqref{stick_expectations} numerically.
-Each expectation is a univariate integral.
-A particularly easy approximation method is
-Gauss-Hermite (GH) quadrature, which we now describe.
+However, we will be considering stick-breaking distributions $\pstick(\nuk)$
+that are outside the family of Beta distributions. To accommodate a generic
+prior $\pstick(\nuk)$, we approximate the expectations in
+\eqref{stick_expectations} numerically. Each expectation is a univariate
+integral. A particularly easy approximation method is Gauss-Hermite (GH)
+quadrature, which we now describe.
 
 To take advantage of GH quadrature, we first logit transform the stick-breaking
 proportion $\nuk$ so that the transformed variable
@@ -391,6 +390,7 @@ is a deterministic, differentiable
 function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.
 This will be useful in our sensitivity computations in the next section.
 
+\hrulefill
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

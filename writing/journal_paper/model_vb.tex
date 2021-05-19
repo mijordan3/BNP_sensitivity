@@ -18,13 +18,13 @@ the posterior $\p(\zeta \vert \x)$ according to a divergence measure on
 posterior distributions. We will make the common choice of Kullback-Leibler (KL)
 divergence:
 %
-\begin{align*}
+\begin{align}\eqlabel{kl_def}
 %
 \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}
 ={}&    \expect{\q(\zeta \vert \eta)}{
-        \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x). \nonumber
+        \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x).
 %
-\end{align*}
+\end{align}
 %
 As we discuss below, we will choose $\q(\zeta \vert \eta)$ so that we can easily
 approximate the above expectation with respect to $\q(\zeta \vert \eta)$ as a
@@ -63,8 +63,14 @@ and we set $\q(\nu_\k = 1 | \eta) =
 probability one for all $\k > \kmax$ (\eqref{stick_breaking}). Correspondingly,
 we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
 
-For the generic BNP mixture model in \eqref{bnp_model},
-we propose a mean-field variational approximating family of the following form:
+Notice that only our variational approximation is truncated---the model
+(\eqref{bnp_model}) itself is not finite. We set $\kmax$ large enough in our
+variational approximation to ensure that a large proportion of the components
+are unoccupied with high probability under $\q$, in which case the truncation
+approximates the fully nonparametric model with $\kmax = \infty$.
+
+For the generic BNP mixture model in \eqref{bnp_model}, we use a mean-field
+variational approximating family of the following form:
 %
 \begin{align}\eqlabel{vb_mf}
 %
@@ -78,8 +84,25 @@ we propose a mean-field variational approximating family of the following form:
 Because $\pi_\k = 0$ for all $\k > \kmax$, we can ignore the latent variables
 $\beta_\k$ for $\k > \kmax$ in defining our variational approximation.
 
-Notice that only our variational approximation is truncated---the model
-(\eqref{bnp_model}) itself is not finite. We set $\kmax$ large enough in our
-variational approximation to ensure that a large proportion of the components
-are unoccupied with high probability under $\q$, in which case the truncation
-approximates the fully nonparametric model with $\kmax = \infty$.
+% This is necessary here becuase it is a condition under which we have
+% differentiability.
+The KL divergence of \eqref{kl_def} contains a term of the form $\expect{\q(\nuk
+\vert \eta)}{\log \pstick(\nuk)}$.  Since we will be considering generic
+densities $\pstick(\nuk)$, we will need to compute this integral numerically.
+To facilitate numerical integration, we model the sticks using a logit-normal
+distribution as follows.  Define
+%
+\begin{align*}
+%
+\lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right),
+%
+\end{align*}
+%
+and choose $\q(\lnu_\k \vert \eta)$ to be normally distributed.  This then
+induces a logit-normal distribution on our original variable of interest,
+$\nuk$.  See \secref{stick_expectations} below for more details.
+
+We will discuss the VB approximation, including the form of $\q(\beta_\k \vert
+\eta)$, of $\q(\z\n \vert \eta)$, and the evaluation of $\KL{\eta}$ in more
+detail below in \secref{computing_sensitivity}, as well as in the experiments of
+\secref{results}.
