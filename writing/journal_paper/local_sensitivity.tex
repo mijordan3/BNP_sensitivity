@@ -36,62 +36,6 @@ and $\p$, so that,
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The prior depends on $\t$; in turn, the posterior $\p(\theta \vert \x, \t)$
-depends on $\t$; in turn, the KL divergance depends on $\t$; in turn, the
-optimal variational parameters depend on $\t$.  Define the shorthand notation
-%
-\begin{align}\eqlabel{kl_shorthand}
-%
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || \p(\x \vert \zeta, \t)}
-\mathand
-\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
-%
-\end{align}
-%
-where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
-In \defref{prior_t}, we take $\t = 0$ at the ``original'' problem,
-\eqref{vb_optimization}, without loss of generality.  We will thus continue to
-use $\etaopt$ with no argument to refer to $\etaopt(0)$.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}\exlabel{alpha_perturbation}
-%
-When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we take
-$\mu$ to be the Lebesgue measure on $[0,1]$ and model
-%
-\begin{align*}
-%
-\pstick(\nuk \vert \alpha) ={}&
-    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
-\log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
-%
-\end{align*}
-%
-Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from
-the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
-%
-\begin{align*}
-%
-\log \pstick(\nuk \vert \t) ={}&
-(\t + \alpha_0 - 1) \log(1 - \nuk) + \const.
-\end{align*}
-%
-The prior on the full $\nu$ vector is given by
-%
-\begin{align*}
-%
-\log \pstick(\nu \vert \t) ={}&
-    \sumkm (t + \alpha_0 - 1) \log(1 - \nuk)+ \const.
-%
-\end{align*}
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 Assuming for the moment that $\t \mapsto \etaopt(\t)$ is continuously
 differentiable (we will consider its differentiability in detail below), and
 that we have already computed the solution $\etaopt$ to the ``original'' problem

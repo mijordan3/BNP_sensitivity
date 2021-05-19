@@ -77,17 +77,17 @@ the approximation retains nonlinearities in the map from $\eta \mapsto
 computation of helpful quantities such worst-case nonparametric prior
 perturbations.
 
-In order for $\etalin(\alpha)$ to be useful, three necessary conditions must be
-met.  First, the map $\alpha \mapsto \etaopt(\alpha)$ must be continuously
-differentiable; if it is not differentiable, then the derivative does not even
-exist, and if it is not continuously differentiable, then small $\abs{\alpha -
-\alpha_0}$ may not guarantee a good approximation to $\etaopt(\alpha)$. Second,
-the derivative $d \etaopt(\alpha) / d\alpha$ must be relatively easy to
-compute---in particular, it must be easier to compute than solving a new
-optimization problem.  Finally, the derivative must {\em extrapolate}
-meaningfully over a meaningful range of alternative values of $\alpha$, i.e.,
-the map $\alpha \mapsto \etaopt(\alpha)$ must be shown to be smooth enough in
-practical problems to be useful.
+In order for the approximation $\etalin(\alpha)$ to be useful, three necessary
+conditions must be met.  First, the map $\alpha \mapsto \etaopt(\alpha)$ must be
+continuously differentiable; if it is not differentiable, then the derivative
+does not even exist, and if it is not continuously differentiable, then small
+$\abs{\alpha - \alpha_0}$ may not guarantee a good approximation to
+$\etaopt(\alpha)$. Second, the derivative $d \etaopt(\alpha) / d\alpha$ must be
+relatively easy to compute---in particular, it must be easier to compute than
+solving a new optimization problem.  Finally, the derivative must {\em
+extrapolate} meaningfully over a meaningful range of alternative values of
+$\alpha$, i.e., the map $\alpha \mapsto \etaopt(\alpha)$ must be shown to be
+smooth enough in practical problems to be useful.
 
 The remainder of the paper addresses these desiderata in turn, both for
 parametric perturbations to the concentration parameter as well as a particular
