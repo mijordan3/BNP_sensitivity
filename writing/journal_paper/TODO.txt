@@ -1,4 +1,11 @@
 
 notation for per-cluster distributions: p(x_n | \theta_k) <- p(x_n | \theta_k, z_{nk} = 1)?
 
-the beta draws are stick-breaking **proportions**; the resulting stick lengths are the mixture weights. 
+the beta draws are stick-breaking **proportions**; the resulting stick lengths are the mixture weights.
+
+It's not correct to say the derivative is an inner product between the influence
+function and perturbation, since the influence function itself may not be a
+member of L_p (it's a member of the dual space, L_q).
+
+If we're going to claim that the posterior is differentiable we should
+prove it; I'm not aware of another proof.

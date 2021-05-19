@@ -32,3 +32,7 @@ Fix the sign on KL divergence --- the prior enters with a negative sign
 
 Go through and check carefully that the perturbations are the difference
 in priors not the new prior.
+
+Observe that we write "KL" even when it's not an actual KL divergence
+(GH quadrature, point mass approximations).  This or define a quantity for
+the objective function.
