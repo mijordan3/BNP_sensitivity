@@ -1,4 +1,4 @@
-This section outlines two important computational necessities for our
+This section outlines two computational steps necessary for our
 method and experiments below.
 First, we discuss how to evaluate, or approximate, expectations with respect
 to the variational distribution $\mathcal{Q}$.
@@ -8,48 +8,63 @@ and in posterior quantities (such as \exref{insample_nclusters}).
 Secondly, all our models that we consider in \secref{results} will
 factorize into \textit{global} and \textit{local} latent variables.
 We take advantage of this factorization
-for both the $\textrm{KL}$ optimization and
-for the Hessian inversion required for local sensitivy.
+to both optimize the $\textrm{KL}$ and to
+invert the Hessian for local sensitivity.
 
 \subsection{Evaluating expectations}
 
 Some expectations with respect to $\mathcal{Q}$ are available
-analytically, but taking advantage of conditional conjugacy, for example.
+analytically, by taking advantage of conditional conjugacy, for example.
 When analytic expectations are unavailable, we approximate expectations
 either with numerical integration or Monte Carlo estimates.
 
 \subsubsection{Conditional conjugacy}
 
+\todo{this section really isnt about computing expectations...
+we discuss a lot of variational distribution details here ... }
+
+In the mean-field factorization for $\q$ (\eqref{vb_mf}),
+the variational parameter vector $\eta$ will
+partition into parameters governing $\nu$, $\beta$, and $\z$.
+Let the VB parameters governing a
+particular parameter vector be denoted with a subscript: for example,
+$\q(\beta_\k \vert \eta) = \q(\beta_\k \vert \eta_{\beta_\k})$,
+$\q(\z_\n \vert \eta) = \q(\z_\n \vert \eta_{\z_{\n}})$, and so on.
+
 For $\z$ and $\beta$ in all models we consider, we will
 take advantage of conditional conjugacy to choose distributions
-$\q(\z_\n\vert\eta)$ and $\q(\beta_k\vert\eta)$, unless otherwise stated.
-This means that we will take $\q(\z_{\n}
-\vert \eta)$ to be multinomial, matching $\p(\z_{\n}
+$\q(\z_\n \vert \eta)$ and
+$\q(\beta_\k \vert \eta)$.
+This means that we will take $\q(\z_\n \vert \eta)$
+to be multinomial, matching $\p(\z_{\n}
 \vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$
 to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
 With conditionally conjugate distributions,
 all expectations with respect to $\z$ and $\beta$
-in the $\mathrm{KL}$ objective will be available analytically.
+necessary for computing the $\mathrm{KL}$ (\eqref{vb_optimization})
+will be available analytically.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
 %
-To evaluate the expectation in \eqref{vb_optimization}, we need to compute
+To evaluate $\mathrm{KL}$, we need to compute
 the expected joint log-likelihood
 \begin{align*}
   \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n, \beta_\k)}. % , \quad
   % \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}.
 \end{align*}
 
-In \exref{iris_bnp_process}, $\beta_\k = (\mu_\k, \Lambda_\k)$,
-and the likelihoods are Gaussian,
+In the GMM (\exref{iris_bnp_process}),
+$\beta_\k = (\mu_\k, \Lambda_\k)$, and
+the likelihoods are Gaussian,
 $\p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}}$.
-The prior $\pbetaprior(\beta_\k)$ a normal-Wishart.
+The prior $\pbetaprior(\beta_\k)$ is normal-Wishart.
 Using the log densities displayed in \exref{iris_bnp_process}
 and the mean-field assumption on $\q$,
-observe that $\beta_\k$ enters the expected joint log-likelihood only through the
+observe that the variational parameters for $\beta_\k$
+enter the expected joint log-likelihood only through the
 expected moments
 %
 \begin{align*}
@@ -61,10 +76,10 @@ expected moments
 
 The conditionally conjugate variational distribution on $\beta_\k$ is
 normal-Wishart, which we denote as
-$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta}$.
+$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta_{\beta_\k}}$.
 With this choice of $\q(\beta_\k \vert \eta)$,
 all the preceding expected moments
-can be provided as closed-form functions of $\eta$.
+can be provided as closed-form functions of $\eta_{\beta_\k}$.
 %
 \end{ex}
 
@@ -79,9 +94,10 @@ the multinomial distribution under $\q$ has $\kmax$ discrete categories.
 We parameterize the the multinomial distribution
 using its natural parameterization
 in exponential family form. That is,
-we let $\eta_{\z_\n} = (\rho_{\n1}, \rho_{\n2}, ..., \rho_{\n(\kmax-1)})$
-be an unconstrained vector in $\mathbb{R}^{\kmax-1}$;
-in this parameterization, the multinomial expectations are
+we let $\eta_{\z_\n}$
+be an unconstrained vector in $\mathbb{R}^{\kmax-1}$.
+Let $\rho_{\n\k}$ be the $k$-th entry of $\eta_{\z_\n}$,
+in which case the multinomial expectations are
 %
 \begin{align*}
   p_{\n\k} := \expect{\q(\z_\n \vert \eta)}{\z_{\n\k}} =
@@ -89,20 +105,26 @@ in this parameterization, the multinomial expectations are
 \end{align*}
 %
 We use the exponential family parameterization because
-we will require the optimal variational parameters $\etaopt$
+we require the optimal variational parameters $\etaopt$
 to be interior to $\etadom$ in our sensitivity analysis
 (\secref{local_sensitivity}).
 In the mean parameterization,
 $\sum_{\k=1}^\kmax p_{\n\k} = 1$, so the
-optimal mean parameters $\hat p_{\n}$ cannot be
+optimal mean parameters cannot be
 interior to $\Delta^{\kmax - 1}$.
-On the other hand, $\eta_{\z_\n}$ as defined
+On the other hand, $\eta_{\z_\n}$, as defined here,
 is unconstrained in $\mathbb{R}^{\kmax - 1}$.
 
-Notice that from the factorization in \eqref{bnp_model}
-and the mean-field assumption on $\q$, the expected
-joint log-likelihood depends on $\z_\n$
-only through the assignment probabilities, $p_{\n\k}$,
+Notice from the factorization of $\logp(\x, \beta, \z, \nu)$ in \eqref{bnp_model}
+and the mean-field assumption on $\q$,
+the expected joint log-likelihood can be written as
+\begin{align*}
+  \expect{\q(\zeta\vert\eta)}{\logp(\x, \beta, \z, \nu)} =
+  \sum_{\k = 1}^\kmax C_{\k} \expect{\q(\z_\n \vert \eta)}{\z_{\n\k}} + C_0,
+\end{align*}
+where the $C_\k$'s do not depned on $\eta_{\z_\n}$.
+In other words, the expected joint log-likelihood (and thus the $\mathrm{KL}$)
+depends on $\eta_{\z_\n}$ only through the assignment probabilities, $p_{\n\k}$,
 which we showed has a closed for expression
 with respect to the variational parameters $\eta_\z$.
 %
@@ -126,31 +148,35 @@ when decomposing the mixture weights
 $\expect{}{\log \pi}$ into its component stick-breaking proportions (\eqref{stick_breaking}).
 
 If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
-then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would also be Beta.
+then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would
+also be a Beta distribution
+\citep{blei:2006:vi_for_dp}.
 In this case, all the displayed expectations in \eqref{stick_expectations}
 can be computed analytically as a function of
 the Beta parameters in the variational approximation.
 
 However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
 are outside the family of Beta distributions.
-Therefore, we chose the distribution on the unconstrained logit-sticks $\lnu_\k$ to be
-normally distributed, which then induces a logit-normal distribution on
-the $(0, 1)$-constrained sticks $\nu_\k$.
-Let $\lnumean_\k$ and $\lnusd_\k$ be location and scale parameter,
-respectively, of the normal distribution on $\lnu_\k$,
-and recall that we let $\s$ be the sigmoid function
-which maps logit-sticks to sticks.
-To compute expectations of a smooth function
-$f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$),
-the law of the unconscious statistician states that,
+We will numerically approximate the expectations in \eqref{stick_expectations},
+which are univariate integrals.
+Our choice a normal distribution on the unconstrained, logit-transformed
+stick proportions $\lnu_\k$
+(or equivalently, a logit-normal distribution on the constrained
+stick proportions $\nu_\k$)
+allows us to express the univariate expectations in \eqref{stick_expectations}
+as a Gaussian integral.
+Let $f(\nuk)$ be some smooth function (such as $f(\nuk) = \pstick(\nuk)$).
+The law of the unconscious statistician states that,
 \begin{align*}
   \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
   \expect{\q(\lnu_\k \vert \eta)}
          {f\circ \s\left(\lnu_\k\right)},
 \end{align*}
 By choosing $\q(\lnu_\k \vert \eta)$ to be Gaussian,
-the right-hand side is a Gaussian integral,
-which we approximate
+the right-hand side is a Gaussian integral.
+Let $\lnumean_\k$ and $\lnusd_\k$ be the location and scale, respectively,
+of the Gaussian distribution on $\lnu_\k$.
+Then, we approximate the Gaussian integral
 using GH quadrature with $\ngh$ knots,
 located at $\xi_g$, weighted by $\omega_g$:
 %
@@ -175,7 +201,7 @@ sensitivity computation (\eqref{sens_mixed_partial}).
 Here, $f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
 In all the functional forms for
 $\t \mapsto \pstick(\nuk \vert \t)$ we consider,
-$f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
+the partial derivative can be provided in either closed-form or computed with automatic differentiation.
 The resulting GH approximation is a deterministic function of $\eta$,
 and thus the gradient in \eqref{sens_mixed_partial} can be computed
 with another application of automatic differentiation.
@@ -193,7 +219,7 @@ For example, computing $\gclusters$ with a threshold $\tau > 0$
 requires forming all ${\N\choose\tau}$ combination of $\tau$-length products
 $\expect{}{\z_{\n_1\k}}\times \ldots \times \expect{}{\z_{\n_\tau\k}}$
 for each $\k$.
-In such cases, we to Monte Carlo approximations of the expectation.
+In such cases, we resort to Monte Carlo approximations of the expectation.
 Specifically, we used the reparameterization trick
 to sample from the variational distribution.
 In the case of $\gclusters$,
@@ -212,17 +238,21 @@ The uniform draws $u_1, \dots, u_m$ can be fixed beforehand.
 This is important for two reasons.
 First, we will be evaluating the same $\g$ at different parameter vectors $\eta$;
 conditional on the fixed $m$ uniform draws, $\g$ will be a deterministic function
-of $\eta$, and we can compare how $\g$ changes without stochasticity.
+of $\eta$, and we can compare how $\g$ changes with respect to $\eta$ without stochasticity.
 Secondly, in the construction of the influence function
 (\secref{functional_perturbations}), we require evaluating the
 gradient of $\g$ with respect to $\eta$; conditional on the random draws,
 $\g$ (or more precisely, our Monte Carlo approximation of $\g$), will be
 differentiable with respect to $\eta$.
+\todo{not clear which part is for generic $\g$ and which is for $\gclusters$.
+If we end up putting this in the appendix, we could probably just make it
+about $\gclusters$}
+
 
 \subsection{A global and local factorization}
 
-All the models we consider will factorize into a set \textit{global} latent
-variables and a setof \textit{local} latent variables.
+All the models we consider will factorize into a set of \textit{global} latent
+variables and a set of \textit{local} latent variables.
 The global variables are common to all data points, while the local variables
 are unique to each data point.
 In the GMM example, the global variables are $(\beta, \nu)$,
@@ -234,10 +264,8 @@ Similarly, let $\ell$ be the local latent variables and
 let $\etalocal$ be the local variational parameters.
 In the GMM example, $\ell = \z$ and $\etalocal = \etaz$,
 but in later models, the local variables will include more than just $\z$.
-Thus, we keep the notation general.
-Notice that the dimension of the global variational parameters scale
-with only $\kmax$, while the local parameters scale with the number of
-data points $\N$.
+Notice that the dimension of $\eta_\gamma$ scales
+with only $\kmax$, while $\eta_\ell$ scales with $\N\times\kmax$.
 
 In all models we will consider,
 the optimal local variational parameters $\etaoptlocal$ can be written
@@ -321,13 +349,10 @@ which we now detail.
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most computationally intensive part of \eqref{vb_eta_sens}, especially when
 the dimension of $\eta$, is large.
-The dimension of $\etaglob$ scales with $\kmax$,
-while the dimension of $\etalocal$ scales with the number
-of data points $\N$.
 Depending on the size of $\eta$, instantiating the full Hessian in memory
 may be impossible.
 
-We again take advantage of the fact that the latent variables
+We take advantage of the fact that the latent variables
 factorize into a set of global and local latent variables.
 For generic latent variables $a$ and $b$,
 let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
@@ -402,12 +427,9 @@ is given by
   \hessopt_\gamma := \left(\hess{\gamma\gamma} -
         \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right).
 \end{align}
-
-
 Each term of $\hessopt_\gamma$ can be easily computed using automatic differentiation.
-In fact, the $\hess{\ell\ell}$ is block-diagonal and has a closed form inverse.
 
-Alternatively, using the optimality of $\etaoptz(\eta_\gamma; \t)$ and
+Alternatively, using the optimality of $\etaoptlocal(\eta_\gamma; \t)$ and
 applying the chain rule, one can check that
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
@@ -423,8 +445,7 @@ compute the Hessian of $\mathrm{KL}_{glob}$
 with respect to the global parameters $\eta_\gamma$.
 
 Crucially, the size of $\hessopt_\gamma$ scales with $(\kmax)^2$,
-while the full Hessian scales with both $(\kmax)^2$
-and the squared number of data points $\N^2$
+while the full Hessian scales with both $(\kmax\times\N)^2$
 Hence, $\hessopt_\gamma$ is more memory efficient to store
 and faster to invert
 than the full Hessian of all the variational parameters.
