@@ -1,49 +1,67 @@
-Let $\zeta$ denote the full vector of latent variables. In the GMM and topic
-model (\exref{iris_bnp_process, structure_bnp_process}), $\zeta := (\beta, \z,
-\nu)$; in the regression example (\exref{mice_bnp_process}), $\zeta$ includes
-the additive shifts, $\zeta := (\beta, \z, \nu, \b)$. In each model, the exact
-posterior distribution $\p(\zeta \vert \x)$ is intractable. Variational Bayes
-(VB) is an approach that seeks an approximate posterior through solving a
+The posterior of a BNP model is difficult to compute for two reasons: because
+the number of components is (countably) infinite, and because the posterior
+normalization constant is intractible.  To address these problems, we follow
+\citet{blei:2006:vi_for_dp} and form a mean field truncated variational
+approximation to the posterior.
+
+Let $\zeta$ denote the full vector of unkown posterior variables. For example,
+in the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z, \nu)$.  The
+exact posterior distribution $\p(\zeta \vert \x)$ is intractable. Variational
+Bayes (VB) is an approach that seeks an approximate posterior through solving a
 numerical optimization problem \citep{jordan:1999:vi,
 wainwright:2008:graphical_models, blei:2017:vi_review}.
 
 VB specifies a family of approximating distributions $\q(\zeta \vert \eta)$
 parameterized by a finite-dimensional vector $\eta \in \etadom \subseteq
 \mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$ that is closest to
-the posterior $\p(\zeta \vert \x)$ in Kullback-Leibler (KL) divergence:
+the posterior $\p(\zeta \vert \x)$ according to a divergence measure on
+posterior distributions. We will make the common choice of Kullback-Leibler (KL)
+divergence:
 %
-\begin{align}\eqlabel{vb_optimization}
+\begin{align*}
 %
-\etaopt :={}&
-    \argmin_{\eta \in \etadom}
-        \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)} \mathwhere \\
 \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}
 ={}&    \expect{\q(\zeta \vert \eta)}{
         \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x). \nonumber
 %
+\end{align*}
+%
+As we discuss below, we will choose $\q(\zeta \vert \eta)$ so that we can easily
+approximate the above expectation with respect to $\q(\zeta \vert \eta)$ as a
+closed-form function of $\eta$.  We will write $\KL{\eta}$ for our
+approximation, choosing the optimal variational parameter $\etaopt$ to satisfy
+%
+\begin{align}\eqlabel{vb_optimization}
+%
+\etaopt :={} \argmin_{\eta \in \etadom} \KL{\eta} \mathwhere
+\KL{\eta} \approx{} \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)},
+%
 \end{align}
 %
-As we discuss
-below, we will choose $\q(\zeta \vert \eta)$ so that we can easily evaluate (or approximate)
-the above expectation with respect to $\q(\zeta \vert \eta)$
-as a closed-form function of $\eta$.
-Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and
-so can be neglected in the optimization.
+where the tractable objective function $\KL{\eta}$ may not be an exact KL
+divergence. Notice that the intractable $\logp(\x)$ term does not depend on
+$\eta$, and so can be neglected in the objective function $\KL{\eta}$.
 
-In practice, forming an approximating posterior for BNP
-can be challenging since the latent variables $\nu$ and $\beta$ are
-(countably) infinite dimensional.
-We would like to keep dimension of the variational parameter $\eta$ finite
-in order for the optimization in \eqref{vb_optimization} to be tractable.
-In the present paper, we will follow \citet{blei:2006:vi_for_dp} and
-use a truncated stick-breaking representation in
-the variational distribution.
-We choose a truncation parameter $\kmax$ large but finite,
-and we set $\q(\nu_\k = 1 | \eta) = 1$ for all $\k > \kmax$.
-This implies that under $\q$, $\pi_\k = 0$ with probability one
-for all $\k > \kmax$
-(\eqref{stick_breaking}).
-Correspondingly, we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
+In practice, forming an approximating posterior for BNP can be challenging since
+the latent variables $\nu$ and $\beta$ are (countably) infinite dimensional. We
+would like to keep dimension of the variational parameter $\eta$ finite in order
+for the optimization in \eqref{vb_optimization} to be tractable. In the present
+paper, we will follow \citet{blei:2006:vi_for_dp} and use a truncated
+stick-breaking representation in the variational distribution. We choose a
+truncation parameter $\kmax$ large but finite,
+%
+\footnote{For $\k > \kmax$, $\q(\nu_\k)$ is effectively a point mass  but
+$\p(\nu_\k \vert \x)$ is dominated by the Lebesgue measure.  So the KL
+divergence $\KL{\q(\nu_\k) || \p(\nu_\k \vert \x)}$ is not well-defined, even
+though $\q(\nu_\k)$ does form a sensible approximation to $\p(\nu_\k \vert \x)$
+in measures of posterior divergence such as the Wasserstein distance.  This is
+one sense in which our tractable objective function $\KL{\eta}$ is not a proper
+KL divergence. }
+%
+and we set $\q(\nu_\k = 1 | \eta) =
+1$ for all $\k > \kmax$. This implies that under $\q$, $\pi_\k = 0$ with
+probability one for all $\k > \kmax$ (\eqref{stick_breaking}). Correspondingly,
+we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
 
 For the generic BNP mixture model in \eqref{bnp_model},
 we propose a mean-field variational approximating family of the following form:
@@ -56,490 +74,12 @@ we propose a mean-field variational approximating family of the following form:
     \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta) \right).
 %
 \end{align}
-Because $\pi_\k = 0$ for all $\k > \kmax$,
-we can ignore the latent variables $\beta_\k$ for $\k > \kmax$ in
-defining our variational approximation.
+%
+Because $\pi_\k = 0$ for all $\k > \kmax$, we can ignore the latent variables
+$\beta_\k$ for $\k > \kmax$ in defining our variational approximation.
 
 Notice that only our variational approximation is truncated---the model
-(\eqref{bnp_model}) itself is not finite.
-We set $\kmax$ large enough in our variational approximation to ensure that a large
-proportion of the components are unoccupied with high probability under $\q$,
-in which case the truncation approximates the fully nonparametric model with $\kmax = \infty$.
-
-The variational approximation for the topic model (\exref{structure_bnp_process})
-is similarly mean-field: the distribution on stick-breaking proportions $\nu$
-factorizes over
-both individuals $\n$ and components $\k$, while the
-assignments $\z$
-factorize over individuals $\n$, loci $\l$, and chromosomes $\i$.
-For the regression model (\exref{mice_bnp_process}), all terms in the
-variational approximation fully-factorize
-except for the cluster assignments $\z$ and additive shifts $\b$.
-While we assume $(\z, \b)$ to be independent from all other latent variables
-under $\q$, we will allow conditional dependence between $\z$ and $\b$ (\appref{app_mice}).
-
-\subsubsection{Conditional conjugacy}\seclabel{vb_conjugacy}
-
-For $\z$ and $\beta$ in all models we consider, we will
-take advantage of conditional conjugacy to choose distributions
-$\q(\z_\n\vert\eta)$ and $\q(\beta_k\vert\eta)$, unless otherwise stated.
-This means that we will take $\q(\z_{\n}
-\vert \eta)$ to be multinomial, matching $\p(\z_{\n}
-\vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$
-to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
-%
-To evaluate the expectation in \eqref{vb_optimization}, we need to compute
-the expected joint log-likelihood
-\begin{align*}
-  \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n, \beta_\k)}. % , \quad
-  % \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}.
-\end{align*}
-
-In \exref{iris_bnp_process}, $\beta_\k = (\mu_\k, \Lambda_\k)$,
-and the likelihoods are Gaussian,
-$\p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}}$.
-The prior $\pbetaprior(\beta_\k)$ a normal-Wishart.
-Using the log densities displayed in \exref{iris_bnp_process},
-observe that $\beta_\k$ enters the expected joint log-likelihood only through the
-expected moments
-%
-\begin{align*}
-\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k},  \quad
-\expect{\q(\beta_\k \vert \eta)}{\log|\Lambda_\k|},  \quad
-\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k\mu_\k}, \quad
-\expect{\q(\beta_\k \vert \eta)}{\mu_\k\Lambda_\k\mu_\k}.
-\end{align*}
-
-The conditionally conjugate variational distribution on $\beta_\k$ is
-normal-Wishart, which we denote as
-$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta}$.
-With this choice of $\q(\beta_\k \vert \eta)$,
-all the preceding expected moments
-can be provided as closed-form functions of $\eta$.
-%
-% With this choice of $\q$, the expectations
-% \begin{align*}
-% \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n \vert \beta_\k)} \quad
-% \expect{\q(\beta_\k \vert \eta)}{\log \pbetaprior(\beta_\k)} \quad
-% \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}
-% \end{align*}
-% all have closed form expressions as functions of $\eta$.
-%
-\end{ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Under the mean-field factorization (\eqref{vb_mf}),
-the vector $\eta$ will partition into parameters
-governing $\nu$, $\beta$, and $\z$. Let the parameters governing a
-particular latent variable or latent vector be denoted with a subscript: for example,
-$\q(\beta \vert \eta) = \q(\beta \vert \etabeta)$,
-$\q(\z_\n \vert \eta) = \q(\z \vert \eta_{\z_{\n}})$, and so on.
-With conditionally conjugate distributions and our mean-field assumption,
-the parameters $\eta_{\z_{\n}}$ can be optimally set as a function of
-parameters $\etabeta$ and $\etanu$.
-The next example details this point.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{ex}[VB approximation for $\z_\n$ in a GMM]\exlabel{qz_form}
-%
-The conditionally conjugate variational distribution for $\z_\n$
-is multinomial.
-Our variational approximation is truncated at $\kmax$ so
-$\z_{\n\k} = 0$ for all $\k > \kmax$;
-the multinomial distribution under $\q$ has $\kmax$ discrete categories.
-
-We parameterize the the multinomial distribution
-using its natural parameterization
-in exponential family form. That is,
-we let $\eta_{\z_\n} = (\rho_{\n1}, \rho_{\n2}, ..., \rho_{\n(\kmax-1)})$
-be an unconstrained vector in $\mathbb{R}^{\kmax-1}$;
-in this parameterization, the multinomial expectations are
-%
-\begin{align*}
-  p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
-  \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax-1}\exp(\rho_{\n\k})}
-\end{align*}
-%
-We use the exponential family parameterization because
-we will require the optimal variational parameters $\etaopt$
-to be interior to $\etadom$ in our sensitivity analysis
-(\secref{local_sensitivity}).
-In the mean parameterization,
-$\sum_{\k=1}^\kmax p_{\n\k} = 1$, so the
-optimal mean parameters $\hat p_{\n}$ cannot be
-interior to $\Delta^{\kmax - 1}$.
-On the other hand, $\eta_{\z_\n}$ as defined
-is unconstrained in $\mathbb{R}^{\kmax - 1}$.
-
-Moreover, with the distributions $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$ fixed,
-the parameter vector $\eta_{\z_\n}$ that minimizes \eqref{vb_optimization}
-has a closed form.
-Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
-the optimal $\etaopt_{\z_\n}$ must satisfy
-%
-\begin{align*}
-& \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
-& \mathwhere \tilde \rho_{\n\k} := \expect{\q(\beta, \nu \vert \eta)}
-       {\logp(\x_n \vert \beta_\k) + \log \pi_\k}.
-\end{align*}
-%
-See \citet{bishop:2006:PRML} and \citet{blei:2017:vi_review} for details.
-To satisfy this optimality condition,
-we set the optimal $\etaopt_{\z_\n}$ to be
-%
-\begin{align*}
-%
-\etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
-\log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
-\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
-%
-\end{align*}
-%
-Thus, as long as the expectation $\tilde\rho_{\n\k}$ has a closed-form as a function of
-$(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
-a function of $(\etabeta, \etanu)$.
-%
-\end{ex}
-
-For fixed $(\etabeta, \etanu)$, the option of setting $\etaz$ at its optimum
-extends beyond the GMM example and will play
-a key role in computing our local sensitivity
-measures in practice (\secref{computing_sensitivity}).
-In greater generality, each of our example models
-has latent variables that factorize in a global/local structure.
-In the GMM example discussed above, we call the variables $(\beta, \nu)$ ``global"
-because they are shared across all data points; the $\z$ is ``local"
-because each $\z_\n$ is unique to a single data point.
-In the regression model (\exref{mice_bnp_process}),
-the global variables are again $(\beta, \nu)$,
-but the local variables comprise of both the cluster assignments $\z$ and additive shifts $\b$.
-In these two models, notice that the dimension of global variables scale with $\kmax$, while
-the dimension of local variables scale with the number of observations $\N$.
-
-In the topic model (\exref{structure_bnp_process}),
-we still call $(\beta, \nu)$ the global latent variables, even though they scale
-with the number of individuals $\N$;
-they do not, however, scale with both the number of individuals and the number of loci
-like $\z$ does. In the topic model, we call $\z$ the local latent variables.
-
-Let $\gamma = (\beta,\nu)$ be the global latent variables
-and let $\etaglob = (\etabeta, \etanu)$ be their variational parameters.
-Let $\etalocal$ be the local variational parameters. In \exref{iris_bnp_process} and
-\exref{structure_bnp_process}, $\etalocal = \etaz$, while
-in \exref{mice_bnp_process}, $\etalocal = (\etaz, \eta_\b)$.
-
-In each model we consider, for $\etaglob$ fixed, the optimal $\etalocal$ that minimizes
-the $\mathrm{KL}$ can be set in closed form as a function of $\etaglob$.
-The multinomial parameters for $\eta_{\z_\n}$ in the regression and topic models
-can be set in the same way as described in \exref{qz_form}.
-For more details concerning the optimal shift parameters $\eta_\b$
-in the regression model, see \appref{app_mice}.
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsubsection{Evaluating stick expectations}\seclabel{stick_expectations}
-
-To evaluate the $\mathrm{KL}$ in \eqref{vb_optimization}, we also need
-the expectations over stick-breaking proportions,
-\begin{align}\eqlabel{stick_expectations}
-%
-\expect{\q(\nuk \vert \eta)}{\log \nuk}
-\textrm{,}\quad
-\expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}
-\textrm{,}\quad\textrm{and}\quad
-\expect{\q(\nuk \vert \eta)}{\log \pstick(\nuk)}.
-%
-\end{align}
-(The discussion in this subsection applies to the topic model as well,
-with stick-breaking proportions indexed by $\n\k$).
-The first two expectations appear in the $\mathrm{KL}$
-when decomposing the mixture weights
-$\expect{}{\log \pi}$ into its component stick-breaking proportions (\eqref{stick_breaking}).
-
-If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
-then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would also be Beta.
-In this case, all the displayed expectations in \eqref{stick_expectations}
-can be computed analytically as a function of
-the Beta parameters in the variational approximation.
-
-However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
-are outside the family of Beta distributions.
-To accommodate a generic prior $\pstick(\nuk)$,
-we approximate the expectations in \eqref{stick_expectations} numerically.
-Each expectation is a univariate integral.
-A particularly easy approximation method is
-Gauss-Hermite (GH) quadrature, which we now describe.
-
-To take advantage of GH quadrature, we first logit transform the stick-breaking
-proportion $\nuk$ so that the transformed variable
-\begin{align*}
-  \lnuk := \log\left(\frac{\nuk}{1 - \nuk}\right)
-\end{align*}
-is not constrained to be between $(0, 1)$ and can take values in all of $\mathbb{R}$.
-Let $\s$ be the sigmoid function,
-which provides the inverse transformation,
-\begin{align*}
-  \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
-\end{align*}
-
-We choose $\q(\lnu_\k \vert \eta)$ to be normally distributed with
-location parameter $\lnumean_\k$ and scale parameter $\lnusd_\k$.
-This then induces a logit-normal
-distribution on our original variable of interest, $\nuk$.
-To compute expectations of a smooth function
-$f(\nuk)$ (such as $f(\nuk) = \pstick(\nuk)$),
-the law of the unconscious statistician states that,
-\begin{align*}
-  \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
-  \expect{\q(\lnu_\k \vert \eta)}
-         {f\circ \s\left(\lnu_\k\right)}.
-\end{align*}
-By choosing $\q(\lnu_\k \vert \eta)$ to be Gaussian,
-the right-hand side is a Gaussian integral,
-which we approximate
-using GH quadrature with $\ngh$ knots,
-located at $\xi_g$, weighted by $\omega_g$:
-%
-\begin{align}\eqlabel{gh_integral}
-%
-\expect{\q(\lnu_\k \vert \eta)}
-       {f\circ \s\left(\lnu_\k\right)}
-\approx{}&
-    \sum_{g=1}^{\ngh} \omega_g f\circ \s \left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
- \nonumber\\=:{}&
-\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
-%
-\end{align}
-%
-Using GH quadrature to approximate the expectation
-is similar to the ``reparameterization trick,'' only using
-GH points rather than standard normal draws.
-Conveniently, the approximation $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$
-is a deterministic, differentiable
-function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.
-This will be useful in our sensitivity computations in the next section.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Posterior quantities}
-\seclabel{posterior_quantities}
-
-In a VB approach, all posterior quantities of interest can be expressed as
-functions of the variational parameter $\eta$. We will use $\g(\eta)$ to denote
-such quantities. Often, $\g(\eta)$ takes the form of an expectation over $\q$,
-\begin{align*}
-  g(\eta) = \expect{q(\zeta\vert\eta)}{f(\zeta)}
-\end{align*}
-for some function $f(\eta)$.
-
-In the next few examples, we define some posterior quantities that we will
-consider in \secref{results}. We will evaluate the sensitivity
-of these quantities to the prior specification $\pstick$.
-
-\begin{ex}[The in-sample number of clusters]\exlabel{insample_nclusters}
-
-One might ask, \textit{how many clusters are present in the data set}?
-For example, in the iris data set, answering this question has the interpretation
-of counting the number of iris species present.
-To estimate the number of clusters in the context of a BNP model,
-define the random variable
-\begin{align*}
-  \nclusters_\tau := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
-  \z_{\n\k}\right) > \tau},
-\end{align*}
-where $\ind{\cdot}$ is the indicator function.
-$\nclusters_\tau$ counts the number of clusters with at least $\tau$
-observations in a set of assignments $\z$.
-The expected number of clusters under the variational posterior is
-\begin{align*}
-  \gclusters(\eta) := \expect{\q(\z\vert\eta)}{\nclusters_\tau}.
-\end{align*}
-
-When $\tau = 0$, $\gclusterszero$ can be written as a function with respect to
-the assignment probabilities
-\begin{align*}
-  \gclusterszero(\eta) = \sum_{k=1}^\kmax \left(1 -  \prod_{n=1}^N
-  \left(1 - \expect{\q(\z_{nk}\vert\eta)}{\z_{nk}}\right)\right).
-\end{align*}
-%
-\end{ex}
-
-\begin{ex}[The predictive number of clusters]\exlabel{predictive_nclusters}
-
-In the Bayesian approach, we can formulate the posterior predictive question,
-\textit{how many clusters would be present if a new data set were collected}?
-In the iris example, this can interpreted as predicting the number of species
-one might see if a fresh sample of iris flowers were collected.
-Under the BNP model, the expected number of predictive clusters is defined as
-\begin{align*}
-  \gclusterspred(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters_\tau}}.
-\end{align*}
-Notice that the inner expectation conditions on $\pi$ and the randomness is
-over $\z$ sampled from the generative model $\z\sim\p(\z\vert\pi)$.
-We can write out the inner expectation:
-%
-\begin{align*}
-  \gclusterspred(\eta) &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
-  \sum_{i=0}^{\lfloor\tau\rfloor} {\N \choose i} (1 - \pi_k)^\N \right)},
-\end{align*}
-where we use the convention that ${\N\choose 0} = 1$.
-%
-\end{ex}
-
-\begin{ex}[Co-clustering]\exlabel{posterior_coclustering}
-
-Finally, in a clustering problem, we are often interested in understanding
-which observations group with each other.
-One way to visualize the clusters is to construct the co-clustering matrix,
-\begin{align*}
-\gcoclustering(\eta) := \expect{\q(\z\vert\eta)}{\z\z^{T}},
-\end{align*}
-where we view $\z$ as a $\N\times \kmax$ matrix of cluster assignments.
-Unlike the quantities in \exref{insample_nclusters, predictive_nclusters},
-$\gcoclustering$ is a matrix quantity, not a scalar quantity.
-
-\end{ex}
-
-For some posterior quantities, the expectation over $\q$ will not be a simple
-closed-form function of $\eta$.
-For example, computing $\gclusters$ with a threshold $\tau > 0$
-requires forming all ${\N\choose\tau}$ combination of $\tau$-length products
-$\expect{}{\z_{\n_1\k}}\times \ldots \times \expect{}{\z_{\n_\tau\k}}$
-for each $\k$.
-In such cases, we resorted to Monte-Carlo approximations of the expectation.
-Specifically, we used the ``reparameterization trick"
-to sample from the variational distribution.
-In the case of $\gclusters$,
-we constructed an $\eta$-dependent transformation
-$f(\cdot, \eta)$ that satisfies
-\begin{align*}
-  u \iid\text{Uniform}(0, 1)^{\N\kmax} \implies
-  f(u, \eta) \stackrel{d}{=} \z \sim \q(\cdot | \eta).
-\end{align*}
-To form a Monte Carlo estimate of $\gclusters$,
-we sampled $u_1, \dots, u_m$ uniformly,
-and then averaged the expression inside the expectation evaluated at points
-$f(u_1, \eta), \ldots, f(u_m, \eta)$.
-The uniform draws $u_1, \dots, u_m$ can be fixed beforehand.
-This is important for two reasons.
-First, we will be evaluating the same $\g$ at different parameter vectors $\eta$;
-conditional on the fixed $m$ uniform draws, $\g$ will be a deterministic function
-of $\eta$, and we can compare how $\g$ changes without stochasticity.
-Secondly, in the construction of our ``influence function" (\secref{functional_perturbations}),
-it will be useful to evaluate the
-gradient of $\g$ with respect to $\eta$; conditional on the random draws,
-$\g$ (or more precisely, our Monte Carlo approximation of $\g$), will be
-differentiable with respect to $\eta$.
-
-% \subsection*{subsection name}
-%
-% we choose $\q(\nuk \vert \eta)$ to be logit-normally distributed,
-% and express the expectations in \eqref{stick_expectations} as Gaussian integrals.
-% Define
-% \begin{align*}
-%   \tilde \nuk := \log\left(\frac{\nuk}{1 - \nuk}\right),
-% \end{align*}
-% which will be normally distributed under our choice of a
-% logit-normal $\q(\nuk \vert \eta)$.
-%
-% Let $\lnumean_\k$ and $\lnusd_\k$ be entries of $\eta$ corresponding to
-% the logit-normal parameters of $\nuk$.
-%
-%
-% In order to optimize the variational objective \eqref{vb_optimization} we see
-% from \eqref{stick_log_post} that we need to evaluate or approximate expectations
-% of the form
-% %
-% \begin{align*}
-% %
-% \expect{\q(\nuk \vert \eta)}{\log \nuk}
-% \textrm{,}\quad
-% \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}
-% \textrm{,}\quad\textrm{and}\quad
-% \expect{\q(\nuk \vert \eta)}{\log \pstick(\nuk)}.
-% %
-% \end{align*}
-%
-%
-%
-%
-% First, define a version of $\nuk$ that is not constrained to $(0,1)$:
-% %
-% \begin{align}\eqlabel{lnuk_transform}
-% %
-% \lnuk :={} \log \left( \frac{\nuk}{1 - \nuk} \right)
-% \quad\Leftrightarrow\quad
-% \nuk :={} \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}.
-% %
-% \end{align}
-% %
-% It will be useful later to have at hand the transform between densities
-% expressed in the space of $\nu$ and $\lnu$, which is given by
-% %
-% \begin{align}\eqlabel{lnuk_derivatives}
-% %
-% \fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
-% %     \frac{1-\nuk}{\nuk}
-% %     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
-% % \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
-% % \\={}&
-%     \frac{1}{\nuk (1 - \nuk)} \mathand
-% %
-% \fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
-%     \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
-% %
-% \end{align}
-% %
-% We wish to let $\lnu_\k$ be distributed normally under the variational
-% distribution.  Let $\lnumean_\k$ and $\lnusd_\k$ be entries of the parameter
-% vector $\eta$, and write
-% %
-% \begin{align}\eqlabel{lnuk_vb_approximation}
-% %
-% \q(\lnu_\k \vert \eta) ={}& \normdist{\lnu_\k \vert \lnumean_\k, \lnusd_\k}
-% \Rightarrow \\
-% \q(\nuk \vert \eta) ={}&
-%     \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-%         \vert \lnumean_\k, \lnusd_\k}
-%     \left|\fracat{d \lnu_\k}{ d\nuk}{\nuk}\right|
-% \nonumber\\={}&
-% \normdist{\log \left( \frac{\nuk}{1 - \nuk} \right)
-%         \vert \lnumean_\k, \lnusd_\k}
-%     \left|\frac{1}{\nuk (1 - \nuk)}\right|.
-% \nonumber
-% %
-% \end{align}
-% %
-% Given this, we can approximate expectations of smooth functions
-% $f(\nuk)$ using GH quadrature with $\ngh$ knots,
-% located at $\xi_g$, weighted by $\omega_g$:
-% %
-% \begin{align}\eqlabel{gh_integral}
-% %
-% \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
-% \expect{\q(\lnu_\k \vert \eta)}
-%        {f\left(\frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}\right)}
-% \nonumber\\\approx{}&
-%     \sum_{g=1}^{\ngh} \omega_g f\left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
-%  \nonumber\\=:{}&
-% \expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
-% %
-% \end{align}
-% %
-% Conveniently, $\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}$ is a differentiable
-% function of $\lnumean_\k$ and $\lnusd_\k$, and so also of $\eta$.  (This
-% technique is similar to the ``reparameterization trick,'' only using
-% GH points rather than standard normal draws.)
+(\eqref{bnp_model}) itself is not finite. We set $\kmax$ large enough in our
+variational approximation to ensure that a large proportion of the components
+are unoccupied with high probability under $\q$, in which case the truncation
+approximates the fully nonparametric model with $\kmax = \infty$.

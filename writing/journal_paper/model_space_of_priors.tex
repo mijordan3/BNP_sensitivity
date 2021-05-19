@@ -1,0 +1,71 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Choices for $\pstick$}
+
+Typically, many different choices for $\pstick$ may be {\em a priori}
+reasonable.  A particularly common choice for $\pstick$ is the
+$\mathrm{Beta}(\nuk \vert 1, \alpha)$ density, which we write as
+%
+\begin{align*}
+%
+\pstick(\nuk \vert \alpha) :=
+\mathrm{Beta}(\nuk \vert 1, \alpha) =
+    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
+         {\Gamma(\alpha)},
+%
+\end{align*}
+%
+When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting
+distribution on $\pi$ is known as the $\textit{GEM distribution}$, and we write
+$\pi \sim \mathrm{GEM}(\alpha)$.
+%
+The GEM distribution is closely related to the Dirichlet process (DP).
+Define a measure on $\betadom$ as
+%
+\begin{align*}
+  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
+\end{align*}
+%
+which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
+\mathrm{GEM}(\alpha)$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
+is a random measure is distributed according to Dirichlet process with
+concentration parameter $\alpha$ and base measure $\pbetaprior$
+\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}.
+
+Typically, the concentration parameter $\alpha$ is not known in advance.
+Rather, $\alpha$ may {\em a priori} plausibly lie within some reasonable range.
+Since the prior $\pstick(\nuk \vert \alpha)$ depends on $\alpha$, the posterior
+the posterior expectation $\expect{\p(\z \vert \x, \alpha)}{\nclusters_0(\z)}$
+depends on $\alpha$ as well.  If $\expect{\p(\z \vert \x,
+\alpha)}{\nclusters_0(\z)}$ varies meaningfully as $\alpha$ varies over its
+plausible values, then the quantity of interest $\expect{\p(\z \vert \x,
+\alpha)}{\nclusters_0(\z)}$ is not robust to the choice of $\alpha$.
+
+In practice, one chooses some ``base value,'' $\alpha_0$, and runs a
+computationally expensive posterior approximation procedure such variational
+Bayes (VB), giving an approximate value for $\expect{\p(\z \vert \x,
+\alpha_0)}{\nclusters_0(\z)}$.
+
+
+More generally, there may be no {\em a priori} reason to believe that $\pstick$
+lies in the Beta family at all (other than computational convenience). By
+$\pbase$ and $\palt$ denote two candidate stick-breaking densities, we can
+. Suppose that
+parameterizing one-dimensional paths in the space of prior densities.  Let
+$\pbase$
+
+
+%
+%
+%
+%
+% Even if one is willing to restrict However, there is typically no {\em a priori}
+% reason to assume that $\pi \sim \mathrm{GEM}(\alpha)$ is a realistic summary of
+% our prior beliefs for any particular $\alpha$.
+%
+%
+% We keep the generic notation $\pstick$ for stick-breaking distributions because
+% in our sensitivity analysis, we will consider stick-breaking distributions that
+% are outside the family of Beta distributions.

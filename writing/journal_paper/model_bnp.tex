@@ -77,11 +77,10 @@ is given by
 \end{align}
 %
 Different choices of $\pstick$ will thus, in general, lead to different
-posterior distributions via the application of Bayes' rule to \eqref{bnp_model}.
-Typically, many different choices for $\pstick$ may be {\em a priori}
-reasonable.  Our goal is to quantify the change in the posterior expectation of
-a particular quantity of as the density $\pstick$ ranges amongst plausible
-choices.
+posterior distributions via the application of Bayes' rule to \eqref{bnp_model},
+and so lead to different values for posterior expectations of quantities of
+interest.  For concreteness, let us consider the following motivational example
+based on the Fisher iris datset \citep{anderson:1936:iris, fisher:1936:iris}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,13 +109,16 @@ We let $\pbetaprior(\beta_\k)$ be the conjugate prior, which in this case is nor
       \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
 \end{align*}
 where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
+%
+For a choice of $\pstick$, and for $\pbetaprior(\beta_\k)$ and $\p(\x_\n \vert
+\beta_\k)$ as given above, the posterior $\p(\beta, \z, \nu \vert \x)$ can in
+principle be computed by applying Bayes' rule to \eqref{bnp_model}.
 
-In \secref{results}, we fit a GMM to Fisher's iris data set
-\citep{anderson:1936:iris, fisher:1936:iris} and cluster irises into latent
-species based on morphological measurements.  In that case, $\k$ indexes
-distinct species, $\beta_{\k}$ characterizes the distribution of morphological
-measurements for species $\k$, and $\z_{\n\k} = 1$ when observation $\n$ is a
-member of species $\k$.
+In \secref{results}, we fit a GMM to Fisher's iris data set and cluster irises
+into latent species based on morphological measurements.  In that case, $\k$
+indexes distinct species, $\beta_{\k}$ characterizes the distribution of
+morphological measurements for species $\k$, and $\z_{\n\k} = 1$ when
+observation $\n$ is a member of species $\k$.
 %
 \end{ex}
 
@@ -135,67 +137,25 @@ this question in the context of a BNP model, define the
 following ``quantity of interest'':
 %
 \begin{align*}
-  \nclusters_0 := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
+  \nclusters_0(\z) := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
   \z_{\n\k}\right) > 0},
 \end{align*}
 %
 where $\ind{\cdot}$ is the indicator function taking value $1$ when the argument
 is true and $0$ otherwise. $\nclusters_0$ counts the number of clusters with at
 least one observations in a set of assignments $\z$.  The posterior expected
-number of clusters is thus given by $\expect{\p(\z\vert\x)}{\nclusters_0}$. For
-example, in the iris data set of \exref{iris_bnp_process},
-$\expect{\p(\z\vert\x)}{\nclusters_0}$ is the posterior expectation of the
+number of clusters is thus given by $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.
+For example, in the iris data set of \exref{iris_bnp_process},
+$\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$ is the posterior expectation of the
 number of distinct iris species present in the observed data.
-
-We consider generalizations of this and other posterior quantities of interest
-in \secref{posterior_quantities} below.
+%
+Again, given a choice of $\pstick$ and the definitions in
+\exref{iris_bnp_process}, $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$ can in
+principle be computed from the posterior $\p(\z \vert \x)$.
+% We consider generalizations of this and other posterior quantities of interest
+% in \secref{posterior_quantities} below.
 %
 \end{ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-A particularly common choice for $\pstick(\nuk)$ is the $\mathrm{Beta}(\nuk
-\vert 1, \alpha)$ distribution,
-%
-\begin{align*}
-%
-\mathrm{Beta}(\nuk \vert 1, \alpha) =
-    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
-         {\Gamma(\alpha)}.
-%
-\end{align*}
-%
-When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting
-distribution on $\pi$ is known as the $\textit{GEM distribution}$, and we write
-$\pi \sim \mathrm{GEM}(\alpha)$.
-%
-The GEM distribution is closely related to the Dirichlet process (DP).
-Define a measure on $\betadom$ as
-%
-\begin{align*}
-  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
-\end{align*}
-%
-which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
-\mathrm{GEM}(\alpha)$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
-is a random measure is distributed according to Dirichlet process with
-concentration parameter $\alpha$ and base measure $\pbetaprior$
-\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}.
-
-
-Even if one is willing to restrict However, there is typically no {\em a priori}
-reason to assume that $\pi \sim \mathrm{GEM}(\alpha)$ is a realistic summary of
-our prior beliefs for any particular $\alpha$.
-
-
-We keep the generic notation $\pstick$ for stick-breaking distributions because
-in our sensitivity analysis, we will consider stick-breaking distributions that
-are outside the family of Beta distributions.
