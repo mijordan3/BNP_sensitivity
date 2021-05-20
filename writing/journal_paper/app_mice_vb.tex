@@ -1,18 +1,66 @@
-We detail the variational approximation for the local
-latent variables in the regression mixture model (\exref{mice_bnp_process}).
-All latent variables fully factorize, except for the cluster assignments $\z$
-and the addtive shifts $\b$. Under $\q$, their distribution factorizes as
-\begin{align*}
-  \q(\z, \b \vert \eta) = \prod_{\n = 1}^{\N}\q(\z_\n\vert\eta)
-  \prod_{\k = 1}^{\kmax} \q(\b_\n\vert \z_{\n\k} = 1, \eta).
-\end{align*}
+\subsection{The data}
+The data come from a publicly available data set of mice gene expression
+\citep{shoemaker:2015:ultrasensitive}.
+Our analysis focuses on mice treated with the ``A/California/04/2009'' strain.
+We normalize the data as described in
+\citet{shoemaker:2015:ultrasensitive} and then apply the differential
+analysis tool EDGE \citep{Storey:2005:significance} to rank the genes from most to least significantly differentially expressed.
+We run our analysis on the top $\ngenes = 1000$ genes.
 
-As discussed in \secref{model_vb},
+\subsection{The B-spline basis}
+Notice from \figref{example_genes}, which shows an example time-course for a single gene,
+that the time points are unevenly spaced, with more frequent observations at the beginning.
+Following \citet{Luan:2003:clustering} we use cubic B-splines to smooth the time course expression data.
+Specifically, we model the first 11 time points using
+cubic B-splines with 7 degrees of freedom.
+For the last three time points, $\timeindx = 72, 120, 168$ hours,
+we use indicator functions.
+That is, if $\tilde \regmatrix$ is the design
+matrix where each column is a
+B-spline basis vector evaluated at the $\ntimepoints$ measurement times,
+we append to $\tilde \regmatrix$ three additional columns:
+in these columns, entries are 1
+if $\timeindx = 72, 120,$ or 168, receptively, and 0 otherwise.
+The resulting matrix is the full design matrix $\regmatrix$.
+We use indicators for the last three time points for numerical stability;
+without the indicator columns,
+the matrix $\tilde \regmatrix^T \tilde \regmatrix$ is nearly singular
+because the later time points are more spread out.
+The left column of \figref{example_genes} shows our basis functions.
+
+\subsection{The generative model}
+\eqref{mice_model} gives the per-component conditional likelihood.
+We use a normal prior for the shifts $\b_\n$,
+a multivariate normal prior for the coefficients $\mu_\k$,
+and a gamma prior for the inverse variance $\tau_\k$.
+The prior on the mixture weights $\pi$ are constructed using the stick-breaking
+construction in the main-text, and the cluster assignments $\z_\n$
+are drawn from a multinomial with wieghts $\pi$, as usual.
+
+
+
+\subsection{The variational approximation}
+The variational approximation, factorizes as
+\begin{align*}
+\q(\zeta \vert \eta) =
+    \left( \prod_{\k=1}^{\kmax - 1} \q(\nuk \vert \eta) \right)
+    \left( \prod_{\k=1}^{\kmax} \q(\beta_\k \vert \eta) \right)
+    \left( \prod_{\n=1}^{\N} \q(\z_{\n} \vert \eta)
+    \q(\b_{\n} \vert \z_{\n}, \eta)\right).
+\end{align*}
+Note that the variational distribution for $\b_\n$ conditions on $\z$.
+We set $\q(\b_{\n} \vert \z_{\n} = k, \eta)$ to be Gaussian
+with variational parameters dependent on $\k$.
+For simplicity in this application,
+we let $\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$,
+where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location.
+
+As discussed in \exref{qz_optimality},
 the optimal distribution $\q(\z_\n\vert\eta)$ is multinomial whose parameters
 can be set in closed form as a function of the global variational parameters only.
-We allow the distribution of $\beta_\n$ to depend on $\z_{\n\k}$ so that
+We allow the distribution of $\b_\n$ to depend on $\z_{\n\k}$ so that
 the its optimal distribution can also be set in closed form as a function of
-global parameters as well.
+global parameters.
 
 The optimal distribution $q(\b_\n\vert \z_{\n\k} = 1, \eta)$ is Gaussian,
 \begin{align*}

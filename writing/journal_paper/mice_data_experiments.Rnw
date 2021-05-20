@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -36,32 +36,40 @@ and expression levels of a set of genes were assessed at 14 time points after in
 Three measurements were taken at each time point (called biological replicates), 
 for a total of $\ntimepoints = 42$ measurements per gene. 
 
-Our analysis focuses on mice treated with the ``A/California/04/2009'' strain. 
-We normalize the data as described in
-\citet{shoemaker:2015:ultrasensitive} and then apply the differential
-analysis tool EDGE \citep{Storey:2005:significance} to rank the genes from most to least significantly differentially expressed. 
-We fit the regression model described in \exref{mice_bnp_process}
-and run our analysis below on the top $\ngenes = 1000$ genes.
-
-\figref{example_genes} shows an example time-course for a single gene. 
-Notice that the time points are unevenly spaced, with more frequent observations at the beginning. 
 Following \citet{Luan:2003:clustering} we apply cubic B-splines to smooth the time course expression data. 
-Specifically, we model the first 11 time points using
-cubic B-splines with 7 degrees of freedom.
-For the last three time points, $\timeindx = 72, 120, 168$ hours,
-we use indicator functions. 
-That is, if $\tilde \regmatrix$ is the design 
-matrix where each column is a
-B-spline basis vector evaluated at the $\ntimepoints$ measurement times, 
-we append to $\tilde \regmatrix$ three additional columns: 
-in these columns, entries are 1
-if $\timeindx = 72, 120,$ or 168, receptively, and 0 otherwise. 
-The resulting matrix is the full design matrix $\regmatrix$. 
-We use indicators for the last three time points for numerical stability; 
-without the indicator columns,
-the matrix $\tilde \regmatrix^T \tilde \regmatrix$ is nearly singular
-because the later time points are more spread out. 
+Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
+at $\ntimepoints$ time points.
+Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix.
+In our case, the $ij$-th entry of $\regmatrix$
+is be the $j$-th B-spline basis vector evaluated at the
+$i$-th time point. 
+\figref{example_genes} shows measurements from an example gene and 
+the B-spline basis. 
 
+
+Each component is characterized by a vector of regression coefficients
+$\mu_\k$ and a variance $\tau^{-1}_\k$, so
+in this model, $\beta_k = (\mu_\k, \tau_\k)$.
+The distribution of the data arising from component $k$ is
+\begin{align}\eqlabel{mice_model}
+\p(\x_\n | \beta_\k, \b_\n) =
+\normdist{\x_\n | \regmatrix\mu_\k + \b_\n,
+\tau_\k^{-1}I_{\ntimepoints \times \ntimepoints}},
+\end{align}
+%
+where $\b_{n}$ is a gene-specific additive offset and $I$ is the identity matrix.
+We include the additive offset because we
+are interested in clustering gene expressions based on their patterns over time,
+not their absolute level.
+
+The joint distribution can be written in the same form as~\eqref{bnp_model},
+except that the conditional data likelihood now depends on $\b_\n$ as well as $\beta_\k$, and we include an additional prior term for $\b_\n$.
+In this model, the local latent variables comprise of both the shifts $\b$ and the cluster assignments $\z$. 
+In this section, we also make the simplification that the distribution
+$\q(\beta_\k \vert\eta)$ are point masses parameterized by their location
+$\eta_{\beta_\k}$. 
+See \appref{app_mice} for further details concerning the model and
+variational approximation. 
 
 %
 <<example_genes_cap>>=
@@ -78,7 +86,8 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
-In this application, we expect to uncover finer structure than the iris data set, so we start with a larger $\alpha$ and set $\alpha_0 = 6$. 
+In this application, we expect to uncover finer structure than the iris data set, so we start with a larger $\alpha$ than the previous example 
+and set $\alpha_0 = 6$. 
 We will evaluate the senstivity to this choice of $\alpha$ below. 
 \figref{gene_centroids} shows the inferred smoothers 
 $\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
