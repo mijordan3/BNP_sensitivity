@@ -26,14 +26,63 @@ For this endangered bird species,
 understanding the degree to which populations have grown genetically distinct is important for conservation efforts: 
 well-separated populations with little genetic diversity are particularly at risk of extinction. 
 
-We employ the topic model from \exref{structure_bnp_process}. 
-Since we know that there are four geographic regions, 
-we pick $\alpha_0 = 3$ so that \textit{a priori} 
+\subsubsection{The model}
+The data consists of 
+consists of $\nindiv$ individuals genotyped at $\nloci$ loci.
+Let $\x_{\n\l\i}\in\{1, \ldots, J\}$ be the observed genotype for
+individual $\n$ at locus $\l$ and chromosome $\i$. 
+Here, $J$ is the number of possible genotypes.
+
+We adapt STRUCTURE, a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure} for such population genetics data, 
+by replacing the finite Dirichlet prior
+with an infinite stick-breaking process.
+The result is a model similar to a hierarchical Dirichlet process for topic modeling,
+\citep{teh:2006:hdp},
+but without the top-level Dirichlet process.
+Here, genetic markers take the place of
+words in a document; 
+in lieu of inferring ``topics," we infer latent populations.
+
+Unlike the previous models, we now have a
+stick-breaking process for each individual.
+Draw sticks
+\begin{align*}
+\nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, \ldots, \nindiv; \k = 1, 2, \ldots \infty.
+\end{align*}
+The prior assignment probability vector
+$\latentadmix_{\n} = (\latentadmix_{\n1}, \latentadmix_{\n2}, \ldots)$,
+now unique to each individual,
+is formed by the same stick-breaking construction as before,
+%
+\begin{align*}
+\latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).
+\end{align*}
+%
+In this genetics application,
+we call $\latentadmix_{\n}$ the
+\textit{admixture} of individual $\n$.
+
+Let $\z_{\n\l\i}$ be the assignment of observation $\x_{\n\l\i}$ to a latent population.
+Notice that for a given individual $\n$,
+different loci, or even different chromosomes at a given locus,
+may have different population assignments.
+The assignments are drawn from the
+usual multinomial distribution
+%
+\begin{align*}
+p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\infty} \latentadmix_{\n\k}^{\z_{\n\l\i\k}}.
+\end{align*}
+
+The distribution of the observed genotype $\x_{\n\l\i}\in\{1, \ldots, J\}$ depends on its population assignment. Here, the components variables $\beta_\k$ 
+are latent frequencies of the genotypes in population $\k$. 
+Further modeling details, as well as our variational approximation,
+can be found in \appref{TODO}. 
+
+The inferred admixtures at $\alpha_0 = 3$ are shown in \figref{stru_init_fit}. 
+We picked $\alpha_0 = 3$ so that \textit{a priori} 
 there are $\approx 4$ populations expected under the 
-GEM prior (\eqref{prior_num_clusters}). 
-\figref{stru_init_fit} shows the inferred
-individual admixtures in the initial fit with a
-$\betadist{1, \alpha_0}$ stick-breaking distribution.
+GEM prior---a reasonable guess since 
+we know that the data was collected from four geographic regions. 
 
 In the posterior, there appears to be three dominant latent populations, 
 which we arbitrarily label as populations 1, 2, and 3
