@@ -3,12 +3,21 @@ Suppose we have committed to using a Beta distribution for $\pstick$ as in
 the posterior depends on $\alpha$ through Bayes rule; in turn, the KL divergence
 depends on $\alpha$; in turn the optimal VB parameters depend on $\alpha$; in
 turn, the quantity of interest depends on $\alpha$ as well. Typically, the
-$\alpha$ may {\em a priori} plausibly lie within some reasonable range.  Let us
-notate the dependence of the optimal VB parameters on $\alpha$ as
-$\etaopt(\alpha)$.  If $\g(\etaopt(\alpha))$ varies meaningfully as $\alpha$
-ranges over its plausible values, we say that a the quantity of interest $\g$ is
-{\em not robust} to changes of $\alpha$.  In any particular problem, some
-posterior quantities of interest may be robust while others are not.
+$\alpha$ may {\em a priori} plausibly lie within some reasonable range.
+
+Let us notate the dependence of the VB objective and optimal parameters on
+$\alpha$ as
+%
+\begin{align*}
+%
+\etaopt(\alpha) := \argmin_{\eta \in \etadom} \KL{\eta, \alpha}.
+%
+\end{align*}
+%
+If $\g(\etaopt(\alpha))$ varies meaningfully as $\alpha$ ranges over its
+plausible values, we say that a the quantity of interest $\g$ is {\em not
+robust} to changes of $\alpha$.  In any particular problem, some posterior
+quantities of interest may be robust while others are not.
 
 Note that non-robustness is to some extent subjective, in that it depends on a
 decision about what a ``reasonable'' range of $\alpha$ might be.  In the present

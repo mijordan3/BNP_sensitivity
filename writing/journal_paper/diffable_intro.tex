@@ -3,27 +3,39 @@ In this section we state general conditions under which VB optima, as defined by
 nonparametric prior perturbations.  The desired results for the BNP model will
 follow as special cases of these general results.
 
-In particular, we consider a generic unknown parameter, $\theta \in \thetadom
-\subseteq \mathbb{R}^{\thetadim}$, with corresponding likelihood $\p(\x \vert
-\theta)$ and approximating variational family $\q(\theta \vert \eta)$, with
-$\eta \in \etadom \subseteq \mathbb{R}^\etadim$.  We let the prior densities for
-$\theta$ live in a one-dimensional parametric family, as stated in
-\defref{prior_t}.
+We first define our general setup in \defref{prior_t}, and then connect
+the general definition to the our BNP problem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_t}
 %
-Let $\q(\theta \vert \eta)$ and the prior $\p(\theta)$ be densities defined with
-respect to the  Let the prior density Let $\mu$ denote a sigma finite measure,
-and let $\p(\theta \vert \t)$ denote a class of probability densities relative
-$\mu$.  Let $\p(\theta \vert \t)$ be defined for $\t$ in an open set $\ball_\t
-\subseteq \mathbb{R}$ containing $0$. Assume that the variational densities
-$\q(\theta \vert \eta)$ are also defined relative to $\mu$.
+For some parameter $\theta \in \thetadom \subseteq \mathbb{R}^{\thetadim}$, let
+$\p(\theta \vert \t)$ denote a class of probability densities relative to
+a sigma-finite measure $\mu$, defined for $\t$ in an open set $\ball_\t
+\subseteq \mathbb{R}$ containing $0$.  Let $\q(\theta \vert \eta)$ be a
+family of approximating densities, also defined relative to $\mu$, and let
+the variational objective factorize as
+%
+\begin{align}
+%
+\KL{\eta, \t} :={}& \KL{\eta} +
+    \expect{\q(\theta \vert \eta)}
+           {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)}
+           \eqlabel{perturbed_objective}\\
+\etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t}.
+    \eqlabel{perturbed_optimum}
+%
+\end{align}
+%
+Let $\etaopt$ with no argument refer to $\etaopt(0)$, the minimizer
+of $\KL{\eta}$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Let $\qtil$ and $\ptil$ refer to potentially
-unnormalized (but normalizable) versions of the respectively corresponding $\q$
-and $\p$, so that,
+Additionally, let $\qtil$ and $\ptil$ refer to potentially unnormalized (but
+normalizable) versions of the respectively corresponding $\q$ and $\p$, so that,
 %
 \begin{align*}
 %
@@ -35,91 +47,80 @@ and $\p$, so that,
     {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
 %
 \end{align*}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-We allow that the full model may involve parameters other than $\theta$. Suppose
-that these parameters are $\thetatil$, with $\p(\x, \theta, \thetatil) = \p(\x
-\thetatil \vert \theta) \p(\theta \vert \t)$,
-so that
-%
-\begin{align*}
-%
-\MoveEqLeft
-\KL{\q(\theta, \thetatil \vert \eta) || \p(\theta, \thetatil \vert \x, \t)}\\
-    ={}& \expect{\q(\theta, \thetatil \vert \eta)}
-                {\log \q(\theta, \thetatil \vert \eta)} -
-        \expect{\q(\theta, \thetatil \vert \eta)}
-               {\log \p(\x, \thetatil \vert \theta)} -
-       \expect{\q(\theta \vert \eta)}
-              {\p(\theta \vert \t)},
-%
-\end{align*}
-%
-which we can write as
-%
-\begin{align*}
-%
-\etaopt :={} \argmax_{\eta \in \etadom} \left( \KL{\eta} + \KL{\eta, \t}\right).
-%
-\end{align*}
-%
-
-
-
-The prior depends on $\t$; in turn, the posterior $\p(\theta \vert \x, \t)$
-depends on $\t$; in turn, the variatoinal objective depends on $\t$; in turn, the
-optimal variational parameters depend on $\t$.  Define the shorthand notation
-%
-\begin{align}\eqlabel{kl_shorthand}
-%
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || \p(\x \vert \theta, \t)}
-\mathand
-\etaopt(\t) := \argmin_{\eta \in \etadom} \KL{\eta, \t},
-%
-\end{align}
-%
-where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
-In \defref{prior_t}, we take $\t = 0$ at the ``original'' problem,
-\eqref{vb_optimization}, without loss of generality.  We will thus continue to
-use $\etaopt$ with no argument to refer to $\etaopt(0)$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
 %
-When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we take
-$\mu$ in \defref{prior_t} to be the Lebesgue measure on $[0,1]$ and model
+For the BNP model with the GEM prior, take $\theta = (\nu_1, \ldots,
+\nu_{\kmax-1})$, $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
+Let $\alpha_0$ be some base value of the concentration parameter, and
+let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
+$0$ represent deviations of $\alpha$ away from $\alpha_0$.
+
+Expanding the KL divergence in \eqref{kl_def},
 %
 \begin{align*}
 %
-\pstick(\nuk \vert \alpha) ={}&
-    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
-\log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
+\MoveEqLeft
+\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x, \alpha)}
+\\={}&    \expect{\q(\zeta \vert \eta)}{
+        \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x)
+\\={}&    \expect{\q(\zeta \vert \eta)}{\log \q(\zeta \vert \eta)} -
+        \expect{\q(\zeta \vert \eta)}
+               {\log \p(\x, \beta, \z \vert \nu )} -
+               \sum_{\k = \kmax}^\infty
+                \expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}
+               +\logp(\x)
+\\{}& -\sum_{\k=1}^{\kmax - 1}
+            \left(
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)} +
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
+             \right).
 %
 \end{align*}
 %
-Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from
-the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
+Recall that the truncated VB objective ignores the terms
+$\expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}$ for $\k \ge \kmax$,
+so that we can write the truncated objective as
 %
 \begin{align*}
 %
-\log \pstick(\nuk \vert \t) ={}&
-(\t + \alpha_0 - 1) \log(1 - \nuk) + \const.
+\KL{\eta, \alpha} = \KL{\eta, \alpha_0}
+-\sum_{\k=1}^{\kmax - 1}
+            \left(
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
+             \right).
+%
 \end{align*}
 %
-The prior on the full $\nu$ vector is given by
+By the definition of $\p(\nuk \vert \alpha)$,
 %
 \begin{align*}
 %
-\log \pstick(\nu \vert \t) ={}&
-    \sumkm (t + \alpha_0 - 1) \log(1 - \nuk)+ \const.
+\log \p(\nu_1, ..., \nu_\kmax \vert \alpha)
+    ={}& (\alpha - 1) \sum_{k=1}^\kmax \log (1 - \nuk)
+    + \kmax \log \frac{\Gamma(1 + \alpha)}{\Gamma(\alpha)}.
 %
 \end{align*}
+%
+The normalizing constant does not depend on $\nuk$, and so its expectation
+does not depend on $\eta$, and so it can be neglected in the VB objective,
+and we can write
+%
+\begin{align*}
+%
+\KL{\eta, \alpha} = \KL{\eta, \alpha_0}
+-(\alpha - \alpha_0) \sum_{\k=1}^{\kmax - 1}
+    \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
+%
+\end{align*}
+%
+Identifying $\KL(\eta)$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$,
+shows that the BNP problem is of the form \eqref{perturbed_objective}.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
