@@ -60,64 +60,6 @@ simply a precise catalogue of what is needed.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}\thmlabel{etat_deriv}
-%
-Under the conditions of \defref{prior_t}, let \assuref{kl_opt_ok} hold at
-$\eta_0 = \etaopt$.  Further, let \assuref{dist_fun_nice} hold with
-%
-\begin{align*}
-%
-\psi(\theta, \t) = \log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)
-%
-\end{align*}
-%
-at $\t_0 = 0$.
-%
-Define\footnote{Note that if $\qtil(\theta \vert \eta)$ is already normalized
-($\qtil = \q$), then $\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} =
-0$ for all $\eta$ and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert
-\etaopt}$. Since it can sometimes be more convenient to work with unnormalized
-distributions, we keep the notation general.}
-%
-\begin{align*}
-%
-\lqgradbar{\theta \vert \etaopt} :={}&
-    \lqgrad{\theta \vert \etaopt} -
-    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}, \\
-\crosshessian :={}&   \expect{\q(\theta \vert \etaopt)}{
-      \lqgradbar{\theta \vert \etaopt}
-      \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}} \mathand \\
-\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
-                      {\partial \eta \partial \eta^T}
-                      {\etaopt}.
-%
-\end{align*}
-%
-Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
-with derivative
-%
-\begin{align}\eqlabel{vb_eta_sens}
-%
-\fracat{d \etaopt(\t)}{d \t}{0} ={}&
-    - \hessopt^{-1}
-    \crosshessian
-    % \expect{\q(\theta \vert \etaopt)}{
-    %     \lqgradbar{\theta \vert \etaopt}
-    %     \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-    % }.
-    % \fracat{\partial^2 \KL{\eta, \t}}
-    %        {\partial \eta \partial \t}
-    %        {\etaopt, 0}.
-%
-\end{align}
-%
-(For a proof, see \appref{proofs} \proofref{etat_deriv}.)
-%
-\end{thm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 We conclude this section by showing that \thmref{etat_deriv} applies to the
 setting of BNP stick-breaking.
 
