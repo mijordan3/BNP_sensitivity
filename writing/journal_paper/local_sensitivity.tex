@@ -198,43 +198,43 @@ that the Hessian is positive definite at the optimum.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We conclude this section with a brief remark about computing the expectation
-$\crosshessian$ in our BNP sensitivity analysis.
-We are interested in sensitivity to the stick-breaking distribution,
-so only the prior terms on stick-breaking proportions
-$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
-Because the elements of $\nu$ fully factorize
-under both the prior and the variational distributions,
-$\crosshessian$ decomposes as
-\begin{align}
-  \crosshessian &=
-  \sum_{\k=1}^{\kmax - 1}
-          \expect{\q(\nuk \vert \eta)}
-                 {
-                 \lqgrad{\nuk \vert \etaopt}
-                 \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
-                 } \notag\\
-  &= \sum_{\k=1}^{\kmax - 1}
-         \evalat{\nabla_\eta \expect{\q(\nuk \vert \eta)}
-                {
-                \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
-                }}{\eta = \etaopt(0)},
-\eqlabel{sens_mixed_partial}
-\end{align}
-where we assumed that $\q(\theta \vert \eta)$ is normalized, so
-$\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$,
-and that the assumptions of \thmref{etat_deriv} hold, so we
-can freely exchange derivatives with expectations.
-
-We approximate the expectation using GH quadrature (\eqref{gh_integral}),
-with
-$f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
-In all the functional forms for
-$\t \mapsto \pstick(\nuk \vert \t)$ considered below,
-$f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
-The resulting GH approximation is a deterministic function of $\eta$,
-and thus the gradient in \eqref{sens_mixed_partial} can be computed
-with another application of automatic differentiation.
-Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
-it is zero for all entries of
-$\eta$ other than those that parameterize the sticks.
+% We conclude this section with a brief remark about computing the expectation
+% $\crosshessian$ in our BNP sensitivity analysis.
+% We are interested in sensitivity to the stick-breaking distribution,
+% so only the prior terms on stick-breaking proportions
+% $\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
+% Because the elements of $\nu$ fully factorize
+% under both the prior and the variational distributions,
+% $\crosshessian$ decomposes as
+% \begin{align}
+%   \crosshessian &=
+%   \sum_{\k=1}^{\kmax - 1}
+%           \expect{\q(\nuk \vert \eta)}
+%                  {
+%                  \lqgrad{\nuk \vert \etaopt}
+%                  \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+%                  } \notag\\
+%   &= \sum_{\k=1}^{\kmax - 1}
+%          \evalat{\nabla_\eta \expect{\q(\nuk \vert \eta)}
+%                 {
+%                 \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+%                 }}{\eta = \etaopt(0)},
+% \eqlabel{sens_mixed_partial}
+% \end{align}
+% where we assumed that $\q(\theta \vert \eta)$ is normalized, so
+% $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$,
+% and that the assumptions of \thmref{etat_deriv} hold, so we
+% can freely exchange derivatives with expectations.
+%
+% We approximate the expectation using GH quadrature (\eqref{gh_integral}),
+% with
+% $f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
+% In all the functional forms for
+% $\t \mapsto \pstick(\nuk \vert \t)$ considered below,
+% $f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
+% The resulting GH approximation is a deterministic function of $\eta$,
+% and thus the gradient in \eqref{sens_mixed_partial} can be computed
+% with another application of automatic differentiation.
+% Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
+% it is zero for all entries of
+% $\eta$ other than those that parameterize the sticks.

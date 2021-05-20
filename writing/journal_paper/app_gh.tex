@@ -1,1 +1,42 @@
-TODO
+We describe how to compute expectations with repsect to the stick-breaking
+proportion $\nu_\k$. Let $f: \mathbb{R}\mapsto\mathbb{R}$ be a smooth function,
+and we are interested in expectations of the form
+\begin{align*}
+  \expect{\q(\nuk \vert \eta)}{f(\nuk)}.
+\end{align*}
+For example, $f$ might be $f(\nu_\k) = \log \pstick(\nu_\k)$, whose
+expectation appears in the $\mathrm{KL}$ divergence.
+
+Recall that we chose the distribution on the logit-transformed
+stick-breaking proportions $\lnu_\k$ to be normally distributed.
+Let $\lnumean_\k$ and $\lnusd_\k$ be the location and scale, respectively,
+of the Gaussian distribution on $\lnu_\k$.
+Also let $\s$ be the sigmoid function, so that $\nu_\k = \s(\lnu_\k)$.
+
+To compute expectations of a smooth function
+$f(\nuk)$, the law of the unconscious statistician states that,
+\begin{align*}
+  \expect{\q(\nuk \vert \eta)}{f(\nuk)} ={}&
+  \expect{\q(\lnu_\k \vert \eta)}
+         {f\circ \s\left(\lnu_\k\right)}.
+\end{align*}
+By choosing $\q(\lnu_\k \vert \eta)$ to be Gaussian,
+the right-hand side of is a Gaussian integral,
+which we approximate
+using GH quadrature with $\ngh$ knots,
+located at $\xi_g$, weighted by $\omega_g$:
+%
+\begin{align}\eqlabel{gh_integral}
+%
+\expect{\q(\lnu_\k \vert \eta)}
+       {f\circ \s\left(\lnu_\k\right)}
+\approx{}&
+    \sum_{g=1}^{\ngh} \omega_g f\circ \s \left(\lnusd_\k \xi_{g} + \lnumean_\k\right)
+ \nonumber\\=:{}&
+\expecthat{\q(\nuk \vert \eta)}{f(\nuk)}.
+%
+\end{align}
+%
+Using GH quadrature to approximate the expectation
+is similar to the ``reparameterization trick,'' only using
+GH points rather than standard normal draws.
