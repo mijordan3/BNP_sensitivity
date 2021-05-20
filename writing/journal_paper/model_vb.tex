@@ -105,7 +105,7 @@ will be available analytically.
 The conditionally conjugate variational distribution on $\beta_\k$ is
 normal-Wishart, which we denote as
 $\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta_{\beta_\k}}$,
-where $\eta_{\beta_\k}$ are the normal-Wishart parameters.
+with $\eta_{\beta_\k}$ the normal-Wishart parameters.
 
 Using the log densities displayed in \exref{iris_bnp_process}
 and the mean-field assumption on $\q$,
@@ -119,7 +119,8 @@ expected moments
 \expect{\q(\beta_\k \vert \eta)}{\Lambda_\k\mu_\k}, \quad
 \expect{\q(\beta_\k \vert \eta)}{\mu_\k\Lambda_\k\mu_\k}.
 \end{align*}
-which all can be computed analytically as functions of $\eta_{\beta_\k}$.
+Under a normal-Wishart, all the displayed expectations
+can be computed analytically as functions of $\eta_{\beta_\k}$.
 %
 \end{ex}
 
@@ -129,7 +130,7 @@ also be a Beta distribution
 \citep{blei:2006:vi_for_dp}.
 Then, in the same way as \exref{iris_var_distr},
 all the necessary expectations with respect to $\nuk$ in the
-$\mathrm{KL}$ can be computed analytically function of the
+$\mathrm{KL}$ can be computed analytically with respect to the
 variational Beta parameters.
 
 However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
@@ -138,20 +139,22 @@ To approximate expectations, we will use numerical integration.
 We choose the distribution on the logit-transformed
 stick-breaking proportions
 \begin{align*}
-  \lnu_\k := \log(\nu_\k) - \log(\nu_\k)
+  \lnu_\k := \log(\nu_\k) - \log(1 - \nu_\k)
 \end{align*}
-to be normally distributed. Letting $\s$ sigmoid function,
+to be normally distributed. Letting $\s$ be the sigmoid function,
 which provides the inverse tranformation,
 \begin{align*}
-    \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
+    \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)},
 \end{align*}
 a normal distribution on $\lnu_\k$ induces a \textit{logit-normal}
 distribution on $\nuk$.
-With this choice of a logit-normal distributions,
-all expectations with respect to $\nu_\k$ can be expressed as a Gaussian
-integral, which we approximate with GH quadrature (see \appref{gh_quadrature})
-Not only do stick expectations appear in the evaluation of the $\mathrm{KL}$
-they will also be necessary in computing local sensitivity (\secref{local_sensitivity}).
+With this choice of a logit-normal distribution,
+all expectations with respect to $\nu_\k$ (such as $\expect{\q(\nu_\k\vert\eta)}{\log \pstick(\nu_\k)}$)
+can be expressed as a Gaussian integral.
+We then approximate the integral with GH quadrature
+(see \appref{gh_quadrature} for details).
+Not only do stick expectations appear in the evaluation of the $\mathrm{KL}$,
+but they will also be necessary in computing local sensitivity (\secref{local_sensitivity}).
 
 Once $\q(\zeta \vert \eta)$ is defined,
 we can approximate any expected posterior quantity of interest
