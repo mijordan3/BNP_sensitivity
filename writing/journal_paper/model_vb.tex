@@ -84,9 +84,80 @@ variational approximating family of the following form:
 Because $\pi_\k = 0$ for all $\k > \kmax$, we can ignore the latent variables
 $\beta_\k$ for $\k > \kmax$ in defining our variational approximation.
 
-Given an expected posterior quantity of interest as in
-\exref{insample_nclusters_simple}, we can simply approximate it with the
-corresponding variational expectation.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For $\z$ and $\beta$ in all models we consider, we have the option of
+taking advantage of conditional conjugacy to choose distributions
+$\q(\z_\n \vert \eta)$ and
+$\q(\beta_\k \vert \eta)$.
+This means that we will take $\q(\z_\n \vert \eta)$
+to be multinomial, matching $\p(\z_{\n}
+\vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$
+to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
+With conditionally conjugate distributions,
+all expectations with respect to $\z$ and $\beta$
+necessary for computing the $\mathrm{KL}$ (\eqref{vb_optimization})
+will be available analytically.
+
+\begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
+%
+The conditionally conjugate variational distribution on $\beta_\k$ is
+normal-Wishart, which we denote as
+$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta_{\beta_\k}}$,
+where $\eta_{\beta_\k}$ are the normal-Wishart parameters.
+
+Using the log densities displayed in \exref{iris_bnp_process}
+and the mean-field assumption on $\q$,
+observe that the variational parameters $\eta_{\beta_\k}$
+enter the expected joint log-likelihood only through the
+expected moments
+%
+\begin{align*}
+\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k},  \quad
+\expect{\q(\beta_\k \vert \eta)}{\log|\Lambda_\k|},  \quad
+\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k\mu_\k}, \quad
+\expect{\q(\beta_\k \vert \eta)}{\mu_\k\Lambda_\k\mu_\k}.
+\end{align*}
+which all can be computed analytically as functions of $\eta_{\beta_\k}$.
+%
+\end{ex}
+
+If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
+then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would
+also be a Beta distribution
+\citep{blei:2006:vi_for_dp}.
+Then, in the same way as \exref{iris_var_distr},
+all the necessary expectations with respect to $\nuk$ in the
+$\mathrm{KL}$ can be computed analytically function of the
+variational Beta parameters.
+
+However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
+are outside the family of Beta distributions.
+To approximate expectations, we will use numerical integration.
+We choose the distribution on the logit-transformed
+stick-breaking proportions
+\begin{align*}
+  \lnu_\k := \log(\nu_\k) - \log(\nu_\k)
+\end{align*}
+to be normally distributed. Letting $\s$ sigmoid function,
+which provides the inverse tranformation,
+\begin{align*}
+    \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
+\end{align*}
+a normal distribution on $\lnu_\k$ induces a \textit{logit-normal}
+distribution on $\nuk$.
+With this choice of a logit-normal distributions,
+all expectations with respect to $\nu_\k$ can be expressed as a Gaussian
+integral, which we approximate with GH quadrature (see \appref{gh_quadrature})
+Not only do stick expectations appear in the evaluation of the $\mathrm{KL}$
+they will also be necessary in computing local sensitivity (\secref{local_sensitivity}).
+
+Once $\q(\zeta \vert \eta)$ is defined,
+we can approximate any expected posterior quantity of interest
+(such as \exref{insample_nclusters_simple}) with the
+corresponding variational expectation, which will
+in turn be a function of the variational parameters $\eta$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
