@@ -1,0 +1,125 @@
+In this section we state general conditions under which VB optima, as defined by
+\eqref{vb_optimization}, are differentiable functions of both parametric and
+nonparametric prior perturbations.  The desired results for the BNP model will
+follow as special cases of these general results.
+
+We first define our general setup in \defref{prior_t}, and then connect
+the general definition to the our BNP problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_t}
+%
+For some parameter $\theta \in \thetadom \subseteq \mathbb{R}^{\thetadim}$, let
+$\p(\theta \vert \t)$ denote a class of probability densities relative to
+a sigma-finite measure $\mu$, defined for $\t$ in an open set $\ball_\t
+\subseteq \mathbb{R}$ containing $0$.  Let $\q(\theta \vert \eta)$ be a
+family of approximating densities, also defined relative to $\mu$.
+
+Define
+%
+\begin{align*}
+%
+\psi(\theta, \t) :={}
+    \expect{\q(\theta \vert \eta)}
+       {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)},
+%
+\end{align*}
+%
+and let the variational objective factorize as
+%
+\begin{align}
+%
+\KL{\eta, \t} :={}& \KL{\eta} + \psi(\theta, \t)
+           \eqlabel{perturbed_objective}\\
+\etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t}.
+    \eqlabel{perturbed_optimum}
+%
+\end{align}
+%
+Let $\etaopt$ with no argument refer to $\etaopt(0)$, the minimizer
+of $\KL{\eta}$.
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{alpha_perturbation}
+%
+For the BNP model with the GEM prior, take $\theta = (\nu_1, \ldots,
+\nu_{\kmax-1})$, $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
+Let $\alpha_0$ be some base value of the concentration parameter, and
+let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
+$0$ represent deviations of $\alpha$ away from $\alpha_0$.
+
+Expanding the KL divergence in \eqref{kl_def}, we see that the prior
+$\p(\nuk \vert \alpha)$ enters the VB objective in a term of the form
+$\sum_{\k=1}^\infty \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)}$.
+Adding and subtracting the this term evaluated at $\alpha_0$ gives
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+% \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x, \alpha)}
+% \\={}&    \expect{\q(\zeta \vert \eta)}{
+%         \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x)
+% \\={}&    \expect{\q(\zeta \vert \eta)}{\log \q(\zeta \vert \eta)} -
+%         \expect{\q(\zeta \vert \eta)}
+%                {\log \p(\x, \beta, \z \vert \nu )}
+%                +\logp(\x)
+% \\{}& -\sum_{\k=1}^{\kmax - 1}
+%             \left(
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)} +
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
+%              \right)
+% \\{}&
+% - \sum_{\k = \kmax}^\infty
+%     \expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}.
+% %
+% \end{align*}
+% %
+% Recall that the truncated VB approximation ignores the terms
+% $\expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}$ for $\k \ge \kmax$,
+% so that we can write the truncated objective as
+%
+\begin{align*}
+%
+\KL{\eta, \alpha} = \KL{\eta, \alpha_0}
+-\sum_{\k=1}^{\kmax - 1}
+            \left(
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
+                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
+             \right).
+%
+\end{align*}
+%
+By the definition of $\p(\nuk \vert \alpha)$,
+%
+\begin{align*}
+%
+\log \p(\nu_1, ..., \nu_\kmax \vert \alpha)
+    ={}& (\alpha - 1) \sum_{k=1}^\kmax \log (1 - \nuk)
+    + \kmax \log \frac{\Gamma(1 + \alpha)}{\Gamma(\alpha)}.
+%
+\end{align*}
+%
+The normalizing constant does not depend on $\nuk$, and so its expectation
+does not depend on $\eta$, and so it can be neglected in the VB objective,
+and we can write
+%
+\begin{align*}
+%
+\KL{\eta, \alpha} = \KL{\eta, \alpha_0}
+-(\alpha - \alpha_0) \sum_{\k=1}^{\kmax - 1}
+    \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
+%
+\end{align*}
+%
+Identifying $\KL{\eta}$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$ evaluated
+at the base concentration parameter shows that the BNP problem with the GEM
+prior is of the form \eqref{perturbed_objective}.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

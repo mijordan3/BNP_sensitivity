@@ -1,142 +1,3 @@
-We now turn to the optimization problem \eqref{vb_optimization} where the priors
-$\pstick(\nuk)$ which enter the term $\logp(\zeta)$ depend on a real-valued
-parameter, $\t \in \tdom \subseteq \mathbb{R}$, writing $\pstick(\nuk \vert
-\t)$.  Starting now, we will state general results in terms of a generic
-parameter $\theta$, specializing to the BNP problem in examples and in the
-experiments below.
-
-%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}\deflabel{prior_t}
-%
-Let $\mu$ denote a sigma finite measure, and let $\p(\theta \vert \t)$ denote a
-class of probability densities relative $\mu$.  Let $\p(\theta \vert \t)$ be
-defined for $\t$ in an open set $\ball_\t \subseteq \mathbb{R}$ containing $0$.
-Assume that the variational densities $\q(\theta \vert \eta)$ are also defined
-relative to $\mu$.
-\todo{need a note about how the truncated approximation uses point masses}
-
-Let $\qtil$ and $\ptil$ refer to potentially
-unnormalized (but normalizable) versions of the respectively corresponding $\q$
-and $\p$, so that,
-%
-\begin{align*}
-%
-\q(\theta \vert \eta) :={}
-    \frac{\qtil(\theta \vert \eta)}
-    {\int \qtil(\theta' \vert \eta) \mu(d\theta')} \mathand
-\p(\theta \vert \t) :={}
-    \frac{\ptil(\theta \vert \t)}
-    {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
-%
-\end{align*}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The prior depends on $\t$; in turn, the posterior $\p(\theta \vert \x, \t)$
-depends on $\t$; in turn, the KL divergance depends on $\t$; in turn, the
-optimal variational parameters depend on $\t$.  Define the shorthand notation
-%
-\begin{align}\eqlabel{kl_shorthand}
-%
-\KL{\eta, \t} := \KL{\q(\theta \vert \eta) || \p(\x \vert \zeta, \t)}
-\mathand
-\etaopt(\t) := \argmin_{\zeta \in \etadom} \KL{\eta, \t},
-%
-\end{align}
-%
-where we write $\etaopt(\t)$ to emphasize the dependence of the optimum on $\t$.
-In \defref{prior_t}, we take $\t = 0$ at the ``original'' problem,
-\eqref{vb_optimization}, without loss of generality.  We will thus continue to
-use $\etaopt$ with no argument to refer to $\etaopt(0)$.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}\exlabel{alpha_perturbation}
-%
-When drawing from the classical $\mathrm{GEM}(\alpha)$ distribution, we take
-$\mu$ to be the Lebesgue measure on $[0,1]$ and model
-%
-\begin{align*}
-%
-\pstick(\nuk \vert \alpha) ={}&
-    \betadist{\nuk \vert 1, \alpha} \Rightarrow\\
-\log \pstick(\nuk \vert \alpha) ={}&
-    (\alpha - 1) \log(1 - \nuk) + \const. &
-    \constdesc{\nuk}
-%
-\end{align*}
-%
-Fix some ``original'' $\alpha_0$.  In this case, we represent deviations from
-the choice $\alpha_0$ by identifying $\t$ with $\alpha - \alpha_0$:
-%
-\begin{align*}
-%
-\log \pstick(\nuk \vert \t) ={}&
-(\t + \alpha_0 - 1) \log(1 - \nuk) + \const.
-\end{align*}
-%
-The prior on the full $\nu$ vector is given by
-%
-\begin{align*}
-%
-\log \pstick(\nu \vert \t) ={}&
-    \sumkm (t + \alpha_0 - 1) \log(1 - \nuk)+ \const.
-%
-\end{align*}
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Assuming for the moment that $\t \mapsto \etaopt(\t)$ is continuously
-differentiable (we will consider its differentiability in detail below), and
-that we have already computed the solution $\etaopt$ to the ``original'' problem
-\eqref{vb_optimization} with $\t=0$, then we can form a Taylor series
-approximation to $\etaopt(\t)$.  Specifically, we define
-%
-\begin{align}\eqlabel{etalin_def}
-%
-\etalin(\t) := \etaopt + \fracat{d \etaopt(\t)}{d \t}{\t=0} \t .
-%
-\end{align}
-%
-Evaluating $\etaopt(\t)$ requires solving a new optimization problem, but, given
-$d\etaopt(\t) / d\t | 0$, evaluating $\etalin(\t)$ involves only
-multiplication and addition.  When $|\t|$ is small, by continuous
-differentiability of $\etaopt(\t)$, we might hope that $\etaopt(\t) \approx
-\etalin(\t)$, and so we can use $\etalin(\t)$ to quickly approximate a
-time-consuming optimization problem.
-
-Futhermore, or functions of interest $\g(\eta)$ which are themselves
-differentiable, we can use the chain rule to compute
-%
-\begin{align}\eqlabel{vb_g_sens}
-%
-\fracat{d g(\etaopt(\t))}{d\t}{\t=0}&
-    \fracat{\partial g(\eta)}{\partial \eta^T}{\etaopt}
-    \fracat{d \etaopt(\t)}{d \t}{\t=0} \\
-\glin(\t) :={}& \g(\etaopt) + \fracat{d g(\etaopt(\t))}{d\t}{\t=0} \t.
-%
-\end{align}
-%
-For non-differentiable functions of $\eta$, we can still form the approximation
-%
-\begin{align*}
-%
-\gapprox(\t) :={}& \g(\etalin(\t)).
-%
-\end{align*}
-%
-The advantage of $\glin(\t)$ relative to $\gapprox(\t)$ is that for the former
-we can compute influence functions and worst-case perturbations, as we discuss
-below.  Converse, $\gapprox(\t)$ may be expected to provide a better
-approximation in some cases since it retains non-linearities in the map $\eta
-\mapsto \g(\eta)$, linearizing only the computationally intensive map $\t
-\mapsto \etaopt(\t)$.
 
 When, then, is $\etaopt(\t)$ continuously differentiable?  We will now state
 some sufficient conditions under which we can apply the implicit function
@@ -155,201 +16,49 @@ In case \assuref{dist_fun_nice} seems forbidding, observe that, in lieu of
 limits and variational expectations whenever needed.  \Assuref{dist_fun_nice} is
 simply a precise catalogue of what is needed.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{dist_fun_nice}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{lem}
+% %
+% Under \assuref{dist_fun_nice}, we can exchange the order of integration
+% and differentiation in
+% %
+% \begin{align*}
+% %
+% \fracat{\partial\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+%        {\partial\eta}{\etaopt, \t=0}
+% \textrm{, }
+% \fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+%        {\partial\eta \partial\eta}{\etaopt, \t=0}
+% \textrm{, and }
+% \fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+%        {\partial\eta \partial \t}{\etaopt, \t=0}.
+% %
+% \end{align*}
+% %
+% (See also \lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}
+% for a more detailed statement.)
+% %
+% \end{lem}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
-% density over the random variable $\theta$ parameterized by $\eta$ defined
-% relative to a dominating measure $\mu$.
-%
-Assume that the map $\eta \mapsto \log \qtil(\theta \vert \eta)$ is twice
-continuously differentiable. Let $\psi(\theta, \t)$ be a scalar-valued
-$\mu$-measurable function of $\theta$ and $\t$.  Assume that the map $\t \mapsto
-\psi(\theta, \t)$ is continuously differentiable.
-
-Define the following shorthand notation:
-%
-\begin{align*}
-%
-\lqgrad{\theta \vert \eta} :={}&
-    \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
-%
-\lqhess{\theta \vert \eta} :={}&
-    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
-           {\partial \eta \partial \eta^T}{\eta} \\
-%
-\psigrad{\theta, \t} :={}& \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t}.
-%
-\end{align*}
-%
-For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
-$\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
-$\mu$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \mu(d\theta) <
-\infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
-\times \ball_\t$:
-%
-\begin{enumerate}
-%
-\item \itemlabel{fundom}
-$\qtil(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
-%
-\item \itemlabel{funqgraddom}
-$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
-M_\psi(\theta)$.
-%
-\item \itemlabel{funqhessdom}
-$\qtil(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
-M_\psi(\theta)$.
-%
-\item \itemlabel{fungradqgraddom}
-$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
-\le M_\psi(\theta)$.
-%
-\item \itemlabel{funqgradsqdom}
-$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
-M_\psi(\theta)$.
-%
-\end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}
-%
-Under \assuref{dist_fun_nice}, we can exchange the order of integration
-and differentiation in
-%
-\begin{align*}
-%
-\fracat{\partial\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
-       {\partial\eta}{\etaopt, \t=0}
-\textrm{, }
-\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
-       {\partial\eta \partial\eta}{\etaopt, \t=0}
-\textrm{, and }
-\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
-       {\partial\eta \partial \t}{\etaopt, \t=0}.
-%
-\end{align*}
-%
-(See also \lemref{logq_derivs, logq_continuous} of \appref{cont_lemmas}
-for a more detailed statement.)
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Next, in \assuref{kl_opt_ok}, we first require some regularity conditions on
-the KL divergence and its optimum.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_opt_ok}
-%
-Let the following conditions on the variational approximation hold.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-%
-    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta, 0}$ is twice
-    continuously differentiable at $\etaopt$.
-
-    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
-    to $\etadom$.
-
-    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta,
-    0}} {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
-
-    \item\itemlabel{kl_dct} The unnormalized variational densities $\qtil(\theta
-    \vert \eta)$ satisfy \assuref{dist_fun_nice} with $\psi(\theta, \t) \equiv
-    1$ (no $\theta$ dependence).
-%
-\end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Observe that \assuref{dist_fun_nice}, applied with $\logp(\x \vert \theta)$, is
-one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary focus
-is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
-\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
-for the prior $\logp(\theta \vert \t)$.
-
-Finally, in \assuref{q_stick_regular} we draw the needed connection between the
-class of prior perturbations and the variational approximation.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{q_stick_regular}
-%
-Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
-\eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
-$\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
-\log \p(\theta \vert \t=0)$.
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}\thmlabel{etat_deriv}
+% Finally, in \assuref{q_stick_regular} we draw the needed connection between the
+% class of prior perturbations and the variational approximation.
 %
-Under the conditions of \defref{prior_t}, let \assuref{kl_opt_ok} hold at
-$\eta_0 = \etaopt$.  Further, let \assuref{dist_fun_nice} hold with
-%
-\begin{align*}
-%
-\psi(\theta, \t) = \log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)
-%
-\end{align*}
-%
-at $\t_0 = 0$.
-%
-Define\footnote{Note that if $\qtil(\theta \vert \eta)$ is already normalized
-($\qtil = \q$), then $\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} =
-0$ for all $\eta$ and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert
-\etaopt}$. Since it can sometimes be more convenient to work with unnormalized
-distributions, we keep the notation general.}
-%
-\begin{align*}
-%
-\lqgradbar{\theta \vert \etaopt} :={}&
-    \lqgrad{\theta \vert \etaopt} -
-    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}, \\
-\crosshessian :={}&   \expect{\q(\theta \vert \etaopt)}{
-      \lqgradbar{\theta \vert \etaopt}
-      \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}} \mathand \\
-\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
-                      {\partial \eta \partial \eta^T}
-                      {\etaopt}.
-%
-\end{align*}
-%
-Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
-with derivative
-%
-\begin{align}\eqlabel{vb_eta_sens}
-%
-\fracat{d \etaopt(\t)}{d \t}{0} ={}&
-    - \hessopt^{-1}
-    \crosshessian
-    % \expect{\q(\theta \vert \etaopt)}{
-    %     \lqgradbar{\theta \vert \etaopt}
-    %     \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-    % }.
-    % \fracat{\partial^2 \KL{\eta, \t}}
-    %        {\partial \eta \partial \t}
-    %        {\etaopt, 0}.
-%
-\end{align}
-%
-(For a proof, see \appref{proofs} \proofref{etat_deriv}.)
-%
-\end{thm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{assu}\assulabel{q_stick_regular}
+% %
+% Under \defref{prior_t}, assume that the variational densities $\q(\theta \vert
+% \eta)$ satisfy \assuref{dist_fun_nice} with both $\psi(\theta, \t) \equiv 1$ (no
+% $\theta$ dependence) and with and $\psi(\theta, \t) = \log \p(\theta \vert \t) -
+% \log \p(\theta \vert \t=0)$.
+% %
+% \end{assu}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 We conclude this section by showing that \thmref{etat_deriv} applies to the
 setting of BNP stick-breaking.

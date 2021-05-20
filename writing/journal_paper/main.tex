@@ -102,7 +102,7 @@
 \input{introduction.tex}
 
 
-\section{Stick-breaking Dirichlet processes}
+\section{The model and variational approximation}
     \subsection{Discrete Bayesian Nonparametric Model}
     \seclabel{model_bnp}
     \input{model_bnp.tex}
@@ -111,23 +111,28 @@
     \seclabel{model_vb}
     \input{model_vb.tex}
 
+    \subsection{Robustness and the Taylor series approximation}
+    \seclabel{model_taylor}
+    \input{model_space_of_priors.tex}
 
-\section{Local sensitivity}\seclabel{local_sensitivity}
-\input{local_sensitivity.tex}
 
-\section{Function-valued prior perturbations}\seclabel{functional_perturbations}
-\input{function_perturbations.tex}
+\section{Differentiability of the VB optimum}
+\seclabel{local_sensitivity}
+\input{diffable_intro}
 
-\section{Valid priors and $\lp{\mu,p}$ balls}\seclabel{valid_priors}
-\input{valid_priors.tex}
+    \subsection{Parametric prior perturbations}
+    \seclabel{diffable_parametric}
+    \input{diffable_parametric}
 
-\section{Differentiability}\seclabel{differentiability}
-\input{differentiability.tex}
+    \subsection{Nonparametric prior perturbations}
+    \seclabel{diffable_nonparametric}
+    \input{diffable_nonparametric}
+
 
 \section{Computing the sensitivity}\seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
 
-\section{Results}\seclabel{results}
+\section{Experimental Results}\seclabel{results}
 \input{results_intro.tex}
 
     \subsection{Gaussian mixture modeling on iris data}
@@ -145,6 +150,10 @@
 \section{Conclusion}
 \seclabel{conclusion}
 This concludes.
+
+\section{Orphans}
+\input{_orphans}
+
 
 
 \section{Acknowledgements}
