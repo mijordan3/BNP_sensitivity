@@ -1,19 +1,2 @@
-- Should we move the details of the variational approximation to the
-appendix?  (Specifically --- conditional conjugacy, GH, and interior sticks)?
-
-- Observe that we write "KL" even when it's not an actual KL divergence
-(GH quadrature, point mass approximations).  This or define a quantity for
-the objective function.
-
-- Introduce the prior perturbation and definition (density WRT base measure
-earlier on).  Also you can define the multiplicative perturbation there, too.
-
-Can we introduce sensitivity right after we introduce the variational
-approximation?
-
-Can we move the other examples of BNP models later in the paper, in order to
-move the main results up?
-
-Can we introduce the parameterization by t right away when we introduce the
-stick breaking density?  This will allow us to parameterize the VB approxiation
-by t right away, too.
+Use this doc instead:
+https://docs.google.com/document/d/1st4Tr1yTPvFtEvoc906oLrBah_MQ30Ro7D3I1M1DMbI/edit

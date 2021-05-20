@@ -36,3 +36,5 @@ in priors not the new prior.
 Observe that we write "KL" even when it's not an actual KL divergence
 (GH quadrature, point mass approximations).  This or define a quantity for
 the objective function.
+
+Refer to the stick-breaking "density", not "distribution"
