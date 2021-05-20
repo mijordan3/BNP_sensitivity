@@ -57,21 +57,25 @@ The distribution of the data arising from component $k$ is
 \tau_\k^{-1}I_{\ntimepoints \times \ntimepoints}},
 \end{align}
 %
-where $\b_{n}$ is a gene-specific additive offset and $I$ is the identity matrix.
+where $\b_\n$ is a gene-specific additive offset and $I$ is the identity matrix.
 We include the additive offset because we
 are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
+Notice that in this model, the shifts $\b_\n$ are local variables since they are unique to each gene $\n$. 
 
-The joint distribution can be written in the same form as~\eqref{bnp_model},
-except that the conditional data likelihood now depends on $\b_\n$ as well as $\beta_\k$, and we include an additional prior term for $\b_\n$.
-In this model, the local latent variables comprise of both the shifts $\b$ and the cluster assignments $\z$. 
-In this section, we also make the simplification that the distribution
-$\q(\beta_\k \vert\eta)$ are point masses parameterized by their location
-$\eta_{\beta_\k}$. 
+The mixture weights and cluster assignments are drawn from the 
+stick-breaking process described in \secref{model_bnp}. 
+
+Our variational distribution factorizes as~\eqref{vb_mf}
+with the addition
+of a factor for the additive shift. 
+In this application,
+we make a simplification by letting
+$\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$, 
+where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location. 
 See \appref{app_mice} for further details concerning the model and
 variational approximation. 
 
-%
 <<example_genes_cap>>=
 example_genes_cap <- paste(
     "(Left) An example gene and its expression measured at 14 unique time points
@@ -86,19 +90,35 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
-In this application, we expect to uncover finer structure than the iris data set, so we start with a larger $\alpha$ than the previous example 
+In this application, we expect to uncover finer structure
+so we start with a larger $\alpha$ than the previous example 
 and set $\alpha_0 = 6$. 
-We will evaluate the senstivity to this choice of $\alpha$ below. 
-\figref{gene_centroids} shows the inferred smoothers 
-$\regmatrix\mathbb{E}_\q[\beta_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
-$\gcoclustering(\eta)$, whose $(i,j)$-th entry is the
+at this choice of $\alpha_0$. 
+More precisely, let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ 
+denote the co-clustering matrix, 
+whose $(i,j)$-th entry is the
 posterior probability that gene $i$ belongs to the same cluster
-as gene $j$ (\exref{posterior_coclustering}).
+as gene $j$, given by 
+\begin{align*}
+[\gcoclustering(\eta)]_{ij}
+&= \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}} \\
+&= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
+\expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
+\end{align*}
+
+% $\gcoclustering(\eta)$, whose , given by 
+% \begin{align*}
+% \gcoclustering{ij}(\eta) 
+% &= \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}} \\
+% &= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
+% \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
+% \end{align*}
 
 Below, we evaluate the sensitivity of the inferred co-clustering matrix to 
 both parametric and functional perturbations to the stick distribution. 
 
+\newcommand{\MiceSmoothers}{
 <<gene_centroids_cap>>=
 gene_centroids_cap <- paste(
     "Inferred clusters in the mice gene expression dataset. 
@@ -111,6 +131,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.8)
 <<gene_centroids, cache=simple_cache, fig.show='hold', fig.cap=gene_centroids_cap>>=
 source("R_scripts/mice/example_centroids.R", echo=knitr_debug, print.eval=TRUE)
 @
+}
 
 
 <<gene_initial_coclustering_cap>>=
