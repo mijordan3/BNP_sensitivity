@@ -33,6 +33,74 @@ $\mu$-almost surely and for all $\t \in S_\t$, then
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{dist_fun_nice}
+%
+% Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
+% density over the random variable $\theta$ parameterized by $\eta$ defined
+% relative to a dominating measure $\mu$.
+%
+Assume that the map $\eta \mapsto \log \qtil(\theta \vert \eta)$ is twice
+continuously differentiable. Let $\psi(\theta, \t)$ be a scalar-valued
+$\mu$-measurable function of $\theta$ and $\t$.  Assume that the map $\t \mapsto
+\psi(\theta, \t)$ is continuously differentiable.
+
+Define the following shorthand notation:
+%
+\begin{align*}
+%
+\lqgrad{\theta \vert \eta} :={}&
+    \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
+%
+\lqhess{\theta \vert \eta} :={}&
+    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta} \\
+%
+\psigrad{\theta, \t} :={}& \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t}.
+%
+\end{align*}
+%
+For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
+$\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
+$\mu$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \mu(d\theta) <
+\infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
+\times \ball_\t$:
+%
+\begin{enumerate}
+%
+\item \itemlabel{fundom}
+$\qtil(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
+%
+\item \itemlabel{funqgraddom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\item \itemlabel{funqhessdom}
+$\qtil(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\item \itemlabel{fungradqgraddom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
+\le M_\psi(\theta)$.
+%
+\item \itemlabel{funqgradsqdom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Observe that \assuref{dist_fun_nice}, applied with $\logp(\x \vert \theta)$, is
+one way to prove \assuitemref{kl_opt_ok}{kl_diffable}.  Since our primary focus
+is on the prior $\logp(\theta \vert \t)$, we prefer to simply state
+\assuitemref{kl_opt_ok}{kl_diffable} directly and reserve our detailed attention
+for the prior $\logp(\theta \vert \t)$.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

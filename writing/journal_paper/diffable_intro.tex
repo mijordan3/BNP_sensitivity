@@ -14,14 +14,23 @@ For some parameter $\theta \in \thetadom \subseteq \mathbb{R}^{\thetadim}$, let
 $\p(\theta \vert \t)$ denote a class of probability densities relative to
 a sigma-finite measure $\mu$, defined for $\t$ in an open set $\ball_\t
 \subseteq \mathbb{R}$ containing $0$.  Let $\q(\theta \vert \eta)$ be a
-family of approximating densities, also defined relative to $\mu$, and let
-the variational objective factorize as
+family of approximating densities, also defined relative to $\mu$.
+
+Define
+%
+\begin{align*}
+%
+\psi(\theta, \t) :={}
+    \expect{\q(\theta \vert \eta)}
+       {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)},
+%
+\end{align*}
+%
+and let the variational objective factorize as
 %
 \begin{align}
 %
-\KL{\eta, \t} :={}& \KL{\eta} +
-    \expect{\q(\theta \vert \eta)}
-           {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)}
+\KL{\eta, \t} :={}& \KL{\eta} + \psi(\theta, \t)
            \eqlabel{perturbed_objective}\\
 \etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t}.
     \eqlabel{perturbed_optimum}

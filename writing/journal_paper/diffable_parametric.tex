@@ -1,6 +1,77 @@
+We now state conditions under which $\t \mapsto \etaopt(\t)$, as defined by
+\defref{prior_t}, is continuously differentiable.  Our key theoretical tool will
+be the implicit function theorem (e.g., \citet{krantz:2012:implicit}), applied
+to the first-order conditions for the VB optimization problem, and the dominated
+converence theorem (e.g., \citet[Theorem 16.8]{billingsley:1986:probability}),
+which will allow us to express derivatives of variational expectations in terms
+of properties  of other variational expectations.
 
-Additionally, let $\qtil$ and $\ptil$ refer to potentially unnormalized (but
-normalizable) versions of the respectively corresponding $\q$ and $\p$, so that,
+For \assuref{kl_opt_ok}, we state some regularity conditions on the ``base
+problem'', $\KL{\eta}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Let the following conditions on the variational approximation hold.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+%
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
+    continuously differentiable at $\etaopt$.
+
+    \item \itemlabel{kl_opt_interior} The optimal $\etaopt$ is interior
+    to $\etadom$.
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
+    {\partial \eta \partial \eta^T} {\etaopt}$ is positive definite.
+
+    % \item\itemlabel{kl_dct} The unnormalized variational densities $\qtil(\theta
+    % \vert \eta)$ satisfy \assuref{dist_fun_nice} with $\psi(\theta, \t) \equiv
+    % 1$ (no $\theta$ dependence).
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Next, we assume that we can exchange the order of integration and
+differentiation in variational expectations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{assu}\assulabel{exchange_order}
+%
+Assume that we can exchange the order of $\q$-integration and differentiation in
+the following expressions:
+%
+\begin{align*}
+%
+\fracat{\partial\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta}{\etaopt, \t=0}
+\textrm{, }
+\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta \partial\eta}{\etaopt, \t=0}
+\textrm{, and }
+\fracat{\partial^2\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}}
+       {\partial\eta \partial \t}{\etaopt, \t=0}.
+%
+\end{align*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In \appref{cont_lemmas}, we state easy-to-verify (but wordy) sufficient
+conditions that allow us to verify \assuref{exchange_order} using the
+dominated convergence theorem.
+
+Before stating our theorem, we define one more additional notation.  The
+derivative can expressed in terms of unnormalized densities, which can simplify
+some computation.  Let $\qtil$ and $\ptil$ refer to potentially unnormalized
+(but normalizable) versions of the respectively corresponding $\q$ and $\p$, so
+that,
 %
 \begin{align*}
 %
@@ -12,3 +83,56 @@ normalizable) versions of the respectively corresponding $\q$ and $\p$, so that,
     {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
 %
 \end{align*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{etat_deriv}
+%
+Under the conditions of \defref{prior_t}, let \assuref{kl_opt_ok,
+exchange_order} hold
+%
+Define\footnote{Note that if $\qtil(\theta \vert \eta)$ is already normalized
+($\qtil = \q$), then $\expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} =
+0$ for all $\eta$ and $\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert
+\etaopt}$.}
+%
+\begin{align*}
+%
+\hessopt :={}& \fracat{\partial^2 \KL{\eta, 0}}
+                      {\partial \eta \partial \eta^T}
+                      {\etaopt},\\
+%
+\lqgradbar{\theta \vert \etaopt} :={}&
+    \lqgrad{\theta \vert \etaopt} -
+    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}},
+    \mathand \\
+%
+\crosshessian :={}&   \expect{\q(\theta \vert \etaopt)}{
+      \lqgradbar{\theta \vert \etaopt}
+      \fracat{\partial \log \ptil(\theta \vert \t)}
+             {\partial \t}{\t=0}}.
+%
+\end{align*}
+%
+Then the map $\t \mapsto \etaopt(\t)$ is continuously differentiable at $\t=0$
+with derivative
+%
+\begin{align}\eqlabel{vb_eta_sens}
+%
+\fracat{d \etaopt(\t)}{d \t}{0} ={}&
+    - \hessopt^{-1}
+    \crosshessian.
+    % \expect{\q(\theta \vert \etaopt)}{
+    %     \lqgradbar{\theta \vert \etaopt}
+    %     \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
+    % }.
+    % \fracat{\partial^2 \KL{\eta, \t}}
+    %        {\partial \eta \partial \t}
+    %        {\etaopt, 0}.
+%
+\end{align}
+%
+(For a proof, see \appref{proofs} \proofref{etat_deriv}.)
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
