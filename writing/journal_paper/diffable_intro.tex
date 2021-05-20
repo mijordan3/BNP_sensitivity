@@ -34,21 +34,6 @@ of $\KL{\eta}$.
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Additionally, let $\qtil$ and $\ptil$ refer to potentially unnormalized (but
-normalizable) versions of the respectively corresponding $\q$ and $\p$, so that,
-%
-\begin{align*}
-%
-\q(\theta \vert \eta) :={}
-    \frac{\qtil(\theta \vert \eta)}
-    {\int \qtil(\theta' \vert \eta) \mu(d\theta')} \mathand
-\p(\theta \vert \t) :={}
-    \frac{\ptil(\theta \vert \t)}
-    {\int \ptil(\theta' \vert \t) \mu(d\theta')}.
-%
-\end{align*}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
@@ -59,32 +44,36 @@ Let $\alpha_0$ be some base value of the concentration parameter, and
 let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
 $0$ represent deviations of $\alpha$ away from $\alpha_0$.
 
-Expanding the KL divergence in \eqref{kl_def},
-%
-\begin{align*}
-%
-\MoveEqLeft
-\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x, \alpha)}
-\\={}&    \expect{\q(\zeta \vert \eta)}{
-        \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x)
-\\={}&    \expect{\q(\zeta \vert \eta)}{\log \q(\zeta \vert \eta)} -
-        \expect{\q(\zeta \vert \eta)}
-               {\log \p(\x, \beta, \z \vert \nu )} -
-               \sum_{\k = \kmax}^\infty
-                \expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}
-               +\logp(\x)
-\\{}& -\sum_{\k=1}^{\kmax - 1}
-            \left(
-                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
-                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)} +
-                \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
-             \right).
-%
-\end{align*}
-%
-Recall that the truncated VB objective ignores the terms
-$\expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}$ for $\k \ge \kmax$,
-so that we can write the truncated objective as
+Expanding the KL divergence in \eqref{kl_def}, we see that the prior
+$\p(\nuk \vert \alpha)$ enters the VB objective in a term of the form
+$\sum_{\k=1}^\infty \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)}$.
+Adding and subtracting the this term evaluated at $\alpha_0$ gives
+% %
+% \begin{align*}
+% %
+% \MoveEqLeft
+% \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x, \alpha)}
+% \\={}&    \expect{\q(\zeta \vert \eta)}{
+%         \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x)
+% \\={}&    \expect{\q(\zeta \vert \eta)}{\log \q(\zeta \vert \eta)} -
+%         \expect{\q(\zeta \vert \eta)}
+%                {\log \p(\x, \beta, \z \vert \nu )}
+%                +\logp(\x)
+% \\{}& -\sum_{\k=1}^{\kmax - 1}
+%             \left(
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha)} -
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)} +
+%                 \expect{\q(\nuk \vert \eta)}{\log \p(\nuk \vert \alpha_0)}
+%              \right)
+% \\{}&
+% - \sum_{\k = \kmax}^\infty
+%     \expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}.
+% %
+% \end{align*}
+% %
+% Recall that the truncated VB approximation ignores the terms
+% $\expect{\q(\zeta \vert \eta)}{\log \p(\nuk \vert \alpha)}$ for $\k \ge \kmax$,
+% so that we can write the truncated objective as
 %
 \begin{align*}
 %
@@ -119,8 +108,9 @@ and we can write
 %
 \end{align*}
 %
-Identifying $\KL(\eta)$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$,
-shows that the BNP problem is of the form \eqref{perturbed_objective}.
+Identifying $\KL{\eta}$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$ evaluated
+at the base concentration parameter shows that the BNP problem with the GEM
+prior is of the form \eqref{perturbed_objective}.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
