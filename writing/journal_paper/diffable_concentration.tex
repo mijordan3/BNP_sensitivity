@@ -36,10 +36,11 @@ is not a standard exponential family
 \footnote{In this section, we continue to take $\mu$ to be the Lebesgue measure
 on $[0,1]$ as in \exref{alpha_perturbation}.  We could have equivalently taken
 $\mu$ to be the Lebesgue measure on $\mathbb{R}$ and analyzed $\p(\lnuk \vert
-\alpha)$ instead.  Had we done so, the same log Jacobian term $\log (\nuk(1 -
-\nuk))$ would have appeared in the $\log \ptil(\lnuk \vert \alpha)$ term rather
-than the $\q(\lnuk \vert \etanuk)$ entropy term, and so been part of
-\assuref{exchange_order} rather than \assuitemref{kl_opt_ok}{kl_diffable}.  For
+\alpha)$ instead of $\p(\nuk \vert \alpha)$.  Had we done so, the log Jacobian
+term $\log (\nuk(1 - \nuk))$ now appearing in the entropy would have instead
+appeared in the $\log \ptil(\lnuk \vert \alpha)$ term, and so been part of
+\assuref{exchange_order} rather than \assuitemref{kl_opt_ok}{kl_diffable}.
+Nevertheless, the needed assumptions would be substantively the same. For
 essentially this reason, the choice of dominainting measure in \defref{prior_t}
 does not matter.}
 %
@@ -183,5 +184,16 @@ Since $\log (1 + \exp(\lnuk)) \exp(-\abs{\lnuk})  < \infty$ for all $\lnuk \in
 any ball $\ball_\eta$ such that the variational variances are all finite, and
 \assuref{exchange_order} is satsified.
 
-It follows that \thmref{etat_deriv} applies to the map $\alpha \mapsto
+Since both \assuref{kl_opt_ok} and \assuref{exchange_order} are satisfied,
+it follows that \thmref{etat_deriv} applies to the map $\alpha \mapsto
 \etaopt(\alpha)$.
+
+We end this section by observing that the only real technical challenge was
+showing that the assumptions were satisfied for the logit-normal distributions
+$\q(\nuk \vert \etanuk)$.  Had we instead used the conjugate beta distribution
+parameterized by its natural parameters, then both \assuref{kl_opt_ok} and
+\assuref{exchange_order} would follow immediately by standard properties of the
+Beta distribution.  In particular, the expectation $\expect{\q(\nuk \vert
+\etanuk)}{t \log (1 - \nuk)}$ needed for \assuref{kl_opt_ok} is simply $\t$
+times the Beta distribution's moment parameter, which is known to be an
+infinitely-differentiable function of the natural parameters.
