@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R", echo=FALSE)
 
@@ -30,18 +30,38 @@ The data set is a sample of 150 iris flowers with
 four measurements taken per flower:
 sepal length, sepal width, petal length, and petal width.
 The GMM was detailed in \exref{iris_bnp_process}; here, the
-data dimension $d = 4$. In the variational approximation,
+data dimension $d = 4$. The variational approximation is 
+mean-field as in \eqref{vb_mf}, and
 we set the truncation parameter $\kmax = 15$.
+The variational distribution on all latent variables were taken to 
+be the conditionally conjugate (\exref{iris_var_distr}), 
+except for the stick-breaking proportions $\nu_\k$ which are logit-normal.
+
+We will investigate how prior choices affect the estimated number of clusters. 
+The expected number of \textit{in-sample} clusters $\gclustersabbr$ was defined 
+in \exref{vb_insample_nclusters_simple}. 
+We will also consider the \textit{posterior predictive} number of clusters, 
+\begin{align*}
+  \gclusterspredabbr(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
+  &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
+  (1 - \pi_k)^\N \right)}.
+\end{align*}
+In the iris example, the predictive quantity 
+can interpreted as the expected number of species
+one might see if a fresh sample of iris flowers were collected.
+
+\todo{make sure this the notation matches from before. }
 
 \subsubsection*{Parametric sensitivity}
 
-We explore how the posterior number of clusters vary with different choices
+We explore how the posterior number of clusters,
+either insample or predictive, varies with different choices
 of the GEM parameter $\alpha$.
 The \textit{a priori} expected number of clusters under a GEM is
 \begin{align}\eqlabel{prior_num_clusters}
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1},
 \end{align}
-where $\N$ is the number of observations CITE.
+where $\N$ is the number of observations \citep{jordan:2015:gentleintrodp}.
 
 For the iris data set, we
 consider the range $\alpha\in[0.1, 4.0]$.
@@ -50,8 +70,8 @@ the prior number of clusters is $\approx 1.5$ when $\alpha = 0.1$ and
 $\approx 15$ when $\alpha = 4.0$.
 The shape of the stick-breaking density varies
 considerably for this range of $\alpha$ (\figref{beta_priors}),
-and without knowing the true number of iris species, it may be
-unclear which $\alpha$ to choose.
+and without knowing the true number of iris species, 
+it may be unclear which $\alpha$ to choose.
 
 <<beta_priors_cap>>=
 beta_priors_cap <-
@@ -84,15 +104,15 @@ source('./R_scripts/iris/iris_init_fit.R',
 @
 
 
-Our posterior quantities,
-the expected number of in-sample clusters and
-the expected number of predictive clusters,
-were defined in~\exref{insample_nclusters, predictive_nclusters}.
-For this application,
-we do not use thresholding in computing the number of clusters
-(i.e. we set $\tau = 0$),
-so we simply write $\gclustersabbr$ and $\gclusterspredabbr$ for the
-in-sample and predictive quantities, respectively.
+% Our posterior quantities,
+% the expected number of in-sample clusters and
+% the expected number of predictive clusters,
+% were defined in~\exref{insample_nclusters, predictive_nclusters}.
+% For this application,
+% we do not use thresholding in computing the number of clusters
+% (i.e. we set $\tau = 0$),
+% so we simply write $\gclustersabbr$ and $\gclusterspredabbr$ for the
+% in-sample and predictive quantities, respectively.
 We formed the linear approximation at the initial
 $\alpha_0 = \Sexpr{alpha0}$ fit.
 Without further optimization, we use the linear approximation

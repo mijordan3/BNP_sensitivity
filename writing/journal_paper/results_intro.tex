@@ -1,16 +1,16 @@
 We evaluate the prior sensitivity in BNP models applied to three distinct data analysis examples.
 We first fit a Gaussian mixture model (\exref{iris_bnp_process}) to the canonical iris data set.
 Secondly, we cluster time-course gene expression data using a regression model
-(\exref{mice_bnp_process}) and study the resulting co-clustering matrix.
-Finally, we fit a topic model (\exref{structure_bnp_process})
+and study the resulting co-clustering matrix.
+Finally, we fit a topic model
 on a data set of sampled genotypes in an endangered bird species.
 We estimate the number of latent populations in this
 bird species and reconstruct ancestral migration patterns.
 
 In each data example, we first fit the variational approximation to a model
-with Beta-distributed sticks at some chosen parameter $\alpha = \alpha_0$.
+with a GEM prior with some chosen parameter $\alpha = \alpha_0$.
 We then examine the effects of varying the parameter $\alpha$
-in the $\betadist{\nuk \vert 1, \alpha}$ stick distribution
+in the $\betadist{\nuk \vert 1, \alpha}$ distribution on stick-breaking proportions
 as well as
 the effects of changing the functional form the Beta prior itself.
 For a given prior perturbation,
@@ -23,7 +23,7 @@ followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-qu
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
 
-In our results below, we use
+In the results below, we use
 the approximation defined by \eqref{global_sens, global_lin_approx},
 where only the global variational parameters are linearized;
 the local parameters are set implicitly as part of the
