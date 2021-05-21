@@ -101,15 +101,15 @@ expressed in the space of $\nu$ and $\lnu$, which is given by
 
 \hrulefill
 
-In the regression example (\exref{mice_bnp_process}), $\zeta$ includes
+In the regression example (MICE BNP PROCESS), $\zeta$ includes
 the additive shifts, $\zeta := (\beta, \z, \nu, \b)$.
 
 The variational approximation for the topic model
-(\exref{structure_bnp_process}) is similarly mean-field: the distribution on
+(STRUCTURE BNP PROCESS) is similarly mean-field: the distribution on
 stick-breaking proportions $\nu$ factorizes over both individuals $\n$ and
 components $\k$, while the assignments $\z$ factorize over individuals $\n$,
 loci $\l$, and chromosomes $\i$. For the regression model
-(\exref{mice_bnp_process}), all terms in the variational approximation
+(MICE BNP PROCESS), all terms in the variational approximation
 fully-factorize except for the cluster assignments $\z$ and additive shifts
 $\b$. While we assume $(\z, \b)$ to be independent from all other latent
 variables under $\q$, we will allow conditional dependence between $\z$ and $\b$
@@ -138,7 +138,7 @@ distribution as follows.  Define
 %
 and choose $\q(\lnu_\k \vert \eta)$ to be normally distributed.  This then
 induces a logit-normal distribution on our original variable of interest,
-$\nuk$.  See \secref{stick_expectations} below for more details.
+$\nuk$.  See STICK EXPECTATIONS below for more details.
 
 
 
