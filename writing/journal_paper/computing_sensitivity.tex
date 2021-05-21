@@ -6,10 +6,9 @@ The cross-hessian term $\crosshessian$
 is inexpensive to compute using automatic differentiation.
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most expensive step in computing local sensitivity,
-especially when the dimension of $\eta$, is large.
+especially when the dimension of $\eta$ is large.
 To invert the Hessian, we will take advantage of the fact that
-all the models we will consider factorize into a set of \textit{global} latent
-variables and a set of \textit{local} latent variables.
+all the models we consider in \secref{results} have a global/local factorization.
 This factorization will be useful for optimizing the $\mathrm{KL}$ objective
 as well.
 
@@ -18,7 +17,8 @@ as well.
 \todo{would this subsection make more sense immediately after \thmref{etat_deriv}?}
 
 We are interested in sensitivity to the stick-breaking distribution,
-so only the prior terms on stick-breaking proportions
+so in our experiments (\secref{results}),
+only the prior terms on stick-breaking proportions
 $\nu = (\nu_1, ..., \nu_{\kmax - 1})$ will depend on $t$.
 Because the elements of $\nu$ fully factorize
 under both the prior and the variational distributions,
@@ -67,14 +67,14 @@ are unique to each data point.
 In the GMM example, the global variables are $(\beta, \nu)$,
 while $\z_1, ..., \z_\N$ are local variables.
 
-Let $\gamma = (\beta,\nu)$ be the global latent variables
-and let $\etaglob = (\etabeta, \etanu)$ be their variational parameters.
+Let $\gamma$ be the collection of global latent variables
+and let $\etaglob$ be their variational parameters.
 Similarly, let $\ell$ be the local latent variables and
 let $\etalocal$ be the local variational parameters.
-In the GMM example, $\ell = \z$ and $\etalocal = \etaz$,
-but in later models, the local variables may include more than just $\z$.
-Notice that the dimension of $\eta_\gamma$ scales
-with only $\kmax$, while $\eta_\ell$ scales with $\N\times\kmax$.
+Notice that because the local latent variables are unique to each data point,
+the dimension of $\etalocal$ scales with $\N$.
+The global parameter $\etaglob$ does not scale with $\N$---in the GMM example,
+$\etaglob$ scales only with $\kmax$.
 
 In all models we will consider,
 the optimal local variational parameters $\etaoptlocal$ can be written
@@ -142,8 +142,6 @@ $(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed
 a function of $(\etabeta, \etanu)$.
 %
 \end{ex}
-
-
 
 Rather than optimizing the $\mathrm{KL}$ over all variational parameters, both global and local,
 we optimize $\KLglobal$ (\eqref{kl_global}), which is a function of global parameters only.
@@ -274,15 +272,14 @@ by implicitly setting local parameters at their optimum;
 we then use automatic differentiation to
 compute the Hessian of $\mathrm{KL}_{glob}$.
 
-Crucially, the size of $\hessopt_\gamma$ scales with $(\kmax)^2$,
-while the full Hessian scales with both $(\kmax\times\N)^2$
-Hence, $\hessopt_\gamma$ is more memory efficient to store
-and faster to invert
-than the full Hessian of all the variational parameters.
-
+Crucially, the size of $\hessopt_\gamma$ scales with the squared dimension
+of $\etaglob$---and recall that the unlike $\etalocal$, the dimension of
+$\etaglob$ does not scale with the number of data points $\N$.
+Hence, on large data sets, $\hessopt_\gamma$ will be much more memory efficient
+to store and faster to invert than the full Hessian.
 
 Now that we can compute the sensitivity of the global parameters in
-\eqref{global_sens}, we produce its linear approximation:
+\eqref{global_sens}, we can produce its linear approximation:
 \begin{align}\eqlabel{global_lin_approx}
   \etalin_\gamma(\t) := \etaopt_\gamma +
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
@@ -291,7 +288,8 @@ Now that we can compute the sensitivity of the global parameters in
 Finally, given a posterior quantity $\g$,
 we again take advantage of the fact that the optimal
 local parameters can be found in closed form given global parameters.
-In the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
+In general, $\g$ will be a function of the entire vector of variational parameters.
+However, in the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
 and is a function of only global parameters and the prior parameter $\t$,
 we can construct an analogous mapping for $\g$,
 \begin{align}\eqlabel{g_as_global}
@@ -299,7 +297,7 @@ we can construct an analogous mapping for $\g$,
 \end{align}
 
 This mapping can be used for any posterior quantity.
-Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient;
+Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient:
 we do not need to invert the full Hessian
 and linearize the entire set of variational parameters, global and local.
 As a shorthand, we will use $\g(\etalin_\gamma(t))$ to

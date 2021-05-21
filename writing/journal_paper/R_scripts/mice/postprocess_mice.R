@@ -89,12 +89,18 @@ load_coclust_file <- function(file, key){
 
 
 ################
-# The coclustering at alpha = 1
+# The coclustering at first alpha perturation
 ################
-alpha1_coclust_file <- np$load(paste0(data_dir, 'coclustering_alpha1.0.npz'))
+alpha_pert1 <- 0.1
+alpha1_coclust_file <- np$load(paste0(data_dir, 
+                                      'coclustering_alpha', 
+                                      alpha_pert1, 
+                                      '.npz'))
 
 # the fit at the initial alpha: 
 # TODO: put this in its own file, this is confusing
+# TODO: save the alpha0
+alpha0 <- 6
 coclust_init <- load_coclust_file(alpha1_coclust_file, 'coclust_init')
 
 # the refit at alpha = 1
@@ -122,10 +128,13 @@ get_max_diff <- function(coclust_refit,
 maxdiff_alpha1 <- get_max_diff(coclust_refit_alpha1, coclust_init)
 
 ################
-# The coclustering at alpha = 11
+# The coclustering at alpha = 12
 ################
+alpha_pert2 = 12.0
 alpha11_coclust_file <- np$load(paste0(data_dir, 
-                                       'coclustering_alpha11.0.npz'))
+                                       'coclustering_alpha', 
+                                       sprintf('%.01f', alpha_pert2), 
+                                       '.npz'))
 
 coclust_refit_alpha11 <- 
   load_coclust_file(alpha11_coclust_file, 'coclust_refit') 

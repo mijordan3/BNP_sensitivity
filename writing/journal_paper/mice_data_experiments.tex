@@ -28,12 +28,12 @@ Three measurements were taken at each time point (called biological replicates),
 for a total of $\ntimepoints = 42$ measurements per gene. 
 
 \subsubsection*{The model}
-Following \citet{Luan:2003:clustering} we apply cubic B-splines to 
-smooth the time course expression data. 
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
 at $\ntimepoints$ time points.
-Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix.
-In our case, the $ij$-th entry of $\regmatrix$
+Following \citet{Luan:2003:clustering} we apply cubic B-splines to 
+smooth the time course expression data.
+Let $\regmatrix$ be the $\ntimepoints \times \d$ B-spline regressor matrix; 
+that is, the $ij$-th entry of $\regmatrix$
 is the $j$-th B-spline basis vector evaluated at the
 $i$-th time point. 
 \figref{example_genes} shows measurements from an example gene and 
@@ -54,7 +54,6 @@ where $\b_\n$ is a gene-specific additive offset and $I$ is the identity matrix.
 We include the additive offset because we
 are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
-Notice that in this model, the shifts $\b_\n$ are local variables since they are unique to each gene $\n$. 
 
 The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the 
 stick-breaking process described in \secref{model_bnp}. 
@@ -90,9 +89,9 @@ variational approximation.
 \end{knitrout}
 %
 
-In this application, we expect to uncover finer structure
+In this application, we expect to uncover finer structure, 
 so we start with a larger $\alpha$ than the previous example 
-and set $\alpha_0 = 6$. 
+and set $\alpha_0 = 6$ in the initial GEM prior. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
 at this choice of $\alpha_0$. 
 More precisely, let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ 
@@ -119,6 +118,7 @@ Below, we evaluate the sensitivity of the inferred co-clustering matrix to
 both parametric and functional perturbations to the stick distribution. 
 
 \newcommand{\MiceSmoothers}{
+% moving this to appendix 
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -157,25 +157,30 @@ both parametric and functional perturbations to the stick distribution.
 \subsubsection*{Sensitivity of co-clustering to $\alpha$}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$ 
-to the choice of $\alpha$ in the
-$\betadist{\nuk \vert 1, \alpha}$ stick-breaking distribution. 
-Let $\gcoclustering^0 := \gcoclustering(\etaopt(\alpha_0))$ be the co-clustering matrix inferred at $\alpha_0$, 
-and let $\Delta\gcoclustering(\eta) := 
-\gcoclustering(\eta) - \gcoclustering^0$. 
-We formed the linear approximation at $\alpha_0$ and computed
-$\Delta\gcoclustering(\etalinglobal(\alpha))$, the 
+to the choice of $\alpha$ in the GEM prior. 
+We formed the linear approximation at $\alpha_0 = 6$ and computed
 the change in co-clustering under the linearized 
-variational parameters, at $\alpha = 1$ and $\alpha = 11$. 
+variational parameters $\etalinglobal(\alpha)$, 
+at $\alpha = 0.1$ and $\alpha = 12$. 
+At $\alpha =  0.1$ the prior is concentrated,
+with only two clusters expected under the GEM prior;
+at $\alpha = 12$, more than fifty are expected. 
+
+
+% Let $\gcoclustering^0 := \gcoclustering(\etaopt(\alpha_0))$ be the co-clustering matrix inferred at $\alpha_0$, 
+% and let $\Delta\gcoclustering(\eta) := 
+% \gcoclustering(\eta) - \gcoclustering^0$. 
+
 %(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
 % We write $\gcoclustering(\etalinglobal)$ with the 
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
 
-For either $\alpha$, the change in the posterior co-clustering 
+Despite this wide prior range, for either $\alpha$,
+the change in the posterior co-clustering 
 matrix is minuscule (\figref{gene_alpha_coclustering}):
-the largest entry of either matrix $\Delta\gcoclustering(\etalinglobal(1))$ 
-or $\Delta\gcoclustering(\etalinglobal(11))$ is of order $10^{-2}$.
-Refitting the approximate posterior at $\alpha = 1$ and $\alpha = 11$ 
-and computing $\Delta\gcoclustering(\etaopt(\alpha))$
+the largest absolute changes in the co-clustering matrix is of order $10^{-2}$.
+Refitting the approximate posterior at $\alpha = 0.1$ and 
+$\alpha = 12$ 
 confirms the insensitivity predicted by the 
 linearized variational global parameters.  
 Beyond capturing insensitivity, the linearized parameters 
@@ -191,15 +196,15 @@ approximate the sign and size of the changes in the individual entries of the co
 }
 
 \caption[Differences in the 
-     co-clustering matrix at $\alpha = 1$ (top row)
-     and $\alpha = 11$ (bottom row),
+     co-clustering matrix at $\alpha = 0.1$ (top row)
+     and $\alpha = 12$ (bottom row),
      relative to the co-clustering matrix at $\alpha_0 = 6$.
      (Left) a scatter plot of differences under the linear approximation 
      against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
      Note the scales of the axes]{Differences in the 
-     co-clustering matrix at $\alpha = 1$ (top row)
-     and $\alpha = 11$ (bottom row),
+     co-clustering matrix at $\alpha = 0.1$ (top row)
+     and $\alpha = 12$ (bottom row),
      relative to the co-clustering matrix at $\alpha_0 = 6$.
      (Left) a scatter plot of differences under the linear approximation 
      against differences after refitting, where
@@ -310,9 +315,9 @@ the refitted results confirms the predictions.
 
 \caption[The multiplicative perturbations $\phi_\alpha(\cdot)$ that 
     corresponds to decreasing (left) or increasing (right) 
-    the $\alpha$ parameter by five]{The multiplicative perturbations $\phi_\alpha(\cdot)$ that 
+    the $\alpha$ parameter]{The multiplicative perturbations $\phi_\alpha(\cdot)$ that 
     corresponds to decreasing (left) or increasing (right) 
-    the $\alpha$ parameter by five. }\label{fig:alpha_pert_logphi}
+    the $\alpha$ parameter. }\label{fig:alpha_pert_logphi}
 \end{figure}
 
 
@@ -325,7 +330,7 @@ The co-clustering matrix appears insensitive to perturbations in the stick-break
 
 Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
-took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
+took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take more than 30 seconds. 
 
 \begin{table}[tb]
 \centering
@@ -335,26 +340,26 @@ took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. C
     \hline 
     & time (seconds) \\ 
     \hline 
-    Initial fit & 25 \\
+    Initial fit & 27 \\
     \hline 
     Hessian solve for $\alpha$ sensitivity & 
-        3.3\\
-    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 1$ & 
-        0.0015\\
-    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 11$ & 
-        0.00095\\
-    Refit $\etaopt(\alpha)$ for $\alpha = 1$ & 
-        14\\
-    Refit $\etaopt(\alpha)$ for $\alpha = 11$ & 
-        50\\
+        3.2\\
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 0.1$ & 
+        0.00098\\
+    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = 12$ & 
+        0.0011\\
+    Refit $\etaopt(\alpha)$ for $\alpha = 0.1$ & 
+        46\\
+    Refit $\etaopt(\alpha)$ for $\alpha = 12$ & 
+        12\\
     \hline
     The influence function & 3.4\\ 
     Hessian solve for $\phi$ perturbation &
         2.8\\
     Linear approx. $\etalin(\t)$ at $\t = 1$ &
-        0.00094\\
+        0.00095\\
     Refit $\etaopt(\t)$ at $\t = 1$ &
-        26\\
+        24\\
     \hline
 \end{tabular}
 \end{table}
