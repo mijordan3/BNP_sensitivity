@@ -1,3 +1,83 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$, let
+% $\mu$ be the Lebesgue measure, and let $\q(\theta \vert \eta) = \normdist{\theta
+% \vert \eta}$ be a normal distribution parameterized by its natural exponential
+% family parameters.
+%
+% Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
+% Fix $\eta_0$ such that $\sigma(\eta_0) > 0$, and let $\ball_\eta$ be an open set
+% containing $\eta_0$ such a that $\sigma_{max} := \sup_{\eta \in \ball_\eta}
+% \sigma(\eta) < \infty$.
+%
+% If there exists a neighborhood $\ball_\t$ of $\t_0$ such that $\abs{\psi(\theta,
+% \t)}$ and $\abs{\psigrad{\theta, \t}}$ are uniformly bounded by some multiple of
+% $\exp(-\abs{\theta})$ for all $\t \in \ball_\t$, then $\q$ and $\psi$ satisfy
+% \assuref{dist_fun_nice}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{proof}
+\proofof{\lemref{normal_q_is_regular}}
+\prooflabel{normal_q_is_regular}
+%
+TODO: update this so that $\eta$ is actually the mean and variance.
+
+By properties of the exponential family,
+%
+\begin{align*}
+%
+\lqgrad{\theta, \eta} ={} (\theta, \theta^2)^T \mathand&
+\lqhess{\theta, \eta} ={} 0_{2\times2} \Rightarrow\\
+%
+\norm{\lqgrad{\theta, \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{\lqhess{\theta, \eta}}_2 ={} 0.
+%
+\end{align*}
+%
+Let $\ballclosed_\eta$ denote the closure of $\ball_\eta$, and let
+%
+\begin{align*}
+%
+\eta^* := \argmax_{\eta \in \ballclosed_\eta}
+    \expect{\q(\theta \vert \eta)}{\exp(\abs{\theta})}.
+%
+\end{align*}
+%
+By standard properties of the normal and the boundedness of $\sigma(\eta)$, the
+right hand side of the preceding display is finite.
+%
+Then
+%
+\begin{align*}
+\int \q(\theta \vert \eta) \psi(\theta, \t) \mu(d \theta) \le{}&
+    \left( \sup_{\theta} \sup_{\t \in \ball_\t}
+        \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
+    \int \q(\theta \vert \eta) \exp(\theta) \mu(d \theta)
+%
+\\\le{}&
+    \const
+    \expect{\q(\theta \vert \eta^*)}{\exp(\abs{\theta})}.
+    \quad\constdesc{\eta, \t}
+%
+\end{align*}
+%
+Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
+\propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
+similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
+$\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
+of the five constants.
+%
+\end{proof}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{proof}\prooflabel{etat_deriv}

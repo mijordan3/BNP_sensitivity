@@ -1,15 +1,83 @@
 In this section, we return to the BNP problem and prove systematically that the
 map $\alpha \mapsto \etaopt(\alpha)$ satisfies \assuref{kl_opt_ok,
-exchange_order}, and so the conditions of \thmref{etat_deriv}.
+exchange_order}, and so the conditions of \thmref{etat_deriv}.  As in
+\exref{alpha_perturbation}, we will take $\mu$ to be the Lebesgue measure on
+$[0,1]^{\kmax - 1}$.
+
+Recall from \secref{model_vb} that we take $\q(\nuk \vert \eta)$ to be a normal
+distribution on the logit-transformed sticks, $\lnu_\k$.  For the duration of
+this section, write $\q(\lnuk \vert \eta) = \normdist{\lnuk \vert \mu_\k,
+\sigma^2_\k}$, so that the subvector of $\eta$ parameterizing $\q(\lnuk \vert
+\eta)$ is $\etanuk = (\mu_\k, \sigma_\k)$.
+%
+By the formula for transformation of probability densities,
+%
+\begin{align*}
+%
+\q(\nuk \vert \etanuk) =
+    \normdist{\log\left(\frac{\nu_\k}{1 - \nu_\k} \right)
+        \Big\vert  \mu_\k, \sigma^2_\k}
+    \frac{1}{\nuk (1 - \nuk)},
+%
+\end{align*}
+%
+where we have used the fact that $\fracat{d \lnu_\k}{ d\nuk}{\nuk} =
+\frac{1}{\nuk (1 - \nuk)}$.  Similarly, for any function $f(\nuk)$ of the stick
+lengths, we can transform the expecations as $\expect{\q(\nuk \vert
+\etanuk)}{f(\nuk)} = \expect{\q(\lnuk \vert \etanuk)}{f\left(
+\frac{\exp(\lnuk)}{1 + \exp(\lnuk)}  \right))}$, using the fact that
+$\nuk = \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}$.
 
 Differentiability of $\KL{\eta}$ (\assuitemref{kl_opt_ok}{kl_diffable}) is
 immediately satisfied for the $\eta$ that parameterize $\q(\beta \vert \eta)$
 and $\q(\z \vert \eta)$ by our use of conjugate approximating families and
-standard parameterizations.  For $\q(\nu \vert \eta)$, we will prove
-\assuitemref{kl_opt_ok}{kl_diffable} on the way to proving that
-\assuref{exchange_order} is satisfied.  Indeed,
-\assuitemref{kl_opt_ok}{kl_diffable} is typically satisfied in VB problems; when
-it is not, many black-box optimization methods also do not apply.
+standard parameterizations.  The stick length density, $\q(\nuk \vert \etanuk)$
+is not a standard exponential family
+%
+\footnote{In this section, we continue to take $\mu$ to be the Lebesgue measure
+on $[0,1]$ as in \exref{alpha_perturbation}.  We could have equivalently taken
+$\mu$ to be the Lebesgue measure on $\mathbb{R}$ and analyzed $\p(\lnuk \vert
+\alpha)$ instead.  Had we done so, the same log Jacobian term $\log (\nuk(1 -
+\nuk))$ would have appeared in the $\log \ptil(\lnuk \vert \alpha)$ term rather
+than the $\q(\lnuk \vert \etanuk)$ entropy term, and so been part of
+\assuref{exchange_order} rather than \assuitemref{kl_opt_ok}{kl_diffable}.  For
+essentially this reason, the choice of dominainting measure in \defref{prior_t}
+does not matter.}
+%
+, so we must show that the entropy $\expect{\q(\nuk \vert \etanuk)}{\log \q(\nuk
+\vert \etanuk)}$ is  twice continuously differentiable. The entropy is given up
+to a constant by
+%
+\begin{align*}
+%
+\MoveEqLeft
+\expect{\q(\nuk \vert \etanuk)}{\log \q(\nuk \vert \etanuk)}
+\\={}&
+    \expect{\q(\nuk \vert \etanuk)}
+           {\log \normdist{\log\left(\frac{\nu_\k}{1 - \nu_\k} \right)
+               \Big\vert  \mu_\k, \sigma^2_\k}} +
+    \expect{\q(\nuk \vert \etanuk)}
+           {\log \left(\nuk (1 - \nuk)\right)}
+% \\={}&
+%     \expect{\q(\lnuk \vert \etanuk)}
+%            {\log \normdist{\lnuk \Big\vert  \mu_\k, \sigma^2_\k}} +
+%     \expect{\q(\lnuk \vert \etanuk)}
+%            {\log \frac{\exp(\lnuk)}{1 + \exp(\lnuk)} } -
+%     \expect{\q(\lnuk \vert \etanuk)}
+%            {\log \frac{1}{1 + \exp(\lnuk)} }
+\\={}&
+   \expect{\q(\lnuk \vert \etanuk)}
+          {\log \normdist{\lnuk \Big\vert  \mu_\k, \sigma^2_\k}} +
+   \expect{\q(\lnuk \vert \etanuk)}{\lnuk}
+\\={}&
+    \frac{1}{2} \log \sigma^2_\k + \mu_\k + \const,
+%
+\end{align*}
+%
+which is twice continuously differentiable by inspection.
+%
+Indeed, \assuitemref{kl_opt_ok}{kl_diffable} is typically satisfied in VB
+problems; when it is not, many black-box optimization methods also do not apply.
 
 Non-singularity of the Hessian matrix $\hessopt$
 (\assuitemref{kl_opt_ok}{kl_hess}) is satisfied whenever $\etaopt$ is at a local
@@ -37,34 +105,9 @@ optimization for variational inference and are a good practice when available
 \appref{app_vb_details}.
 
 Verifying \assuref{exchange_order} is the principal technical challenge of
-satisfying the conditions of \thmref{etat_deriv}. Recall from \secref{model_vb}
-that we take $\q(\nuk \vert \eta)$ to be a normal distribution on the
-logit-transformed sticks, $\lnu_\k$.  For the duration of this section, write
-$\q(\lnuk \vert \eta) = \normdist{\lnuk \vert \mu_\k, \sigma^2_\k}$, so that the
-subvector of $\eta$ parameterizing $\q(\lnuk \vert \eta)$ is $\etanuk = (\mu_\k,
-\sigma_\k)$.  Derivatives with respect to any components of $\eta$ are zero and
-so \assuref{exchange_order} is trivially satisfied.
-
-By the formula for transformation of probability densities,
-%
-\begin{align*}
-%
-\q(\nuk \vert \etanuk) =
-    \normdist{\log\left(\frac{\nu_\k}{1 - \nu_\k} \right)
-        \Big\vert  \mu_\k, \sigma^2_\k}
-    \frac{1}{\nuk (1 - \nuk)},
-%
-\end{align*}
-%
-where we have used the fact that $\fracat{d \lnu_\k}{ d\nuk}{\nuk} =
-\frac{1}{\nuk (1 - \nuk)}$.  Similarly, for any function $f(\nuk)$ of the stick
-lengths, we can transform the expecations as $\expect{\q(\nuk \vert
-\etanuk)}{f(\nuk)} = \expect{\q(\lnuk \vert \etanuk)}{f\left(
-\frac{\exp(\lnuk)}{1 + \exp(\lnuk)}  \right))}$, using the fact that
-$\nuk = \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}$.
-
-Recall from \exref{alpha_perturbation} that $\log \ptil(\nuk \vert \t) = t \log
-(1 - \nuk)$, so we need to establish \assuref{exchange_order} for
+satisfying the conditions of \thmref{etat_deriv}. Recall from
+\exref{alpha_perturbation} that $\log \ptil(\nuk \vert \t) = t \log (1 - \nuk)$,
+so we need to establish \assuref{exchange_order} for
 %
 \begin{align*}
 %
@@ -77,13 +120,14 @@ Recall from \exref{alpha_perturbation} that $\log \ptil(\nuk \vert \t) = t \log
 \end{align*}
 %
 Since the preceding equality holds for all $\t$ and $\etanuk$, it suffices to
-establish that we can exchange the order of integration and differentiation
-for the right hand side.
+establish that we can exchange the order of integration and differentiation for
+the right hand side.  Note that derivatives with respect to any components of
+$\eta$ other than $\etanuk$ are zero and so \assuref{exchange_order} is
+trivially satisfied.
 
-Furthermore, to establish \assuitemref{kl_opt_ok}{kl_diffable}, we must show
-that the entropy $\expect{\q(\nuk \vert \etanuk)}{\log \q(\nuk \vert \etanuk)}$
-is continuously differentiable; since $\q(\nuk \vert \etanuk)$ is not a standard
-exponential family, this is not trivial.
+
+By the following lemma,
+
 
 % \begin{align}\eqlabel{lnuk_derivatives}
 % %
@@ -100,77 +144,43 @@ exponential family, this is not trivial.
 % \end{align}
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{lem}\lemlabel{normal_q_is_regular}
 %
-In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$, let
-$\mu$ be the Lebesgue measure, and let $\q(\theta \vert \eta) = \normdist{\theta
-\vert \eta}$ be a normal distribution parameterized by its natural exponential
-family parameters.
+Let $\mu$ denote the Lebesgue measure on $\mathbb{R}$. Let $\eta = (\mu,
+\sigma)$, let $\normdist{\theta \vert \eta}$ denote the corresponding normal
+density with respect to $\mu$, and and let $\ball_\eta$ denote an open ball in
+$\mathbb{R}^2$ such that $0 < \sigma < \infty$ for all $\eta \in \ball_\eta$.
 
-Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
-Fix $\eta_0$ such that $\sigma(\eta_0) > 0$, and let $\ball_\eta$ be an open set
-containing $\eta_0$ such a that $\sigma_{max} := \sup_{\eta \in \ball_\eta}
-\sigma(\eta) < \infty$.
+Let $\ball_\t$ denote an open ball in $\mathbb{R}$, and let $\psi(\theta, \t)$
+be a function such that $\theta \mapsto \psi(\theta, \t)$ is $\mu$-measurable
+for all $\t \in \ball_\t$.
 
-If there exists a neighborhood $\ball_\t$ of $\t_0$ such that $\abs{\psi(\theta,
-\t)}$ and $\abs{\psigrad{\theta, \t}}$ are uniformly bounded by some multiple of
-$\exp(-\abs{\theta})$ for all $\t \in \ball_\t$, then $\q$ and $\psi$ satisfy
-\assuref{dist_fun_nice}.
-
-\begin{proof}
-%
-By properties of the exponential family,
+If there exists a constant $C > 0$ such that
 %
 \begin{align*}
 %
-\lqgrad{\theta, \eta} ={} (\theta, \theta^2)^T \mathand&
-\lqhess{\theta, \eta} ={} 0_{2\times2} \Rightarrow\\
-%
-\norm{\lqgrad{\theta, \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
-\norm{\lqhess{\theta, \eta}}_2 ={} 0.
-%
-\end{align*}
-%
-Let $\ballclosed_\eta$ denote the closure of $\ball_\eta$, and let
-%
-\begin{align*}
-%
-\eta^* := \argmax_{\eta \in \ballclosed_\eta}
-    \expect{\q(\theta \vert \eta)}{\exp(\abs{\theta})}.
+\sup_{\t \in \ball_\t} \abs{\psi(\theta, \t)}
+    \le C \exp(-\abs{\theta})
+\mathand
+\sup_{\t \in \ball_\t}
+    \abs{\frac{\partial \psi(\theta, \t)}{\partial \t}}
+    \le C \exp(-\abs{\theta}),
 %
 \end{align*}
 %
-By standard properties of the normal and the boundedness of $\sigma(\eta)$, the
-right hand side of the preceding display is finite.
-%
-Then
-%
-\begin{align*}
-\int \q(\theta \vert \eta) \psi(\theta, \t) \mu(d \theta) \le{}&
-    \left( \sup_{\theta} \sup_{\t \in \ball_\t}
-        \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
-    \int \q(\theta \vert \eta) \exp(\theta) \mu(d \theta)
-%
-\\\le{}&
-    \const
-    \expect{\q(\theta \vert \eta^*)}{\exp(\abs{\theta})}.
-    \quad\constdesc{\eta, \t}
-%
-\end{align*}
-%
-Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
-\propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
-similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
-$\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
-of the five constants.
-%
-\end{proof}
-%
+then one can exchange the order of expectation and differentation in the
+expression $\expect{\normdist{\theta \vert \eta}}{\psi(\theta, \t)}$ for the
+derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta \partial
+\eta$, and $\partial^2 / \partial \eta  \partial \t$, eavluated at any $\t \in
+\ball_\t$ and $\eta \in \ball_\eta$.
+
+\seeproof{normal_q_is_regular}
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
