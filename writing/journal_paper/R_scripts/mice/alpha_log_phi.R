@@ -15,7 +15,7 @@ scale <- 550
 
 p1 <- plot_influence_and_logphi(influence_df$logit_v, 
                           influence_df$influence_x_prior, 
-                          log_phi(influence_df$logit_v, 0.1),
+                          log_phi(influence_df$logit_v, alpha_pert1),
                           scale = scale) + 
   ggtitle(TeX(paste0('$\\alpha - \\alpha_0$  = ', 
                      alpha_pert1 - alpha0))) + 
@@ -29,7 +29,7 @@ p1 <- plot_influence_and_logphi(influence_df$logit_v,
 
 p2 <- plot_influence_and_logphi(influence_df$logit_v, 
                                 influence_df$influence_x_prior, 
-                                log_phi(influence_df$logit_v, 12), 
+                                log_phi(influence_df$logit_v, alpha_pert2), 
                                 scale = scale) + 
   ggtitle(TeX(paste0('$\\alpha - \\alpha_0$  = ', 
                      alpha_pert2 - alpha0))) + 
