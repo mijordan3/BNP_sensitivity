@@ -175,3 +175,157 @@ Therefore, in general, there exist valid priors that cannot be expressed by
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{exchange_order_q}
+%
+Assume that, for any $\mu$-measurable set $A$, we can exchange the order of
+$\mu$-integration and differentiation in the expression $\int \ind{A} \q(\theta
+\vert \eta) \mu(d\theta)$ at $\eta = \etaopt$ for the derivatives $\partial /
+\partial \eta$ and $\partial^2 / \partial \eta^2$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Observe that \assuref{exchange_order_q} is strictly weaker than
+\assuref{exchange_order}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_deriv_form}
+%
+Let \assuref{kl_opt_ok, exchange_order_q} and fix the quantities given in
+\defref{prior_nl_pert}. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
+continuously differentiable real-valued function of interest.  Define the
+``influence function''
+%
+\begin{align}\eqlabel{infl_defn}
+%
+\infl(\theta) :={}&
+    - \fracat{d g(\eta)}{ d \eta^T}{\etaopt} \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \q(\theta \vert \etaopt).
+%
+\end{align}
+%
+Then, if $\norminf{\phi} < \infty$, the map $\t \mapsto g(\etaopt(\t \phi))$ is
+continuously differentiable at $\t=0$ with derivative
+%
+\begin{align}\eqlabel{vb_eta_infl_sens}
+%
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
+    \int \infl(\theta) \phi(\theta) \mu(d\theta).
+%
+\end{align}
+%
+\begin{proof}
+%
+It suffices to show that \assuref{exchange_order_q} implies
+\assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
+when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
+\phi(\theta)$, so
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)} =
+    \t \int \q(\theta \vert \eta) \phi(\theta) \mu(d\theta).
+%
+\end{align*}
+%
+Consider the derivative $\partial / \partial \eta$.  It suffices to show that
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{ \lim_{\eta \rightarrow \etaopt}
+\int \phi(\theta)
+    \left(\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           \right) \mu(d\theta) }_2
+\\\le{}&
+\norminf{\phi}
+\lim_{\eta \rightarrow \etaopt}
+\int
+    \norm{\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           }_2  \mu(d\theta)
+={} 0.
+%
+\end{align*}
+%
+The second derivative follows analogously.
+%
+\end{proof}
+%
+\end{cor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{diffable_classes}
+    (\citep[Definition 4.5]{zeidler:2013:functional})
+%
+Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
+an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
+\mapsto B_2$.
+
+The function $f$ is {\em directionally differentiable} (also known as a Gateaux
+differentiable) if there exists a bounded linear functional $f^{\mathrm{lin}}:
+B_1 \mapsto B_2$ such that the following condition holds for any
+$\phi$ with $\norm{\phi - \phi_0} < \infty$:
+%
+\begin{align*}
+%
+%\textrm{For any }\phi\textrm{ with }\norm{\phi - \phi_0} < \infty\textrm{, }
+\lim_{t \rightarrow 0}
+    \frac{f(\phi) - f(\phi_0) -
+          f^{\mathrm{lin}}(t (\phi - \phi_0) )
+         }{t} \rightarrow 0.
+%
+\end{align*}
+%
+
+Similarly, the function $f$ is {\em boundedly differentiable} (also known as
+Fr{\'echet} differentiable) at $\phi_0$ if we can take the limit uniformly in
+$\phi$:
+%
+\begin{align*}
+%
+\lim_{t \rightarrow 0}
+    \sup_{\phi: \norm{\phi - \phi_0} = 1}
+    \frac{f(\phi) - f(\phi_0) -
+          f^{\mathrm{lin}}(t (\phi - \phi_0))
+         }{t} \rightarrow 0.
+%
+\end{align*}
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
+\defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
+then the two derivatives must coincide \citep[Proposition
+4.8]{zeidler:2013:functional}, which justifies our notation.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{eta_phi_deriv}
+%
+Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
+\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
+neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
+with the derivative given in \corref{etafun_deriv_form}.
+
+(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
+
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
