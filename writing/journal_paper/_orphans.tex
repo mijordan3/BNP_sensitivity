@@ -149,52 +149,6 @@ This means that we will take $\q(\z_{\n}
 to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
-%
-To evaluate the expectation in \eqref{vb_optimization}, we need to compute
-the expected joint log-likelihood
-\begin{align*}
-  \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n, \beta_\k)}. % , \quad
-  % \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}.
-\end{align*}
-
-In \exref{iris_bnp_process}, $\beta_\k = (\mu_\k, \Lambda_\k)$,
-and the likelihoods are Gaussian,
-$\p(\x_\n \vert \beta_\k) = \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}}$.
-The prior $\pbetaprior(\beta_\k)$ a normal-Wishart.
-Using the log densities displayed in \exref{iris_bnp_process},
-observe that $\beta_\k$ enters the expected joint log-likelihood only through the
-expected moments
-%
-\begin{align*}
-\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k},  \quad
-\expect{\q(\beta_\k \vert \eta)}{\log|\Lambda_\k|},  \quad
-\expect{\q(\beta_\k \vert \eta)}{\Lambda_\k\mu_\k}, \quad
-\expect{\q(\beta_\k \vert \eta)}{\mu_\k\Lambda_\k\mu_\k}.
-\end{align*}
-
-The conditionally conjugate variational distribution on $\beta_\k$ is
-normal-Wishart, which we denote as
-$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta}$.
-With this choice of $\q(\beta_\k \vert \eta)$,
-all the preceding expected moments
-can be provided as closed-form functions of $\eta$.
-%
-% With this choice of $\q$, the expectations
-% \begin{align*}
-% \expect{\q(\beta_\k \vert \eta)}{\log \p(\x_\n \vert \beta_\k)} \quad
-% \expect{\q(\beta_\k \vert \eta)}{\log \pbetaprior(\beta_\k)} \quad
-% \expect{\q(\beta_\k \vert \eta)}{\log \q(\beta_\k \vert \eta)}
-% \end{align*}
-% all have closed form expressions as functions of $\eta$.
-%
-\end{ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 Under the mean-field factorization (\eqref{vb_mf}),
 the vector $\eta$ will partition into parameters
 governing $\nu$, $\beta$, and $\z$. Let the parameters governing a
@@ -649,7 +603,50 @@ $\nuk$.  See \secref{stick_expectations} below for more details.
 \hrulefill
 
 
-\input{local_sensitivity.tex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We conclude this section with a brief remark about computing the expectation
+$\crosshessian$ in our BNP sensitivity analysis.
+We are interested in sensitivity to the stick-breaking distribution,
+so only the prior terms on stick-breaking proportions
+$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ depends on $t$.
+Because the elements of $\nu$ fully factorize
+under both the prior and the variational distributions,
+$\crosshessian$ decomposes as
+\begin{align}
+  \crosshessian &=
+  \sum_{\k=1}^{\kmax - 1}
+          \expect{\q(\nuk \vert \eta)}
+                 {
+                 \lqgrad{\nuk \vert \etaopt}
+                 \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+                 } \notag\\
+  &= \sum_{\k=1}^{\kmax - 1}
+         \evalat{\nabla_\eta \expect{\q(\nuk \vert \eta)}
+                {
+                \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
+                }}{\eta = \etaopt(0)},
+\eqlabel{sens_mixed_partial}
+\end{align}
+where we assumed that $\q(\theta \vert \eta)$ is normalized, so
+$\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$,
+and that the assumptions of \thmref{etat_deriv} hold, so we
+can freely exchange derivatives with expectations.
+
+We approximate the expectation using GH quadrature (\eqref{gh_integral}), with
+$f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$. In all
+the functional forms for $\t \mapsto \pstick(\nuk \vert \t)$ considered below,
+$f(\nu_k)$ can be provided in either closed-form or computed with automatic
+differentiation. The resulting GH approximation is a deterministic function of
+$\eta$, and thus the gradient in \eqref{sens_mixed_partial} can be computed with
+another application of automatic differentiation. Note that $\crosshessian$ is
+sparse in \eqref{sens_mixed_partial}: it is zero for all entries of $\eta$ other
+than those that parameterize the sticks.
+
+
+\hrulefill
 
 \subsection{Function-valued prior perturbations}
 \seclabel{functional_perturbations}

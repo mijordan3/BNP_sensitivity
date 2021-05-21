@@ -119,7 +119,14 @@ and we can write
 %
 Identifying $\KL{\eta}$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$ evaluated
 at the base concentration parameter shows that the BNP problem with the GEM
-prior is of the form \eqref{perturbed_objective}.
+prior is of the form \eqref{perturbed_objective}, and that
+%
+\begin{align*}
+%
+\psi(\nu, \t) = -\t \sum_{\k=1}^{\kmax - 1}
+    \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
+%
+\end{align*}
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
