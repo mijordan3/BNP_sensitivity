@@ -116,7 +116,7 @@ By \lemref{logq_derivs}, $\eta \mapsto \rho(\eta, \t)$ is continuous, and
 by \lemref{logq_continuous} $\eta \mapsto \rho(\eta, \t)$ is continuously
 differentiable, for all $\eta, \t \in \ball$.  So $\partial \KL{\eta, \t}  /
 \partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
-first-order condition of \eqref{kl_shorthand}, $\etaopt(\t)$ satisfies
+first-order condition, $\etaopt(\t)$ satisfies
 %
 \begin{align}\eqlabel{vb_first_order_condition}
 %
@@ -135,7 +135,7 @@ $\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
 \partial \eta$ is continuously differentiable, so we need only consider
 $\rho_\eta(\theta, \t)$.
 
-By \lemref{logq_continuous} and \assuref{q_stick_regular}, we
+By \lemref{logq_continuous} and (Q STICK REGULAR), we
 have that both $\partial \rho_\eta(\eta, \t) / \partial \eta$ and $\partial
 \rho_\eta(\eta, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
 Since both its partial derivatives are continuously differentiable, the joint
@@ -292,8 +292,9 @@ $\mu'(d\theta)$, respectively.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{proof}\prooflabel{pert_well_defined}
-\proofof{\thmref{pert_well_defined}}
+\begin{proof}
+%\prooflabel{pert_well_defined}
+%\proofof{\thmref{pert_well_defined}}
 %
 First, consider the fact that perterubations are priors. It is clear that
 $\mathscr{P}_{\mathrm{valid}} \subseteq \mathscr{P}_{\pbase,p}$, since one can
@@ -526,7 +527,7 @@ $\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
 \end{align*}
 
 For any $\phi \in \ball_\phi$, observe that $\t \mapsto \pstick(\zeta \vert \t
-\phi)$ satisfies \assuref{q_stick_regular} under \assuref{q_fun_stick_regular},
+\phi)$ satisfies (Q STICK REGULAR) under (Q FUN STICK REGULAR),
 since, for any $f(\nu)$, $\lambda$-almost surely,
 %
 \begin{align*}

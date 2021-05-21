@@ -417,135 +417,135 @@ analogously to the other term, the conclusion follows.
 
 Next, we prove a result for directional derivatives in $\lp{p}$ spaces.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{lp_integral_bound}
 %
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{lem}\lemlabel{lp_integral_bound}
-% %
-% Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$
-% and $\inf_\theta \gamma(\theta) > -\infty$, then there
-% exists an $M(\theta)$ with $\int M(\theta) \mu(d\theta) < \infty$
-% such that, for all $0 \le \t \le (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$,
-% %
-% \begin{align}
-% %
-% \abs{\psi(\theta)}\abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
-%     <{}& M(\theta) \mathand \eqlabel{lp_integral_bound}\\
-% %
-% \abs{\psi(\theta)}\abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}}\q(\theta)
-%     <{}& M(\theta). \eqlabel{lp_integral_deriv_bound}
-% %
-% \end{align}
-% %
-% \begin{proof}
+Under \assuref{lp_regular}, if $\norm{\gamma}_{\pbase, p} < \infty$
+and $\inf_\theta \gamma(\theta) > -\infty$, then there
+exists an $M(\theta)$ with $\int M(\theta) \mu(d\theta) < \infty$
+such that, for all $0 \le \t \le (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$,
 %
-% Let $\t_{max} := (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$.  Then
-% %
-% \begin{align*}
-% %
-% 1 + \t \gamma(\theta) \ge{}& 1 - \t \abs{\inf_\theta \gamma(\theta)}
-% \\={}
-%     1 - \frac{\t}{2 \t_{max}}.
-% %
-% \end{align*}
-% %
-% So $\t \le \t_{max} \Rightarrow 1 + \t \gamma(\theta) \ge 1/2$ for all $\theta$.
-% Expanding the integral,
-% %
-% \begin{align*}
-% %
-% \MoveEqLeft
-% \int \abs{\psi(\theta)}
-%     \abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
-%     \mu(d\theta) ={}
-% \\&
-% \int \abs{\psi(\theta)}
-%     \abs{\log\left(1 + \t \gamma(\theta)\right)}
-%     \ind{\gamma(\theta) \le 0}
-%     \q(\theta)\mu(d\theta)  +
-% \\&
-% \int \abs{\psi(\theta)}
-%     \abs{\log\left(1 + \t \gamma(\theta)\right)}
-%     \ind{\gamma(\theta) > 0}
-%     \q(\theta)\mu(d\theta).
-% %
-% \end{align*}
-% %
-% For all $0 \le \t \le \t_{max}$, $0 \le \abs{\log\left(1 + \t
-% \gamma(\theta)\right)} \ind{\gamma(\theta) \le 0} \le \log(1/2)$,
-% so the first term in the preceding display is dominated by the integrable
-% function $\log(1/2) \abs{\psi(\theta)}\q(\theta)$.
+\begin{align}
 %
-% For the second term, by the fact that $x \ge 0 \Rightarrow \log (1 + x) \le x$
-% and Holder's inequality with respect to $\pbase(\theta)$,
-% %
-% \begin{align*}
-% %
-% \MoveEqLeft
-% \int \abs{\psi(\theta)}
-%     \abs{\log\left(1 + \t \gamma(\theta)\right)}
-%     \ind{\gamma(\theta) > 0}
-%     \q(\theta)\mu(d\theta)
-% \\\le{}&
-% \t
-% \int \abs{\psi(\theta)}
-%     \abs{\gamma(\theta)}
-%     \ind{\gamma(\theta) > 0}
-%     \q(\theta)\mu(d\theta)
-% \\={}&
-% \t
-% \int \abs{\psi(\theta)}
-%     \abs{\gamma(\theta)}
-%     \ind{\gamma(\theta) > 0}
-%     \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
-% \\\le{}&
-% \t
-% \int \abs{\psi(\theta)}
-%     \abs{\gamma(\theta)}
-%     \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
-% \\\le{}&
-% \t_{max}
-% \left(
-% \int
-%     \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
-%     \pbase(\theta) \mu(d\theta)
-% \right)^{1/q}
-% \left(
-% \int\abs{\gamma(\theta)}^p \pbase(\theta) \mu(d\theta)
-% \right)^{1/p}
-% \\\le{}&
-% \t_{max}
-% \left(
-% \int
-%     \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
-%     \pbase(\theta) \mu(d\theta)
-% \right)^{1/q}
-% \norm{\gamma}_{\pbase,p}.
-% %
-% \end{align*}
-% %
-% By assumption, the final equation in the preceding display is finite, and the
-% second line does not depend on $\t$, so we have proven the existence of an
-% integrable bounding function.  \Eqref{lp_integral_bound} follows.
+\abs{\psi(\theta)}\abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    <{}& M(\theta) \mathand \eqlabel{lp_integral_bound}\\
 %
-% For \eqref{lp_integral_deriv_bound} observe that $\t \le \t_{max}$ implies
-% %
-% \begin{align*}
-% %
-% \abs{\psi(\theta)}
-%     \abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}} \q(\theta)
-% \le{}&
-% 2 \t \abs{\psi(\theta)} \abs{\gamma(\theta)} \q(\theta).
-% %
-% \end{align*}
-% %
-% Thus \eqref{lp_integral_deriv_bound} was proven along the way to
-% proving \eqref{lp_integral_bound}.
-% %
-% \end{proof}
-% %
-% \end{lem}
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\abs{\psi(\theta)}\abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}}\q(\theta)
+    <{}& M(\theta). \eqlabel{lp_integral_deriv_bound}
+%
+\end{align}
+%
+\begin{proof}
+
+Let $\t_{max} := (2 \abs{\inf_\theta \gamma(\theta)})^{-1}$.  Then
+%
+\begin{align*}
+%
+1 + \t \gamma(\theta) \ge{}& 1 - \t \abs{\inf_\theta \gamma(\theta)}
+\\={}
+    1 - \frac{\t}{2 \t_{max}}.
+%
+\end{align*}
+%
+So $\t \le \t_{max} \Rightarrow 1 + \t \gamma(\theta) \ge 1/2$ for all $\theta$.
+Expanding the integral,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \abs{\psi(\theta)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}\q(\theta)
+    \mu(d\theta) ={}
+\\&
+\int \abs{\psi(\theta)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) \le 0}
+    \q(\theta)\mu(d\theta)  +
+\\&
+\int \abs{\psi(\theta)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\mu(d\theta).
+%
+\end{align*}
+%
+For all $0 \le \t \le \t_{max}$, $0 \le \abs{\log\left(1 + \t
+\gamma(\theta)\right)} \ind{\gamma(\theta) \le 0} \le \log(1/2)$,
+so the first term in the preceding display is dominated by the integrable
+function $\log(1/2) \abs{\psi(\theta)}\q(\theta)$.
+
+For the second term, by the fact that $x \ge 0 \Rightarrow \log (1 + x) \le x$
+and Holder's inequality with respect to $\pbase(\theta)$,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \abs{\psi(\theta)}
+    \abs{\log\left(1 + \t \gamma(\theta)\right)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\mu(d\theta)
+\\\le{}&
+\t
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
+    \ind{\gamma(\theta) > 0}
+    \q(\theta)\mu(d\theta)
+\\={}&
+\t
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
+    \ind{\gamma(\theta) > 0}
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
+\\\le{}&
+\t
+\int \abs{\psi(\theta)}
+    \abs{\gamma(\theta)}
+    \frac{\q(\theta)}{\pbase(\theta)} \pbase(\theta) \mu(d\theta)
+\\\le{}&
+\t_{max}
+\left(
+\int
+    \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
+    \pbase(\theta) \mu(d\theta)
+\right)^{1/q}
+\left(
+\int\abs{\gamma(\theta)}^p \pbase(\theta) \mu(d\theta)
+\right)^{1/p}
+\\\le{}&
+\t_{max}
+\left(
+\int
+    \abs{\frac{\psi(\theta)\q(\theta)}{\pbase(\theta)}}^q
+    \pbase(\theta) \mu(d\theta)
+\right)^{1/q}
+\norm{\gamma}_{\pbase,p}.
+%
+\end{align*}
+%
+By assumption, the final equation in the preceding display is finite, and the
+second line does not depend on $\t$, so we have proven the existence of an
+integrable bounding function.  \Eqref{lp_integral_bound} follows.
+
+For \eqref{lp_integral_deriv_bound} observe that $\t \le \t_{max}$ implies
+%
+\begin{align*}
+%
+\abs{\psi(\theta)}
+    \abs{\frac{\t \gamma(\theta)}{1 + \t \gamma(\theta)}} \q(\theta)
+\le{}&
+2 \t \abs{\psi(\theta)} \abs{\gamma(\theta)} \q(\theta).
+%
+\end{align*}
+%
+Thus \eqref{lp_integral_deriv_bound} was proven along the way to
+proving \eqref{lp_integral_bound}.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
