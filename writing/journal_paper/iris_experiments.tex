@@ -17,13 +17,13 @@ The GMM was detailed in \exref{iris_bnp_process}; here, the
 data dimension $d = 4$. The variational approximation is 
 mean-field as in \eqref{vb_mf}, and
 we set the truncation parameter $\kmax = 15$.
-The variational distribution on all latent variables except for the 
-stick-breaking proportions $\nu_\k$ were taken to 
-be the conditionally conjugate (\exref{TODO}). 
+The variational distribution on all latent variables were taken to 
+be the conditionally conjugate (\exref{iris_var_distr}), 
+except for the stick-breaking proportions $\nu_\k$ which are logit-normal.
 
 We will investigate how prior choices affect the estimated number of clusters. 
 The expected number of \textit{in-sample} clusters $\gclustersabbr$ was defined 
-in \exref{insample_nclusters_simple}. 
+in \exref{vb_insample_nclusters_simple}. 
 We will also consider the \textit{posterior predictive} number of clusters, 
 \begin{align*}
   \gclusterspredabbr(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
@@ -34,12 +34,12 @@ In the iris example, the predictive quantity
 can interpreted as the expected number of species
 one might see if a fresh sample of iris flowers were collected.
 
-\todo{make sure this the notation $g_{cl}$ etc. $G_0$ matches from before. }
+\todo{make sure this the notation matches from before. }
 
 \subsubsection*{Parametric sensitivity}
 
 We explore how the posterior number of clusters,
-either \textit{insample} or \textit{predictive}, vary with different choices
+either insample or predictive, varies with different choices
 of the GEM parameter $\alpha$.
 The \textit{a priori} expected number of clusters under a GEM is
 \begin{align}\eqlabel{prior_num_clusters}

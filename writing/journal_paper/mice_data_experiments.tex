@@ -27,20 +27,22 @@ and expression levels of a set of genes were assessed at 14 time points after in
 Three measurements were taken at each time point (called biological replicates), 
 for a total of $\ntimepoints = 42$ measurements per gene. 
 
-Following \citet{Luan:2003:clustering} we apply cubic B-splines to smooth the time course expression data. 
+\subsubsection*{The model}
+Following \citet{Luan:2003:clustering} we apply cubic B-splines to 
+smooth the time course expression data. 
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
 at $\ntimepoints$ time points.
 Let $\regmatrix$ be an $\ntimepoints \times \d$ regressor matrix.
 In our case, the $ij$-th entry of $\regmatrix$
-is be the $j$-th B-spline basis vector evaluated at the
+is the $j$-th B-spline basis vector evaluated at the
 $i$-th time point. 
 \figref{example_genes} shows measurements from an example gene and 
 the B-spline basis. 
 
-
-Each component is characterized by a vector of regression coefficients
+In this model, 
+each component is characterized by a vector of regression coefficients
 $\mu_\k$ and a variance $\tau^{-1}_\k$, so
-in this model, $\beta_k = (\mu_\k, \tau_\k)$.
+$\beta_k = (\mu_\k, \tau_\k)$.
 The distribution of the data arising from component $k$ is
 \begin{align}\eqlabel{mice_model}
 \p(\x_\n | \beta_\k, \b_\n) =
@@ -54,14 +56,12 @@ are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
 Notice that in this model, the shifts $\b_\n$ are local variables since they are unique to each gene $\n$. 
 
-The mixture weights and cluster assignments are drawn from the 
+The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the 
 stick-breaking process described in \secref{model_bnp}. 
 
-Our variational distribution factorizes as~\eqref{vb_mf}
-with the addition
-of a factor for the additive shift. 
-In this application,
-we make a simplification by letting
+Our variational distribution factorizes similarly to \eqref{vb_mf}
+except with an additional factor for the additive shift. 
+In our variational approximation, we also make a simplification by letting
 $\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$, 
 where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized location. 
 See \appref{app_mice} for further details concerning the model and
@@ -93,8 +93,6 @@ variational approximation.
 In this application, we expect to uncover finer structure
 so we start with a larger $\alpha$ than the previous example 
 and set $\alpha_0 = 6$. 
-% \figref{gene_centroids} shows the inferred smoothers 
-% $\regmatrix\mathbb{E}_\q[\mu_k]$ for selected clusters. 
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
 at this choice of $\alpha_0$. 
 More precisely, let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ 

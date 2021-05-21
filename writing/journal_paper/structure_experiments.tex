@@ -26,25 +26,32 @@ For this endangered bird species,
 understanding the degree to which populations have grown genetically distinct is important for conservation efforts: 
 well-separated populations with little genetic diversity are particularly at risk of extinction. 
 
-\subsubsection{The model}
+\subsubsection*{The model}
 The data consists of 
 consists of $\nindiv$ individuals genotyped at $\nloci$ loci.
-Let $\x_{\n\l\i}\in\{1, \ldots, J\}$ be the observed genotype for
+Let $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ be the observed genotype for
 individual $\n$ at locus $\l$ and chromosome $\i$. 
-Here, $J$ is the number of possible genotypes.
+$J_\l$ is the number of possible genotypes at locus $\l$.
+For example, if the measurements are all single nucleotides (A, T, C or G)
+then $J_\l = 4$ for all $\l$.
 
-We adapt STRUCTURE, a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure} for such population genetics data, 
-by replacing the finite Dirichlet prior
-with an infinite stick-breaking process.
-The result is a model similar to a hierarchical Dirichlet process for topic modeling,
-\citep{teh:2006:hdp},
-but without the top-level Dirichlet process.
-Here, genetic markers take the place of
-words in a document; 
-in lieu of inferring ``topics," we infer latent populations.
+A latent population is characterized by the collection
+$\beta_k = (\latentpop_{\k1}, \ldots, \latentpop_{\k\nloci})$ where
+$\latentpop_{\k\l}\in\Delta^{J_\l - 1}$ are the latent frequencies for the $J_l$
+possible genotypes at locus $\l$.
+Let $\z_{\n\l\i}$ be the assignment of observation $\x_{\n\l\i}$ to a latent population.
+Notice that for a given individual $\n$,
+different loci, or even different chromosomes at a given locus,
+may have different population assignments.
+The distribution of $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ arising from population $\k$ is
+\begin{align*}
+\p(\x_{\n\l\i} \vert \latentpop_{\k}) =
+\categoricaldist{\x_{\n\l\i}\vert \latentpop_{\k\l}}.
+\end{align*}
 
-Unlike the previous models, we now have a
-stick-breaking process for each individual.
+
+Unlike the previous models, we now have a stick-breaking 
+process for each individual.
 Draw sticks
 \begin{align*}
 \nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, \ldots, \nindiv; \k = 1, 2, \ldots \infty.
@@ -58,25 +65,30 @@ is formed by the same stick-breaking construction as before,
 \latentadmix_{\n\k} = \nu_{\n\k} \prod_{\k' < \k} (1 - \nu_{\n\k'}).
 \end{align*}
 %
-In this genetics application,
-we call $\latentadmix_{\n}$ the
-\textit{admixture} of individual $\n$.
-
-Let $\z_{\n\l\i}$ be the assignment of observation $\x_{\n\l\i}$ to a latent population.
-Notice that for a given individual $\n$,
-different loci, or even different chromosomes at a given locus,
-may have different population assignments.
-The assignments are drawn from the
+The population assignment $\z_{\n\l\i}$
+is drawn from the
 usual multinomial distribution
 %
 \begin{align*}
 p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\infty} \latentadmix_{\n\k}^{\z_{\n\l\i\k}}.
 \end{align*}
+%
+In this genetics application,
+we call $\latentadmix_{\n}$ the
+\textit{admixture} of individual $\n$.
 
-The distribution of the observed genotype $\x_{\n\l\i}\in\{1, \ldots, J\}$ depends on its population assignment. Here, the components variables $\beta_\k$ 
-are latent frequencies of the genotypes in population $\k$. 
-Further modeling details, as well as our variational approximation,
-can be found in \appref{TODO}. 
+This model is identical to STRUCTURE,
+a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure},
+except that we replace the Dirichlet prior in STRUCTURE
+with an infinite stick-breaking process.
+The result is a model similar to a hierarchical Dirichlet process for topic modeling,
+\citep{teh:2006:hdp},
+but without the top-level Dirichlet process.
+Genotypes at genetic markers take the place of
+words in a document; 
+in lieu of inferring ``topics," we infer latent populations.
+
+\subsubsection*{The initial fit}
 
 The inferred admixtures at $\alpha_0 = 3$ are shown in \figref{stru_init_fit}. 
 We picked $\alpha_0 = 3$ so that \textit{a priori} 
@@ -94,10 +106,9 @@ individuals from the Chawia are admixed with populations 1, 2, and 3.
 The four individuals from Yale appear similar to individuals from the Ngangao;
 this is not surprising given that the Yale region is geographically located in proximity to the Ngangao region. 
 
-The resulting inference from our BNP model is qualitatively similar to the results reported in \citet{pritchard:2000:structure}, who employed a related model called STRUCTURE. 
-STRUCTURE uses a Dirichlet prior for the individual admixtures 
-with some fixed number of populations $K$ and does inference with MCMC. 
-To select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
+The resulting inference from our BNP model is qualitatively similar to the results reported in \citet{pritchard:2000:structure} which used the STRUCTURE model. 
+Since STRUCTURE is a finite mixture model,
+to select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
 $p(K | \x)$, under the assumption of a uniformly distributed prior on $K$. 
 Their algorithm selected $K = 3$. 
 At $\alpha_0 = 3$, the BNP model agrees with \citet{pritchard:2000:structure} in that we both uncover three genetically distinct clusters,
@@ -133,14 +144,24 @@ to the $\alpha$ parameter in the $\betadist{\nu_{nk}\vert 1, \alpha}$ stick dist
 We consider the range $\alpha = 0.5, 1, \ldots 7$. 
 For this range of $\alpha$, there can be anywhere from two to seven expected populations per individual under the GEM prior (\eqref{prior_num_clusters}). 
 
-The expected number of in-sample clusters in the data set was 
-defined in \exref{insample_nclusters}, 
-except in this model, the summation is over the indices for individual $n$, locus $\l$ and chromosome $i$. 
-(We also will use ``population" interchangably with ``cluster",
-in this application). 
-We will allow the option of setting $\tau > 0$ in order to count only the
-populations that comprise a non-negligible fraction of the data set. 
-
+Our posterior quantity of interest is the expected number of 
+in-sample populations (in this section, we will use ``populations" and ``clusters" interchangeably). 
+We consider a slightly more general definition than
+\exref{vb_insample_nclusters_simple}. 
+Define 
+\begin{align*}
+\gclusters(\eta)
+&= \expect{\q(\z\vert\eta)}{\sum_{\k=1}^\kmax \ind{ 
+\left(\sum_{\n=1}^{\nindiv}
+\sum_{\l=1}^{\nloci}
+\sum_{\i=1}^2
+\z_{\n \l \i \k}\right) > \tau}},
+\end{align*}
+which is the expected number of populations in the data set that contains at least $\tau$ loci. 
+We allow the option of setting $\tau > 0$ in order to count only the populations that comprise a non-negligible fraction of the data set. 
+Other than the added parameter $\tau$, the only difference from
+\exref{vb_insample_nclusters_simple} is that the summation 
+is now over individuals $n$, loci $\l$ and chromosomes $i$. 
 
 % 
 % $\gpop$ counts a population as present if they contain at least $\tau$ loci. 
@@ -213,57 +234,46 @@ the reduction to two latent populations at $\alpha = 0.5$ observed in the refits
 
 \end{knitrout}
 
-We provide some more intuition concerning the thresholded estimate for the number of populations.
-The posterior quantity $\gclusters$ is closely related to the expected number of loci belonging to each population,
-defined as
-\begin{align*}
-\gloci(\eta; k)
-&= \expect{\q(\z\vert\eta)}{\sum_{n=1}^{\nindiv}
-\sum_{l=1}^{\nloci}
-\sum_{i=1}^2
-\z_{\n l i \k}}. 
-\end{align*}
-
-\figref{stru_alpha_cluster_weights} plots $\gloci$ for the first six populations 
-as $\alpha$ varies.
-The expected number of loci at the initial fit, $\gloci(\etaopt(\alpha_0); k)$,
-is at least 100 for populations $\k = 1, 2,$ and $3$ and 
-less than 
-12
-for the remaining populations.  
-A sample of assignments $\z\sim \q(\z\vert\etaopt(\alpha_0))$ will 
-almost always have at least $\tau$ loci allocated to populations 1, 2, and 3, 
-while the allocations to each remaining population will almost always be below $\tau$, for either $\tau = 20$ or $\tau = 40$. 
-Thus, at $\alpha = \alpha_0$ there then are clearly 3 populations by our definition of $\gclusters$, for either $\tau$.
-
-At $\alpha = 7$, the expected number of loci belonging to population 4
-increases to 
-$20.7$, 
-a new population emerges above the threshold at $\tau = 20$. 
-Both the linearized and the refitted variational parameters agree on this shift in allocation to population 4. 
-On the other hand, under the refitted variational parameters at $\alpha = 0.5$, 
-the expected number of loci belonging to population 3 decreases to 
-$6.7$, 
-below the threshold $\tau = 20$. 
-Thus, the expected number of latent populations with allocations above
-the threshold $\tau = 20$ decreases to two. 
-The linearized parameters
-under-estimated this decrease in allocation to population 3, and 
-therefore continued to estimate three latent populations even at $\alpha = 0.5$. 
-
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.980\linewidth,height=0.588\linewidth]{figure/stru_alpha_cluster_weights-1} 
-
-}
-
-\caption[The expected number of loci per population as $\alpha$ varies]{The expected number of loci per population as $\alpha$ varies. }\label{fig:stru_alpha_cluster_weights}
-\end{figure}
+% We provide some more intuition concerning the thresholded estimate for the number of populations.
+% The posterior quantity $\gclusters$ is closely related to the expected number of loci belonging to each population,
+% defined as
+% \begin{align*}
+% \gloci(\eta; k)
+% &= \expect{\q(\z\vert\eta)}{\sum_{n=1}^{\nindiv}
+% \sum_{l=1}^{\nloci}
+% \sum_{i=1}^2
+% \z_{\n l i \k}}. 
+% \end{align*}
+% 
+% \figref{stru_alpha_cluster_weights} plots $\gloci$ for the first six populations 
+% as $\alpha$ varies.
+% The expected number of loci at the initial fit, $\gloci(\etaopt(\alpha_0); k)$,
+% is at least 100 for populations $\k = 1, 2,$ and $3$ and 
+% less than 
+% ceiling(weights_alpha_init$weight[4])
+% for the remaining populations.  
+% A sample of assignments $\z\sim \q(\z\vert\etaopt(\alpha_0))$ will 
+% almost always have at least $\tau$ loci allocated to populations 1, 2, and 3, 
+% while the allocations to each remaining population will almost always be below $\tau$, for either $\tau = 20$ or $\tau = 40$. 
+% Thus, at $\alpha = \alpha_0$ there then are clearly 3 populations by our definition of $\gclusters$, for either $\tau$.
+% 
+% At $\alpha = 7$, the expected number of loci belonging to population 4
+% increases to 
+% $sprintf('%.1f', weights_alpha_large$weight[4])$, 
+% a new population emerges above the threshold at $\tau = 20$. 
+% Both the linearized and the refitted variational parameters agree on this shift in allocation to population 4. 
+% On the other hand, under the refitted variational parameters at $\alpha = 0.5$, 
+% the expected number of loci belonging to population 3 decreases to 
+% $sprintf('%.1f', weights_alpha_small$weight[3])$, 
+% below the threshold $\tau = 20$. 
+% Thus, the expected number of latent populations with allocations above
+% the threshold $\tau = 20$ decreases to two. 
+% The linearized parameters
+% under-estimated this decrease in allocation to population 3, and 
+% therefore continued to estimate three latent populations even at $\alpha = 0.5$. 
 
 
-\end{knitrout}
+
 
 \subsubsection*{Sensitivity of individual admixtures to functional perturbations}
 
@@ -501,7 +511,7 @@ resulting in the later admixture proportions being under-estimated.
 The third admixture proportion was particularly poorly approximated under the linearized variational parameters. 
 Given the recursive nature of the relationship between admixtures and stick-breaking proportions, errors at early sticks affect later admixture proportions. 
 Fully linearizing the mapping $\t\mapsto\g(\etaopt(\t))$ to form the approximation 
-$\glin(t)$ (\eqref{vb_g_sens}) avoids this problem. 
+$\glin(t)$ avoids this problem. 
 In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, with $\g$ being the admixture proportion of population 3. 
 In previous examples 
 (including the example in \figref{stru_lin_bad_example}), 
@@ -509,9 +519,7 @@ computing $\g(\etalin(t))$, and thus retaining the non-linearities in the mappin
 does no worse, and is usually better,
 than the fully linearized version, $\glin(\t)$---as can be seen by drawing tangent lines of the refitted curve at
 $\alpha = \alpha_0$ or $t = 0$
-for 
-\figref{stru_alpha_nclusters, 
-stru_alpha_cluster_weights}. 
+in \figref{stru_alpha_nclusters, stru_lin_bad_example}. 
 It is likely that $\g(\etalin(t))$ outperforms $\glin(\t)$ for most posterior quantities, though as we see in \figref{stru_fully_lin_example},
 this is not guaranteed to always be true.  
 

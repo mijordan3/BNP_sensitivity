@@ -36,6 +36,7 @@ and expression levels of a set of genes were assessed at 14 time points after in
 Three measurements were taken at each time point (called biological replicates), 
 for a total of $\ntimepoints = 42$ measurements per gene. 
 
+\subsubsection*{The model}
 Following \citet{Luan:2003:clustering} we apply cubic B-splines to 
 smooth the time course expression data. 
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
@@ -67,7 +68,7 @@ Notice that in this model, the shifts $\b_\n$ are local variables since they are
 The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the 
 stick-breaking process described in \secref{model_bnp}. 
 
-Our variational distribution factorizes similarly to \eqref{vb_mf}
+Our variational approximation factorizes similarly to \eqref{vb_mf}
 except with an additional factor for the additive shift. 
 In our variational approximation, we also make a simplification by letting
 $\q(\beta_\k \vert \eta) = \delta (\beta_k \vert \eta)$, 
