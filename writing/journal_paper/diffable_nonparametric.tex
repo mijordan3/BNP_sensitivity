@@ -1,0 +1,139 @@
+In the previous section, we showed that we can form a Taylor series
+approximation to the dependence of a variational optimum on the parameter
+$\alpha$ in the GEM prior.  However, there is typically no {\em a priori} reason
+to believe that the stick breaking prior lies within the parametric Beta family.
+In this section, we follow \citet{gustafson:1996:local} and define a class of
+multiplicative nonparametric prior perturbations to the prior density.  We show
+that not only can we apply \thmref{etat_deriv} for any nonparametric
+perturbation within the multiplicative class, but that the derivative provides a
+uniformly good linear approximation to the VB optimum within the nonparametric
+class---i.e., that the VB optimum is Fr{\'e}chet differentiable.  This fact
+motivates the definition and analysis of the ``influence function'', a
+single function which summarizes the effect of different prior shapes on
+differentiable posterior quantities of interest.
+
+First, we must introduce some additional measure theory notation. Below, we will
+take $\lambda$ to denote the Lebesgue measure on the Borel sets of $\thetadom
+\subseteq \mathbb{R}^{\thetadim}$.  As in \defref{prior_t}, we will be
+interested in densities with respect to $\lambda$, expressed as Radon-Nikodym
+derivatives, though it will be convenient to use the same notation for a density
+and for the measure induced by the density.  Specifically, for a
+$\mu$-measurable set $S$, and a Radon-Nikodym derivative $f$ defined with
+respect to $\mu$, we will write $f(S) = \int_{\theta \in S} f(\theta)
+\mu(d\theta)$.  We similarly extend the notation for measure domination: for two
+densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
+\Rightarrow f(S) = 0$ for all $\mu$-measurable sets $S$.  Finally, let
+$\esssup_{\theta\sim\mu}$ denote the essential supremum over $\theta$ with
+respect to the measure $\mu$.
+
+Again let us return to the abstract setting of \defref{prior_t}. Let us fix a
+base prior density, $\pbase(\theta)$, at which we have computed a VB
+approximation, and suppose we wish to ask what the variational optimum would
+have been had we used some alternative prior density, $\palt(\theta)$. For
+example, in the BNP setting, one might take $\pbase(\theta)$ to be
+$\betadist{\nuk \vert \alpha_0}$, and $\palt(\theta)$ to be some generic
+function of $\theta$ outside the Beta family. Let us write $\etaopt(\pbase)$ and
+$\etaopt(\palt)$ for these two approximations, respectively, so we are
+interested in quantifying the change $\g(\etaopt(\palt)) - \g(\etaopt(\pbase))$.
+
+To approximately answer this question using the local sensitivity approach of
+\secref{local_sensitivity}, we must somehow define a continuous path from
+$\pbase(\theta)$ to $\palt(\theta)$ parameterized, say, by $\t \in [0, 1]$. One
+way to do so is to define a multiplicative path
+%
+\begin{align}
+%
+\log \ptil(\theta \vert \t) ={}&
+    (1 - \t)\log \pbase(\theta) + \t \log \palt(\theta).
+        \eqlabel{mult_pert_simple}
+%
+\end{align}
+%
+Under \eqref{mult_pert_simple}, when $\t=0$, $\p(\theta \vert \t) =
+\pbase(\theta)$, when $\t=1$, $\p(\theta \vert \t, \pbase, \palt) =
+\palt(\theta)$, and $\t \in (0,1)$ smoothly parameterizes a path between the
+two.  If we can verify that \thmref{etat_deriv} applies to the perturbation
+given in \eqref{mult_pert_simple}, then, just as in the parametric case, we can
+form the Taylor series approximation,
+%
+\begin{align*}
+%
+\etaopt(\palt) \approx
+    \etaopt(\pbase) + \fracat{d \etaopt(\t)}{d\t}{\t=0} (1 - 0).
+%
+\end{align*}
+
+Our first task is then to state conditions under which \thmref{etat_deriv}
+applies to \eqref{mult_pert_simple}.  Note that, in \eqref{mult_pert_simple} we
+have assumed that $\palt$ is a density, but it will be more convenient to
+observe that, when $\palt \ll \pbase$, we can re-write
+%
+\begin{align*}
+%
+\log \ptil(\theta \vert \t) ={}&
+    \log \pbase(\theta) +
+        \t \log \frac{\palttil(\theta)}{\pbasetil(\theta)} +
+        \const. & \constdesc{\theta}
+%
+\end{align*}
+%
+Defining the generic function $\phi(\theta) := \log
+\frac{\palttil(\theta)}{\pbasetil(\theta)}$ motivates consideration of
+perturbations of the form $\log \ptil(\theta \vert \t) = \pbase(\theta) + \t
+\phi(\theta)$, where $\phi(\theta)$ is some generic measurable function. We can
+then ask what $\phi$ give rise to valid densities as well as differentiable maps
+$\t \mapsto \etaopt(\t)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_nl_pert}
+%
+Let $\mu$ denote a measure with $\mu \ll \lambda$, and fix $\pbase(\theta)$, a
+density with respect to $\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$.
+For any measurable $\phi: \thetadom \mapsto \mathbb{R}$ for which the
+expressions are well-defined, let
+%
+\begin{align*}
+\p(\theta \vert \phi) :={}&
+\frac{\pbase(\theta)\exp(\phi(\theta))}
+     {\int \pbase(\theta')\exp(\phi(\theta')) \mu(d \theta')}.
+%
+\end{align*}
+%
+Further, define the norm $\norminf{\phi} := \esssup_{\theta \sim \mu}
+\abs{\phi(\theta)}$.
+%
+\end{defn}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The class of perturbations defined in \defref{prior_nl_pert} are one of the
+family of ``nonlinear'' functional perturbations given by
+\citet{gustafson:1996:local}, though we deviate from
+\citet{gustafson:1996:local} by allowing $\phi$ to take on negative values.
+Otherwise, it can be difficult to choose prior perturbations that ablate prior
+mass---see \appref{positive_pert} for an extended discussion.  Negative
+perturbations mean that the following result is only a minor modification
+of the corresponding result from \citet{gustafson:1996:local}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pert_invariance}
+%
+(\citet{gustafson:1996:local})
+%
+Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
+measure $\p \ll \mu$, let $\phi(\theta \vert \p) := \log \p(\theta) /
+\pbase(\theta)$.  Then $\p \mapsto \norminf{\phi(\cdot \vert \p)}$ is a
+norm, does not depend on $\mu$, and is invariant to invertible transformations
+of $\theta$.
+
+Furthermore, for any $\phi$ with $\norminf{\phi} < \infty$, the quantity
+$\ptil(\theta \vert \phi)$ gives rise to a valid prior, in the sense that
+$\ptil(\theta \vert \phi) \ge 0$ $\mu$-almost everywhere, and
+$0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$.
+%
+\seeproof{pert_invariance}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

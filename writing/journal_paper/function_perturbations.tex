@@ -1,14 +1,6 @@
 In \corref{gem_approximation_ok} of \secref{local_sensitivity}, we showed that
 we can form a Taylor series approximation to the dependence of a variational
-optimum on the parameter $\alpha$ in a Beta prior. However, there is typically
-no {\em a priori} reason to believe that the stick breaking prior lies within
-the parametric Beta family.  In this section, we follow
-\citet{gustafson:1996:local} and define a class of ways to perturb to the
-functional form of the prior.  These classes of nonparametric perturbations will
-allow us to employ \thmref{etat_deriv} for any given alternative  prior.  We
-will take on the more difficult task of the existence and accuracy of the
-derivative in nonparameteric spaces of priors in \secref{valid_priors,
-differentiability} below.
+optimum on the parameter $\alpha$ in a Beta prior.
 
 Let us fix a base prior density, $\pbase(\theta)$, at which we have computed a
 VB approximation, and suppose we wish to ask what the variational optimum would
@@ -60,20 +52,20 @@ of) the family of ``nonlinear'' functional perturbations given by
 \citep{gustafson:1996:local}, of which our examples $\p_{lin}$ and $\p_{mult}$
 are the two extremes, corresponding to $p=1$ and $p=\infty$, respectively.
 
-First, some necessary measure theory notation. Below, we will take $\lambda$ to
-denote the Lebesgue measure on the Borel sets of $\thetadom \subseteq
-\mathbb{R}^{\thetadim}$.  We will be interested in densities with respect to
-$\lambda$, expressed as Radon-Nikodym derivatives, though it will be convenient
-to use the same notation for a density and for the measure induced by the
-density.  Specifically, for a $\lambda$-measurable set $S$, and a Radon-Nikodym
-derivative $f$ defined with respect to $\lambda$, we will write $f(S) =
-\int_{\theta \in S} f(\theta) \lambda(d\theta)$.  Similarly, for two densities
-$f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0 \Rightarrow f(S) =
-0$ for all $\lambda$-measurable sets $S$.
-
+% First, some necessary measure theory notation. Below, we will take $\lambda$ to
+% denote the Lebesgue measure on the Borel sets of $\thetadom \subseteq
+% \mathbb{R}^{\thetadim}$.  We will be interested in densities with respect to
+% $\lambda$, expressed as Radon-Nikodym derivatives, though it will be convenient
+% to use the same notation for a density and for the measure induced by the
+% density.  Specifically, for a $\lambda$-measurable set $S$, and a Radon-Nikodym
+% derivative $f$ defined with respect to $\lambda$, we will write $f(S) =
+% \int_{\theta \in S} f(\theta) \lambda(d\theta)$.  Similarly, for two densities
+% $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0 \Rightarrow f(S) =
+% 0$ for all $\lambda$-measurable sets $S$.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}\deflabel{prior_nl_pert}
+\begin{defn}\deflabel{prior_nl_pert_old}
 %
 Let $\mu$ denote a measure with $\mu \ll \lambda$, and fix $\pbase(\theta)$, a
 density with respect to $\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$.
