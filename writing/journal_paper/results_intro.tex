@@ -29,17 +29,16 @@ where only the global variational parameters are linearized;
 the local parameters are set implicitly as part of the
 computation of the posterior statistic $\g$.
 We solved the linear system in~\eqref{global_sens} using
-the conjugate gradient algorithm, which requires only Hessian-vector products;
-this avoids instatiating the full Hessian matrix in memory.
-If memory were not limited,
-we could have computed the full Hessian and
+the conjugate gradient (CG) algorithm, which requires only Hessian-vector products;
+this avoids instatiating the Hessian matrix in memory.
+We could have also computed the Hessian and
 either factorized it (e.g. with a Cholesky decomposition) or found its inverse directly.
 Then, the Hessian inverse (or its Cholesky decomposition) can
 be re-used for different perturbations
 (since different choices of prior perturbation
 require solving different $\crosshessian$).
-By using conjugate gradient, we need to re-solve the linear system (\eqref{global_sens})
-for each choice of prior perturbation.
+In our case, we need to re-solve the linear system (\eqref{global_sens}) with
+CG for each choice of prior perturbation.
 On our data sets, the conjugate gradient algorithm was at least
 an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
 to exploring different perturbations.

@@ -15,9 +15,10 @@ scale <- 550
 
 p1 <- plot_influence_and_logphi(influence_df$logit_v, 
                           influence_df$influence_x_prior, 
-                          log_phi(influence_df$logit_v, 1),
+                          log_phi(influence_df$logit_v, 0.1),
                           scale = scale) + 
-  ggtitle(TeX('$\\alpha - \\alpha_0 =  -5$')) + 
+  ggtitle(TeX(paste0('$\\alpha - \\alpha_0$  = ', 
+                     alpha_pert1 - alpha0))) + 
   # manually set y-limits (so it matches with p2 below)
   scale_y_continuous(  
     # label for log phi
@@ -28,9 +29,10 @@ p1 <- plot_influence_and_logphi(influence_df$logit_v,
 
 p2 <- plot_influence_and_logphi(influence_df$logit_v, 
                                 influence_df$influence_x_prior, 
-                                log_phi(influence_df$logit_v, 11), 
+                                log_phi(influence_df$logit_v, 12), 
                                 scale = scale) + 
-  ggtitle(TeX('$\\alpha - \\alpha_0 =  5$')) + 
+  ggtitle(TeX(paste0('$\\alpha - \\alpha_0$  = ', 
+                     alpha_pert2 - alpha0))) + 
   # remove left axis
   theme(axis.title.y.left = element_blank(),
         axis.text.y.left = element_blank(),
