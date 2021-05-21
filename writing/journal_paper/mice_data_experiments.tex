@@ -330,7 +330,7 @@ The co-clustering matrix appears insensitive to perturbations in the stick-break
 
 Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}). 
 Forming the linear approximation, which requires a Hessian inversion, 
-took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take up to 20 seconds. 
+took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take more than 30 seconds. 
 
 \begin{table}[tb]
 \centering
@@ -357,9 +357,9 @@ took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. C
     Hessian solve for $\phi$ perturbation &
         2.8\\
     Linear approx. $\etalin(\t)$ at $\t = 1$ &
-        0.00094\\
+        0.00095\\
     Refit $\etaopt(\t)$ at $\t = 1$ &
-        26\\
+        24\\
     \hline
 \end{tabular}
 \end{table}
