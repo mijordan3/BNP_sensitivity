@@ -189,8 +189,8 @@ $\mu$-integration and differentiation in the expression $\int \ind{A} \q(\theta
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Observe that \assuref{exchange_order_q} is strictly weaker than
-\assuref{exchange_order}.
+Observe that \assuref{exchange_order_q} is not strictly weaker than
+\assuref{exchange_order}.  But it could be!  See \assuref{dist_fun_nice}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -276,26 +276,9 @@ The second derivative follows analogously.
 Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
 an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
 \mapsto B_2$.
-
-The function $f$ is {\em directionally differentiable} (also known as a Gateaux
-differentiable) if there exists a bounded linear functional $f^{\mathrm{lin}}:
-B_1 \mapsto B_2$ such that the following condition holds for any
-$\phi$ with $\norm{\phi - \phi_0} < \infty$:
 %
-\begin{align*}
-%
-%\textrm{For any }\phi\textrm{ with }\norm{\phi - \phi_0} < \infty\textrm{, }
-\lim_{t \rightarrow 0}
-    \frac{f(\phi) - f(\phi_0) -
-          f^{\mathrm{lin}}(t (\phi - \phi_0) )
-         }{t} \rightarrow 0.
-%
-\end{align*}
-%
-
-Similarly, the function $f$ is {\em boundedly differentiable} (also known as
-Fr{\'echet} differentiable) at $\phi_0$ if we can take the limit uniformly in
-$\phi$:
+A function $f$ is {\em Fr{\'echet} differentiable} (also known as boundedly
+differentiable) at $\phi_0$ if
 %
 \begin{align*}
 %
@@ -320,7 +303,7 @@ then the two derivatives must coincide \citep[Proposition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}\thmlabel{eta_phi_deriv}
 %
-Let \assuref{kl_opt_ok, q_fun_stick_regular} hold. Then the map $\phi \mapsto
+Let \assuref{kl_opt_ok, exchange_order_q} hold. Then the map $\phi \mapsto
 \etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
 neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
 with the derivative given in \corref{etafun_deriv_form}.
