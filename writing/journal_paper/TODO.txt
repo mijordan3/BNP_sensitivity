@@ -9,3 +9,12 @@ member of L_p (it's a member of the dual space, L_q).
 
 If we're going to claim that the posterior is differentiable we should
 prove it; I'm not aware of another proof.
+
+Need to refer to reparameterization trick somewhere, either in results or elsewhere.
+Maybe example 4 would be a good spot (where we define the VB approximation to the number of clusters).
+e.g. "for posterior quantities whose expectations which cannot be provided in closed form
+with respect to $\eta$, we use Monte Carlo estimates.
+In particular, we use the reparameterization trick,
+which allows us to condition on a set of random draws independent of $\eta$;
+conditional on the random draws, $\g$ (or rather its Monte Carlo approximation)
+is a deterministic, differentiable function of $\eta$. (see \appref{TODO})"

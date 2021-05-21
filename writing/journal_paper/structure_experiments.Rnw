@@ -22,14 +22,15 @@ pop2_color <- '#fc8d62'
 pop3_color <- '#8da0cb'
 @
       
-Our final data analysis example is an application of population genetics. 
+Our final data analysis example is an application of a Bayesian 
+topic model to population genetics. 
 Given a database of individuals and their genotypes at selected genetic loci, 
 population geneticists seek to identify the presence of latent populations, 
 infer the population of origin for specific loci, 
 and estimate the degree to which populations are admixed in each individual. 
 
 We consider a publicly available dataset from \citet{galbusera:2000:thrush}
-that contains genotypes from  155 samples of an endangered bird species,
+that contains genotypes from 155 samples of an endangered bird species,
 the Taita thrush.  
 Individuals were collected from four regions in southeast Kenya 
 (Chawia, Mbololo, Ngangao, Yale),
@@ -95,12 +96,15 @@ This model is identical to STRUCTURE,
 a model proposed in \citet{pritchard:2000:structure, raj:2014:faststructure},
 except that we replace the Dirichlet prior in STRUCTURE
 with an infinite stick-breaking process.
-The result is a model similar to a hierarchical Dirichlet process for topic modeling,
-\citep{teh:2006:hdp},
+The result is a model similar to a hierarchical Dirichlet process for topic modeling \citep{teh:2006:hdp},
 but without the top-level Dirichlet process.
-Genotypes at genetic markers take the place of
+In addition, genotypes at genetic markers take the place of
 words in a document; 
 in lieu of inferring ``topics," we infer latent populations.
+
+The variational approximation is mean-field as before, and all distributions are conditionally conjugate except for the stick-breaking proportions,
+which remain logit-normal. 
+See \appref{app_structure} for further details. 
 
 \subsubsection*{The initial fit}
 
@@ -125,7 +129,7 @@ Since STRUCTURE is a finite mixture model,
 to select $K$, \citet{pritchard:2000:structure} ran STRUCTURE with $K = 1, ..., 5$, and selected the $K$ that maximized a proxy for the posterior quantity 
 $p(K | \x)$, under the assumption of a uniformly distributed prior on $K$. 
 Their algorithm selected $K = 3$. 
-At $\alpha_0 = 3$, the BNP model agrees with \citet{pritchard:2000:structure} in that we both uncover three genetically distinct clusters,
+At $\alpha_0 = 3$, the BNP model agrees with \citet{pritchard:2000:structure} in that we both uncover three genetically distinct groups of individuals,
 corresponding with the Chawia, Ngangao, and Mbololo geographical regions.
 
 
@@ -157,8 +161,7 @@ For this range of $\alpha$, there can be anywhere from two to seven expected pop
 Our posterior quantity of interest is the expected number of 
 in-sample populations (in this section, we will use ``populations" and ``clusters" interchangeably). 
 We consider a slightly more general definition than
-\exref{vb_insample_nclusters_simple}. 
-Define 
+\exref{vb_insample_nclusters_simple}: define 
 \begin{align*}
 \gclusters(\eta)
 &= \expect{\q(\z\vert\eta)}{\sum_{\k=1}^\kmax \ind{ 
