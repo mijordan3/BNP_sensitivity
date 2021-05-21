@@ -1,8 +1,7 @@
-In this section, we return to the BNP problem and prove systematically that the
-map $\alpha \mapsto \etaopt(\alpha)$ satisfies \assuref{kl_opt_ok,
-exchange_order}, and so the conditions of \thmref{etat_deriv}.  As in
-\exref{alpha_perturbation}, we will take $\mu$ to be the Lebesgue measure on
-$[0,1]^{\kmax - 1}$.
+In this section, we return to the BNP problem and prove carefully that the map
+$\alpha \mapsto \etaopt(\alpha)$ satisfies \assuref{kl_opt_ok, exchange_order},
+and so the conditions of \thmref{etat_deriv}.  As in \exref{alpha_perturbation},
+we will take $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax - 1}$.
 
 Recall from \secref{model_vb} that we take $\q(\nuk \vert \eta)$ to be a normal
 distribution on the logit-transformed sticks, $\lnu_\k$.  For the duration of
@@ -125,9 +124,8 @@ the right hand side.  Note that derivatives with respect to any components of
 $\eta$ other than $\etanuk$ are zero and so \assuref{exchange_order} is
 trivially satisfied.
 
-
-By the following lemma,
-
+The following lemma establishes a general condition for the ability
+to exchange normal expectations and the needed derivatives.
 
 % \begin{align}\eqlabel{lnuk_derivatives}
 % %
@@ -152,7 +150,7 @@ Let $\mu$ denote the Lebesgue measure on $\mathbb{R}$. Let $\eta = (\mu,
 \sigma)$, let $\normdist{\theta \vert \eta}$ denote the corresponding normal
 density with respect to $\mu$, and and let $\ball_\eta$ denote an open ball in
 $\mathbb{R}^2$ such that $0 < \sigma < \infty$ for all $\eta \in \ball_\eta$.
-
+%
 Let $\ball_\t$ denote an open ball in $\mathbb{R}$, and let $\psi(\theta, \t)$
 be a function such that $\theta \mapsto \psi(\theta, \t)$ is $\mu$-measurable
 for all $\t \in \ball_\t$.
@@ -162,11 +160,11 @@ If there exists a constant $C > 0$ such that
 \begin{align*}
 %
 \sup_{\t \in \ball_\t} \abs{\psi(\theta, \t)}
-    \le C \exp(-\abs{\theta})
+    \le C \exp(\abs{\theta})
 \mathand
 \sup_{\t \in \ball_\t}
     \abs{\frac{\partial \psi(\theta, \t)}{\partial \t}}
-    \le C \exp(-\abs{\theta}),
+    \le C \exp(\abs{\theta}),
 %
 \end{align*}
 %
@@ -180,66 +178,10 @@ derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta \partial
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Since $\log (1 + \exp(\lnuk)) \exp(-\abs{\lnuk})  < \infty$ for all $\lnuk \in
+\mathbb{R}$, the conditions of \lemref{normal_q_is_regular} are satisfied for
+any ball $\ball_\eta$ such that the variational variances are all finite, and
+\assuref{exchange_order} is satsified.
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}\exlabel{gem_pert_ok}
-%
-To analyze \exref{alpha_perturbation}, we take $\theta$
-in \lemref{normal_q_is_regular}
-be the unconstrained stick-breaking proportion $\lnuk$, which
-recall from \secref{stick_expectations}
-was normally distributed under $\q$.
-Let $\mu$ be the Lebesgue measure on $\mathbb{R}$.
-
-In \exref{alpha_perturbation},
-the parameterization of the stick-breaking distribution was given by
-\begin{align*}
-  \log \pstick(\nuk \vert \t) - \log \pstick(\nuk \vert \t=0) ={}&
-  \t \log(1 - \nuk).
-\end{align*}
-%
-Expressing the perturbation in terms of
-$\lnuk$,
-%
-\begin{align*}
-%
-\log \pstick(\lnuk \vert \t) - \log \pstick(\lnuk \vert \t=0) ={}&
-\t \log\left(1 - \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}\right)
-\\={}&
--\t \log\left(1 + \exp(\lnuk)\right).
-%
-\end{align*}
-%
-So, by \lemref{normal_q_is_regular}, \assuref{q_stick_regular} is satisfied with
-the VB approximation given in \secref{stick_expectations} and the parametric
-perturbation given in \exref{alpha_perturbation}.
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{cor}\corlabel{gem_approximation_ok}
-%
-For the variational approximation of \secref{model_vb} and perturbation
-given in \exref{alpha_perturbation}, $\alpha \mapsto \etaopt(\alpha)$
-is continuously differentiable.
-%
-\begin{proof}
-%
-We have already shown in \exref{gem_pert_ok} that \assuref{q_stick_regular} is
-satisfied.  Given that the variational approximations to $\p(\z \vert \x, \beta,
-\nu)$ and $\p(\beta \vert \x, \nu, \z)$ are conjugate exponential family
-approximations, $\eta \mapsto \KL{\eta, 0}$ is continuous.  It remains only to
-numerically find $\etaopt$ and verify \assuitemref{kl_opt_ok}{kl_hess}, i.e.
-that the Hessian is positive definite at the optimum.
-%
-\end{proof}
-%
-\end{cor}
+It follows that \thmref{etat_deriv} applies to the map $\alpha \mapsto
+\etaopt(\alpha)$.
