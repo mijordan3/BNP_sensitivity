@@ -30,19 +30,25 @@ approximation given in \eqref{vb_mf} and \exref{iris_var_distr}.  Here, the data
 dimension $d = 4$, we set the truncation parameter $\kmax = 15$.  For our
 quantities of interest, we investigate both the estimated number of in-sample
 clusters as described in \exref{vb_insample_nclusters_simple} and the
-\textit{posterior predictive} number of clusters,
+\textit{posterior predictive} number of clusters. Let $\nclusters(\z)$ be the
+number of clusters as defined as in \exref{insample_nclusters_simple}.  The
+posterior predictive number of clusters, $\expect{\p(\pi \vert
+\x)}{\expect{\p(\z \vert \pi)}{\nclusters(\z)}}$, is the posterior
+expectation of the number of distinct clusters that we would expect to see
+in a new dataset.  Analogously to \exref{insample_nclusters_simple}, we
+define a variational approximation to posterior predictive number of
+clusters as
 %
 \begin{align*}
 \gclusterspredabbr(\eta) :=
-    \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}}
-  = \sum_{k=1}^\kmax\left(1 - (1 - \pi_k)^\N \right).
+    \expect{\q(\nu\vert\eta)}{\expect{\p(\z\vert\nu)}{\nclusters(\z)}}
+  = \sum_{k=1}^\kmax\left(1 -
+  \expect{\q(\nu \vert \eta)}{(1 - \pi_\k)^\N} \right).
 \end{align*}
 %
 In the iris example, the predictive quantity can interpreted as the expected
 number of species one might see if a fresh sample of iris flowers were
 collected.
-
-\todo{make sure this the notation matches from before. }
 
 \subsubsection*{Parametric sensitivity}
 

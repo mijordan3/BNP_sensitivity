@@ -164,7 +164,7 @@ in turn be a function of the variational parameters $\eta$.
 %
 Given a solution $\etaopt$ to \eqref{vb_optimization}, the intractable posterior
 expectation in \exref{insample_nclusters_simple} can be approximated as
-a funciton of $\etaopt$:
+a function of $\etaopt$:
 %
 \begin{align*}
 %
@@ -174,18 +174,6 @@ a funciton of $\etaopt$:
 %
 \end{align*}
 
-In fact, given the mean field factorization of \eqref{vb_mf}, the function
-$\g(\etaopt)$ has a particularly simple form.  Since each $\z_{\n\k}$ is either
-zero or one, $\sum_{\n=1}^N \z_{\n\k} > 0$ if and only if $\prod_{\n=1}^\N (1 -
-\z_{\n\k}) = 0$, so we can re-write the quantity of interest as
-%
-\begin{align*}
-%
-\nclusters_0(\z) ={}&
-    \sumk \left(1 -  \prod_{\n=1}^\N (1 - \z_{\n\k})\right).
-%
-\end{align*}
-%
 By the mean field assumption, we can write
 %
 \begin{align*}
@@ -200,15 +188,24 @@ Using the preceding expression, one could express our function of interest
 $\g(\eta)$ as a function only of $\eta_\z$, the variational parameters for the
 $\z$ indicators.  In our experiments, we write $\g(\eta)$ slightly differently,
 taking advantage of the fact that, in all our models, the multinomial posterior
-$\p(\z_\n \vert \beta, \nu)$ has a differentiable, easy-to-evaluate closed form
-as a function of $\beta$ and $\nu$. Using this fact, we can take
+$\p(\z_\n \vert \beta, \nu, \x)$ has a differentiable, easy-to-evaluate closed
+form as a function of $\beta$ and $\nu$. Using this fact, we can instead take
 %
 \begin{align*}
 %
-\g(\eta) :={}&
+\g(\etaopt) :={}&
+    \expect{\q(\beta, \nu \vert\etaopt)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+    } \approx
+    \expect{\p(\beta, \nu \vert \x)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+    }
+    = \expect{\p(\z\vert\x)}{\nclusters_0(\z)} \Rightarrow \\
+%
+\g(\eta) ={}&
     \sumk \left(1 -  \prod_{\n=1}^\N
         \left(1 - \expect{\q(\beta, \nu \vert \eta_\beta, \eta_\nu)}
-                    {\expect{\p(\z_{\n} \vert \beta, \nu)}{\z_{\n\k}}}
+                    {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}
                     \right)\right).
 %
 \end{align*}
@@ -219,7 +216,7 @@ much lower-dimensional than $\eta_\z$, and retains nonlinearities in the map
 \begin{align*}
 %
 \eta_\beta, \eta_\nu \mapsto \expect{\q(\beta, \nu \vert \eta_\beta,
-\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu)}{\z_{\n\k}}}.
+\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}.
 %
 \end{align*}
 %
