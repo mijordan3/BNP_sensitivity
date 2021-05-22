@@ -212,3 +212,50 @@ for some scalar-valued funciton $f(\theta, \tau)$,
 if there exists a dominating function $M(\theta) > 0$ such that
 $\int M(\theta) \mu(d\theta) < \infty$ with $\abs{f(\theta, \tau)} < M(\theta)$
 and $\abs{df(\theta, \tau) / d\tau} < M(\theta)$ in a neighborhood of $\tau=0$.
+
+
+
+\hrulefill
+
+NB: The problem with this proof is that it requires you to be able
+to interchange integration and differentiation with $\q(\theta \vert \eta) \ind{A}$
+for all sets $A$, which is not transparently a weaker assumption than
+is required for the parametric case.
+
+It suffices to show that \assuref{exchange_order_q} implies
+\assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
+when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
+\phi(\theta)$, so
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)} =
+    \t \int \q(\theta \vert \eta) \phi(\theta) \mu(d\theta).
+%
+\end{align*}
+%
+Consider the derivative $\partial / \partial \eta$.  It suffices to show that
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{ \lim_{\eta \rightarrow \etaopt}
+\int \phi(\theta)
+    \left(\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           \right) \mu(d\theta) }_2
+\\\le{}&
+\norminf{\phi}
+\lim_{\eta \rightarrow \etaopt}
+\int
+    \norm{\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           }_2  \mu(d\theta)
+={} 0.
+%
+\end{align*}
+%
+The second derivative follows analogously.
+%
