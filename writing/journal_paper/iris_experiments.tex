@@ -8,55 +8,56 @@
 
 
 
-We demonstrate the local sensitivity computations on a
-Gaussian mixture model (GMM) of Fisher's iris data set.
-The data set is a sample of 150 iris flowers with
-four measurements taken per flower:
-sepal length, sepal width, petal length, and petal width.
-The GMM was detailed in \exref{iris_bnp_process}; here, the
-data dimension $d = 4$. The variational approximation is 
-mean-field as in \eqref{vb_mf}, and
-we set the truncation parameter $\kmax = 15$.
-The variational distribution on all latent variables were taken to 
-be the conditionally conjugate (\exref{iris_var_distr}), 
-except for the stick-breaking proportions $\nu_\k$ which are logit-normal.
-
-We will investigate how prior choices affect the estimated number of clusters. 
-The expected number of \textit{in-sample} clusters $\gclustersabbr$ was defined 
-in \exref{vb_insample_nclusters_simple}. 
-We will also consider the \textit{posterior predictive} number of clusters, 
+In this section, we apply our methods to Fisher's iris data set, using the
+Gaussian mixture model (GMM) model from \exref{iris_bnp_process} and VB
+approximation given in \eqref{vb_mf} and \exref{iris_var_distr}.  Here, the data
+dimension $d = 4$, we set the truncation parameter $\kmax = 15$.  For our
+quantities of interest, we investigate both the estimated number of in-sample
+clusters as described in \exref{vb_insample_nclusters_simple} and the
+\textit{posterior predictive} number of clusters. Let $\nclusters(\z)$ be the
+number of clusters as defined as in \exref{insample_nclusters_simple}.  The
+posterior predictive number of clusters, $\expect{\p(\pi \vert
+\x)}{\expect{\p(\z \vert \pi)}{\nclusters(\z)}}$, is the posterior expectation
+of the number of distinct clusters that we would expect to see in a new dataset
+the same size as our original dataset.  Analogously to
+\exref{insample_nclusters_simple}, we define a variational approximation to
+posterior predictive number of clusters as
+%
 \begin{align*}
-  \gclusterspredabbr(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
-  &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
-  (1 - \pi_k)^\N \right)}.
+\gclusterspredabbr(\eta) :=
+    \expect{\q(\nu\vert\eta)}{\expect{\p(\z\vert\nu)}{\nclusters(\z)}}
+  = \sum_{k=1}^\kmax\left(1 -
+  \expect{\q(\nu \vert \eta)}{(1 - \pi_\k)^\N} \right).
 \end{align*}
-In the iris example, the predictive quantity 
-can interpreted as the expected number of species
-one might see if a fresh sample of iris flowers were collected.
-
-\todo{make sure this the notation matches from before. }
+%
+In the iris example, the predictive quantity can interpreted as the expected
+number of species one might see if a fresh sample of iris flowers were
+collected.
 
 \subsubsection*{Parametric sensitivity}
 
-We explore how the posterior number of clusters,
-either insample or predictive, varies with different choices
-of the GEM parameter $\alpha$.
-The \textit{a priori} expected number of clusters under a GEM is
+We first explore sensitivity of the in-sample and posterior predictive number of
+clusters to the concentration parameter, $\alpha$, using the results in
+\secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
+recall that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
+number of distinct clusters in a dataset of size $N$ is given
+\citep{jordan:2015:gentleintrodp} by
+%
 \begin{align}\eqlabel{prior_num_clusters}
-\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1},
+\expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
+\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
-where $\N$ is the number of observations \citep{jordan:2015:gentleintrodp}.
+%
+Using this formula, we take $\alpha\in[0.1, 4.0]$, corresponding to an an {\em a
+priori} range of approximately $1.5$ to $15$ clusters.  Over this range, the
+shape of the stick-breaking density varies considerably, as shown in
+\figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
+use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we compute
+the derivatives for all the results below.  \Figref{iris_fit} shows the
+posterior clustering for $\alpha_0$.  For our base prior, the posterior thus
+recovers the known ground truth that there are in truth three distinct species.
 
-For the iris data set, we
-consider the range $\alpha\in[0.1, 4.0]$.
-Using \eqref{prior_num_clusters},
-the prior number of clusters is $\approx 1.5$ when $\alpha = 0.1$ and
-$\approx 15$ when $\alpha = 4.0$.
-The shape of the stick-breaking density varies
-considerably for this range of $\alpha$ (\figref{beta_priors}),
-and without knowing the true number of iris species, 
-it may be unclear which $\alpha$ to choose.
-
+\todo{Bryan: these should all have the same y-axis scale}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -72,12 +73,7 @@ it may be unclear which $\alpha$ to choose.
 \end{knitrout}
 
 
-We arbitrarily pick $\alpha_0 = 2$, near the midpoint of our considered range, and
-\figref{iris_fit} shows the GMM fit with this prior choice.
-The BNP model identifies three dominant clusters, agreeing with the
-known fact that there are three iris species in this dataset.
-We now investigate whether this result is sensitive to our choice of $\alpha$.
-
+\todo{Bryan: the caption says $\alpha=6$, but the text says $\alpha=2$.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -99,51 +95,7 @@ We now investigate whether this result is sensitive to our choice of $\alpha$.
 \end{knitrout}
 
 
-% Our posterior quantities,
-% the expected number of in-sample clusters and
-% the expected number of predictive clusters,
-% were defined in~\exref{insample_nclusters, predictive_nclusters}.
-% For this application,
-% we do not use thresholding in computing the number of clusters
-% (i.e. we set $\tau = 0$),
-% so we simply write $\gclustersabbr$ and $\gclusterspredabbr$ for the
-% in-sample and predictive quantities, respectively.
-We formed the linear approximation at the initial
-$\alpha_0 = 2$ fit.
-Without further optimization, we use the linear approximation
-to quickly evaluate
-$\etalinglobal(\alpha)$ for a sequence of $\alpha$'s
-in the range $\alpha \in [0.1, 4.0]$,
-and produce posterior quantities $g(\etalinglobal(\alpha))$.
-
-For this range of $\alpha$,
-the predictive quantity appears much more sensitive than
-the in-sample quantity (\figref{iris_alpha_sens}).
-The in-sample quantity $\gclustersabbr(\etalinglobal(\alpha))$ is nearly constant with value $\approx 3$
-(recall that there are three iris species in the data set).
-On the other hand, over the same range of $\alpha$,
-the predictive quantity $\gclusterspredabbr(\etalinglobal(\alpha))$
-varies from
-3.0 to
-5.6.
-
-Subsequent refits at $\alpha\not=\alpha_0$ confirm the sensitivity conclusions
-of our linearized variational parameters.
-The values $\g(\etalinglobal(\alpha))$ closely mimic the
-values $g(\etaopt(\alpha))$ found by refitting
-the variational parameters at each $\alpha$.
-Importantly,
-the linear approximation is an order of magnitude faster than refitting.
-Forming the linear approximation at $\alpha = \alpha_0$,
-required 0.02 seconds.
-After forming the linear approximation,
-computing $\etalinglobal(\alpha)$ for the sequence
-of $\alpha$'s considered in \figref{iris_alpha_sens} took another
-0.01 seconds.
-On the other hand, to refit $\etaopt(\alpha)$ for the set of
-$\alpha$s took a total of  9 seconds, with a median refit time of 0.5 seconds.
-
-
+\todo{Bryan: Maybe don't hard-code 2 in the caption?}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -172,104 +124,68 @@ In blue, the expected number of clusters obtained by refitting the model at each
 
 \end{knitrout}
 
+\Figref{iris_alpha_sens} shows both the posterior in-sample and predictive
+number of distinct clusters as $\alpha$ varies.  Over this range of $\alpha$,
+the in-sample number of clusters is quite robust, but the posterior predictive
+number of clusters is non-robust, ranging roughly from 3.0 to 5.6 expected
+species.  Our approximation captures this qualititative behavior. As expected,
+the approximation is least accurate furthest from the $\alpha_0$ at which it is
+evalutated.
 
-%
-% - we demonstrate the utility of the influence function
-% - figure ref top three rows shows three different functional perturbations.
-% - can't really tell from densities how these will affect posterior statistic
-% - but they do in fact have very different effects (in sign and size).
-% - but their effects make sense when looking at the influence function
-%
-% -last row is worst-case
+Forming the linear approximation at $\alpha_0$ required 0.02 seconds, and, after forming the linear approximation,
+computing $\etalinglobal(\alpha)$ for the sequence of $\alpha$'s considered in
+\figref{iris_alpha_sens} took another 0.01 seconds. In contrast, to refit $\etaopt(\alpha)$ for the
+set of $\alpha$s took a total of  9 seconds, with a median refit time of
+0.5 seconds.  In this case, the
+approximation produced the same qualitative conclusions an order of magnitude
+faster than refitting.
+
 
 \subsubsection*{Functional perturbations and the influence function}
 
-We again start with the variational approximation fit with GEM parameter
-$\alpha_0 = 2$, but now we consider functional perturbations to
-the stick-breaking $\betadist{1, \alpha_0}$ density.
-We demonstrate the ability of the influence function to
-provide guidance on the anticipated effect of potential perturbations
-on the expected number of in-sample clusters.
+\todo{Bryan: Why aren't we doing this with the predicted number of
+clusters, which is actually sensitive?}
 
-Recall from \eqref{vb_eta_infl_sens} that the local sensitivity can
-be represented as an inner product between the influence function $\infl$
-and a multiplicative perturbation $\phi$;
-the inner product takes the form,
-\begin{align}\eqlabel{recall_infl_innerprod}
-\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
-    \int \infl(\lnuk) \phi(\lnuk) \mu(d\lnuk),
-\end{align}
-where we expressed both the influence function and the perturbation in
-unconstrained space, $\lnuk := \log(\nuk) - \log(1 - \nuk)$.
-The left column of \figref{iris_fsens} shows the influence function
-for the number of in-sample clusters $\gclustersabbr$ in purple.
+In this section, we demonstrated the ability of the influence function to
+predict the effect of nonparametric changes to the prior. As in the previous
+section, we take $\pbase(\nuk) = \betadist(\nuk \vert 1, \alpha_0)$ for each
+$\k$.  In order to facilitate visualization, we perform our computations in
+logit-stick space.  In terms of \defref{prior_t}, we take $\mu$ to be the
+Lebesgue measure on $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots,
+\lnu_{\kmax - 1})$, suitably transforming the prior density.  Our quantity of
+interest will be $\gclustersabbr$, the expected number of in-sample clusters.
 
-In order to illustrate this inner product,
-we consider perturbations $\phi_\mu$
-which are Gaussian bumps, with each perturbation centered at a
-different $\mu$ on the real line (\figref{iris_fsens} left column).
-The perturbed densities are
-$p(\lnu_k|\t\phi_\mu) = p_0(\lnu_k)\exp(\t\phi_\mu(\lnu_k))$.
-The middle column of \figref{iris_fsens} displays the initial density
-$p_0(\nu_k) = \betadist{\nu_k\vert 1, \alpha_0}$
-along with the perturbed densities at $\t = 1$
-for different choices of $\mu$,
-in the original $(0, 1)$ constrained space.
+\todo{A note for everywhere: it's not an inner product.  My bad for calling
+it that at some point, but we need to get away from that.  It's just an
+integral.  The reason is that the influence function may not be a
+member of $L_\infty$; technically, it's a member of the dual space
+($L_1$).}
 
+\todo{Somewhere need to explain how the influence function is 1d despite
+there being $\kmax - 1$ sticks}
 
-% The perturbations of the form
-% $\phi_\mu(x) = e^{2(x - \mu)^2}$, with each perturbation having a
-% different mode $\mu$ (\figref{iris_fsens} left column).
-% The perturbations are multiplicative with perturbed prior
-% $p(\nu_k|\t) = p_0(\nu_k)\exp(\t\phi_\mu(\nu_k))$.
-% The middle column of \figref{iris_fsens} displays the initial density,
-% $p_0(\nu_k) = \betadist{\nu_k\vert 1, \alpha_0}$,
-% along with the perturbed densities
-% $p(\nu_k|\t = 1)$ for different choices of $\mu$.
+The leftmost column of \figref{iris_fsens} shows in purple the influence
+function, $\infl(\nu)$, as given by \corref{etafun_deriv_form}.  We consider
+perturbations $\phi$ which are Gaussian bumps, with each perturbation centered
+at a different location on the real line.  Each row of \figref{iris_fsens}
+corresponds to a different $\phi$, which are shown in gray in the left-hand
+column of \figref{iris_fsens}. The middle column of \figref{iris_fsens} shows
+the stick-breaking prior $\p(\nuk \vert \phi)$ induced by the corresponding
+$\phi$, and the rightmost column of \figref{iris_fsens} shows the changes
+produced by the corresponding perturbation, as measured by re-fitting and  as
+predicted by our approximation.
 
-Each perturbation $\phi_\mu$ with a different choice of $\mu$
-produces distinct changes in the expected number
-of in-sample clusters $\gclustersabbr$.
-The right column of \figref{iris_fsens} plots the differences
-$\Delta\gclustersabbr(\eta(\t)) :=
-\gclustersabbr(\eta(\t)) - \gclustersabbr(\etaopt(0))$
-for $\t\in[0,1]$.
-Depending on the perturbation,
-$\Delta\gclustersabbr$ can be positive, negative, or nearly zero.
-In each case, the approximation
-$\Delta\gclustersabbr(\etalinglobal(\t))$
-is able to mirror the qualitative behavior of
-$\Delta\gclustersabbr(\etaopt(\t))$
-observed by refitting.
+According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
+a perturbation should be determined by its integral against the influence
+function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
+first row, we expect the change to be negative.  Similarly, we expect the
+perturbation of the middle row to produce a positive change, and the bottom row,
+in which $\phi$ overlaps with both negative and positive parts of the influence
+function, to produce a relatively small change.  The third column of
+\corref{etafun_deriv_form} confirms that this intuition holds.
 
-While each perturbation produces distinct changes in $\gclustersabbr$,
-it is unclear how to anticipate the effect of a perturbation
-by comparing the original and perturbed densities alone.
-On the other hand, the sign and magnitude of the change in $\gclustersabbr$ after
-prior perturbation are well-explained by its influence function
-and the representation of local sensitivity as an inner product
-(\eqref{recall_infl_innerprod}).
-When $\phi_\mu$ is centered at a location where the influence function is negative, the effect of the perturbation on $\gclustersabbr$
-is negative (\figref{iris_fsens} top row);
-conversely, when $\phi_\mu$ is centered at a location where the influence function is positive, its effect on $\gclustersabbr$ is positive (bottom row);
-finally, when $\phi_\mu$ is centered at a location where the influence transitions from negative to positive, its effect on
-$\gclustersabbr$ is roughly zero (middle row).
-In the last case, $\phi_\mu$ placed approximately equal weight on the negative and positive portions of the prior-weighted influence function, resulting in an approximately zero inner-product.
-
-
-Finally, we consider the
-worst-case multiplicative perturbation with unit $L_\infty$ norm.
-Recall that the worst-case perturbation with unit $L_\infty$ norm is a
-step-function taking on values $\pm1$ corresponding
-to the sign of the influence function (\figref{iris_worstcase} left).
-The middle column of \figref{iris_worstcase} shows the prior density perturbed by the worst-case perturbation;
-the right column shows the effect on $\gclustersabbr$.
-This worst-case perturbation has a much larger effect on
-$\gclustersabbr$ compared to the other unit $L_\infty$ norm perturbations in
-\figref{iris_fsens}.
-However, even with the worst-case perturbation,
-the change in $\gclustersabbr$ is still small.
-We conclude that on the iris data set, $\gclustersabbr$ appears to be a quantity insensitive to the prior under a Gaussian mixture model.
+\todo{This figure is actually pretty strange.  Why is it cut off?  Why is the
+last row actually a pretty large negative change?}
 
 
 
@@ -318,6 +234,25 @@ We conclude that on the iris data set, $\gclustersabbr$ appears to be a quantity
 
 
 \end{knitrout}
+
+
+
+Finally, we consider the worst-case multiplicative perturbation with unit
+$L_\infty$ norm. Recall that the worst-case perturbation with unit $L_\infty$
+norm is a step-function taking on values $\pm1$ corresponding to the sign of the
+influence function (\figref{iris_worstcase} left). The middle column of
+\figref{iris_worstcase} shows the prior density perturbed by the worst-case
+perturbation; the right column shows the effect on $\gclustersabbr$. This
+worst-case perturbation has a much larger effect on $\gclustersabbr$ compared to
+the other unit $L_\infty$ norm perturbations in \figref{iris_fsens}. However,
+even with the worst-case perturbation, the change in $\gclustersabbr$ is still
+small. We conclude that on the iris data set, $\gclustersabbr$ appears to be a
+quantity insensitive to the prior under a Gaussian mixture model.
+
+
+
+
+
 
 Computing the linearized variational parameters $\etalinglobal(\t)$ at $\t = 1$
 (including the necessary Hessian solve)

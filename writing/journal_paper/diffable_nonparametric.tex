@@ -181,16 +181,16 @@ Therefore, in general, there exist valid priors that cannot be expressed by
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{exchange_order_q}
 %
-Assume that, for any $\mu$-measurable set $A$, we can exchange the order of
-$\mu$-integration and differentiation in the expression $\int \ind{A} \q(\theta
-\vert \eta) \mu(d\theta)$ at $\eta = \etaopt$ for the derivatives $\partial /
-\partial \eta$ and $\partial^2 / \partial \eta^2$.
+Assume that \lemref{exchange_order} applies with the function $f(\theta, \eta,
+\t) = \q(\theta \vert \eta)$ (no $\t$ dependence).
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Observe that \assuref{exchange_order_q} is not strictly weaker than
-\assuref{exchange_order}.  But it could be!  See \assuref{dist_fun_nice}.
+Observe that \assuref{exchange_order_q} is strictly weaker than
+\assuref{exchange_order_dom}.  Nevertheless, \assuref{exchange_order_q}
+suffices to prove \assuref{exchange_order} when $\norminf{\phi} < \infty$,
+as we now prove.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,46 +226,24 @@ continuously differentiable at $\t=0$ with derivative
 It suffices to show that \assuref{exchange_order_q} implies
 \assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
 when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
-\phi(\theta)$, so
+\phi(\theta)$, so, for any $f(\theta, \eta, \t)$ that satisfies the conditions
+of \lemref{exchange_order},
 %
 \begin{align*}
 %
-\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)} =
-    \t \int \q(\theta \vert \eta) \phi(\theta) \mu(d\theta).
+\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta).
 %
 \end{align*}
 %
-Consider the derivative $\partial / \partial \eta$.  It suffices to show that
-%
-\begin{align*}
-%
-\MoveEqLeft
-\norm{ \lim_{\eta \rightarrow \etaopt}
-\int \phi(\theta)
-    \left(\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
-               {\eta - \etaopt} -
-               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
-           \right) \mu(d\theta) }_2
-\\\le{}&
-\norminf{\phi}
-\lim_{\eta \rightarrow \etaopt}
-\int
-    \norm{\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
-               {\eta - \etaopt} -
-               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
-           }_2  \mu(d\theta)
-={} 0.
-%
-\end{align*}
-%
-The second derivative follows analogously.
+Therefore \lemref{exchange_order} applies to $\phi(\theta) f(\theta, \eta, \t)$
+as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
+\assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}.
 %
 \end{proof}
 %
 \end{cor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

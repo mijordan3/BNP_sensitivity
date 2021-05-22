@@ -174,11 +174,16 @@ following ``quantity of interest'':
 %
 \begin{align*}
   \nclusters_0(\z) := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
-  \z_{\n\k}\right) > 0},
+  \z_{\n\k}\right) > 0}
+  = \sumk \left(1 -  \prod_{\n=1}^\N (1 - \z_{\n\k})\right),
 \end{align*}
 %
 where $\ind{\cdot}$ is the indicator function taking value $1$ when the argument
-is true and $0$ otherwise. $\nclusters_0$ counts the number of clusters with at
+is true and $0$ otherwise, and the second equality follows from the fact that
+each $\z_{\n\k}$ is either zero or one, so $\sum_{\n=1}^N \z_{\n\k} > 0$ if and
+only if $\prod_{\n=1}^\N (1 - \z_{\n\k}) = 0$.
+
+$\nclusters_0$ counts the number of clusters with at
 least one observations in a set of assignments $\z$.  The posterior expected
 number of clusters is thus given by $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.
 For example, in the iris data set of \exref{iris_bnp_process},

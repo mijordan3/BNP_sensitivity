@@ -65,25 +65,59 @@ $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial \t$.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In \appref{cont_lemmas}, we state easy-to-verify (but technical) sufficient
-conditions that allow us to establish \assuref{exchange_order}.  The key to
-establishing \assuref{exchange_order} is the dominated convergence theorem
-\citep[Theorem 16.8]{billingsley:1986:probability}, which states roughly that,
-for some scalar-valued funciton $f(\theta, \tau)$,
+In certain cases, one can verify \assuref{exchange_order} directly, such as when
+$\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}$ has a closed form.
+For more general situations, the following straightforward extention of the
+dominated convergence theorem \citep[Theorem 16.8]{billingsley:1986:probability}
+is useful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\begin{align*}
+\begin{lem}\lemlabel{exchange_order}
 %
-\left. \frac{d}{d\tau} \int f(\theta, \tau) \mu(d\theta) \right|_{\tau=0} =
-     \int \fracat{df(\theta, \tau)}{d\tau}{\tau=0}  \mu(d\theta)
+Let $M(\theta) > 0$ be a measurable function with $\int M(\theta) \mu(d\theta) <
+\infty$.  Let $f(\theta, \eta, \t)$ denote a function that is continuously
+differentiable in $\t$ and measurable in $\theta$ for $\eta, \t \in \ball_\eta
+\times \ball_\t$, where $\ball_\eta \times \ball_\t$ is open.
+
+Assume that, for all $\eta, \t \in \ball_\eta \times \ball_\t$, $M(\theta)$ is
+$\mu$-almost everywhere greater than each of the following functions: $f(\theta,
+\eta, \t)$, $\norm{\partial f(\theta, \eta, \t) / \partial \eta}^2_2$,
+$\norm{\partial^2 f(\theta, \eta, \t) / \partial \eta \partial \eta^T}_2$, and
+$\norm{\partial^2 f(\theta, \eta, \t) / \partial \eta \partial \t}_2$. Then, at
+any $\eta, \t \in \ball_\eta \times \ball_\t$, we can exchange the order of
+integration and differentiation in $\int f(\theta, \eta, \t) \mu(d\theta)$ for
+the derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta^2$, and
+$\partial^2 / \partial \eta \partial \t$.
+
+\seeproof{logq_continuous}
 %
-\end{align*}
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if there exists a dominating function $M(\theta) > 0$ such that
-$\int M(\theta) \mu(d\theta) < \infty$ with $\abs{f(\theta, \tau)} < M(\theta)$
-and $\abs{df(\theta, \tau) / d\tau} < M(\theta)$ in a neighborhood of $\tau=0$.
+\begin{assu}\assulabel{exchange_order_dom}
+(Sufficient conditions for \assuref{exchange_order}.)
+%
+Assume that \lemref{exchange_order} applies with the function
+$f(\theta, \eta, \t) = \q(\theta \vert \eta) \log \ptil(\theta \vert \t)$
+as well as with $f(\theta, \eta, \t) = \q(\theta \vert \eta)$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The advantage of \assuref{exchange_order_dom} over \assuref{exchange_order} is
+that the conditions of \assuref{exchange_order_dom} can typically be verified
+even when the expectation $\expect{\q(\theta \vert \eta)}{\log \ptil(\theta
+\vert \t)}$ does not have a closed form.  In \secref{diffable_concentration}, we
+will dicuss how different choices of variational approximations for the stick
+lengths lend themselves to either \assuref{exchange_order} of
+\assuref{exchange_order_dom}.
 
 We are now in a position to define the quantities that occur in the derivative.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
