@@ -17,9 +17,9 @@ clusters as described in \exref{vb_insample_nclusters_simple} and the
 \textit{posterior predictive} number of clusters,
 %
 \begin{align*}
-\gclusterspredabbr(\eta) &:=
-    \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
-  &= \sum_{k=1}^\kmax\left(1 - (1 - \pi_k)^\N \right).
+\gclusterspredabbr(\eta) :=
+    \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}}
+  = \sum_{k=1}^\kmax\left(1 - (1 - \pi_k)^\N \right).
 \end{align*}
 %
 In the iris example, the predictive quantity can interpreted as the expected
