@@ -57,7 +57,6 @@ the derivatives for all the results below.  \Figref{iris_fit} shows the
 posterior clustering for $\alpha_0$.  For our base prior, the posterior thus
 recovers the known ground truth that there are in truth three distinct species.
 
-\todo{Bryan: these should all have the same y-axis scale}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -73,7 +72,6 @@ recovers the known ground truth that there are in truth three distinct species.
 \end{knitrout}
 
 
-\todo{Bryan: the caption says $\alpha=6$, but the text says $\alpha=2$.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -83,11 +81,8 @@ recovers the known ground truth that there are in truth three distinct species.
 }
 
 \caption[The iris data in principal component space and
-                      GMM fit at $\alpha = 6$.
-                      Colors denote inferred memberships and
-                      ellipses represent estimated covariances]{The iris data in principal component space and
-                      GMM fit at $\alpha = 6$.
-                      Colors denote inferred memberships and
+                      GMM fit at $\alpha = 2$]{The iris data in principal component space and
+                      GMM fit at $\alpha = 2$. Colors denote inferred memberships and
                       ellipses represent estimated covariances. }\label{fig:iris_fit}
 \end{figure}
 
@@ -95,7 +90,6 @@ recovers the known ground truth that there are in truth three distinct species.
 \end{knitrout}
 
 
-\todo{Bryan: Maybe don't hard-code 2 in the caption?}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -104,21 +98,7 @@ recovers the known ground truth that there are in truth three distinct species.
 
 }
 
-\caption[The expected number of clusters as $\alpha$ varies in the
-the GMM fit of the iris data.
-On the left is in-sample quantity $\gclustersabbr$.
-On the right is the the predictive quantity $\gclusterspredabbr$.
-We formed the linear approximation at $\alpha=2$.
-In red, the expected number of clusters computed under the
-linearly approximated variational parameters.
-In blue, the expected number of clusters obtained by refitting the model at each $\alpha$]{The expected number of clusters as $\alpha$ varies in the
-the GMM fit of the iris data.
-On the left is in-sample quantity $\gclustersabbr$.
-On the right is the the predictive quantity $\gclusterspredabbr$.
-We formed the linear approximation at $\alpha=2$.
-In red, the expected number of clusters computed under the
-linearly approximated variational parameters.
-In blue, the expected number of clusters obtained by refitting the model at each $\alpha$. }\label{fig:iris_alpha_sens}
+\caption[The expected number of clusters as $\alpha$ varies in thethe GMM fit of the iris data]{The expected number of clusters as $\alpha$ varies in thethe GMM fit of the iris data. On the left is in-sample quantity $\gclustersabbr$. On the right is the the predictive quantity $\gclusterspredabbr$. We formed the linear approximation at $\alpha=2$.}\label{fig:iris_alpha_sens}
 \end{figure}
 
 
