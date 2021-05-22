@@ -1,0 +1,314 @@
+In the previous section, we showed that we can form a Taylor series
+approximation to the dependence of a variational optimum on the parameter
+$\alpha$ in the GEM prior.  However, there is typically no {\em a priori} reason
+to believe that the stick breaking prior lies within the parametric Beta family.
+In this section, we follow \citet{gustafson:1996:local} and define a class of
+multiplicative nonparametric prior perturbations to the prior density.  We show
+that not only can we apply \thmref{etat_deriv} for any nonparametric
+perturbation within the multiplicative class, but that the derivative provides a
+uniformly good linear approximation to the VB optimum within the nonparametric
+class---i.e., that the VB optimum is Fr{\'e}chet differentiable.  This fact
+motivates the definition and analysis of the ``influence function'', a
+single function which summarizes the effect of different prior shapes on
+differentiable posterior quantities of interest.
+
+First, we must introduce some additional measure theory notation. Below, we will
+take $\lambda$ to denote the Lebesgue measure on the Borel sets of $\thetadom
+\subseteq \mathbb{R}^{\thetadim}$.  As in \defref{prior_t}, we will be
+interested in densities with respect to $\lambda$, expressed as Radon-Nikodym
+derivatives, though it will be convenient to use the same notation for a density
+and for the measure induced by the density.  Specifically, for a
+$\mu$-measurable set $S$, and a Radon-Nikodym derivative $f$ defined with
+respect to $\mu$, we will write $f(S) = \int_{\theta \in S} f(\theta)
+\mu(d\theta)$.  We similarly extend the notation for measure domination: for two
+densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
+\Rightarrow f(S) = 0$ for all $\mu$-measurable sets $S$.  Finally, let
+$\esssup_{\theta\sim\mu}$ denote the essential supremum over $\theta$ with
+respect to the measure $\mu$.
+
+Again let us return to the abstract setting of \defref{prior_t}. Let us fix a
+base prior density, $\pbase(\theta)$, at which we have computed a VB
+approximation, and suppose we wish to ask what the variational optimum would
+have been had we used some alternative prior density, $\palt(\theta)$. For
+example, in the BNP setting, one might take $\pbase(\theta)$ to be
+$\betadist{\nuk \vert \alpha_0}$, and $\palt(\theta)$ to be some generic
+function of $\theta$ outside the Beta family. Let us write $\etaopt(\pbase)$ and
+$\etaopt(\palt)$ for these two approximations, respectively, so we are
+interested in quantifying the change $\g(\etaopt(\palt)) - \g(\etaopt(\pbase))$.
+
+To approximately answer this question using the local sensitivity approach of
+\secref{local_sensitivity}, we must somehow define a continuous path from
+$\pbase(\theta)$ to $\palt(\theta)$ parameterized, say, by $\t \in [0, 1]$. One
+way to do so is to define a multiplicative path
+%
+\begin{align}
+%
+\log \ptil(\theta \vert \t) ={}&
+    (1 - \t)\log \pbase(\theta) + \t \log \palt(\theta).
+        \eqlabel{mult_pert_simple}
+%
+\end{align}
+%
+Under \eqref{mult_pert_simple}, when $\t=0$, $\p(\theta \vert \t) =
+\pbase(\theta)$, when $\t=1$, $\p(\theta \vert \t, \pbase, \palt) =
+\palt(\theta)$, and $\t \in (0,1)$ smoothly parameterizes a path between the
+two.  If we can verify that \thmref{etat_deriv} applies to the perturbation
+given in \eqref{mult_pert_simple}, then, just as in the parametric case, we can
+form the Taylor series approximation,
+%
+\begin{align*}
+%
+\etaopt(\palt) \approx
+    \etaopt(\pbase) + \fracat{d \etaopt(\t)}{d\t}{\t=0} (1 - 0).
+%
+\end{align*}
+
+Our first task is then to state conditions under which \thmref{etat_deriv}
+applies to \eqref{mult_pert_simple}.  Note that, in \eqref{mult_pert_simple} we
+have assumed that $\palt$ is a density, but it will be more convenient to
+observe that, when $\palt \ll \pbase$, we can re-write
+%
+\begin{align*}
+%
+\log \ptil(\theta \vert \t) ={}&
+    \log \pbase(\theta) +
+        \t \log \frac{\palttil(\theta)}{\pbasetil(\theta)} +
+        \const. & \constdesc{\theta}
+%
+\end{align*}
+%
+Defining the generic function $\phi(\theta) := \log
+\frac{\palttil(\theta)}{\pbasetil(\theta)}$ motivates consideration of
+perturbations of the form $\log \ptil(\theta \vert \t) = \pbase(\theta) + \t
+\phi(\theta)$, where $\phi(\theta)$ is some generic measurable function. We can
+then ask what $\phi$ give rise to valid densities as well as differentiable maps
+$\t \mapsto \etaopt(\t)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{prior_nl_pert}
+%
+Let $\mu$ denote a measure with $\mu \ll \lambda$, and fix $\pbase(\theta)$, a
+density with respect to $\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$.
+For any measurable $\phi: \thetadom \mapsto \mathbb{R}$ for which the
+expressions are well-defined, let
+%
+\begin{align*}
+% \p(\theta \vert \phi) :={}&
+% \frac{\pbase(\theta)\exp(\phi(\theta))}
+%      {\int \pbase(\theta')\exp(\phi(\theta')) \mu(d \theta')}.
+\ptil(\theta \vert \phi) :={}& \pbase(\theta)\exp(\phi(\theta)).
+%
+\end{align*}
+%
+As usual, when $0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$, we let
+$\p(\theta \vert \phi)$ be the normalized version of $\ptil(\theta \vert \phi)$.
+Further, define the norm $\norminf{\phi} := \esssup_{\theta \sim \mu}
+\abs{\phi(\theta)}$, and let $\ball_\phi(\delta) := \left\{ \phi: \norminf{\phi} <
+\delta \right\}$.
+%
+\end{defn}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The class of perturbations defined in \defref{prior_nl_pert} are one of the
+family of ``nonlinear'' functional perturbations given by
+\citet{gustafson:1996:local}, though we deviate from
+\citet{gustafson:1996:local} by allowing $\phi$ to take on negative values.
+Otherwise, it can be difficult to choose prior perturbations that ablate prior
+mass---see \appref{positive_pert} for an extended discussion.  The following
+result is only a minor modification of the corresponding result from
+\citet{gustafson:1996:local} to allow negative perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{pert_invariance}
+%
+(\citet{gustafson:1996:local})
+%
+Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
+measure $\p \ll \mu$, let $\phi(\theta \vert \p) := \log \p(\theta) /
+\pbase(\theta)$.  Then $\p \mapsto \norminf{\phi(\cdot \vert \p)}$ is a
+norm, does not depend on $\mu$, and is invariant to invertible transformations
+of $\theta$.
+
+Furthermore, for any $\phi$ with $\norminf{\phi} < \infty$, the quantity
+$\ptil(\theta \vert \phi)$ gives rise to a valid prior, in the sense that
+$\ptil(\theta \vert \phi) \ge 0$ $\mu$-almost everywhere, and
+$0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$.
+%
+\seeproof{pert_invariance}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The set of priors $\left\{\p(\theta \vert \phi) : \phi \in
+\ball_\phi(\delta)\right\}$ live in a multiplicative band around the original
+prior, $\pbase$, as shown in \figref{func_ball}. Although
+\lemref{pert_invariance} proves that every $\phi$ with $\norminf{\phi}$ is a
+valid prior, the converse is not true, and the Beta prior perturbation of
+\exref{alpha_perturbation} is a counterexample.
+
+\FunctionBallFig{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{beta_inf_norm}
+%
+Take $\mu$ to be the Lebesgue measure on $[0,1]$, let $\pbase(\theta) =
+\betadist{\theta \vert 1, \alpha_0}$ and $\palt(\theta) = \betadist{\theta \vert
+1, \alpha_1}$ for $\alpha_0 \ne \alpha_1$.  Taking
+$\phi(\theta) = (\alpha_1 - \alpha_0) \log(1 - \theta)$ parameterizes
+a path from $\pbase$ to $\palt$ as in \eqref{mult_pert_simple}, and
+%
+\begin{align*}
+%
+\norminf{\phi} =
+    \abs{\alpha_1 - \alpha_0} \sup_{\theta \in [0,1]} \abs{\log(1 - \theta)} =
+    \infty.
+%
+\end{align*}
+%
+Therefore, in general, there exist valid priors that cannot be expressed by
+\defref{prior_nl_pert} with $\phi$ with $\norminf{\phi} < \infty$.
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{exchange_order_q}
+%
+Assume that, for any $\mu$-measurable set $A$, we can exchange the order of
+$\mu$-integration and differentiation in the expression $\int \ind{A} \q(\theta
+\vert \eta) \mu(d\theta)$ at $\eta = \etaopt$ for the derivatives $\partial /
+\partial \eta$ and $\partial^2 / \partial \eta^2$.
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Observe that \assuref{exchange_order_q} is not strictly weaker than
+\assuref{exchange_order}.  But it could be!  See \assuref{dist_fun_nice}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_deriv_form}
+%
+Let \assuref{kl_opt_ok, exchange_order_q} and fix the quantities given in
+\defref{prior_nl_pert}. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
+continuously differentiable real-valued function of interest.  Define the
+``influence function''
+%
+\begin{align}\eqlabel{infl_defn}
+%
+\infl(\theta) :={}&
+    - \fracat{d g(\eta)}{ d \eta^T}{\etaopt} \hessopt^{-1}
+        \lqgradbar{\theta \vert \etaopt}
+        \q(\theta \vert \etaopt).
+%
+\end{align}
+%
+Then, if $\norminf{\phi} < \infty$, the map $\t \mapsto g(\etaopt(\t \phi))$ is
+continuously differentiable at $\t=0$ with derivative
+%
+\begin{align}\eqlabel{vb_eta_infl_sens}
+%
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
+    \int \infl(\theta) \phi(\theta) \mu(d\theta).
+%
+\end{align}
+%
+\begin{proof}
+%
+It suffices to show that \assuref{exchange_order_q} implies
+\assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
+when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
+\phi(\theta)$, so
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)} =
+    \t \int \q(\theta \vert \eta) \phi(\theta) \mu(d\theta).
+%
+\end{align*}
+%
+Consider the derivative $\partial / \partial \eta$.  It suffices to show that
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{ \lim_{\eta \rightarrow \etaopt}
+\int \phi(\theta)
+    \left(\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           \right) \mu(d\theta) }_2
+\\\le{}&
+\norminf{\phi}
+\lim_{\eta \rightarrow \etaopt}
+\int
+    \norm{\frac{\q(\theta \vert \eta) - \q(\theta \vert \etaopt)}
+               {\eta - \etaopt} -
+               \fracat{\partial \q(\theta \vert \eta)}{\partial \eta}{\etaopt}
+           }_2  \mu(d\theta)
+={} 0.
+%
+\end{align*}
+%
+The second derivative follows analogously.
+%
+\end{proof}
+%
+\end{cor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{diffable_classes}
+    (\citep[Definition 4.5]{zeidler:2013:functional})
+%
+Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
+an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
+\mapsto B_2$.
+%
+A function $f$ is {\em Fr{\'echet} differentiable} (also known as boundedly
+differentiable) at $\phi_0$ if
+%
+\begin{align*}
+%
+\lim_{t \rightarrow 0}
+    \sup_{\phi: \norm{\phi - \phi_0} = 1}
+    \frac{f(\phi) - f(\phi_0) -
+          f^{\mathrm{lin}}(t (\phi - \phi_0))
+         }{t} \rightarrow 0.
+%
+\end{align*}
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
+\defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
+then the two derivatives must coincide \citep[Proposition
+4.8]{zeidler:2013:functional}, which justifies our notation.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{eta_phi_deriv}
+%
+Let \assuref{kl_opt_ok, exchange_order_q} hold. Then the map $\phi \mapsto
+\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
+neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
+with the derivative given in \corref{etafun_deriv_form}.
+
+(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
+
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

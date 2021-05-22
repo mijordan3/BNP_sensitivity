@@ -17,12 +17,21 @@ For a given prior perturbation,
 we validate the performace of the linear approximation against
 the more expensive process of re-fitting the model.
 
+\todo{Here it would be good to say more explicitly that you
+choose an alpha range and re-fit the model on a grid of alphas.
+Then in each experiment you can just present the result with no additional
+commentary.}
+
+
+\todo{This paragraph could go somewhere less prominent.}
 We optimized the initial variational approximation with
 the BFGS algorithm run with a loose convergence tolerance
 followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-quality optimum.
+\todo{Cite the details of the trust-ncg algorithm, nobody will know what that means}
 Unless otherwise noted, all subsequent refits after a prior pertrubation were found
 using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
 
+\todo{This paragraph should go in the Computing the Sensitivity section.}
 In the results below, we use
 the approximation defined by \eqref{global_sens, global_lin_approx},
 where only the global variational parameters are linearized;

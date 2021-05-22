@@ -87,18 +87,14 @@ $\beta_\k$ for $\k > \kmax$ in defining our variational approximation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-For $\z$ and $\beta$ in all models we consider, we have the option of
-taking advantage of conditional conjugacy to choose distributions
-$\q(\z_\n \vert \eta)$ and
-$\q(\beta_\k \vert \eta)$.
-This means that we will take $\q(\z_\n \vert \eta)$
-to be multinomial, matching $\p(\z_{\n}
-\vert \x, \beta, \nu)$, and we will take $\q(\beta_\k \vert \eta)$
-to match the distribution of $\p(\beta_{\k} \vert \x, \z, \nu)$.
-With conditionally conjugate distributions,
-all expectations with respect to $\z$ and $\beta$
-necessary for computing the $\mathrm{KL}$ (\eqref{vb_optimization})
-will be available analytically.
+For $\z$ and $\beta$ in all models we consider, we have the option of taking
+advantage of conditional conjugacy to choose distributions $\q(\z_\n \vert
+\eta)$ and $\q(\beta_\k \vert \eta)$. This means that we will take $\q(\z_\n
+\vert \eta)$ to be multinomial, matching $\p(\z_{\n} \vert \x, \beta, \nu)$, and
+we will take $\q(\beta_\k \vert \eta)$ to match the distribution of
+$\p(\beta_{\k} \vert \x, \z, \nu)$. With conditionally conjugate distributions,
+all expectations with respect to $\z$ and $\beta$ necessary for computing the
+$\mathrm{KL}$ (\eqref{vb_optimization}) will be available analytically.
 
 \begin{ex}[VB approximation for $\beta_\k$ in a GMM]\exlabel{iris_var_distr}
 %
@@ -126,35 +122,35 @@ can be computed analytically as functions of $\eta_{\beta_\k}$.
 
 If the prior $\pstick(\nuk)$ were Beta-distributed like in the GEM construction,
 then the conditionally conjugate distribution for $\q(\nuk \vert \eta)$ would
-also be a Beta distribution
-\citep{blei:2006:vi_for_dp}.
-Then, in the same way as \exref{iris_var_distr},
-all the necessary expectations with respect to $\nuk$ in the
-$\mathrm{KL}$ can be computed analytically with respect to the
+also be a Beta distribution \citep{blei:2006:vi_for_dp}. Then, in the same way
+as \exref{iris_var_distr}, all the necessary expectations with respect to $\nuk$
+in the $\mathrm{KL}$ can be computed analytically with respect to the
 variational Beta parameters.
 
-However, we will be considering stick-breaking distributions $\pstick(\nuk)$ that
-are outside the family of Beta distributions.
-To approximate expectations, we will use numerical integration.
-We choose the distribution on the logit-transformed
-stick-breaking proportions
+However, we will be considering stick-breaking distributions $\pstick(\nuk)$
+that are outside the family of Beta distributions. To approximate expectations,
+we will use numerical integration. We choose the distribution on the
+logit-transformed stick-breaking proportions
+%
 \begin{align*}
   \lnu_\k := \log(\nu_\k) - \log(1 - \nu_\k)
 \end{align*}
+%
 to be normally distributed. Letting $\s$ be the sigmoid function,
 which provides the inverse tranformation,
+%
 \begin{align*}
     \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)},
 \end{align*}
-a normal distribution on $\lnu_\k$ induces a \textit{logit-normal}
-distribution on $\nuk$.
-With this choice of a logit-normal distribution,
-all expectations with respect to $\nu_\k$ (such as $\expect{\q(\nu_\k\vert\eta)}{\log \pstick(\nu_\k)}$)
-can be expressed as a Gaussian integral.
-We then approximate the integral with GH quadrature
-(see \appref{gh_quadrature} for details).
-Not only do stick expectations appear in the evaluation of the $\mathrm{KL}$,
-but they will also be necessary in computing local sensitivity (\secref{local_sensitivity}).
+%
+a normal distribution on $\lnu_\k$ induces a \textit{logit-normal} distribution
+on $\nuk$. With this choice of a logit-normal distribution, all expectations
+with respect to $\nu_\k$ (such as $\expect{\q(\nu_\k\vert\eta)}{\log
+\pstick(\nu_\k)}$) can be expressed as a Gaussian integral. We then approximate
+the integral with GH quadrature (see \appref{gh_quadrature} for details). Not
+only do stick expectations appear in the evaluation of the $\mathrm{KL}$, but
+they will also be necessary in computing local sensitivity
+(\secref{local_sensitivity}).
 
 Once $\q(\zeta \vert \eta)$ is defined,
 we can approximate any expected posterior quantity of interest
@@ -207,8 +203,3 @@ is differentiable.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% We will discuss more details of the VB approximation, including the form of the
-% mean field factors and the evaluation of $\KL{\eta}$ in more detail below in
-% \secref{computing_sensitivity}, as well as in the experiments of
-% \secref{results}.

@@ -97,6 +97,7 @@
 \input{abstract.tex}
 \end{abstract}
 
+
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
 
@@ -123,9 +124,17 @@
     \seclabel{diffable_parametric}
     \input{diffable_parametric}
 
+    \subsection{Differentiability of BNP models with respect to $\alpha$}
+    \seclabel{diffable_concentration}
+    \input{diffable_concentration}
+
     \subsection{Nonparametric prior perturbations}
     \seclabel{diffable_nonparametric}
     \input{diffable_nonparametric}
+
+    \subsection{Other nonparametric prior perturbations}
+    \seclabel{diffable_lp}
+    \input{diffable_lp}
 
 
 \section{Computing the sensitivity}\seclabel{computing_sensitivity}
@@ -150,8 +159,8 @@
 \seclabel{conclusion}
 This concludes.
 
-\section{Orphans}
-\input{_orphans}
+% \section{Orphans}
+% \input{_orphans}
 
 
 
@@ -186,5 +195,13 @@ Thanks to everyone.
 
 \section{STRUCTURE model details}\applabel{app_structure}
 \input{app_structure}
+
+% I'm not sure where VB details are going to go, but Bryan, whenever you add
+% the right section, just update the other reference to point to your new
+% sections.
+\section{Variational approximation details}
+\applabel{app_vb_details}
+
+
 
 \end{document}
