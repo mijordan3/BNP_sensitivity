@@ -36,26 +36,28 @@ collected.
 
 \subsubsection*{Parametric sensitivity}
 
-We explore how the posterior number of clusters,
-either insample or predictive, varies with different choices
-of the GEM parameter $\alpha$.
-The \textit{a priori} expected number of clusters under a GEM is
-\todo{Give this equation a left hand side}
+We first explore sensitivity of the in-sample and posterior predictive number of
+clusters to the concentration parameter, $\alpha$, using the results in
+\secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
+recall that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
+number of distinct clusters in a dataset of size $N$ is given
+\citep{jordan:2015:gentleintrodp} by
+%
 \begin{align}\eqlabel{prior_num_clusters}
-\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1},
+\expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
+\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
-where $\N$ is the number of observations \citep{jordan:2015:gentleintrodp}.
+%
+Using this formula, we take $\alpha\in[0.1, 4.0]$, corresponding to an an {\em a
+priori} range of approximately $1.5$ to $15$ clusters.  Over this range, the
+shape of the stick-breaking density varies considerably, as shown in
+\figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
+use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we compute
+the derivatives for all the results below.  \Figref{iris_fit} shows the
+posterior clustering for $\alpha_0$.  For our base prior, the posterior thus
+recovers the known ground truth that there are in truth three distinct species.
 
-For the iris data set, we
-consider the range $\alpha\in[0.1, 4.0]$.
-Using \eqref{prior_num_clusters},
-the prior number of clusters is $\approx 1.5$ when $\alpha = 0.1$ and
-$\approx 15$ when $\alpha = 4.0$.
-The shape of the stick-breaking density varies
-considerably for this range of $\alpha$ (\figref{beta_priors}),
-and without knowing the true number of iris species,
-it may be unclear which $\alpha$ to choose.
-
+\todo{Bryan: these should all have the same y-axis scale}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -71,13 +73,7 @@ it may be unclear which $\alpha$ to choose.
 \end{knitrout}
 
 
-\todo{It's not arbitrary, you chose the midpoint of a plausible range}
-We arbitrarily pick $\alpha_0 = 2$, near the midpoint of our considered range, and
-\figref{iris_fit} shows the GMM fit with this prior choice.
-The BNP model identifies three dominant clusters, agreeing with the
-known fact that there are three iris species in this dataset.
-We now investigate whether this result is sensitive to our choice of $\alpha$.
-
+\todo{Bryan: the caption says $\alpha=6$, but the text says $\alpha=2$.}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -99,56 +95,7 @@ We now investigate whether this result is sensitive to our choice of $\alpha$.
 \end{knitrout}
 
 
-% Our posterior quantities,
-% the expected number of in-sample clusters and
-% the expected number of predictive clusters,
-% were defined in~\exref{insample_nclusters, predictive_nclusters}.
-% For this application,
-% we do not use thresholding in computing the number of clusters
-% (i.e. we set $\tau = 0$),
-% so we simply write $\gclustersabbr$ and $\gclusterspredabbr$ for the
-% in-sample and predictive quantities, respectively.
-\todo{This paragraph is unnecessary, it's all already above}
-We formed the linear approximation at the initial
-$\alpha_0 = 2$ fit.
-Without further optimization, we use the linear approximation
-to quickly evaluate
-$\etalinglobal(\alpha)$ for a sequence of $\alpha$'s
-in the range $\alpha \in [0.1, 4.0]$,
-and produce posterior quantities $g(\etalinglobal(\alpha))$.
-
-\todo{I think there's a lot of text redundantly summarizing what's
-already in the graphics}
-For this range of $\alpha$,
-the predictive quantity appears much more sensitive than
-the in-sample quantity (\figref{iris_alpha_sens}).
-The in-sample quantity $\gclustersabbr(\etalinglobal(\alpha))$ is nearly constant with value $\approx 3$.
-On the other hand, over the same range of $\alpha$,
-the predictive quantity $\gclusterspredabbr(\etalinglobal(\alpha))$
-varies from
-3.0 to
-5.6.
-
-\todo{Put the timing information in its own table, and in text you can just
-say the approximation is much faster.}
-Subsequent refits at $\alpha\not=\alpha_0$ confirm the sensitivity conclusions
-of our linearized variational parameters.
-The values $\g(\etalinglobal(\alpha))$ closely mimic the
-values $g(\etaopt(\alpha))$ found by refitting
-the variational parameters at each $\alpha$.
-Importantly,
-the linear approximation is an order of magnitude faster than refitting.
-Forming the linear approximation at $\alpha = \alpha_0$,
-required 0.02 seconds.
-After forming the linear approximation,
-computing $\etalinglobal(\alpha)$ for the sequence
-of $\alpha$'s considered in \figref{iris_alpha_sens} took another
-0.01 seconds.
-On the other hand, to refit $\etaopt(\alpha)$ for the set of
-$\alpha$s took a total of  9 seconds, with a median refit time of 0.5 seconds.
-
-\todo{I think this caption does not need to re-state things that are
-clear enough in the legend}
+\todo{Bryan: Maybe don't hard-code 2 in the caption?}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -177,15 +124,21 @@ In blue, the expected number of clusters obtained by refitting the model at each
 
 \end{knitrout}
 
+\Figref{iris_alpha_sens} shows both the posterior in-sample and predictive
+number of distinct clusters as $\alpha$ varies.  Over this range of $\alpha$,
+the in-sample number of clusters is quite robust, but the posterior predictive
+number of clusters is non-robust, ranging roughly from 3.0 to 5.6 expected
+species.  Our approximation captures this qualititative behavior. As expected,
+the approximation is least accurate furthest from the $\alpha_0$ at which it is
+evalutated.
 
-%
-% - we demonstrate the utility of the influence function
-% - figure ref top three rows shows three different functional perturbations.
-% - can't really tell from densities how these will affect posterior statistic
-% - but they do in fact have very different effects (in sign and size).
-% - but their effects make sense when looking at the influence function
-%
-% -last row is worst-case
+For this dataset, the linear approximation is an order of magnitude faster than
+refitting. Forming the linear approximation at $\alpha_0$ required
+0.02 seconds. After forming the linear
+approximation, computing $\etalinglobal(\alpha)$ for the sequence of $\alpha$'s
+considered in \figref{iris_alpha_sens} took another 0.01 seconds. On the other hand, to refit $\etaopt(\alpha)$ for
+the set of $\alpha$s took a total of  9 seconds, with a median refit time of
+0.5 seconds.
 
 \subsubsection*{Functional perturbations and the influence function}
 
