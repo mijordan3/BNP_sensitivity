@@ -143,6 +143,11 @@ faster than refitting.
 \todo{Bryan: Why aren't we doing this with the predicted number of
 clusters, which is actually sensitive?}
 
+\todo{The reasoning here was: in-sample was insensitive to alpha. 
+maybe sensitive to other functional perturbations?
+Looks like its not, e.g. worst-case. 
+TODO make this logic clear from the get-go}
+
 In this section, we demonstrated the ability of the influence function to
 predict the effect of nonparametric changes to the prior. As in the previous
 section, we take $\pbase(\nuk) = \betadist(\nuk \vert 1, \alpha_0)$ for each
