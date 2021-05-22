@@ -145,7 +145,7 @@ stru_init_fit_cap <- paste(
     as population 1, 2, and 3, respectively. ")
 SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
 @
-  <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
+<<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
 out <- plot_initial_fit()
 out$p
 @
@@ -233,7 +233,7 @@ the reduction to two latent populations at $\alpha = 0.5$ observed in the refits
     of the total number of loci in the data set, respectively. ")
 SetImageSize(aspect_ratio = 0.55 * base_aspect_ratio)
 @
-  <<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
+<<stru_alpha_nclusters, cache=simple_cache, fig.show='hold', fig.cap=stru_alpha_nclusters_cap>>=
 source("R_scripts/structure/structure_n_clusters_alphasens.R", echo=knitr_debug, print.eval=TRUE)
 @
 

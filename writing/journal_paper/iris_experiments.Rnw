@@ -33,11 +33,11 @@ clusters as described in \exref{vb_insample_nclusters_simple} and the
 \textit{posterior predictive} number of clusters. Let $\nclusters(\z)$ be the
 number of clusters as defined as in \exref{insample_nclusters_simple}.  The
 posterior predictive number of clusters, $\expect{\p(\pi \vert
-\x)}{\expect{\p(\z \vert \pi)}{\nclusters(\z)}}$, is the posterior
-expectation of the number of distinct clusters that we would expect to see
-in a new dataset.  Analogously to \exref{insample_nclusters_simple}, we
-define a variational approximation to posterior predictive number of
-clusters as
+\x)}{\expect{\p(\z \vert \pi)}{\nclusters(\z)}}$, is the posterior expectation
+of the number of distinct clusters that we would expect to see in a new dataset
+the same size as our original dataset.  Analogously to
+\exref{insample_nclusters_simple}, we define a variational approximation to
+posterior predictive number of clusters as
 %
 \begin{align*}
 \gclusterspredabbr(\eta) :=
