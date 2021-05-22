@@ -8,31 +8,23 @@
 
 
 
-We demonstrate the local sensitivity computations on a
-Gaussian mixture model (GMM) of Fisher's iris data set.
-The data set is a sample of 150 iris flowers with
-four measurements taken per flower:
-sepal length, sepal width, petal length, and petal width.
-The GMM was detailed in \exref{iris_bnp_process}; here, the
-data dimension $d = 4$. The variational approximation is 
-mean-field as in \eqref{vb_mf}, and
-we set the truncation parameter $\kmax = 15$.
-The variational distribution on all latent variables were taken to 
-be the conditionally conjugate (\exref{iris_var_distr}), 
-except for the stick-breaking proportions $\nu_\k$ which are logit-normal.
-
-We will investigate how prior choices affect the estimated number of clusters. 
-The expected number of \textit{in-sample} clusters $\gclustersabbr$ was defined 
-in \exref{vb_insample_nclusters_simple}. 
-We will also consider the \textit{posterior predictive} number of clusters, 
+In this section, we apply our methods to Fisher's iris data set, using the
+Gaussian mixture model (GMM) model from \exref{iris_bnp_process} and VB
+approximation given in \eqref{vb_mf} and \exref{iris_var_distr}.  Here, the data
+dimension $d = 4$, we set the truncation parameter $\kmax = 15$.  For our
+quantities of interest, we investigate both the estimated number of in-sample
+clusters as described in \exref{vb_insample_nclusters_simple} and the
+\textit{posterior predictive} number of clusters,
+%
 \begin{align*}
-  \gclusterspredabbr(\eta) &:= \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
-  &= \expect{\q(\pi\vert\eta)}{\sum_{k=1}^\kmax\left(1 -
-  (1 - \pi_k)^\N \right)}.
+\gclusterspredabbr(\eta) &:=
+    \expect{\q(\pi\vert\eta)}{\expect{\p(\z\vert\pi)}{\nclusters(\z)}} \\
+  &= \sum_{k=1}^\kmax\left(1 - (1 - \pi_k)^\N \right).
 \end{align*}
-In the iris example, the predictive quantity 
-can interpreted as the expected number of species
-one might see if a fresh sample of iris flowers were collected.
+%
+In the iris example, the predictive quantity can interpreted as the expected
+number of species one might see if a fresh sample of iris flowers were
+collected.
 
 \todo{make sure this the notation matches from before. }
 
@@ -42,6 +34,7 @@ We explore how the posterior number of clusters,
 either insample or predictive, varies with different choices
 of the GEM parameter $\alpha$.
 The \textit{a priori} expected number of clusters under a GEM is
+\todo{Give this equation a left hand side}
 \begin{align}\eqlabel{prior_num_clusters}
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1},
 \end{align}
@@ -54,7 +47,7 @@ the prior number of clusters is $\approx 1.5$ when $\alpha = 0.1$ and
 $\approx 15$ when $\alpha = 4.0$.
 The shape of the stick-breaking density varies
 considerably for this range of $\alpha$ (\figref{beta_priors}),
-and without knowing the true number of iris species, 
+and without knowing the true number of iris species,
 it may be unclear which $\alpha$ to choose.
 
 
@@ -72,6 +65,7 @@ it may be unclear which $\alpha$ to choose.
 \end{knitrout}
 
 
+\todo{It's not arbitrary, you chose the midpoint of a plausible range}
 We arbitrarily pick $\alpha_0 = 2$, near the midpoint of our considered range, and
 \figref{iris_fit} shows the GMM fit with this prior choice.
 The BNP model identifies three dominant clusters, agreeing with the
@@ -108,6 +102,7 @@ We now investigate whether this result is sensitive to our choice of $\alpha$.
 % (i.e. we set $\tau = 0$),
 % so we simply write $\gclustersabbr$ and $\gclusterspredabbr$ for the
 % in-sample and predictive quantities, respectively.
+\todo{This paragraph is unnecessary, it's all already above}
 We formed the linear approximation at the initial
 $\alpha_0 = 2$ fit.
 Without further optimization, we use the linear approximation
@@ -116,17 +111,20 @@ $\etalinglobal(\alpha)$ for a sequence of $\alpha$'s
 in the range $\alpha \in [0.1, 4.0]$,
 and produce posterior quantities $g(\etalinglobal(\alpha))$.
 
+\todo{I think there's a lot of text redundantly summarizing what's
+already in the graphics}
 For this range of $\alpha$,
 the predictive quantity appears much more sensitive than
 the in-sample quantity (\figref{iris_alpha_sens}).
-The in-sample quantity $\gclustersabbr(\etalinglobal(\alpha))$ is nearly constant with value $\approx 3$
-(recall that there are three iris species in the data set).
+The in-sample quantity $\gclustersabbr(\etalinglobal(\alpha))$ is nearly constant with value $\approx 3$.
 On the other hand, over the same range of $\alpha$,
 the predictive quantity $\gclusterspredabbr(\etalinglobal(\alpha))$
 varies from
 3.0 to
 5.6.
 
+\todo{Put the timing information in its own table, and in text you can just
+say the approximation is much faster.}
 Subsequent refits at $\alpha\not=\alpha_0$ confirm the sensitivity conclusions
 of our linearized variational parameters.
 The values $\g(\etalinglobal(\alpha))$ closely mimic the
@@ -143,7 +141,8 @@ of $\alpha$'s considered in \figref{iris_alpha_sens} took another
 On the other hand, to refit $\etaopt(\alpha)$ for the set of
 $\alpha$s took a total of  9 seconds, with a median refit time of 0.5 seconds.
 
-
+\todo{I think this caption does not need to re-state things that are
+clear enough in the legend}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
@@ -184,6 +183,7 @@ In blue, the expected number of clusters obtained by refitting the model at each
 
 \subsubsection*{Functional perturbations and the influence function}
 
+\todo{Use the notation $\pbase(\nuk) = \betadist(\nuk \vert \alpha=2)$}
 We again start with the variational approximation fit with GEM parameter
 $\alpha_0 = 2$, but now we consider functional perturbations to
 the stick-breaking $\betadist{1, \alpha_0}$ density.
@@ -191,6 +191,8 @@ We demonstrate the ability of the influence function to
 provide guidance on the anticipated effect of potential perturbations
 on the expected number of in-sample clusters.
 
+\todo{This is redundant.  However, you may want to say something
+about using a different base measure than our theory examples.}
 Recall from \eqref{vb_eta_infl_sens} that the local sensitivity can
 be represented as an inner product between the influence function $\infl$
 and a multiplicative perturbation $\phi$;
@@ -204,6 +206,13 @@ unconstrained space, $\lnuk := \log(\nuk) - \log(1 - \nuk)$.
 The left column of \figref{iris_fsens} shows the influence function
 for the number of in-sample clusters $\gclustersabbr$ in purple.
 
+\todo{A note for everywhere: it's not an inner product.  My bad for calling
+it that at some point, but we need to get away from that.  It's just an
+integral.  The reason is that the influence function may not be a
+member of $L_\infty$; technically, it's a member of the dual space
+($L_1$).}
+\todo{A lot can be cut by not re-stating things that are already said
+in the theory section, and this is another example}
 In order to illustrate this inner product,
 we consider perturbations $\phi_\mu$
 which are Gaussian bumps, with each perturbation centered at a
@@ -216,6 +225,7 @@ along with the perturbed densities at $\t = 1$
 for different choices of $\mu$,
 in the original $(0, 1)$ constrained space.
 
+\todo{Left off here...}
 
 % The perturbations of the form
 % $\phi_\mu(x) = e^{2(x - \mu)^2}$, with each perturbation having a
