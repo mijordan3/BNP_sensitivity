@@ -18,7 +18,7 @@ fisher:1936:iris} using a Dirichelt process prior with concetration parameter
 $\alpha$.  One might imagine the biologist asking: ``Suppose I went out and
 gathered a new dataset the same size as the one I have.  How many distinct
 species of iris would I expect to find?''  The posterior predictive expectation
-of the number of distinct species may depend strongly on the choice of $\alpha$,
+of the number of distinct species may depend strongly on the choice of $\alpha$
 as $\alpha$ varies over some reasonable range, and, if it does, the biologist
 would presumably like to be warned that her posterior quantity of interest is
 {\em non-robust} to the choice of $\alpha$.
@@ -76,70 +76,114 @@ and approximate
 g(\etaopt(\alpha)) \approx g(\etalin(\alpha)).
 %
 \end{align*}
+
+If the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable, then
+we might expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when
+$\abs{\alpha - \alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) /
+d\alpha$ can be computed much more efficiently than the cost of optimizing
+directly, $\etalin(\alpha)$ can be much faster to compute than
+$\etaopt(\alpha)$.  Even when the approximation $\etalin(\alpha)$ is not a
+completely adequate substitue for exact re-optimization, the derivative can be a
+useful guide for what sorts of prior perturbations might be problematic.
+
+The approximation immediately motivates three key questions:
 %
+\begin{enumerate}
+%
+\item \itemlabel{intro_diff}
+    When is $\alpha \mapsto \etaopt(\alpha)$ continuously differentiable?
+%
+\item \itemlabel{intro_comp}
+    How can we easily and efficiently compute the derivative?
+%
+\item \itemlabel{intro_extrap}
+    How well does the linear approximation extrapolate in real-world problems?
+%
+\end{enumerate}
+%
+For the remainder of the paper, we address these three questions in order, after
+introducing our BNP model and VB approximation in \secref{model}.
 
+In \secref{local_sensitivity}, we state sufficient conditions for
+differentiability of VB approximations in general, both for parametric
+perturbations such as the concentration parameter $\alpha$, as well as for
+nonparametric perturbations to the prior density.  Amongst a class of
+nonparametric perturbations considered by \citet{gustafson:1996:local}, we prove
+in \secref{diffable_nonparametric, diffable_lp} that VB optima are Fr{\'e}chet
+differentiable only for multiplicative perturbations to the prior density. The
+differentiability of our motivating BNP problems follow as a special case.
 
+In \secref{computing_sensitivity}, we address practical computability of the
+derivative, and show that the approximation can be easily and efficiently
+computed even in high-dimensional problems like BNP models, using moder
+automatic differentiation tools \citep{baydin:2018:automatic, jax2018github} and
+the iterative linear algebra techniques such as the conjugate gradient algorithm
+\citep{nocedal:2006:numerical}.  In our experiments, we find that the derivative
+can be computed roughly an order of magnitude faster than re-optimizing.
 
-Notably, we go beyond previous work on local Bayesian sensitivity
-(e.g. \citet{gustafson:1996:local, basu:1996:local}) which treat sensitivity as
-a measure of robustness \textit{per se}; rather, in the design and evaluation of
+Finally, in \secref{results}, we demonstrate the usefulness of the approximation
+in practice on a series of increasingly complex real-world datasets.  We
+investigate the accuracy of our local approximation both for parametric and
+nonparametric perturbations by comparing against the much more expensive process
+of refitting the variational posterior.  We demonstrate how different posterior
+quantities can be sensitive or non-sensitive, depending on both the application
+and the quantity of interest.  In most cases, the local approximation provides
+qualitatively accurate results many times faster re-optimizing.  We also discuss
+some limitations of local sensitivity and present scenarios where it fails to be
+a good approximation to refitting. \Secref{conclusion} concludes.
+
+We close the introduction by observing that  the present work is essentially a
+VB extension of the local Bayesian robustness literature
+\citet{gustafson:1996:local, basu:1996:local}.  In a sense, VB is more naturally
+amenable to sensitivity analysis than Markov Chain Monte Carlo, since the
+derivative of VB approximations is typically available in closed form, whereas
+the derivative of Bayesian posteriors must be approximated using potentially
+noisy posterior covariances and/ or posterior conditional densities that are not
+readily available from MCMC draws \citep{gustafson:1996:marginal}.  In addition
+to providing rigorous theory and computational tools for the VB context, we go
+beyond previous work on local Bayesian sensitivity which treat sensitivity as a
+measure of robustness \textit{per se}.  Rather, in the design and evaluation of
 our local sensitivity measures we pay special attention to our ability to
-accurately extrapolate posterior inferences to different priors.
+accurately and usefully extrapolate VB posterior inferences to different priors.
 
-Using a stick-breaking representation of a Dirichlet process, we consider
-perturbations both to the scalar concentration parameter and to the functional
-form of the stick-breaking distribution. To evaluate functional perturbations,
-we follow \cite{gustafson:1996:local} and embed the stick-breaking density in
-the $L_p$ vector spaces of integrable functions. In considering functional
-sensitivity however, it is impossible to evaluate senstivity to all possible
-perturbations. To uncover potentially influential perturbations, we also show
-that the local sensitivity takes the form of an integral of the prior
-perturbation times an \textit{influence function}. Using H{\"o}lder's
-inequality, we can use the influence function to construct maximally influential
-alternative priors.
 
-Importantly, in order to use the influence function to search for
-influential prior perturbations, the derivative needs to be a
-uniformly good approximation in
-a neighborhood of the original prior: that is, the VB optimum must be
-\textit{Fre{\'e}chet differentiable} with respect to the prior perturbation.
-We prove that, though the VB optimum is directional differentiable for all
-$1 \le p \le \infty$,  only for multiplicative perturbations and
-$p=\infty$ does the stronger condition of Fre{\'e}chet differentiability hold.
-The differentiability properties of the VB posterior is distinct from the
-exact Bayesian posterior, whose Fre{\'e}chet differentiability
-holds irrespective of the choice of $p$.
-With this in mind, we employ function sensitivity with only with multiplicative
-perturbations.
+% Using a stick-breaking representation of a Dirichlet process, we consider
+% perturbations both to the scalar concentration parameter and to the functional
+% form of the stick-breaking distribution. To evaluate functional perturbations,
+% we follow \cite{gustafson:1996:local} and embed the stick-breaking density in
+% the $L_p$ vector spaces of integrable functions. In considering functional
+% sensitivity however, it is impossible to evaluate senstivity to all possible
+% perturbations. To uncover potentially influential perturbations, we also show
+% that the local sensitivity takes the form of an integral of the prior
+% perturbation times an \textit{influence function}. Using H{\"o}lder's
+% inequality, we can use the influence function to construct maximally influential
+% alternative priors.
 
-The variational approach is particularly suitable for the
-sensitivity calculations we derive.
-Because the approximate posterior is characterized as a fixed point to an optimization
-objective, the derivative of the VB optimum with respect to any prior
-parameter can be computed in closed form.
-Using modern automatic differentiation tools, computing local sensitivity
-in practice requires almost no additional code beyond
-implementing the optimization objective itself.
-The computation time of forming the local approximation can be
-more than an order of magnitude faster than refitting the VB posterior.
+% Importantly, in order to use the influence function to search for
+% influential prior perturbations, the derivative needs to be a
+% uniformly good approximation in
+% a neighborhood of the original prior: that is, the VB optimum must be
+% \textit{Fre{\'e}chet differentiable} with respect to the prior perturbation.
+% We prove that, though the VB optimum is directional differentiable for all
+% $1 \le p \le \infty$,  only for multiplicative perturbations and
+% $p=\infty$ does the stronger condition of Fre{\'e}chet differentiability hold.
+% The differentiability properties of the VB posterior is distinct from the
+% exact Bayesian posterior, whose Fre{\'e}chet differentiability
+% holds irrespective of the choice of $p$.
+% With this in mind, we employ function sensitivity with only with multiplicative
+% perturbations.
 
-\Secref{model_bnp} details the stick-breaking construction of Dirichlet process
-priors. \Secref{model_vb} outlines our truncated variational approximation.
-\Secref{local_sensitivity} presents our local approximation for parametric and
-functional perturbations, respectively. \secref{computing_sensitivity} discusses
-how computing the sensitivity is done in practice.
+% The variational approach is particularly suitable for the sensitivity
+% calculations we derive. Because the approximate posterior is characterized as a
+% fixed point to an optimization objective, the derivative of the VB optimum with
+% respect to any prior parameter can be computed in closed form. Using modern
+% automatic differentiation tools, computing local sensitivity in practice
+% requires almost no additional code beyond implementing the optimization
+% objective itself. The computation time of forming the local approximation can be
+% more than an order of magnitude faster than refitting the VB posterior.
 
-In our results (\secref{results}),
-we apply our methods to several real-world datasets, estimating the sensitivity
-of key posterior quantities to
-the BNP prior specification.
-We show the accuracy of our local approximation both for
-parametric and nonparametric perturbations by comparing
-against the much more expensive process of refitting the variational posterior.
-We find that posterior quantities can be sensitive or non-sensitive,
-depending on both the application and the quantity of interest.
-In most cases, the local approximation well-approximates the results found under
-refitting while running many times faster.
-We also discuss some limitations of local sensitivity
-and present scenarios where it fails to be a good approximation to refitting.
-\secref{conclusion} concludes.
+% \Secref{model_bnp} details the stick-breaking construction of Dirichlet process
+% priors. \Secref{model_vb} outlines our truncated variational approximation.
+% \Secref{local_sensitivity} presents our local approximation for parametric and
+% functional perturbations, respectively. \secref{computing_sensitivity} discusses
+% how computing the sensitivity is done in practice.
