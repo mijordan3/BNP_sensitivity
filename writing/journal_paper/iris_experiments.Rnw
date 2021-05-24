@@ -226,39 +226,25 @@ SetImageSize(aspect_ratio = 0.525 * base_aspect_ratio)
 source("R_scripts/iris/iris_worst_case.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-
-
-Finally, we consider the worst-case multiplicative perturbation with unit
-$L_\infty$ norm. Recall that the worst-case perturbation with unit $L_\infty$
-norm is a step-function taking on values $\pm1$ corresponding to the sign of the
-influence function (\figref{iris_worstcase} left). The middle column of
+Finally, we consider the worst-case multiplicative perturbation with
+$\norminf{\phi} = 1$, as in REFERENCEWHENWRITTEN.  The middle column of
 \figref{iris_worstcase} shows the prior density perturbed by the worst-case
 perturbation; the right column shows the effect on $\gclustersabbr$. This
 worst-case perturbation has a much larger effect on $\gclustersabbr$ compared to
 the other unit $L_\infty$ norm perturbations in \figref{iris_fsens}. However,
 even with the worst-case perturbation, the change in $\gclustersabbr$ is still
 small. We conclude that on the iris data set, $\gclustersabbr$ appears to be a
-quantity insensitive to the prior under a Gaussian mixture model.
+robust quantity for this model and dataset.
 
-
-
-
-
-
-Computing the linearized variational parameters $\etalinglobal(\t)$ at $\t = 1$
-(including the necessary Hessian solve)
-for a given functional perturbation
-required \Sexpr{sprintf('%1.1g', wc_hessian_time + wc_lr_time)} seconds.
-A refit at $\t = 1$ requires about one second.
-While a second for a refit is not exceedingly large, the
-order-of-magnitude difference in timing between the linear approximation and refit
-will continue to hold for larger data analysis problems below.
-In general, the speed of the linear approximation allows us to quickly
-explore many different potential functional perturbations when
-refitting for each perturbation becomes prohibitive.
-In the data applications below,
-the influence function will guide our choice of functional perturbation and
-uncover potentially influential perturbations.
+As with the concentration parameter, the approximation was much faster to
+compute than the exact refits. Computing the linearized variational parameters
+$\etalinglobal(\t)$ at $\t = 1$ (including the necessary Hessian solve) for a
+given functional perturbation required \Sexpr{sprintf('%1.1g', wc_hessian_time +
+wc_lr_time)} seconds. A refit using $\palt$ in place of $\pbase$ requires about
+one second. The time to refit on the small dataset is, of course, small.
+However, the order-of-magnitude difference in timing between the linear
+approximation and refit will continue to hold for larger data analysis problems
+below.
 
 % \begin{table}[tb]
 % \centering

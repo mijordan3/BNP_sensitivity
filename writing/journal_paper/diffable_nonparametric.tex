@@ -229,15 +229,16 @@ when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
 \phi(\theta)$, so, for any $f(\theta, \eta, \t)$ that satisfies the conditions
 of \lemref{exchange_order},
 %
-\begin{align*}
+%\begin{align*}
 %
-\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta).
+$\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta)$.
 %
-\end{align*}
+%\end{align*}
 %
 Therefore \lemref{exchange_order} applies to $\phi(\theta) f(\theta, \eta, \t)$
 as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
-\assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}.
+\assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}. The form of
+the influence function can then be read off the expression for the derivative.
 %
 \end{proof}
 %
@@ -245,6 +246,41 @@ as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Having the influence function motivates the following corrolary.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_worst_case}
+%
+The ``worst-case'' derivative in $\ball_\phi(\delta)$ is given by
+%
+\begin{align*}
+%
+\sup_{\phi \in \ball_\phi(\delta)}
+    \fracat{d g(\etaopt(\t \phi))}{d \t}{0} =
+        \delta \int \abs{\infl(\theta)} \mu(d\theta),
+%
+\end{align*}
+%
+which is acheived at the perturbation
+$\phi^*(\theta) = \delta \, \mathrm{sign}\left(\infl(\theta)\right)$.
+%
+\begin{proof}
+%
+The result follows immediately from applying H{\"o}lder's inequality
+\citep[Theorem 5.1.2 and subsequent disscussion]{dudley:2018:real}to $\sup_{\phi
+\in \ball_\phi(\delta)} \int \infl(\theta) \phi(\theta) \mu(d \theta)$.
+%
+\end{proof}
+%
+\end{cor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+By \citep[Theorem 5.2.1]{dudley:2018:real}, $L_\infty$ is a Banach space.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

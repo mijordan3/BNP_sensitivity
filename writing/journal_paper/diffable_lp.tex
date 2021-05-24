@@ -1,26 +1,187 @@
-Though every directional derivative exists, the quality of the linear
-approximation can be arbitrarily poor; in the $\lp{\mu,p}$ space, the role of
-$\theta$ near integer multiples of $\pi$ is played by prior perturbations with
-density near zero in small sets of nonzero measure.  To carry the analogy
-futher, one might be tempted to further restrict $\phi$ so that $\p(\theta \vert
-\phi)$ is bounded away from zero.
+In \secref{diffable_nonparametric} we considered multiplicative perturbations to
+the prior density.  One might ask whether one could consider other paths through
+the space of priors, such as additive perturbations.  In this section, we
+briefly consider a broader class of nonlinear perturbations investigated by
+\citet{gustafson:1996:local}, of which additive and multiplicative perturbations
+are special cases, and show that, within this class, only multiplicative
+perturbations are compatible with KL divergence.
 
-Indeed, the tension between differentiability and expressiveness appears
-fundamental.  Consider \figref{func_dist}.  These two densities are far from one
-another according to KL divergence (from blue to red) since the red density has
-nearly zero mass where the blue does not.  They are also distant from one
-another in $\norminf{\cdot}$, since it takes a large multiplicative change to
-turn a nonzero number into a nearly zero number.  However, the two densities are
-close in $\norm{\cdot}_{p}$, since the region where the red density is nearly
-zero has a small measure. In order for VB approximations to be continuous (a
-necessary condition for Fr{\'e}chet differentiability), one must consider a
-topology on priors that is no coarser than the topology induced by KL
+As in \secref{diffable_nonparametric}, suppose we have a base prior $\pbase$ and
+an alternative $\palt$, and that we wish to parameterize a continuous path
+between them.  We will do so as follows. For some $p \in [1, \infty)$, let
+%
+\begin{align}\eqlabel{p_pert_simple}
+%
+\ptil(\theta \vert \tp) :=
+    \left((1 - \tp)\pbase(\theta)^{1/p} +
+    \tp \frac{1}{p}\palt(\theta)^{1/p} \right)^{p}.
+%
+\end{align}
+%
+As with \eqref{mult_pert_simple}, $\p(\theta \vert \tp = 0) = \pbase(\theta)$,
+$\p(\theta \vert \tp = 1) = \palt(\theta)$, and $\p(\theta \vert \tp)$ moves
+continously between the two in $\tp \in (0, 1)$.  When $p = 1$,
+$\ptil(\theta \vert \tp)$ defines an ``additive perturbation,'' and
+the limit as $p \rightarrow \infty$ gives the multiplicative perturbation
+of \eqref{mult_pert_simple}.
+%
+\citet{gustafson:1996:local} proves that a result analogous to
+\eqref{p_pert_simple} for \eqref{p_pert_simple}, where the
+$\norminf{\cdot}$ norm is repalaced by
+%
+\begin{align}\eqlabel{phi_lp_norm}
+%
+\phi(\theta \vert \palt, p) :={}
+    \palt(\theta)^{1/p} - \pbase(\theta)^{1/p} \mathand
+\norm{\phi}_p :={} \left(\int \abs{\phi(\theta)}^p \right)^{1/p}.
+%
+\end{align}
+%
+We refer the reader to \citet{gustafson:1996:local} for details.  For our
+present discussion, what matters is that the use of the perturbation in
+\eqref{p_pert_simple} strongly motivates the use of the norm $\norm{\phi(\theta
+\vert \palt, p)}_p$ when forming, for example, worst-case perturbations as in
+\corref{etafun_worst_case}.
+
+Though the $\norm{\phi(\theta \vert \palt, p)}_p$ norm does not appear to cause
+major difficulties for the full Bayesian posterior, this norm is not compatible
+with KL divergence, in the sense that KL divergence is {\em discontinuous} in
+this norm.  Prior changes that are arbitrarily small according to
+$\norm{\phi(\theta \vert \palt, p)}_p$ can induce arbitrarily large changes in
+the KL divergence \eqref{kl_def}, and so (in genreal) arbitrarily large
+changes in its optimum.  The problem is best illustrated with an
+example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{kl_discontinuous}
+%
+Let $\mu$ denote a measure on $\thetadom$ that is absolutely continous
+with respect to the Lebesgue measure, and let $\q(\theta)$ and
+$\pbase(\theta)$ denote densities with respect to $\mu$.  Without loss of
+generality, assume that $\q(\theta) > 0$ on $\thetadom$.  Assume that
+$\KL{q(\theta) || \pbase(\theta)}$ is well-defined and finite.
+
+Then, for any $\epsilon > 0$ and any $M > 0$, we can find a density
+$\palt(\theta)$ such that $\norm{\phi(\theta \vert \palt, p)}_p < \epsilon$ but
+$\abs{\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}} > M$.
+
+\begin{proof}
+%
+The proof will follow by perturbing $\pbase(\theta)$ to zero in a small
+interval.  By making the interval narrow, we can make $\norm{\phi(\theta \vert
+\palt, p)}_p$ small, but by making the $\palt(\theta)$ sufficiently close to
+zero, we can make the KL divergence difference large irresective of how narrow
+the interval is.
+
+First, observe that
+%
+\begin{align*}
+%
+\KL{q(\theta) || \palt(\theta)} -
+\KL{q(\theta) || \pbase(\theta)} ={}&
+\expect{\q(\theta)}{\log \frac{\palt(\theta)}{\pbase(\theta)}}.
+%
+\end{align*}
+
+For any set $S$ with $\pbase(S) = \epsilon$, define
+%
+\begin{align*}
+%
+\palt(\theta \vert S, \delta) :=
+    \frac{\delta^{\ind{\theta \in S}}}{1 + \epsilon(1 - \delta)}.
+%
+\end{align*}
+%
+Then $\palt(\theta \vert S, \delta)$ is a valid density, and
+%
+\begin{align*}
+%
+\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}
+    ={}& \q(S) \log \delta - \log\left( 1 + \epsilon(1 - \delta) \right).
+%
+\end{align*}
+%
+By \eqref{phi_lp_norm},
+%
+\begin{align*}
+%
+\phi(\theta \vert \palt, p) ={}&
+    \pbase(\theta)^{1/p} \left(
+        \frac{\left(\delta^{1/p}\right)^{\ind{\theta \in S}}}
+             {\left( 1 + \epsilon(1 - \delta) \right)^{1/p}} - 1 \right) \mathand\\
+\norm{\phi(\theta \vert \palt, p)}_p^p ={}&
+\epsilon \left(
+   \frac{\left(\delta^{1/p}\right)}
+        {\left( 1 + \epsilon(1 - \delta) \right)^{1/p}} - 1 \right) +
+(1 - \epsilon) \left(
+   \frac{1}
+        {\left( 1 + \epsilon(1 - \delta) \right)^{1/p}} - 1 \right).
+%
+\end{align*}
+
+Since $\mu$ is absolutely continuous with respect to the Lebesgue measure, there
+exists a sequence $\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a
+sequence of corresponding sets $S_n$ such that $\pbase(S_n) = \epsilon_n$. (See
+\lemref{continuity_partition} for a proof of this fact, which is a
+straightforward consequence of \citet[Proposition 15.5]{nielsen:1997:measure}
+and the continuity of the Lebesgue measure.) Since $\q(\theta) > 0$ on
+$\thetadom$, $\q(S_n) > 0$ for all $n$.  Since $\KL{\q(\theta) ||
+\pbase(\theta)}$ is finite, we must have $\lim_{n \rightarrow} \q(S_n) = 0$.
+
+Take $\delta_n  = \exp(-1 / (\q(S_n)^2))$, and take $\palt(\theta) =
+\palt(\theta \vert S_n, \delta_n)$.  Then $\epsilon_n (1 - \delta_n) \rightarrow
+0$, and $\q(S_n)\log \delta_n = -1 / \q(S_n)$, so
+%
+\begin{align*}
+%
+\abs{\KL{q(\theta) || \palt(\theta \vert S_n, \delta_n)} -
+    \KL{q(\theta) || \pbase(\theta)}} \rightarrow{}& \infty, \quad \textrm{but}\\
+%
+\norm{\phi(\theta \vert \palt(\cdot \vert S_n, \delta_n), p)}_p^p
+    \rightarrow{}& 0.
+%
+\end{align*}
+%
+Thus, for sufficiently large $n$, the conclusion follows.
+%
+\end{proof}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since Fr{\'e}chet differentiability implies continuity,
+\thmref{kl_discontinuous} shows that it is impossible to derive an analogue of
+\thmref{eta_phi_deriv} for perturbations of the form \eqref{p_pert_simple}
+with the norms \eqref{phi_lp_norm}.
+
+Recall \exref{beta_inf_norm}, where we showed that there exist valid priors for
+which $\norminf{\phi} < \infty$.  Viewed in light of the proof of
+\thmref{kl_discontinuous}, the limited expressiveness of the $\norminf{\cdot}$
+norm looks like a feature, rather than a bug.
+% The KL divergence that defines a variational objective cannot handle
+% prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
+% considers such densities to be ``distant'' from $\pbase$, whereas the
+% more permissive $\norm{\cdot}_p$ norms do not.
+The situation is illustrated in  \figref{func_dist}.  The two shown densities
+are far from one another according to KL divergence (from blue to red) since the
+red density has nearly zero mass where the blue does not.  They are also distant
+from one another in $\norminf{\cdot}$, since it takes a large multiplicative
+change to turn a nonzero number into a nearly zero number.  However, the two
+densities are close in $\norm{\cdot}_{p}$, since the region where the red
+density is nearly zero has a small measure. In order for VB approximations to be
+continuous (a necessary condition for Fr{\'e}chet differentiability), one must
+consider a topology on priors that is no coarser than the topology induced by KL
 divergence.  But since valid priors can take values close to zero, a sacrifice
 in expressiveness of the neighborhood of zero must be made in order to induce a
 topology that works with KL divergence.  Multiplicative changes and the
 $\norminf{\cdot}$ norm make such a tradeoff in a natural, easy-to-understand
-way.  If one desires a more expressive prior space, it seems to the authors more
-fruitful to investigate variational divergences other than KL rather than
-attempt to adapt the space of prior perturbations.
+way.
+
+In this sense, VB approximations based on KL divergence are inherently
+non-robust to priors that ablate mass nearly to zero.  No parameterization of
+the space of priors will relieve this non-robustness.  Only by basing
+variational approximations on divergences other than KL will this non-robustness
+be alleviated.
 
 \FunctionDistFig{}
