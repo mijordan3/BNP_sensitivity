@@ -89,11 +89,9 @@ variational approximation.
 \end{knitrout}
 %
 
-In this application, we expect to uncover finer structure,
-so we start with a larger $\alpha$ than the previous example
-and set $\alpha_0 = 6$ in the initial GEM prior.
+\subsubsection*{The initial fit}
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
-at this choice of $\alpha_0$.
+at $\alpha_0 = 6$.
 More precisely, let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$
 denote the co-clustering matrix,
 whose $(i,j)$-th entry is the
@@ -114,8 +112,12 @@ as gene $j$, given by
 % \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
 % \end{align*}
 
+We started with $\alpha_0$ larger than the previous example
+because we expect to uncover finer structure in the gene expression 
+data. 
 Below, we evaluate the sensitivity of the inferred co-clustering matrix to
-both parametric and functional perturbations to the stick distribution.
+this choice of $\alpha$ as well as to
+functional perturbations to the stick distribution.
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix
@@ -167,7 +169,7 @@ the change in co-clustering under the linearized
 variational parameters $\etalinglobal(\alpha)$,
 at $\alpha = 0.1$ and $\alpha = 12$.
 At $\alpha =  0.1$ the prior is concentrated,
-with only two clusters expected under the GEM prior;
+with only two clusters expected {\em a priori} under the GEM prior;
 at $\alpha = 12$, more than fifty are expected.
 
 

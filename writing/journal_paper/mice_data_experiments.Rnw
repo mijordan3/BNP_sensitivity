@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -90,11 +90,9 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
-In this application, we expect to uncover finer structure,
-so we start with a larger $\alpha$ than the previous example
-and set $\alpha_0 = 6$ in the initial GEM prior.
+\subsubsection*{The initial fit}
 \figref{gene_initial_coclustering} displays the inferred co-clustering matrix
-at this choice of $\alpha_0$.
+at $\alpha_0 = 6$.
 More precisely, let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$
 denote the co-clustering matrix,
 whose $(i,j)$-th entry is the
@@ -115,8 +113,12 @@ as gene $j$, given by
 % \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
 % \end{align*}
 
+We started with $\alpha_0$ larger than the previous example
+because we expect to uncover finer structure in the gene expression 
+data. 
 Below, we evaluate the sensitivity of the inferred co-clustering matrix to
-both parametric and functional perturbations to the stick distribution.
+this choice of $\alpha$ as well as to
+functional perturbations to the stick distribution.
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix
@@ -160,7 +162,7 @@ the change in co-clustering under the linearized
 variational parameters $\etalinglobal(\alpha)$,
 at $\alpha = \Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$.
 At $\alpha =  \Sexpr{alpha_pert1}$ the prior is concentrated,
-with only two clusters expected under the GEM prior;
+with only two clusters expected {\em a priori} under the GEM prior;
 at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are expected.
 
 

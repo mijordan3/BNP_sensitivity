@@ -56,16 +56,17 @@ We first explore sensitivity of the in-sample and posterior predictive number of
 clusters to the concentration parameter, $\alpha$, using the results in
 \secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
 recall that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
-number of distinct clusters in a dataset of size $N$ is given
-\citep{jordan:2015:gentleintrodp} by
+number of distinct clusters in a dataset of size $N$ is given by
 %
 \begin{align}\eqlabel{prior_num_clusters}
 \expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
 %
-Using this formula, we take $\alpha\in[0.1, 4.0]$, corresponding to an an {\em a
-priori} range of approximately $1.5$ to $15$ clusters.  Over this range, the
+See \citep{jordan:2015:gentleintrodp} for this formula. 
+We take $\alpha\in[0.1, 4.0]$, which according to \eqlabel{prior_num_clusters},
+corresponds to an an {\em a priori} range of approximately
+$1.5$ to $15$ clusters.  Over this range, the
 shape of the stick-breaking density varies considerably, as shown in
 \figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
 use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we compute
@@ -150,7 +151,7 @@ TODO make this logic clear from the get-go}
 
 In this section, we demonstrated the ability of the influence function to
 predict the effect of nonparametric changes to the prior. As in the previous
-section, we take $\pbase(\nuk) = \betadist(\nuk \vert 1, \alpha_0)$ for each
+section, we take $\pbase(\nuk) = \betadist{\nuk \vert 1, \alpha_0}$ for each
 $\k$.  In order to facilitate visualization, we perform our computations in
 logit-stick space.  In terms of \defref{prior_t}, we take $\mu$ to be the
 Lebesgue measure on $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots,
