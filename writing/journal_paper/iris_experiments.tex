@@ -66,7 +66,7 @@ recovers the known ground truth that there are in truth three distinct species.
 
 }
 
-\caption[Probability density functions of $\text{Beta}(1, \alpha)$ distributions, under various $\alpha$ considered for the iris data set]{Probability density functions of $\text{Beta}(1, \alpha)$ distributions, under various $\alpha$ considered for the iris data set.}\label{fig:beta_priors}
+\caption[Probability density functions of $\text{Beta}(1, \alpha)$ distributions, under various $\alpha$ considered for the iris data set]{Probability density functions of $\text{Beta}(1, \alpha)$ distributions, under various $\alpha$ considered for the iris data set.  Note the change in y-axis scale.}\label{fig:beta_priors}
 \end{figure}
 
 
@@ -104,21 +104,7 @@ recovers the known ground truth that there are in truth three distinct species.
 
 }
 
-\caption[The expected number of clusters as $\alpha$ varies in the
-the GMM fit of the iris data.
-On the left is in-sample quantity $\gclustersabbr$.
-On the right is the the predictive quantity $\gclusterspredabbr$.
-We formed the linear approximation at $\alpha=2$.
-In red, the expected number of clusters computed under the
-linearly approximated variational parameters.
-In blue, the expected number of clusters obtained by refitting the model at each $\alpha$]{The expected number of clusters as $\alpha$ varies in the
-the GMM fit of the iris data.
-On the left is in-sample quantity $\gclustersabbr$.
-On the right is the the predictive quantity $\gclusterspredabbr$.
-We formed the linear approximation at $\alpha=2$.
-In red, the expected number of clusters computed under the
-linearly approximated variational parameters.
-In blue, the expected number of clusters obtained by refitting the model at each $\alpha$. }\label{fig:iris_alpha_sens}
+\caption[The expected number of clusters as $\alpha$ varies in thethe GMM fit of the iris data.On the left is in-sample quantity $\gclustersabbr$.On the right is the the predictive quantity $\gclusterspredabbr$.We formed the linear approximation at $\alpha=2$]{The expected number of clusters as $\alpha$ varies in thethe GMM fit of the iris data.On the left is in-sample quantity $\gclustersabbr$.On the right is the the predictive quantity $\gclusterspredabbr$.We formed the linear approximation at $\alpha=2$.}\label{fig:iris_alpha_sens}
 \end{figure}
 
 
@@ -235,39 +221,24 @@ last row actually a pretty large negative change?}
 
 \end{knitrout}
 
-
-
-Finally, we consider the worst-case multiplicative perturbation with unit
-$L_\infty$ norm. Recall that the worst-case perturbation with unit $L_\infty$
-norm is a step-function taking on values $\pm1$ corresponding to the sign of the
-influence function (\figref{iris_worstcase} left). The middle column of
+Finally, we consider the worst-case multiplicative perturbation with
+$\norminf{\phi} = 1$, as in REFERENCEWHENWRITTEN.  The middle column of
 \figref{iris_worstcase} shows the prior density perturbed by the worst-case
 perturbation; the right column shows the effect on $\gclustersabbr$. This
 worst-case perturbation has a much larger effect on $\gclustersabbr$ compared to
 the other unit $L_\infty$ norm perturbations in \figref{iris_fsens}. However,
 even with the worst-case perturbation, the change in $\gclustersabbr$ is still
 small. We conclude that on the iris data set, $\gclustersabbr$ appears to be a
-quantity insensitive to the prior under a Gaussian mixture model.
+robust quantity for this model and dataset.
 
-
-
-
-
-
-Computing the linearized variational parameters $\etalinglobal(\t)$ at $\t = 1$
-(including the necessary Hessian solve)
-for a given functional perturbation
-required 0.03 seconds.
-A refit at $\t = 1$ requires about one second.
-While a second for a refit is not exceedingly large, the
-order-of-magnitude difference in timing between the linear approximation and refit
-will continue to hold for larger data analysis problems below.
-In general, the speed of the linear approximation allows us to quickly
-explore many different potential functional perturbations when
-refitting for each perturbation becomes prohibitive.
-In the data applications below,
-the influence function will guide our choice of functional perturbation and
-uncover potentially influential perturbations.
+As with the concentration parameter, the approximation was much faster to
+compute than the exact refits. Computing the linearized variational parameters
+$\etalinglobal(\t)$ at $\t = 1$ (including the necessary Hessian solve) for a
+given functional perturbation required 0.03 seconds. A refit using $\palt$ in place of $\pbase$ requires about
+one second. The time to refit on the small dataset is, of course, small.
+However, the order-of-magnitude difference in timing between the linear
+approximation and refit will continue to hold for larger data analysis problems
+below.
 
 % \begin{table}[tb]
 % \centering
