@@ -21,7 +21,7 @@ alpha_density_df %>%
                              alpha_num)) %>% 
   ggplot() + 
   geom_line(aes(x = x, y = pdf)) + 
-  facet_wrap(~alpha, nrow = 1, scales = 'free_y') + 
+  facet_wrap(~alpha, nrow = 1) + 
   ylab('p.d.f.') + 
   xlab('stick propn') +
   get_fontsizes()

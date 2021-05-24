@@ -73,12 +73,11 @@ the derivatives for all the results below.  \Figref{iris_fit} shows the
 posterior clustering for $\alpha_0$.  For our base prior, the posterior thus
 recovers the known ground truth that there are in truth three distinct species.
 
-\todo{Bryan: these should all have the same y-axis scale}
 <<beta_priors_cap>>=
 beta_priors_cap <-
   paste0("Probability density functions of $\\text{Beta}(1, \\alpha)$ ",
          "distributions, under various $\\alpha$ considered for the ",
-         "iris data set.  Note the change in y-axis scale.")
+         "iris data set.")
 SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
 @
 <<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
@@ -87,11 +86,11 @@ source('./R_scripts/iris/plot_beta_priors.R',
 @
 
 
-\todo{Bryan: the caption says $\alpha=6$, but the text says $\alpha=2$.}
 <<iris_fit_cap>>=
-iris_fit_cap <- paste("The iris data in principal component space and
-                      GMM fit at $\\alpha = 6$.
-                      Colors denote inferred memberships and
+iris_fit_cap <- paste0("The iris data in principal component space and
+                      GMM fit at $\\alpha = ", 
+                      alpha0,
+                      "$. Colors denote inferred memberships and
                       ellipses represent estimated covariances. ")
 SetImageSize(aspect_ratio = base_aspect_ratio,
              image_width = 0.6)
@@ -102,14 +101,14 @@ source('./R_scripts/iris/iris_init_fit.R',
 @
 
 
-\todo{Bryan: Maybe don't hard-code 2 in the caption?}
 <<iris_alpha_sens_cap>>=
 iris_alpha_sens_cap <- paste0(
     "The expected number of clusters as $\\alpha$ varies in the",
-    "the GMM fit of the iris data.",
-    "On the left is in-sample quantity $\\gclustersabbr$.",
-    "On the right is the the predictive quantity $\\gclusterspredabbr$.",
-    "We formed the linear approximation at $\\alpha=2$.")
+    "the GMM fit of the iris data. ",
+    "On the left is in-sample quantity $\\gclustersabbr$. ",
+    "On the right is the the predictive quantity $\\gclusterspredabbr$. ",
+    "We formed the linear approximation at $\\alpha=", 
+    alpha0, '$.')
 
 SetImageSize(aspect_ratio = 0.7 * base_aspect_ratio,
              image_width = 0.8)
@@ -143,6 +142,11 @@ faster than refitting.
 
 \todo{Bryan: Why aren't we doing this with the predicted number of
 clusters, which is actually sensitive?}
+
+\todo{The reasoning here was: in-sample was insensitive to alpha. 
+maybe sensitive to other functional perturbations?
+Looks like its not, e.g. worst-case. 
+TODO make this logic clear from the get-go}
 
 In this section, we demonstrated the ability of the influence function to
 predict the effect of nonparametric changes to the prior. As in the previous
