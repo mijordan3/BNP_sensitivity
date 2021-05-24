@@ -155,10 +155,10 @@ Since Fr{\'e}chet differentiability implies continuity,
 \thmref{eta_phi_deriv} for perturbations of the form \eqref{p_pert_simple}
 with the norms \eqref{phi_lp_norm}.
 
-Recall \exref{beta_inf_norm}, where we showed that there exist valid
-priors for which $\norminf{\phi} < \infty$.  Viewed in light of the
-proof of \thmref{kl_discontinuous}, the limited expressiveness of the
-$\norminf{\cdot}$ norm begins to look like a feature, rather than a bug.
+Recall \exref{beta_inf_norm}, where we showed that there exist valid priors for
+which $\norminf{\phi} < \infty$.  Viewed in light of the proof of
+\thmref{kl_discontinuous}, the limited expressiveness of the $\norminf{\cdot}$
+norm looks like a feature, rather than a bug.
 % The KL divergence that defines a variational objective cannot handle
 % prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
 % considers such densities to be ``distant'' from $\pbase$, whereas the
@@ -176,8 +176,12 @@ divergence.  But since valid priors can take values close to zero, a sacrifice
 in expressiveness of the neighborhood of zero must be made in order to induce a
 topology that works with KL divergence.  Multiplicative changes and the
 $\norminf{\cdot}$ norm make such a tradeoff in a natural, easy-to-understand
-way.  If one desires a more expressive prior space, it seems to the authors more
-fruitful to investigate variational divergences other than KL rather than
-attempt to adapt the space of prior perturbations.
+way.
+
+In this sense, VB approximations based on KL divergence are inherently
+non-robust to priors that ablate mass nearly to zero.  No parameterization of
+the space of priors will relieve this non-robustness.  Only by basing
+variational approximations on divergences other than KL will this non-robustness
+be alleviated.
 
 \FunctionDistFig{}
