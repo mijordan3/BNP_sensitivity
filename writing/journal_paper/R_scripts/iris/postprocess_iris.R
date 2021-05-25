@@ -103,14 +103,17 @@ infl_time <- influence_data['infl_time'] + influence_data['grad_g_time']
 
 # save all timing results into a dictionary 
 iris_timing_dict <- 
-  list(init_fit_time = init_fit_time, 
-       alpha_hess_time = alpha_hess_time, 
-       refit_time = median_alpha_refit_time, 
-       lr_time = median_alpha_lr_time, 
-       phi_hessian_time = phi_hessian_time, 
-       phi_refit_time = phi_refit_time, 
-       phi_lr_time = phi_lr_time, 
-       infl_time = infl_time)
+  list(init_fit_time = init_fit_time, # intial fit time
+       alpha_hess_time = alpha_hess_time, # hessian inv. time for alpha
+       alpha_refit_time = median_alpha_refit_time, # refit time for alpha
+       alpha_lr_time = median_alpha_lr_time, # lr time for alpha
+       phi_hessian_time = wc_hessian_time, # h. inv. time for worst-case pert
+       phi_refit_time = wc_refit_time, # refit time for worst-case pert
+       phi_lr_time = wc_lr_time, # lr time for worst-case pert
+       infl_time = infl_time) # time for influence function
+
+save(iris_timing_dict, 
+     file="./R_scripts/data_processed/iris_timing.RData")
 
 save.image('./R_scripts/data_processed/iris.RData') 
 

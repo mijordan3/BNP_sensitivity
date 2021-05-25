@@ -1,0 +1,80 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{table}[tb]
+\centering
+\caption{Compute time of results on the iris data set. }
+\begin{tabular}{|r|r|r|r|}
+    \hline
+    & iris & mice  & thrush \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % initial fit
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Initial fit & 
+    1 & 
+    30 & 
+    7 \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % hessian solve for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Hessian solve for $\alpha$ sensitivity &
+    0.02 & 
+    3 & 
+    0.3 \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % linear approx time for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Linear approx. $\etalin(\alpha)$ &
+    0.0008 & 
+    0.001 & 
+    0.0008 \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % refit time for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Refits $\etaopt(\alpha)$ &
+    0.5 & 
+    30 & 
+    5 \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % influence function
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    The influence function & 
+    0.09 & 
+    3 & 
+    0.6 \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % hessian solve for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Hessian solve for $\phi$ &
+    0.02 & 
+    3 & 
+    0.4\\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % linear approx for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Linear approx. $\etalin(\t)|_{\t = 1}$
+    for $\phi$ &
+    0.001 & 
+    0.001 & 
+    0.0008 \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % refit time for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Refit $\etaopt(\t)|_{\t = 1}$ for $\phi$ &
+    0.6 & 
+    20 & 
+    10 \\
+    \hline
+\end{tabular}
+\end{table}
