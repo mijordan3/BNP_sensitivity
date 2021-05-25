@@ -1,0 +1,94 @@
+As we saw in \corref{etafun_deriv_form}, the derivative of perturbations given
+by \defref{prior_nl_pert} takes the form of an integral of the influence
+function against the perturbation.  It is natural to use the influence function
+to {\em explore} the space of priors, e.g., to find alternative priors with
+large influence but small $\norminf{\phi}$.  Consider as an example the
+following corollary is an example, which is the VB analogue of \citet[Result
+11]{gustafson:1996:local}.
+
+% , where the integrand is known as the ``influence function.'' In
+% addition to providing an interpretable summary of the effect of different
+% perturbations, the influence function motivates the consideration of
+% ``worst-case'' prior perturbations which maximize the influence subject to a
+% size constraint.  To justify this using the influence function in this way, we
+% prove that the VB optimum is in fact Fr{\'e}chet differentiable as a function of
+% the perturbation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{cor}\corlabel{etafun_worst_case}
+%
+The ``worst-case'' derivative in $\ball_\phi(\delta)$ is given by
+%
+\begin{align*}
+%
+\sup_{\phi \in \ball_\phi(\delta)}
+    \fracat{d g(\etaopt(\t \phi))}{d \t}{0} =
+        \delta \int \abs{\infl(\theta)} \mu(d\theta),
+%
+\end{align*}
+%
+which is acheived at the perturbation
+$\phi^*(\theta) = \delta \, \mathrm{sign}\left(\infl(\theta)\right)$.
+%
+\begin{proof}
+%
+The result follows immediately from applying H{\"o}lder's inequality
+(\citet[Theorem 5.1.2]{dudley:2018:real} and subsequent disscussion)
+to \eqref{vb_eta_infl_sens}.
+%
+\end{proof}
+%
+\end{cor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+However, \corref{etafun_deriv_form} does not precisely justify using
+the influence function as in \corref{etafun_worst_case}.
+
+
+In turn, \corref{etafun_worst_case} motivates the question of whether
+\eqref{vb_eta_infl_sens} provides a uniformly good linear approximation to
+$\etaopt(\t)$ in a neighborhood of $0$: that is, whether $\phi \mapsto
+\etaopt(\phi)$ is Fr{\'e}chet differentiable. By \citep[Theorem
+5.2.1]{dudley:2018:real}, $L_\infty$ is a Banach space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{defn}\deflabel{diffable_classes}
+    (\citep[Definition 4.5]{zeidler:2013:functional})
+%
+Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
+an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
+\mapsto B_2$.
+%
+A function $f$ is {\em Fr{\'echet} differentiable} (also known as boundedly
+differentiable) at $\phi_0$ if
+%
+\begin{align*}
+%
+\lim_{t \rightarrow 0}
+    \sup_{\phi: \norm{\phi - \phi_0} = 1}
+    \frac{f(\phi) - f(\phi_0) -
+          f^{\mathrm{lin}}(t (\phi - \phi_0))
+         }{t} \rightarrow 0.
+%
+\end{align*}
+%
+\end{defn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{eta_phi_deriv}
+%
+Let \assuref{kl_opt_ok, exchange_order_q} hold. Then the map $\phi \mapsto
+\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
+neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
+with the derivative given in \corref{etafun_deriv_form}.
+
+(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
+
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
