@@ -257,6 +257,54 @@ albeit small).
 
 \subsubsection*{Sensitivity of co-clustering to a functional perturbation}
 
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.980\linewidth,height=0.823\linewidth]{figure/gene_fpert_coclustering-1} 
+
+}
+
+\caption[Effect on the co-clustering matrix after a multiplicative functional
+     perturbation.
+     (Top left) the perturbation $\phi$ in grey,
+     and the influence function in purple.
+     (Top right) the effect of this perturbation on the prior density.
+     (Bottom) the effect of this perturbation on
+    the coclustering matrix.
+    Note the scale of the scatterplot axes compared with
+    the scatterplots in \figref{gene_alpha_coclustering}]{Effect on the co-clustering matrix after a multiplicative functional
+     perturbation.
+     (Top left) the perturbation $\phi$ in grey,
+     and the influence function in purple.
+     (Top right) the effect of this perturbation on the prior density.
+     (Bottom) the effect of this perturbation on
+    the coclustering matrix.
+    Note the scale of the scatterplot axes compared with
+    the scatterplots in \figref{gene_alpha_coclustering}. }\label{fig:gene_fpert_coclustering}
+\end{figure}
+
+
+\end{knitrout}
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
+
+{\centering \includegraphics[width=0.882\linewidth,height=0.423\linewidth]{figure/alpha_pert_logphi-1} 
+
+}
+
+\caption[The multiplicative perturbations $\phi_\alpha(\cdot)$ that
+    corresponds to decreasing (left) or increasing (right)
+    the $\alpha$ parameter]{The multiplicative perturbations $\phi_\alpha(\cdot)$ that
+    corresponds to decreasing (left) or increasing (right)
+    the $\alpha$ parameter. }\label{fig:alpha_pert_logphi}
+\end{figure}
+
+
+\end{knitrout}
+
 As in \secref{results_iris}, we now investigate whether the co-clustering matix
 is robust to deviations from the Beta prior. To use \corref{etafun_worst_case} as
 well as to produce an easily-visualized influence function, we must choose a
@@ -288,78 +336,6 @@ case: \figref{alpha_pert_logphi} shows that changing $\alpha$ (as in
 \exref{beta_inf_norm}) induces large changes in the prior only where the
 influence function is small.
 
-% <<gene_coclustering_infl_cap>>=
-% gene_coclustering_infl_cap <- paste(
-%     "The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix. ")
-% SetImageSize(aspect_ratio=base_aspect_ratio * 0.4)
-% @
-% <<gene_coclustering_influence, cache=simple_cache, fig.show='hold', fig.cap=gene_coclustering_infl_cap>>=
-% # source("R_scripts/mice/coclustering_influence.R",
-% #        echo=knitr_debug, print.eval=TRUE)
-% @
-
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.980\linewidth,height=0.823\linewidth]{figure/gene_fpert_coclustering-1} 
-
-}
-
-\caption[Effect on the co-clustering matrix after a multiplicative functional
-     perturbation.
-     (Top left) the perturbation $\phi$ in grey,
-     and the influence function in purple.
-     (Top right) the effect of this perturbation on the prior density.
-     (Bottom) the effect of this perturbation on
-    the coclustering matrix.
-    Note the scale of the scatterplot axes compared with
-    the scatterplots in \figref{gene_alpha_coclustering}]{Effect on the co-clustering matrix after a multiplicative functional
-     perturbation.
-     (Top left) the perturbation $\phi$ in grey,
-     and the influence function in purple.
-     (Top right) the effect of this perturbation on the prior density.
-     (Bottom) the effect of this perturbation on
-    the coclustering matrix.
-    Note the scale of the scatterplot axes compared with
-    the scatterplots in \figref{gene_alpha_coclustering}. }\label{fig:gene_fpert_coclustering}
-\end{figure}
-
-
-\end{knitrout}
-
-% The influence function is able to explain why the co-clustering matrix is
-% insensitive to $\alpha$.
-% The functional perturbation
-% that corresponds to a change in $\alpha$ is
-% \begin{align*}
-% \phi_\alpha(\nu_\k) :=
-% \log\betadist{\nu_\k\vert 1, \alpha} -
-% \log\betadist{\nu_\k\vert 1, \alpha_0}.
-% \end{align*}
-% The function $\phi_\alpha(\nu_\k)$ is large when the influence function is small and vice-versa (\figref{alpha_pert_logphi}),
-% resulting in a small inner-product between the influence function
-% and $\phi_\alpha$.
-% Thus, the linear approximation will predict small changes, and
-% the refitted results confirms the predictions.
-
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
-
-{\centering \includegraphics[width=0.882\linewidth,height=0.423\linewidth]{figure/alpha_pert_logphi-1} 
-
-}
-
-\caption[The multiplicative perturbations $\phi_\alpha(\cdot)$ that
-    corresponds to decreasing (left) or increasing (right)
-    the $\alpha$ parameter]{The multiplicative perturbations $\phi_\alpha(\cdot)$ that
-    corresponds to decreasing (left) or increasing (right)
-    the $\alpha$ parameter. }\label{fig:alpha_pert_logphi}
-\end{figure}
-
-
-\end{knitrout}
 
 However, even with the selected functional perturbation,
 the size of the differences in the co-clustering matrix remains modest.
