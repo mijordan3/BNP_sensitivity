@@ -147,7 +147,7 @@ Chawia, Ngangao, and Mbololo geographical regions
 
 \subsubsection*{Quantities of interest}
 
-\todo{Here, say what the quantities of interest are and why}
+\todo{Here, say what all the quantities of interest are and why}
 
 Our posterior quantity of interest is the expected number of
 in-sample populations (in this section, we will use ``populations" and ``clusters" interchangeably).
@@ -181,11 +181,18 @@ is now over individuals $n$, loci $\l$ and chromosomes $i$.
 % This allows us to condition on fixed draws from a distribution that is independent of $\eta$ (in this case, the underlying distribution is $\mathrm{Uniform}[0, 1]$);
 % these fixed draws are shared across every computation of $\gpop(\eta; \tau)$ below.
 
+\todo{I think a major story here is that threshholding induces robustness.
+We should make that point clear.}
+
+\todo{Actually, I think we arguably don't care about the number of
+populations for fastSTRUCTURE.  Could we possibly make this thresholding
+point as part of the iris predictive example?}
+
 The expected number of latent populations is sensitive to $\alpha$
 (\figref{stru_alpha_nclusters}). Without any thresholding ($\tau = 0$), the
 expected number of populations quickly increases as $\alpha$ increases; in fact,
 it nearly saturates at $\kmax = 20$ when $\alpha = 7$. This sensitivity is
-likely due to the fact that the non-thresholded quantity is highly dependent on
+due to the fact that the non-thresholded quantity is highly dependent on
 the behavior of small, nearly unoccupied populations; even though the
 probability of a single locus belonging to these rare populations is small, the
 probability that \textit{none} of the $\nindiv \times \nloci \times 2$ observed
@@ -287,20 +294,28 @@ at $\alpha = 0.5$ observed in the refits.
 
 \subsubsection*{Sensitivity of individual admixtures to functional perturbations}
 
-Examining the inferred admixtures in \figref{stru_init_fit} provides clues into the historical migration patterns of the genotyped individuals.
-For example, while individuals collected from the Mbololo region are inferred to be admixed primarily with population 1,
-several individuals from this region have abnormally large admixture proportions of population 2.
-Conversely, while individuals collected from the Ngangao region are admixed primarily with population 2, a few of these individuals have abnormally large
-admixture proportions of population 1.
-This suggests that some migration has occurred between the Mbololo and Ngangao regions.
+\todo{Move this up to the quantities of interest section}
+Examining the inferred admixtures in \figref{stru_init_fit} provides clues into
+the historical migration patterns of the genotyped individuals. For example,
+while individuals collected from the Mbololo region are inferred to be admixed
+primarily with population 1, several individuals from this region have
+abnormally large admixture proportions of population 2. Conversely, while
+individuals collected from the Ngangao region are admixed primarily with
+population 2, a few of these individuals have abnormally large admixture
+proportions of population 1. This suggests that some migration has occurred
+between the Mbololo and Ngangao regions.
+
+\todo{Left off here}
 
 We evaluate the sensitivity of this conclusion to possible prior perturbations.
-Consider the posterior statistic
+Consider the posterior statistic:
+%
 \begin{align*}
 \gadmix(\eta; \mathcal{N}, k) =
  \expect{\q(\pi\vert\eta)}{\frac{1}{|\mathcal{N}|}\sum_{n\in\mathcal{N}}
 \pi_{\n\k}},
 \end{align*}
+%
 the average admixture proportion of population $\k$ in a set of
 individuals $\mathcal{N}$.
 
@@ -315,25 +330,35 @@ The first two posterior quantities relate to the inferred mixing between
 Mbololo and Ngangao.
 In the last case, we are studying the sensitivity of having a third latent
 population present, a population which primarily appears in Chawia individuals.
+\todo{Reference a figure here so it's clear what you're talking about}
 
-We construct the worst-case negative perturbation for each variant of $\gadmix$.
-We consider the negative direction because we are interested in testing the
-robustness of these patterns' existence.
-For each worst-case perturbation, we examine the effect on its respective
-posterior quantity
-as $t \rightarrow 1$ in
-the multiplicatively perturbed prior
-$\p(\nu_{\n\k} \vert \t) = \p_0(\nu_{\n\k})\exp(\t\phiworstcase(\nu_{\n\k}))$ (\figref{stru_func_sens}).
-Under the linearized variational parameters $\etalinglobal(\t)$,
-the admixture proportion of population 2 in the outlying Mbololo individuals is nearly halved at $\t = 1$.
-The same quantity computed after refitting the model
-confirms the sensitivity predicted by the linearized variational parameters
-On the other hand, the presence of population 1 in the outlying Ngangao individuals appears to be insensitive even after this worst-case perturbation.
-The linearized and the refitted variational parameters again
-agree on this conclusion.
-Finally, the presence of population 3 in the Chawia individuals is anticipated to be sensitive by the linearized parameters,
-as this admixture proportion steadily decreases as $t\rightarrow 1$.
-However, under the refits, this admixture proportion does not decrease steadily but rather levels off after $t = 0.5$.
+In \figref{stru_func_sens}, we construct the worst-case negative perturbation
+for each decreasing each of our three variant of $\gadmix$, in order to see
+whether the biologically interesting patterns can be made to disappear
+with different prior choices.
+
+\todo{Make the text easier to match up with the picture, which doesn't
+have the populations (Ngangao, &c) labeled.  Right now it's hard to see
+what's going on.}
+
+\todo{I think this whole section could be easier to understand and much more
+compact.  Basically just say that A is non-robust, B is robust, and on C
+the linear approximation and refit disagree.  Then we investigate A more.}
+
+Under the
+linearized variational parameters $\etalinglobal(\t)$, the admixture proportion
+of population 2 in the outlying Mbololo individuals is nearly halved.
+The same quantity computed after refitting the model confirms the
+sensitivity predicted by the linearized variational parameters.
+
+ On the other
+hand, the presence of population 1 in the outlying Ngangao individuals appears
+to be insensitive even after this worst-case perturbation. The linearized and
+the refitted variational parameters again agree on this conclusion. Finally, the
+presence of population 3 in the Chawia individuals is anticipated to be
+sensitive by the linearized parameters, as this admixture proportion steadily
+decreases as $t\rightarrow 1$. However, under the refits, this admixture
+proportion does not decrease steadily but rather levels off after $t = 0.5$.
 
 
 
@@ -372,23 +397,34 @@ However, under the refits, this admixture proportion does not decrease steadily 
 
 \end{knitrout}
 
-Our sensitivity analysis suggests that the inferred migration from Mbololo to Ngangao based on the outlying Ngangao admixtures
-appears robust to our stick-breaking prior.
-On the other had, the the outlying Mbololo admixtures appears to be more sensitive to the stick-breaking prior, and conclusions about migration from Ngangao to Mbololo may be dependent on prior choices.
+Our sensitivity analysis suggests that the inferred migration from Mbololo to
+Ngangao based on the outlying Ngangao admixtures appears robust to our
+stick-breaking prior. On the other had, the the outlying Mbololo admixtures
+appears to be more sensitive to the stick-breaking prior, and conclusions about
+migration from Ngangao to Mbololo may be dependent on prior choices.
+
+\todo{Say something about the fact that these priors are maybe too
+adversarial.}
 
 \subsubsection*{Computation time}
 
-The computational cost of linearizing the variational parameters is again favorable compared with the cost of refitting (\tabref{stru_timing}).
-The linear approximation allows us to quickly explore all the
-functional perturbations presented here, and many more:
-computing the linearized variational parameters (including the Hessian inversion) $\etalinglobal$ takes about half a second for a given perturbation.
-On the other hand, refitting the model after a prior perturbation can take more than ten seconds.
-While exploring \textit{all} the possible functional perturbations is impossible, the linear approximation allows rapid exploration of the space of perturbations.
-Notice also that computing the influence function only takes half a second.
-As we have demonstrated, the influence function provides an informative guide
-for uncovering which perturbations might result in greater sensitivity than others.
-These perturbations can be more explored either by either linearizing in
-the direction of the perturbation, or by refitting.
+The computational cost of linearizing the variational parameters is again
+favorable compared with the cost of refitting (\tabref{stru_timing}).
+Even though, for this model and dataset, the approximation matched refitting
+less well, the influence function still provided a valuable guide for
+identifying influential prior perturbations which could then be investigated
+further with refitting.
+
+% The linear approximation allows us to quickly explore all the
+% functional perturbations presented here, and many more:
+% computing the linearized variational parameters (including the Hessian inversion) $\etalinglobal$ takes about half a second for a given perturbation.
+% On the other hand, refitting the model after a prior perturbation can take more than ten seconds.
+% While exploring \textit{all} the possible functional perturbations is impossible, the linear approximation allows rapid exploration of the space of perturbations.
+% Notice also that computing the influence function only takes half a second.
+% As we have demonstrated, the influence function provides an informative guide
+% for uncovering which perturbations might result in greater sensitivity than others.
+% These perturbations can be more explored either by either linearizing in
+% the direction of the perturbation, or by refitting.
 
 \begin{table}[tb]
 \centering
@@ -423,6 +459,11 @@ in  \figref{stru_func_sens}. Timing on other considered $\phi$ are similar. }
 \end{table}
 
 \subsection{Limitations of local sensitivity}
+
+\todo{I agree that basically all of this section except for the figure could
+go in the appendix and could be made much less wordy.  There are some other
+examples of poor linear approximations in this section.  I think we should
+make that a top-line takeaway of this experiment.}
 
 In this final subsection,
 we discuss some examples where
