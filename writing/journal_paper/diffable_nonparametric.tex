@@ -197,10 +197,10 @@ as we now prove.
 
 \begin{cor}\corlabel{etafun_deriv_form}
 %
-Let \assuref{kl_opt_ok, exchange_order_q} and fix the quantities given in
+Let \assuref{kl_opt_ok, exchange_order_q} hold and fix the quantities given in
 \defref{prior_nl_pert}. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
-``influence function''
+``influence function'' $\infl: \thetadom \mapsto \mathbb{R}$:
 %
 \begin{align}\eqlabel{infl_defn}
 %
@@ -237,8 +237,10 @@ $\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta)$.
 %
 Therefore \lemref{exchange_order} applies to $\phi(\theta) f(\theta, \eta, \t)$
 as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
-\assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}. The form of
-the influence function can then be read off the expression for the derivative.
+\assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}.
+%
+The form of the influence function is then given by gathering terms in
+\eqref{vb_eta_sens}.
 %
 \end{proof}
 %
@@ -246,8 +248,8 @@ the influence function can then be read off the expression for the derivative.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Having the influence function motivates the following corrolary.
-
+The form of the influence function motivates the following corollary,
+which is the VB analogue of \citet[Result 11]{gustafson:1996:local}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -270,8 +272,8 @@ $\phi^*(\theta) = \delta \, \mathrm{sign}\left(\infl(\theta)\right)$.
 \begin{proof}
 %
 The result follows immediately from applying H{\"o}lder's inequality
-\citep[Theorem 5.1.2 and subsequent disscussion]{dudley:2018:real}to $\sup_{\phi
-\in \ball_\phi(\delta)} \int \infl(\theta) \phi(\theta) \mu(d \theta)$.
+(\citet[Theorem 5.1.2]{dudley:2018:real} and subsequent disscussion)
+to \eqref{vb_eta_infl_sens}.
 %
 \end{proof}
 %
@@ -279,8 +281,11 @@ The result follows immediately from applying H{\"o}lder's inequality
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-By \citep[Theorem 5.2.1]{dudley:2018:real}, $L_\infty$ is a Banach space.
+In turn, \corref{etafun_worst_case} motivates the question of whether
+\eqref{vb_eta_infl_sens} provides a uniformly good linear approximation to
+$\etaopt(\t)$ in a neighborhood of $0$: that is, whether $\phi \mapsto
+\etaopt(\phi)$ is Fr{\'e}chet differentiable. By \citep[Theorem
+5.2.1]{dudley:2018:real}, $L_\infty$ is a Banach space.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -306,12 +311,6 @@ differentiable) at $\phi_0$ if
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Note that we used the same notation $f^{\mathrm{lin}}$ for both derivatives in
-\defref{diffable_classes}.  In fact, if a function is Fr{\'e}chet differentiable
-then the two derivatives must coincide \citep[Proposition
-4.8]{zeidler:2013:functional}, which justifies our notation.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

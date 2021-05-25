@@ -1,26 +1,32 @@
+\todo{This abstract needs to be re-done to match the new outline}
 A Bayesian nonparametric approach to clustering treats the number of distinct
-clusters in a data set as a random quantity by modeling an infinite number
-of components.  It therefore avoids specification of the number
-clusters \textit{a priori} and allows for inference about the number clusters
-to be done through the posterior distribution.
-However, a Bayesian nonparametic model requires the specification of a
-prior distribution, and it is important in practice to establish the the sensitivity
-of any posterior inferences to possibly arbitrary prior choices.
-We derive local sensitivity measures based on Taylor series approximations for a
-truncated variational Bayes (VB) approximation based on the Kullback-Leibler
-divergence.
-In addition, we show that local sensitivity can be expressed as
-a functional derivative in an $L_p$ vector space of integrable functions.
-The linear derivative operator, in this context called an \textit{influence function},
-can guide our search for prior perturbations with high senesitivity.
-To safely search through functional space however, the
-VB posterior requires more careful consideration than the exact posterior:
-while the exact posterior is Fr{\'e}chet differentiable for all $p$,
-the VB posterior is Fr{\'e}chet differentiable
-only with multiplicative perturbations and $p=\infty$.
-We test our local approximation on real-world datasets and show that
-it can be an accurate way to quickly assess
-robustness to both parametric and non-parametric prior perturbations.
+clusters in a data set as a random quantity by modeling an infinite number of
+components.  It therefore avoids specification of the number clusters \textit{a
+priori} and allows for inference about the number clusters to be done through
+the posterior distribution. However, a Bayesian nonparametic model requires the
+specification of a prior distribution, and it is important in practice to
+establish the the sensitivity of any posterior inferences to possibly arbitrary
+prior choices. We derive local sensitivity measures based on Taylor series
+approximations for a truncated variational Bayes (VB) approximation based on the
+Kullback-Leibler divergence. In addition, we show that local sensitivity can be
+expressed as a functional derivative in an $L_p$ vector space of integrable
+functions. The linear derivative operator, in this context called an
+\textit{influence function}, can guide our search for prior perturbations with
+high senesitivity. To safely search through functional space however, the VB
+posterior requires more careful consideration than the exact posterior: while
+the exact posterior is Fr{\'e}chet differentiable for all $p$, the VB posterior
+is Fr{\'e}chet differentiable only with multiplicative perturbations and
+$p=\infty$. We test our local approximation on real-world datasets and show that
+it can be an accurate way to quickly assess robustness to both parametric and
+non-parametric prior perturbations.
+
+
+
+
+
+
+
+
 
 
 % Two central questions in many probabilistic clustering problems is how many
