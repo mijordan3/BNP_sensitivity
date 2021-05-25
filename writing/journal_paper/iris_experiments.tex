@@ -39,7 +39,7 @@ collected.
 We first explore sensitivity of the in-sample and posterior predictive number of
 clusters to the concentration parameter, $\alpha$, using the results in
 \secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
-recall that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
+note that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
 number of distinct clusters in a dataset of size $N$ is given by
 %
 \begin{align}\eqlabel{prior_num_clusters}
@@ -48,14 +48,15 @@ number of distinct clusters in a dataset of size $N$ is given by
 \end{align}
 %
 See \citep{jordan:2015:gentleintrodp} for this formula. 
-We take $\alpha\in[0.1, 4.0]$, which according to \eqlabel{prior_num_clusters},
+We take $\alpha\in[0.1, 4.0]$, which according to \eqref{prior_num_clusters},
 corresponds to an an {\em a priori} range of approximately
 $1.5$ to $15$ clusters.  Over this range, the
 shape of the stick-breaking density varies considerably, as shown in
 \figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
-use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we compute
-the derivatives for all the results below.  \Figref{iris_fit} shows the
-posterior clustering for $\alpha_0$.  For our base prior, the posterior thus
+use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we form 
+the linear approximation for all the results below.  
+\Figref{iris_fit} shows the
+posterior clustering for $\alpha_0$.  Using our base prior, the posterior
 recovers the known ground truth that there are in truth three distinct species.
 
 
@@ -106,8 +107,8 @@ recovers the known ground truth that there are in truth three distinct species.
 \end{knitrout}
 
 \Figref{iris_alpha_sens} shows both the posterior in-sample and predictive
-number of distinct clusters as $\alpha$ varies.  Over this range of $\alpha$,
-the in-sample number of clusters is quite robust, but the posterior predictive
+number of distinct clusters as $\alpha$ varies. Over this range of $\alpha$,
+the in-sample number of clusters is quite robust, remaining nearly constant at three, but the posterior predictive
 number of clusters is non-robust, ranging roughly from 3.0 to 5.6 expected
 species.  Our approximation captures this qualititative behavior. As expected,
 the approximation is least accurate furthest from the $\alpha_0$ at which it is
@@ -115,27 +116,22 @@ evalutated.
 
 \subsubsection*{Functional perturbations and the influence function}
 
-In this section, we demonstrated the ability of the influence function to
-predict the effect of nonparametric changes to the prior. As in the previous
-section, we take $\pbase(\nuk) = \betadist{\nuk \vert 1, \alpha_0}$ for each
+While the number of in-sample clusters $\gclustersabbr$ was insensitive 
+over our range of $\alpha$, 
+insensitivity to $\alpha$ does not
+rule out sensitivity to other prior perturbations. 
+In this subsection, we first 
+demonstrate the ability of the influence function to
+predict the effect of nonparametric changes to the prior. 
+Then, we use the influence function to construct a worst-case perturbation
+for $\gclustersabbr$. 
+
+As in the previous
+subsection, we take $\pbase(\nuk) = \betadist{\nuk \vert 1, \alpha_0}$ for each
 $\k$.  In order to facilitate visualization, we perform our computations in
 logit-stick space.  In terms of \defref{prior_t}, we take $\mu$ to be the
 Lebesgue measure on $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots,
-\lnu_{\kmax - 1})$, suitably transforming the prior density.  Our quantity of
-interest will be $\gclustersabbr$, the expected number of in-sample clusters.
-
-\todo{A note for everywhere: it's not an inner product.  My bad for calling
-it that at some point, but we need to get away from that.  It's just an
-integral.  The reason is that the influence function may not be a
-member of $L_\infty$; technically, it's a member of the dual space
-($L_1$).}
-
-
-\todo{(Bryan) Make it clear that we've already established that
-the predictive is non-robust.  Now we do functional perturbations
-to see whether the in-sample was robust only because we stayed in the
-Beta family.  Say that, along the way, we demonstrate how the influence
-function guides the choice of prior perturbations.}
+\lnu_{\kmax - 1})$, suitably transforming the prior density.
 
 The leftmost column of \figref{iris_fsens} shows in purple the influence
 function, $\infl(\nu)$, as given by \corref{etafun_deriv_form}.  For ease of
@@ -150,7 +146,7 @@ in the left-hand column of \figref{iris_fsens}. The middle column of
 \figref{iris_fsens} shows the stick-breaking prior $\p(\nuk \vert \phi)$ induced
 by the corresponding $\phi$, and the rightmost column of \figref{iris_fsens}
 shows the changes produced by the corresponding perturbation, as measured by
-re-fitting and  as predicted by our approximation.
+re-fitting and as predicted by our approximation.
 
 According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
 a perturbation should be determined by its integral against the influence
@@ -161,10 +157,6 @@ in which $\phi$ overlaps with both negative and positive parts of the influence
 function, to produce a relatively small change.  The third column of
 \corref{etafun_deriv_form} confirms that this intuition holds, both for
 the refits and linear approximation.
-
-\todo{With the new compacted sections, we should use $\norminf{\cdot}$
-rather than $L_\infty$.  I'm not really talking about $L_p$ spaces in the
-text much.}
 
 
 \begin{knitrout}
@@ -180,7 +172,7 @@ text much.}
         to three multiplicative perturbations each with $\norminf{\phi} = 1$.
         (Left) The multiplicative perturbation $\phi$ in grey.
         The influence function $\Psi$ in purple,
-        scaled to also have unit $L_{\infty}$-norm.
+        scaled to also have $\norminf{\Psi}=1$.
         (Middle) The base and alternative priors $\pbase(\nuk)$
         and $\palt(\nuk)$.
         (Right) The effect of the perturbation
@@ -211,70 +203,13 @@ text much.}
 
 \end{knitrout}
 
-Finally, we consider the worst-case multiplicative perturbation with
-$\norminf{\phi} = 1$, as given by \corref{etafun_worst_case}.  The panel
-layout is the same as in \figref{iris_fsens}.
-%
-%
-% The middle column
-% of \figref{iris_worstcase} shows the prior density perturbed by the worst-case
-% perturbation; the right column shows the effect on $\gclustersabbr$.
-%
-
-\todo{Say something about the fact that this is an unreasonable prior,
-but the fact that it's still robust means this is fine.}
-This worst-case perturbation has a much larger effect on $\gclustersabbr$
-compared to the other unit $L_\infty$ norm perturbations in \figref{iris_fsens}.
-However, even with the worst-case perturbation, the change in $\gclustersabbr$
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case}, 
+along with its effect on the prior and $\gclustersabbr$. 
+As expected, this worst-case perturbation 
+has a much larger effect on $\gclustersabbr$
+compared to the other unit-norm perturbations in \figref{iris_fsens}.
+However, even with the worst-case perturbation---which results in a rather unreasonably shaped prior density---the change in $\gclustersabbr$
 is still small. We conclude that on the iris data set, $\gclustersabbr$ appears
 to be a robust quantity for this model and dataset.
 
-\subsubsection*{Timing}
 
-\todo{I really think these timing results could all be in a single
-compact table with minimal discussion.}
-
-Forming the linear approximation at $\alpha_0$ required 0.02 seconds, and, after forming the linear approximation,
-computing $\etalinglobal(\alpha)$ for the sequence of $\alpha$'s considered in
-\figref{iris_alpha_sens} took another 0.01 seconds. In contrast, to refit $\etaopt(\alpha)$ for the
-set of $\alpha$s took a total of  9 seconds, with a median refit time of
-0.5 seconds.  In this case, the
-approximation produced the same qualitative conclusions an order of magnitude
-faster than refitting.
-
-As with the concentration parameter, the approximation was much faster to
-compute than the exact refits. Computing the linearized variational parameters
-$\etalinglobal(\t)$ at $\t = 1$ (including the necessary Hessian solve) for a
-given functional perturbation required 0.03 seconds. A refit using $\palt$ in place of $\pbase$ requires about
-one second. The time to refit on the small dataset is, of course, small.
-However, the order-of-magnitude difference in timing between the linear
-approximation and refit will continue to hold for larger data analysis problems
-below.
-
-% \begin{table}[tb]
-% \centering
-% \caption{Compute time of results on the iris data set. }
-% \begin{tabular}{|r|r|}
-%     \hline
-%     & time (seconds) \\
-%     \hline
-%     Initial fit & sprintf('%1.2g', init_fit_time) \\
-%     \hline
-%     Hessian solve for $\alpha$ sensitivity &
-%         sprintf('%1.2g', alpha_hess_time)\\
-%     Linear approx. $\eta^{lin}(\alpha)$ for $\alpha = 1, \ldots , 16$ &
-%         sprintf('%1.2g', total_alpha_lr_time)\\
-%     Refits $\eta(\alpha)$ for $\alpha = 1, \ldots , 16$ &
-%         sprintf('%1.2g', total_alpha_refit_time)\\
-%     \hline
-%     The influence function & sprintf('%1.2g', infl_time)\\
-%     Hessian solve for worst-case $\phi$ &
-%         sprintf('%1.2g', wc_hessian_time)\\
-%     Linear approx. $\eta^{lin}(\t)|_{\t = 1}$
-%     for worst-case $\phi$ &
-%         sprintf('%1.2g', wc_lr_time)\\
-%     Refit $\eta(\t)|_{\t = 1}$ for worst-case $\phi$ &
-%         sprintf('%1.2g', wc_refit_time)\\
-%     \hline
-% \end{tabular}
-% \end{table}
