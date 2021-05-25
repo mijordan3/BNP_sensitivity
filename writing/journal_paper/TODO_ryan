@@ -38,3 +38,5 @@ Observe that we write "KL" even when it's not an actual KL divergence
 the objective function.
 
 Refer to the stick-breaking "density", not "distribution"
+
+Write GEM(\alpha) everywhere

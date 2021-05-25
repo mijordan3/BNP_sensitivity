@@ -2,21 +2,20 @@ The posterior of a BNP model is difficult to compute for two reasons: because
 the number of components is (countably) infinite, and because the posterior
 normalization constant is intractible.  To address these problems, we follow
 \citet{blei:2006:vi_for_dp} and form a mean field truncated variational
-approximation to the posterior.
+approximation to the posterior. Variational Bayes (VB) is an approach that seeks
+an approximate posterior through solving a numerical optimization problem
+\citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review},
+minimizing the divergence from a simple, tractable class of candidate posteriors
+to the true posterior.
 
-Let $\zeta$ denote the full vector of unkown posterior variables. For example,
-in the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z, \nu)$.  The
-exact posterior distribution $\p(\zeta \vert \x)$ is intractable. Variational
-Bayes (VB) is an approach that seeks an approximate posterior through solving a
-numerical optimization problem \citep{jordan:1999:vi,
-wainwright:2008:graphical_models, blei:2017:vi_review}.
-
-VB specifies a family of approximating distributions $\q(\zeta \vert \eta)$
-parameterized by a finite-dimensional vector $\eta \in \etadom \subseteq
-\mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$ that is closest to
-the posterior $\p(\zeta \vert \x)$ according to a divergence measure on
-posterior distributions. We will make the common choice of Kullback-Leibler (KL)
-divergence:
+Formally, let $\zeta$ denote the full vector of unkown posterior variables. For
+example, in the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z,
+\nu)$.  The exact posterior distribution $\p(\zeta \vert \x)$ is intractable.
+The most common version of VB specifies a family of approximating distributions
+$\q(\zeta \vert \eta)$ parameterized by a finite-dimensional vector $\eta \in
+\etadom \subseteq \mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$
+that is closest to the posterior $\p(\zeta \vert \x)$ according to  the
+Kullback-Leibler (KL) divergence:
 %
 \begin{align}\eqlabel{kl_def}
 %
@@ -42,13 +41,11 @@ where the tractable objective function $\KL{\eta}$ may not be an exact KL
 divergence. Notice that the intractable $\logp(\x)$ term does not depend on
 $\eta$, and so can be neglected in the objective function $\KL{\eta}$.
 
-In practice, forming an approximating posterior for BNP can be challenging since
-the latent variables $\nu$ and $\beta$ are (countably) infinite dimensional. We
-would like to keep dimension of the variational parameter $\eta$ finite in order
-for the optimization in \eqref{vb_optimization} to be tractable. In the present
+In a BNP model, the full $\zeta$ vector is infinite-dimensional. In the present
 paper, we will follow \citet{blei:2006:vi_for_dp} and use a truncated
-stick-breaking representation in the variational distribution. We choose a
-truncation parameter $\kmax$ large but finite,
+stick-breaking representation in the variational distribution, so that the
+approximating family $\q(\zeta \vert \eta)$ is finite-dimensional for practical
+purposes. We choose a truncation parameter $\kmax$ large but finite,
 %
 \footnote{For $\k > \kmax$, $\q(\nu_\k)$ is effectively a point mass  but
 $\p(\nu_\k \vert \x)$ is dominated by the Lebesgue measure.  So the KL
@@ -62,8 +59,8 @@ and we set $\q(\nu_\k = 1 | \eta) =
 1$ for all $\k > \kmax$. This implies that under $\q$, $\pi_\k = 0$ with
 probability one for all $\k > \kmax$ (\eqref{stick_breaking}). Correspondingly,
 we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
-
-Notice that only our variational approximation is truncated---the model
+%
+We emphaize that only our variational approximation is truncated---the model
 (\eqref{bnp_model}) itself is not finite. We set $\kmax$ large enough in our
 variational approximation to ensure that a large proportion of the components
 are unoccupied with high probability under $\q$, in which case the truncation
@@ -198,7 +195,8 @@ $\nu$. Using this fact, we can instead take
 \gclustersabbr(\etaopt) :={}&
     \expect{\q(\beta, \nu \vert\etaopt)}{
         \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
-    } \approx
+    }
+\\\approx{}&
     \expect{\p(\beta, \nu \vert \x)}{
         \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
     }

@@ -17,54 +17,63 @@ mixture model (GMM) fit to the Fisher iris dataset \citep{anderson:1936:iris,
 fisher:1936:iris} using a Dirichelt process prior with concetration parameter
 $\alpha$.  One might imagine the biologist asking: ``Suppose I went out and
 gathered a new dataset the same size as the one I have.  How many distinct
-species of iris would I expect to find?''  The posterior predictive expectation
-of the number of distinct species may depend strongly on the choice of $\alpha$
-as $\alpha$ varies over some reasonable range, and, if it does, the biologist
-would presumably like to be warned that her posterior quantity of interest is
-{\em non-robust} to the choice of $\alpha$.
+species of iris would I expect to find?''  This posterior predictive expectation
+of the number of distinct species may depend strongly on the choice of the
+concetration parameter $\alpha$ as it varies over some reasonable range, and, if
+it does, the biologist would presumably like to be warned that her posterior
+quantity of interest is {\em non-robust} to the choice of $\alpha$.
 
 The posterior in a BNP model cannot be calcluated analytically, and thus
 approximate methods are required in practice. In the present work, we consider
 inference using variational Bayes (VB), which posits a constrained family of
 distributions, and uses optimization to find the member of the family that is
 closest to the true posterior in Kullback-Leibler ($\mathrm{KL}$) divergence
-\citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review}.
-VB is a popular method on large-scale data sets because solving the optimization
-problem can be much faster than running Markov chain Monte Carlo (MCMC). VB is
-particularly apt for data analysis problems that are exploratory in nature, and
-where quick, approximate solutions suffice. For these applications, we thus
-would like a similarly quick, possibly approximate, method to assess the
-sensitivity of the VB posterior to prior choices. Assessing sensitivity is
-especially important when the results of these exploratory analyses will be
-guiding further downstream investigation.
+\citep{blei:2017:vi_review, blei:2006:vi_for_dp}. VB is a popular method on
+large-scale data sets because solving the optimization problem can be much
+faster than running Markov chain Monte Carlo (MCMC). VB is particularly apt for
+data analysis problems that are exploratory in nature, and where quick,
+approximate solutions suffice.
+% \todo{Do these sentences move us forward here?}
+% For these applications, we thus would like a
+% similarly quick, possibly approximate, method to assess the sensitivity of the
+% VB posterior to prior choices. Assessing sensitivity is especially important
+% when the results of these exploratory analyses will be guiding further
+% downstream investigation.
+
 
 Concretely, the output of a VB approximation is a vector of optimal VB
-parameters, which we can denote as $\etaopt$.  For example, $\etaopt$ might be a
-vector of approximate posterior means and variances for all the quantities in
-the posterior.  Of course, the optimal VB parameters depend on the choice of
-prior, and we can denote this dependence with $\etaopt(\alpha)$.  Posterior
-quantites of interest, such as posterior expectations, can be approximated using
-expectations of the variational distributions, which in turn are functions of
-the VB parameters $\etaopt(\alpha)$. For example, in our motivating example, can
-write $\g(\etaopt(\alpha))$ as the map from the space of variational parameters
-to the approximate posterior predictive number of distinct species in a new
-dataset.
+parameters, which we can denote as $\etaopt$.  For instance, $\etaopt$ might be
+a vector of approximate posterior means and variances for all the quantities in
+the posterior.  In our example, evaluating $\etaopt$ for a particular prior
+parameter $\alpha$ means solving an optimization problem whose objective
+function depends on $\alpha$, and we notate the resulting dependence of
+$\etaopt$ on $\alpha$ as $\etaopt(\alpha)$.
+%
+Posterior quantites of interest, such as posterior expectations,
+can be approximated using expectations of the variational distributions, which
+in turn are functions of the VB parameters $\etaopt(\alpha)$. For example, in
+our motivating example, can write $\g(\etaopt(\alpha))$ as the map from the
+space of variational parameters to the approximate posterior predictive number
+of distinct species in a new dataset.
 
-A conceptually straightforward way to assess sensitivity would be to refit the
-VB posterior for several different prior choices.  For example, one might find
+A conceptually straightforward way to assess the robustness of
+$\g(\etaopt(\alpha))$ to $\alpha$ would be to refit the VB posterior for several
+different plausible prior choices.  For example, one might find
 $\etaopt(\alpha_g)$ for each $\alpha_g \in \{\alpha_1, \ldots, \alpha_G \}$ in a
-grid of $G$ plausible values, and see how much $\g(\alpha_g)$ varies. However,
-repeatedly solving for variational optima after each prior choice may be
-unnecessarily expensive, particularly for the settings we consider where
+grid of $G$ plausible values.  If $\g(\etaopt(\alpha_g))$ varies meaningfully,
+we would say that the quantity $\g(\cdot)$ is non-robust to the choice of
+$\alpha$.  However, repeatedly finding variational optima for each prior choice
+may be unnecessarily expensive, particularly for the settings we consider where
 approximate optima might suffice.
 
 In this work, we circumvent the need for repeated optimization by approximating
 the nonlinear dependence of the VB optimum on prior parameters using a
-first-order Taylor series expansion. We use the Taylor expansion to quickly
-extrapolate, from an initial variational optimum, the posterior quantities that
-would be obtained after a model perturbation, without having to refit the VB
-posterior.  In our example, we would choose some ``base value'' $\alpha_0$,
-and approximate
+first-order Taylor series expansion.  Starting with an initial VB optimum, we
+use the Taylor expansion to quickly extrapolate the values of posterior
+quantities that would be obtained after a model perturbation, without having to
+refit the VB posterior.  In our example, we would choose some ``base value''
+$\alpha_0$ of the concentration parameter, solve the optimization problem to
+compute $\etaopt(\alpha_0)$, and use $\etaopt(\alpha_0)$ to approximate
 %
 \begin{align*}
 %
@@ -84,20 +93,24 @@ d\alpha$ can be computed much more efficiently than the cost of optimizing
 directly, $\etalin(\alpha)$ can be much faster to compute than
 $\etaopt(\alpha)$.  Even when the approximation $\etalin(\alpha)$ is not a
 completely adequate substitue for exact re-optimization, the derivative can be a
-useful guide for what sorts of prior perturbations might be problematic.
+useful guide for what sorts of prior perturbations might be problematic,
+informing exploration by re-solving the optimization problem for potentially
+problematic priors.
 
 The approximation immediately motivates three key questions:
 %
 \begin{enumerate}
 %
 \item \itemlabel{intro_diff}
-    When is $\alpha \mapsto \etaopt(\alpha)$ continuously differentiable?
+    When are the optimal VB parameters a continuously differentiable
+    function of the prior?
 %
 \item \itemlabel{intro_comp}
     How can we easily and efficiently compute the derivative?
 %
 \item \itemlabel{intro_extrap}
-    How well does the linear approximation extrapolate in real-world problems?
+    How well does the linear approximation extrapolate to reasonable
+    alternative priors in real-world problems?
 %
 \end{enumerate}
 %
@@ -115,11 +128,12 @@ differentiability of our motivating BNP problems follow as a special case.
 
 In \secref{computing_sensitivity}, we address practical computability of the
 derivative, and show that the approximation can be easily and efficiently
-computed even in high-dimensional problems like BNP models, using moder
+computed even in high-dimensional problems like BNP models, using modern
 automatic differentiation tools \citep{baydin:2018:automatic, jax2018github} and
-the iterative linear algebra techniques such as the conjugate gradient algorithm
-\citep{nocedal:2006:numerical}.  In our experiments, we find that the derivative
-can be computed roughly an order of magnitude faster than re-optimizing.
+iterative linear algebra techniques such as the conjugate gradient algorithm
+\citep{nocedal:2006:numerical}.  In our experiments, we find that the  needed
+derivatives can be computed roughly an order of magnitude faster than
+re-optimizing.
 
 Finally, in \secref{results}, we demonstrate the usefulness of the approximation
 in practice on a series of increasingly complex real-world datasets.  We
@@ -130,21 +144,23 @@ quantities can be sensitive or non-sensitive, depending on both the application
 and the quantity of interest.  In most cases, the local approximation provides
 qualitatively accurate results many times faster re-optimizing.  We also discuss
 some limitations of local sensitivity and present scenarios where it fails to be
-a good approximation to refitting. \Secref{conclusion} concludes.
+a good approximation to refitting.
 
 We close the introduction by observing that  the present work is essentially a
-VB extension of the local Bayesian robustness literature
+VB extension of the local Bayesian robustness literature, which was
+traditionally based on Markov Chain Monte Carlo (MCMC)
 \citet{gustafson:1996:local, basu:1996:local}.  In a sense, VB is more naturally
-amenable to sensitivity analysis than Markov Chain Monte Carlo, since the
-derivative of VB approximations is typically available in closed form, whereas
-the derivative of Bayesian posteriors must be approximated using potentially
-noisy posterior covariances and/ or posterior conditional densities that are not
-readily available from MCMC draws \citep{gustafson:1996:marginal}.  In addition
+amenable to sensitivity analysis than MCMC, since the derivative of VB
+approximations is typically available in closed form, whereas the derivative of
+Bayesian posteriors must be approximated using potentially noisy posterior
+covariances and/ or posterior conditional densities that are not readily
+available from MCMC draws (e.g., \citet{gustafson:1996:marginal}).  In addition
 to providing rigorous theory and computational tools for the VB context, we go
 beyond previous work on local Bayesian sensitivity which treat sensitivity as a
-measure of robustness \textit{per se}.  Rather, in the design and evaluation of
-our local sensitivity measures we pay special attention to our ability to
-accurately and usefully extrapolate VB posterior inferences to different priors.
+measure of robustness \textit{per se}.  In contrast, in the design and
+evaluation of our local sensitivity measures we pay special attention to our
+ability to accurately and usefully extrapolate VB posterior inferences to
+different priors.
 
 
 % Using a stick-breaking representation of a Dirichlet process, we consider

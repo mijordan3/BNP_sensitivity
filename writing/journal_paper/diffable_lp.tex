@@ -4,11 +4,12 @@ the space of priors, such as additive perturbations.  In this section, we
 briefly consider a broader class of nonlinear perturbations investigated by
 \citet{gustafson:1996:local}, of which additive and multiplicative perturbations
 are special cases, and show that, within this class, only multiplicative
-perturbations are compatible with KL divergence.
+perturbations lead to Fr{\'e}chet differentiable VB optima.
 
 As in \secref{diffable_nonparametric}, suppose we have a base prior $\pbase$ and
 an alternative $\palt$, and that we wish to parameterize a continuous path
-between them.  We will do so as follows. For some $p \in [1, \infty)$, let
+between them.  Deviating from multiplicative perturbations, for some $p \in [1,
+\infty)$, let
 %
 \begin{align}\eqlabel{p_pert_simple}
 %
@@ -25,9 +26,9 @@ $\ptil(\theta \vert \tp)$ defines an ``additive perturbation,'' and
 the limit as $p \rightarrow \infty$ gives the multiplicative perturbation
 of \eqref{mult_pert_simple}.
 %
-\citet{gustafson:1996:local} proves that a result analogous to
-\eqref{p_pert_simple} for \eqref{p_pert_simple}, where the
-$\norminf{\cdot}$ norm is repalaced by
+\citet[Result 2]{gustafson:1996:local} states
+a result analogous to \lemref{pert_invariance} for \eqref{p_pert_simple}, where
+the $\norminf{\cdot}$ norm is repalaced by
 %
 \begin{align}\eqlabel{phi_lp_norm}
 %
@@ -37,11 +38,34 @@ $\norminf{\cdot}$ norm is repalaced by
 %
 \end{align}
 %
-We refer the reader to \citet{gustafson:1996:local} for details.  For our
-present discussion, what matters is that the use of the perturbation in
-\eqref{p_pert_simple} strongly motivates the use of the norm $\norm{\phi(\theta
-\vert \palt, p)}_p$ when forming, for example, worst-case perturbations as in
-\corref{etafun_worst_case}.
+We refer the reader to \citet{gustafson:1996:local} for details
+%
+\footnote{\citet{gustafson:1996:local} in fact considers only pointwise positive
+peturbations $\phi(\theta \vert \palt, p) > 0$, $\mu$-almost everywhere.  It is
+not hard to extend \lemref{pert_invariance} \citet[Result
+2]{gustafson:1996:local} to permit negative perturbations, except for the fact
+that $\norm{\cdot}_p$-neighborhoods of the zero function will always contain
+pointwise negative ``priors.''
+%
+We allow for negative $\phi(\theta \vert \palt, p)$ because otherwise
+$\norm{\cdot}_p$ leads to counterintuitive notions of the ``size'' of prior
+perturbations, as we dicuss in \appref{positive_pert}.
+
+However, we must acknolwedge that our \thmref{kl_discontinuous} below relies on
+the possibility that $\phi(\theta \vert \palt, p)$ can be negative.   In light
+of this, one might reasonably wonder whether we should in fact restrict to
+positive perturbations to avoid the negative consequences of
+\thmref{kl_discontinuous}. In the view of the authors, restricting to pointwise
+positive perturbations is a somewhat artificial solution to a fundamental
+disconnect between the $\norm{\cdot}_p$ and KL divergence which we dicuss at the
+end of the present section, a disconnect which we believe is resolved more
+transparently and naturally through the use of the $\norminf{\cdot}$ norm and
+multiplicative perturbations. }
+%
+.  For our present discussion, what matters is that the use of the perturbation
+in \eqref{p_pert_simple} strongly motivates the use of the norm
+$\norm{\phi(\theta \vert \palt, p)}_p$ when forming, for example, worst-case
+perturbations as in \corref{etafun_worst_case}.
 
 Though the $\norm{\phi(\theta \vert \palt, p)}_p$ norm does not appear to cause
 major difficulties for the full Bayesian posterior, this norm is not compatible
@@ -89,7 +113,7 @@ For any set $S$ with $\pbase(S) = \epsilon$, define
 \begin{align*}
 %
 \palt(\theta \vert S, \delta) :=
-    \frac{\delta^{\ind{\theta \in S}}}{1 + \epsilon(1 - \delta)}.
+    \frac{\delta^{\ind{\theta \in S}}}{1 + \epsilon(1 - \delta)} \pbase(\theta).
 %
 \end{align*}
 %

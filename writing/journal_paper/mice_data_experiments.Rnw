@@ -18,26 +18,33 @@ load('./R_scripts/data_processed/mice.RData')
 
 @
 
-We consider the problem of clustering time-course gene expression data.
-While thousands of genes might be simultaneously
-measured in a given genomics experiment,
-many genes may exhibit similar expression patterns.
-Clustering gene expressions
-is one way to reduce the dimensionality of a complex data set
-and to facilitate scientific interpretations of intricate biological processes.
-Often, such dimensionality reduction is used for exploratory analysis and
-is a first step before further downstream investigation.
-It is important, therefore, to ascertain the stability of the
-discovered clusters.
+In this section, we study a publicly available data set of mice gene expression
+\citep{shoemaker:2015:ultrasensitive}. Mice were infected with influenza virus,
+and expression levels of a set of genes were assessed at 14 time points after
+infection. Three measurements were taken at each time point (called biological
+replicates), for a total of $\ntimepoints = 42$ measurements per gene.
 
-We study a publicly available data set of mice gene expression
-\citep{shoemaker:2015:ultrasensitive}.
-Mice were infected with influenza virus,
-and expression levels of a set of genes were assessed at 14 time points after infection.
-Three measurements were taken at each time point (called biological replicates),
-for a total of $\ntimepoints = 42$ measurements per gene.
+The goal of the analysis is to clustering the time-course gene expression data
+under the assumption that genes with similar time-course behavior may
+have similar function.
+% While thousands of genes might be simultaneously
+% measured in a given genomics experiment,
+% many genes may exhibit similar expression patterns.
+Clustering gene expressions is one way to reduce the dimensionality of a complex
+data set and to facilitate scientific interpretations of intricate biological
+processes. Often, such dimensionality reduction is used for exploratory analysis
+and is a first step before further downstream investigation. It is important,
+therefore, to ascertain the stability of the discovered clusters.
+
 
 \subsubsection*{The model}
+
+\todo{This could be much clearer.  Start by referencing the figure as an example.
+Then say that a cluster defines an average expression level over time, that
+each gene is modeled as belonging to a cluster, and that the gene's
+expression is modeled as IID noise added to its cluster's time series with
+a per-gene offset.  Then you can say that we use B-splines to represent
+the cluster time series, and list the parameters.}
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
 at $\ntimepoints$ time points.
 Following \citet{Luan:2003:clustering} we apply cubic B-splines to
@@ -105,6 +112,18 @@ as gene $j$, given by
 \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
 \end{align*}
 
+\todo{Connect the alpha range to the formula for expected number of clusters.
+Also define the range of $\alpha$ here.  It would be good to make the
+each section follow the same structure as much as possible.}
+
+In this application, we expect {\em a priori} to uncover more distinct clusters
+than in the iris data of the previous section. so we set $\alpha_0 = 6$ in the
+initial GEM prior.
+Below, we evaluate the sensitivity of the inferred co-clustering matrix to
+this choice of $\alpha$ as well as to
+functional perturbations to the stick distribution.
+
+
 % $\gcoclustering(\eta)$, whose , given by
 % \begin{align*}
 % \gcoclustering{ij}(\eta)
@@ -113,12 +132,44 @@ as gene $j$, given by
 % \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
 % \end{align*}
 
-We started with $\alpha_0$ larger than the previous example
-because we expect to uncover finer structure in the gene expression 
-data. 
-Below, we evaluate the sensitivity of the inferred co-clustering matrix to
-this choice of $\alpha$ as well as to
-functional perturbations to the stick distribution.
+\todo{Define the co-clustering matrix before displaying it}
+
+\subsection*{Quantity of interest: The co-clustering matrix}
+
+For this model, we are particularly interested in which genes cluster together,
+a quantity which we express through the following posterior co-clustering
+matrix.  Let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ denote the matrix
+whose $(i,j)$-th entry is the posterior probability that gene $i$ belongs to the
+same cluster as gene $j$, given by \todo{This isn't right for $i=j$, is it?}
+%
+\begin{align*}
+%
+[\gcoclustering(\eta)]_{ij} =
+\expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}}  =
+\sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
+\expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
+%
+\end{align*}
+%
+\figref{gene_initial_coclustering} displays the inferred co-clustering matrix
+at $\alpha_0$.
+
+
+To use \corref{etafun_worst_case} as
+well as to produce an easily-visualized influence function, we must choose a
+univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
+the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
+given by
+%
+\begin{align*} \laplacianevsum(\eta) = \text{Tr}\left( I - D(\eta)^{-1/2}
+\gcoclustering(\eta) D(\eta)^{-1/2} \right), \end{align*}
+%
+where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i =
+\sum_{j=1}^{\ngenes}[\gcoclustering(\eta)]_{ij}$. The quantity $\laplacianevsum$
+is differentiable, and has close connection with the number of distinct
+components in a graph~\citep{luxburg:2007:spectralcluster}. We expect that prior
+changes that produce large changes in $\laplacianevsum$ will also produce large
+changes in the full co-clustering matrix.
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix
@@ -156,14 +207,17 @@ p
 \subsubsection*{Sensitivity of co-clustering to $\alpha$}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$
-to the choice of $\alpha$ in the GEM prior.
-We formed the linear approximation at $\alpha_0 = 6$ and computed
-the change in co-clustering under the linearized
-variational parameters $\etalinglobal(\alpha)$,
-at $\alpha = \Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$.
-At $\alpha =  \Sexpr{alpha_pert1}$ the prior is concentrated,
-with only two clusters expected {\em a priori} under the GEM prior;
-at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are expected.
+to the choice of $\alpha$ in the GEM prior. We formed the linear approximation
+at $\alpha_0 = 6$ and computed the change in co-clustering under the linearized
+variational parameters $\etalinglobal(\alpha)$, at $\alpha =
+\Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$. At $\alpha =
+\Sexpr{alpha_pert1}$ the prior is concentrated, with only two clusters expected
+under the GEM prior; at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are
+expected.
+
+\todo{Say that therefore $\gclustersabbr$ is non-robust, but we don't really
+care about it here.}
+
 
 
 % Let $\gcoclustering^0 := \gcoclustering(\etaopt(\alpha_0))$ be the co-clustering matrix inferred at $\alpha_0$,
@@ -174,17 +228,18 @@ at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are expected.
 % We write $\gcoclustering(\etalinglobal)$ with the
 % understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
 
-Despite this wide prior range, for either $\alpha$,
-the change in the posterior co-clustering
-matrix is minuscule (\figref{gene_alpha_coclustering}):
-the largest absolute changes in the co-clustering matrix is of order $10^{-2}$.
+\todo{Briefly explain how it can be that the co-clustering can be
+robust even though the number of clusters is not.}
+
+Despite this wide prior range, for either $\alpha$, the change in the posterior
+co-clustering matrix is minuscule (\figref{gene_alpha_coclustering}): the
+largest absolute changes in the co-clustering matrix is of order $10^{-2}$.
 Refitting the approximate posterior at $\alpha = \Sexpr{alpha_pert1}$ and
-$\alpha = \Sexpr{alpha_pert2}$
-confirms the insensitivity predicted by the
-linearized variational global parameters.
-Beyond capturing insensitivity, the linearized parameters
-were also able to
-approximate the sign and size of the changes in the individual entries of the coclustering matrix (these changes albeit small).
+$\alpha = \Sexpr{alpha_pert2}$ confirms the insensitivity predicted by the
+linearized variational global parameters. Beyond capturing insensitivity, the
+linearized parameters were also able to approximate the sign and size of the
+changes in the individual entries of the coclustering matrix (these changes
+albeit small).
 
 <<gene_alpha_coclustering_cap>>=
 gene_alpha_coclustering_cap <-
@@ -192,14 +247,15 @@ gene_alpha_coclustering_cap <-
      co-clustering matrix at $\\alpha = 0.1$ (top row)
      and $\\alpha = 12$ (bottom row),
      relative to the co-clustering matrix at $\\alpha_0 = 6$.
-     (Left) a scatter plot of differences under the linear approximation
+     (Left) A scatter plot of differences under the linear approximation
      against differences after refitting, where
      each point represents an entry of the co-coclustering matrix.
      Note the scales of the axes:
      the largest change in an entry of the co-clustering matrix is
      $\\approx 0.03$.
-     (Middle) sign changes in the co-clustering matrix observed after refitting.
-     (Right) the changes under the linearly approximated variational
+     (Middle) Sign changes in the co-clustering matrix observed after refitting,
+     ignoring the magnitude of the change.
+     (Right) Sign changes under the linearly approximated variational
      parameters.
      For visualization, changes with absolute value $< 1e-5$ are not colored. ")
 
@@ -210,55 +266,6 @@ source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eva
 @
 
 \subsubsection*{Sensitivity of co-clustering to a functional perturbation}
-
-Insensitivity to $\alpha$ does not necessarily rule out insensitivity to other prior perturbations, however.
-As demonstrated in \secref{results_iris},
-the influence function can provide guidance on which functional perturbations may result in greater sensitivity for a chosen posterior quantity.
-However, the co-clustering matrix as a posterior quantity is
-$\ngenes^2$-dimensional and
-thus does not lend itself to an easily interpretable influence function.
-We therefore summarize the co-clustering matrix into a scalar quantity:
-we use the sum of the eigenvalues of the symmetrically normalized graph Laplacian.
-This quantity has close connection with
-the number of distinct components in a graph~\citep{luxburg:2007:spectralcluster}.
-Let this posterior quantity be denoted $\laplacianevsum$, given by
-\begin{align*}
-  \laplacianevsum(\eta) =
-  \text{Tr}\left(
-  I - D(\eta)^{-1/2} \gcoclustering(\eta) D(\eta)^{-1/2}
-  \right),
-\end{align*}
-where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i = \sum_{j=1}^{\ngenes}[\gcoclustering(\eta)]_{ij}$.
-(And recall that the trace of a matrix is equivalent to the sum of its eigenvalues).
-
-Because $\laplacianevsum(\eta)$ is a scalar quantity, we can plot its influence function.
-We choose a functional perturbation $\phi_{\textrm{ev}}$ that has a large, positive inner-product with the influence function.
-In this case, we construct $\phi_{\textrm{ev}}$
-using two Gaussian bumps aligned with
-the two largest modes of the prior-weighted influence function
-(\figref{gene_fpert_coclustering} top left).
-We anticipate $\phi_{\textrm{ev}}$
-to have a large effect on $\laplacianevsum$.
-With $\laplacianevsum$ a proxy for our actual posterior quantity of interest,
-the full co-clustering matrix, we then expect that the co-clustering matrix
-will also experience large changes.
-
-<<gene_coclustering_infl_cap>>=
-gene_coclustering_infl_cap <- paste(
-    "The influence function of $g_{ev}$, the sum of the eigenvalues of the coclustering Laplacian matrix. ")
-SetImageSize(aspect_ratio=base_aspect_ratio * 0.4)
-@
-<<gene_coclustering_influence, cache=simple_cache, fig.show='hold', fig.cap=gene_coclustering_infl_cap>>=
-# source("R_scripts/mice/coclustering_influence.R",
-#        echo=knitr_debug, print.eval=TRUE)
-@
-
-
-Our intuition is confirmed in \figref{gene_fpert_coclustering}.
-After perturbing by $\phi_{\textrm{ev}}$,
-the largest changes in the co-clustering matrix are of now of order $10^{-1}$,
-compared with changes on the order of $10^{-2}$ after the $\alpha$ perturbations.
-The linearized variational parameters are again able to capture the qualitative changes in the co-clustering matrix after refitting at the perturbed prior.
 
 <<gene_fpert_coclustering_cap>>=
 gene_fpert_coclustering_cap <- paste(
@@ -275,23 +282,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 1.05)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=
 source("R_scripts/mice/fpert_coclustering_matrix.R",  echo=knitr_debug, print.eval=TRUE)
-
 @
-
-The influence function is able to explain why the co-clustering matrix is
-insensitive to $\alpha$.
-The functional perturbation
-that corresponds to a change in $\alpha$ is
-\begin{align*}
-\phi_\alpha(\nu_\k) :=
-\log\betadist{\nu_\k\vert 1, \alpha} -
-\log\betadist{\nu_\k\vert 1, \alpha_0}.
-\end{align*}
-The function $\phi_\alpha(\nu_\k)$ is large when the influence function is small and vice-versa (\figref{alpha_pert_logphi}),
-resulting in a small inner-product between the influence function
-and $\phi_\alpha$.
-Thus, the linear approximation will predict small changes, and
-the refitted results confirms the predictions.
 
 <<alpha_pert_logphi_cap>>=
 alpha_pert_logphi_cap <- paste(
@@ -305,14 +296,34 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.6,
 source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
 @
 
-However, even with the selected functional perturbation,
-the size of the differences in the co-clustering matrix remains modest.
-It is unlikely that any conclusions derived from the co-clustering matrix would have changed after the functional perturbation.
-The co-clustering matrix appears insensitive to perturbations in the stick-breaking distribution.
 
-Finally, the computational cost of linearizing the variational parameters is favorable compared with refitting (\tabref{mice_timing}).
-Forming the linear approximation, which requires a Hessian inversion,
-took 3-4 seconds; subsequent evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the model after a prior perturbation can take more than 30 seconds.
+As in \secref{results_iris}, we now investigate whether the co-clustering matix
+is robust to deviations from the Beta prior.
+In \figref{gene_fpert_coclustering}, we use the influence function for
+$\laplacianevsum$ to construct a nonparametric prior perturbation which we
+expect to have a large, positive effect.  The resulting prior does indeed
+produce changes an order of magnitude larger than those produced by $\alpha$
+perturbations shown in \figref{gene_alpha_coclustering}, and the approximation
+is able to capture the qualitative changes.  The influence function is able to
+capture why $\alpha$ perturbations were unable to produce large changes in this
+case: \figref{alpha_pert_logphi} shows that changing $\alpha$ (as in
+\exref{beta_inf_norm}) induces large changes in the prior only where the
+influence function is small.
+
+However, even with the (unreasonable-looking) selected functional perturbation,
+the size of the differences in the co-clustering matrix remains modest. It is
+unlikely that any conclusions derived from the co-clustering matrix would have
+changed after the functional perturbation. The co-clustering matrix appears
+robust to perturbations in the stick-breaking distribution.
+
+\subsection*{Timing}
+
+Finally, the computational cost of linearizing the variational parameters is
+favorable compared with refitting (\tabref{mice_timing}). Forming the linear
+approximation, which requires a Hessian inversion, took 3-4 seconds; subsequent
+evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the
+model after a prior perturbation can take more than 30 seconds.
+\todo{Let's do a table like this for Iris too}
 
 \begin{table}[tb]
 \centering
