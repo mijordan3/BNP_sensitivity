@@ -4,7 +4,7 @@ and so the conditions of \thmref{etat_deriv}.  As in \exref{alpha_perturbation},
 we will take $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax - 1}$.
 
 Recall from \secref{model_vb} that we take $\q(\nuk \vert \eta)$ to be a normal
-distribution on the logit-transformed sticks, $\lnu_\k$.  For the duration of
+density on the logit-transformed sticks, $\lnu_\k$.  For the duration of
 this section, write $\q(\lnuk \vert \eta) = \normdist{\lnuk \vert \mu_\k,
 \sigma^2_\k}$, so that the subvector of $\eta$ parameterizing $\q(\lnuk \vert
 \eta)$ is $\etanuk = (\mu_\k, \sigma_\k)$.
@@ -189,8 +189,8 @@ it follows that \thmref{etat_deriv} applies to the map $\alpha \mapsto
 \etaopt(\alpha)$.
 
 We end this section by observing that the only real technical challenge was
-showing that the assumptions were satisfied for the logit-normal distributions
-$\q(\nuk \vert \etanuk)$.  Had we instead used the conjugate beta distribution
+showing that the assumptions were satisfied for the logit-normal densitys
+$\q(\nuk \vert \etanuk)$.  Had we instead used the conjugate beta density
 parameterized by its natural parameters, then both \assuref{kl_opt_ok} and
 \assuref{exchange_order} would follow immediately by standard properties of the
 Beta distribution.  In particular, the expectation $\expect{\q(\nuk \vert

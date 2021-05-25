@@ -8,7 +8,7 @@
 %
 % In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$, let
 % $\mu$ be the Lebesgue measure, and let $\q(\theta \vert \eta) = \normdist{\theta
-% \vert \eta}$ be a normal distribution parameterized by its natural exponential
+% \vert \eta}$ be a normal density parameterized by its natural exponential
 % family parameters.
 %
 % Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
@@ -32,11 +32,11 @@ By properties of the exponential family,
 %
 \begin{align*}
 %
-\lqgrad{\theta, \eta} ={} (\theta, \theta^2)^T \mathand&
-\lqhess{\theta, \eta} ={} 0_{2\times2} \Rightarrow\\
+\lqgrad{\theta \vert \eta} ={} (\theta, \theta^2)^T \mathand&
+\lqhess{\theta \vert \eta} ={} 0_{2\times2} \Rightarrow\\
 %
-\norm{\lqgrad{\theta, \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
-\norm{\lqhess{\theta, \eta}}_2 ={} 0.
+\norm{\lqgrad{\theta \vert \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{\lqhess{\theta \vert \eta}}_2 ={} 0.
 %
 \end{align*}
 %
@@ -440,7 +440,7 @@ We can thus write
 \MoveEqLeft
 \int \mathrm{sign}\left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)
     \abs{\pbase(\theta)^{1/p} + \frac{1}{p}\abs{\phi(\theta)}}^{p} d\theta
-={}\\&
+\\={}&
     \int \left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)^{p}
         \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \ge 0}
         d\theta - \\&
@@ -694,9 +694,9 @@ $\eta$ direction, so the dual norm is given by
 \begin{align*}
 %
 \MoveEqLeft
-\norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* ={}\\&
+\norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* \\={}&
 \sup_{\phi: \norminf{\phi} \le 1}
-    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \le{}\\&
+    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \\\le{}&
 4 \norm{
     \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk'}} -
     \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk}}

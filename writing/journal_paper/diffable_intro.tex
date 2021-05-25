@@ -21,9 +21,9 @@ Let the variational objective factorize as
 \begin{align}
 %
 \KL{\eta, \t} :={}&
-    \KL{\eta} +
+    \KL{\eta} -
     \expect{\q(\theta \vert \eta)}
-       {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)}           \eqlabel{perturbed_objective}\\
+       {\left(\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)\right)}           \eqlabel{perturbed_objective}\\
 \etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t}.
     \eqlabel{perturbed_optimum}
 %
@@ -34,6 +34,13 @@ of $\KL{\eta}$.
 %
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The decomposition \eqref{perturbed_objective} is always possible, in the sense
+that one could always take $\theta = \zeta$ and $\KL{\eta} = 0$.  We decompose
+the objective in this way in order to state strict regularity assumptions only
+on the part of the KL divergence that is being perturbed.  Indeed, we will
+require little from the $\KL{\eta}$ part of the decomposition other than that it
+can be differentiated and optimized.
 
 By identfiying $\t$ with some hyperparameter (e.g. the concentration parameter,
 as in \exref{alpha_perturbation} below), we can use \defref{prior_t} to study
@@ -149,8 +156,8 @@ form \defref{prior_t}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
 %
-For the BNP model with the GEM prior, take $\theta = (\nu_1, \ldots,
-\nu_{\kmax-1})$, $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
+For the BNP model with the $\gem$ prior, take $\theta = (\nu_1, \ldots,
+\nu_{\kmax-1})$, and take $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
 Let $\alpha_0$ be some base value of the concentration parameter, and
 let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
 $0$ represent deviations of $\alpha$ away from $\alpha_0$.
@@ -210,39 +217,6 @@ optimization, letting $\KL{\eta} := \KL{\eta, \alpha_0}$, and substituting $\t =
 %
 \end{align*}
 %
-% By the definition of $\p(\nuk \vert \alpha)$,
-% %
-% \begin{align*}
-% %
-% \log \p(\nu_1, ..., \nu_\kmax \vert \alpha)
-%     ={}& (\alpha - 1) \sum_{k=1}^\kmax \log (1 - \nuk)
-%     + \kmax \log \frac{\Gamma(1 + \alpha)}{\Gamma(\alpha)}.
-% %
-% \end{align*}
-% %
-% The normalizing constant does not depend on $\nuk$, and so its expectation
-% does not depend on $\eta$, and so it can be neglected in the VB objective,
-% and we can write
-% %
-% \begin{align*}
-% %
-% \KL{\eta, \alpha} = \KL{\eta, \alpha_0}
-% -(\alpha - \alpha_0) \sum_{\k=1}^{\kmax - 1}
-%     \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
-% %
-% \end{align*}
-% %
-% Identifying $\KL{\eta}$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$ evaluated
-% at the base concentration parameter shows that the BNP problem with the GEM
-% prior is of the form \eqref{perturbed_objective}, and that
-% %
-% \begin{align*}
-% %
-% \psi(\nu, \t) = -\t \sum_{\k=1}^{\kmax - 1}
-%     \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
-% %
-% \end{align*}
-%
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -254,7 +228,7 @@ optimization, letting $\KL{\eta} := \KL{\eta, \alpha_0}$, and substituting $\t =
 %
 As in \exref{alpha_perturbation}, take $\theta = (\nu_1, \ldots, \nu_{\kmax-1})$
 and $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$. Let $\pbase(\nuk) :=
-\betadist{\nuk \vert 1, \alpha_0}$, and let $\palt(\nuk)$ be a distribution, not
+\betadist{\nuk \vert 1, \alpha_0}$, and let $\palt(\nuk)$ be a density, not
 in the Beta family, that shifts mass towards zero:
 %
 \begin{align*}

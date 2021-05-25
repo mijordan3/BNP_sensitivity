@@ -123,7 +123,8 @@ Then the following equalties hold:
 %
 \MoveEqLeft
 \fracat{\partial \expect{\q(\theta \vert \eta)}
-              {\psi(\theta, \t)}}{\partial \eta}{\eta} ={}
+              {\psi(\theta, \t)}}{\partial \eta}{\eta}
+={}
 \expect{\q(\theta \vert \eta)}
        {\lqgradbar{\theta \vert \eta} \left(
         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
@@ -132,7 +133,8 @@ Then the following equalties hold:
 %
 \MoveEqLeft
 \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
-      {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t} ={}\nonumber\\&
+      {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t}
+\nonumber\\={}&
   \expect{\q(\theta \vert \eta)}
          {\lqgradbar{\theta \vert \eta} \left(
           \psigrad{\theta,\t} - \expect{\q(\theta \vert \eta)}{\psigrad{\theta, \t})}
@@ -141,15 +143,15 @@ Then the following equalties hold:
  %
  \MoveEqLeft
  \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
-       {\psi(\theta, \t)}}{\partial \eta \partial \eta^T}{\eta} ={}
- \nonumber\\&
+       {\psi(\theta, \t)}}{\partial \eta \partial \eta^T}{\eta}
+\nonumber\\={}&
  \expect{\q(\theta \vert \eta)}
         {\lqgradbar{\theta \vert \eta} \lqgradbar{\theta \vert \eta}^T
         \left(
          \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
         \right)
         } +
- \nonumber\\ &
+\nonumber\\ &
  \expect{\q(\theta \vert \eta)}{
         \lqhessbar{\theta \vert \eta}
         \left(
@@ -170,7 +172,7 @@ integration and differentiation as in \citep[Theorem
 \MoveEqLeft
 \fracat{\partial \int \q(\theta \vert \nu) \psi(\theta \vert \t) \mu(d\theta)}
        {\partial \eta}{\eta}
-={}\\&
+\\={}&
 \int \fracat{\partial \q(\theta \vert \nu) \psi(\theta \vert \t) }
           {\partial \eta}{\eta} \mu(d\theta)={}
 &\mathtxt{(\assuitemref{dist_fun_nice}{fundom} and \thmref{dct})}
@@ -316,7 +318,7 @@ are continuous.  For example,
        {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
    \expect{\q(\theta \vert \eta')}
           {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
-      }_2 =\\&
+      }_2 \\={}&
 %
 \norm{\int \left(
 \q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
@@ -358,7 +360,7 @@ each term in the final line of the preceding display, giving
        {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
    \expect{\q(\theta \vert \eta')}
           {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
-      }_2 \le\\&
+      }_2 \\\le{}&
 %
 \int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
 \left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
