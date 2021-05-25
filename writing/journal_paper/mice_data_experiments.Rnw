@@ -136,8 +136,21 @@ same cluster as gene $j$, given by \todo{This isn't right for $i=j$, is it?}
 at $\alpha_0$.
 
 
-Below, we evaluate the sensitivity of the inferred co-clustering matrix to
-both parametric and functional perturbations to the stick distribution.
+To use \corref{etafun_worst_case} as
+well as to produce an easily-visualized influence function, we must choose a
+univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
+the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
+given by
+%
+\begin{align*} \laplacianevsum(\eta) = \text{Tr}\left( I - D(\eta)^{-1/2}
+\gcoclustering(\eta) D(\eta)^{-1/2} \right), \end{align*}
+%
+where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i =
+\sum_{j=1}^{\ngenes}[\gcoclustering(\eta)]_{ij}$. The quantity $\laplacianevsum$
+is differentiable, and has close connection with the number of distinct
+components in a graph~\citep{luxburg:2007:spectralcluster}. We expect that prior
+changes that produce large changes in $\laplacianevsum$ will also produce large
+changes in the full co-clustering matrix.
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix
@@ -263,26 +276,9 @@ SetImageSize(aspect_ratio=base_aspect_ratio * 0.6,
 source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
 @
 
+
 As in \secref{results_iris}, we now investigate whether the co-clustering matix
-is robust to deviations from the Beta prior. To use \corref{etafun_worst_case} as
-well as to produce an easily-visualized influence function, we must choose a
-univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
-the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
-given by
-%
-\begin{align*} \laplacianevsum(\eta) = \text{Tr}\left( I - D(\eta)^{-1/2}
-\gcoclustering(\eta) D(\eta)^{-1/2} \right), \end{align*}
-%
-where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i =
-\sum_{j=1}^{\ngenes}[\gcoclustering(\eta)]_{ij}$. The quantity $\laplacianevsum$
-is differentiable, and has close connection with the number of distinct
-components in a graph~\citep{luxburg:2007:spectralcluster}. We expect that prior
-changes that produce large changes in $\laplacianevsum$ will also produce large
-changes in the full co-clustering matrix.
-
-% Is this important?
-%(And recall that the trace of a matrix is equivalent to the sum of its eigenvalues).
-
+is robust to deviations from the Beta prior.
 In \figref{gene_fpert_coclustering}, we use the influence function for
 $\laplacianevsum$ to construct a nonparametric prior perturbation which we
 expect to have a large, positive effect.  The resulting prior does indeed
