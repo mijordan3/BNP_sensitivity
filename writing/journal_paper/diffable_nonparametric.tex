@@ -244,18 +244,50 @@ The form of the influence function is then given by gathering terms in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}
-%
-For our stick-breaking example, the influence function is a map
-from $[0,1]^{\kmax - 1}$ into $\mathbb{R}$.  However, if we commit to
-applying the same perturbation..
 
-TODO: Allow $\phi$ to be univariate even though $\theta$ is multivariate.
-TODO: Mention that the decomposition of KL into a bit depending only
-on eta and a bit dependeing on theta and t just for assumption convenience.
-TODO: Motivate a concern about Frechet differentiable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exref{infl_univariate}
+%
+In the BNP example, we are perturbing each of the sticks, so we take $\theta \in
+[0,1]^{\kmax - 1}$.  Formally, $\phi: [0,1]^{\kmax - 1} \mapsto \mathbb{R}$ can
+express different perturbations for the density of each of the $\kmax - 1$
+sticks.  However, when we describe ``changing the stick breaking density,'' we
+mean changing each stick's prior density in the same way.
+
+To represent perturbing all the sticks simultaneously, take some univariate
+perturbation $\phi_{u}: [0,1] \mapsto \mathbb{R}$, and set $\phi(\nu_1, \ldots,
+\nu_{\kmax - 1}) = \sum_{\k=1}^{\kmax - 1} \phi_{u}(\nuk)$. By linearity of the
+derivative \corref{etafun_deriv_form},
+%
+\begin{align*}
+%
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
+    \int \infl(\theta) \left(
+        \sum_{\k=1}^{\kmax - 1} \phi_{u}(\nuk) \right)
+    d\nu_1 \ldots d \nu_{\kmax - 1}.
+%
+\end{align*}
+%
+By definition, $\expect{\q(\theta \vert \etaopt)}{\lqgradbar{\theta \vert
+\etaopt}} = 0$, so $\int \infl(\theta) \mu(d\theta) = 0$.  By the mean field
+assumption, $\infl(\nu_1, \ldots, \nu_{\kmax - 1}) = \prod_{\k=1}^{\kmax - 1}
+\infl_\k(\nuk)$, where $\infl_\k(\nuk)$ is derived from \eqref{infl_defn} but
+using $\theta = \nuk$.  Letting $\nu_0 \in [0,1]$ denote the variable of
+integration and plugging in the preceding observations gives
+%
+\begin{align*}
+%
+\int \infl(\theta) \phi(\theta) \mu(d\theta) =
+    \int_0^1 \left(\sum_{\k=1}^{\kmax - 1} \infl_k(\nu_0) \right)
+        \phi_{u}(\nu_0) d \nu_0.
+%
+\end{align*}
+%
+Thus we can say that the influence function for perturbing all the stick
+breaking distributions simultaneously is given by the sum of the
+individual sticks' influence functions, which maps $[0,1] \mapsto \mathbb{R}$.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
