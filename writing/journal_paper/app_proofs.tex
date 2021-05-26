@@ -124,8 +124,6 @@ Finally, the form of the derivative is given by \citet[Theorem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \prooflabel{pert_invariance}\proofof{\lemref{pert_invariance}}
 %
-\todo{Put the proof of Linfty validity in here too.}
-
 Let $\mu$ and $\mu'$ denote two mutually absolutely continuous candidate
 dominating measures for $\pbase$, with respective densities (Radon-Nikodym
 derivatives) $\pbase(\theta)$ and $\pbase'(\theta)$.  Let the respective
@@ -161,6 +159,30 @@ densities of $\tau$.  The desired result follows by the exact same formal
 argument as for the change of measure, except with $J(\theta) \mu(d\theta)$
 and $\mu(d\tau)$ taking the place of $R(\theta) \mu(d\theta)$ and
 $\mu'(d\theta)$, respectively.
+
+We now prove that $\phi$ gives rise to valid priors when $\norminf{\phi} <
+\infty$. Since the exponential funciton is positive, for any $\phi(\theta)$,
+%
+\begin{align*}
+%
+\ptil(\theta \vert \phi) = \pbase(\theta) \exp(\phi(\theta)) > 0,
+%
+\end{align*}
+%
+$\mu$-almost everywhere.  Furthermore, since $\int \pbase(\theta)
+\lambda(d\theta) = 1$,
+%
+\begin{align*}
+%
+\exp(-\norminf{\phi}) \le{}
+\int \pbase(\theta) \exp\left(\phi(\theta)\right) \mu(d\theta)
+\le{}
+\exp(\norminf{\phi}).
+%
+\end{align*}
+%
+so that $0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$
+whenever $\norminf{\phi} < \infty$.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
