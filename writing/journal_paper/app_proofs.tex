@@ -5,9 +5,8 @@
 \proofof{\lemref{normal_q_is_regular}}
 \prooflabel{normal_q_is_regular}
 %
-TODO: update this so that $\eta$ is actually the mean and variance.
-
-By properties of the exponential family,
+For the duration of the proof, let $\eta$ denote the exponential family natural
+parameters of the normal distribution. By properties of the exponential family,
 %
 \begin{align*}
 %
@@ -51,6 +50,13 @@ Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
 similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
 $\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
 of the five constants.
+
+Finally, if $\tilde{\eta}$ is a twice-continuously differentiable function of
+the natural parameters $\eta$ (e.g the mean and variance), then the derivatives
+with respect to $\tilde{\eta}$ are equal to the derivatives with respect to
+$\eta$ times bounded (on $\ball_\eta$) functions of $\eta$ that do not depend on
+$\theta$. Thus a constant multiple of $M(\theta)$ will bound the new
+derivatives.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -181,7 +187,7 @@ $\max\{1, \delta\} M(\theta)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{lem}
+\begin{lem}\lemlabel{objective_is_frechet}
 
 Under \assuref{exchange_order_q}, the map $\eta, \phi \mapsto \partial
 \expect{\q(\theta \vert \eta)}{\phi(\theta)} / \partial \eta$ is Fr{\'e}chet
@@ -224,6 +230,9 @@ show that the joint map is Fr{\'e}chet differentiable.
 
 Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
 applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
+
+%%%%%%%
+% eta
 
 First, consider the partial derivative with respect to $\eta$.  The
 linear operator corresponding to the directional derivative in the
@@ -280,7 +289,11 @@ For the second term, by \lemref{logq_continuous}, for all $\phi''$,
 \end{align*}
 %
 It follows that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta,
-\phi$, and so the partial derivative with respect to $\eta$ is Fr{\'e}chet.
+\phi$, and so the partial derivative with respect to $\eta$ is
+a continuous Fr{\'e}chet derivative.
+
+%%%%%%%
+% phi
 
 Next, we consider the partial derivative with respect to $\phi$.  By \eqref{q_sens_is_cov}, we can write
 %
@@ -391,14 +404,14 @@ denominator of \eqref{phi_partial_dual} is also conitnuous by an analogous
 argument.  Since the denominator of \eqref{phi_partial_dual} is bounded away
 from zero, $\expect{\q(\theta \vert \eta)} {\norm{\lqgradbar{\theta \vert
 \eta}}_1}$ is a continuous composition of continuous functions, and itself
-continuous.  It follows that the $\phi$ partial derivative is Fr{\'e}chet.
+continuous.  It follows that the $\phi$ partial derivative is
+continuously Fr{\'e}chet differentiable.
 
 Since its partial derivatives are continuous, it follows by \citet[Proposition
 4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
-\partial \KL{\eta, \phi} / \partial \eta$ is continously Fr{\'e}chet
-differentiable.
+\partial \expect{\q(\theta \vert \eta)}{\phi(\theta)} / \partial \eta$ is
+continously Fr{\'e}chet differentiable.
 
-%
 \end{proof}
 %
 \end{lem}
@@ -411,91 +424,38 @@ differentiable.
 
 \prooflabel{eta_phi_deriv}\proofof{\thmref{eta_phi_deriv}}
 %
-
-
-By a first-order
-condition $\etaopt(\phi)$ satisfies
+Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
+applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
+Therefore, as in the proof of \thmref{etat_deriv}, for any $\phi \in \ball_\phi(\delta)$, $\etaopt(\phi)$ satisfies the first-order condition
 %
-\begin{align*}
+\begin{align}\eqlabel{vb_first_order_condition}
 %
-\fracat{\partial \KL{\eta, \phi}}
-                {\partial \eta}
-                {\etaopt(\phi)} = 0.
+\fracat{\partial \KL{\eta}}{ \partial \eta}{\etaopt(\phi)} +
+\fracat{\partial
+    \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+    {\partial \eta}
+    {\etaopt(\phi)}
+={} 0.
 %
-\end{align*}
+\end{align}
 
+As in the proof of \thmref{etat_deriv}, we wish to employ an implicit
+function theorem, but this time for general Banach spaces.  We will
+us \citet[Theorem 4.B]{zeidler:2013:functional}.
 
-Using this estimating equation, the key to the proof will be the implicit
-function theorem for Banach spaces.  To use the implicit function theorem, we
-need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable at $\etaopt, \phiz$.
+First, \citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
+$\KLhess{\etaopt(\phiz), \phiz}$ is invertible by
+\assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i), (ii), and
+(iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that the
+function $\etaopt(\phi)$ exists.
 
-%  and that $\KLhess{\eta, \phi}$ is positive
-% definite in $\ball$.  --- is the actually needed?
+Moreover, by \assuitemref{kl_opt_ok}{kl_diffable} and
+\lemref{objective_is_frechet}, the estimating equation
+\eqref{vb_first_order_condition} is continuously Fre{\'e}chet differentiable
+($C^1$ in the notation of Zeidler) in a neighborhood of $\etaopt(\phiz), \phiz$.
+It follows from \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$
+is also continuously Fr{\'e}chet differentiable.
 
-%
-% For the duration of the proof, define
-% %
-% \begin{align*}
-% %
-% \rho(\etanuk, \phi) :={}&
-%     \expect{\q(\nu \vert \etanuk)}{\phi(\etanuk)}
-% \mathand\\
-% \rho_\eta(\etanuk, \phi) :={}&
-%     \fracat{\partial \rho(\etanuk, \phi)}{\phi(\etanuk)}.
-% %
-% \end{align*}
-% %
-% Expanding $\logp(\zeta \vert \phi)$ in \eqref{vb_optimization}, we see that
-% %
-% \begin{align}
-% \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
-%  ={}&
-%     \fracat{\partial \KL{\eta, \phiz}}{\partial \eta}{\eta} +
-%     \sumkm \rho_\eta(\etanuk, \phi). \eqlabel{kl_fun_pert}
-% %
-% \end{align}
-% %
-% By \assuref{kl_opt_ok}, $\partial \KL{\eta, \phiz} / \partial \eta$ is
-% continuously Fr{\'e}chet differentiable (it does not depend on $\phi$), so we
-% need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.
-
-
-
-
-Furthermore, \citet[Chapter 4 Condition
-21b]{zeidler:2013:functional} holds since $\KLhess{\etaopt(\phiz), \phiz}$ is
-invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i),
-(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
-the function $\etaopt(\phi)$ exists.  Moreover, since we have shown that $\eta,
-\phi \mapsto \partial \KL{\eta, \phi} / \partial \eta$ is continuously
-Fre{\'e}chet differentiable ($C^1$ in the notation of Zeidler) in a neighborhood
-of $\etaopt(\phiz), \phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional},
-$\etaopt(\phi)$ is also continuously Fr{\'e}chet differentiable.
-
-The form of the derivative is given by the directional derivatives $d \etaopt(\t
-\phi) / d\t | \t = 0$, which, by \thmref{etat_deriv} and \eqref{rho_phi_partial,
-rho_phi_partial_cov}, is given by
-%
-\begin{align*}
-%
--\left(\fracat{\partial^2 \KL{\eta, \phiz}}
-                {\partial \eta \partial \eta^T}
-                {\etaopt}\right)^{-1}
-\left(
-    \sumkm \expect{\q(\nu \vert \etaoptnuk)}
-                  {\lqgradbar{\nuk \vert \etanuk}
-                   \phi(\nuk) }
-\right).
-%
-\end{align*}
-%
-(Note that a general version of the same result is given immediately following
-the statement of \citet[Theorem 4.B(c)]{zeidler:2013:functional}.)  In the last
-line of the preceding display we have dropped the $\expect{\q(\nuk \vert
-\etanuk)}{\phi(\nuk)}$ term since $\expect{\q(\nu \vert \etaoptnuk)}
-{\lqgradbar{\nuk \vert \etanuk}} = 0$.  \Eqref{infl_defn} follows by
-re-writing the preceding display as an integral.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
