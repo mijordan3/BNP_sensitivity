@@ -39,54 +39,59 @@ $\mu$-almost surely and for all $\t \in S_\t$, then
 \proofof{\lemref{exchange_order}}\prooflabel{exchange_order}
 
 Let $\eta_d$ denote the $d-$th entry of the vector $\eta$.  Then
-$\abs{\partial f(\theta, \eta, \t) / \partial \eta_d} \le
-  \norm{\partial f(\theta, \eta, \t) / \partial \eta}_2$
-,
-$\abs{\partial^2 f(\theta, \eta, \t) / \partial \eta_d \partial \t} \le
-    \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial \t}_2$,
-and
-$\abs{\partial^2 f(\theta, \eta, \t) /
-       \partial \eta_{d_1} \partial \eta_{d_2}} \le
-     \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial\eta^T}_2$.
+%
+\begin{align*}
+%
+\abs{\partial f(\theta, \eta, \t) / \partial \eta_d} \le{}&
+  \norm{\partial f(\theta, \eta, \t) / \partial \eta}_2
+\textrm{,}\\
+\abs{\partial^2 f(\theta, \eta, \t) / \partial \eta_d \partial \t} \le{}&
+    \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial \t}_2
+\textrm{, and}\\
+\abs{\partial^2 f(\theta, \eta, \t) /
+       \partial \eta_{d_1} \partial \eta_{d_2}} \le{}&
+     \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial\eta^T}_2.
+%
+\end{align*}
 %
 The conclusion follows by repeatedly applying \thmref{dct} to the components
 of the derivatives.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}
 %
-Throughout the appendix, use the following notation.
 %
-\begin{align*}
-%
-\lqgrad{\theta \vert \eta} :={}&
-    \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
-%
-\lqhess{\theta \vert \eta} :={}&
-    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
-           {\partial \eta \partial \eta^T}{\eta} \\
-%
-\psi(\theta, \t) :={}&
-    \log \ptil(\theta \vert \t) - \log \ptil(\theta \vert \t=0)\\
-%
-\psigrad{\theta, \t} :={}&
-    \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t} \\
-%
-\lqgradbar{\theta \vert \eta} :={}& \lqgrad{\theta \vert \eta}
-  - \expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} \\
-%
-\lqhessbar{\theta \vert \eta} :={}& \lqhess{\theta \vert \eta}
- - \expect{\q(\theta \vert \eta)}{\lqhess{\theta \vert \eta}}.
-%
-\end{align*}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{defn}
+% %
+% Throughout the appendix, use the following notation.
+% %
+% \begin{align*}
+% %
+% \lqgrad{\theta \vert \eta} :={}&
+%     \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
+% %
+% \lqhess{\theta \vert \eta} :={}&
+%     \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
+%            {\partial \eta \partial \eta^T}{\eta} \\
+% %
+% \psi(\theta, \t) :={}&
+%     \log \ptil(\theta \vert \t) - \log \ptil(\theta \vert \t=0)\\
+% %
+% \psigrad{\theta, \t} :={}&
+%     \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t} \\
+% %
+% \lqgradbar{\theta \vert \eta} :={}& \lqgrad{\theta \vert \eta}
+%   - \expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}} \\
+% %
+% \lqhessbar{\theta \vert \eta} :={}& \lqhess{\theta \vert \eta}
+%  - \expect{\q(\theta \vert \eta)}{\lqhess{\theta \vert \eta}}.
+% %
+% \end{align*}
+% %
+% \end{defn}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,191 +141,152 @@ Throughout the appendix, use the following notation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% \begin{lem}\lemlabel{logq_derivs}
+% %
+% Under \assuref{exchange_order}, the following equalties hold:
+% %
+% \begin{align}
+% %
+% \MoveEqLeft
+% \fracat{\partial \expect{\q(\theta \vert \eta)}
+%               {\psi(\theta, \t)}}{\partial \eta}{\eta}
+% \nonumber\\ \quad={}&
+% \expect{\q(\theta \vert \eta)}
+%        {\lqgradbar{\theta \vert \eta} \left(
+%         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
+%        \right)
+%        }\eqlabel{q_sens_is_cov}\\\nonumber\\
+% %
+% \MoveEqLeft
+% \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+%       {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t}
+% \nonumber\\ \quad={}&
+%   \expect{\q(\theta \vert \eta)}
+%          {\lqgradbar{\theta \vert \eta} \left(
+%           \psigrad{\theta,\t} - \expect{\q(\theta \vert \eta)}{\psigrad{\theta, \t})}
+%          \right)
+%          } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
+%  %
+%  \MoveEqLeft
+%  \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+%        {\psi(\theta, \t)}}{\partial \eta \partial \eta^T}{\eta}
+% \nonumber\\={}&
+%  \expect{\q(\theta \vert \eta)}
+%         {\lqgradbar{\theta \vert \eta} \lqgradbar{\theta \vert \eta}^T
+%         \left(
+%          \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
+%         \right)
+%         } +
+% \nonumber\\ \quad&
+%  \expect{\q(\theta \vert \eta)}{
+%         \lqhessbar{\theta \vert \eta}
+%         \left(
+%          \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
+%         \right)
+%         }. \eqlabel{q_score_sens_is_cov}
+% %
+% \end{align}
+% %
+% \begin{proof}
+% %
+% The proof follows by repeatedly using \thmref{dct} to interchange the order of
+% integration and differentiation as in  \citep[Theorem
+% 1]{giordano:2018:covariances}, from which \eqref{q_sens_is_cov} follows
+% directly.  \Eqref{q_sens_psi_grad_is_cov} follows by applying
+% \assuref{exchange_order} to \eqref{q_sens_is_cov}.
+%
+% To compute \eqref{q_score_sens_is_cov}, we differentiate \eqref{q_sens_is_cov}
+% with respect to $\eta$, which involves terms of the form $\expect{\q(\theta
+% \vert \eta)}{\lqgrad{\theta \vert \eta}}$ and $\expect{\q(\theta \vert
+% \eta)}{\lqgrad{\theta \vert \eta} \psi(\theta, \t)}$.  For both of these terms,
+% we can exchange the order of the expectation and differentiation by
+% \assuref{exchange_order}.  \Eqref{q_score_sens_is_cov} then follows by
+% differentiating and collecting terms.
+% %
+% \end{proof}
+% %
+% \end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{lem}\lemlabel{logq_derivs}
-%
-Under \assuref{exchange_order}, the following equalties hold:
-%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}
+
+Under \assuref{exchange_order}, the map $\eta, \t \mapsto \expect{\q(\theta
+\vert \eta)}{\ptil(\theta \vert \t)}$ has continuous partial derivatives
+$\partial / \partial \eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 /
+\partial \eta \partial \t$ at all $\eta, \t \in \ball_\eta \times \ball_\t$.
+Furthermore,
+
 \begin{align}
-%
-\MoveEqLeft
-\fracat{\partial \expect{\q(\theta \vert \eta)}
-              {\psi(\theta, \t)}}{\partial \eta}{\eta}
-\nonumber\\ \quad={}&
-\expect{\q(\theta \vert \eta)}
-       {\lqgradbar{\theta \vert \eta} \left(
-        \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
-       \right)
-       }\eqlabel{q_sens_is_cov}\\\nonumber\\
-%
-\MoveEqLeft
 \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
       {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t}
-\nonumber\\ \quad={}&
-  \expect{\q(\theta \vert \eta)}
-         {\lqgradbar{\theta \vert \eta} \left(
-          \psigrad{\theta,\t} - \expect{\q(\theta \vert \eta)}{\psigrad{\theta, \t})}
-         \right)
-         } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
- %
- \MoveEqLeft
- \fracat{\partial^2 \expect{\q(\theta \vert \eta)}
-       {\psi(\theta, \t)}}{\partial \eta \partial \eta^T}{\eta}
-\nonumber\\={}&
- \expect{\q(\theta \vert \eta)}
-        {\lqgradbar{\theta \vert \eta} \lqgradbar{\theta \vert \eta}^T
-        \left(
-         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
-        \right)
-        } +
-\nonumber\\ \quad&
- \expect{\q(\theta \vert \eta)}{
-        \lqhessbar{\theta \vert \eta}
-        \left(
-         \psi(\theta,\t) - \expect{\q(\theta \vert \eta)}{\psi(\theta, \t)}
-        \right)
-        }. \eqlabel{q_score_sens_is_cov}
-%
+={}&
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta} \psigrad{\theta,\t}}
+\eqlabel{q_sens_psi_grad_is_cov}.
+  % \expect{\q(\theta \vert \eta)}
+  %        {\lqgradbar{\theta \vert \eta} \left(
+  %         \psigrad{\theta,\t} - \expect{\q(\theta \vert \eta)}{\psigrad{\theta, \t})}
+  %        \right)
+  %        } \eqlabel{q_sens_psi_grad_is_cov} \\\nonumber\\
 \end{align}
+
+%
+% each of the following functions
+% are continuous on $\ball_\eta \times \ball_\t$.
+% %
+% \begin{align*}
+% %
+% \eta, \t \mapsto{}& \fracat{\partial
+% \expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta}{\eta, \t}
+% %
+% \mathtxt{,}\\
+% %
+% \eta, \t \mapsto{}& \fracat{\partial^2
+% \expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
+% \t}{\eta, \t}
+% %
+% \mathtxt{, and}\\
+% %
+% \eta, \t \mapsto{}&  \fracat{\partial^2
+% \expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
+% \eta^T}{\eta}
+% %
+% \end{align*}
+% %
 %
 \begin{proof}
 %
-The proof follows by repeatedly using \thmref{dct} to interchange the order of
-integration and differentiation as in  \citep[Theorem
-1]{giordano:2018:covariances}, from which \eqref{q_sens_is_cov} follows
-directly.  \Eqref{q_sens_psi_grad_is_cov} follows by applying
-\assuref{exchange_order} to \eqref{q_sens_is_cov}.
-
-To compute \eqref{q_score_sens_is_cov}, we differentiate \eqref{q_sens_is_cov}
-with respect to $\eta$, which involves terms of the form $\expect{\q(\theta
-\vert \eta)}{\lqgrad{\theta \vert \eta}}$ and $\expect{\q(\theta \vert
-\eta)}{\lqgrad{\theta \vert \eta} \psi(\theta, \t)}$.  For both of these terms,
-we can exchange the order of the expectation and differentiation by
-\assuref{exchange_order}.  \Eqref{q_score_sens_is_cov} then follows by
-differentiating and collecting terms.
+We can write
 %
+\begin{align*}
+%
+R(a, b) :={} \frac{a}{b} \quad \Rightarrow
+\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)} ={}
+R\left(\int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta),
+  \int \qtil(\theta \vert \eta) \mu(d\theta)\right).
+% \frac{\int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta)}
+%      {\int \qtil(\theta \vert \eta) \mu(d\theta)}.
+%
+\end{align*}
+%
+If necessary, we can shrink $\ball_\eta$ so that the denominator $\int
+\qtil(\theta \vert \eta) \mu(d\theta)$ is bounded below by a positive constant
+for all $\eta \in \ball_\eta$.  With the denominator strongly positive, $R(a,b)$
+is is a continuously differentiable function to all orders for all $\t, \eta \in
+\ball_\t \times \ball_\eta$.  The desired results follow from
+\assuref{exchange_order} by the chain rule.
+
 \end{proof}
 %
 \end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{lem}\lemlabel{logq_continuous}\seeproof{logq_continuous}
-
-Under \assuref{exchange_order}, each of the following functions
-are continuous on $\ball_\eta \times \ball_\t$.
-%
-\begin{align*}
-%
-\eta, \t \mapsto{}& \fracat{\partial
-\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta}{\eta, \t}
-%
-\mathtxt{,}\\
-%
-\eta, \t \mapsto{}& \fracat{\partial^2
-\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
-\t}{\eta, \t}
-%
-\mathtxt{, and}\\
-%
-\eta, \t \mapsto{}&  \fracat{\partial^2
-\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
-\eta^T}{\eta}
-%
-\end{align*}
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-TODO: you need to assume the dominated version, \assuref{exchange_order}
-is not enough.
-
-TODO: Prove separately the continuiuty and differentiability of $\eta, \t
-\mapsto \int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta)$ and of
-$\eta \mapsto \int \qtil(\theta \vert \eta) \mu(d\theta)$.
-
-
-%
-\begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
-%
-Since
-%
-\begin{align*}
-%
-\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)} ={}&
-\frac{\int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta)}
-     {\int \qtil(\theta \vert \eta) \mu(d\theta)},
-%
-\end{align*}
-%
-and $\int \qtil(\theta \vert \eta) \mu(d\theta) > 0$ for all $\eta$,
-by definition, it suffices to prove that
-%
-\begin{align*}
-%
-\eta, \t \mapsto{}
-    \int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta) \mathand
-\eta \mapsto{}
-    \int \qtil(\theta \vert \eta) \mu(d\theta)
-%
-\end{align*}
-%
-are continuously differentiable to the required degree.
-
-Consider first the continuity of $\partial \int \qtil(\theta \vert \eta)
-\psi(\theta, \t) \mu(d\theta) / \partial \eta$.  By \assuref{exchange_order},
-and \lemref{exchange_order},
-%
-\begin{align*}
-%
-\fracat{\partial \int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta) }
-       {\partial \eta}{\eta, \t} ={}&
-\int \fracat{\partial \qtil(\theta \vert \eta) }
-      {\partial \eta}{\eta}  \psi(\theta, \t) \mu(d\theta).
-%
-\end{align*}
-%
-By DCT ASSU, we can take the limits...
-%
-\end{proof}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-The next lemma is a different kind of continuity lemma.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{lem}\lemlabel{continuity_partition}
-%
-Let $\epsilon'_n = n^{-1}$.  Since $\pbase \ll \mu \ll \lambda$ (where $\lambda$
-is the Lebesgue measure), by applying \citet[Proposition
-15.5]{nielsen:1997:measure}, for each $n$ there exists a $\delta'_n$ such that,
-for any measureable set $A$ with $\mu(A) < \delta'_n$, $\pbase(A) <
-\epsilon'_n$.  Again applying \citet[Proposition 15.5]{nielsen:1997:measure},
-there similarly exists a $\delta_n$ such that for any measureable set $A$ with
-$\lambda(A) < \delta_n$, $\mu(A) < \delta'_n \Rightarrow \pbase(A) <
-\epsilon'_n$.
-
-For each $n$, partition $\thetadom$ into a countable number of sets $A_{m}$ such
-that $\sum_{m} \lambda(A_{m}) = 1$ and $\lambda(A_{m}) < \delta_n$. (This is
-possible by dividing $\thetadom$ into sufficiently small rectangles, for
-example.)  Then $\pbase(A_{m}) < \epsilon'_n$ for all $m$.  Since $\pbase$ is a
-probability measure, $\sum_m \pbase(A_{m}) = 1$, so there must exist at least $1 /
-\epsilon'_n$ indices $m'$ such that $\pbase(A_{m'}) > 0$. Take any such $m'$ and
-let $\epsilon_n = \pbase(A_{m'})$ and $S_n = A_{m'}$.
-
-%
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
