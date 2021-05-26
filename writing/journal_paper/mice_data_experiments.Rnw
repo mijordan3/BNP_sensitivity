@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/mice/mice_plotting_utils.R")
@@ -24,42 +24,44 @@ and expression levels of a set of genes were assessed at 14 time points after
 infection. Three measurements were taken at each time point (called biological
 replicates), for a total of $\ntimepoints = 42$ measurements per gene.
 
-The goal of the analysis is to clustering the time-course gene expression data
+The goal of the analysis is to cluster the time-course gene expression data
 under the assumption that genes with similar time-course behavior may
 have similar function.
-% While thousands of genes might be simultaneously
-% measured in a given genomics experiment,
-% many genes may exhibit similar expression patterns.
-Clustering gene expressions is one way to reduce the dimensionality of a complex
-data set and to facilitate scientific interpretations of intricate biological
-processes. Often, such dimensionality reduction is used for exploratory analysis
-and is a first step before further downstream investigation. It is important,
-therefore, to ascertain the stability of the discovered clusters.
-
+Genes that cluster together may be evidence that they share a 
+regulatory pathway, for example. 
+Clustering gene expressions is often used for exploratory analysis
+and is a first step before further downstream investigation. 
+It is important, therefore, to ascertain the 
+stability of the discovered clusters.
 
 \subsubsection*{The model}
 
-\todo{This could be much clearer.  Start by referencing the figure as an example.
-Then say that a cluster defines an average expression level over time, that
-each gene is modeled as belonging to a cluster, and that the gene's
-expression is modeled as IID noise added to its cluster's time series with
-a per-gene offset.  Then you can say that we use B-splines to represent
-the cluster time series, and list the parameters.}
+% \todo{This could be much clearer. 
+% Start by referencing the figure as an example.
+% Then say that a cluster defines an average expression level over time, that
+% each gene is modeled as belonging to a cluster, and that the gene's
+% expression is modeled as IID noise added to its cluster's time series with
+% a per-gene offset.  Then you can say that we use B-splines to represent
+% the cluster time series, and list the parameters.}
+
+
+The left plot of \figref{example_genes} 
+shows the measurements of a single gene over time. 
+We model each gene as belonging to a latent component, 
+where each component defines a smooth expression curve over time. 
+Then, observations are drawn by adding i.i.d. noise to the smoothed 
+curve along with a gene-specific offset. 
+Following \citet{Luan:2003:clustering} we construct the smoothers 
+using cubic B-splines. 
+
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
 at $\ntimepoints$ time points.
-Following \citet{Luan:2003:clustering} we apply cubic B-splines to
-smooth the time course expression data.
-Let $\regmatrix$ be the $\ntimepoints \times \d$ B-spline regressor matrix;
-that is, the $ij$-th entry of $\regmatrix$
+Let $\regmatrix$ be the $\ntimepoints \times \d$ regressor matrix. 
+In our case, the $ij$-th entry of $\regmatrix$
 is the $j$-th B-spline basis vector evaluated at the
 $i$-th time point.
-\figref{example_genes} shows measurements from an example gene and
-the B-spline basis.
-
-In this model,
-each component is characterized by a vector of regression coefficients
-$\mu_\k$ and a variance $\tau^{-1}_\k$, so
-$\beta_k = (\mu_\k, \tau_\k)$.
+The right plot of 
+\figref{example_genes} shows the B-spline basis.
 The distribution of the data arising from component $k$ is
 \begin{align}\eqlabel{mice_model}
 \p(\x_\n | \beta_\k, \b_\n) =
@@ -71,6 +73,8 @@ where $\b_\n$ is a gene-specific additive offset and $I$ is the identity matrix.
 We include the additive offset because we
 are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
+In this model, the component variables are $\beta_\k = (\mu_\k, \tau_\k)$, 
+the regression coefficients and the inverse noise variance. 
 
 The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the
 stick-breaking process described in \secref{model_bnp}.
@@ -83,61 +87,34 @@ where $\delta(\cdot \vert \eta)$ denotes a point mass at a parameterized locatio
 See \appref{app_mice} for further details concerning the model and
 variational approximation.
 
-<<example_genes_cap>>=
-example_genes_cap <- paste(
-    "(Left) An example gene and its expression measured at 14 unique time points
-    with three biological replicates at each time point.
-     (Right) The cubic B-spline basis with 7 degrees of freedom,
-    along with three indicator functions for the last three time points,
-    $\\timeindx = 72, 120, 168$.")
-SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
-@
-<<example_genes, cache=simple_cache, fig.show='hold', fig.cap=example_genes_cap>>=
-source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
-@
-%
 
-\todo{Connect the alpha range to the formula for expected number of clusters.
-Also define the range of $\alpha$ here.  It would be good to make the
-each section follow the same structure as much as possible.}
+\subsubsection*{Quantity of interest: the co-clustering matrix}
 
-In this application, we expect {\em a priori} to uncover more distinct clusters
-than in the iris data of the previous section. so we set $\alpha_0 = 6$ in the
-initial GEM prior.
-
-% $\gcoclustering(\eta)$, whose , given by
-% \begin{align*}
-% \gcoclustering{ij}(\eta)
-% &= \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}} \\
-% &= \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
-% \expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
-% \end{align*}
-
-\todo{Define the co-clustering matrix before displaying it}
-
-\subsection*{Quantity of interest: The co-clustering matrix}
-
-For this model, we are particularly interested in which genes cluster together,
+In this application, 
+we are particularly interested in which genes cluster together,
 a quantity which we express through the following posterior co-clustering
 matrix.  Let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ denote the matrix
 whose $(i,j)$-th entry is the posterior probability that gene $i$ belongs to the
-same cluster as gene $j$, given by \todo{This isn't right for $i=j$, is it?}
+same cluster as gene $j$, given by 
 %
 \begin{align*}
 %
 [\gcoclustering(\eta)]_{ij} =
 \expect{\q(\z\vert\eta)}{\ind{\z_{i} = \z_{j}}}  =
+\begin{cases}
 \sum_{k=1}^{\kmax}\left(\expect{\q(\z_i\vert\eta)}{\z_{ik}}
-\expect{\q(\z_j\vert\eta)}{\z_{jk}}\right).
+\expect{\q(\z_j\vert\eta)}{\z_{jk}}\right)
+& \text{for } i \not= j\\
+1 & \text{for } i = j
+\end{cases}.
 %
 \end{align*}
-%
-\figref{gene_initial_coclustering} displays the inferred co-clustering matrix
-at $\alpha_0$.
+Below, we will evaluate the sensitivity of the co-clustering matrix to 
+both changes in the GEM parameter $\alpha$ and to functional perturbations of the stick-breaking density. 
 
-
-To use \corref{etafun_worst_case} as
-well as to produce an easily-visualized influence function, we must choose a
+We will use the influence function (\corref{etafun_worst_case})
+to guide our choice of functional perturbation. 
+To produce an easily-visualized influence function, we must choose a
 univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
 the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
 given by
@@ -149,8 +126,7 @@ where $D(\eta)^{-1/2}$ is the diagonal matrix with entries $d_i =
 \sum_{j=1}^{\ngenes}[\gcoclustering(\eta)]_{ij}$. The quantity $\laplacianevsum$
 is differentiable, and has close connection with the number of distinct
 components in a graph~\citep{luxburg:2007:spectralcluster}. We expect that prior
-changes that produce large changes in $\laplacianevsum$ will also produce large
-changes in the full co-clustering matrix.
+perturbations which produce large changes in $\laplacianevsum$ will also produce large changes in the full co-clustering matrix.
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix
@@ -185,28 +161,45 @@ p
 @
 
 
-\subsubsection*{Sensitivity of co-clustering to $\alpha$}
+\subsubsection*{Parametric sensitivity}
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$
-to the choice of $\alpha$ in the GEM prior. We formed the linear approximation
-at $\alpha_0 = 6$ and computed the change in co-clustering under the linearized
-variational parameters $\etalinglobal(\alpha)$, at $\alpha =
-\Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$. At $\alpha =
-\Sexpr{alpha_pert1}$ the prior is concentrated, with only two clusters expected
-under the GEM prior; at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are
-expected.
+to the choice of $\alpha$ in the GEM prior.
+We use $\p(\nu_\k\vert\alpha_0) = \betadist{\nu_\k \vert 1, \alpha_0}$ 
+with $\alpha_0 = 6$ as the base prior at 
+which we form the linear approximation. 
+\figref{gene_initial_coclustering} shows the inferred 
+co-clustering matrix at $\alpha_0$. 
+
+<<example_genes_cap>>=
+example_genes_cap <- paste(
+    "(Left) An example gene and its expression measured at 14 unique time points
+    with three biological replicates at each time point.
+     (Right) The cubic B-spline basis with 7 degrees of freedom,
+    along with three indicator functions for the last three time points,
+    $\\timeindx = 72, 120, 168$.")
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+@
+<<example_genes, cache=simple_cache, fig.show='hold', fig.cap=example_genes_cap>>=
+source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
+@
+%
+
+We use the linear approximation to extrapolate the co-clustering matrix 
+under prior parameters 
+$\alpha = \Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$,
+Using \eqref{prior_num_clusters} with $\N = 1000$, 
+we see that at $\alpha = \Sexpr{alpha_pert1}$, only two clusters expected
+{\em a priori} under the GEM prior; 
+at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are expected.
+
+
+\todo{Connect the alpha range to the formula for expected number of clusters.
+Also define the range of $\alpha$ here.  It would be good to make the
+each section follow the same structure as much as possible.}
 
 \todo{Say that therefore $\gclustersabbr$ is non-robust, but we don't really
 care about it here.}
-
-
-% Let $\gcoclustering^0 := \gcoclustering(\etaopt(\alpha_0))$ be the co-clustering matrix inferred at $\alpha_0$,
-% and let $\Delta\gcoclustering(\eta) :=
-% \gcoclustering(\eta) - \gcoclustering^0$.
-
-%(Note that the co-clustering matrix as a posterior quantity depends on only expectations of $\z$.
-% We write $\gcoclustering(\etalinglobal)$ with the
-% understanding that the coclustering matrix is a function of global parameters $\etaglob$ only through its corresponding local parameters $\eta_\z$).
 
 \todo{Briefly explain how it can be that the co-clustering can be
 robust even though the number of clusters is not.}
@@ -245,7 +238,7 @@ SetImageSize(aspect_ratio=base_aspect_ratio)
 source("R_scripts/mice/alpha_coclustering_matrix.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-\subsubsection*{Sensitivity of co-clustering to a functional perturbation}
+\subsubsection*{Functional sensitivity}
 
 <<gene_fpert_coclustering_cap>>=
 gene_fpert_coclustering_cap <- paste(
@@ -296,43 +289,3 @@ unlikely that any conclusions derived from the co-clustering matrix would have
 changed after the functional perturbation. The co-clustering matrix appears
 robust to perturbations in the stick-breaking distribution.
 
-\subsection*{Timing}
-
-Finally, the computational cost of linearizing the variational parameters is
-favorable compared with refitting (\tabref{mice_timing}). Forming the linear
-approximation, which requires a Hessian inversion, took 3-4 seconds; subsequent
-evaluations of $\etalinglobal$ take milliseconds. Conversely, refitting the
-model after a prior perturbation can take more than 30 seconds.
-\todo{Let's do a table like this for Iris too}
-
-\begin{table}[tb]
-\centering
-\caption{Compute time of results on the mice data set. }
-\tablabel{mice_timing}
-\begin{tabular}{|r|r|}
-    \hline
-    & time (seconds) \\
-    \hline
-    Initial fit & \Sexpr{sprintf('%1.2g', init_fit_time)} \\
-    \hline
-    Hessian solve for $\alpha$ sensitivity &
-        \Sexpr{sprintf('%1.2g', alpha_hess_time)}\\
-    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = \Sexpr{alpha_pert1}$ &
-        \Sexpr{sprintf('%1.2g', lr_time_vec[1])}\\
-    Linear approx. $\etalinglobal(\alpha)$ for $\alpha = \Sexpr{alpha_pert2}$ &
-        \Sexpr{sprintf('%1.2g', lr_time_vec[2])}\\
-    Refit $\etaopt(\alpha)$ for $\alpha = \Sexpr{alpha_pert1}$ &
-        \Sexpr{sprintf('%1.2g', refit_time_vec[1])}\\
-    Refit $\etaopt(\alpha)$ for $\alpha = \Sexpr{alpha_pert2}$ &
-        \Sexpr{sprintf('%1.2g', refit_time_vec[2])}\\
-    \hline
-    The influence function & \Sexpr{sprintf('%1.2g', infl_time)}\\
-    Hessian solve for $\phi$ perturbation &
-        \Sexpr{sprintf('%1.2g', phi_hessian_time)}\\
-    Linear approx. $\etalin(\t)$ at $\t = 1$ &
-        \Sexpr{sprintf('%1.2g', phi_lr_time)}\\
-    Refit $\etaopt(\t)$ at $\t = 1$ &
-        \Sexpr{sprintf('%1.2g', phi_refit_time)}\\
-    \hline
-\end{tabular}
-\end{table}

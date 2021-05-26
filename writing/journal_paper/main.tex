@@ -18,6 +18,7 @@
 \usepackage{siunitx}
 \usepackage{hyperref}
 \usepackage{xargs}[2008/03/08]
+\usepackage{xfrac}
 
 % Documentation
 % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
@@ -156,6 +157,10 @@
     \seclabel{results_structure}
     \input{structure_experiments.tex}
 
+    \subsection{Computation time}
+    \seclabel{compute_time}
+    \input{timing_table.tex}
+
 \section{Conclusion}
 \seclabel{conclusion}
 This concludes.
@@ -196,6 +201,9 @@ Thanks to everyone.
 
 \section{fastSTRUCTURE model details}\applabel{app_structure}
 \input{app_structure}
+
+\section{fastSTRUCTURE supplemental results}\applabel{app_structure_results}
+
 
 % I'm not sure where VB details are going to go, but Bryan, whenever you add
 % the right section, just update the other reference to point to your new

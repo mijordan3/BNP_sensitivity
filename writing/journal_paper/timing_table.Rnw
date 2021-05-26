@@ -1,0 +1,136 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<setup, include=FALSE>>=
+# load data for the table 
+
+load("R_scripts/data_processed/iris_timing.RData")
+load("R_scripts/data_processed/mice_timing.RData")
+load("R_scripts/data_processed/structure_timing.RData")
+
+print_sigfigs <- function(x){
+    if(x < 10){
+        sprintf('%1.1g', x)
+    }else{
+        # not sure how to not default to 
+        # scientific notation 
+        return(round(x, -1))
+    }
+}
+
+@
+
+The data sets we considered in our experiments had varying degrees
+of complexity, 
+and the computational of cost of fitting the variational approximation 
+thus also varies accordingly. 
+However, in each experiment, the cost of forming the linear approximation 
+is rougly an order of magnitude faster than refitting (\tabref{timing_table})
+After forming the linear approximation, extrapolating to a new $\alpha$ or a 
+perturbation $\phi$ takes \sfrac{1}{1000}th of a second. 
+
+
+For example, in the thrush data and topic model,
+the initial fit took seven seconds, with subsequent refits
+(which recall were warm-started with the initial fit) taking
+between five and ten seconds.
+Inverting the Hessian to form the linear approximation takes less than a second.
+Note that computing the influence function also takes less than a second.
+Therefore, even though for this model and dataset, 
+the approximation matched refitting less well (\secref{stru_results}), 
+the influence function is cheap to compute; 
+it can still provide a valuable guide for
+identifying influential prior perturbations
+which could then be investigated
+further with refitting.
+
+
+% For example, in the mice data and regression model, 
+% the initial fit took 30 seconds, with subsequent refits
+% (which recall were warm-started with the initial fit) taking 
+% between 20 and 30 seconds. 
+% Inverting the Hessian to form the linear approximation three seconds. 
+% Computing the influence function also takes less than a second. 
+
+
+
+
+
+\begin{table}[tb]
+\centering
+\caption{Compute time in seconds of various quantities on each data set. 
+Reported times for $\etaopt(\alpha)$ and $\etalin(\alpha)$ are 
+median times over the set of considered $\alpha$'s.
+The reported influence function time is the time required to 
+evaluate the influence function on a grid of 1000 points. }
+\tablabel{timing_table}
+\begin{tabular}{|r|r|r|r|}
+    \hline
+    & iris & mice  & thrush \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % initial fit
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Initial fit & 
+    \Sexpr{print_sigfigs(iris_timing_dict$init_fit_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$init_fit_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$init_fit_time)} \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % hessian solve for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Hessian solve for $\alpha$ sensitivity &
+    \Sexpr{print_sigfigs(iris_timing_dict$alpha_hess_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$alpha_hess_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$alpha_hess_time)} \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % linear approx time for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Linear approx. $\etalin(\alpha)$ &
+    \Sexpr{print_sigfigs(iris_timing_dict$alpha_lr_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$alpha_lr_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$alpha_lr_time)} \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % refit time for alpha
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Refits $\etaopt(\alpha)$ &
+    \Sexpr{print_sigfigs(iris_timing_dict$alpha_refit_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$alpha_refit_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$alpha_refit_time)} \\
+    \hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % influence function
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    The influence function &
+    \Sexpr{print_sigfigs(iris_timing_dict$infl_time)} &
+    \Sexpr{print_sigfigs(mice_timing_dict$infl_time)} &
+    \Sexpr{print_sigfigs(structure_timing_dict$infl_time)} \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % hessian solve for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Hessian solve for $\phi$ &
+    \Sexpr{print_sigfigs(iris_timing_dict$phi_hessian_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$phi_hessian_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$phi_hessian_time)}\\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % linear approx for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Linear approx. $\etalin(\phi)$ &
+    \Sexpr{print_sigfigs(iris_timing_dict$phi_lr_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$phi_lr_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$phi_lr_time)} \\
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % refit time for functional perturbation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Refit $\etalin(\phi)$ &
+    \Sexpr{print_sigfigs(iris_timing_dict$phi_refit_time)} & 
+    \Sexpr{print_sigfigs(mice_timing_dict$phi_refit_time)} & 
+    \Sexpr{print_sigfigs(structure_timing_dict$phi_refit_time)} \\
+    \hline
+\end{tabular}
+\end{table}

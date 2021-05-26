@@ -1,73 +1,22 @@
 We evaluate the prior sensitivity in BNP models applied to three distinct data analysis examples.
 We first fit a Gaussian mixture model (\exref{iris_bnp_process}) to the canonical iris data set.
-Second, we cluster time-course gene expression data using a regression model
+Secondly, we cluster time-course gene expression data using a regression model
 and study the resulting co-clustering matrix.
 Finally, we fit a topic model
 on a data set of sampled genotypes in an endangered bird species.
-We estimate the number of latent populations in this
-bird species and reconstruct ancestral migration patterns.
+From the inferred population structure,
+we reconstruct ancestral migration patterns.
 
 In each data example, we first fit the variational approximation to a model
-with a GEM prior with some chosen parameter $\alpha = \alpha_0$.
-We then examine the effects of varying the parameter $\alpha$
-in the $\betadist{\nuk \vert 1, \alpha}$ distribution on stick-breaking proportions
-as well as
-the effects of changing the functional form the Beta prior itself.
-For a given prior perturbation,
+with a GEM prior at some chosen parameter $\alpha = \alpha_0$.
+We then evaluate sensitivity to the chosen $\alpha$ parameter
+by refitting the variational approximation for each $\alpha$
+in a set $\{\alpha_1, ..., \alpha_m\}$ of plausible values.
+We also examine the effects of changing the functional form the Beta prior itself,
+using the influence function to guide our choice of prior perturbation.
+To speed up the refitting process, we used the intitial
+variational optimum at $\alpha = \alpha_0$ as a warm-start
+for subsequent refits after a prior pertrubation.
+For each prior perturbation,
 we validate the performace of the linear approximation against
-the more expensive process of re-fitting the model.
-
-\todo{Here it would be good to say more explicitly that you
-choose an alpha range and re-fit the model on a grid of alphas.
-Then in each experiment you can just present the result with no additional
-commentary.}
-
-
-\todo{This paragraph could go somewhere less prominent.}
-We optimized the initial variational approximation with
-the BFGS algorithm run with a loose convergence tolerance
-followed by trust-region Newton conjugate gradient (trust-ncg) to find a high-quality optimum.
-\todo{Cite the details of the trust-ncg algorithm, nobody will know what that means}
-Unless otherwise noted, all subsequent refits after a prior pertrubation were found
-using trust-ncg with the variational parameters at $\alpha = \alpha_0$ as an initialization.
-
-\todo{This paragraph should go in the Computing the Sensitivity section.}
-In the results below, we use
-the approximation defined by \eqref{global_sens, global_lin_approx},
-where only the global variational parameters are linearized;
-the local parameters are set implicitly as part of the
-computation of the posterior statistic $\g$.
-We solved the linear system in~\eqref{global_sens} using
-the conjugate gradient (CG) algorithm, which requires only Hessian-vector products;
-this avoids instatiating the Hessian matrix in memory.
-We could have also computed the Hessian and
-either factorized it (e.g. with a Cholesky decomposition) or found its inverse directly.
-Then, the Hessian inverse (or its Cholesky decomposition) can
-be re-used for different perturbations
-(since different choices of prior perturbation
-require solving different $\crosshessian$).
-In our case, we need to re-solve the linear system (\eqref{global_sens}) with
-CG for each choice of prior perturbation.
-On our data sets, the conjugate gradient algorithm was at least
-an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
-to exploring different perturbations.
-
-The conjugate gradient algorithm along with the optimizers BFGS and trust-ncg
-are implemented in SciPy~\citep{scipy}.
-All derivatives were computed using the Python
-automatic differentiation libarary Jax~\citep{jax2018github}.
-
-% To describe our results in this section, we use the following notation:
-% \begin{align*}
-% \grefit(t) &:= \g(\etaopt(t)) \\
-% \gapproxglobal(t) &:= \g(\etalinglobal(t))
-% \end{align*}
-% to describe a posterior quantity under the refitted variational parameters and
-% linearly approximated variational parameters, respectively.
-
-% We demonstrate that the linear approximation provides a descriptive tool that well-captures both the
-% direction and size of changes in posterior quantities after a prior perturbation.
-% In addition, the influence function provides a useful guide in revealing which
-% functional pertrubations will result in large changes in the posterior statistic of interest.
-% Importantly, the speed in forming a linear approximation is an order
-% of magnitude faster than refitting the model on the data examples we consider.
+re-fitting the model.

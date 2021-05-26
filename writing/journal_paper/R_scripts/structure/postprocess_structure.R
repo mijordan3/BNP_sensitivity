@@ -165,6 +165,8 @@ init_fit_time <- alpha_timing_results['init_optim_time']
 alpha_hess_time <- alpha_timing_results['hess_solve_time']
 total_alpha_refit_time <- sum(alpha_timing_results['refit_time_vec'])
 total_alpha_lr_time <- sum(alpha_timing_results['lr_time_vec'])
+median_alpha_refit_time <- median(alpha_timing_results['refit_time_vec'])
+median_alpha_lr_time <- median(alpha_timing_results['lr_time_vec'])
 
 # for functional sensitivity
 # just report for the mbololo region
@@ -203,6 +205,19 @@ mbololo_admix_sigmoidal_priors <-
 
 mbololo_admix_sigmoidal_admix <- 
   mbololo_admix_sigmoidal_file['admix_refit']
+
+structure_timing_dict <- 
+  list(init_fit_time = init_fit_time, 
+       alpha_hess_time = alpha_hess_time, 
+       alpha_refit_time = median_alpha_refit_time,
+       alpha_lr_time = median_alpha_lr_time, 
+       phi_hessian_time = fsens_hess_time, 
+       phi_refit_time = fsens_refit_time, 
+       phi_lr_time = fsens_lr_time, 
+       infl_time = infl_time)
+
+save(structure_timing_dict, 
+     file="./R_scripts/data_processed/structure_timing.RData")
 
 save.image('./R_scripts/data_processed/structure.RData') 
 

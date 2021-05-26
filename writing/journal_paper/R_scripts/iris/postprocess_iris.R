@@ -83,6 +83,7 @@ total_alpha_refit_time <- sum(alpha_timing['refit_time_vec'])
 median_alpha_refit_time <- median(alpha_timing['refit_time_vec'])
 
 total_alpha_lr_time <- sum(alpha_timing['lr_time_vec'])
+median_alpha_lr_time <- median(alpha_timing['lr_time_vec'])
 alpha_hess_time <- alpha_timing['hess_solve_time']
 
 #################
@@ -98,6 +99,21 @@ wc_hessian_time <- wc_results_file['hess_solve_time']
 
 # influence function timing 
 infl_time <- influence_data['infl_time'] + influence_data['grad_g_time']
+
+
+# save all timing results into a dictionary 
+iris_timing_dict <- 
+  list(init_fit_time = init_fit_time, # intial fit time
+       alpha_hess_time = alpha_hess_time, # hessian inv. time for alpha
+       alpha_refit_time = median_alpha_refit_time, # refit time for alpha
+       alpha_lr_time = median_alpha_lr_time, # lr time for alpha
+       phi_hessian_time = wc_hessian_time, # h. inv. time for worst-case pert
+       phi_refit_time = wc_refit_time, # refit time for worst-case pert
+       phi_lr_time = wc_lr_time, # lr time for worst-case pert
+       infl_time = infl_time) # time for influence function
+
+save(iris_timing_dict, 
+     file="./R_scripts/data_processed/iris_timing.RData")
 
 save.image('./R_scripts/data_processed/iris.RData') 
 
