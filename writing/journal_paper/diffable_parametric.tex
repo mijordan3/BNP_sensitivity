@@ -57,10 +57,22 @@ differentiation in variational expectations.
 %
 \begin{assu}\assulabel{exchange_order}
 %
-Assume that we can exchange the order of $\q$-integration and differentiation in
-the expression $\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}$ at
-$\eta = \etaopt$ and $\t = 0$ for the derivatives $\partial / \partial \eta$,
-$\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial \t$.
+Assume that the map $\eta \mapsto \qtil(\theta \vert \eta)$ is twice
+continuously differentiable, and that the map $\t \mapsto \ptil(\theta \vert
+\t)$ is continuously differentiable.
+
+% Which version is better?
+% Assume that we can exchange the order of $\q$-integration and differentiation in
+% the expression $\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}$ at
+% $\eta = \etaopt$ and $\t = 0$ for the derivatives $\partial / \partial \eta$,
+% $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial \t$.
+
+Furhter, assume that we can exchange the order of integration and
+differentiation in the expressions $\int \qtil(\theta \vert \eta) \log
+\ptil(\theta \vert \t) \mu(d\theta)$ and $\int \qtil(\theta \vert \eta)
+\mu(d\theta)$ at $\eta = \etaopt$ and $\t = 0$ for the derivatives $\partial /
+\partial \eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta
+\partial \t$.
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,7 +95,7 @@ differentiable in $\t$ and measurable in $\theta$ for $\eta, \t \in \ball_\eta
 
 Assume that, for all $\eta, \t \in \ball_\eta \times \ball_\t$, $M(\theta)$ is
 $\mu$-almost everywhere greater than each of the following functions: $f(\theta,
-\eta, \t)$, $\norm{\partial f(\theta, \eta, \t) / \partial \eta}^2_2$,
+\eta, \t)$, $\norm{\partial f(\theta, \eta, \t) / \partial \eta}_2$,
 $\norm{\partial^2 f(\theta, \eta, \t) / \partial \eta \partial \eta^T}_2$, and
 $\norm{\partial^2 f(\theta, \eta, \t) / \partial \eta \partial \t}_2$. Then, at
 any $\eta, \t \in \ball_\eta \times \ball_\t$, we can exchange the order of
@@ -91,7 +103,7 @@ integration and differentiation in $\int f(\theta, \eta, \t) \mu(d\theta)$ for
 the derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta^2$, and
 $\partial^2 / \partial \eta \partial \t$.
 
-\seeproof{logq_continuous}
+\seeproof{exchange_order}
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,9 +114,9 @@ $\partial^2 / \partial \eta \partial \t$.
 \begin{assu}\assulabel{exchange_order_dom}
 (Sufficient conditions for \assuref{exchange_order}.)
 %
-Assume that \lemref{exchange_order} applies with the function
-$f(\theta, \eta, \t) = \q(\theta \vert \eta) \log \ptil(\theta \vert \t)$
-as well as with $f(\theta, \eta, \t) = \q(\theta \vert \eta)$.
+Assume that \lemref{exchange_order} applies with the function $f(\theta, \eta,
+\t) = \qtil(\theta \vert \eta) \log \ptil(\theta \vert \t)$ as well as with
+$f(\theta, \eta, \t) = \qtil(\theta \vert \eta)$.
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
