@@ -9,22 +9,6 @@ densities using multiplicative perturbations, and identify a norm on the
 perturbation which guarantees both that the perturbed prior is a proper prior
 and that \thmref{etat_deriv} can be applied.
 
-% \todo{Not all this notation is still needed in the new draft}
-% First, we must introduce some additional measure theory notation. Below, we will
-% take $\lambda$ to denote the Lebesgue measure on the Borel sets of $\thetadom
-% \subseteq \mathbb{R}^{\thetadim}$.  As in \defref{prior_t}, we will be
-% interested in densities with respect to $\lambda$, expressed as Radon-Nikodym
-% derivatives, though it will be convenient to use the same notation for a density
-% and for the measure induced by the density.  Specifically, for a
-% $\mu$-measurable set $S$, and a Radon-Nikodym derivative $f$ defined with
-% respect to $\mu$, we will write $f(S) = \int_{\theta \in S} f(\theta)
-% \mu(d\theta)$.  We similarly extend the notation for measure domination: for two
-% densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
-% \Rightarrow f(S) = 0$ for all $\mu$-measurable sets $S$.
-% Finally, let
-% $\esssup_{\theta\sim\mu}$ denote the essential supremum over $\theta$ with
-% respect to the measure $\mu$.
-
 Again let us return to the abstract setting of \defref{prior_t}. Let us fix a
 base prior density, $\pbase(\theta)$, at which we have computed a VB
 approximation, and suppose we wish to ask what the variational optimum would
