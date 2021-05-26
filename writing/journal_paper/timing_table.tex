@@ -8,10 +8,50 @@
 
 
 
+The data sets we considered in our experiments had varying degrees
+of complexity, 
+and the computational of cost of fitting the variational approximation 
+thus also varies accordingly. 
+However, in each experiment, the cost of forming the linear approximation 
+is rougly an order of magnitude faster than refitting (\tabref{timing_table})
+After forming the linear approximation, extrapolating to a new $\alpha$ or a 
+perturbation $\phi$ takes \sfrac{1}{1000}th of a second. 
+
+
+For example, in the thrush data and topic model,
+the initial fit took seven seconds, with subsequent refits
+(which recall were warm-started with the initial fit) taking
+between five and ten seconds.
+Inverting the Hessian to form the linear approximation takes less than a second.
+Note that computing the influence function also takes less than a second.
+Therefore, even though for this model and dataset, 
+the approximation matched refitting less well (\secref{stru_results}), 
+the influence function is cheap to compute; 
+it can still provide a valuable guide for
+identifying influential prior perturbations
+which could then be investigated
+further with refitting.
+
+
+% For example, in the mice data and regression model, 
+% the initial fit took 30 seconds, with subsequent refits
+% (which recall were warm-started with the initial fit) taking 
+% between 20 and 30 seconds. 
+% Inverting the Hessian to form the linear approximation three seconds. 
+% Computing the influence function also takes less than a second. 
+
+
+
+
 
 \begin{table}[tb]
 \centering
-\caption{Compute time of results on the iris data set. }
+\caption{Compute time in seconds of various quantities on each data set. 
+Reported times for $\etaopt(\alpha)$ and $\etalin(\alpha)$ are 
+median times over the set of considered $\alpha$'s.
+The reported influence function time is the time required to 
+evaluate the influence function on a grid of 1000 points. }
+\tablabel{timing_table}
 \begin{tabular}{|r|r|r|r|}
     \hline
     & iris & mice  & thrush \\
@@ -49,9 +89,9 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % influence function
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    The influence function & 
-    0.09 & 
-    3 & 
+    The influence function &
+    0.09 &
+    3 &
     0.6 \\
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % hessian solve for functional perturbation
@@ -63,15 +103,14 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % linear approx for functional perturbation
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    Linear approx. $\etalin(\t)|_{\t = 1}$
-    for $\phi$ &
+    Linear approx. $\etalin(\phi)$ &
     0.001 & 
     0.001 & 
     0.0008 \\
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % refit time for functional perturbation
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    Refit $\etaopt(\t)|_{\t = 1}$ for $\phi$ &
+    Refit $\etalin(\phi)$ &
     0.6 & 
     20 & 
     10 \\

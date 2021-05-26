@@ -18,6 +18,7 @@
 \usepackage{siunitx}
 \usepackage{hyperref}
 \usepackage{xargs}[2008/03/08]
+\usepackage{xfrac}
 
 % Documentation
 % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
@@ -156,7 +157,9 @@
     \seclabel{results_structure}
     \input{structure_experiments.tex}
 
-\input{timing_table}
+    \subsection{Computation time}
+    \seclabel{compute_time}
+    \input{timing_table.tex}
 
 \section{Conclusion}
 \seclabel{conclusion}
