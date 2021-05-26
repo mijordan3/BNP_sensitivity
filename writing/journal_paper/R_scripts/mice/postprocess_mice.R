@@ -204,4 +204,19 @@ phi_lr_time <- fsens_timing_results['lr_time_vec'][n]
 
 infl_time <- fsens_timing_results['grad_time'] +
               fsens_timing_results['infl_time']
+
+# save everything into one dictionary
+mice_timing_dict <- 
+  list(init_fit_time = init_fit_time, 
+       alpha_hess_time = alpha_hess_time, 
+       alpha_refit_time = median(refit_time_vec), 
+       alpha_lr_time = median(lr_time_vec), 
+       phi_hessian_time = phi_hessian_time, 
+       phi_refit_time = phi_refit_time, 
+       phi_lr_time = phi_lr_time, 
+       infl_time = infl_time)
+
+save(mice_timing_dict, 
+     file="./R_scripts/data_processed/mice_timing.RData")
+
 save.image('./R_scripts/data_processed/mice.RData') 
