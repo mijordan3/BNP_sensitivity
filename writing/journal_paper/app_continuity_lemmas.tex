@@ -227,11 +227,20 @@ $\partial / \partial \eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 /
 Furthermore,
 
 \begin{align}
-\fracat{\partial^2 \expect{\q(\theta \vert \eta)}
-      {\psi(\theta, \t)}}{\partial \eta \partial \t}{\eta, \t}
+\fracat{\partial \expect{\q(\theta \vert \eta)}
+              {\ptil(\theta \vert \t)}}{\partial \eta}{\eta}
 ={}&
 \expect{\q(\theta \vert \eta)}
-       {\lqgradbar{\theta \vert \eta} \psigrad{\theta,\t}}
+       {\lqgradbar{\theta \vert \eta}
+       \ptil(\theta \vert \t)}
+       \eqlabel{q_sens_is_cov}\\
+%
+\fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+      {\ptil(\theta \vert \t)}}{\partial \eta \partial \t}{\eta, \t}
+={}&
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta}
+       \fracat{\partial \ptil(\theta \vert \t)}{\partial \t}{\t}}
 \eqlabel{q_sens_psi_grad_is_cov}.
   % \expect{\q(\theta \vert \eta)}
   %        {\lqgradbar{\theta \vert \eta} \left(

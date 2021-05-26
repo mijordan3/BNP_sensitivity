@@ -62,42 +62,6 @@ of the five constants.
 \prooflabel{etat_deriv}
 \proofof{\thmref{etat_deriv}}
 %
-TODO: replace all the continuity with an assumption, then state a
-DCT assumption that is sufficient.  The proof them reduces to a straightforward
-consequence of the implicit function theorem, together with the form of the
-derivative from a lemma about q expectation derivatives.
-
-% %
-% For the duration of the proof, define
-% %
-% \begin{align*}
-% %
-% \rho(\eta, \t) :={}&
-%     \expect{\q(\theta \vert \eta)}
-%            {\log \p(\theta \vert \t) - \log \p(\theta \vert 0)}
-% \mathand\\
-% \rho_\eta(\eta, \t) :={}&
-% \fracat{\partial \rho(\eta, \t)}
-%        {\partial \eta}{\eta}.
-% %
-% \end{align*}
-% %
-% Expanding $\logp(\theta \vert \t)$ in \eqref{vb_optimization}, we see that
-% %
-% \begin{align}
-% %
-% % \logp(\theta \vert \t) ={}& \logp(\theta) +
-% %     \log \p(\theta\vert\t) - \log \p(\theta \vert 0) \Rightarrow \nonumber\\
-% \KL{\eta, \t} ={}&
-%     \KL{\eta, 0} + \rho(\eta, \t). \eqlabel{kl_pert}
-% %
-% \end{align}
-% %
-% We thus see that the optimization objective $\KL{\eta, \t}$ is the original
-% optimization obejctive, $\KL{\eta, 0}$, plus the additive term $\rho(\eta,
-% \t)$ depending only on $\eta$ and $\t$.
-%
-
 By \assuitemref{kl_opt_ok}{kl_diffable} and \lemref{logq_continuous}, $\eta
 \mapsto \KL{\eta, \t}$ is continuously differentiable for all $\eta, \t \in
 \ball_\eta \times \ball_\t$.  So, for all $\t \in \ball_\t$, the optimal
@@ -194,16 +158,40 @@ $\mu'(d\theta)$, respectively.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
+\vspace{1em}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Proof of eta_phi_deriv
-
-\prooflabel{eta_phi_deriv}\proofof{\thmref{eta_phi_deriv}}
+\begin{lem}\lemlabel{exchange_order_q_suffices}
 %
-The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
+Under \defref{prior_nl_pert},
+\assuref{exchange_order_q} implies \assuref{exchange_order} when
+$\norminf{\phi} < \infty$.
+
+\begin{proof}
+%
+Since $\qtil(\theta \vert \eta) \phi(\theta) \le \qtil(\theta \vert \eta)
+\delta$, and $\qtil(\theta \vert \eta)$ satisfies \lemref{exchange_order} with
+some $M(\theta)$ by \assuref{exchange_order_q}, so we can satisfy
+\lemref{exchange_order} for $\qtil(\theta \vert \eta) \phi(\theta)$ with
+$\max\{1, \delta\} M(\theta)$.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}
+
+Under \assuref{exchange_order_q}, the map $\eta, \phi \mapsto \partial
+\expect{\q(\theta \vert \eta)}{\phi(\theta)} / \partial \eta$ is Fr{\'e}chet
+differentiable as a map from $\mathbb{R}^\etadim \times \linf  \mapsto
+\mathbb{R}^\etadim$.
+%
+\begin{proof}
+%
+The map $\eta, \phi \mapsto  \partial \expect{\q(\theta \vert
+\eta)}{\phi(\theta)} / \partial \eta$ is a map from the Banach space
 $\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
 take the L2 norm $\norm{\cdot}_2$ on $\mathbb{R}^{\etadim}$ and $\mathbb{R}$.
 Let $\ball$ denote the ball $\ball_\eta \times \{ \phi: \norminf{\phi} <
@@ -213,82 +201,106 @@ $\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
 \begin{align*}
 %
 \norm{\linop}^* :=
-    \sup_{\eta: \norm{\eta}_2 \le 1} \sup_{\phi: \norminf{\phi} \le 1}
-     \norm{\linop(\eta, \phi)}_2.
+    \sup_{\Delta \eta: \norm{\eta}_2 \le 1}
+    \sup_{\Delta \phi: \norminf{\phi} \le 1}
+     \norm{\linop(\Delta \eta, \Delta \phi)}_2.
 %
 \end{align*}
+%
+Formally, $\Delta \eta$ and $\Delta \phi$ are members of $\mathbb{R}^\etadim$
+and $\linf$ respectively, but in the preceding display they can be thought of as
+directions on which the linear operator $\linop$ operates.
 
-TOOD: the part about the estimating equation now follows from the directional
-differentiability corrolary.
+Observe that the directional derivatives are linear operators, and so
+$\norm{\cdot}^*$ defines a norm on the space of linear operators. We will prove
+Fr{\'e}chet differentiability using the fact that a functional is Fr{\'e}chet
+differentiable if its directional derivatives are continuous in $\norm{\cdot}^*$
+as a function of the location at which they are evaluted  (see
+\citet[Proposition 4.8(c)]{zeidler:2013:functional}, \citet[Corollary
+1.4]{averbukh:1967:theory} and \citep[Appendix A]{reeds:1976:thesis}). Further,
+it suffices by \citet[Proposition 4.14(c)]{zeidler:2013:functional} to show that
+the partial derivatives with respect to $\eta$ and $\phi$ are Fr{\'e}chet to
+show that the joint map is Fr{\'e}chet differentiable.
 
-For any $\phi \in \ball_\phi$, observe that $\t \mapsto \pstick(\zeta \vert \t
-\phi)$ satisfies (Q STICK REGULAR) under (Q FUN STICK REGULAR),
-since, for any $f(\nu)$, $\lambda$-almost surely,
+Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
+applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
+
+First, consider the partial derivative with respect to $\eta$.  The
+linear operator corresponding to the directional derivative in the
+$\Delta \eta$ direction is given by
 %
 \begin{align*}
 %
-f(\nu) \phi(\nu) \le f(\nu) \norminf{\phi} \le \norminf{\phi} M(\nu).
+\linop_\eta(\Delta \eta, \Delta \phi) =
+    \fracat{\partial^2 \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+           {\partial \eta \partial\eta^T}{\eta} \Delta \eta,
 %
 \end{align*}
 %
-So, by \lemref{logq_continuous}, $\eta \mapsto \partial \KL{\eta, \phi} /
-\partial \eta$ is continuous for any $\phi \in \ball_\phi$, and by a first-order
-condition $\etaopt(\phi)$ satisfies
+with no dependence on $\Delta \phi$.  Define for the moment the the $\etadim
+\times \etadim$ matrix $\mathscr{H}(\eta, \phi) := \partial^2 \expect{\q(\theta
+\vert \eta)}{\phi(\theta)} / \partial \eta \partial \eta^T$.  Then the dual norm
+of the derivative is simply the operator norm of $\mathscr{H}$, i.e.,
+$\norm{\linop_\eta}^* = \norm{\mathscr{H}(\eta, \phi)}_{op}$. Thus we must show
+that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta, \phi$.  For
+any $\eta', \phi'$ and $\eta'', \phi''$ in $\ball_\eta \times
+\ball_\phi(\delta)$,
 %
 \begin{align*}
 %
-\fracat{\partial \KL{\eta, \phi}}
-                {\partial \eta}
-                {\etaopt(\phi)} = 0.
+\MoveEqLeft
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta'', \phi'')}_{op} \\
+&\le
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op} +
+\norm{\mathscr{H}(\eta', \phi'') - \mathscr{H}(\eta'', \phi'')}_{op}.
 %
 \end{align*}
-
-
-Using this estimating equation, the key to the proof will be the implicit
-function theorem for Banach spaces. To use the implicit function theorem, we
-need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable at $\etaopt, \phiz$.
-
-%  and that $\KLhess{\eta, \phi}$ is positive
-% definite in $\ball$.  --- is the actually needed?
-
-TODO: this is specialized to sticks.  Make it general.
-
-For the duration of the proof, define
+%
+For the first term in the preceding display, for all $\eta'$,
 %
 \begin{align*}
 %
-\rho(\etanuk, \phi) :={}&
-    \expect{\q(\nu \vert \etanuk)}{\phi(\etanuk)}
-\mathand\\
-\rho_\eta(\etanuk, \phi) :={}&
-    \fracat{\partial \rho(\etanuk, \phi)}{\phi(\etanuk)}.
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op}
+    \le{}&
+    \fracat{\partial^2 \expect{\q(\theta \vert \eta)}{1}}
+           {\partial \eta \partial\eta^T}{\eta'} \norminf{\phi' - \phi''}
+           \Rightarrow\\
+\lim_{\phi' \rightarrow \phi''}
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op} ={}& 0.
 %
 \end{align*}
 %
-Expanding $\logp(\zeta \vert \phi)$ in \eqref{vb_optimization}, we see that
+For the second term, by \lemref{logq_continuous}, for all $\phi''$,
 %
-\begin{align}
-\fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
- ={}&
-    \fracat{\partial \KL{\eta, \phiz}}{\partial \eta}{\eta} +
-    \sumkm \rho_\eta(\etanuk, \phi). \eqlabel{kl_fun_pert}
+\begin{align*}
 %
-\end{align}
+\lim_{\eta' \rightarrow \eta''}
+    \norm{\mathscr{H}(\eta', \phi'') - \mathscr{H}(\eta'', \phi'')}_{op} = 0.
 %
-By \assuref{kl_opt_ok}, $\partial \KL{\eta, \phiz} / \partial \eta$ is
-continuously Fr{\'e}chet differentiable (it does not depend on $\phi$), so we
-need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.  As
-in the proof of \thmref{etat_deriv}, we will show continuous differentiability
-by showing that the partial derivatives in the $\eta$ and $\phi$ directions
-are continuous, this time in the dual norm $\norm{\cdot}^*$.
+\end{align*}
+%
+It follows that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta,
+\phi$, and so the partial derivative with respect to $\eta$ is Fr{\'e}chet.
 
-TODO: As with the parametric proof, this part can be done more easily by proving
-the continuity of the derivatives of $\int \qtil(\theta \vert \eta) \phi(\theta)
-\mu(d\theta)$ as functionals.
+\hrulefill
 
-Let us first consider the partial derivative of $\rho_\eta(\etanuk, \phi)$ in
-the $\eta$ direction. By \lemref{logq_derivs} \eqref{q_score_sens_is_cov},
+ so we
+use \eqref{q_sens_is_cov} to write
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+       {\partial \eta}{\eta}
+={}
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta} \phi(\theta)}.
+%
+\end{align*}
+%
+
+
+Let us first consider the partial derivative in the $\eta$ direction. By
+\lemref{logq_derivs} \eqref{q_score_sens_is_cov},
 %
 \begin{align*}
 %
@@ -422,7 +434,74 @@ function, continuous in the point at which it is evaluated, and so $\phi \mapsto
 Since its partial derivatives are continuous, it follows by \citet[Proposition
 4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
 \partial \KL{\eta, \phi} / \partial \eta$ is continously Fr{\'e}chet
-differentiable.  Furthermore, \citet[Chapter 4 Condition
+differentiable.
+
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Proof of eta_phi_deriv
+
+\prooflabel{eta_phi_deriv}\proofof{\thmref{eta_phi_deriv}}
+%
+
+
+By a first-order
+condition $\etaopt(\phi)$ satisfies
+%
+\begin{align*}
+%
+\fracat{\partial \KL{\eta, \phi}}
+                {\partial \eta}
+                {\etaopt(\phi)} = 0.
+%
+\end{align*}
+
+
+Using this estimating equation, the key to the proof will be the implicit
+function theorem for Banach spaces.  To use the implicit function theorem, we
+need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
+differentiable at $\etaopt, \phiz$.
+
+%  and that $\KLhess{\eta, \phi}$ is positive
+% definite in $\ball$.  --- is the actually needed?
+
+%
+% For the duration of the proof, define
+% %
+% \begin{align*}
+% %
+% \rho(\etanuk, \phi) :={}&
+%     \expect{\q(\nu \vert \etanuk)}{\phi(\etanuk)}
+% \mathand\\
+% \rho_\eta(\etanuk, \phi) :={}&
+%     \fracat{\partial \rho(\etanuk, \phi)}{\phi(\etanuk)}.
+% %
+% \end{align*}
+% %
+% Expanding $\logp(\zeta \vert \phi)$ in \eqref{vb_optimization}, we see that
+% %
+% \begin{align}
+% \fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
+%  ={}&
+%     \fracat{\partial \KL{\eta, \phiz}}{\partial \eta}{\eta} +
+%     \sumkm \rho_\eta(\etanuk, \phi). \eqlabel{kl_fun_pert}
+% %
+% \end{align}
+% %
+% By \assuref{kl_opt_ok}, $\partial \KL{\eta, \phiz} / \partial \eta$ is
+% continuously Fr{\'e}chet differentiable (it does not depend on $\phi$), so we
+% need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.
+
+
+
+
+Furthermore, \citet[Chapter 4 Condition
 21b]{zeidler:2013:functional} holds since $\KLhess{\etaopt(\phiz), \phiz}$ is
 invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i),
 (ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
