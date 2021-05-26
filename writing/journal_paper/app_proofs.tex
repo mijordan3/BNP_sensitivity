@@ -1,42 +1,151 @@
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+A standard consequence of the dominated convergence theorem is the ability to
+exchange integration and differentiation.  Since we will use this result
+frequently, we state it here in our own notation as \thmref{dct}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thm}\thmlabel{dct}
+\citep[Theorem 16.8]{billingsley:1986:probability}
 %
-% In the setting of \assuref{dist_fun_nice}, let $\theta \in \mathbb{R}$, let
-% $\mu$ be the Lebesgue measure, and let $\q(\theta \vert \eta) = \normdist{\theta
-% \vert \eta}$ be a normal distribution parameterized by its natural exponential
-% family parameters.
-%
-% Let $\sigma(\eta)$ denote the standard deviation of the normal distribution.
-% Fix $\eta_0$ such that $\sigma(\eta_0) > 0$, and let $\ball_\eta$ be an open set
-% containing $\eta_0$ such a that $\sigma_{max} := \sup_{\eta \in \ball_\eta}
-% \sigma(\eta) < \infty$.
-%
-% If there exists a neighborhood $\ball_\t$ of $\t_0$ such that $\abs{\psi(\theta,
-% \t)}$ and $\abs{\psigrad{\theta, \t}}$ are uniformly bounded by some multiple of
-% $\exp(-\abs{\theta})$ for all $\t \in \ball_\t$, then $\q$ and $\psi$ satisfy
-% \assuref{dist_fun_nice}.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Let $\mu$ be sigma-finite measure on $\thetadom$, and let $S_\t \subseteq
+\mathbb{R}$.  Let $f:\thetadom \times S_\t \mapsto \mathbb{R}$.
 
-\begin{proof}
-\proofof{\lemref{normal_q_is_regular}}
-\prooflabel{normal_q_is_regular}
-%
-TODO: update this so that $\eta$ is actually the mean and variance.
+If there exists a function $M(\theta)$ with $\int M(\theta) \mu(d\theta) <
+\infty$ such that $\abs{f(\theta, \t)} \le M(\theta)$, $\mu$-almost surely,
+for all $\t \in S_\t$, then the map $\t \mapsto \int f(\theta, \t)
+\mu(d\theta)$ is continuous.
 
-By properties of the exponential family,
+Further, suppose that the derivative $\fracat{\partial f(\theta, \t)}{\partial
+\t}{\t}$ exist $\mu$-almost surely for $\t \in S_\t$.  If there exists
+an $M'(\theta)$ such that $\int M'(\theta) \mu(d\theta) < \infty$ and
+$\abs{\fracat{\partial f(\theta, \t)}{\partial \t}{\t}} \le M'(\theta)$,
+$\mu$-almost surely and for all $\t \in S_\t$, then
 %
 \begin{align*}
 %
-\lqgrad{\theta, \eta} ={} (\theta, \theta^2)^T \mathand&
-\lqhess{\theta, \eta} ={} 0_{2\times2} \Rightarrow\\
+\fracat{\partial \int f(\theta, \t) \mu(d\theta)}{\partial \t}{\t} =
+     \int \fracat{\partial f(\theta, \t)}{\partial \t}{\t} \mu(d\theta).
 %
-\norm{\lqgrad{\theta, \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
-\norm{\lqhess{\theta, \eta}}_2 ={} 0.
+\end{align*}
+%
+\end{thm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{lem}\lemlabel{exchange_order}
+%
+Under \assuref{exchange_order_f}, at any $\eta, \t \in \ball_\eta \times
+\ball_\t$, we can exchange the order of integration and differentiation in $\int
+f(\theta, \eta, \t) \mu(d\theta)$ for the derivatives $\partial / \partial
+\eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial
+\t$.
+%
+\begin{proof}
+
+Let $\eta_d$ denote the $d-$th entry of the vector $\eta$.  Then
+%
+\begin{align*}
+%
+\abs{\partial f(\theta, \eta, \t) / \partial \eta_d} \le{}&
+  \norm{\partial f(\theta, \eta, \t) / \partial \eta}_2
+\textrm{,}\\
+\abs{\partial^2 f(\theta, \eta, \t) / \partial \eta_d \partial \t} \le{}&
+    \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial \t}_2
+\textrm{, and}\\
+\abs{\partial^2 f(\theta, \eta, \t) /
+       \partial \eta_{d_1} \partial \eta_{d_2}} \le{}&
+     \norm{\partial f(\theta, \eta, \t) / \partial \eta \partial\eta^T}_2.
+%
+\end{align*}
+%
+The conclusion follows by repeatedly applying \thmref{dct} to the components
+of the derivatives.
+
+\end{proof}
+\end{lem}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{logq_continuous}
+
+Under \assuref{exchange_order}, the map $\eta, \t \mapsto \expect{\q(\theta
+\vert \eta)}{\ptil(\theta \vert \t)}$ has continuous partial derivatives
+$\partial / \partial \eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 /
+\partial \eta \partial \t$ at all $\eta, \t \in \ball_\eta \times \ball_\t$.
+Furthermore,
+
+\begin{align}
+\fracat{\partial \expect{\q(\theta \vert \eta)}
+              {\ptil(\theta \vert \t)}}{\partial \eta}{\eta}
+={}&
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta}
+       \ptil(\theta \vert \t)}
+       \eqlabel{q_sens_is_cov}\\
+%
+\fracat{\partial^2 \expect{\q(\theta \vert \eta)}
+      {\ptil(\theta \vert \t)}}{\partial \eta \partial \t}{\eta, \t}
+={}&
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta}
+       \fracat{\partial \ptil(\theta \vert \t)}{\partial \t}{\t}}
+\eqlabel{q_sens_psi_grad_is_cov}.
+%
+\end{align}
+%
+\begin{proof}
+%
+We can write
+%
+\begin{align*}
+%
+R(a, b) :={} \frac{a}{b} \quad \Rightarrow
+\expect{\q(\theta \vert \eta)}{\psi(\theta, \t)} ={}
+R\left(\int \qtil(\theta \vert \eta) \psi(\theta, \t) \mu(d\theta),
+  \int \qtil(\theta \vert \eta) \mu(d\theta)\right).
+%
+\end{align*}
+%
+If necessary, we can shrink $\ball_\eta$ so that the denominator $\int
+\qtil(\theta \vert \eta) \mu(d\theta)$ is bounded below by a positive constant
+for all $\eta \in \ball_\eta$.  With the denominator strongly positive, $R(a,b)$
+is is a continuously differentiable function to all orders for all $\t, \eta \in
+\ball_\t \times \ball_\eta$.  The desired results follow from
+\assuref{exchange_order} by the chain rule.
+
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\proofof{\lemref{normal_q_is_regular}}
+\prooflabel{normal_q_is_regular}
+%
+For the duration of the proof, let $\eta$ denote the exponential family natural
+parameters of the normal distribution. By properties of the exponential family,
+%
+\begin{align*}
+%
+\lqgrad{\theta \vert \eta} ={} (\theta, \theta^2)^T \mathand&
+\lqhess{\theta \vert \eta} ={} 0_{2\times2} \Rightarrow\\
+%
+\norm{\lqgrad{\theta \vert \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{\lqhess{\theta \vert \eta}}_2 ={} 0.
 %
 \end{align*}
 %
@@ -67,96 +176,55 @@ Then
 %
 \end{align*}
 %
-Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
+Therefore, for \assuref{exchange_order_f}, we can take $M(\theta)
 \propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
 similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
 $\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
 of the five constants.
-%
-\end{proof}
+
+Finally, if $\tilde{\eta}$ is a twice-continuously differentiable function of
+the natural parameters $\eta$ (e.g the mean and variance), then the derivatives
+with respect to $\tilde{\eta}$ are equal to the derivatives with respect to
+$\eta$ times bounded (on $\ball_\eta$) functions of $\eta$ that do not depend on
+$\theta$. Thus a constant multiple of $M(\theta)$ will bound the new
+derivatives.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1em}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{proof}\prooflabel{etat_deriv}
+\prooflabel{etat_deriv}
 \proofof{\thmref{etat_deriv}}
 %
-For the duration of the proof, define
-%
-\begin{align*}
-%
-\rho(\eta, \t) :={}&
-    \expect{\q(\theta \vert \eta)}
-           {\log \p(\theta \vert \t) - \log \p(\theta \vert 0)}
-\mathand\\
-\rho_\eta(\eta, \t) :={}&
-\fracat{\partial \rho(\eta, \t)}
-       {\partial \eta}{\eta}.
-%
-\end{align*}
-%
-Expanding $\logp(\theta \vert \t)$ in \eqref{vb_optimization}, we see that
-%
-\begin{align}
-%
-% \logp(\theta \vert \t) ={}& \logp(\theta) +
-%     \log \p(\theta\vert\t) - \log \p(\theta \vert 0) \Rightarrow \nonumber\\
-\KL{\eta, \t} ={}&
-    \KL{\eta, 0} + \rho(\eta, \t). \eqlabel{kl_pert}
-%
-\end{align}
-%
-% We thus see that the optimization objective $\KL{\eta, \t}$ is the original
-% optimization obejctive, $\KL{\eta, 0}$, plus the additive term $\rho(\eta,
-% \t)$ depending only on $\eta$ and $\t$.
-%
-By \lemref{logq_derivs}, $\eta \mapsto \rho(\eta, \t)$ is continuous, and
-by \lemref{logq_continuous} $\eta \mapsto \rho(\eta, \t)$ is continuously
-differentiable, for all $\eta, \t \in \ball$.  So $\partial \KL{\eta, \t}  /
-\partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
-first-order condition, $\etaopt(\t)$ satisfies
+By \assuitemref{kl_opt_ok}{kl_diffable} and \lemref{logq_continuous}, $\eta
+\mapsto \KL{\eta, \t}$ is continuously differentiable for all $\eta, \t \in
+\ball_\eta \times \ball_\t$.  So, for all $\t \in \ball_\t$, the optimal
+$\etaopt(\t)$ satisfies the first order condition:
 %
 \begin{align}\eqlabel{vb_first_order_condition}
 %
 \fracat{\partial \KL{\eta, \t}}{ \partial \eta}{\etaopt(\t), \t} ={}
-\fracat{\partial \KL{\eta, 0}}{ \partial \eta}{\etaopt(\t)}
-+  \rho_\eta(\etaopt(\t), \t) ={} 0
+\fracat{\partial \KL{\eta}}{ \partial \eta}{\etaopt(\t)} +
+\fracat{\partial
+    \expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}}
+    {\partial \eta}
+    {\etaopt(\t)}
+={} 0
 %
 \end{align}
-%
-for all $\t \in \ball_\t$.
 
-We wish to apply the implicit function theorem to
-\eqref{vb_first_order_condition}, for which we must show that $\partial
-\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
-$\t$.  By \assuitemref{kl_opt_ok}{kl_diffable}, $\partial \KL{\eta, 0} /
-\partial \eta$ is continuously differentiable, so we need only consider
-$\rho_\eta(\theta, \t)$.
-
-By \lemref{logq_continuous} and (Q STICK REGULAR), we
-have that both $\partial \rho_\eta(\eta, \t) / \partial \eta$ and $\partial
-\rho_\eta(\eta, \t) / \partial \t$ are continuous in both $\eta$ and $\t$.
-Since both its partial derivatives are continuously differentiable, the joint
-map $\eta, \t \mapsto \rho_\eta(\eta, \t)$ is also continuously differentiable
-(e.g., \citet[Theorem 3.2]{fleming:2012:functions}).  Consequently, $\partial
-\KL{\eta, \t} / \partial \eta$ is continuously differentiable in both $\eta$ and
-$\t$.
-
-% This does not appear to be necessary.
-% Since $\rho_\eta(\eta, \t)$ is continuously differentiable, $\KLhess{\eta, \t}$
-% is continuous, and since $\KLhess{\etaopt, 0}$ is positive definite,
-% $\KLhess{\eta, \t}$ is positive definite for all $\eta, \t \in \ball$.
-
-Together with \assuitemref{kl_opt_ok}{kl_hess}, which gives that $\partial^2
-\KL{\eta, \t} / \partial \eta \partial\eta^T$ is invertible at $\etaopt$, the
-result then follows from the implicit function theorem \citet[Theorem
-3.3.1]{krantz:2012:implicit}. For convenience, \tabref{kranz_notation} shows the
-correspondence between their notation and ours.
-% Note
-% that we make the following formal identifications with the notation of
-% \citet[Theorem 3.3.1]{krantz:2012:implicit}:
+We wish to apply the implicit function theorem, \citet[Theorem
+3.3.1]{krantz:2012:implicit}, to the estimating equation defined by
+\eqref{vb_first_order_condition}. Again, by \assuitemref{kl_opt_ok}{kl_diffable}
+and \lemref{logq_continuous}, the estimating equation given is continuously
+differentiable in both $\eta$ and $\t$. The Jacobian of the estimating equation
+is nonsingular by \assuitemref{kl_opt_ok}{kl_hess}, and valid in an open ball by
+\assuitemref{kl_opt_ok}{kl_opt_interior}. For convenience,
+\tabref{kranz_notation} shows the correspondence between our notation and that
+of \citet[Theorem 3.3.1]{krantz:2012:implicit}.
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -165,7 +233,7 @@ correspondence between their notation and ours.
 $\Phi(x)$                       & $\KL{\eta, \t}$ \\\hline
 $Q$                             & $1$ \\\hline
 $M$                             & $\etadim$ \\\hline
-$U$                             & $\ball$ \\\hline
+$U$                             & $\ball_\eta \times \ball_\t$ \\\hline
 $W$                             & $\ball_\t$ \\\hline
 $x_1,\ldots,x_Q$                & $\t$ \\\hline
 $x_{Q+1},\ldots,x_N$            & $\eta$ \\\hline
@@ -175,36 +243,18 @@ $f_1(x_a), \ldots,f_M(x_a)$     & $\etaopt(\t)$ \\\hline
 \end{tabular}\tablabel{kranz_notation}
 \end{center}
 
-The form of the derivative is given by combining \eqref{kl_pert} with
-\eqref{q_sens_psi_grad_is_cov} of \lemref{logq_derivs}, since
+Finally, the form of the derivative is given by \citet[Theorem
+3.3.1]{krantz:2012:implicit}, together with \eqref{q_sens_psi_grad_is_cov} of
+\lemref{logq_continuous}.
 %
-\begin{align*}
-%
-\fracat{\partial^2 \KL{\eta, \t}}
-       {\partial \eta \partial \t}
-       {\etaopt, 0} =
-\expect{\q(\theta \vert \etaopt)}{
-    \lqgradbar{\theta \vert \etaopt}
-    \fracat{\partial \log \p(\theta \vert \t)}{\partial \t}{\t=0}
-}.
-%
-\end{align*}
-%
-
-%
-\end{proof}
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+\vspace{1em}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{proof}\prooflabel{pert_invariance}\proofof{\lemref{pert_invariance}}
+\prooflabel{pert_invariance}\proofof{\lemref{pert_invariance}}
 %
-\todo{Put the proof of Linfty validity in here too.}
-
 Let $\mu$ and $\mu'$ denote two mutually absolutely continuous candidate
 dominating measures for $\pbase$, with respective densities (Radon-Nikodym
 derivatives) $\pbase(\theta)$ and $\pbase'(\theta)$.  Let the respective
@@ -213,38 +263,7 @@ well.  Let $R(\theta) = \fracat{d\mu}{d\mu'}{\theta}$ denote the Radon-Nikodym
 derivative of $\mu$ with respect to $\mu'$, and note that $\pbase'(\theta) =
 R(\theta) \pbase(\theta)$ and $\palt'(\theta) = R(\theta) \palt(\theta)$.
 
-First, take $p \in [1, \infty)$.  By \defref{prior_nl_pert}, the perturbations
-for $\mu$ and $\mu'$ are given respectively by
-%
-\begin{align*}
-%
-\phi(\theta \vert \beta, \palt) ={}&
-    \beta p \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}\\
-\phi'(\theta \vert \beta, \palt') ={}&
-    \beta p \palt'(\theta)^{1/p} - \pbase'(\theta)^{1/p},
-%
-\end{align*}
-%
-so
-%
-\begin{align*}
-%
-\norm{\phi(\theta \vert \beta, \palt)}_{\mu,p}^p ={}&
-\int \abs{\beta p \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}}^p
-    \mu(d\theta)
-%
-\\={}&
-\int \abs{\beta p \left(R(\theta) \palt(\theta)\right)^{1/p} -
-          \left(R(\theta) \pbase(\theta)\right)^{1/p}}^p
-     \mu'(d\theta)
-%
-\\={}&
-\norm{\phi'(\theta \vert \beta, \palt')}_{\mu',p}^p.
-%
-\end{align*}
-%
-Next, for $p = \infty$, we have that the perturbations for $\mu$ and $\mu'$ are
-given respectively by
+We have that the perturbations for $\mu$ and $\mu'$ are given respectively by
 %
 \begin{align*}
 %
@@ -271,247 +290,68 @@ densities of $\tau$.  The desired result follows by the exact same formal
 argument as for the change of measure, except with $J(\theta) \mu(d\theta)$
 and $\mu(d\tau)$ taking the place of $R(\theta) \mu(d\theta)$ and
 $\mu'(d\theta)$, respectively.
-%
-\end{proof}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{proof}
-%\prooflabel{pert_well_defined}
-%\proofof{\thmref{pert_well_defined}}
-%
-First, consider the fact that perterubations are priors. It is clear that
-$\mathscr{P}_{\mathrm{valid}} \subseteq \mathscr{P}_{\pbase,p}$, since one can
-simply take $\t = 1$ for any $\palt \in \mathscr{P}_{\mathrm{valid}}$.  To show
-that $\mathscr{P}_{\pbase,p} \subseteq \mathscr{P}_{\mathrm{valid}}$, it will
-suffice to show that any element of $\mathscr{P}_{\pbase,p}$ is non-negative and
-can be normalized.
-
-Take $p \in [1, \infty)$ with $\phi \in \pertset$.  By definition, for $\phi \in
-\pertset$, there exist $\beta > 0$, $\t \in [0,1]$, and $\palt(\theta)$ such
-that
+We now prove that $\phi$ gives rise to valid priors when $\norminf{\phi} <
+\infty$. Since the exponential funciton is positive, for any $\phi(\theta)$,
 %
 \begin{align*}
 %
-\pbase(\theta)^{1/p} + \frac{1}{p} \phi(\theta) ={}&
-    \t \beta \palt(\theta)^{1/p} + (1- \t) \pbase(\theta)^{1/p}.
+\ptil(\theta \vert \phi) = \pbase(\theta) \exp(\phi(\theta)) > 0,
 %
 \end{align*}
 %
-From this it follows that $\ptil(\theta \vert \t \phi) \ge 0$, since $\t \in
-[0,1]$.  Furthermore, for the same $\phi$,
-%
-\begin{align*}
-%
-\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
-\int \left(\t \beta \palt(\theta)^{1/p} +
-           (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
-\\\ge{}&
-\t^p \beta^p \int \palt(\theta) \mu(d\theta) +
-    (1- \t)^p \int \pbase(\theta) \mu(d\theta)
-\\={}& \t^p \beta^p + (1- \t)^p > 0,
-%
-\end{align*}
-%
-and, by Jensen's inequality,
-%
-\begin{align*}
-%
-\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
-2^p \int \left(\frac{1}{2} \t \beta \palt(\theta)^{1/p} +
-           \frac{1}{2} (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
-\\\le{}&
-%
-2^{p-1} \left(
-    \t^p \beta^p \int \palt(\theta) \mu(d\theta) +
-    (1- \t)^p \int  \pbase(\theta)\mu(d\theta)
-\right)
-\\={}& 2^{p-1} \left( \t^p \beta^p + (1- \t)^p\right) < \infty.
-%
-\end{align*}
-
-For $p = \infty$ and $\phi \in \pertset[\infty]$, it is clear that $\ptil(\theta
-\vert \phi) = \pbase(\theta) \exp(\phi(\theta)) \ge 0$. As above, since $\phi
-\in \pertset[\infty]$, there exist $\palt$, $\beta > 0$, and $\t \in [0,1]$ such
-that
-%
-\begin{align*}
-%
-\phi(\theta) ={}&
-    \t \log \palt(\theta) - (1-\t)\log \pbase(\theta) + \log \beta \Rightarrow\\
-%
-\int \ptil(\theta \vert \phi)\mu(d\theta) ={}&
-    \beta \int \palt(\theta)^\t \pbase(\theta)^{1 - \t}\mu(d\theta)
-\\={}&
-\beta \int \pbase(\theta)
-    \left( \frac{\palt(\theta)}{\pbase(\theta)}\right)^\t \mu(d\theta)
-\\\le{}&
-\beta \int \pbase(\theta)
-    \frac{\palt(\theta)}{\pbase(\theta)}
-    \ind{\palt(\theta) \ge \pbase(\theta)} \mu(d\theta) +
-\\&
-  \beta \int \pbase(\theta)
-    \ind{\palt(\theta) < \pbase(\theta)} \mu(d\theta)
-\\\le{}& 2\beta.
-%
-\end{align*}
-%
-This concludes the proof of PERT ARE PRIORS.
-
-For PERTS VS BALL P, we show that, when $p \in [1, \infty)$ and
-$\norm{\phi}_{\mu,p} < p$, then $\p(\theta \vert \phi)$ is normalizable. Um but
-that is not necessary.  All we need to do is show that if $\phi \in \pertset$
-then $\norm{\phi}_{\mu,p} < \infty$.
-
-First, consider the case of general $\phi$ with $p \in [1, \infty)$. By Jensen's
-inequality applied pointwise to the convex function $x \mapsto x^p$,
-%
-\begin{align*}
-%
-\abs{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) }^{p} \le{}&
-    \left(\pbase(\theta)^{1/p} + \frac{1}{p}\abs{\phi(\theta)} \right)^{p}
-\\={}&
-    2^p \left(\frac{1}{2}\pbase(\theta)^{1/p} +
-              \frac{1}{2} \frac{1}{p}\abs{\phi(\theta)} \right)^{p}
-\\\le{}&
-    2^{p-1} \left(\pbase(\theta) + \frac{1}{p^p}\abs{\phi(\theta)}^p \right).
-%
-\end{align*}
-%
-Consequently,
-%
-\begin{align*}
-%
-\int \abs{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) }^{p}
-    \lambda(d\theta) \le{}&
-2^{p-1} \int \left(\pbase(\theta) + \frac{1}{p}\abs{\phi(\theta)}^p \right)
-    \lambda(d\theta)
-\\={}&
-    2^{p-1} \left(1 + \frac{1}{p^p}\norm{\phi}_p^p\right).
-%
-\end{align*}
-%
-So, as in \citep[Result 2]{gustafson:1996:local}, $\norm{\phi}_p < \infty$
-implies that the prior can be normalized.
-
-Continuing the case of general $\phi$ with $1 \le p < \infty$, by
-convexity,\footnote{Apply the definition of convexity to the points $0$, $x$,
-and $x + y$, and again to the points $0$, $y$, and $x+y$, then add the results.}
-for any $x \ge y \ge 0$,
-%
-\begin{align*}
-%
-(x + y)^p \ge{} x^p + y^p \mathand
-(x - y)^p \le{} x^p - y^p.
-%
-\end{align*}
-%
-Also note that, since $\pbase(\theta) \ge 0$,
-%
-\begin{align*}
-%
-\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \le 0
-\quad\Rightarrow\quad
-\phi(\theta) \le 0 \mathand
-\frac{1}{p} \abs{\phi(\theta)} - \pbase(\theta)^{1/p} \ge 0.
-%
-\end{align*}
-%
-We can thus write
-%
-\begin{align*}
-%
-\MoveEqLeft
-\int \mathrm{sign}\left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)
-    \abs{\pbase(\theta)^{1/p} + \frac{1}{p}\abs{\phi(\theta)}}^{p} d\theta
-={}\\&
-    \int \left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)^{p}
-        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \ge 0}
-        d\theta - \\&
-    \int \left(\frac{1}{p}\abs{\phi(\theta)} - \pbase(\theta)^{1/p}\right)^{p}
-        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) < 0}
-        d\theta
-\\\ge{}&
-    \int \left(\pbase(\theta) - \frac{1}{p^p}\abs{\phi(\theta)}^{p}\right)
-        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \ge 0}
-        d\theta - \\&
-    \int \left(\frac{1}{p^p}\abs{\phi(\theta)}^p - \pbase(\theta)\right)
-        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) < 0}
-        d\theta
-\\={}&
-    \int \pbase(\theta) d\theta - \frac{1}{p^p}\int \abs{\phi(\theta)}^p d\theta
-\\={}&
-    1 - \frac{1}{p^p} \norm{\phi}_p^p.
-%
-\end{align*}
-%
-The final line is non-negative when $\norm{\phi}_p \le p$.
-
-
-
-
-
-Finally, consider $p = \infty$.  Since $\int \pbase(\theta) \lambda(d\theta) = 1$,
+$\mu$-almost everywhere.  Furthermore, since $\int \pbase(\theta)
+\lambda(d\theta) = 1$,
 %
 \begin{align*}
 %
 \exp(-\norminf{\phi}) \le{}
-\abs{\int_0^1 \exp\left(\log \pbase(\theta) + \phi(\theta)\right) \lambda(d\theta)}
+\int \pbase(\theta) \exp\left(\phi(\theta)\right) \mu(d\theta)
 \le{}
 \exp(\norminf{\phi}).
 %
 \end{align*}
 %
-so that $0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty$
-whenever $\norminf{\phi} < \infty$.  Furthermore,
+so that $0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$
+whenever $\norminf{\phi} < \infty$.
 %
-\begin{align*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1em}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{exchange_order_q_suffices}
 %
-\exp\left(\log \pbase(\theta) + \phi(\theta)\right) \ge 0.
+Under \defref{prior_nl_pert},
+\assuref{exchange_order_q} implies \assuref{exchange_order} when
+$\norminf{\phi} < \infty$.
+
+\begin{proof}
 %
-\end{align*}
+Since $\qtil(\theta \vert \eta) \phi(\theta) \le \qtil(\theta \vert \eta)
+\delta$, and $\qtil(\theta \vert \eta)$ satisfies \assuref{exchange_order_f}
+with some $M(\theta)$ by \assuref{exchange_order_q}, we can satisfy
+\assuref{exchange_order_f} for $\qtil(\theta \vert \eta) \phi(\theta)$ with
+$\max\{1, \delta\} M(\theta)$.  Finally, \lemref{exchange_order} implies that
+\assuref{exchange_order} is satisfied.
 %
 \end{proof}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Proof of eta_phi_deriv
-
-\begin{proof}\prooflabel{eta_phi_deriv}
 %
-The map $\eta, \phi \mapsto \KL{\eta, \phi}$ is a map from the Banach space
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{objective_is_frechet}
+
+Under \assuref{exchange_order_q}, the map $\eta, \phi \mapsto \partial
+\expect{\q(\theta \vert \eta)}{\phi(\theta)} / \partial \eta$ is Fr{\'e}chet
+differentiable as a map from $\mathbb{R}^\etadim \times \linf  \mapsto
+\mathbb{R}^\etadim$.
+%
+\begin{proof}
+%
+The map $\eta, \phi \mapsto  \partial \expect{\q(\theta \vert
+\eta)}{\phi(\theta)} / \partial \eta$ is a map from the Banach space
 $\mathbb{R}^\etadim \times \linf$ into the Banach space $\mathbb{R}$. Let us
 take the L2 norm $\norm{\cdot}_2$ on $\mathbb{R}^{\etadim}$ and $\mathbb{R}$.
 Let $\ball$ denote the ball $\ball_\eta \times \{ \phi: \norminf{\phi} <
@@ -521,239 +361,283 @@ $\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
 \begin{align*}
 %
 \norm{\linop}^* :=
-    \sup_{\eta: \norm{\eta}_2 \le 1} \sup_{\phi: \norminf{\phi} \le 1}
-     \norm{\linop(\eta, \phi)}_2.
+    \sup_{\Delta \eta: \norm{\eta}_2 \le 1}
+    \sup_{\Delta \phi: \norminf{\phi} \le 1}
+     \norm{\linop(\Delta \eta, \Delta \phi)}_2.
 %
 \end{align*}
+%
+Formally, $\Delta \eta$ and $\Delta \phi$ are members of $\mathbb{R}^\etadim$
+and $\linf$ respectively, but in the preceding display they can be thought of as
+directions on which the linear operator $\linop$ operates.
 
-For any $\phi \in \ball_\phi$, observe that $\t \mapsto \pstick(\zeta \vert \t
-\phi)$ satisfies (Q STICK REGULAR) under (Q FUN STICK REGULAR),
-since, for any $f(\nu)$, $\lambda$-almost surely,
+Observe that the directional derivatives are linear operators, and so
+$\norm{\cdot}^*$ defines a norm on the space of linear operators. We will prove
+Fr{\'e}chet differentiability using the fact that a functional is Fr{\'e}chet
+differentiable if its directional derivatives are continuous in $\norm{\cdot}^*$
+as a function of the location at which they are evaluted  (see
+\citet[Proposition 4.8(c)]{zeidler:2013:functional}, \citet[Corollary
+1.4]{averbukh:1967:theory} and \citep[Appendix A]{reeds:1976:thesis}). Further,
+it suffices by \citet[Proposition 4.14(c)]{zeidler:2013:functional} to show that
+the partial derivatives with respect to $\eta$ and $\phi$ are Fr{\'e}chet to
+show that the joint map is Fr{\'e}chet differentiable.
+
+Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
+applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
+
+%%%%%%%
+% eta
+
+First, consider the partial derivative with respect to $\eta$.  The
+linear operator corresponding to the directional derivative in the
+$\Delta \eta$ direction is given by
 %
 \begin{align*}
 %
-f(\nu) \phi(\nu) \le f(\nu) \norminf{\phi} \le \norminf{\phi} M(\nu).
+\linop_\eta(\Delta \eta, \Delta \phi) =
+    \fracat{\partial^2 \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+           {\partial \eta \partial\eta^T}{\eta} \Delta \eta,
 %
 \end{align*}
 %
-So, by \lemref{logq_continuous}, $\eta \mapsto \partial \KL{\eta, \phi} /
-\partial \eta$ is continuous for any $\phi \in \ball_\phi$, and by a first-order
-condition $\etaopt(\phi)$ satisfies
+with no dependence on $\Delta \phi$.  Define for the moment the the $\etadim
+\times \etadim$ matrix $\mathscr{H}(\eta, \phi) := \partial^2 \expect{\q(\theta
+\vert \eta)}{\phi(\theta)} / \partial \eta \partial \eta^T$.  Then the dual norm
+of the derivative is simply the operator norm of $\mathscr{H}$, i.e.,
+$\norm{\linop_\eta}^* = \norm{\mathscr{H}(\eta, \phi)}_{op}$. Thus we must show
+that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta, \phi$.  For
+any $\eta', \phi'$ and $\eta'', \phi''$ in $\ball_\eta \times
+\ball_\phi(\delta)$,
 %
 \begin{align*}
 %
-\fracat{\partial \KL{\eta, \phi}}
-                {\partial \eta}
-                {\etaopt(\phi)} = 0.
+\MoveEqLeft
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta'', \phi'')}_{op} \\
+&\le
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op} +
+\norm{\mathscr{H}(\eta', \phi'') - \mathscr{H}(\eta'', \phi'')}_{op}.
 %
 \end{align*}
 %
-Using this estimating equation, the key to the proof will be the implicit
-function theorem for Banach spaces. To use the implicit function theorem, we
-need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
-differentiable at $\etaopt, \phiz$.
-
-%  and that $\KLhess{\eta, \phi}$ is positive
-% definite in $\ball$.  --- is the actually needed?
-
-For the duration of the proof, define
+For the first term in the preceding display, for all $\eta'$,
 %
 \begin{align*}
 %
-\rho(\etanuk, \phi) :={}&
-    \expect{\q(\nu \vert \etanuk)}{\phi(\etanuk)}
-\mathand\\
-\rho_\eta(\etanuk, \phi) :={}&
-    \fracat{\partial \rho(\etanuk, \phi)}{\phi(\etanuk)}.
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op}
+    \le{}&
+    \fracat{\partial^2 \expect{\q(\theta \vert \eta)}{1}}
+           {\partial \eta \partial\eta^T}{\eta'} \norminf{\phi' - \phi''}
+           \Rightarrow\\
+\lim_{\phi' \rightarrow \phi''}
+\norm{\mathscr{H}(\eta', \phi') - \mathscr{H}(\eta', \phi'')}_{op} ={}& 0.
 %
 \end{align*}
 %
-Expanding $\logp(\zeta \vert \phi)$ in \eqref{vb_optimization}, we see that
+For the second term, by \lemref{logq_continuous}, for all $\phi''$,
+%
+\begin{align*}
+%
+\lim_{\eta' \rightarrow \eta''}
+    \norm{\mathscr{H}(\eta', \phi'') - \mathscr{H}(\eta'', \phi'')}_{op} = 0.
+%
+\end{align*}
+%
+It follows that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta,
+\phi$, and so the partial derivative with respect to $\eta$ is
+a continuous Fr{\'e}chet derivative.
+
+%%%%%%%
+% phi
+
+Next, we consider the partial derivative with respect to $\phi$.  By \eqref{q_sens_is_cov}, we can write
+%
+\begin{align*}
+%
+\fracat{\partial \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+       {\partial \eta}{\eta}
+={}
+\expect{\q(\theta \vert \eta)}
+       {\lqgradbar{\theta \vert \eta} \phi(\theta)}.
+%
+\end{align*}
+%
+Since this expression is linear in $\phi$, the linear operator for the partial
+derivative with respect to $\phi$ is given by
+%
+\begin{align*}
+%
+\linop_\phi(\Delta \eta, \Delta \phi) =
+    \expect{\q(\theta \vert \eta)}
+           {\lqgradbar{\theta \vert \eta} \Delta \phi(\theta)},
+%
+\end{align*}
+%
+with no dependence on $\Delta \eta$.
+
+In order to be a valid partial derivaive, we must verify that $\linop_\phi$ is a
+bounded linear operator.  Boundedness follows from H{\"o}lder's inequality and
+\assuref{exchange_order_q} since
+%
+\begin{align*}
+%
+\sup_{\Delta\phi: \norminf{\Delta\phi} \le 1}
+    \norm{\linop_\phi(\Delta \eta, \Delta \phi)}_2
+\le{}&
+\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1} \norminf{\Delta \phi}
+\\\le{}&
+\sqrt{\etadim}\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_2}
+\\\le{}&
+\sqrt{\etadim} \int M(\theta) \mu(d\theta) < \infty.
+%
+\end{align*}
+
+Similarly, the dual norm of the $\phi$ partial derivative is given by
+%
+\begin{align*}
+%
+\norm{\linop_\phi}^* ={}& \expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1}.
+%
+\end{align*}
+%
+We thus need to show that $\eta \mapsto \expect{\q(\theta \vert \eta)}
+{\norm{\lqgradbar{\theta \vert \eta}}_1}$ is a continuous function of $\eta$
+(there is no $\phi$ dependence).  To show this, observe that
 %
 \begin{align}
-\fracat{\partial \KL{\eta, \phi}}{\partial \eta}{\eta, \phi}
- ={}&
-    \fracat{\partial \KL{\eta, \phiz}}{\partial \eta}{\eta} +
-    \sumkm \rho_\eta(\etanuk, \phi). \eqlabel{kl_fun_pert}
+%
+\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1} ={}&
+\frac{\int \qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_1 \mu(d\theta)}
+     {\int \qtil(\theta \vert \eta) \mu(d\theta)}.
+    \eqlabel{phi_partial_dual}
 %
 \end{align}
 %
-By \assuref{kl_opt_ok}, $\partial \KL{\eta, \phiz} / \partial \eta$ is
-continuously Fr{\'e}chet differentiable (it does not depend on $\phi$), so we
-need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.  As
-in the proof of \thmref{etat_deriv}, we will show continuous differentiability
-by showing that the partial derivatives in the $\eta$ and $\phi$ directions
-are continuous, this time in the dual norm $\norm{\cdot}^*$.
-
-Let us first consider the partial derivative of $\rho_\eta(\etanuk, \phi)$ in
-the $\eta$ direction. By \lemref{logq_derivs} \eqref{q_score_sens_is_cov},
+By \assuref{exchange_order_q}, we have that there exists a finitely integrable
+envelope function $M(\theta)$ such that, for all $\eta \in \ball_\eta$,
 %
 \begin{align*}
 %
-\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} ={}&
-\expect{\q(\nuk \vert \etanuk)}{
-   \lqhessbar{\nuk \vert \etanuk}
-       \left(
-        \phi(\nuk) - \expect{\q(\nuk \vert \etanuk)}{\phi(\nuk)}
-       \right)
-       }.
+\qtil(\theta \vert \eta) \le{}& M(\theta) \mathand \\
+\qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_1
+    \le{}&
+\sqrt{\etadim} \qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_2
+           \le{} M(\theta).
 %
 \end{align*}
 %
-We need to show that the preceding expression is continuous in the dual norm
-$\norm{\cdot}^*$.  The linear operator acts only in the $\eta$ direction, so
-the dual norm is equivalent to operator norm $\normop{\cdot}$.  Since
-the preceding display is linear in $\phi$,
-
+Therefore, by the dominated convergence theorem, we can exchange limits and
+integrals in the numerator and denominator of \eqref{phi_partial_dual}.  It
+follows that, for any $\eta'$ and $\eta''$ in $\ball_\eta$,
 %
 \begin{align*}
 %
-\MoveEqLeft
-%
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-      }^* \\ \le
-%
-& \norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-        \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'}
-    }^* + \\&\quad
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-    }^* \\ \le
-%
-& \normop{
-    \expect{\q(\nuk \vert \etanuk)}
-           {\lqhessbar{\nuk \vert \etanuk}}
-    } \norminf{\phi - \phi'} + \\&\quad
-\normop{
-    \expect{\q(\nuk \vert \etanuk)}{\lqhessbar{\nuk \vert \etanuk}} -
-    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk'}}
-  } \norminf{\phi'}.
+\lim_{\eta' \rightarrow \eta''}
+\abs{\int \qtil(\theta \vert \eta') \mu(d\theta) -
+     \int \qtil(\theta \vert \eta'') \mu(d\theta)}
+\le{}&
+\lim_{\eta' \rightarrow \eta''}
+\int  \abs{\qtil(\theta \vert \eta') - \qtil(\theta \vert \eta'')}
+\mu(d\theta)
+\\={}&
+\int \lim_{\eta' \rightarrow \eta''}  \abs{
+\qtil(\theta \vert \eta') - \qtil(\theta \vert \eta'')
+}
+={} 0.
 %
 \end{align*}
 %
-Since continuity in $\norm{\cdot}_2$ implies continuity in $\normop{\cdot}$,
-the preceding display and \lemref{logq_continuous} gives that
-$\partial \rho_\eta(\etanuk, \phi) / \partial \etanuk$ is continuous,
-since
-%
-\begin{align*}
-%
-\lim_{\eta' \rightarrow \eta} \lim_{\phi' \rightarrow \phi}
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-      }^* = 0.
-%
-\end{align*}
-
-Next, we consider the partial derivative in the direction $\phi$.  Observing
-that $\rho_\eta(\etanuk, \phi)$ is in fact linear in $\phi$, we see that the
-partial derivative in the $\phi$ direction is given by the linear map
-%
-\begin{align}\eqlabel{rho_phi_partial}
-%
-\fracat{\partial \rho_\eta(\etanuk, \phi)}
-       {\partial \phi}{\eta, \phi} \phi =
-    \rho_\eta(\etanuk, \phi).
-%
-\end{align}
-%
-By \lemref{logq_derivs} \eqref{q_sens_is_cov},
-%
-\begin{align}\eqlabel{rho_phi_partial_cov}
-%
-\rho_\eta(\etanuk, \phi) ={}&
-\expect{\q(\nuk \vert \etanuk)}
-       {\lqgradbar{\nuk \vert \etanuk} \left(
-        \phi(\nuk) - \expect{\q(\nuk \vert \etanuk)}{\phi(\nuk)}
-       \right)
-       }.
-%
-\end{align}
-%
-Note that
-%
-\begin{align*}
-%
-\sup_{\phi: \norminf{\phi} \le 1} \norm{\rho_\eta(\etanuk, \phi)}_2 \le{}&
-    2 \expect{\q(\nuk \vert \etanuk)}
-             {\norm{\lqgradbar{\nuk \vert \etanuk}}_2
-             },
-%
-\end{align*}
-%
-so that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is a bounded linear operator and
-so a valid derivative.
-
-We now need to show continuity of the map of $\eta, \phi \mapsto
-\rho_\eta(\etanuk, \phi)$ in the dual norm $\norm{\cdot}^*$.  Obviously the
-linear map does not depend on the location $\phi$ at which it is evaluated, so
-we need consider only continuity in $\eta$.  The linear map is zero in the
-$\eta$ direction, so the dual norm is given by
-%
-\begin{align*}
-%
-\MoveEqLeft
-\norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* ={}\\&
-\sup_{\phi: \norminf{\phi} \le 1}
-    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \le{}\\&
-4 \norm{
-    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk'}} -
-    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk}}
-}_2.
-%
-\end{align*}
-%
-Applying \lemref{logq_continuous} to the preceding display gives
-%
-\begin{align*}
-%
-\lim_{\eta' \rightarrow \eta}
-    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* = 0,
-%
-\end{align*}
-%
-and so $\partial \rho_\eta(\eta, \phi) / \partial \phi$ is a bounded linear
-function, continuous in the point at which it is evaluated, and so $\phi \mapsto
-\rho_\eta(\eta, \phi)$ is continuously Fr{\'e}chet differentiable.
+Thus the numerator of \eqref{phi_partial_dual} is continuous in $\eta$. The
+denominator of \eqref{phi_partial_dual} is also conitnuous by an analogous
+argument.  Since the denominator of \eqref{phi_partial_dual} is bounded away
+from zero, $\expect{\q(\theta \vert \eta)} {\norm{\lqgradbar{\theta \vert
+\eta}}_1}$ is a continuous composition of continuous functions, and itself
+continuous.  It follows that the $\phi$ partial derivative is
+continuously Fr{\'e}chet differentiable.
 
 Since its partial derivatives are continuous, it follows by \citet[Proposition
 4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
-\partial \KL{\eta, \phi} / \partial \eta$ is continously Fr{\'e}chet
-differentiable.  Furthermore, \citet[Chapter 4 Condition
-21b]{zeidler:2013:functional} holds since $\KLhess{\etaopt(\phiz), \phiz}$ is
-invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i),
-(ii), and (iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that
-the function $\etaopt(\phi)$ exists.  Moreover, since we have shown that $\eta,
-\phi \mapsto \partial \KL{\eta, \phi} / \partial \eta$ is continuously
-Fre{\'e}chet differentiable ($C^1$ in the notation of Zeidler) in a neighborhood
-of $\etaopt(\phiz), \phiz$, by \citet[Theorem 4.B(d)]{zeidler:2013:functional},
-$\etaopt(\phi)$ is also continuously Fr{\'e}chet differentiable.
+\partial \expect{\q(\theta \vert \eta)}{\phi(\theta)} / \partial \eta$ is
+continously Fr{\'e}chet differentiable.
 
-The form of the derivative is given by the directional derivatives $d \etaopt(\t
-\phi) / d\t | \t = 0$, which, by \thmref{etat_deriv} and \eqref{rho_phi_partial,
-rho_phi_partial_cov}, is given by
-%
-\begin{align*}
-%
--\left(\fracat{\partial^2 \KL{\eta, \phiz}}
-                {\partial \eta \partial \eta^T}
-                {\etaopt}\right)^{-1}
-\left(
-    \sumkm \expect{\q(\nu \vert \etaoptnuk)}
-                  {\lqgradbar{\nuk \vert \etanuk}
-                   \phi(\nuk) }
-\right).
-%
-\end{align*}
-%
-(Note that a general version of the same result is given immediately following
-the statement of \citet[Theorem 4.B(c)]{zeidler:2013:functional}.)  In the last
-line of the preceding display we have dropped the $\expect{\q(\nuk \vert
-\etanuk)}{\phi(\nuk)}$ term since $\expect{\q(\nu \vert \etaoptnuk)}
-{\lqgradbar{\nuk \vert \etanuk}} = 0$.  \Eqref{infl_defn} follows by
-re-writing the preceding display as an integral.
-%
 \end{proof}
 %
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Proof of eta_phi_deriv
+
+\prooflabel{eta_phi_deriv}\proofof{\thmref{eta_phi_deriv}}
+%
+Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
+applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
+Therefore, as in the proof of \thmref{etat_deriv}, for any $\phi \in \ball_\phi(\delta)$, $\etaopt(\phi)$ satisfies the first-order condition
+%
+\begin{align}\eqlabel{vb_first_order_condition_phi}
+%
+\fracat{\partial \KL{\eta}}{ \partial \eta}{\etaopt(\phi)} +
+\fracat{\partial
+    \expect{\q(\theta \vert \eta)}{\phi(\theta)}}
+    {\partial \eta}
+    {\etaopt(\phi)}
+={} 0.
+%
+\end{align}
+
+As in the proof of \thmref{etat_deriv}, we wish to employ an implicit
+function theorem, but this time for general Banach spaces.  We will
+us \citet[Theorem 4.B]{zeidler:2013:functional}.
+
+First, \citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
+$\KLhess{\etaopt(\phiz), \phiz}$ is invertible by
+\assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i), (ii), and
+(iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that the
+function $\etaopt(\phi)$ exists.
+
+Moreover, by \assuitemref{kl_opt_ok}{kl_diffable} and
+\lemref{objective_is_frechet}, the estimating equation
+\eqref{vb_first_order_condition_phi} is continuously Fre{\'e}chet differentiable
+($C^1$ in the notation of Zeidler) in a neighborhood of $\etaopt(\phiz), \phiz$.
+It follows from \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$
+is also continuously Fr{\'e}chet differentiable.
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{lem}\lemlabel{continuity_partition}
+%
+Let $\epsilon'_n = n^{-1}$.  Since $\pbase \ll \mu \ll \lambda$ (where $\lambda$
+is the Lebesgue measure), by applying \citet[Proposition
+15.5]{nielsen:1997:measure}, for each $n$ there exists a $\delta'_n$ such that,
+for any measureable set $A$ with $\mu(A) < \delta'_n$, $\pbase(A) <
+\epsilon'_n$.  Again applying \citet[Proposition 15.5]{nielsen:1997:measure},
+there similarly exists a $\delta_n$ such that for any measureable set $A$ with
+$\lambda(A) < \delta_n$, $\mu(A) < \delta'_n \Rightarrow \pbase(A) <
+\epsilon'_n$.
+
+For each $n$, partition $\thetadom$ into a countable number of sets $A_{m}$ such
+that $\sum_{m} \lambda(A_{m}) = 1$ and $\lambda(A_{m}) < \delta_n$. (This is
+possible by dividing $\thetadom$ into sufficiently small rectangles, for
+example.)  Then $\pbase(A_{m}) < \epsilon'_n$ for all $m$.  Since $\pbase$ is a
+probability measure, $\sum_m \pbase(A_{m}) = 1$, so there must exist at least $1 /
+\epsilon'_n$ indices $m'$ such that $\pbase(A_{m'}) > 0$. Take any such $m'$ and
+let $\epsilon_n = \pbase(A_{m'})$ and $S_n = A_{m'}$.
+
+%
+\end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
