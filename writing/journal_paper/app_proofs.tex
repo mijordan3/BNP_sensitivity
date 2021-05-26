@@ -282,10 +282,7 @@ For the second term, by \lemref{logq_continuous}, for all $\phi''$,
 It follows that $\norm{\mathscr{H}(\eta, \phi)}_{op}$ is continuous in $\eta,
 \phi$, and so the partial derivative with respect to $\eta$ is Fr{\'e}chet.
 
-\hrulefill
-
- so we
-use \eqref{q_sens_is_cov} to write
+Next, we consider the partial derivative with respect to $\phi$.  By \eqref{q_sens_is_cov}, we can write
 %
 \begin{align*}
 %
@@ -297,139 +294,104 @@ use \eqref{q_sens_is_cov} to write
 %
 \end{align*}
 %
-
-
-Let us first consider the partial derivative in the $\eta$ direction. By
-\lemref{logq_derivs} \eqref{q_score_sens_is_cov},
+Since this expression is linear in $\phi$, the linear operator for the partial
+derivative with respect to $\phi$ is given by
 %
 \begin{align*}
 %
-\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} ={}&
-\expect{\q(\nuk \vert \etanuk)}{
-   \lqhessbar{\nuk \vert \etanuk}
-       \left(
-        \phi(\nuk) - \expect{\q(\nuk \vert \etanuk)}{\phi(\nuk)}
-       \right)
-       }.
+\linop_\phi(\Delta \eta, \Delta \phi) =
+    \expect{\q(\theta \vert \eta)}
+           {\lqgradbar{\theta \vert \eta} \Delta \phi(\theta)},
 %
 \end{align*}
 %
-We need to show that the preceding expression is continuous in the dual norm
-$\norm{\cdot}^*$.  The linear operator acts only in the $\eta$ direction, so
-the dual norm is equivalent to operator norm $\normop{\cdot}$.  Since
-the preceding display is linear in $\phi$,
+with no dependence on $\Delta \eta$.
 
+In order to be a valid partial derivaive, we must verify that $\linop_\phi$ is a
+bounded linear operator.  Boundedness follows from H{\"o}lder's inequality and
+\assuref{exchange_order_q} since
 %
 \begin{align*}
 %
-\MoveEqLeft
-%
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-      }^* \\ \le
-%
-& \norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-        \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'}
-    }^* + \\&\quad
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi'} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-    }^* \\ \le
-%
-& \normop{
-    \expect{\q(\nuk \vert \etanuk)}
-           {\lqhessbar{\nuk \vert \etanuk}}
-    } \norminf{\phi - \phi'} + \\&\quad
-\normop{
-    \expect{\q(\nuk \vert \etanuk)}{\lqhessbar{\nuk \vert \etanuk}} -
-    \expect{\q(\nuk \vert \etanuk')}{\lqhessbar{\nuk \vert \etanuk'}}
-  } \norminf{\phi'}.
-%
-\end{align*}
-%
-Since continuity in $\norm{\cdot}_2$ implies continuity in $\normop{\cdot}$,
-the preceding display and \lemref{logq_continuous} gives that
-$\partial \rho_\eta(\etanuk, \phi) / \partial \etanuk$ is continuous,
-since
-%
-\begin{align*}
-%
-\lim_{\eta' \rightarrow \eta} \lim_{\phi' \rightarrow \phi}
-\norm{\fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta, \phi} -
-      \fracat{\partial \rho_\eta(\etanuk, \phi)}{\partial \etanuk}{\eta', \phi'}
-      }^* = 0.
+\sup_{\Delta\phi: \norminf{\Delta\phi} \le 1}
+    \norm{\linop_\phi(\Delta \eta, \Delta \phi)}_2
+\le{}&
+\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1} \norminf{\Delta \phi}
+\\\le{}&
+\sqrt{\etadim}\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_2}
+\\\le{}&
+\sqrt{\etadim} \int M(\theta) \mu(d\theta) < \infty.
 %
 \end{align*}
 
-Next, we consider the partial derivative in the direction $\phi$.  Observing
-that $\rho_\eta(\etanuk, \phi)$ is in fact linear in $\phi$, we see that the
-partial derivative in the $\phi$ direction is given by the linear map
+Similarly, the dual norm of the $\phi$ partial derivative is given by
 %
-\begin{align}\eqlabel{rho_phi_partial}
+\begin{align*}
 %
-\fracat{\partial \rho_\eta(\etanuk, \phi)}
-       {\partial \phi}{\eta, \phi} \phi =
-    \rho_\eta(\etanuk, \phi).
+\norm{\linop_\phi}^* ={}& \expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1}.
+%
+\end{align*}
+%
+We thus need to show that $\eta \mapsto \expect{\q(\theta \vert \eta)}
+{\norm{\lqgradbar{\theta \vert \eta}}_1}$ is a continuous function of $\eta$
+(there is no $\phi$ dependence).  To show this, observe that
+%
+\begin{align}
+%
+\expect{\q(\theta \vert \eta)}
+       {\norm{\lqgradbar{\theta \vert \eta}}_1} ={}&
+\frac{\int \qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_1 \mu(d\theta)}
+     {\int \qtil(\theta \vert \eta) \mu(d\theta)}.
+    \eqlabel{phi_partial_dual}
 %
 \end{align}
 %
-By \lemref{logq_derivs} \eqref{q_sens_is_cov},
-%
-\begin{align}\eqlabel{rho_phi_partial_cov}
-%
-\rho_\eta(\etanuk, \phi) ={}&
-\expect{\q(\nuk \vert \etanuk)}
-       {\lqgradbar{\nuk \vert \etanuk} \left(
-        \phi(\nuk) - \expect{\q(\nuk \vert \etanuk)}{\phi(\nuk)}
-       \right)
-       }.
-%
-\end{align}
-%
-Note that
+By \assuref{exchange_order_q}, we have that there exists a finitely integrable
+envelope function $M(\theta)$ such that, for all $\eta \in \ball_\eta$,
 %
 \begin{align*}
 %
-\sup_{\phi: \norminf{\phi} \le 1} \norm{\rho_\eta(\etanuk, \phi)}_2 \le{}&
-    2 \expect{\q(\nuk \vert \etanuk)}
-             {\norm{\lqgradbar{\nuk \vert \etanuk}}_2
-             },
+\qtil(\theta \vert \eta) \le{}& M(\theta) \mathand \\
+\qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_1
+    \le{}&
+\sqrt{\etadim} \qtil(\theta \vert \eta)
+           \norm{\lqgradbar{\theta \vert \eta}}_2
+           \le{} M(\theta).
 %
 \end{align*}
 %
-so that $\phi \mapsto \rho_\eta(\etanuk, \phi)$ is a bounded linear operator and
-so a valid derivative.
-
-We now need to show continuity of the map of $\eta, \phi \mapsto
-\rho_\eta(\etanuk, \phi)$ in the dual norm $\norm{\cdot}^*$.  Obviously the
-linear map does not depend on the location $\phi$ at which it is evaluated, so
-we need consider only continuity in $\eta$.  The linear map is zero in the
-$\eta$ direction, so the dual norm is given by
+Therefore, by the dominated convergence theorem, we can exchange limits and
+integrals in the numerator and denominator of \eqref{phi_partial_dual}.  It
+follows that, for any $\eta'$ and $\eta''$ in $\ball_\eta$,
 %
 \begin{align*}
 %
-\MoveEqLeft
-\norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* \\={}&
-\sup_{\phi: \norminf{\phi} \le 1}
-    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}_2 \\\le{}&
-4 \norm{
-    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk'}} -
-    \expect{\q(\nuk \vert \etanuk')}{\lqgradbar{\nuk \vert \etanuk}}
-}_2.
+\lim_{\eta' \rightarrow \eta''}
+\abs{\int \qtil(\theta \vert \eta') \mu(d\theta) -
+     \int \qtil(\theta \vert \eta'') \mu(d\theta)}
+\le{}&
+\lim_{\eta' \rightarrow \eta''}
+\int  \abs{\qtil(\theta \vert \eta') - \qtil(\theta \vert \eta'')}
+\mu(d\theta)
+\\={}&
+\int \lim_{\eta' \rightarrow \eta''}  \abs{
+\qtil(\theta \vert \eta') - \qtil(\theta \vert \eta'')
+}
+={} 0.
 %
 \end{align*}
 %
-Applying \lemref{logq_continuous} to the preceding display gives
-%
-\begin{align*}
-%
-\lim_{\eta' \rightarrow \eta}
-    \norm{\rho_\eta(\etanuk', \phi) - \rho_\eta(\etanuk, \phi)}^* = 0,
-%
-\end{align*}
-%
-and so $\partial \rho_\eta(\eta, \phi) / \partial \phi$ is a bounded linear
-function, continuous in the point at which it is evaluated, and so $\phi \mapsto
-\rho_\eta(\eta, \phi)$ is continuously Fr{\'e}chet differentiable.
+Thus the numerator of \eqref{phi_partial_dual} is continuous in $\eta$. The
+denominator of \eqref{phi_partial_dual} is also conitnuous by an analogous
+argument.  Since the denominator of \eqref{phi_partial_dual} is bounded away
+from zero, $\expect{\q(\theta \vert \eta)} {\norm{\lqgradbar{\theta \vert
+\eta}}_1}$ is a continuous composition of continuous functions, and itself
+continuous.  It follows that the $\phi$ partial derivative is Fr{\'e}chet.
 
 Since its partial derivatives are continuous, it follows by \citet[Proposition
 4.14(c)]{zeidler:2013:functional} that the joint map $\eta, \phi \mapsto
