@@ -165,8 +165,8 @@ density, which is strictly weaker than \assuref{exchange_order_dom}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{exchange_order_q}
 %
-Assume that \lemref{exchange_order} applies with the function $f(\theta, \eta,
-\t) = \q(\theta \vert \eta)$ (no $\t$ dependence).
+Assume that \assuref{exchange_order_f} applies with the function $f(\theta,
+\eta, \t) = \q(\theta \vert \eta)$ (no $\t$ dependence).
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,7 +206,7 @@ It suffices to show that \assuref{exchange_order_q} implies
 \assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
 when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
 \phi(\theta)$, so, for any $f(\theta, \eta, \t)$ that satisfies the conditions
-of \lemref{exchange_order},
+of \assuref{exchange_order_f},
 %
 %\begin{align*}
 %
@@ -214,8 +214,8 @@ $\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta)$.
 %
 %\end{align*}
 %
-Therefore \lemref{exchange_order} applies to $\phi(\theta) f(\theta, \eta, \t)$
-as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
+Therefore \assuref{exchange_order_f} is satisfied by $\phi(\theta) f(\theta,
+\eta, \t)$ as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
 \assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}.
 %
 The form of the influence function is then given by gathering terms in

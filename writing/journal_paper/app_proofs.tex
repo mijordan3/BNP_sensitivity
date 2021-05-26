@@ -37,7 +37,15 @@ $\mu$-almost surely and for all $\t \in S_\t$, then
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\proofof{\lemref{exchange_order}}\prooflabel{exchange_order}
+\begin{lem}\lemlabel{exchange_order}
+%
+Under \assuref{exchange_order_f}, at any $\eta, \t \in \ball_\eta \times
+\ball_\t$, we can exchange the order of integration and differentiation in $\int
+f(\theta, \eta, \t) \mu(d\theta)$ for the derivatives $\partial / \partial
+\eta$, $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial
+\t$.
+%
+\begin{proof}
 
 Let $\eta_d$ denote the $d-$th entry of the vector $\eta$.  Then
 %
@@ -57,6 +65,9 @@ Let $\eta_d$ denote the $d-$th entry of the vector $\eta$.  Then
 %
 The conclusion follows by repeatedly applying \thmref{dct} to the components
 of the derivatives.
+
+\end{proof}
+\end{lem}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -165,7 +176,7 @@ Then
 %
 \end{align*}
 %
-Therefore, for \lemref{exchange_order}, we can take $M(\theta)
+Therefore, for \assuref{exchange_order_f}, we can take $M(\theta)
 \propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
 similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
 $\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
@@ -318,10 +329,11 @@ $\norminf{\phi} < \infty$.
 \begin{proof}
 %
 Since $\qtil(\theta \vert \eta) \phi(\theta) \le \qtil(\theta \vert \eta)
-\delta$, and $\qtil(\theta \vert \eta)$ satisfies \lemref{exchange_order} with
-some $M(\theta)$ by \assuref{exchange_order_q}, so we can satisfy
-\lemref{exchange_order} for $\qtil(\theta \vert \eta) \phi(\theta)$ with
-$\max\{1, \delta\} M(\theta)$.
+\delta$, and $\qtil(\theta \vert \eta)$ satisfies \assuref{exchange_order_f}
+with some $M(\theta)$ by \assuref{exchange_order_q}, we can satisfy
+\assuref{exchange_order_f} for $\qtil(\theta \vert \eta) \phi(\theta)$ with
+$\max\{1, \delta\} M(\theta)$.  Finally, \lemref{exchange_order} implies that
+\assuref{exchange_order} is satisfied.
 %
 \end{proof}
 %
