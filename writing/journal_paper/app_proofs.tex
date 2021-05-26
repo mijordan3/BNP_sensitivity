@@ -165,7 +165,7 @@ Then
 %
 \end{align*}
 %
-Therefore, for \assuitemref{dist_fun_nice}{fundom}, we can take $M(\theta)
+Therefore, for \lemref{exchange_order}, we can take $M(\theta)
 \propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
 similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
 $\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
@@ -570,7 +570,7 @@ Recall that, by \lemref{exchange_order_q_suffices}, \lemref{logq_continuous}
 applies with $\ptil(\theta \vert \t) = \phi(\theta)$ (no $\t$ dependence).
 Therefore, as in the proof of \thmref{etat_deriv}, for any $\phi \in \ball_\phi(\delta)$, $\etaopt(\phi)$ satisfies the first-order condition
 %
-\begin{align}\eqlabel{vb_first_order_condition}
+\begin{align}\eqlabel{vb_first_order_condition_phi}
 %
 \fracat{\partial \KL{\eta}}{ \partial \eta}{\etaopt(\phi)} +
 \fracat{\partial
@@ -593,7 +593,7 @@ function $\etaopt(\phi)$ exists.
 
 Moreover, by \assuitemref{kl_opt_ok}{kl_diffable} and
 \lemref{objective_is_frechet}, the estimating equation
-\eqref{vb_first_order_condition} is continuously Fre{\'e}chet differentiable
+\eqref{vb_first_order_condition_phi} is continuously Fre{\'e}chet differentiable
 ($C^1$ in the notation of Zeidler) in a neighborhood of $\etaopt(\phiz), \phiz$.
 It follows from \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$
 is also continuously Fr{\'e}chet differentiable.
