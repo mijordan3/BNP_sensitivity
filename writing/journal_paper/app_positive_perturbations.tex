@@ -1,90 +1,41 @@
 
-% Suppose $p < \infty$ and we wish to choose a $\phi$ to change $\pbase$ into
-% $\palt$, for which \defref{prior_nl_pert} gives that we must choose
-% %
-% \begin{align}\eqlabel{phi_for_palt}
-% %
-% \phi(\theta) = \alpha \palt(\theta)^{1/p} - \pbase(\theta)^{1/p}
-%     \mathtxt{where}\alpha > 0.
-% %
-% \end{align}
-%
-As long as $\palt(\nu) > 0$ whenever $\pbase(\nu) >
-0$ (a condition which is certainly not always satisfied), one can choose
-%
-\begin{align*}
-%
-\alpha = \sup_{\nu} \left(\frac{\pbase(\nu)}{\palt(\nu)}\right)^{1/p}
-%
-\end{align*}
-%
-to guarantee that $\phi(\nu)$ is non-negative.  However, by doing so, one might
-have to create a ``large'' perturbation, according to the $\norm{\cdot}_p$,
-as the following \exref{positive_pert_large} demonstrates.
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{ex}
-% %
-% Let $\pbase(\nu) = \frac{4}{3}\ind{\frac{1}{4} \le \nu \le 1}$ and $\palt(\nu) =
-% \frac{4}{3}\ind{0 \le \nu \le \frac{3}{4}}$.  Then, for any $\alpha > 0$, any $1
-% \le p < \infty$, and for $\phi$ as given in \eqref{phi_for_palt}, $\phi(7/8) <
-% 0$.  So there is no value of $\alpha$ that can transform $\pbase$ into $\palt$
-% using only a positive perturbation.
-% %
-% \end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\SimPositivePertFig
+The following example illustrates how, by requiring pertubations to be positive,
+one can induce counterintuitive notions of the ``size'' of a perturbation that
+ablates prior mass.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{positive_pert_large}
 %
+\SimPositivePertFig
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \begin{figure}[h!]
-%
-% \includegraphics[width=0.980\linewidth,height=0.980\linewidth]{static_images/positive_phi_example.png}
-% %
-% \caption{A plot of the perturbations from \exref{positive_pert_large}
-% with $p=2$ and $\epsilon=0.05$.  Positive $\phi$ can only add mass, so to remove
-% a small amount of mass requires adding mass everywhere else and re-normalizing,
-% resulting in a large perturbation according to $\norm{\cdot}_p$.}
-% %
-% \figlabel{positive_pert_large}
-% \centering
-% \end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Let $\pbase(\nu) = \ind{0 \le \nu \le 1}$.  For some $\delta > 0$ and $0 <
-\epsilon \ll 1$, let
+Take $\mu$ to be the Lebesgue measure on $[0,1]$. Let $\pbase(\theta) = \ind{0
+\le \theta \le 1}$.  For some $\delta > 0$ and $0 < \epsilon \ll 1$, let
 %
 \begin{align*}
 %
-\palt(\nu) :={}&
+\palt(\theta) :={}&
     \left(\frac{1-\delta \epsilon}{1 - \epsilon} \right)
-        \ind{\epsilon \le \nu \le 1} +
-    \delta \ind{0 \le \nu \le \epsilon}.
+        \ind{\epsilon \le \theta \le 1} +
+    \delta \ind{0 \le \theta \le \epsilon}.
 %
 \end{align*}
 %
-% where the final approximation is due to the smallness of $\epsilon$.
-Then (PHI FOR PALT) gives, for some $\alpha$,
+
+We can use \eqref{p_pert_simple} to give $\ptil(\theta \vert \tp=1) = \palt(\theta)$ by using, for any $\alpha > 0$,
 %
 \begin{align*}
 %
-\phi ={}&
+\phi(\theta) ={}&
     \left( \alpha\left(\frac{1-\delta \epsilon}{1-\epsilon} \right)^{1/p}
         - 1
     \right)
-        \ind{\epsilon \le \nu \le 1} +
-    \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \nu \le \epsilon}.
+        \ind{\epsilon \le \theta \le 1} +
+    \left(\alpha \delta^{1/p} - 1 \right) \ind{0 \le \theta \le \epsilon}.
 %
 %
 \end{align*}
 %
-And
+It follows that
 %
 \begin{align*}
 %
@@ -139,7 +90,7 @@ so
 
 Next, consider removing the same amount of mass with the symmetric change
 $\delta = \epsilon$, letting $\phi^-$ be the corresponding perturbation. Then we
-can ensure that $\phi(\nu) \ge 0$ with $\alpha^p \ge \epsilon^{-1}$, and
+can ensure that $\phi(\theta) \ge 0$ with $\alpha^p \ge \epsilon^{-1}$, and
 $\epsilon \ll 1$ gives
 %
 \begin{align*}
