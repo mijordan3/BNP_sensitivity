@@ -26,50 +26,53 @@ chawia_outliers <-
   filter(region == 'Chawia')
 
 
-rect_alpha = 0.1
-linesize = 0.5
+rect_alpha = 0.02
+linesize = 0.1
 text_height = 0.1
 text_size = 3
 
-mbololo_box <- geom_rect(aes(xmin = min(mbololo_outliers$obs_id) - 1.5,
-                             xmax = max(mbololo_outliers$obs_id) + 1.5,
-                             ymin = 0.15, 
-                             ymax = 0.5), 
-                         color = 'black', 
-                         alpha = 0., 
-                         size = linesize)
+vline_bias = 0.6
 
-ngangao_box <- geom_rect(aes(xmin = min(ngangao_outliers$obs_id) - 1.5,
-                             xmax = max(ngangao_outliers$obs_id) + 1.5,
-                             ymin = 0.4, 
-                             ymax = 1.1), 
-                         color = 'black', 
-                         alpha = 0., 
-                         size = linesize)
+box1 <- geom_rect(aes(xmin = 0,
+                     xmax = min(mbololo_outliers$obs_id) - vline_bias,
+                     ymin = 0, 
+                     ymax = 1),
+                  fill = 'grey',
+                  color = 'black',
+                  alpha = rect_alpha,
+                  size = linesize)
 
-chawia_box <- geom_rect(aes(xmin = min(chawia_outliers$obs_id) - 1.5,
-                             xmax = max(chawia_outliers$obs_id),
-                             ymin = 0.1, 
-                             ymax = 0.65), 
-                         color = 'black', 
-                         alpha = 0., 
-                         size = linesize)
+box2 <- geom_rect(aes(xmin = max(mbololo_outliers$obs_id) + vline_bias,
+                      xmax = min(ngangao_outliers$obs_id) - vline_bias,
+                      ymin = 0, 
+                      ymax = 1),
+                  fill = 'grey',
+                  color = 'black',
+                  alpha = rect_alpha, 
+                  size = linesize)
+
+box3 <- geom_rect(aes(xmin = max(ngangao_outliers$obs_id) + vline_bias,
+                      xmax = min(chawia_outliers$obs_id) - vline_bias,
+                      ymin = 0, 
+                      ymax = 1),
+                  fill = 'grey',
+                  color = 'black',
+                  alpha = rect_alpha, 
+                  size = linesize)
 
 p_admix <- out$p + 
-  mbololo_box + 
-  ngangao_box + 
-  chawia_box + 
+  box1 + box2 + box3 + 
   # add letter labels 
-  geom_text(aes(x = min(mbololo_outliers$obs_id) - 5, 
-                y = 0.2, 
+  geom_text(aes(x = median(mbololo_outliers$obs_id), 
+                y = 0.1, 
                 label = 'A'), 
             size = text_size) + 
-  geom_text(aes(x = min(ngangao_outliers$obs_id) - 5, 
-                y = 0.5,
+  geom_text(aes(x = median(ngangao_outliers$obs_id),
+                y = 0.1,
                 label = 'B'), 
             size = text_size) + 
   geom_text(aes(x = median(chawia_outliers$obs_id),
-                y = 0.75, 
+                y = 0.1, 
                 label = 'C'), 
             size = text_size) + 
   theme(axis.text.x = element_blank(), 
@@ -214,5 +217,5 @@ chawia_plots_sum <-
 
 p_admix <- p_admix + theme(legend.position = 'top')
 
-p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum + 
+p_admix / mbololo_plots_sum / ngangao_plots_sum / chawia_plots_sum +
   plot_layout(heights = c(1.25, 1, 1, 1))

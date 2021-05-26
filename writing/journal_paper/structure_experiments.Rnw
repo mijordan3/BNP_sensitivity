@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/structure/structure_plotting_utils.R")
@@ -24,7 +24,7 @@ pop3_color <- '#8da0cb'
 
 Our final data analysis example is an application of a Bayesian topic model to
 population genetics. We consider a publicly available dataset from
-\citet{galbusera:2000:thrush} that contains genotypes from 155 samples of an
+\citet{galbusera:2000:thrush} that contains genotypes from 155 individuals of an
 endangered bird species, the Taita thrush. Individuals were collected from four
 regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual
 was genotyped at seven micro-satellite loci. The four regions were once part of
@@ -32,9 +32,7 @@ a cohesive cloud forest that has since been fragmented by human development. For
 this endangered bird species, understanding the degree to which populations have
 grown genetically distinct is important for conservation efforts: well-separated
 populations with little genetic diversity are particularly at risk of
-extinction.  The goal of the analysis is to identify the presence of latent
-populations, from which one can infer the population of origin for specific
-loci, and estimate the degree to which populations are admixed in each
+extinction.  The goal of the analysis is to infer the population of origin for specific loci and estimate the degree to which populations are admixed in each
 individual.
 
 
@@ -108,7 +106,7 @@ stru_init_fit_cap <- paste(
     (Mbololo, Ngangao, Yale, and Chawia).
     In the text, we refer to the green, orange, and purple latent populations
     as population 1, 2, and 3, respectively. ")
-SetImageSize(aspect_ratio = 0.75 * base_aspect_ratio)
+SetImageSize(aspect_ratio = 0.6 * base_aspect_ratio)
 @
 <<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
 out <- plot_initial_fit()
@@ -118,24 +116,29 @@ out$p
 \subsubsection*{Quantity of interest}
 
 The posterior quantities of interest in this application
-are the individual admixtures $\pi_\n$. 
-\figref{stru_init_fit} plots the inferred admixtures $\pi_\n$ for all
-individuals $\n$ under a GEM prior with parameter $\alpha_0 = 3$.  
-The choice of $\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}, motivated by the fact that the individuals come from four geographic regions. 
+are the admixtures $\pi_\n$. 
+\figref{stru_init_fit} plots the inferred admixtures
+$\expect{\q}{\pi_\n}$ for all individuals $\n$. 
+The approximate posterior was fit to a model with a
+GEM prior at parameter $\alpha_0 = 3$.  
+The choice of $\alpha_0 = 3$ corresponds to roughly four distinct populations 
+{\em a priori} (\eqref{prior_num_clusters}), 
+motivated by the fact that the individuals come from four geographic regions. 
 We will examine the robustness of the inferred admixtures to the prior below. 
 
-In the posterior at $\alpha_0$, there
+In the approximate posterior at $\alpha_0$, there
 appear to be three dominant latent populations, which we arbitrarily label as
 populations 1, 2, and 3 (\figref{stru_init_fit}). 
-The inferred admixture proportions generally correspond with the geographic regions from which each individuals are sampled. 
+The inferred admixture proportions generally correspond with geographic regions:
+Mbololo individuals are primarily population 1; 
+Ngangao individuals are primarily population 2; 
+and Chawia individuals are a mixture of populations 1, 2, and 3. 
 
 Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species. 
 For example,
-while individuals collected from the Mbololo region are inferred to be admixed
-primarily with population 1, several individuals from this region have
-abnormally large admixture proportions of population 2. Conversely, while
-individuals collected from the Ngangao region are admixed primarily with
-population 2, a few of these individuals have abnormally large admixture
+while Mbololo individuals are dominantly population 1,
+several individuals have abnormally large admixture proportions of population 2. Conversely, while Ngangao individuals are dominantly population 2, 
+several individuals have abnormally large admixture
 proportions of population 1. This suggests that some migration has occurred
 between the Mbololo and Ngangao regions.
 
@@ -152,13 +155,14 @@ the average admixture proportion of population $\k$ in a set of
 individuals $\mathcal{N}$.
 
 Below, we present results on three variations of $\gadmix$, corresponding to 
-indididuals hightlighted as ``A," ``B", or ``C" in the top row of \figref{stru_func_sens}:
+individuals hightlighted as ``A," ``B", or ``C" 
+in the top row of \figref{stru_func_sens}:
 $\mathcal{N} = \{26, ..., 31\}$ and $k = 2$,
-corresponding to the six individuals from the Mbololo region with outlying proportions of population 2;
+corresponding to the six Mbololo individuals with outlying proportions of population 2;
 $\mathcal{N} = \{125, ..., 128\}$ and $k = 1$,
-corresponding to the four individuals from the Ngangao region with outlying proportions of population 1;
+corresponding to the four Ngangao individuals with outlying proportions of population 1;
 $\mathcal{N} = \{139, ..., 155\}$ and $k = 3$,
-corresponding to all individuals from the Chawia region.
+corresponding to all Chawia individuals.
 The first two posterior quantities relate to the inferred migration between
 the Mbololo and Ngangao regions. 
 In the last case, we are studying the robustness of having a third latent
