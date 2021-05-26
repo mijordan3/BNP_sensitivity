@@ -60,6 +60,12 @@ of the five constants.
 \prooflabel{etat_deriv}
 \proofof{\thmref{etat_deriv}}
 %
+TODO: replace all the continuity with an assumption, then state a
+DCT assumption that is sufficient.  The proof them reduces to a straightforward
+consequence of the implicit function theorem, together with the form of the
+derivative from a lemma about q expectation derivatives.
+
+%
 For the duration of the proof, define
 %
 \begin{align*}
@@ -89,11 +95,10 @@ Expanding $\logp(\theta \vert \t)$ in \eqref{vb_optimization}, we see that
 % optimization obejctive, $\KL{\eta, 0}$, plus the additive term $\rho(\eta,
 % \t)$ depending only on $\eta$ and $\t$.
 %
-By \lemref{logq_derivs}, $\eta \mapsto \rho(\eta, \t)$ is continuous, and
-by \lemref{logq_continuous} $\eta \mapsto \rho(\eta, \t)$ is continuously
-differentiable, for all $\eta, \t \in \ball$.  So $\partial \KL{\eta, \t}  /
-\partial \eta$ is continuous for all $\eta, \t \in \ball$ and, by the
-first-order condition, $\etaopt(\t)$ satisfies
+By \lemref{logq_continuous}, $\eta \mapsto \rho(\eta, \t)$ is continuous and
+continuously differentiable for all $\eta, \t \in \ball$.  So $\partial
+\KL{\eta, \t}  / \partial \eta$ is continuous for all $\eta, \t \in \ball$ and,
+by the first-order condition, $\etaopt(\t)$ satisfies
 %
 \begin{align}\eqlabel{vb_first_order_condition}
 %
@@ -239,6 +244,9 @@ $\ball$ to $\mathbb{R}^\etadim$, and define the dual norm
 %
 \end{align*}
 
+TOOD: the part about the estimating equation now follows from the directional
+differentiability corrolary.
+
 For any $\phi \in \ball_\phi$, observe that $\t \mapsto \pstick(\zeta \vert \t
 \phi)$ satisfies (Q STICK REGULAR) under (Q FUN STICK REGULAR),
 since, for any $f(\nu)$, $\lambda$-almost surely,
@@ -260,7 +268,8 @@ condition $\etaopt(\phi)$ satisfies
                 {\etaopt(\phi)} = 0.
 %
 \end{align*}
-%
+
+
 Using this estimating equation, the key to the proof will be the implicit
 function theorem for Banach spaces. To use the implicit function theorem, we
 need to show that $\KLgrad{\eta, \phi}$ is continuously Fr{\'e}chet
@@ -268,6 +277,8 @@ differentiable at $\etaopt, \phiz$.
 
 %  and that $\KLhess{\eta, \phi}$ is positive
 % definite in $\ball$.  --- is the actually needed?
+
+TODO: this is specialized to sticks.  Make it general.
 
 For the duration of the proof, define
 %
@@ -297,6 +308,10 @@ need consider only $\etanuk, \phi \mapsto \rho_\eta(\etanuk, \phi)$.  As
 in the proof of \thmref{etat_deriv}, we will show continuous differentiability
 by showing that the partial derivatives in the $\eta$ and $\phi$ directions
 are continuous, this time in the dual norm $\norm{\cdot}^*$.
+
+TODO: As with the parametric proof, this part can be done more easily by proving
+the continuity of the derivatives of $\int \qtil(\theta \vert \eta) \phi(\theta)
+\mu(d\theta)$ as functionals.
 
 Let us first consider the partial derivative of $\rho_\eta(\etanuk, \phi)$ in
 the $\eta$ direction. By \lemref{logq_derivs} \eqref{q_score_sens_is_cov},
