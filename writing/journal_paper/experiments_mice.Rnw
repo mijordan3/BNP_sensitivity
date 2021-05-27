@@ -28,13 +28,13 @@ The goal of the analysis is to cluster the time-course gene expression data
 under the assumption that genes with similar time-course behavior may
 have similar function.
 Clustering gene expressions is often used for exploratory analysis
-and is a first step before further downstream investigation. 
-It is important, therefore, to ascertain the 
+and is a first step before further downstream investigation.
+It is important, therefore, to ascertain the
 stability of the discovered clusters.
 
 \subsubsection*{The model}
 
-% \todo{This could be much clearer. 
+% \todo{This could be much clearer.
 % Start by referencing the figure as an example.
 % Then say that a cluster defines an average expression level over time, that
 % each gene is modeled as belonging to a cluster, and that the gene's
@@ -43,22 +43,22 @@ stability of the discovered clusters.
 % the cluster time series, and list the parameters.}
 
 
-The left plot of \figref{example_genes} 
-shows the measurements of a single gene over time. 
-We model each gene as belonging to a latent component, 
-where each component defines a smooth expression curve over time. 
-Then, observations are drawn by adding i.i.d. noise to the smoothed 
-curve along with a gene-specific offset. 
-Following \citet{Luan:2003:clustering} we construct the smoothers 
-using cubic B-splines. 
+The left plot of \figref{example_genes}
+shows the measurements of a single gene over time.
+We model each gene as belonging to a latent component,
+where each component defines a smooth expression curve over time.
+Then, observations are drawn by adding i.i.d. noise to the smoothed
+curve along with a gene-specific offset.
+Following \citet{Luan:2003:clustering} we construct the smoothers
+using cubic B-splines.
 
 Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurements of gene $\n$
 at $\ntimepoints$ time points.
-Let $\regmatrix$ be the $\ntimepoints \times \d$ regressor matrix. 
+Let $\regmatrix$ be the $\ntimepoints \times \d$ regressor matrix.
 In our case, the $ij$-th entry of $\regmatrix$
 is the $j$-th B-spline basis vector evaluated at the
 $i$-th time point.
-The right plot of 
+The right plot of
 \figref{example_genes} shows the B-spline basis.
 The distribution of the data arising from component $k$ is
 \begin{align}\eqlabel{mice_model}
@@ -71,8 +71,8 @@ where $\b_\n$ is a gene-specific additive offset and $I$ is the identity matrix.
 We include the additive offset because we
 are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
-In this model, the component variables are $\beta_\k = (\mu_\k, \tau_\k)$, 
-the regression coefficients and the inverse noise variance. 
+In this model, the component variables are $\beta_\k = (\mu_\k, \tau_\k)$,
+the regression coefficients and the inverse noise variance.
 
 The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the
 stick-breaking process described in \secref{model_bnp}.
@@ -88,12 +88,12 @@ variational approximation.
 
 \subsubsection*{Quantity of interest: the co-clustering matrix}
 
-In this application, 
+In this application,
 we are particularly interested in which genes cluster together,
 a quantity which we express through the following posterior co-clustering
 matrix.  Let $\gcoclustering(\eta)\in\mathbb{R}^{\N\times\N}$ denote the matrix
 whose $(i,j)$-th entry is the posterior probability that gene $i$ belongs to the
-same cluster as gene $j$, given by 
+same cluster as gene $j$, given by
 %
 \begin{align*}
 %
@@ -108,13 +108,12 @@ same cluster as gene $j$, given by
 %
 \end{align*}
 
-Below, we will use the influence function (\corref{etafun_worst_case})
-to try and find a perturbation that produces large changes in the co-clustering 
-matrix. 
-To produce an easily-visualized influence function, we must choose a
-univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
-the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
-given by
+Below, we will use the influence function (\corref{etafun_worst_case}) to try
+and find a perturbation that produces large changes in the co-clustering matrix.
+To compute the worst-case perturbation, we must choose a univariate summary of
+the $\ngenes^2$-dimensional co-clustering matrix whose deriviative we wish to
+extremize. We use the sum of the eigenvalues of the symmetrically normalized
+graph Laplacian, as given by
 %
 \begin{align*} \laplacianevsum(\eta) = \text{Tr}\left( I - D(\eta)^{-1/2}
 \gcoclustering(\eta) D(\eta)^{-1/2} \right), \end{align*}
@@ -162,11 +161,11 @@ p
 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$
 to the choice of $\alpha$ in the GEM prior.
-We use $\p(\nu_\k\vert\alpha_0) = \betadist{\nu_\k \vert 1, \alpha_0}$ 
-with $\alpha_0 = 6$ as the base prior at 
-which we form the linear approximation. 
-\figref{gene_initial_coclustering} shows the inferred 
-co-clustering matrix at $\alpha_0$. 
+We use $\p(\nu_\k\vert\alpha_0) = \betadist{\nu_\k \vert 1, \alpha_0}$
+with $\alpha_0 = 6$ as the base prior at
+which we form the linear approximation.
+\figref{gene_initial_coclustering} shows the inferred
+co-clustering matrix at $\alpha_0$.
 
 <<example_genes_cap>>=
 example_genes_cap <- paste(
@@ -183,11 +182,11 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 %
 
 We use the linear approximation to extrapolate the co-clustering matrix
-under prior parameters 
+under prior parameters
 $\alpha = \Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$,
-Using \eqref{prior_num_clusters} with $\N = 1000$, 
+Using \eqref{prior_num_clusters} with $\N = 1000$,
 we see that at $\alpha = \Sexpr{alpha_pert1}$, only two clusters are expected
-{\em a priori} under the GEM prior; 
+{\em a priori} under the GEM prior;
 at $\alpha = \Sexpr{alpha_pert2}$, more than fifty are expected.
 
 
@@ -264,7 +263,7 @@ $\laplacianevsum$ to construct a nonparametric prior perturbation which we
 expect to have a large, positive effect.  The resulting prior does indeed
 produce changes an order of magnitude larger than those produced by $\alpha$
 perturbations shown in \figref{gene_alpha_coclustering}, and the approximation
-is again able to capture the qualitative changes.  
+is again able to capture the qualitative changes.
 The influence function is also able to
 explain why $\alpha$ perturbations were unable to produce large changes in this
 case: \figref{alpha_pert_logphi} shows that changing $\alpha$ (as in
@@ -276,4 +275,3 @@ the size of the differences in the co-clustering matrix remains modest. It is
 unlikely that any scientific conclusions derived from the co-clustering matrix would have
 changed after the functional perturbation. The co-clustering matrix appears
 robust to perturbations in the stick-breaking distribution.
-
