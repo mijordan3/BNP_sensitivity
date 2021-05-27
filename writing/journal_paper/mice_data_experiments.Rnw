@@ -27,8 +27,6 @@ replicates), for a total of $\ntimepoints = 42$ measurements per gene.
 The goal of the analysis is to cluster the time-course gene expression data
 under the assumption that genes with similar time-course behavior may
 have similar function.
-Genes that cluster together may be evidence that they share a 
-regulatory pathway, for example. 
 Clustering gene expressions is often used for exploratory analysis
 and is a first step before further downstream investigation. 
 It is important, therefore, to ascertain the 
@@ -54,7 +52,7 @@ curve along with a gene-specific offset.
 Following \citet{Luan:2003:clustering} we construct the smoothers 
 using cubic B-splines. 
 
-Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurments of gene $\n$
+Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurements of gene $\n$
 at $\ntimepoints$ time points.
 Let $\regmatrix$ be the $\ntimepoints \times \d$ regressor matrix. 
 In our case, the $ij$-th entry of $\regmatrix$
@@ -184,7 +182,7 @@ source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
 @
 %
 
-We use the linear approximation to extrapolate the co-clustering matrix 
+We use the linear approximation to extrapolate the co-clustering matrix
 under prior parameters 
 $\alpha = \Sexpr{alpha_pert1}$ and $\alpha = \Sexpr{alpha_pert2}$,
 Using \eqref{prior_num_clusters} with $\N = 1000$, 
@@ -238,8 +236,8 @@ gene_fpert_coclustering_cap <- paste(
      (Top right) the effect of this perturbation on the prior density.
      (Bottom) the effect of this perturbation on
     the coclustering matrix.
-    Note the scale of the scatterplot axes compared with
-    the scatterplots in \\figref{gene_alpha_coclustering}. ")
+    Note the scale of the scatter plot axes compared with
+    the scatter plots in \\figref{gene_alpha_coclustering}. ")
 SetImageSize(aspect_ratio=base_aspect_ratio * 1.05)
 @
 <<gene_fpert_coclustering, cache=simple_cache, fig.show='hold', fig.cap=gene_fpert_coclustering_cap>>=
@@ -259,7 +257,7 @@ source("R_scripts/mice/alpha_log_phi.R",  echo=knitr_debug, print.eval=TRUE)
 @
 
 
-As in \secref{results_iris}, we now investigate whether the co-clustering matix
+As in \secref{results_iris}, we now investigate whether the co-clustering matrix
 is robust to deviations from the Beta prior.
 In \figref{gene_fpert_coclustering}, we use the influence function for
 $\laplacianevsum$ to construct a nonparametric prior perturbation which we
