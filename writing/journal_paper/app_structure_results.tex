@@ -1,0 +1,50 @@
+Recall from \secref{results_structure} and \figref{stru_func_sens_admix}
+that the linear approximation
+failed to capture the change in the admixture proportion of an individual,
+$n = 25$ after a worst-case functional perturbation.
+
+\figref{stru_lin_bad_example} examines individual $n = 25$ more closely.
+The bottom row plots this individual's
+admixture proportions as $\t$ varies from 0 to 1 in the perturbed prior
+$\p(\nu\vert \t) = \p_0(\nuk)\exp(\t\phiworstcase(\nuk))$.
+The linearized parameters poorly captured the change in admixture proportions observed after refitting, particularly
+for populations 1 and 2, for values of $\t$ close to 1.
+Even though we retain non-linearities
+in the mapping from variational parameters to the posterior statistic,
+for this perturbation, the mapping from prior parameter
+$\t$ to the relevant variational parameters
+is highly non-linear.
+This latter mapping is what we linearize
+and what causes our approximation to fail in this case.
+Specifically, the variational location parameter on the first stick-breaking proportion is concave as a function of $\t$ ---
+the location parameter increases for small $\t$,
+then decreases as $\t\rightarrow1$.
+However,
+$\etalin(\t)$ linearizes the relationship between the location parameter and $\t$.
+Therefore, the corresponding admixture mixture proportion of
+population 1 is over-estimated under the linearized variational parameters.
+Furthermore, because our linearized variational parameters
+over-estimated the length of the first stick,
+and the second admixture proportion is a product of the
+remaining stick times the second stick-breaking proportion,
+the linearized variational parameters then under-estimates
+the admixture proportion of population 2.
+
+\StructureLimitationsA
+
+\figref{stru_fully_lin_example} shows a similar situation for individual $n = 74$.
+The linearized variational parameters grossly over-estimated the length of the first stick,
+resulting in the later admixture proportions being under-estimated.
+The third admixture proportion was particularly poorly approximated under the linearized variational parameters.
+Given the recursive nature of the relationship between admixtures and stick-breaking proportions, errors at early sticks affect later admixture proportions.
+Fully linearizing the mapping $\t\mapsto\g(\etaopt(\t))$ to form the approximation
+$\glin(t)$ avoids this problem.
+In this example, $\glin(t)$ outperforms $\g(\etalin(t))$, with $\g$ being the admixture proportion of population 3.
+In our experience,
+computing $\g(\etalin(t))$, and thus retaining non-linearities in the mapping from $\eta\mapsto\g(\eta)$,
+is usually beneficial to the quality of the approximation.
+It is likely that $\g(\etalin(t))$ outperforms $\glin(\t)$ for most posterior quantities,
+though as we see in \figref{stru_fully_lin_example},
+this is not guaranteed to always be true.
+
+\StructureLimitationsB
