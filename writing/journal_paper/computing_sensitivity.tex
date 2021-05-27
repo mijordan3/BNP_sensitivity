@@ -276,12 +276,56 @@ of $\etaoptlocal(\etaglob)$, by redefining our quantity of interest as
         \left(\etaglob(\t), \etaoptlocal(\etaglob; \t) \right) \right)
 \end{align}
 %
-\Exref{vb_insample_nclusters_simple} above employs this technique. By using
-\eqref{g_as_global} for our approximation, we both render the derivative
-computation easier, and retain nonlinearities in the map $\etaglob \mapsto
-\etaoptlocal(\etaglob; \t)$.  As a shorthand, we will use
+By using \eqref{g_as_global} for our approximation, we both render the
+derivative computation easier, and retain nonlinearities in the map $\etaglob
+\mapsto \etaoptlocal(\etaglob; \t)$.  As a shorthand, we will use
 $\g(\etalin_\gamma(t))$ to denote the posterior computed under our linearized
 global parameters at prior parameter $\t$ using the mapping \eqref{g_as_global}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{ex}\exlabel{vb_insample_nclusters_globallocal}
+%
+In this example, we produce a version of \exref{vb_insample_nclusters_simple}
+that takes advantage of the global / local structure of the BNP problem. Let
+$\gclustersabbr(\eta)$ denote our variational approximation to
+$\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.   Using the fact that $\p(\z_\n
+\vert \beta, \nu, \x)$ is available in closed form, we can then take
+%
+\begin{align*}
+%
+\gclustersabbr(\etaopt) :={}&
+    \expect{\q(\beta, \nu \vert\etaopt)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+    }
+\\\approx{}&
+    \expect{\p(\beta, \nu \vert \x)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+    }
+    = \expect{\p(\z\vert\x)}{\nclusters_0(\z)} \Rightarrow \\
+%
+\gclustersabbr(\eta) ={}&
+    \sumk \left(1 -  \prod_{\n=1}^\N
+        \left(1 - \expect{\q(\beta, \nu \vert \eta_\beta, \eta_\nu)}
+                    {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}
+                    \right)\right).
+%
+\end{align*}
+%
+In this way, $\gclustersabbr(\eta)$ depends only on $\eta_\beta$ and $\eta_\nu$,
+which are much lower-dimensional than $\eta_\z$, and retains nonlinearities in
+the map
+%
+\begin{align*}
+%
+\eta_\beta, \eta_\nu \mapsto \expect{\q(\beta, \nu \vert \eta_\beta,
+\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}.
+%
+\end{align*}
+%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Finally, we will briefly discuss how to numerically solve the linear system
 $\hessopt_\gamma^{-1}\crosshessian_\gamma$ of \eqref{global_sens}.  We used the
