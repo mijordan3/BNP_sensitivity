@@ -1,0 +1,36 @@
+Recall from \thmref{etat_deriv} that we require the optimal variational parameters
+$\etaopt$ to be in the interior of its domain. One way to achieve this
+is to use only \textit{unconstrained} parameterizations for the
+component distributions of $\q$. One such parameterization was
+presented in \exref{qz_optimality}, where we let
+$\eta_{\z_\n}$, which parameterize the cluster assignments, be allowed to
+take any value in $\mathbb{R}^{\kmax - 1}$; the assignment probabilities
+$m_{\n}\in\mathbb{R}^{\kmax}$, which are constrained to sum to one,
+are then formed with an appropriate transform of the unconstrained parameters
+$\eta_{\z_\n}$
+
+Other variables require careful parameterization as well.
+For instance, instead of parameterizing the normal distribution on
+logit-sticks $\lnu_\k$ using a mean and variance, we let $\eta_{\nu_\k}\in\mathbb{R}^2$
+be the mean and \textit{log} variance. The variance is constrained to be positive;
+the log-variance is unconstrained on the real line.
+In general, a real-valued parameter $\mu_i$ which must be constrained
+$a \leq \mu_i \leq b$ can be transformed to its unconstrained parameterization
+by letting
+\begin{align*}
+  \eta_i = \log(\mu_i - a) - \log(b - \mu_i).
+\end{align*}
+
+In the variational approximation to the GMM model,
+we let the component variables $\beta_\k$ be Normal-Wishart.
+In this case, the scale matrix of the Normal-Wishart, $W_\k\in\mathbb{R}^{d\times d}$,
+is constrained be positive definite.
+Because $W$ is symmetric, we only neeed $d(d + 1) / 2$ parameters to represent it.
+To form an unconstrained parameterization, we factorize $W$ using the Cholesky decomposition,
+\begin{align*}
+W = L^T L,
+\end{align*}
+where $L$ is a lower-triangular matrix, with positive diagonal entries.
+The unconstrained parameterization of $W$ is then taken to be
+the strictly lower-diagonal entries of $L$,
+along with the $\log$ of the diagonal entries of $L$.
