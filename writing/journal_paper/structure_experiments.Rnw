@@ -7,8 +7,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 <<setup, include=FALSE, cache=FALSE>>=
-knitr_debug <- TRUE # Set to true to see error output
-simple_cache <- FALSE # Set to true to cache knitr output for this analysis.
+knitr_debug <- FALSE # Set to true to see error output
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
 source("R_scripts/structure/structure_plotting_utils.R")
@@ -162,7 +162,8 @@ the outlying Mbololo individuals, labeled
 ``A" in \figref{stru_func_sens}; 
 $\mathcal{N} = \{125, ..., 128\}$, corresponding to the four 
 outlying Ngangao individuals, labeled ``B";
-and $\mathcal{N} = \{139, ..., 155\}$ corresponding to all Chawia individuals.
+and $\mathcal{N} = \{139, ..., 155\}$ corresponding to all Chawia individuals, 
+labeled ``C".
 For individuals A, we let $\k=2$ in $\gadmix$ and 
 examine the robustness of the presence of population 2; 
 for individuals B, we use $\k = 1$; 
@@ -179,9 +180,9 @@ for decreasing each of our three variants of $\gadmix$, in order to see
 whether the biologically interesting patterns can be made to disappear
 with different prior choices.
 We find that after the worst-case perturbations, 
-the admixture proportion of population 2 in individuals ``A" are
+the admixture proportion of population 2 in individuals A are
 non-robust: the admixture proportion was nearly halved after the pertubation. 
-On the other hand, the admixture of population 1 in individuals ``B" 
+On the other hand, the admixture of population 1 in individuals B 
 more robust.
 We conclude that the inferred migration from Mbololo to
 Ngangao appears robust to our stick-breaking prior, while 
@@ -219,26 +220,26 @@ in this data set and model.
 For example, the admixture proportion of population 3 in individuals C were predicted to more sensitive by our linear approximation than 
 were actaully observed after refitting (bottom row \figref{stru_func_sens}). 
 
-Moreover, even though the linearized parameters
+Moreover, even though the linear approximation
 agreed with the refits in producing the diminished 
 overall admixture proportion of population 2 in individuals A
 (\figref{stru_func_sens} second row),
 the approximation does does not perform uniformly well over all individual admixtures. 
 \figref{stru_func_sens_admix} plots the inferred admixtures
-computed under both our linear approximation and after refitting
+computed using the linearized variational parameters 
+and the refitted variational parameters 
 after the worst-case prior perturbation. 
 The admixture proportion of population 2 in individual $n = 25$
-dramatically increased after refitting with the perturbed prior $\p_1$;
+dramatically increased after refitting with the perturbed prior;
 the linearized parameters failed to reproduce this change.
-In this data set and model, even though linear approx works less well, 
+Even though linear approx works less well in this example, 
 the influence function is still able to guide our choice of
-functional perturbations at which to refit.
+functional perturbation at which to refit.
 While the worst-case perturbations we used 
-may be an adversarial choice which results in
-a non-smooth perturbed density, 
+may be an adversarial choice, 
 the influence function suggests that 
 we can construct a smoother perturbation 
-with similar a similar effect as the worst-case, 
+with a similar effect as the worst-case, 
 as we did in \secref{mice_results}. 
 Importantly, as we will note in the next subsection, 
 the influence function is cheap to compute relative to refitting. 

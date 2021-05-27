@@ -1,8 +1,7 @@
 
 This section outlines practical considerations for computating
 the local sensitivity in \thmref{etat_deriv}.
-The cross-hessian term $\crosshessian$
-\todo{is this actually called a cross hessian? need to give a name}
+The mixed, second-order partial term $\crosshessian$
 is inexpensive to compute using automatic differentiation.
 Typically, it is the computation and inversion of the Hessian matrix that is
 the most expensive step in computing local sensitivity,
@@ -18,7 +17,7 @@ as well.
 
 We are interested in sensitivity to the stick-breaking distribution,
 so in our experiments (\secref{results}),
-only the prior terms on stick-breaking proportions
+only the prior on stick-breaking proportions
 $\nu = (\nu_1, ..., \nu_{\kmax - 1})$ will depend on $t$.
 Because the elements of $\nu$ fully factorize
 under both the prior and the variational distributions,
@@ -48,7 +47,7 @@ with the integrand $f$ in \eqref{gh_integral} being
 $f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
 In all the functional forms for
 $\t \mapsto \pstick(\nuk \vert \t)$ considered below,
-$f(\nu_k)$ can be provided in either closed-form or computed with automatic differentiation.
+$f(\nu_k)$ can be provided either analytically or computed with automatic differentiation.
 The resulting GH approximation is a deterministic function of $\eta$,
 and thus the gradient in \eqref{sens_mixed_partial} can be computed
 with another application of automatic differentiation.
@@ -64,7 +63,8 @@ the latent variables can be partitioned into a set of \textit{global}
 variables and a set of \textit{local} latent variables.
 The global variables are common to all data points, while the local variables
 are unique to each data point.
-In the GMM example, the global variables are $(\beta, \nu)$,
+In the GMM example (\exref{iris_bnp_process}),
+the global variables are $(\beta, \nu)$,
 while $\z_1, ..., \z_\N$ are local variables.
 
 Let $\gamma$ be the collection of global latent variables
@@ -133,7 +133,8 @@ we set the optimal $\etaopt_{\z_\n}$ to be
 %
 \end{align*}
 %
-Thus, as long as the expectation $\tilde\rho_{\n\k}$ has a closed-form as a function of
+Thus, as long as the expectations $\tilde\rho_{\n\k}$ can be provided
+as a closed-form function of
 $(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
 a function of $(\etabeta, \etanu)$.
 %
@@ -143,15 +144,15 @@ The availability of the minimizer \eqref{local_eta_optim}
 in closed-form will be useful for both optimizing the variational parameters
 and for computing local sensitivity.
 Define
-\begin{align}\eqlabel{kl_global}
+\begin{align*}
 \KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptlocal(\eta_\gamma; \t)), \t\Big),
-\end{align}
+\end{align*}
 which returns the $\mathrm{KL}$ as a function of only global parameters
 by implicitly setting local parameters at their optimum.
 
 Rather than optimizing the $\mathrm{KL}$ over all variational parameters, both global and local,
-we optimize $\KLglobal$ (\eqref{kl_global}), which is a function of global parameters only.
-Minimizing $\KLglobal(\etaglob)$ keeps the
+we optimize $\KLglobal$, which is a function of global parameters only.
+Thus, minimizing $\KLglobal(\etaglob)$ keeps the
 dimension of the optimization parameter independent of the number of data points.
 To minimize $\KLglobal(\etaglob)$ in practice,
 we run the BFGS algorithm with a loose convergence tolerance
@@ -162,7 +163,7 @@ the optimal local parameters $\etaoptlocal$ can be set in closed form
 to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
 
 The construction of $\KLglobal$ will also play an
-important role in computing the local sensitivity in practice,
+important role in inverting the Hessian matrix for local sensitivity,
 which we now detail.
 
 
@@ -322,15 +323,9 @@ We could have also computed the Hessian and
 either factorized it (e.g. with a Cholesky decomposition) or found its inverse directly.
 Then, the Hessian inverse (or its Cholesky decomposition) can
 be re-used for different perturbations.
-In our case, we need to re-solve the linear system (\eqref{global_sens}) with
+In our approach, we need to re-solve the linear system (\eqref{global_sens}) with
 CG for each choice of prior perturbation (since different choices of prior perturbation
 require solving different $\crosshessian$).
 On our applications in \secref{results}, the conjugate gradient algorithm was at least
 an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
 to exploring different perturbations.
-
-The conjugate gradient algorithm along with
-the optimizers BFGS and Newton conjugate gradient
-are implemented in SciPy~\citep{scipy}.
-All necessary derivatives were computed using the Python
-automatic differentiation libarary Jax~\citep{jax2018github}.

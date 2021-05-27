@@ -99,11 +99,10 @@ same cluster as gene $j$, given by
 \end{cases}.
 %
 \end{align*}
-Below, we will evaluate the sensitivity of the co-clustering matrix to 
-both changes in the GEM parameter $\alpha$ and to functional perturbations of the stick-breaking density. 
 
-We will use the influence function (\corref{etafun_worst_case})
-to guide our choice of functional perturbation. 
+Below, we will use the influence function (\corref{etafun_worst_case})
+to try and find a perturbation that produces large changes in the co-clustering 
+matrix. 
 To produce an easily-visualized influence function, we must choose a
 univariate summary of the $\ngenes^2$-dimensional co-clustering matrix. We use
 the sum of the eigenvalues of the symmetrically normalized graph Laplacian, as
@@ -196,7 +195,7 @@ We use the linear approximation to extrapolate the co-clustering matrix
 under prior parameters 
 $\alpha = 0.1$ and $\alpha = 12$,
 Using \eqref{prior_num_clusters} with $\N = 1000$, 
-we see that at $\alpha = 0.1$, only two clusters expected
+we see that at $\alpha = 0.1$, only two clusters are expected
 {\em a priori} under the GEM prior; 
 at $\alpha = 12$, more than fifty are expected.
 
@@ -217,7 +216,7 @@ largest absolute changes in the co-clustering matrix is of order $10^{-2}$.
 Refitting the approximate posterior at $\alpha = 0.1$ and
 $\alpha = 12$ confirms the insensitivity predicted by the
 linearized variational global parameters. Beyond capturing insensitivity, the
-linearized parameters were also able to approximate the sign and size of the
+linearized parameters were also able to capture the sign and size of the
 changes in the individual entries of the coclustering matrix (these changes
 albeit small).
 
@@ -321,15 +320,16 @@ $\laplacianevsum$ to construct a nonparametric prior perturbation which we
 expect to have a large, positive effect.  The resulting prior does indeed
 produce changes an order of magnitude larger than those produced by $\alpha$
 perturbations shown in \figref{gene_alpha_coclustering}, and the approximation
-is able to capture the qualitative changes.  The influence function is able to
-capture why $\alpha$ perturbations were unable to produce large changes in this
+is again able to capture the qualitative changes.  
+The influence function is also able to
+explain why $\alpha$ perturbations were unable to produce large changes in this
 case: \figref{alpha_pert_logphi} shows that changing $\alpha$ (as in
 \exref{beta_inf_norm}) induces large changes in the prior only where the
 influence function is small.
 
 However, even with the (unreasonable-looking) selected functional perturbation,
 the size of the differences in the co-clustering matrix remains modest. It is
-unlikely that any conclusions derived from the co-clustering matrix would have
+unlikely that any scientific conclusions derived from the co-clustering matrix would have
 changed after the functional perturbation. The co-clustering matrix appears
 robust to perturbations in the stick-breaking distribution.
 
