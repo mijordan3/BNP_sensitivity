@@ -134,7 +134,7 @@ Mbololo individuals are primarily population 1;
 Ngangao individuals are primarily population 2; 
 and Chawia individuals are a mixture of populations 1, 2, and 3. 
 
-Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species. 
+Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species.
 For example,
 while most Mbololo individuals are dominantly population 1,
 Mbololo individuals have abnormally 
@@ -232,6 +232,7 @@ after the worst-case prior perturbation.
 The admixture proportion of population 2 in individual $n = 25$
 dramatically increased after refitting with the perturbed prior;
 the linearized parameters failed to reproduce this change.
+
 Even though linear approx works less well in this example, 
 the influence function is still able to guide our choice of
 functional perturbation at which to refit.

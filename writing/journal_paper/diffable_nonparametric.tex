@@ -1,30 +1,13 @@
 In the previous section, we showed that we can form a Taylor series
 approximation to the dependence of a variational optimum on the parameter
-$\alpha$ in the GEM prior.  However, there is typically no {\em a priori} reason
+$\alpha$ in the $\gem$ prior.  However, there is typically no {\em a priori} reason
 to believe that the stick breaking prior lies within the parametric Beta family.
-In this section, we follow \citet{gustafson:1996:local} and define a class of
-multiplicative nonparametric prior perturbations to the prior density.  We show
-that not only can we apply \thmref{etat_deriv} for any nonparametric
-perturbation within the multiplicative class, but that the derivative provides a
-uniformly good linear approximation to the VB optimum within the nonparametric
-class---i.e., that the VB optimum is Fr{\'e}chet differentiable.  This fact
-motivates the definition and analysis of the ``influence function'', a
-single function which summarizes the effect of different prior shapes on
-differentiable posterior quantities of interest.
-
-First, we must introduce some additional measure theory notation. Below, we will
-take $\lambda$ to denote the Lebesgue measure on the Borel sets of $\thetadom
-\subseteq \mathbb{R}^{\thetadim}$.  As in \defref{prior_t}, we will be
-interested in densities with respect to $\lambda$, expressed as Radon-Nikodym
-derivatives, though it will be convenient to use the same notation for a density
-and for the measure induced by the density.  Specifically, for a
-$\mu$-measurable set $S$, and a Radon-Nikodym derivative $f$ defined with
-respect to $\mu$, we will write $f(S) = \int_{\theta \in S} f(\theta)
-\mu(d\theta)$.  We similarly extend the notation for measure domination: for two
-densities $f$ and $g$, we will write $f \ll g$ to mean that $g(S) = 0
-\Rightarrow f(S) = 0$ for all $\mu$-measurable sets $S$.  Finally, let
-$\esssup_{\theta\sim\mu}$ denote the essential supremum over $\theta$ with
-respect to the measure $\mu$.
+By parameterizing a path between two arbitrary densities, we can apply
+\thmref{etat_deriv} to nonparametric perturbations. In this section, following
+\citet{gustafson:1996:local}, we define paths through the space of prior
+densities using multiplicative perturbations, and identify a norm on the
+perturbation which guarantees both that the perturbed prior is a proper prior
+and that \thmref{etat_deriv} can be applied.
 
 Again let us return to the abstract setting of \defref{prior_t}. Let us fix a
 base prior density, $\pbase(\theta)$, at which we have computed a VB
@@ -88,10 +71,10 @@ $\t \mapsto \etaopt(\t)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{defn}\deflabel{prior_nl_pert}
 %
-Let $\mu$ denote a measure with $\mu \ll \lambda$, and fix $\pbase(\theta)$, a
-density with respect to $\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$.
-For any measurable $\phi: \thetadom \mapsto \mathbb{R}$ for which the
-expressions are well-defined, let
+Let $\mu$ denote a measure and fix $\pbase(\theta)$, a density with respect to
+$\mu$.  Assume that $\pbase(\theta) > 0$ on $\thetadom$. For any measurable
+$\phi: \thetadom \mapsto \mathbb{R}$ for which the expressions are well-defined,
+let
 %
 \begin{align*}
 % \p(\theta \vert \phi) :={}&
@@ -114,10 +97,8 @@ Further, define the norm $\norminf{\phi} := \esssup_{\theta \sim \mu}
 The class of perturbations defined in \defref{prior_nl_pert} are one of the
 family of ``nonlinear'' functional perturbations given by
 \citet{gustafson:1996:local}, though we deviate from
-\citet{gustafson:1996:local} by allowing $\phi$ to take on negative values.
-Otherwise, it can be difficult to choose prior perturbations that ablate prior
-mass---see \appref{positive_pert} for an extended discussion.  The following
-result is only a minor modification of the corresponding result from
+\citet{gustafson:1996:local} by allowing $\phi$ to take on negative values. The
+following result is only a minor modification of the corresponding result from
 \citet{gustafson:1996:local} to allow negative perturbations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,21 +157,19 @@ Therefore, in general, there exist valid priors that cannot be expressed by
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+We now show that, when $\norminf{\phi} < \infty$, we can apply
+\thmref{etat_deriv}.  We still require the following assumption on the VB
+density, which is strictly weaker than \assuref{exchange_order_dom}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{assu}\assulabel{exchange_order_q}
 %
-Assume that \lemref{exchange_order} applies with the function $f(\theta, \eta,
-\t) = \q(\theta \vert \eta)$ (no $\t$ dependence).
+Assume that \assuref{exchange_order_f} applies with the function $f(\theta,
+\eta, \t) = \q(\theta \vert \eta)$ (no $\t$ dependence).
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Observe that \assuref{exchange_order_q} is strictly weaker than
-\assuref{exchange_order_dom}.  Nevertheless, \assuref{exchange_order_q}
-suffices to prove \assuref{exchange_order} when $\norminf{\phi} < \infty$,
-as we now prove.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -227,7 +206,7 @@ It suffices to show that \assuref{exchange_order_q} implies
 \assuref{exchange_order} for the perturbation given in \defref{prior_nl_pert}
 when $\norminf{\phi} < \infty$.  Observe that $\log \ptil(\theta \vert \t) = \t
 \phi(\theta)$, so, for any $f(\theta, \eta, \t)$ that satisfies the conditions
-of \lemref{exchange_order},
+of \assuref{exchange_order_f},
 %
 %\begin{align*}
 %
@@ -235,8 +214,8 @@ $\phi(\theta) f(\theta, \eta, \t) \le \norminf{\phi} M(\theta)$.
 %
 %\end{align*}
 %
-Therefore \lemref{exchange_order} applies to $\phi(\theta) f(\theta, \eta, \t)$
-as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
+Therefore \assuref{exchange_order_f} is satisfied by $\phi(\theta) f(\theta,
+\eta, \t)$ as well.  It follows that \assuref{exchange_order_q} $\Rightarrow$
 \assuref{exchange_order_dom} $\Rightarrow$ \assuref{exchange_order}.
 %
 The form of the influence function is then given by gathering terms in
@@ -248,80 +227,51 @@ The form of the influence function is then given by gathering terms in
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The form of the influence function motivates the following corollary,
-which is the VB analogue of \citet[Result 11]{gustafson:1996:local}.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{cor}\corlabel{etafun_worst_case}
+\begin{ex}\exlabel{infl_univariate}
 %
-The ``worst-case'' derivative in $\ball_\phi(\delta)$ is given by
+In the BNP example, we are perturbing each of the sticks, so we take $\theta \in
+[0,1]^{\kmax - 1}$.  Formally, $\phi: [0,1]^{\kmax - 1} \mapsto \mathbb{R}$ can
+express different perturbations for the density of each of the $\kmax - 1$
+sticks.  However, when we describe ``changing the stick breaking density,'' we
+mean changing each stick's prior density in the same way.
+
+To represent perturbing all the sticks simultaneously, take some univariate
+perturbation $\phi_{u}: [0,1] \mapsto \mathbb{R}$, and set $\phi(\nu_1, \ldots,
+\nu_{\kmax - 1}) = \sum_{\k=1}^{\kmax - 1} \phi_{u}(\nuk)$. By linearity of the
+derivative \corref{etafun_deriv_form},
 %
 \begin{align*}
 %
-\sup_{\phi \in \ball_\phi(\delta)}
-    \fracat{d g(\etaopt(\t \phi))}{d \t}{0} =
-        \delta \int \abs{\infl(\theta)} \mu(d\theta),
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}&
+    \int \infl(\theta) \left(
+        \sum_{\k=1}^{\kmax - 1} \phi_{u}(\nuk) \right)
+    d\nu_1 \ldots d \nu_{\kmax - 1}.
 %
 \end{align*}
 %
-which is acheived at the perturbation
-$\phi^*(\theta) = \delta \, \mathrm{sign}\left(\infl(\theta)\right)$.
-%
-\begin{proof}
-%
-The result follows immediately from applying H{\"o}lder's inequality
-(\citet[Theorem 5.1.2]{dudley:2018:real} and subsequent disscussion)
-to \eqref{vb_eta_infl_sens}.
-%
-\end{proof}
-%
-\end{cor}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In turn, \corref{etafun_worst_case} motivates the question of whether
-\eqref{vb_eta_infl_sens} provides a uniformly good linear approximation to
-$\etaopt(\t)$ in a neighborhood of $0$: that is, whether $\phi \mapsto
-\etaopt(\phi)$ is Fr{\'e}chet differentiable. By \citep[Theorem
-5.2.1]{dudley:2018:real}, $L_\infty$ is a Banach space.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}\deflabel{diffable_classes}
-    (\citep[Definition 4.5]{zeidler:2013:functional})
-%
-Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
-an open neighborhood of $\phi_0 \in B_1$.  Fix a function $f: \ball_1
-\mapsto B_2$.
-%
-A function $f$ is {\em Fr{\'echet} differentiable} (also known as boundedly
-differentiable) at $\phi_0$ if
+By definition, $\expect{\q(\theta \vert \etaopt)}{\lqgradbar{\theta \vert
+\etaopt}} = 0$, so $\int \infl(\theta) \mu(d\theta) = 0$.  By the mean field
+assumption, $\infl(\nu_1, \ldots, \nu_{\kmax - 1}) = \prod_{\k=1}^{\kmax - 1}
+\infl_\k(\nuk)$, where $\infl_\k(\nuk)$ is derived from \eqref{infl_defn} but
+using $\theta = \nuk$.  Letting $\nu_0 \in [0,1]$ denote the variable of
+integration and plugging in the preceding observations gives
 %
 \begin{align*}
 %
-\lim_{t \rightarrow 0}
-    \sup_{\phi: \norm{\phi - \phi_0} = 1}
-    \frac{f(\phi) - f(\phi_0) -
-          f^{\mathrm{lin}}(t (\phi - \phi_0))
-         }{t} \rightarrow 0.
+\int \infl(\theta) \phi(\theta) \mu(d\theta) =
+    \int_0^1 \left(\sum_{\k=1}^{\kmax - 1} \infl_k(\nu_0) \right)
+        \phi_{u}(\nu_0) d \nu_0.
 %
 \end{align*}
 %
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{thm}\thmlabel{eta_phi_deriv}
+Thus we can say that the influence function for perturbing all the stick
+breaking densities simultaneously is given by the sum of the
+individual sticks' influence functions, which maps $[0,1] \mapsto \mathbb{R}$.
 %
-Let \assuref{kl_opt_ok, exchange_order_q} hold. Then the map $\phi \mapsto
-\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
-neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
-with the derivative given in \corref{etafun_deriv_form}.
-
-(For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
-
-\end{thm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -21,9 +21,9 @@ Let the variational objective factorize as
 \begin{align}
 %
 \KL{\eta, \t} :={}&
-    \KL{\eta} +
+    \KL{\eta} -
     \expect{\q(\theta \vert \eta)}
-       {\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)}           \eqlabel{perturbed_objective}\\
+       {\left(\log \p(\theta \vert \t) - \log \p(\theta \vert \t=0)\right)}           \eqlabel{perturbed_objective}\\
 \etaopt(\t) :={}& \argmin_{\eta \in \etadom} \KL{\eta, \t}.
     \eqlabel{perturbed_optimum}
 %
@@ -35,6 +35,13 @@ of $\KL{\eta}$.
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The decomposition \eqref{perturbed_objective} is always possible, in the sense
+that one could always take $\theta = \zeta$ and $\KL{\eta} = 0$.  We decompose
+the objective in this way in order to state strict regularity assumptions only
+on the part of the KL divergence that is being perturbed.  Indeed, we will
+require little from the $\KL{\eta}$ part of the decomposition other than that it
+can be differentiated and optimized.
+
 By identfiying $\t$ with some hyperparameter (e.g. the concentration parameter,
 as in \exref{alpha_perturbation} below), we can use \defref{prior_t} to study
 parametric perturbations.  Furthermore, by parameterizing a path through the
@@ -43,115 +50,114 @@ nonparametric perturbations (e.g. \exref{gem_mult_perturbation} below and the
 detailed analysis of \secref{diffable_nonparametric, diffable_lp}).  We
 can thus study VB prior robustness in general by studying problems of the
 form \defref{prior_t}.
-
-As $\etaopt(\t)$ varies, so does our quantity of interest, $\g(\etaopt(\t))$. If
-$\g(\etaopt(\t))$ varies meaningfully as $\t$ ranges over its plausible values,
-we say that a the quantity of interest $\g$ is {\em not robust} to changes of
-$\t$.  In any particular problem, some posterior quantities of interest may be
-robust while others are not.
 %
-Note that non-robustness is to some extent subjective, in that it depends on a
-decision about what a ``reasonable'' range of $\alpha$ might be, as well as how
-much variation in $\g(\etaopt(\alpha))$ is ``acceptable.''  In the present paper
-we will primarily focus on the task of approximating the computation of
-$\g(\etaopt(\alpha))$, leaving the context-specific decision of what priors are
-reasonable up to the the reader.  However, when considering non-parametric
-perturbations to the prior, we will explicitly consider whether the
-nonparametric neighborhoods correspond to intuitively reasonable sets of prior
-perturbations.
-
-In a world with no computational costs, we could simply evaluate
-$\g(\etaopt(\t))$ for a large number of candidate $\t$ and directly
-check for robustness.  Unfortunately, the evaluation of $\etaopt(\t)$
-requires solving an optimization problem, which is often computationally
-expensive for even a single $\t$, much less many different $\t$.  For
-nonparametric perturbations, the problem is even greater, since each $\t$
-explores only a single alternative $\palt(\theta)$.
-
-We propose avoiding the need to repeatedly re-optimize by forming a {\em linear
-approximation} to the map $\alpha \mapsto \etaopt(\alpha)$ as follows. Supposing
-for the moment that the map $\alpha \mapsto \etaopt(\alpha)$ is continuously
-differentiable (we will establish precise conditions below), and that we have
-found $\etaopt(\alpha_0)$ for some ``base value,'' $\alpha_0$.  If we can
-compute the derivative $d \etaopt(\alpha) / d\alpha$ (which is a
-$\etadim$-length vector), we can form the first-order Taylor series
-approximation
+% As $\etaopt(\t)$ varies, so does our quantity of interest, $\g(\etaopt(\t))$. If
+% $\g(\etaopt(\t))$ varies meaningfully as $\t$ ranges over its plausible values,
+% we say that a the quantity of interest $\g$ is {\em not robust} to changes of
+% $\t$.  In any particular problem, some posterior quantities of interest may be
+% robust while others are not.
+% %
+% Note that non-robustness is to some extent subjective, in that it depends on a
+% decision about what a ``reasonable'' range of $\alpha$ might be, as well as how
+% much variation in $\g(\etaopt(\alpha))$ is ``acceptable.''  In the present paper
+% we will primarily focus on the task of approximating the computation of
+% $\g(\etaopt(\alpha))$, leaving the context-specific decision of what priors are
+% reasonable up to the the reader.  However, when considering non-parametric
+% perturbations to the prior, we will explicitly consider whether the
+% nonparametric neighborhoods correspond to intuitively reasonable sets of prior
+% perturbations.
 %
-\begin{align*}
+% In a world with no computational costs, we could simply evaluate
+% $\g(\etaopt(\t))$ for a large number of candidate $\t$ and directly
+% check for robustness.  Unfortunately, the evaluation of $\etaopt(\t)$
+% requires solving an optimization problem, which is often computationally
+% expensive for even a single $\t$, much less many different $\t$.  For
+% nonparametric perturbations, the problem is even greater, since each $\t$
+% explores only a single alternative $\palt(\theta)$.
 %
-\etaopt(\alpha) \approx \etalin(\alpha) :={}
-    \etaopt(\alpha_0) +
-    \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
+% We propose avoiding the need to repeatedly re-optimize by forming a {\em linear
+% approximation} to the map $\alpha \mapsto \etaopt(\alpha)$ as follows. Supposing
+% for the moment that the map $\alpha \mapsto \etaopt(\alpha)$ is continuously
+% differentiable (we will establish precise conditions below), and that we have
+% found $\etaopt(\alpha_0)$ for some ``base value,'' $\alpha_0$.  If we can
+% compute the derivative $d \etaopt(\alpha) / d\alpha$ (which is a
+% $\etadim$-length vector), we can form the first-order Taylor series
+% approximation
+% %
+% \begin{align*}
+% %
+% \etaopt(\alpha) \approx \etalin(\alpha) :={}
+%     \etaopt(\alpha_0) +
+%     \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
+% %
+% \end{align*}
+% %
+% Given the derivative $d \etaopt(\alpha) / d\alpha$, the cost of evaluating
+% $\etalin(\alpha)$ for any $\alpha$ is only that of vector multiplication, not
+% that of solving a new optimization problem.
 %
-\end{align*}
+% We can then use the approximation $\etalin(\alpha)$ to approximate our quantity
+% of interest, $\g(\etaopt(\alpha))$.  For this, we can either use the
+% approximation
+% %
+% \begin{align*}
+% %
+% \g(\etaopt(\alpha)) \approx{} \g(\etalin(\alpha))
+% %
+% \end{align*}
+% %
+% or, when $\eta \mapsto \g(\eta)$ is continuously differentiable, using the chain
+% rule to form
+% %
+% \begin{align*}
+% %
+% %\g(\etaopt(\alpha)) \approx{}& \g(\etaopt(\alpha)) \quad \textrm{or}\\
+% \g(\etaopt(\alpha)) \approx{}&
+%     \glin(\alpha) :=
+%         \g(\etaopt(\alpha_0)) +
+%             \fracat{d \g(\eta)}{ d\eta^T}{\etaopt(\alpha_0)}
+%             \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
+% %
+% \end{align*}
+% %
+% We will discuss the relative advantages of $\g(\etalin(\alpha))$ and
+% $\glin(\alpha)$ below.  In short, the advantage of $\g(\etalin(\alpha))$ is that
+% the approximation retains nonlinearities in the map from $\eta \mapsto
+% \g(\eta)$, but the full linear approximation $\glin(\alpha)$ allows the
+% computation of helpful quantities such worst-case nonparametric prior
+% perturbations.
 %
-Given the derivative $d \etaopt(\alpha) / d\alpha$, the cost of evaluating
-$\etalin(\alpha)$ for any $\alpha$ is only that of vector multiplication, not
-that of solving a new optimization problem.
-
-We can then use the approximation $\etalin(\alpha)$ to approximate our quantity
-of interest, $\g(\etaopt(\alpha))$.  For this, we can either use the
-approximation
+% In order for the approximation $\etalin(\alpha)$ to be useful, three necessary
+% conditions must be met.  First, the map $\alpha \mapsto \etaopt(\alpha)$ must be
+% continuously differentiable; if it is not differentiable, then the derivative
+% does not even exist, and if it is not continuously differentiable, then small
+% $\abs{\alpha - \alpha_0}$ may not guarantee a good approximation to
+% $\etaopt(\alpha)$. Second, the derivative $d \etaopt(\alpha) / d\alpha$ must be
+% relatively easy to compute---in particular, it must be easier to compute than
+% solving a new optimization problem.  Finally, the derivative must {\em
+% extrapolate} meaningfully over a meaningful range of alternative values of
+% $\alpha$, i.e., the map $\alpha \mapsto \etaopt(\alpha)$ must be shown to be
+% smooth enough in practical problems to be useful.
 %
-\begin{align*}
-%
-\g(\etaopt(\alpha)) \approx{} \g(\etalin(\alpha))
-%
-\end{align*}
-%
-or, when $\eta \mapsto \g(\eta)$ is continuously differentiable, using the chain
-rule to form
-%
-\begin{align*}
-%
-%\g(\etaopt(\alpha)) \approx{}& \g(\etaopt(\alpha)) \quad \textrm{or}\\
-\g(\etaopt(\alpha)) \approx{}&
-    \glin(\alpha) :=
-        \g(\etaopt(\alpha_0)) +
-            \fracat{d \g(\eta)}{ d\eta^T}{\etaopt(\alpha_0)}
-            \fracat{d \etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
-%
-\end{align*}
-%
-We will discuss the relative advantages of $\g(\etalin(\alpha))$ and
-$\glin(\alpha)$ below.  In short, the advantage of $\g(\etalin(\alpha))$ is that
-the approximation retains nonlinearities in the map from $\eta \mapsto
-\g(\eta)$, but the full linear approximation $\glin(\alpha)$ allows the
-computation of helpful quantities such worst-case nonparametric prior
-perturbations.
-
-In order for the approximation $\etalin(\alpha)$ to be useful, three necessary
-conditions must be met.  First, the map $\alpha \mapsto \etaopt(\alpha)$ must be
-continuously differentiable; if it is not differentiable, then the derivative
-does not even exist, and if it is not continuously differentiable, then small
-$\abs{\alpha - \alpha_0}$ may not guarantee a good approximation to
-$\etaopt(\alpha)$. Second, the derivative $d \etaopt(\alpha) / d\alpha$ must be
-relatively easy to compute---in particular, it must be easier to compute than
-solving a new optimization problem.  Finally, the derivative must {\em
-extrapolate} meaningfully over a meaningful range of alternative values of
-$\alpha$, i.e., the map $\alpha \mapsto \etaopt(\alpha)$ must be shown to be
-smooth enough in practical problems to be useful.
-
-The remainder of the paper addresses these desiderata in turn, both for
-parametric perturbations to the concentration parameter as well as a particular
-family of nonparametric perturbations.  First, we provide theoretical conditions
-under which we have continuously differentiability of the VB optimum in
-\secref{local_sensitivity}, and show that they are satisfied for our BNP model.
-In \secref{computing_sensitivity}, we use the theoretical results of
-\secref{local_sensitivity} to show that the derivative can be computed
-efficiently in the BNP problems we are considering, with an emphasis on how
-modern automatic differentiation tools render many of the computations automatic
-\citep{jax2018github}.  Finally, in \secref{results}, we demonstrate the
-practical usefulness of the approximation on a set of three real-world BNP
-problems of increasing complexity.
-
+% The remainder of the paper addresses these desiderata in turn, both for
+% parametric perturbations to the concentration parameter as well as a particular
+% family of nonparametric perturbations.  First, we provide theoretical conditions
+% under which we have continuously differentiability of the VB optimum in
+% \secref{local_sensitivity}, and show that they are satisfied for our BNP model.
+% In \secref{computing_sensitivity}, we use the theoretical results of
+% \secref{local_sensitivity} to show that the derivative can be computed
+% efficiently in the BNP problems we are considering, with an emphasis on how
+% modern automatic differentiation tools render many of the computations automatic
+% \citep{jax2018github}.  Finally, in \secref{results}, we demonstrate the
+% practical usefulness of the approximation on a set of three real-world BNP
+% problems of increasing complexity.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
 %
-For the BNP model with the GEM prior, take $\theta = (\nu_1, \ldots,
-\nu_{\kmax-1})$, $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
+For the BNP model with the $\gem$ prior, take $\theta = (\nu_1, \ldots,
+\nu_{\kmax-1})$, and take $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
 Let $\alpha_0$ be some base value of the concentration parameter, and
 let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
 $0$ represent deviations of $\alpha$ away from $\alpha_0$.
@@ -198,35 +204,15 @@ Adding and subtracting the this term evaluated at $\alpha_0$ gives
 %
 \end{align*}
 %
-By the definition of $\p(\nuk \vert \alpha)$,
+Plugging in the definition of $\p(\nuk \vert \alpha)$, recognizing that the
+normalizing constant does not depend on $\nuk$ and so can be neglected in the
+optimization, letting $\KL{\eta} := \KL{\eta, \alpha_0}$, and substituting $\t =
+\alpha - \alpha_0$ gives
 %
 \begin{align*}
 %
-\log \p(\nu_1, ..., \nu_\kmax \vert \alpha)
-    ={}& (\alpha - 1) \sum_{k=1}^\kmax \log (1 - \nuk)
-    + \kmax \log \frac{\Gamma(1 + \alpha)}{\Gamma(\alpha)}.
-%
-\end{align*}
-%
-The normalizing constant does not depend on $\nuk$, and so its expectation
-does not depend on $\eta$, and so it can be neglected in the VB objective,
-and we can write
-%
-\begin{align*}
-%
-\KL{\eta, \alpha} = \KL{\eta, \alpha_0}
--(\alpha - \alpha_0) \sum_{\k=1}^{\kmax - 1}
-    \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
-%
-\end{align*}
-%
-Identifying $\KL{\eta}$ of \defref{prior_t} with $\KL{\eta, \alpha_0}$ evaluated
-at the base concentration parameter shows that the BNP problem with the GEM
-prior is of the form \eqref{perturbed_objective}, and that
-%
-\begin{align*}
-%
-\psi(\nu, \t) = -\t \sum_{\k=1}^{\kmax - 1}
+\KL{\eta, \t} = \KL{\eta, \alpha_0}
+-\t \sum_{\k=1}^{\kmax - 1}
     \expect{\q(\nuk \vert \eta)}{\log (1 - \nuk)}.
 %
 \end{align*}
@@ -242,7 +228,7 @@ prior is of the form \eqref{perturbed_objective}, and that
 %
 As in \exref{alpha_perturbation}, take $\theta = (\nu_1, \ldots, \nu_{\kmax-1})$
 and $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$. Let $\pbase(\nuk) :=
-\betadist{\nuk \vert 1, \alpha_0}$, and let $\palt(\nuk)$ be a distribution, not
+\betadist{\nuk \vert 1, \alpha_0}$, and let $\palt(\nuk)$ be a density, not
 in the Beta family, that shifts mass towards zero:
 %
 \begin{align*}

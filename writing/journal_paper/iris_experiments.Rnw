@@ -55,7 +55,7 @@ collected.
 We first explore sensitivity of the in-sample and posterior predictive number of
 clusters to the concentration parameter, $\alpha$, using the results in
 \secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
-note that, under the GEM$(\alpha)$ prior, the {\em a priori} expected
+note that, under the $\gem$ prior, the {\em a priori} expected
 number of distinct clusters in a dataset of size $N$ is given by
 %
 \begin{align}\eqlabel{prior_num_clusters}

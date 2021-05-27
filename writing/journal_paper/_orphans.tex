@@ -196,7 +196,7 @@ $\nuk$.  See STICK EXPECTATIONS below for more details.
 
 
 
-In \appref{cont_lemmas}, we state easy-to-verify (but technical) sufficient
+In \appref{proofs}, we state easy-to-verify (but technical) sufficient
 conditions that allow us to establish \assuref{exchange_order}.  The key to
 establishing \assuref{exchange_order} is the dominated convergence theorem
 \citep[Theorem 16.8]{billingsley:1986:probability}, which states roughly that,
@@ -260,3 +260,418 @@ Consider the derivative $\partial / \partial \eta$.  It suffices to show that
 %
 The second derivative follows analogously.
 %
+
+
+
+\hrulefill
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\todo{I think this is no longer necessary}
+\begin{assu}\assulabel{dist_fun_nice}
+%
+% Let $\qtil(\theta \vert \eta)$ be a (integrable, but possibly unnormalized)
+% density over the random variable $\theta$ parameterized by $\eta$ defined
+% relative to a dominating measure $\mu$.
+%
+Assume that the map $\eta \mapsto \log \qtil(\theta \vert \eta)$ is twice
+continuously differentiable. Let $\psi(\theta, \t)$ be a scalar-valued
+$\mu$-measurable function of $\theta$ and $\t$.  Assume that the map $\t \mapsto
+\psi(\theta, \t)$ is continuously differentiable.
+
+Define the following shorthand notation:
+%
+\begin{align*}
+%
+\lqgrad{\theta \vert \eta} :={}&
+    \fracat{\partial \log \qtil(\theta \vert \eta)}{\partial \eta}{\eta} \\
+%
+\lqhess{\theta \vert \eta} :={}&
+    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
+           {\partial \eta \partial \eta^T}{\eta} \\
+%
+\psigrad{\theta, \t} :={}& \fracat{\partial \psi(\theta, \t)}{\partial \t}{\t}.
+%
+\end{align*}
+%
+For a given $\t_0$ and $\eta_0$, assume there exists some neighborhood of
+$\t_0$, $\ball_\t$, some neighborhood of $\eta_0$, $\ball_\eta$, and a
+$\mu$-integrable $M_\psi(\theta)$ with $\int M_\psi(\theta) \mu(d\theta) <
+\infty$ such that the following bounds hold for all $\eta, \t \in \ball_\eta
+\times \ball_\t$:
+%
+\begin{enumerate}
+%
+\item \itemlabel{fundom}
+$\qtil(\theta \vert \eta) \psi(\theta, \t) \le M_\psi(\theta)$.
+%
+\item \itemlabel{funqgraddom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\item \itemlabel{funqhessdom}
+$\qtil(\theta \vert \eta) \norm{\lqhess{\theta \vert \eta}}_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\item \itemlabel{fungradqgraddom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}_2 \psigrad{\theta, \t}
+\le M_\psi(\theta)$.
+%
+\item \itemlabel{funqgradsqdom}
+$\qtil(\theta \vert \eta) \norm{\lqgrad{\theta \vert \eta}}^2_2 \psi(\theta, \t) \le
+M_\psi(\theta)$.
+%
+\end{enumerate}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{proof}
+%\prooflabel{pert_well_defined}
+%\proofof{\thmref{pert_well_defined}}
+%
+First, consider the fact that perterubations are priors. It is clear that
+$\mathscr{P}_{\mathrm{valid}} \subseteq \mathscr{P}_{\pbase,p}$, since one can
+simply take $\t = 1$ for any $\palt \in \mathscr{P}_{\mathrm{valid}}$.  To show
+that $\mathscr{P}_{\pbase,p} \subseteq \mathscr{P}_{\mathrm{valid}}$, it will
+suffice to show that any element of $\mathscr{P}_{\pbase,p}$ is non-negative and
+can be normalized.
+
+Take $p \in [1, \infty)$ with $\phi \in \pertset$.  By definition, for $\phi \in
+\pertset$, there exist $\beta > 0$, $\t \in [0,1]$, and $\palt(\theta)$ such
+that
+%
+\begin{align*}
+%
+\pbase(\theta)^{1/p} + \frac{1}{p} \phi(\theta) ={}&
+    \t \beta \palt(\theta)^{1/p} + (1- \t) \pbase(\theta)^{1/p}.
+%
+\end{align*}
+%
+From this it follows that $\ptil(\theta \vert \t \phi) \ge 0$, since $\t \in
+[0,1]$.  Furthermore, for the same $\phi$,
+%
+\begin{align*}
+%
+\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
+\int \left(\t \beta \palt(\theta)^{1/p} +
+           (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
+\\\ge{}&
+\t^p \beta^p \int \palt(\theta) \mu(d\theta) +
+    (1- \t)^p \int \pbase(\theta) \mu(d\theta)
+\\={}& \t^p \beta^p + (1- \t)^p > 0,
+%
+\end{align*}
+%
+and, by Jensen's inequality,
+%
+\begin{align*}
+%
+\int \ptil(\theta \vert \phi) \mu(d\theta) ={}&
+2^p \int \left(\frac{1}{2} \t \beta \palt(\theta)^{1/p} +
+           \frac{1}{2} (1- \t) \pbase(\theta)^{1/p} \right)^{p} \mu(d\theta)
+\\\le{}&
+%
+2^{p-1} \left(
+    \t^p \beta^p \int \palt(\theta) \mu(d\theta) +
+    (1- \t)^p \int  \pbase(\theta)\mu(d\theta)
+\right)
+\\={}& 2^{p-1} \left( \t^p \beta^p + (1- \t)^p\right) < \infty.
+%
+\end{align*}
+
+For $p = \infty$ and $\phi \in \pertset[\infty]$, it is clear that $\ptil(\theta
+\vert \phi) = \pbase(\theta) \exp(\phi(\theta)) \ge 0$. As above, since $\phi
+\in \pertset[\infty]$, there exist $\palt$, $\beta > 0$, and $\t \in [0,1]$ such
+that
+%
+\begin{align*}
+%
+\phi(\theta) ={}&
+    \t \log \palt(\theta) - (1-\t)\log \pbase(\theta) + \log \beta \Rightarrow\\
+%
+\int \ptil(\theta \vert \phi)\mu(d\theta) ={}&
+    \beta \int \palt(\theta)^\t \pbase(\theta)^{1 - \t}\mu(d\theta)
+\\={}&
+\beta \int \pbase(\theta)
+    \left( \frac{\palt(\theta)}{\pbase(\theta)}\right)^\t \mu(d\theta)
+\\\le{}&
+\beta \int \pbase(\theta)
+    \frac{\palt(\theta)}{\pbase(\theta)}
+    \ind{\palt(\theta) \ge \pbase(\theta)} \mu(d\theta) +
+\\&
+  \beta \int \pbase(\theta)
+    \ind{\palt(\theta) < \pbase(\theta)} \mu(d\theta)
+\\\le{}& 2\beta.
+%
+\end{align*}
+%
+This concludes the proof of PERT ARE PRIORS.
+
+For PERTS VS BALL P, we show that, when $p \in [1, \infty)$ and
+$\norm{\phi}_{\mu,p} < p$, then $\p(\theta \vert \phi)$ is normalizable. Um but
+that is not necessary.  All we need to do is show that if $\phi \in \pertset$
+then $\norm{\phi}_{\mu,p} < \infty$.
+
+First, consider the case of general $\phi$ with $p \in [1, \infty)$. By Jensen's
+inequality applied pointwise to the convex function $x \mapsto x^p$,
+%
+\begin{align*}
+%
+\abs{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) }^{p} \le{}&
+    \left(\pbase(\theta)^{1/p} + \frac{1}{p}\abs{\phi(\theta)} \right)^{p}
+\\={}&
+    2^p \left(\frac{1}{2}\pbase(\theta)^{1/p} +
+              \frac{1}{2} \frac{1}{p}\abs{\phi(\theta)} \right)^{p}
+\\\le{}&
+    2^{p-1} \left(\pbase(\theta) + \frac{1}{p^p}\abs{\phi(\theta)}^p \right).
+%
+\end{align*}
+%
+Consequently,
+%
+\begin{align*}
+%
+\int \abs{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) }^{p}
+    \lambda(d\theta) \le{}&
+2^{p-1} \int \left(\pbase(\theta) + \frac{1}{p}\abs{\phi(\theta)}^p \right)
+    \lambda(d\theta)
+\\={}&
+    2^{p-1} \left(1 + \frac{1}{p^p}\norm{\phi}_p^p\right).
+%
+\end{align*}
+%
+So, as in \citep[Result 2]{gustafson:1996:local}, $\norm{\phi}_p < \infty$
+implies that the prior can be normalized.
+
+Continuing the case of general $\phi$ with $1 \le p < \infty$, by
+convexity,\footnote{Apply the definition of convexity to the points $0$, $x$,
+and $x + y$, and again to the points $0$, $y$, and $x+y$, then add the results.}
+for any $x \ge y \ge 0$,
+%
+\begin{align*}
+%
+(x + y)^p \ge{} x^p + y^p \mathand
+(x - y)^p \le{} x^p - y^p.
+%
+\end{align*}
+%
+Also note that, since $\pbase(\theta) \ge 0$,
+%
+\begin{align*}
+%
+\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \le 0
+\quad\Rightarrow\quad
+\phi(\theta) \le 0 \mathand
+\frac{1}{p} \abs{\phi(\theta)} - \pbase(\theta)^{1/p} \ge 0.
+%
+\end{align*}
+%
+We can thus write
+%
+\begin{align*}
+%
+\MoveEqLeft
+\int \mathrm{sign}\left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)
+    \abs{\pbase(\theta)^{1/p} + \frac{1}{p}\abs{\phi(\theta)}}^{p} d\theta
+\\={}&
+    \int \left(\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta)\right)^{p}
+        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \ge 0}
+        d\theta - \\&
+    \int \left(\frac{1}{p}\abs{\phi(\theta)} - \pbase(\theta)^{1/p}\right)^{p}
+        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) < 0}
+        d\theta
+\\\ge{}&
+    \int \left(\pbase(\theta) - \frac{1}{p^p}\abs{\phi(\theta)}^{p}\right)
+        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) \ge 0}
+        d\theta - \\&
+    \int \left(\frac{1}{p^p}\abs{\phi(\theta)}^p - \pbase(\theta)\right)
+        \ind{\pbase(\theta)^{1/p} + \frac{1}{p}\phi(\theta) < 0}
+        d\theta
+\\={}&
+    \int \pbase(\theta) d\theta - \frac{1}{p^p}\int \abs{\phi(\theta)}^p d\theta
+\\={}&
+    1 - \frac{1}{p^p} \norm{\phi}_p^p.
+%
+\end{align*}
+%
+The final line is non-negative when $\norm{\phi}_p \le p$.
+
+
+
+
+
+Finally, consider $p = \infty$.  Since $\int \pbase(\theta) \lambda(d\theta) = 1$,
+%
+\begin{align*}
+%
+\exp(-\norminf{\phi}) \le{}
+\abs{\int_0^1 \exp\left(\log \pbase(\theta) + \phi(\theta)\right) \lambda(d\theta)}
+\le{}
+\exp(\norminf{\phi}).
+%
+\end{align*}
+%
+so that $0 < \int \tilde{\p}(\theta \vert \phi) \lambda(d\theta) < \infty$
+whenever $\norminf{\phi} < \infty$.  Furthermore,
+%
+\begin{align*}
+%
+\exp\left(\log \pbase(\theta) + \phi(\theta)\right) \ge 0.
+%
+\end{align*}
+%
+\end{proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+\hrulefill
+
+
+
+
+
+
+
+%
+\begin{proof}[Proof of \lemref{logq_continuous}]\prooflabel{logq_continuous}
+%
+By \lemref{logq_derivs}, the mixed partial $ \eta, \t \mapsto \fracat{\partial^2
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
+\t}{\eta, \t}$ is a continuous combination of the terms
+%
+$\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}}$,
+%
+$\expect{\q(\theta \vert \eta)}
+      {\lqgrad{\theta \vert \eta}}$, and
+%
+$\expect{\q(\theta \vert \eta)}
+    {\psigrad{\theta,\t}}$.
+%
+By \assuref{exchange_order}, each of these expressions is continuous.  For
+example,
+%
+\begin{align*}
+%
+\MoveEqLeft
+\norm{\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
+   \expect{\q(\theta \vert \eta')}
+          {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
+      }_2 \\={}&
+%
+\norm{\int \left(
+\q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
+\q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
+\right)\mu(d\theta)
+}_2  \le\\&
+%
+\int \norm{
+\q(\theta \vert \eta) \lqgrad{\theta \vert \eta} \psigrad{\theta,\t} -
+\q(\theta \vert \eta') \lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}
+}_2 \mu(d\theta) \le\\&
+%
+\int \norm{
+\left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
+    \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
+}_2 \mu(d\theta) + \\&\quad
+%
+\int \norm{
+\q(\theta \vert \eta')
+    \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
+    \psigrad{\theta, \t}
+}_2 \mu(d\theta) + \\&\quad
+%
+\int \norm{
+\q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
+    \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
+}_2 \mu(d\theta).
+%
+\end{align*}
+%
+By ACTUALLY WE NEED THIS ASSUMPTION we can apply the dominated
+convergence theorem to
+each term in the final line of the preceding display, giving
+%
+\begin{align*}
+%
+\MoveEqLeft
+\lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t}
+\norm{\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \psigrad{\theta,\t}} -
+   \expect{\q(\theta \vert \eta')}
+          {\lqgrad{\theta \vert \eta'} \psigrad{\theta,\t'}}
+      }_2 \\\le{}&
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\left(\q(\theta \vert \eta) - \q(\theta \vert \eta')\right)
+    \lqgrad{\theta \vert \eta} \psigrad{\theta, \t}
+}_2 \mu(d\theta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\theta \vert \eta')
+    \left( \lqgrad{\theta \vert \eta} - \lqgrad{\theta \vert \eta'} \right)
+    \psigrad{\theta, \t}
+}_2 \mu(d\theta) + \\&\quad
+%
+\int \lim_{\eta' \rightarrow \eta} \lim_{\t' \rightarrow \t} \norm{
+\q(\theta \vert \eta')\lqgrad{\theta \vert \eta'}
+    \left( \psigrad{\theta, \t} - \psigrad{\theta, \t'} \right)
+}_2 \mu(d\theta) = 0,
+%
+\end{align*}
+%
+the final equality following from the continuity assumptions of
+\assuref{dist_fun_nice}.
+
+Similarly, $\fracat{\partial^2
+\expect{\q(\theta \vert \eta)} {\psi(\theta, \t)}}{\partial \eta \partial
+\eta^T}{\eta}$ involves terms of the form
+%
+\begin{align*}
+%
+\expect{\q(\theta \vert \eta)}
+       {\lqgrad{\theta \vert \eta} \lqgrad{\theta \vert \eta}^T
+        \psi(\theta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
+       %
+\expect{\q(\theta \vert \eta)}
+      {\lqgrad{\theta \vert \eta} \lqgrad{\theta \vert \eta}^T}
+      && \mathtxt{\assuitemref{dist_fun_nice}{funqgradsqdom}} \\
+%
+\expect{\q(\theta \vert \eta)}
+       {\lqhess{\theta \vert \eta}
+        \psi(\theta,\t)}
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}} \\
+%
+\expect{\q(\theta \vert \eta)}
+       {\lqhess{\theta \vert \eta}},
+       && \mathtxt{\assuitemref{dist_fun_nice}{funqhessdom}}
+%
+\end{align*}
+%
+to which we can apply \thmref{dct} by the corresponding assumption.  Reasoning
+analogously to the other term, the conclusion follows.
+%
+\end{proof}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
