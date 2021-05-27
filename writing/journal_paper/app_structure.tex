@@ -1,1 +1,24 @@
-TODO
+The generative process was described in the main text (\secref{results_structure}).
+We detail here the variational approximation.
+Like in all our examples, the variational distribution is mean-field:
+\begin{align*}
+\q(\zeta \vert \eta) =
+    \left(
+    \prod_{\n=1}^{\nindiv}\prod_{\k=1}^{\kmax - 1}
+    \q(\nu_{nk} \vert \eta) \right)
+    \left(\prod_{\k=1}^{\kmax}\prod_{l=1}^{\nloci}
+    \q(\latentpop_{\k l} \vert \eta) \right)
+    \left( \prod_{\n=1}^{\N} \prod_{l=1}^{\nloci} \prod_{i=1}^{2} \q(\z_{\n l i} \vert \eta) \right).
+\end{align*}
+We let all distributions be conditionally conjugate except for the sticks,
+which are logit-normal.
+Each membership indicator $\z_{\n l i}$ is categorical, and the
+allele frequencies $\latentpop_{\k l}$ are Dirichlet distributed.
+
+In this model, we still call $(\beta, \nu)$ the global latent variables, even though they scale
+with the number of individuals $\N$;
+they do not, however, scale with both the number of individuals and the number of loci
+like $\z$ does. Thus, we call $\z$ the local latent variables.
+The local variational parameters $\eta_\z$ can be set optimally in
+an analagous way as \exref{qz_optimality}, except with the
+indices $\n\k$ replaced with $\n\l\i\k$.
