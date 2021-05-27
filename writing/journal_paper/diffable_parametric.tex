@@ -1,12 +1,9 @@
 We now state conditions under which $\t \mapsto \etaopt(\t)$, as defined by
 \defref{prior_t}, is continuously differentiable.  Our key theoretical tool will
 be the implicit function theorem (e.g., \citet{krantz:2012:implicit}), applied
-to the first-order conditions for the VB optimization problem, and the dominated
-converence theorem (e.g., \citet[Theorem 16.8]{billingsley:1986:probability}),
-which will allow us to express derivatives of variational expectations in terms
-of properties  of other variational expectations.
+to the first-order conditions for the VB optimization problem.
 
-The derivative can expressed in terms of unnormalized densities, which can
+Our results can be expressed in terms of unnormalized densities, which can
 simplify some computation.  To that end, let $\qtil$ and $\ptil$ refer to
 potentially unnormalized (but normalizable) versions of the respectively
 corresponding $\q$ and $\p$ given in \defref{prior_t}, so that
@@ -22,8 +19,8 @@ corresponding $\q$ and $\p$ given in \defref{prior_t}, so that
 %
 \end{align*}
 
-For \assuref{kl_opt_ok}, we state some regularity conditions on the ``base
-problem'', $\KL{\eta}$.
+First, in \assuref{kl_opt_ok}, we will require some mild regularity conditions
+for the ``base problem,'' $\KL{\eta}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,8 +46,12 @@ Let the following conditions on the variational approximation hold.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Next, we assume that we can exchange the order of integration and
-differentiation in variational expectations.
+As we discuss in \secref{diffable_concentration}, \assuref{kl_opt_ok} states
+conditions that are typically satisfied when $\KL{\eta}$ can be optimized
+numerically using unconstrained optimization.
+
+Next, we will require some differentiability conditions for the perturbation and
+the variational approximation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,12 +61,6 @@ differentiation in variational expectations.
 Assume that the map $\eta \mapsto \qtil(\theta \vert \eta)$ is twice
 continuously differentiable, and that the map $\t \mapsto \ptil(\theta \vert
 \t)$ is continuously differentiable.
-
-% Which version is better?
-% Assume that we can exchange the order of $\q$-integration and differentiation in
-% the expression $\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}$ at
-% $\eta = \etaopt$ and $\t = 0$ for the derivatives $\partial / \partial \eta$,
-% $\partial^2 / \partial \eta^2$, and $\partial^2 / \partial \eta \partial \t$.
 
 Further, assume that we can exchange the order of integration and
 differentiation in the expressions $\int \qtil(\theta \vert \eta) \log
@@ -90,9 +85,9 @@ is useful.
 %
 Let $f(\theta, \eta, \t)$ be a function taking values in $\mathbb{R}$. Assume
 that the partial derivatives $\partial / \partial \eta$, $\partial^2 / \partial
-\eta^2$, and $\partial^2 / \partial \eta \partial \t$ exist, are continuous
-functions of $\eta$ and $\t$, and are $\mu$-measureable functions of $\theta$ on
-some open set $\ball_\eta \times \ball_\t$.
+\eta^2$, and $\partial^2 / \partial \eta \partial \t$ of $f$ exist, are
+continuous functions of $\eta$ and $\t$, and are $\mu$-measureable functions of
+$\theta$ on some open set $\ball_\eta \times \ball_\t$.
 
 Let $M(\theta) > 0$ be a measurable function with $\int M(\theta) \mu(d\theta) <
 \infty$.  Assume that, for all $\eta, \t \in \ball_\eta \times \ball_\t$,
@@ -131,7 +126,8 @@ variational approximations for the stick lengths lend themselves to either
 \assuref{exchange_order_f} will be essential to analyzing nonparametric
 perturbations in \secref{diffable_nonparametric}.
 
-We are now in a position to define the quantities that occur in the derivative.
+We are now in a position to define the quantities that occur in the derivative
+and state our main result.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -202,3 +198,12 @@ Under the conditions of \defref{prior_t, deriv_quantities}, let
 %
 \end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The derivative given in \eqref{vb_eta_sens} involves two terms: $\hessopt^{-1}$
+and  $\crosshessian$.  Typically, $\crosshessian$, which is a derivative of a
+variational expectation, is simple to evaluate.  Forming and inverting or
+factorizing $\hessopt$ can present a challenge, since $\hessopt$ has dimensions
+$\etadim \times \etadim$, which can be very large.  Nevertheless, in many
+cases---including our BNP problem---we can take advantage of model sparsity to
+effeciently compute \eqref{vb_eta_sens}.  We take up these computational
+considerations in detail in \secref{computing_sensitivity} below.
