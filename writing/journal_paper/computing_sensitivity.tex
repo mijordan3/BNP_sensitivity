@@ -1,116 +1,94 @@
 
-This section outlines practical considerations for computating
-the local sensitivity in \thmref{etat_deriv}.
-The mixed, second-order partial term $\crosshessian$
-is inexpensive to compute using automatic differentiation.
-Typically, it is the computation and inversion of the Hessian matrix that is
-the most expensive step in computing local sensitivity,
-especially when the dimension of $\eta$ is large.
-To invert the Hessian, we will take advantage of the fact that
-all the models we consider in \secref{results} have a global/local factorization.
-This factorization will be useful for optimizing the $\mathrm{KL}$ objective
-as well.
+This section outlines practical considerations for computating the local
+sensitivity in \thmref{etat_deriv}. The mixed, second-order partial term
+$\crosshessian$ is inexpensive to compute using automatic differentiation.
+Typically, it is the computation and inversion of the Hessian matrix that is the
+most expensive step in computing local sensitivity, especially when the
+dimension of $\eta$ is large. To invert the Hessian, we will take advantage of
+the fact that all the models we consider in \secref{results} can be decomposed
+into a relatively small dimensional set of ``global'' variables (e.g., $\beta$
+and $\nu$), and a relatively lare set of local variables ($\z$). This
+factorization will be useful for optimizing the $\mathrm{KL}$ objective as well.
 
 \subsection{The cross-hessian}
 
-\todo{would this subsection make more sense immediately after \thmref{etat_deriv}?}
-
-We are interested in sensitivity to the stick-breaking density,
-so in our experiments (\secref{results}),
-only the prior on stick-breaking proportions
-$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ will depend on $t$.
-Because the elements of $\nu$ fully factorize
-under both the prior and the variational density,
+We are interested in sensitivity to the stick-breaking density, so in our
+experiments (\secref{results}), only the prior on stick-breaking proportions
+$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ will depend on $\t$. Because the elements
+of $\nu$ fully factorize under both the prior and the variational density,
 $\crosshessian$ decomposes as
+%
 \begin{align}
-  \crosshessian &=
-  \sum_{\k=1}^{\kmax - 1}
-          \expect{\q(\nuk \vert \eta)}
-                 {
-                 \lqgrad{\nuk \vert \etaopt}
-                 \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
-                 } \notag\\
+  \crosshessian
   &= \sum_{\k=1}^{\kmax - 1}
-         \evalat{\nabla_\eta \expect{\q(\nuk \vert \eta)}
+         \evalat{\frac{\partial}{\partial \etanuk} \expect{\q(\nuk \vert \eta)}
                 {
-                \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}
-                }}{\eta = \etaopt(0)},
+                \fracat{\partial \log \ptil(\nuk \vert \t)}{\partial \t}{\t = 0}
+                }}{\etaopt}.
 \eqlabel{sens_mixed_partial}
 \end{align}
-where we assumed that $\q(\theta \vert \eta)$ is normalized, so
-$\lqgradbar{\theta \vert \etaopt} = \lqgrad{\theta \vert \etaopt}$,
-and that the assumptions of \thmref{etat_deriv} hold, so we
-can freely exchange derivatives with expectations.
 
-We approximate the expectation using GH quadrature (\appref{gh_quadrature}),
-with the integrand $f$ in \eqref{gh_integral} being
-$f(\nu_k) = \fracat{\log \pstick(\nuk \vert \t)}{\partial \t}{\t = 0}$.
-In all the functional forms for
-$\t \mapsto \pstick(\nuk \vert \t)$ considered below,
-$f(\nu_k)$ can be provided either analytically or computed with automatic differentiation.
-The resulting GH approximation is a deterministic function of $\eta$,
-and thus the gradient in \eqref{sens_mixed_partial} can be computed
-with another application of automatic differentiation.
-Note that $\crosshessian$ is sparse in \eqref{sens_mixed_partial}:
-it is zero for all entries of
-$\eta$ other than those that parameterize the sticks.
+We approximate the expectation using GH quadrature (\appref{gh_quadrature}). In
+all the functional forms for $\t \mapsto \ptil(\nuk \vert \t)$ considered below,
+the derivative can be provided either analytically or computed with automatic
+differentiation.  The resulting GH approximation is a deterministic function of
+$\eta$, and thus the derivative in \eqref{sens_mixed_partial} can be computed
+with another application of automatic differentiation. Note that $\crosshessian$
+is sparse in \eqref{sens_mixed_partial}: it is zero for all entries of $\eta$
+other than those that parameterize the stick distributions.
 
 \subsection{A global and local factorization}
 
-To compute the local sensitivity in practice, we
-make use of a factorization common to all the models we will consider:
-the latent variables can be partitioned into a set of \textit{global}
-variables and a set of \textit{local} latent variables.
-The global variables are common to all data points, while the local variables
-are unique to each data point.
-In the GMM example (\exref{iris_bnp_process}),
-the global variables are $(\beta, \nu)$,
-while $\z_1, ..., \z_\N$ are local variables.
+To compute the local sensitivity in practice, we make use of a factorization
+common to all the models we will consider: the latent variables can be
+partitioned into a set of \textit{global} variables and a set of \textit{local}
+latent variables. The global variables are common to all data points, while the
+local variables are unique to each data point. In the GMM example
+(\exref{iris_bnp_process}), the global variables are $(\beta, \nu)$, while $\z$
+are local variables.
 
-Let $\gamma$ be the collection of global latent variables
-and let $\etaglob$ be their variational parameters.
-Similarly, let $\ell$ be the local latent variables and
-let $\etalocal$ be the local variational parameters.
-Notice that because the local latent variables are unique to each data point,
-the dimension of $\etalocal$ scales with $\N$.
-The global parameter $\etaglob$ does not scale with $\N$---in the GMM example,
-$\etaglob$ scales only with $\kmax$.
+Let $\gamma$ denote the collection of global latent variables and let $\etaglob$
+be their variational parameters. Similarly, let $\ell$ denote the local latent
+variables and let $\etalocal$ be the local variational parameters. Notice that
+because the local latent variables are unique to each data point, the dimension
+of $\etalocal$ scales with $\N$. The global parameter $\etaglob$ does not scale
+directly with $\N$---in the GMM example, $\etaglob$ scales only with $\kmax$.
 
-In all models we will consider,
-the optimal local variational parameters $\etaoptlocal$ can be written
-as a closed-form function of the global variational parameters $\etaglob$.
-Let $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping; that is,
+In all models we will consider, the conditional posterior $\p(\z \vert
+\gamma,\x)$ has a tractable closed form.  Since we choose a conjugate mean field
+approximating family for $\q(\z \vert \eta)$, this implies that the optimal
+local variational parameters $\etaoptlocal$ can be written as a closed-form
+function of the global variational parameters $\etaglob$.  Let
+$\etaoptlocal(\eta_\gamma; \t)$ denote this mapping, so that
+%
 \begin{align}\eqlabel{local_eta_optim}
-  \etaoptlocal(\etaglob; \t) := \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
+\etaoptlocal(\etaglob; \t) :=
+    \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
 \end{align}
-
+%
 The next example details this mapping for the Gaussian mixture model.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}[Optimalility of $\etalocal$ in a GMM]\exlabel{qz_optimality}
 Recall that under our truncated variational approximation,
 the cluster assignment $\z_\n$ is a discrete random variable
 over $\kmax$ categories.
 
-Let $\eta_{\z_\n}$ be the categorical parameters in its
-exponential family natural parameterization.
-That is, we let $\eta_{\z_\n} = (\rho_{\n1}, \rho_{\n2}, ..., \rho_{\n(\kmax-1)})$
-be an unconstrained vector in $\mathbb{R}^{\kmax-1}$;
-in this parameterization, the assignment probabilities are
+Let $\eta_{\z_\n}$ be the categorical parameters in its exponential family
+natural parameterization. That is, we let $\eta_{\z_\n} = (\rho_{\n1},
+\rho_{\n2}, ..., \rho_{\n(\kmax-1)})$ be an unconstrained vector in
+$\mathbb{R}^{\kmax-1}$; in this parameterization, the assignment probabilities
+are
 %
 \begin{align*}
   p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
   \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax-1}\exp(\rho_{\n\k})}
 \end{align*}
 %
-We use the exponential family parameterization because
-we require the optimal variational parameters $\etaopt$
-to be interior to $\etadom$ in \thmref{etat_deriv}.
-In the mean parameterization,
-$\sum_{\k=1}^\kmax p_{\n\k} = 1$, so the
-optimal mean parameters $\hat p_{\n}$ cannot be
-interior to $\Delta^{\kmax - 1}$.
-On the other hand, $\eta_{\z_\n}$ as defined
-is unconstrained in $\mathbb{R}^{\kmax - 1}$.
+We use the exponential family parameterization because we require the optimal
+variational parameters $\etaopt$ to be interior to $\etadom$ in
+\assuitemref{kl_opt_ok}{kl_opt_interior}.
 
 Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
 the optimal $\etaopt_{\z_\n}$ must satisfy
@@ -139,49 +117,38 @@ $(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed
 a function of $(\etabeta, \etanu)$.
 %
 \end{ex}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The availability of the minimizer \eqref{local_eta_optim}
-in closed-form will be useful for both optimizing the variational parameters
-and for computing local sensitivity.
-Define
+The availability of the minimizer \eqref{local_eta_optim} in closed-form will be
+useful for both optimizing the variational parameters and for computing local
+sensitivity.  Using \eqref{local_eta_optim}, we can rewrite our objective as a
+function of the global parameters, which will aid in both optimization and
+derivative computations.  Define
+%
 \begin{align*}
-\KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptlocal(\eta_\gamma; \t)), \t\Big),
+\KLglobal(\etaglob, \t) :=
+    \mathrm{KL}\Big((\etaglob, \etaoptlocal(\etaglob; \t)), \t\Big).
 \end{align*}
-which returns the $\mathrm{KL}$ as a function of only global parameters
-by implicitly setting local parameters at their optimum.
+%
+The $\etaoptglob(\t)$ which minimizes $\KLglobal(\etaglob, \t)$ is the same as
+the corresponding sub-vector of the $\etaopt(\t)$ that minimizes $\KL{\eta,
+\t}$.  Therefore we can use the objective function $\KLglobal(\etaglob, \t)$ as
+a numerical surrogate for $\KL{\eta, \t}$ when optimizing or computing
+derivatives.
 
-Rather than optimizing the $\mathrm{KL}$ over all variational parameters, both global and local,
-we optimize $\KLglobal$, which is a function of global parameters only.
-Thus, minimizing $\KLglobal(\etaglob)$ keeps the
-dimension of the optimization parameter independent of the number of data points.
-To minimize $\KLglobal(\etaglob)$ in practice,
-we run the BFGS algorithm with a loose convergence tolerance
-followed by trust-region Newton conjugate gradient \citep[Chapter~7]{nocedal:2006:numerical}
-to find a high-quality optimum.
-After the optimization terminates at an optimal $\etaoptglob$,
-the optimal local parameters $\etaoptlocal$ can be set in closed form
-to produce the entire vector of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
-
-The construction of $\KLglobal$ will also play an
-important role in inverting the Hessian matrix for local sensitivity,
-which we now detail.
-
-
-% Using the optimality of $\etaoptz(\eta_\gamma; \t)$ and applying the chain rule, one can check that
-% \begin{align}\eqlabel{global_kl}
-% \hessopt_{\gamma} &=
-% \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
-% \KLglobal(\etaopt_\gamma, 0) \\
-% & \mathwhere
-% % \mathrm{KL}_{glob}(\eta_\gamma) := \evalat{\KL{\eta, \t}}{\eta = (\eta_\gamma, \etaoptz(\eta_\gamma; t))}.
-% \KLglobal(\eta_\gamma, \t) := \mathrm{KL}\Big((\eta_\gamma, \etaoptz(\eta_\gamma; \t)), \t\Big).
-% \notag
-% \end{align}
-
-% the global latent variables $\gamma := (\nu, \beta)$.
-% We also defined local variational parameters $\eta_\ell$ which parameterize
-% the local latent variables $\z$ (or $(\z, \b)$ in the regression model).
-% Instead of optimizing
+For example rather than optimizing the $\KL{\eta}$ over all variational
+parameters, we numerically optimize $\KLglobal$, which is a function only of the
+relatively low-dimensional global parameters.  To minimize $\KLglobal(\etaglob)$
+in practice, we run the BFGS algorithm with a loose convergence tolerance
+followed by trust-region Newton conjugate gradient
+\citep[Chapter~7]{nocedal:2006:numerical} to find a high-quality optimum. After
+the optimization terminates at an optimal $\etaoptglob$, the optimal local
+parameters $\etaoptlocal$ can be set in closed form to produce the entire vector
+of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
+%
+The construction of $\KLglobal$ will also play an important role in inverting
+the Hessian matrix for local sensitivity, which we now detail.
 
 
 \subsection{The Hessian inversion}
