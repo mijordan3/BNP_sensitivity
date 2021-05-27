@@ -66,7 +66,9 @@ $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping, so that
     \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
 \end{align}
 %
-The next example details this mapping for the Gaussian mixture model.
+When $\t=0$, we will simply write $\etaoptlocal(\etaglob; \t=0) =
+\etaoptlocal(\etaglob)$. The next example details this mapping for the Gaussian
+mixture model.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,27 +155,26 @@ the Hessian matrix for local sensitivity, which we now detail.
 
 \subsection{The Hessian inversion}
 
-Typically, it is the computation and inversion of the Hessian matrix that is
-the most computationally intensive part of \eqref{vb_eta_sens}, especially when
-the dimension of $\eta$, is large.
-For especially high-dimensional $\eta$,
-instantiating the full Hessian in memory
-may be impossible.
+Typically, it is the computation and inversion of the $\etadim \times
+\etadim$-dimensional Hessian matrix $\hessopt$ that is the most computationally
+intensive part of \eqref{vb_eta_sens}, especially when the dimension of $\eta$
+is large.  Recalling that the dimension of $\eta$ scales with $N$, it is easy to
+imagine how it may even be impossible to instantiate a dense representation of
+$\hessopt$ in memory.
 
-To invert the Hessian, we take advantage of the fact that the latent variables
-factorize into a set of global and local latent variables.
-For generic latent variables $a$ and $b$,
-let $\hess{ab}$ denote $\evalat{\partial^2 \KL{\eta, \t} / \partial \eta_a
-\eta_b^T}{\etaopt(0), t=0}$, the Hessian with respect to the variational
-parameters governing $a$ and $b$.
-We decompose the Hessian matrix $\hessopt$ into four blocks:
+To efficiently invert $\hessopt$, we again take advantage the factorization into
+global and local variables. For generic variables $a$ and $b$, let
+$\hess{ab}$ denote the sub-matrix $\evalat{\partial^2 \KL{\eta} / \partial
+\eta_a \eta_b^T}{\etaopt}$, the Hessian with respect to the variational
+parameters governing $a$ and $b$. We decompose the Hessian matrix $\hessopt$
+into four blocks according to the global / local decomposition:
 %
 \begin{align*}
 %
 \hessopt =
-\fracat{\partial^2 \KL{\eta, \t}}
+\fracat{\partial^2 \KL{\eta}}
        {\partial \eta \partial \eta^T}
-       {\etaopt(0), t= 0} ={}&
+       {\etaopt} ={}&
 \left(
 \begin{array}{cc}
    \hess{\gamma\gamma} & \hess{\gamma\ell} \\
@@ -182,13 +183,15 @@ We decompose the Hessian matrix $\hessopt$ into four blocks:
 \right).
 %
 \end{align*}
-
-Next, let $\crosshessian_\gamma$ be the components of
-$\crosshessian$ corresponding to the variational parameters
-$\etaglob$---that is, $\crosshessian_\gamma$ is given by replacing
-the operator $\nabla_\eta$ with $\nabla_{\eta_\gamma}$ in \eqref{sens_mixed_partial}.
-The analogous quantity for the local parameters, $\crosshessian_\ell$,
-is zero, since no local variables enter the expectation in \eqref{sens_mixed_partial}.
+%
+Simiarly, let $\crosshessian_\gamma$ be the components of $\crosshessian$
+corresponding to the variational parameters $\etaglob$.  For example,
+$\crosshessian_\gamma$ is given by replacing the operator $\partial / \partial
+\eta$ with $\partial / \partial \etaglob$ in \eqref{sens_mixed_partial}. The
+analogous quantity for the local parameters, $\crosshessian_\ell$, is zero,
+since no local variables enter the expectation in \eqref{sens_mixed_partial}
+when we are perturbing the stick-breaking distribution.
+%
 We can thus write
 \begin{align*}
   \crosshessian = \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right).
@@ -223,76 +226,73 @@ I_{\gamma\gamma} \\
       \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right)^{-1} \crosshessian_\gamma,
 %
 \end{align*}
+%
 where $I_{\gamma\gamma}$ is the identity matrix with
 the same dimension as $\eta_\gamma$.
-
+%
 Specifically, observe that the sensitivity of the global parameters
 is given by
+%
 \begin{align}\eqlabel{global_sens}
   \fracat{d \etaopt_\gamma(\t)}{d \t}{t = 0} &=
   - \hessopt_\gamma^{-1}\crosshessian_\gamma
   \mathwhere
   \hessopt_\gamma := \left(\hess{\gamma\gamma} -
-        \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right).
+        \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right),
 \end{align}
-Each term of $\hessopt_\gamma$ can be easily computed using automatic differentiation.
+%
+In our model, $\hess{\ell\ell}$ is sparse, and the size of $\hess{\gamma\gamma}$
+does not grow with $\N$. Thus, each term of $\hessopt_\gamma$ can be tractably
+computed, stored in  memory, and inverted, even on very large datasets.
 
-Alternatively, using the optimality of $\etaoptlocal(\eta_\gamma; \t)$ and
-applying the chain rule, one can check that
+One can derive the exact same identity using the optimality of
+$\etaoptlocal(\eta_\gamma)$.  By applying the chain rule, one can
+verify that
+%
 \begin{align}\eqlabel{global_kl}
 \hessopt_{\gamma} &=
-\frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
-\KLglobal(\etaopt_\gamma, 0)
+    \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
+    \KLglobal(\etaopt_\gamma, 0).
 \end{align}
+%
+In practice, we evaluate $\hessopt_\gamma$ using automatic differentiation and
+\eqref{global_kl} rather than the Schur complement.
 
-\eqref{global_kl} is how we calculate $\hessopt_\gamma$ in practice:
-we implement $\mathrm{KL}_{glob}$, which returns the $\mathrm{KL}$ as a function of only global parameters
-by implicitly setting local parameters at their optimum;
-we then use automatic differentiation to
-compute the Hessian of $\mathrm{KL}_{glob}$.
-
-Crucially, the size of $\hessopt_\gamma$ scales with the squared dimension
-of $\etaglob$---and recall that the unlike $\etalocal$, the dimension of
-$\etaglob$ does not scale with the number of data points $\N$.
-Hence, on large data sets, $\hessopt_\gamma$ will be much more memory efficient
-to store and faster to invert than the full Hessian.
-
-Now that we can compute the sensitivity of the global parameters in
-\eqref{global_sens}, we can produce its linear approximation:
+Using \eqref{global_sens}, we can compute a Taylor series for the
+global parameters only:
+%
 \begin{align}\eqlabel{global_lin_approx}
   \etalin_\gamma(\t) := \etaopt_\gamma +
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
 \end{align}
-
-Finally, given a posterior quantity $\g$,
-we again take advantage of the fact that the optimal
-local parameters can be found in closed form given global parameters.
-In general, $\g$ will be a function of the entire vector of variational parameters.
-However, in the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
-and is a function of only global parameters and the prior parameter $\t$,
-we can construct an analogous mapping for $\g$,
+%
+When our function of interest $\g_{loc}$ depends on the full vector $\eta$,
+including the local parameters, we can again take advantage of the closed form
+of $\etaoptlocal(\etaglob)$, by redefining our quantity of interest as
+%
 \begin{align}\eqlabel{g_as_global}
-(\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big).
+\g(\etaglob(\t)) :=
+    \g_{loc}\left(
+        \left(\etaglob(\t), \etaoptlocal(\etaglob; \t) \right) \right)
 \end{align}
+%
+\Exref{vb_insample_nclusters_simple} above employs this technique. By using
+\eqref{g_as_global} for our approximation, we both render the derivative
+computation easier, and retain nonlinearities in the map $\etaglob \mapsto
+\etaoptlocal(\etaglob; \t)$.  As a shorthand, we will use
+$\g(\etalin_\gamma(t))$ to denote the posterior computed under our linearized
+global parameters at prior parameter $\t$ using the mapping \eqref{g_as_global}.
 
-This mapping can be used for any posterior quantity.
-Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient:
-we do not need to invert the full Hessian
-and linearize the entire set of variational parameters, global and local.
-As a shorthand, we will use $\g(\etalin_\gamma(t))$ to
-denote the posterior computed under our linearized global parameters
-at prior parameter $\t$ using the mapping \eqref{g_as_global}.
-
-In practice, we solved the linear system in~\eqref{global_sens} using
-the conjugate gradient (CG) algorithm, which requires only Hessian-vector products;
-this avoids instatiating the Hessian matrix in memory.
-We could have also computed the Hessian and
-either factorized it (e.g. with a Cholesky decomposition) or found its inverse directly.
-Then, the Hessian inverse (or its Cholesky decomposition) can
-be re-used for different perturbations.
-In our approach, we need to re-solve the linear system (\eqref{global_sens}) with
-CG for each choice of prior perturbation (since different choices of prior perturbation
-require solving different $\crosshessian$).
-On our applications in \secref{results}, the conjugate gradient algorithm was at least
-an order of magnitude faster than refitting, and did not pose a meaningful bottleneck
-to exploring different perturbations.
+Finally, we will briefly discuss how to numerically solve the linear system
+$\hessopt_\gamma^{-1}\crosshessian_\gamma$ of \eqref{global_sens}.  We used the
+conjugate gradient (CG) algorithm, which requires only Hessian-vector products
+which are readily available through automatic differentiation. Iterative methods
+such as CG avoid instatiating the Hessian matrix in memory. We could have also
+computed the Hessian and either factorized it (e.g. with a Cholesky
+decomposition). Then, the Hessian inverse (or its Cholesky decomposition) can be
+re-used for different perturbations. In our approach, we need to re-solve the
+linear system \eqref{global_sens} with CG for each choice of prior perturbation
+(since different choices of prior perturbation require solving different
+$\crosshessian$). On our applications in \secref{results}, the conjugate
+gradient algorithm was at least an order of magnitude faster than refitting, and
+did not pose a meaningful bottleneck to exploring different perturbations.
