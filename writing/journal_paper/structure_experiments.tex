@@ -10,7 +10,7 @@
 
 Our final data analysis example is an application of a Bayesian topic model to
 population genetics. We consider a publicly available dataset from
-\citet{galbusera:2000:thrush} that contains genotypes from 155 samples of an
+\citet{galbusera:2000:thrush} that contains genotypes from 155 individuals of an
 endangered bird species, the Taita thrush. Individuals were collected from four
 regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual
 was genotyped at seven micro-satellite loci. The four regions were once part of
@@ -18,9 +18,7 @@ a cohesive cloud forest that has since been fragmented by human development. For
 this endangered bird species, understanding the degree to which populations have
 grown genetically distinct is important for conservation efforts: well-separated
 populations with little genetic diversity are particularly at risk of
-extinction.  The goal of the analysis is to identify the presence of latent
-populations, from which one can infer the population of origin for specific
-loci, and estimate the degree to which populations are admixed in each
+extinction.  The goal of the analysis is to infer the population of origin for specific loci and estimate the degree to which populations are admixed in each
 individual.
 
 
@@ -88,7 +86,7 @@ logit-normal. See \appref{app_structure} for further details.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!h]
 
-{\centering \includegraphics[width=0.980\linewidth,height=0.588\linewidth]{figure/stru_init_fit-1} 
+{\centering \includegraphics[width=0.980\linewidth,height=0.470\linewidth]{figure/stru_init_fit-1} 
 
 }
 
@@ -115,29 +113,36 @@ logit-normal. See \appref{app_structure} for further details.
 \subsubsection*{Quantity of interest}
 
 The posterior quantities of interest in this application
-are the individual admixtures $\pi_\n$.
-\figref{stru_init_fit} plots the inferred admixtures $\pi_\n$ for all
-individuals $\n$ under a $\gem$ prior with parameter $\alpha_0 = 3$.
-The choice of $\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}, motivated by the fact that the individuals come from four geographic regions.
-We will examine the robustness of the inferred admixtures to the prior below.
+are the admixtures $\pi_\n$. 
+\figref{stru_init_fit} plots the inferred admixtures
+$\expect{\q}{\pi_\n}$ for all individuals $\n$. 
+The approximate posterior $\q$ was fit to a model with a
+GEM prior at parameter $\alpha_0 = 3$.  
+The choice of $\alpha_0 = 3$ corresponds to roughly four distinct populations 
+{\em a priori} (\eqref{prior_num_clusters}), 
+motivated by the fact that the individuals come from four geographic regions. 
+Below, we will evaluate sensitivity to this prior choice. 
 
-In the posterior at $\alpha_0$, there
+In the approximate posterior at $\alpha_0$, there
 appear to be three dominant latent populations, which we arbitrarily label as
-populations 1, 2, and 3 (\figref{stru_init_fit}).
-The inferred admixture proportions generally correspond with the geographic regions from which each individuals are sampled.
+populations 1, 2, and 3 (\figref{stru_init_fit}). 
+The inferred admixture proportions generally correspond with geographic regions:
+Mbololo individuals are primarily population 1; 
+Ngangao individuals are primarily population 2; 
+and Chawia individuals are a mixture of populations 1, 2, and 3. 
 
 Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species.
 For example,
-while individuals collected from the Mbololo region are inferred to be admixed
-primarily with population 1, several individuals from this region have
-abnormally large admixture proportions of population 2. Conversely, while
-individuals collected from the Ngangao region are admixed primarily with
-population 2, a few of these individuals have abnormally large admixture
+while most Mbololo individuals are dominantly population 1,
+several Mbololo individuals have abnormally 
+large admixture proportions of population 2.
+Conversely, while most Ngangao individuals are dominantly population 2, 
+several Ngangao individuals have abnormally large admixture
 proportions of population 1. This suggests that some migration has occurred
 between the Mbololo and Ngangao regions.
 
 We evaluate the sensitivity of this conclusion to possible prior perturbations.
-Consider the posterior statistic
+Define the posterior quantity of interest
 %
 \begin{align*}
 \gadmix(\eta; \mathcal{N}, k) =
@@ -148,48 +153,40 @@ Consider the posterior statistic
 the average admixture proportion of population $\k$ in a set of
 individuals $\mathcal{N}$.
 
-Below, we present results on three variations of $\gadmix$, corresponding to
-indididuals hightlighted as ``A," ``B", or ``C" in the top row of \figref{stru_func_sens}:
-$\mathcal{N} = \{26, ..., 31\}$ and $k = 2$,
-corresponding to the six individuals from the Mbololo region with outlying proportions of population 2;
-$\mathcal{N} = \{125, ..., 128\}$ and $k = 1$,
-corresponding to the four individuals from the Ngangao region with outlying proportions of population 1;
-$\mathcal{N} = \{139, ..., 155\}$ and $k = 3$,
-corresponding to all individuals from the Chawia region.
+Below, we consider $\gadmix$ with three different sets of individuals: 
+$\mathcal{N} = \{26, ..., 31\}$, corresponding to 
+the outlying Mbololo individuals, labeled 
+``A" in \figref{stru_func_sens}; 
+$\mathcal{N} = \{125, ..., 128\}$, corresponding to the four 
+outlying Ngangao individuals, labeled ``B";
+and $\mathcal{N} = \{139, ..., 155\}$ corresponding to all Chawia individuals, 
+labeled ``C".
+For individuals A, we let $\k=2$ in $\gadmix$ and 
+examine the robustness of the presence of population 2; 
+for individuals B, we use $\k = 1$; 
+and for individuals C, we use $\k = 3$. 
 The first two posterior quantities relate to the inferred migration between
-the Mbololo and Ngangao regions.
-In the last case, we are studying the robustness of having a third latent
+the Mbololo and Ngangao regions. 
+In the last example, we study the robustness of having a third latent
 population present, a population which primarily appears in Chawia individuals.
 
 \subsubsection*{Functional sensitivity}
 
-In \figref{stru_func_sens}, we construct the worst-case negative perturbation
-for decreasing each of our three variant of $\gadmix$, in order to see
+We construct the worst-case negative perturbation
+for decreasing each of our three variants of $\gadmix$, in order to see
 whether the biologically interesting patterns can be made to disappear
 with different prior choices.
+\figref{stru_func_sens} shows the result of the worst-case perturbations 
+on the prior density and $\gadmix$. 
+After the worst-case perturbation, 
+the admixture proportion of population 2 in individuals A 
+was nearly halved.
+On the other hand, the admixture of population 1 in individuals B 
+is more robust.
+We conclude that the inferred migration from Ngangao to
+Mbololo is relatively robust to the stick-breaking prior, while 
+conclusions about migration from Mbololo to Ngangao may be dependent on prior choices.
 
-\todo{Make the text easier to match up with the picture, which doesn't
-have the populations (Ngangao, etc) labeled.  Right now it's hard to see
-what's going on.}
-
-\todo{I think this whole section could be easier to understand and much more
-compact.  Basically just say that A is non-robust, B is robust, and on C
-the linear approximation and refit disagree.  Then we investigate A more.}
-
-Under the
-linearized variational parameters $\etalinglobal(\t)$, the admixture proportion
-of population 2 in the outlying Mbololo individuals is nearly halved.
-The same quantity computed after refitting the model confirms the
-sensitivity predicted by the linearized variational parameters.
-
- On the other
-hand, the presence of population 1 in the outlying Ngangao individuals appears
-to be insensitive even after this worst-case perturbation. The linearized and
-the refitted variational parameters again agree on this conclusion. Finally, the
-presence of population 3 in the Chawia individuals is anticipated to be
-sensitive by the linearized parameters, as this admixture proportion steadily
-decreases as $t\rightarrow 1$. However, under the refits, this admixture
-proportion does not decrease steadily but rather levels off after $t = 0.5$.
 
 
 
@@ -231,28 +228,41 @@ proportion does not decrease steadily but rather levels off after $t = 0.5$.
 \end{knitrout}
 
 
-\todo{Say something about the fact that these priors are maybe too
-adversarial.}
-
 
 The conclusions from the linear approximation did not
-perfectly agree with the conclusions from refitting variational approximation
-in this data set and model.
-For example, the admixture proportion of population 3 in individuals ``C" were predicted to be non-robust by our linear approximation but are in actuality are robust after refitting (bottom row \figref{stru_func_sens}).
+always agree with the conclusions from refitting the
+variational approximation 
+in this data set and model. 
+For example, the admixture proportion of population 3 in individuals C were predicted to more sensitive by our linear approximation than 
+were actually observed after refitting (bottom row \figref{stru_func_sens}). 
 
-Moreover, even though the linearized parameters
-agreed with the refits in producing the diminished
-overall admixture proportion of population 2 in individuals ``A"
+Moreover, even though the linear approximation
+agreed with the refits for individuals A in 
+overall admixture proportion 
 (\figref{stru_func_sens} second row),
-the approximation does does not perform uniformly well over all individual admixtures.
-\figref{stru_func_sens_admix} plots the individual admixtures after the worst-case prior perturbation computed under both our linear approximation and after refitting.
+the approximation does does not perform uniformly well over all individuals.
+\figref{stru_func_sens_admix} plots the inferred admixtures
+computed using the linearized variational parameters 
+and the refitted variational parameters 
+after the worst-case prior perturbation. 
 The admixture proportion of population 2 in individual $n = 25$
-dramatically increased after refitting with the perturbed prior $\p_1$;
+dramatically increased after refitting with the perturbed prior;
 the linearized parameters failed to reproduce this change.
-For a more in depth discussion of the limitations of the linear approximation,
+
+Even though linear approximation works less well in this example, 
+the influence function is still able to guide our choice of
+functional perturbations at which to refit.
+While the worst-case perturbations we used 
+may be an adversarial choice, 
+the influence function suggests that 
+we can construct a smoother perturbation 
+with a similar effect as the worst-case, 
+as we did in \secref{results_mice}. 
+Importantly, as we will note in the next subsection, 
+the influence function is cheap to compute relative to refitting. 
+For a more further discussion of the limitations of the linear approximation, 
 see \appref{app_structure_results}.
 
-\todo{need to highlight main takeaway: even though linear approx works less well, still can use influence function to guide where to refit. }
 
 
 \begin{knitrout}

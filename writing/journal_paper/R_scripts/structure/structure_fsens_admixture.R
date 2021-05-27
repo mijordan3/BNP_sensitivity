@@ -1,9 +1,8 @@
 out_init <- plot_initial_fit(add_geographic_labels = FALSE)
 
 # box for mbololo outliers
-add_box <- mbololo_box 
-add_label <- geom_text(aes(x = min(mbololo_outliers$obs_id) - 6, 
-                y = 0.2, 
+add_label <- geom_text(aes(x = median(mbololo_outliers$obs_id), 
+                y = 0.1, 
                 label = 'A'), 
             size = text_size)
 
@@ -21,7 +20,7 @@ trim_plot <- coord_cartesian(xlim = c(0.5, 50),
 # initial fit
 p_admix <- out_init$p +
   ggtitle('initial fit') +
-  add_box + 
+  box1 + box2 + 
   add_label + 
   theme(title = element_text(size = title_size), 
         legend.position = 'none') + 
@@ -37,7 +36,7 @@ plot_admix_here <- function(admix_matr){
   out <- plot_structure_fit(admix_matr[, 1:clusters_keep]) 
 
   return(out$p + 
-           add_box + 
+           box1 + box2 + 
            add_label + 
            theme(axis.text.x = element_blank(), 
                  axis.ticks.x = element_blank(), 
