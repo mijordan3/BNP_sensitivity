@@ -1,21 +1,21 @@
 The posterior of a BNP model is difficult to compute for two reasons: because
 the number of components is (countably) infinite, and because the posterior
-normalization constant is intractible.  To address these problems, we follow
+normalizating constant is intractible.  To address these problems, we follow
 \citet{blei:2006:vi_for_dp} and form a mean field truncated variational
 approximation to the posterior. Variational Bayes (VB) is an approach that seeks
 an approximate posterior through solving a numerical optimization problem
 \citep{jordan:1999:vi, wainwright:2008:graphical_models, blei:2017:vi_review},
-minimizing the divergence from a simple, tractable class of candidate posteriors
+minimizing a divergence from a simple, tractable class of candidate posteriors
 to the true posterior.
 
-Formally, let $\zeta$ denote the full vector of unkown posterior variables. For
-example, in the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z,
-\nu)$.  The exact posterior distribution $\p(\zeta \vert \x)$ is intractable.
-The most common version of VB specifies a family of approximating distributions
-$\q(\zeta \vert \eta)$ parameterized by a finite-dimensional vector $\eta \in
-\etadom \subseteq \mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$
-that is closest to the posterior $\p(\zeta \vert \x)$ according to  the
-Kullback-Leibler (KL) divergence:
+Formally, let $\zeta$ denote the full vector of unkown posterior variables. In
+the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z, \nu)$.  The
+exact posterior distribution $\p(\zeta \vert \x)$ is intractable. A common
+version of VB specifies a family of approximating distributions $\q(\zeta \vert
+\eta)$ parameterized by a finite-dimensional vector $\eta \in \etadom \subseteq
+\mathbb{R}^{\etadim}$ and solves for $\q(\zeta\vert\etaopt)$ that is closest to
+the posterior $\p(\zeta \vert \x)$ according to  the Kullback-Leibler (KL)
+divergence:
 %
 \begin{align}\eqlabel{kl_def}
 %
@@ -27,25 +27,34 @@ Kullback-Leibler (KL) divergence:
 %
 As we discuss below, we will choose $\q(\zeta \vert \eta)$ so that we can easily
 approximate the above expectation with respect to $\q(\zeta \vert \eta)$ as a
-closed-form function of $\eta$.  We will write $\KL{\eta}$ for our
-approximation, choosing the optimal variational parameter $\etaopt$ to satisfy
+closed-form function of $\eta$.  Nevertheless, except in special cases, one may
+not be able to compute \eqref{kl_def} exactly.  For example, in the present
+work, we will replace some exact expectations with numerical approximations, and
+our choice of approximating family will not admit a well-defined KL divergence.
+To avoid ambiguity, we will write $\KL{\eta}$ for the objective that we actually
+minimize, which may be only an approximation to the actual KL divergence of
+\eqref{kl_def}.  We thus choose the optimal variational parameter $\etaopt$ to
+satisfy
 %
 \begin{align}\eqlabel{vb_optimization}
 %
 \etaopt :={} \argmin_{\eta \in \etadom} \KL{\eta} \mathwhere
-\KL{\eta} \approx{} \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)},
+\KL{\eta} \approx{} \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}.
 %
 \end{align}
 %
-where the tractable objective function $\KL{\eta}$ may not be an exact KL
-divergence. Notice that the intractable $\logp(\x)$ term does not depend on
-$\eta$, and so can be neglected in the objective function $\KL{\eta}$.
+Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and so
+can be neglected in the objective function $\KL{\eta}$.  In general, when
+writing $\KL{\eta}$, we will neglect terms that do not depend on $\eta$.
 
 In a BNP model, the full $\zeta$ vector is infinite-dimensional. In the present
 paper, we will follow \citet{blei:2006:vi_for_dp} and use a truncated
 stick-breaking representation in the variational distribution, so that the
 approximating family $\q(\zeta \vert \eta)$ is finite-dimensional for practical
-purposes. We choose a truncation parameter $\kmax$ large but finite,
+purposes. We choose a truncation parameter $\kmax$ large but finite, and we set
+$\q(\nu_\k = 1 | \eta) = 1$ for all $\k > \kmax$. This implies that under $\q$,
+$\pi_\k = 0$ with probability one for all $\k > \kmax$. Correspondingly, we also
+set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.~
 %
 \footnote{For $\k > \kmax$, $\q(\nu_\k)$ is effectively a point mass  but
 $\p(\nu_\k \vert \x)$ is dominated by the Lebesgue measure.  So the KL
@@ -53,14 +62,9 @@ divergence $\KL{\q(\nu_\k) || \p(\nu_\k \vert \x)}$ is not well-defined, even
 though $\q(\nu_\k)$ does form a sensible approximation to $\p(\nu_\k \vert \x)$
 in measures of posterior divergence such as the Wasserstein distance.  This is
 one sense in which our tractable objective function $\KL{\eta}$ is not a proper
-KL divergence. }
+KL divergence.}
 %
-and we set $\q(\nu_\k = 1 | \eta) =
-1$ for all $\k > \kmax$. This implies that under $\q$, $\pi_\k = 0$ with
-probability one for all $\k > \kmax$ (\eqref{stick_breaking}). Correspondingly,
-we also set $\q(\z_{\n\k} = 0 | \eta) = 1$ for $\k > \kmax$.
-%
-We emphaize that only our variational approximation is truncated---the model
+We emphasize that only our variational approximation is truncated---the model
 (\eqref{bnp_model}) itself is not finite. We set $\kmax$ large enough in our
 variational approximation to ensure that a large proportion of the components
 are unoccupied with high probability under $\q$, in which case the truncation
@@ -126,28 +130,23 @@ to the variational Beta parameters.
 
 However, we will be considering stick-breaking densities $\pstick(\nuk)$
 that are outside the family of Beta densities. To approximate expectations,
-we will use numerical integration. We choose the density on the
-logit-transformed stick-breaking proportions
+we will use numerical integration.  Define the logit-transformed stick-breaking
+proprtions $\lnuk$ as follows:
 %
 \begin{align*}
   \lnu_\k := \log(\nu_\k) - \log(1 - \nu_\k)
+  \quad \Leftrightarrow \quad
+  \nuk = \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)}.
 \end{align*}
 %
-to be normally distributed. Letting $\s$ be the sigmoid function,
-which provides the inverse tranformation,
-%
-\begin{align*}
-    \nuk = \s(\tilde\nuk) := \frac{\exp(\lnu_\k)}{1 + \exp(\lnu_\k)},
-\end{align*}
-%
-a normal distribution on $\lnu_\k$ induces a \textit{logit-normal} distribution
-on $\nuk$. With this choice of a logit-normal distribution, all expectations
-with respect to $\nu_\k$ (such as $\expect{\q(\nu_\k\vert\eta)}{\log
-\pstick(\nu_\k)}$) can be expressed as a Gaussian integral. We then approximate
-the integral with GH quadrature (see \appref{gh_quadrature} for details). Not
-only do stick expectations appear in the evaluation of the $\mathrm{KL}$, but
-they will also be necessary in computing local sensitivity
-(\secref{local_sensitivity}).
+We take $\q(\lnuk \vert \eta)$ to be a normal distribution, which induces a
+\textit{logit-normal} distribution on $\nuk$. With this choice of a logit-normal
+distribution, all expectations with respect to $\nu_\k$ (such as
+$\expect{\q(\nu_\k\vert\eta)}{\log \pstick(\nu_\k)}$) can be expressed as a
+Gaussian integral. We then approximate the integral with GH quadrature (see
+\appref{gh_quadrature} for details). Not only do stick expectations appear in
+the evaluation of the $\mathrm{KL}$, but they will also be necessary in
+computing local sensitivity (\secref{local_sensitivity}).
 
 Once $\q(\zeta \vert \eta)$ is defined,
 we can approximate any expected posterior quantity of interest
@@ -159,36 +158,28 @@ in turn be a function of the variational parameters $\eta$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{vb_insample_nclusters_simple}
 %
-Given a solution $\etaopt$ to \eqref{vb_optimization}, the intractable posterior
-expectation in \exref{insample_nclusters_simple} can be approximated as a
-function of $\etaopt$.  Let $\gclustersabbr(\eta)$ denote our variational
-approximation to $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.  By plugging the
-variational approximation in directly, we would write
+Given an optimal VB parameter, $\etaopt$, the intractable posterior expectation
+in \exref{insample_nclusters_simple} can be approximated as a function of
+$\etaopt$.  For example, by plugging the variational approximation in directly,
+we could write
 %
 \begin{align*}
 %
-\expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)} \approx
-    \expect{\p(\z\vert\x)}{\nclusters_0(\z)}.
+\expect{\p(\z\vert\x)}{\nclusters_0(\z)} \approx
+\expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)} =
+\sumk \left(1 -  \prod_{\n=1}^\N
+    (1 - \expect{\q(\z \vert \etaoptz)}{\z_{\n\k}})\right).
 %
 \end{align*}
+%
+Using the preceding expression, one could express our function of interest as a
+function only of $\eta_\z$, the variational parameters for the $\z$ indicators.
 
-By the mean field assumption, we can write
-%
-\begin{align*}
-%
-\expect{\q(\z \vert \etaopt)}{\nclusters_0(\z)} ={}
-    \sumk \left(1 -  \prod_{\n=1}^\N
-        (1 - \expect{\q(\z \vert \etaoptz)}{\z_{\n\k}})\right).
-%
-\end{align*}
-%
-Using the preceding expression, one could express our function of interest
-$\gclustersabbr(\eta)$ as a function only of $\eta_\z$, the variational
-parameters for the $\z$ indicators.  In our experiments, we write
-$\gclustersabbr(\eta)$ slightly differently, taking advantage of the fact that,
-in all our models, the multinomial posterior $\p(\z_\n \vert \beta, \nu, \x)$
-has a differentiable, easy-to-evaluate closed form as a function of $\beta$ and
-$\nu$. Using this fact, we can instead take
+In our experiments, we take a different approach, taking advantage of the fact
+that, in all our models, the multinomial posterior $\p(\z_\n \vert \beta, \nu,
+\x)$ has a differentiable, easy-to-evaluate closed form as a function of $\beta$
+and $\nu$. Let $\gclustersabbr(\eta)$ denote our variational approximation to
+$\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.   We can then take
 %
 \begin{align*}
 %
@@ -222,9 +213,8 @@ the map
 \end{align*}
 %
 See \secref{computing_sensitivity} for more discussion of this technique.
-
-It will be useful later to observe that, under our chosen parameterizations, the
-map $\eta \mapsto \gclustersabbr(\eta)$ is differentiable.
+% It will be useful later to observe that, under our chosen parameterizations, the
+% map $\eta \mapsto \gclustersabbr(\eta)$ is differentiable.
 %
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
