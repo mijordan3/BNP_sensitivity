@@ -121,14 +121,14 @@ can be computed analytically as functions of $\eta_{\beta_\k}$.
 %
 \end{ex}
 
-If the prior $\pstick(\nuk)$ were Beta-distributed like in the $\gem$
+If the prior $\p(\nuk)$ were Beta-distributed like in the $\gem$
 construction, then the conditionally conjugate distribution for $\q(\nuk \vert
 \eta)$ would also be a Beta distribution \citep{blei:2006:vi_for_dp}. Then, in
 the same way as \exref{iris_var_distr}, all the necessary expectations with
 respect to $\nuk$ in the $\mathrm{KL}$ can be computed analytically with respect
 to the variational Beta parameters.
 
-However, we will be considering stick-breaking densities $\pstick(\nuk)$
+However, we will be considering stick-breaking densities $\p(\nuk)$
 that are outside the family of Beta densities. To approximate expectations,
 we will use numerical integration.  Define the logit-transformed stick-breaking
 proprtions $\lnuk$ as follows:
