@@ -52,15 +52,13 @@ curve along with a gene-specific offset.
 Following \citet{Luan:2003:clustering} we construct the smoothers
 using cubic B-splines.
 
-Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurements of gene $\n$
-at $\ntimepoints$ time points.
-Let $\regmatrix$ be the $\ntimepoints \times \d$ regressor matrix.
-In our case, the $ij$-th entry of $\regmatrix$
-is the $j$-th B-spline basis vector evaluated at the
-$i$-th time point.
-The right plot of
-\figref{example_genes} shows the B-spline basis.
-The distribution of the data arising from component $k$ is
+Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurements of gene $\n$ at
+$\ntimepoints$ time points. Let $\regmatrix$ be the $\ntimepoints \times \d$
+B-spline regressor matrix, so that the $ij$-th entry of $\regmatrix$ is the
+$j$-th B-spline basis vector evaluated at the $i$-th time point. The right plot
+of \figref{example_genes} shows the B-spline basis. The distribution of the data
+arising from component $k$ is
+%
 \begin{align}\eqlabel{mice_model}
 \p(\x_\n | \beta_\k, \b_\n) =
 \normdist{\x_\n | \regmatrix\mu_\k + \b_\n,
@@ -73,7 +71,7 @@ are interested in clustering gene expressions based on their patterns over time,
 not their absolute level.
 In this model, the component variables are $\beta_\k = (\mu_\k, \tau_\k)$,
 the regression coefficients and the inverse noise variance.
-
+%
 The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the
 stick-breaking process described in \secref{model_bnp}.
 
