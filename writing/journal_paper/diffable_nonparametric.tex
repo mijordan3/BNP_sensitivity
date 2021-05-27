@@ -1,13 +1,10 @@
-In the previous section, we showed that we can form a Taylor series
-approximation to the dependence of a variational optimum on the parameter
-$\alpha$ in the $\gem$ prior.  However, there is typically no {\em a priori} reason
-to believe that the stick breaking prior lies within the parametric Beta family.
-By parameterizing a path between two arbitrary densities, we can apply
-\thmref{etat_deriv} to nonparametric perturbations. In this section, following
-\citet{gustafson:1996:local}, we define paths through the space of prior
-densities using multiplicative perturbations, and identify a norm on the
-perturbation which guarantees both that the perturbed prior is a proper prior
-and that \thmref{etat_deriv} can be applied.
+In the previous section, we showed that we can differentiate the VB optimum with
+respect to $\alpha$ in the $\gem$ prior, which we can use to form a Taylor
+series to how $\etaopt(\alpha)$ varies within the $\gem$ family.  However, there
+is typically no {\em a priori} reason to believe that the stick breaking prior
+lies within the parametric Beta family.  We now show how, by parameterizing a
+path between two arbitrary densities, we can apply \thmref{etat_deriv} to
+nonparametric perturbations.
 
 Again let us return to the abstract setting of \defref{prior_t}. Let us fix a
 base prior density, $\pbase(\theta)$, at which we have computed a VB
@@ -18,8 +15,10 @@ $\betadist{\nuk \vert \alpha_0}$, and $\palt(\theta)$ to be some generic
 function of $\theta$ outside the Beta family. Let us write $\etaopt(\pbase)$ and
 $\etaopt(\palt)$ for these two approximations, respectively, so we are
 interested in quantifying the change $\g(\etaopt(\palt)) - \g(\etaopt(\pbase))$.
+If this change is large, we say that our quantity of interest is not robust to
+replacing $\pbase$ with $\palt$.
 
-To approximately answer this question using the local sensitivity approach of
+To approximately assess robustness using the local sensitivity approach of
 \secref{local_sensitivity}, we must somehow define a continuous path from
 $\pbase(\theta)$ to $\palt(\theta)$ parameterized, say, by $\t \in [0, 1]$. One
 way to do so is to define a multiplicative path
@@ -47,9 +46,9 @@ form the Taylor series approximation,
 \end{align*}
 
 Our first task is then to state conditions under which \thmref{etat_deriv}
-applies to \eqref{mult_pert_simple}.  Note that, in \eqref{mult_pert_simple} we
-have assumed that $\palt$ is a density, but it will be more convenient to
-observe that, when $\palt \ll \pbase$, we can re-write
+applies to \eqref{mult_pert_simple}.  In \eqref{mult_pert_simple} we have
+assumed that $\palt$ is a density, but it will be more convenient to observe
+that, when $\palt \ll \pbase$, we can re-write
 %
 \begin{align*}
 %
@@ -77,9 +76,6 @@ $\phi: \thetadom \mapsto \mathbb{R}$ for which the expressions are well-defined,
 let
 %
 \begin{align*}
-% \p(\theta \vert \phi) :={}&
-% \frac{\pbase(\theta)\exp(\phi(\theta))}
-%      {\int \pbase(\theta')\exp(\phi(\theta')) \mu(d \theta')}.
 \ptil(\theta \vert \phi) :={}& \pbase(\theta)\exp(\phi(\theta)).
 %
 \end{align*}
@@ -98,8 +94,10 @@ The class of perturbations defined in \defref{prior_nl_pert} are one of the
 family of ``nonlinear'' functional perturbations given by
 \citet{gustafson:1996:local}, though we deviate from
 \citet{gustafson:1996:local} by allowing $\phi$ to take on negative values. The
-following result is only a minor modification of the corresponding result from
-\citet{gustafson:1996:local} to allow negative perturbations.
+following result, which motivates the use of the $\norminf{\cdot}$ norm to
+measure the ``size'' of a perturbation $\phi$, is only a minor modification of
+the corresponding result from \citet{gustafson:1996:local} to allow negative
+perturbations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,8 +106,8 @@ following result is only a minor modification of the corresponding result from
 (\citet{gustafson:1996:local})
 %
 Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
-measure $\p \ll \mu$, let $\phi(\theta \vert \p) := \log \p(\theta) /
-\pbase(\theta)$.  Then $\p \mapsto \norminf{\phi(\cdot \vert \p)}$ is a
+measure $\palt \ll \mu$, let $\phi(\theta \vert \palt) := \log \palt(\theta) /
+\pbase(\theta)$.  Then $\palt \mapsto \norminf{\phi(\cdot \vert \palt)}$ is a
 norm, does not depend on $\mu$, and is invariant to invertible transformations
 of $\theta$.
 
@@ -176,8 +174,8 @@ Assume that \assuref{exchange_order_f} applies with the function $f(\theta,
 
 \begin{cor}\corlabel{etafun_deriv_form}
 %
-Let \assuref{kl_opt_ok, exchange_order_q} hold and fix the quantities given in
-\defref{prior_nl_pert}. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
+Fix the quantities given in \defref{prior_nl_pert}, and  et \assuref{kl_opt_ok,
+exchange_order_q} hold. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
 ``influence function'' $\infl: \thetadom \mapsto \mathbb{R}$:
 %
@@ -227,8 +225,10 @@ The form of the influence function is then given by gathering terms in
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
+The influence function can be a useful summary of the effect of making generic
+changes to the prior density, as we will show in the experiments of
+\secref{results}.  For visualization, it can be useful to reduce the dimension
+of the domain of the influence function, as we discuss in the following example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

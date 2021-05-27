@@ -12,7 +12,6 @@
 # )
 
 df_distant <- path_env$df_distant
-
 ggplot(df_distant, aes(x=theta)) +
     geom_line(aes(y=0.96 * p), color="blue") +
     geom_line(aes(y=p1), color="red") + ylab(NULL) + xlab("stick propn")
