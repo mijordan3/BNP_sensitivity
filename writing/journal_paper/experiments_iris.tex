@@ -47,16 +47,14 @@ number of distinct clusters in a dataset of size $N$ is given by
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
 %
-See \citep{jordan:2015:gentleintrodp} for this formula. 
-We take $\alpha\in[0.1, 4.0]$, which according to \eqref{prior_num_clusters},
-corresponds to an an {\em a priori} range of approximately
-$1.5$ to $15$ clusters.  Over this range, the
-shape of the stick-breaking density varies considerably, as shown in
+(See \citep{jordan:2015:gentleintrodp}.) We take $\alpha\in[0.1, 4.0]$, which
+according to \eqref{prior_num_clusters}, corresponds to an an {\em a priori}
+range of approximately $1.5$ to $15$ clusters.  Over this range, the shape of
+the stick-breaking density varies considerably, as shown in
 \figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
-use the prior $\p(\nuk \vert \alpha_0)$ as the base prior at which we form 
-the linear approximation for all the results below.  
-\Figref{iris_fit} shows the
-posterior clustering for $\alpha_0$.  Using our base prior, the posterior
+use the prior $\p(\nuk \vert \alpha_0)$ as the initial prior at which we form the
+linear approximation for all the results below. \Figref{iris_fit} shows the
+posterior clustering for $\alpha_0$.  Using our initial prior, the posterior
 recovers the known ground truth that there are in truth three distinct species.
 
 
@@ -116,28 +114,22 @@ evalutated.
 
 \subsubsection*{Functional perturbations and the influence function}
 
-While the number of in-sample clusters $\gclustersabbr$ was insensitive 
-over our range of $\alpha$, 
-insensitivity to $\alpha$ does not
-rule out sensitivity to other prior perturbations. 
-In this subsection, we first 
-demonstrate the ability of the influence function to
-predict the effect of nonparametric changes to the prior. 
-Then, we use the influence function to construct a worst-case perturbation
-for $\gclustersabbr$. 
+While the number of in-sample clusters $\gclustersabbr$ was insensitive over our
+range of $\alpha$, insensitivity to $\alpha$ does not rule out sensitivity to
+other prior perturbations. In this subsection, we first demonstrate the ability
+of the influence function to predict the effect of nonparametric changes to the
+prior. Then, we use the influence function to construct a worst-case
+perturbation for $\gclustersabbr$.
 
-As in the previous
-subsection, we take $\pbase(\nuk) = \betadist{\nuk \vert 1, \alpha_0}$ for each
-$\k$.  In order to facilitate visualization, we perform our computations in
-logit-stick space.  In terms of \defref{prior_t}, we take $\mu$ to be the
-Lebesgue measure on $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots,
-\lnu_{\kmax - 1})$, suitably transforming the prior density.
-
-The leftmost column of \figref{iris_fsens} shows in purple the influence
-function, $\infl(\nu)$, as given by \corref{etafun_deriv_form}.  For ease of
-visualization, we show the influence function in logit stick space, taking $\mu$
-to be the Lebesgue measure on $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1,
-\ldots, \lnu_{\kmax - 1})$, suitably transforming the prior density.
+As in the previous subsection, we take $\pbase(\nuk) = \betadist{\nuk \vert 1,
+\alpha_0}$ for each $\k$.  The leftmost column of \figref{iris_fsens} shows in
+purple the influence function, $\infl(\nu)$, as given by
+\corref{etafun_deriv_form}.  For ease of visualization, we show the influence
+function in logit stick space, taking $\mu$ to be the Lebesgue measure on
+$\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots, \lnu_{\kmax - 1})$,
+suitably transforming the prior density.  We additionally perturb all the sticks
+in the same way, reducing the domain of the influence function to $\mathbb{R}$
+as in \exref{infl_univariate}.
 
 We consider perturbations $\phi$ which are Gaussian bumps, with each
 perturbation centered at a different location on the real line.  Each row of
@@ -203,13 +195,11 @@ the refits and linear approximation.
 
 \end{knitrout}
 
-Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case}, 
-along with its effect on the prior and $\gclustersabbr$. 
-As expected, this worst-case perturbation 
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case},
+along with its effect on the prior and $\gclustersabbr$.
+As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$
 compared to the other unit-norm perturbations in \figref{iris_fsens}.
 However, even with the worst-case perturbation---which results in a rather unreasonably shaped prior density---the change in $\gclustersabbr$
 is still small. We conclude that on the iris data set, $\gclustersabbr$ appears
 to be a robust quantity for this model and dataset.
-
-

@@ -3,7 +3,7 @@ $\x_n$ from one of an infinite number of components indexed by $\k = 1, 2,
 \ldots \infty$. Each component is characterized by a vector $\beta_\k \in
 \betadom \subseteq \mathbb{R}^{\betadim}$, with $\p(\x_n \vert \beta_\k)$
 denoting the distribution of data arising from  component $\k$. We model the
-$\beta_\k$ as arising IID from a known prior, or \textit{base density},
+$\beta_\k$ as arising IID from a known prior, or \textit{initial density},
 denoted $\pbetaprior(\beta_\k)$, and write $\beta = (\beta_1, \beta_2, \ldots)$.
 
 Assignment of data point $\n$ to a mixture component is represented by an
@@ -18,11 +18,12 @@ defined in this way, we can write
 %
 \end{align*}
 
-The prior probabilities of assignments $\z_{\n}$ are generated according to the
-following ``stick-breaking'' process. Fix a density $\pstick(\cdot)$, with
+The prior probabilities of assignments $\z_{\n}$ can be generated according to
+the following ``stick-breaking'' process. Fix a density $\pstick(\cdot)$, with
 respect to the Lebesgue measure on $[0,1]$, over stick-breaking proportions
-$\nuk \in (0, 1)$ and draw $\nuk\iid\pstick(\nuk)$ for $\k=1,2,\ldots\infty$.
-Given these stick lengths, construct probabilities using the following formula:
+$\nuk \in [0, 1]$ and draw $\nuk\iid\pstick(\nuk)$ for $\k=1,2,\ldots\infty$.
+Given these stick lengths, we can construct probabilities using the following
+formula:
 %
 \begin{align}\eqlabel{stick_breaking}
 %
@@ -78,7 +79,7 @@ Define a measure on $\betadom$ as
 which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
 \gem$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
 is a random measure is distributed according to Dirichlet process with
-concentration parameter $\alpha$ and base measure $\pbetaprior$
+concentration parameter $\alpha$ and initial measure $\pbetaprior$
 \citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}. Below, we will
 give special attention to stick-breaking densities in the Beta family, though we
 will also consider deviations from the Beta family to generic densities.
@@ -160,11 +161,14 @@ observation $\n$ is a member of species $\k$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+In practice, we are not interested in the whole posterior, but rather some
+aspect of the posterior, such as the expected number of clusters present in the
+observed data, or the pattern of co-colustering between observations. In the
+present work, we focus on quantities that can be expressed as posterior
+expectations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 \begin{ex}[A posterior quantity of interest]\exlabel{insample_nclusters_simple}
 
@@ -184,20 +188,14 @@ each $\z_{\n\k}$ is either zero or one, so $\sum_{\n=1}^N \z_{\n\k} > 0$ if and
 only if $\prod_{\n=1}^\N (1 - \z_{\n\k}) = 0$.
 
 $\nclusters_0(\z)$ counts the number of clusters with at least one observations
-in a set of assignments $\z$.  Under the $\gem$ prior, the posterior
-expected number of clusters is thus given by
+in a set of assignments $\z$.  Under the $\gem$ prior, the posterior expected
+number of clusters is thus given by
 $\expect{\p(\z\vert\x,\alpha)}{\nclusters_0(\z)}$. For example, in the iris data
 set of \exref{iris_bnp_process},
 $\expect{\p(\z\vert\x,\alpha)}{\nclusters_0(\z)}$ is the posterior expectation
-of the number of distinct iris species present in the observed data, where
-we have conditioned the posterior explicitly on $\alpha$ to emphasize that
-our posterior expected quantity of interest depends on the prior chosen.
-%
-% Again, given a choice of $\pstick$ and the definitions in
-% \exref{iris_bnp_process}, $\expect{\p(\z\vert\x,\alpha)}{\nclusters_0(\z)}$ can
-% in principle be computed from the posterior $\p(\z \vert \x,\alpha)$.
-% We consider generalizations of this and other posterior quantities of interest
-% in \secref{posterior_quantities} below.
+of the number of distinct iris species present in the observed data.  Here, we
+have conditioned the posterior explicitly on $\alpha$ to emphasize that our
+posterior expected quantity of interest depends on the prior chosen.
 %
 \end{ex}
 

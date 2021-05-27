@@ -1,3 +1,3 @@
 #!/bin/bash
 
-Rscript -e 'library(knitr); knit("mice_data_experiments.Rnw")'
+Rscript -e 'library(knitr); knit("experiments_mice.Rnw")'

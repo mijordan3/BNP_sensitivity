@@ -112,31 +112,28 @@ logit-normal. See \appref{app_structure} for further details.
 
 \subsubsection*{Quantity of interest}
 
-The posterior quantities of interest in this application
-are the admixtures $\pi_\n$. 
-\figref{stru_init_fit} plots the inferred admixtures
-$\expect{\q}{\pi_\n}$ for all individuals $\n$. 
-The approximate posterior $\q$ was fit to a model with a
-GEM prior at parameter $\alpha_0 = 3$.  
-The choice of $\alpha_0 = 3$ corresponds to roughly four distinct populations 
-{\em a priori} (\eqref{prior_num_clusters}), 
-motivated by the fact that the individuals come from four geographic regions. 
-Below, we will evaluate sensitivity to this prior choice. 
+The posterior quantities of interest in this application are the admixtures
+$\pi_\n$. \figref{stru_init_fit} plots the inferred admixtures
+$\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.  Our
+initial prior was a $\gem$ with parameter $\alpha_0 = 3$. The choice of
+$\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}
+(\eqref{prior_num_clusters}), motivated by the fact that the individuals come
+from four geographic regions. Below, we will evaluate sensitivity to this prior
+choice.
 
-In the approximate posterior at $\alpha_0$, there
-appear to be three dominant latent populations, which we arbitrarily label as
-populations 1, 2, and 3 (\figref{stru_init_fit}). 
-The inferred admixture proportions generally correspond with geographic regions:
-Mbololo individuals are primarily population 1; 
-Ngangao individuals are primarily population 2; 
-and Chawia individuals are a mixture of populations 1, 2, and 3. 
+In the approximate posterior at $\alpha_0$, there appear to be three dominant
+latent populations, which we arbitrarily label as populations 1, 2, and 3
+(\figref{stru_init_fit}). The inferred admixture proportions generally
+correspond with geographic regions: Mbololo individuals are primarily population
+1; Ngangao individuals are primarily population 2; and Chawia individuals are a
+mixture of populations 1, 2, and 3.
 
 Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species.
 For example,
 while most Mbololo individuals are dominantly population 1,
-several Mbololo individuals have abnormally 
+several Mbololo individuals have abnormally
 large admixture proportions of population 2.
-Conversely, while most Ngangao individuals are dominantly population 2, 
+Conversely, while most Ngangao individuals are dominantly population 2,
 several Ngangao individuals have abnormally large admixture
 proportions of population 1. This suggests that some migration has occurred
 between the Mbololo and Ngangao regions.
@@ -153,20 +150,20 @@ Define the posterior quantity of interest
 the average admixture proportion of population $\k$ in a set of
 individuals $\mathcal{N}$.
 
-Below, we consider $\gadmix$ with three different sets of individuals: 
-$\mathcal{N} = \{26, ..., 31\}$, corresponding to 
-the outlying Mbololo individuals, labeled 
-``A" in \figref{stru_func_sens}; 
-$\mathcal{N} = \{125, ..., 128\}$, corresponding to the four 
+Below, we consider $\gadmix$ with three different sets of individuals:
+$\mathcal{N} = \{26, ..., 31\}$, corresponding to
+the outlying Mbololo individuals, labeled
+``A" in \figref{stru_func_sens};
+$\mathcal{N} = \{125, ..., 128\}$, corresponding to the four
 outlying Ngangao individuals, labeled ``B";
-and $\mathcal{N} = \{139, ..., 155\}$ corresponding to all Chawia individuals, 
+and $\mathcal{N} = \{139, ..., 155\}$ corresponding to all Chawia individuals,
 labeled ``C".
-For individuals A, we let $\k=2$ in $\gadmix$ and 
-examine the robustness of the presence of population 2; 
-for individuals B, we use $\k = 1$; 
-and for individuals C, we use $\k = 3$. 
+For individuals A, we let $\k=2$ in $\gadmix$ and
+examine the robustness of the presence of population 2;
+for individuals B, we use $\k = 1$;
+and for individuals C, we use $\k = 3$.
 The first two posterior quantities relate to the inferred migration between
-the Mbololo and Ngangao regions. 
+the Mbololo and Ngangao regions.
 In the last example, we study the robustness of having a third latent
 population present, a population which primarily appears in Chawia individuals.
 
@@ -176,15 +173,15 @@ We construct the worst-case negative perturbation
 for decreasing each of our three variants of $\gadmix$, in order to see
 whether the biologically interesting patterns can be made to disappear
 with different prior choices.
-\figref{stru_func_sens} shows the result of the worst-case perturbations 
-on the prior density and $\gadmix$. 
-After the worst-case perturbation, 
-the admixture proportion of population 2 in individuals A 
+\figref{stru_func_sens} shows the result of the worst-case perturbations
+on the prior density and $\gadmix$.
+After the worst-case perturbation,
+the admixture proportion of population 2 in individuals A
 was nearly halved.
-On the other hand, the admixture of population 1 in individuals B 
+On the other hand, the admixture of population 1 in individuals B
 is more robust.
 We conclude that the inferred migration from Ngangao to
-Mbololo is relatively robust to the stick-breaking prior, while 
+Mbololo is relatively robust to the stick-breaking prior, while
 conclusions about migration from Mbololo to Ngangao may be dependent on prior choices.
 
 
@@ -231,36 +228,36 @@ conclusions about migration from Mbololo to Ngangao may be dependent on prior ch
 
 The conclusions from the linear approximation did not
 always agree with the conclusions from refitting the
-variational approximation 
-in this data set and model. 
-For example, the admixture proportion of population 3 in individuals C were predicted to more sensitive by our linear approximation than 
-were actually observed after refitting (bottom row \figref{stru_func_sens}). 
+variational approximation
+in this data set and model.
+For example, the admixture proportion of population 3 in individuals C were predicted to more sensitive by our linear approximation than
+were actually observed after refitting (bottom row \figref{stru_func_sens}).
 
 Moreover, even though the linear approximation
-agreed with the refits for individuals A in 
-overall admixture proportion 
+agreed with the refits for individuals A in
+overall admixture proportion
 (\figref{stru_func_sens} second row),
 the approximation does does not perform uniformly well over all individuals.
 \figref{stru_func_sens_admix} plots the inferred admixtures
-computed using the linearized variational parameters 
-and the refitted variational parameters 
-after the worst-case prior perturbation. 
+computed using the linearized variational parameters
+and the refitted variational parameters
+after the worst-case prior perturbation.
 The admixture proportion of population 2 in individual $n = 25$
 dramatically increased after refitting with the perturbed prior;
 the linearized parameters failed to reproduce this change.
 
-Even though linear approximation works less well in this example, 
+Even though linear approximation works less well in this example,
 the influence function is still able to guide our choice of
 functional perturbations at which to refit.
-While the worst-case perturbations we used 
-may be an adversarial choice, 
-the influence function suggests that 
-we can construct a smoother perturbation 
-with a similar effect as the worst-case, 
-as we did in \secref{results_mice}. 
-Importantly, as we will note in the next subsection, 
-the influence function is cheap to compute relative to refitting. 
-For a more further discussion of the limitations of the linear approximation, 
+While the worst-case perturbations we used
+may be an adversarial choice,
+the influence function suggests that
+we can construct a smoother perturbation
+with a similar effect as the worst-case,
+as we did in \secref{results_mice}.
+Importantly, as we will note in the next subsection,
+the influence function is cheap to compute relative to refitting.
+For a more further discussion of the limitations of the linear approximation,
 see \appref{app_structure_results}.
 
 

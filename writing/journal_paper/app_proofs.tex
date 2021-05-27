@@ -130,67 +130,6 @@ is is a continuously differentiable function to all orders for all $\t, \eta \in
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\proofof{\lemref{normal_q_is_regular}}
-\prooflabel{normal_q_is_regular}
-%
-For the duration of the proof, let $\eta$ denote the exponential family natural
-parameters of the normal distribution. By properties of the exponential family,
-%
-\begin{align*}
-%
-\lqgrad{\theta \vert \eta} ={} (\theta, \theta^2)^T \mathand&
-\lqhess{\theta \vert \eta} ={} 0_{2\times2} \Rightarrow\\
-%
-\norm{\lqgrad{\theta \vert \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
-\norm{\lqhess{\theta \vert \eta}}_2 ={} 0.
-%
-\end{align*}
-%
-Let $\ballclosed_\eta$ denote the closure of $\ball_\eta$, and let
-%
-\begin{align*}
-%
-\eta^* := \argmax_{\eta \in \ballclosed_\eta}
-    \expect{\q(\theta \vert \eta)}{\exp(\abs{\theta})}.
-%
-\end{align*}
-%
-By standard properties of the normal and the boundedness of $\sigma(\eta)$, the
-right hand side of the preceding display is finite.
-%
-Then
-%
-\begin{align*}
-\int \q(\theta \vert \eta) \psi(\theta, \t) \mu(d \theta) \le{}&
-    \left( \sup_{\theta} \sup_{\t \in \ball_\t}
-        \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
-    \int \q(\theta \vert \eta) \exp(\theta) \mu(d \theta)
-%
-\\\le{}&
-    \const
-    \expect{\q(\theta \vert \eta^*)}{\exp(\abs{\theta})}.
-    \quad\constdesc{\eta, \t}
-%
-\end{align*}
-%
-Therefore, for \assuref{exchange_order_f}, we can take $M(\theta)
-\propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
-similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
-$\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
-of the five constants.
-
-Finally, if $\tilde{\eta}$ is a twice-continuously differentiable function of
-the natural parameters $\eta$ (e.g the mean and variance), then the derivatives
-with respect to $\tilde{\eta}$ are equal to the derivatives with respect to
-$\eta$ times bounded (on $\ball_\eta$) functions of $\eta$ that do not depend on
-$\theta$. Thus a constant multiple of $M(\theta)$ will bound the new
-derivatives.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \vspace{1em}
 
 
@@ -641,3 +580,102 @@ let $\epsilon_n = \pbase(A_{m'})$ and $S_n = A_{m'}$.
 %
 \end{lem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lem}\lemlabel{normal_q_is_regular}
+%
+Let $\mu$ denote the Lebesgue measure on $\mathbb{R}$. Let $\sigma$ denote the
+standard deviation of a normal distribution, let $\eta$ denote a continuously
+differentiable function of the normal distribution's natural parameters, let
+$\normdist{\theta \vert \eta}$ denote a normal density with respect to $\mu$,
+and let $\ball_\eta$ denote an open ball in $\mathbb{R}^2$ such that $0 < \sigma <
+\infty$ for all $\eta \in \ball_\eta$.
+%
+Let $\ball_\t$ denote an open ball in $\mathbb{R}$, and let $\psi(\theta, \t)$
+be a function such that $\theta \mapsto \psi(\theta, \t)$ is $\mu$-measurable
+for all $\t \in \ball_\t$.
+
+If there exists a constant $C > 0$ such that
+%
+\begin{align*}
+%
+\sup_{\t \in \ball_\t} \abs{\psi(\theta, \t)}
+    \le C \exp(\abs{\theta})
+\mathand
+\sup_{\t \in \ball_\t}
+    \abs{\frac{\partial \psi(\theta, \t)}{\partial \t}}
+    \le C \exp(\abs{\theta}),
+%
+\end{align*}
+%
+then one can exchange the order of expectation and differentation in the
+expression $\expect{\normdist{\theta \vert \eta}}{\psi(\theta, \t)}$ for the
+derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta \partial
+\eta$, and $\partial^2 / \partial \eta  \partial \t$, eavluated at any $\t \in
+\ball_\t$ and $\eta \in \ball_\eta$.
+
+\begin{proof}
+% \proofof{\lemref{normal_q_is_regular}}
+% \prooflabel{normal_q_is_regular}
+%
+For the moment, let $\eta$ denote the exponential family natural parameters of
+the normal distribution. By properties of the exponential family,
+%
+\begin{align*}
+%
+\lqgrad{\theta \vert \eta} ={} (\theta, \theta^2)^T \mathand&
+\lqhess{\theta \vert \eta} ={} 0_{2\times2} \Rightarrow\\
+%
+\norm{\lqgrad{\theta \vert \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{\lqhess{\theta \vert \eta}}_2 ={} 0.
+%
+\end{align*}
+%
+Let $\ballclosed_\eta$ denote the closure of $\ball_\eta$, and let
+%
+\begin{align*}
+%
+\eta^* := \argmax_{\eta \in \ballclosed_\eta}
+    \expect{\q(\theta \vert \eta)}{\exp(\abs{\theta})}.
+%
+\end{align*}
+%
+By standard properties of the normal and the boundedness of $\sigma(\eta)$, the
+right hand side of the preceding display is finite.
+%
+Then
+%
+\begin{align*}
+\int \q(\theta \vert \eta) \psi(\theta, \t) \mu(d \theta) \le{}&
+    \left( \sup_{\theta} \sup_{\t \in \ball_\t}
+        \abs{\psi(\theta, \t)} \exp(-\abs{\theta}) \right)
+    \int \q(\theta \vert \eta) \exp(\theta) \mu(d \theta)
+%
+\\\le{}&
+    \const
+    \expect{\q(\theta \vert \eta^*)}{\exp(\abs{\theta})}.
+    \quad\constdesc{\eta, \t}
+%
+\end{align*}
+%
+Therefore, for \assuref{exchange_order_f}, we can take $M(\theta)
+\propto \q(\theta \vert \eta^*) \exp(\abs{\theta})$. The other terms follow
+similarly, since each multiplier of $\q(\theta \vert \eta)$ is dominated by
+$\exp(-\abs{\theta})$.  The final $M(\theta)$ simply takes the largest
+of the five constants.
+
+Finally, if $\tilde{\eta}$ is a twice-continuously differentiable function of
+the natural parameters $\eta$ (e.g the mean and variance), then the derivatives
+with respect to $\tilde{\eta}$ are equal to the derivatives with respect to
+$\eta$ times bounded (on $\ball_\eta$) functions of $\eta$ that do not depend on
+$\theta$. Thus a constant multiple of $M(\theta)$ will bound the new
+derivatives.
+%
+\end{proof}
+%
+\end{lem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
