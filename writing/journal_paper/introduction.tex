@@ -19,9 +19,9 @@ $\alpha$.  One might imagine the biologist asking: ``Suppose I went out and
 gathered a new dataset the same size as the one I have.  How many distinct
 species of iris would I expect to find?''  This posterior predictive expectation
 of the number of distinct species may depend strongly on the choice of the
-concetration parameter $\alpha$ as it varies over some reasonable range, and, if
-it does, the biologist would presumably like to be warned that her posterior
-quantity of interest is {\em non-robust} to the choice of $\alpha$.
+concetration parameter $\alpha$ as $\alpha$ varies over some reasonable range,
+and, if it does, the biologist would presumably like to be warned that her
+posterior quantity of interest is {\em non-robust} to the choice of $\alpha$.
 
 The posterior in a BNP model cannot be calcluated analytically, and thus
 approximate methods are required in practice. In the present work, we consider
@@ -33,28 +33,21 @@ large-scale data sets because solving the optimization problem can be much
 faster than running Markov chain Monte Carlo (MCMC). VB is particularly apt for
 data analysis problems that are exploratory in nature, and where quick,
 approximate solutions suffice.
-% \todo{Do these sentences move us forward here?}
-% For these applications, we thus would like a
-% similarly quick, possibly approximate, method to assess the sensitivity of the
-% VB posterior to prior choices. Assessing sensitivity is especially important
-% when the results of these exploratory analyses will be guiding further
-% downstream investigation.
 
-
-Concretely, the output of a VB approximation is a vector of optimal VB
-parameters, which we can denote as $\etaopt$.  For instance, $\etaopt$ might be
-a vector of approximate posterior means and variances for all the quantities in
-the posterior.  In our example, evaluating $\etaopt$ for a particular prior
-parameter $\alpha$ means solving an optimization problem whose objective
-function depends on $\alpha$, and we notate the resulting dependence of
-$\etaopt$ on $\alpha$ as $\etaopt(\alpha)$.
+Concretely, the output of a VB approximation is a vector of optimal
+approximating parameters, which we can denote as $\etaopt$.  For instance,
+$\etaopt$ might be a vector of approximating exponential family natural
+parameters for all the quantities in the posterior.  In our example, evaluating
+$\etaopt$ for a particular prior parameter $\alpha$ means solving an
+optimization problem whose objective function depends on $\alpha$, and we notate
+the resulting dependence of $\etaopt$ on $\alpha$ as $\etaopt(\alpha)$.
 %
-Posterior quantites of interest, such as posterior expectations,
-can be approximated using expectations of the variational distributions, which
-in turn are functions of the VB parameters $\etaopt(\alpha)$. For example, in
-our motivating example, can write $\g(\etaopt(\alpha))$ as the map from the
-space of variational parameters to the approximate posterior predictive number
-of distinct species in a new dataset.
+Posterior quantites of interest, such as posterior expectations, can be
+approximated using expectations of the variational distributions, which in turn
+are functions of the VB parameters $\etaopt(\alpha)$. For example, in our
+motivating example, can write $\alpha \mapsto \g(\etaopt(\alpha))$ as the map
+from a choice of prior concentration parameter to our approximate posterior
+quantity of interest.
 
 A conceptually straightforward way to assess the robustness of
 $\g(\etaopt(\alpha))$ to $\alpha$ would be to refit the VB posterior for several
@@ -87,17 +80,16 @@ g(\etaopt(\alpha)) \approx g(\etalin(\alpha)).
 \end{align*}
 
 If the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable, then
-we might expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when
-$\abs{\alpha - \alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) /
-d\alpha$ can be computed much more efficiently than the cost of optimizing
-directly, $\etalin(\alpha)$ can be much faster to compute than
-$\etaopt(\alpha)$.  Even when the approximation $\etalin(\alpha)$ is not a
-completely adequate substitue for exact re-optimization, the derivative can be a
-useful guide for what sorts of prior perturbations might be problematic,
-informing exploration by re-solving the optimization problem for potentially
-problematic priors.
+we expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when $\abs{\alpha -
+\alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) / d\alpha$ can be
+computed much more efficiently than the cost of optimizing directly,
+$\etalin(\alpha)$ can be much faster to compute than $\etaopt(\alpha)$.  Even
+when the approximation $\etalin(\alpha)$ is not a completely adequate substitue
+for exact re-optimization, the derivative can be a useful guide for what sorts
+of prior perturbations might be problematic, informing futher exploration based
+on re-optimizing.
 
-The approximation immediately motivates three key questions:
+The approximation thus motivates three key questions:
 %
 \begin{enumerate}
 %
@@ -114,17 +106,21 @@ The approximation immediately motivates three key questions:
 %
 \end{enumerate}
 %
-For the remainder of the paper, we address these three questions in order, after
+For the remainder of the paper, we address these three questions, after
 introducing our BNP model and VB approximation in \secref{model}.
 
 In \secref{local_sensitivity}, we state sufficient conditions for
 differentiability of VB approximations in general, both for parametric
 perturbations such as the concentration parameter $\alpha$, as well as for
-nonparametric perturbations to the prior density.  Amongst a class of
+nonparametric perturbations to the prior density.  The differentiability of our
+motivating BNP problems follow as a special case.  Amongst a class of
 nonparametric perturbations considered by \citet{gustafson:1996:local}, we prove
-in \secref{diffable_nonparametric, diffable_lp} that VB optima are Fr{\'e}chet
-differentiable only for multiplicative perturbations to the prior density. The
-differentiability of our motivating BNP problems follow as a special case.
+that VB optima are Fr{\'e}chet differentiable only for multiplicative
+perturbations to the prior density.  Furthermore, we show that the sensitivity
+of the VB approximation to nonparametric prior perturbations takes the form of
+an integral against a computationally tractable \textit{influence function},
+which can provide an interpretable summary of the effect of arbitrary changes to
+the prior density.
 
 In \secref{computing_sensitivity}, we address practical computability of the
 derivative, and show that the approximation can be easily and efficiently
@@ -156,50 +152,7 @@ Bayesian posteriors must be approximated using potentially noisy posterior
 covariances and/ or posterior conditional densities that are not readily
 available from MCMC draws (e.g., \citet{gustafson:1996:marginal}).  In addition
 to providing rigorous theory and computational tools for the VB context, we go
-beyond previous work on local Bayesian sensitivity which treat sensitivity as a
-measure of robustness \textit{per se}.  In contrast, in the design and
-evaluation of our local sensitivity measures we pay special attention to our
-ability to accurately and usefully extrapolate VB posterior inferences to
-different priors.
-
-
-% Using a stick-breaking representation of a Dirichlet process, we consider
-% perturbations both to the scalar concentration parameter and to the functional
-% form of the stick-breaking distribution. To evaluate functional perturbations,
-% we follow \cite{gustafson:1996:local} and embed the stick-breaking density in
-% the $L_p$ vector spaces of integrable functions. In considering functional
-% sensitivity however, it is impossible to evaluate senstivity to all possible
-% perturbations. To uncover potentially influential perturbations, we also show
-% that the local sensitivity takes the form of an integral of the prior
-% perturbation times an \textit{influence function}. Using H{\"o}lder's
-% inequality, we can use the influence function to construct maximally influential
-% alternative priors.
-
-% Importantly, in order to use the influence function to search for
-% influential prior perturbations, the derivative needs to be a
-% uniformly good approximation in
-% a neighborhood of the original prior: that is, the VB optimum must be
-% \textit{Fre{\'e}chet differentiable} with respect to the prior perturbation.
-% We prove that, though the VB optimum is directional differentiable for all
-% $1 \le p \le \infty$,  only for multiplicative perturbations and
-% $p=\infty$ does the stronger condition of Fre{\'e}chet differentiability hold.
-% The differentiability properties of the VB posterior is distinct from the
-% exact Bayesian posterior, whose Fre{\'e}chet differentiability
-% holds irrespective of the choice of $p$.
-% With this in mind, we employ function sensitivity with only with multiplicative
-% perturbations.
-
-% The variational approach is particularly suitable for the sensitivity
-% calculations we derive. Because the approximate posterior is characterized as a
-% fixed point to an optimization objective, the derivative of the VB optimum with
-% respect to any prior parameter can be computed in closed form. Using modern
-% automatic differentiation tools, computing local sensitivity in practice
-% requires almost no additional code beyond implementing the optimization
-% objective itself. The computation time of forming the local approximation can be
-% more than an order of magnitude faster than refitting the VB posterior.
-
-% \Secref{model_bnp} details the stick-breaking construction of Dirichlet process
-% priors. \Secref{model_vb} outlines our truncated variational approximation.
-% \Secref{local_sensitivity} presents our local approximation for parametric and
-% functional perturbations, respectively. \secref{computing_sensitivity} discusses
-% how computing the sensitivity is done in practice.
+beyond previous work on local Bayesian sensitivity by paying special attention
+to our ability to accurately and usefully \textit{extrapolate} VB posterior
+inferences to different priors, rather than simply considering large derivatives
+to be indicative of non-robustness \textit{per se}.
