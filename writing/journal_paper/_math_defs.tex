@@ -1,22 +1,17 @@
 
 % Operators
-\def\mbe{\mathbb{E}}%
 \def\ind#1{\mathbb{I}\left(#1\right)}
 \def\evalat#1#2{\left.#1\right|_{#2}}
 \def\fracat#1#2#3{\left.\frac{#1}{#2}\right\vert_{#3}}
 \def\iid{\overset{iid}{\sim}}
 \def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
-\def\cov#1#2{\underset{#1}{\mathrm{Cov}}\left(#2\right)}
 \def\expecthat#1#2{\underset{#1}{\widehat{\mathbb{E}}}\left[#2\right]}
 \def\abs#1{\left|#1\right|}
 \def\norm#1{\left\Vert#1\right\Vert}
 \def\norminf#1{\left\Vert#1\right\Vert_{\infty}}
 \def\normop#1{\left\Vert#1\right\Vert_{\mathrm{op}}}
-\def\sumk{\sum_{\k=1}^{\kmax}}
 \def\sumkm{\sum_{\k=1}^{\kmax - 1}}
-\def\dirderiv#1#2{\delta_{#1\rightarrow#2}} % A directional derivative (unused?)
 \def\linop{\mathcal{L}} % A linear operator
-\def\logtrim{\tilde{\log}}
 
 \DeclareMathOperator*{\argmax}{\mathrm{argmax}}
 \DeclareMathOperator*{\argmin}{\mathrm{argmin}}
@@ -30,12 +25,10 @@
 \def\x{x}   % Data
 \def\t{t}   % Generic prior parameter
 \def\tp{t_{p}}   % Prior parameter for Lp perturbation
-\def\phip{\phi_{p}}   % Prior perturbation for Lp perturbation
 \def\z{z}   % Cluster indicators
 \def\g{g}   % Function of interest
 \def\k{k}   % Cluster index
 \def\n{n}   % Data index
-\def\c{c}   % A real number you don't care about (distinct from \const)
 \def\b{b}   % additive shift for mice model
 \def\l{l}   % index for locus
 \def\i{i}   % index for chromosome
@@ -49,9 +42,7 @@
 \def\lnusd{\eta^{\sigma}}   % Unconstrained stick vb std
 \def\hess#1{H_{#1}}   % Hessian
 \def\crosshessian{\hat J} % the cross hessian
-\def\phiz{0}   % The phi zero function.
 \def\infl{\Psi}   % The influence function
-\def\inflg{\Psi_{\g}}   % The influence function for a function of interest
 
 % Variational parameters
 \def\etabeta{\eta_{\beta}}  % VB parameters for certain components
@@ -69,7 +60,6 @@
 \def\etaoptz{\etaopt_{\z}}  % VB parameters for certain components
 \def\etaoptgamma{\etaopt_{\gamma}}  % VB parameters for certain components
 \def\hessopt{\hat{H}}  % VB parameters for certain components
-\def\thetatil{\tilde{\theta}}  % Nuisance VB parameters
 
 
 % Distributions central to the story
@@ -79,38 +69,26 @@
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}} % Stick breaking dens, use only for BNP section
 \def\pbetaprior{\p_{\mathrm{base}}}   % distribution on cluster centroids
-\def\logp{\log \p}   % Log probabiltty
 \def\lqgrad#1{{\nabla_\eta \log \qtil}\left(#1\right)}   % Log VB distribution gradient
-\def\lqhess#1{{\nabla_\eta^2 \log \qtil}\left(#1\right)}   % Log VB distribution Hessian
 \def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
-\def\lqhessbar#1{\overline{\lqhess{#1}}\,\,}   % Log VB distribution Hessian centered
-\def\psigrad#1{{\nabla_\t \psi}\left(#1\right)}   % Function of interest grad
-\def\pbase{\p_{0}}   % Base prior
+\def\pbase{\p_{0}}   % Initial (base) prior (different from the base prior of the DP)
 \def\palt{\p_{1}}   % Alternative prior
 \def\pbasetil{\ptil_{0}}   % Base prior
 \def\palttil{\ptil_{1}}   % Alternative prior
-% \def\psigradbar#1{\overline{\psigrad{#1}}\,\,}   % Cenetered function of interest
-% \def\psibar#1{\overline{\psi\left(#1\right)}\,\,}   % Cenetered function of interest
 
 % Less commonly used distributions
 \def\normdist#1{\mathcal{N}\left(#1\right)}   % Normal distribution
 \def\gem{\mathrm{GEM}(\alpha)}
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
-\def\KLhat#1{\widetilde{\mathrm{KL}}\left(#1\right)}   % KL divergence smoothed
-\def\KLgrad#1{\mathrm{KL}_{\eta}\left(#1\right)}   % KL divergence
-\def\KLhess#1{\mathrm{KL}_{\eta\eta}\left(#1\right)}   % KL divergence
 \def\normalwishart#1{\mathcal{N}\mathcal{W}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
 \def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
-
-
-\newcommand{\KLglobal}{\mathrm{KL}_{\mathrm{glob}}}   % KL divergence as function of global parameters only
+\def\KLglobal{\mathrm{KL}_{\mathrm{glob}}}   % KL divergence as function of global parameters only
 
 % Taylor series
 \def\etalin{\etaopt^{\mathrm{lin}}}
 \def\etalinglobal{\etaopt_\gamma^{\mathrm{lin}}}
 \def\glin{\g^{\mathrm{lin}}}
-\def\gapprox{\g^{\eta.\mathrm{lin}}} % changed to avoid double superscript
 
 
 % Dimensions
@@ -129,11 +107,8 @@
 \def\betadom{\Omega_{\beta}}
 \def\tdom{\Omega_{\t}}
 \def\linf{{L_{\infty}}}
-\def\lp#1{{L_{#1}}}
 \def\ball{\mathcal{B}}
 \def\ballclosed{\overline{\ball}}
-%\def\pertset{\mathcal{S}_{\pbase,p}}
-\newcommandx\pertset[1][usedefault, 1=p]{\mathcal{S}_{\pbase,#1}}
 
 % Annotations
 \def\mathtxt#1{\quad\textrm{#1}\quad}%
