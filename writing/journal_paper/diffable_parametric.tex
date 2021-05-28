@@ -74,7 +74,7 @@ differentiation in the expressions $\int \qtil(\theta \vert \eta) \log
 
 In certain cases, one can verify \assuref{exchange_order} directly, such as when
 $\expect{\q(\theta \vert \eta)}{\log \ptil(\theta \vert \t)}$ has a closed form.
-For more general situations, the following straightforward extention of the
+For more general situations, the following straightforward extension of the
 dominated convergence theorem \citep[Theorem 16.8]{billingsley:1986:probability}
 is useful.
 
@@ -120,7 +120,7 @@ proof). The advantage of \assuref{exchange_order_dom} over
 \assuref{exchange_order} is that the conditions of \assuref{exchange_order_dom}
 can typically be verified even when the expectation $\expect{\q(\theta \vert
 \eta)}{\log \ptil(\theta \vert \t)}$ does not have a closed form.  In
-\secref{diffable_concentration}, we will dicuss how different choices of
+\secref{diffable_concentration}, we will discuss how different choices of
 variational approximations for the stick lengths lend themselves to either
 \assuref{exchange_order} of \assuref{exchange_order_dom}.  Furthermore,
 \assuref{exchange_order_f} will be essential to analyzing nonparametric
@@ -205,5 +205,5 @@ variational expectation, is simple to evaluate.  Forming and inverting or
 factorizing $\hessopt$ can present a challenge, since $\hessopt$ has dimensions
 $\etadim \times \etadim$, which can be very large.  Nevertheless, in many
 cases---including our BNP problem---we can take advantage of model sparsity to
-effeciently compute \eqref{vb_eta_sens}.  We take up these computational
+efficiently compute \eqref{vb_eta_sens}.  We take up these computational
 considerations in detail in \secref{computing_sensitivity} below.

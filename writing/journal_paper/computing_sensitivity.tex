@@ -1,5 +1,5 @@
 
-This section outlines practical considerations for computating the local
+This section outlines practical considerations for computing the local
 sensitivity in \thmref{etat_deriv}. The mixed, second-order partial term
 $\crosshessian$ is inexpensive to compute using automatic differentiation.
 Typically, it is the computation and inversion of the Hessian matrix that is the
@@ -72,7 +72,7 @@ mixture model.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}[Optimalility of $\etalocal$ in a GMM]\exlabel{qz_optimality}
+\begin{ex}[Optimality of $\etalocal$ in a GMM]\exlabel{qz_optimality}
 Recall that under our truncated variational approximation,
 the cluster assignment $\z_\n$ is a discrete random variable
 over $\kmax$ categories.
@@ -184,7 +184,7 @@ into four blocks according to the global / local decomposition:
 %
 \end{align*}
 %
-Simiarly, let $\crosshessian_\gamma$ be the components of $\crosshessian$
+Similarly, let $\crosshessian_\gamma$ be the components of $\crosshessian$
 corresponding to the variational parameters $\etaglob$.  For example,
 $\crosshessian_\gamma$ is given by replacing the operator $\partial / \partial
 \eta$ with $\partial / \partial \etaglob$ in \eqref{sens_mixed_partial}. The
@@ -290,20 +290,20 @@ global parameters at prior parameter $\t$ using the mapping \eqref{g_as_global}.
 In this example, we produce a version of \exref{vb_insample_nclusters_simple}
 that takes advantage of the global / local structure of the BNP problem. Let
 $\gclustersabbr(\eta)$ denote our variational approximation to
-$\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.   Using the fact that $\p(\z_\n
+$\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that $\p(\z_\n
 \vert \beta, \nu, \x)$ is available in closed form, we can then take
 %
 \begin{align*}
 %
 \gclustersabbr(\etaopt) :={}&
     \expect{\q(\beta, \nu \vert\etaopt)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
     }
 \\\approx{}&
     \expect{\p(\beta, \nu \vert \x)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
     }
-    = \expect{\p(\z\vert\x)}{\nclusters_0(\z)} \Rightarrow \\
+    = \expect{\p(\z\vert\x)}{\nclusters(\z)} \Rightarrow \\
 %
 \gclustersabbr(\eta) ={}&
     \sumk \left(1 -  \prod_{\n=1}^\N
@@ -331,7 +331,7 @@ Finally, we will briefly discuss how to numerically solve the linear system
 $\hessopt_\gamma^{-1}\crosshessian_\gamma$ of \eqref{global_sens}.  We used the
 conjugate gradient (CG) algorithm, which requires only Hessian-vector products
 which are readily available through automatic differentiation. Iterative methods
-such as CG avoid instatiating the Hessian matrix in memory. We could have also
+such as CG avoid instantiating the Hessian matrix in memory. We could have also
 computed the Hessian and either factorized it (e.g. with a Cholesky
 decomposition). Then, the Hessian inverse (or its Cholesky decomposition) can be
 re-used for different perturbations. In our approach, we need to re-solve the

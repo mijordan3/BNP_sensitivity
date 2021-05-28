@@ -46,7 +46,7 @@ on the part of the KL divergence that is being perturbed.  Indeed, we will
 require little from the $\KL{\eta}$ part of the decomposition other than that it
 can be differentiated and optimized.
 
-By identfiying $\t$ with some hyperparameter (e.g. the concentration parameter,
+By identifying $\t$ with some hyperparameter (e.g. the concentration parameter,
 as in \exref{alpha_perturbation} below), we can use \defref{prior_t} to study
 parametric perturbations.  Furthermore, by parameterizing a path through the
 space of general densities, \defref{prior_t} will allow us to study
@@ -130,7 +130,7 @@ $\p(\nuk \vert \t)  = \palt(\nuk)$.  For $\t \in (0,1)$
 $\p(\nuk \vert \t)$ varies smoothly between $\pbase$ and $\palt$.
 
 As in \exref{alpha_perturbation}, up to constants not depending on
-$\lnuk$ we can write
+$\nuk$ we can write
 %
 \begin{align*}
 %
@@ -138,7 +138,7 @@ $\lnuk$ we can write
     -\t \log \pbase(\nuk) + \t \log \palt(\nuk) + \const
 \\={}& -\t \nuk + \const \Rightarrow
 \\
-\KL{\eta, \t} ={}& \KL{\eta} -\t \nuk + \const.
+\KL{\eta, \t} ={}& \KL{\eta} -\t \expect{\q(\nuk\vert\eta)}{\nuk} + \const.
 %
 \end{align*}
 %

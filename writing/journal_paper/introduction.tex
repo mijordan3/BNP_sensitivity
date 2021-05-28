@@ -14,16 +14,16 @@ rather than because of a considered subjective belief.
 
 Consider, as a simple motivating example, a field biologist fitting a Gaussian
 mixture model (GMM) fit to the Fisher iris dataset \citep{anderson:1936:iris,
-fisher:1936:iris} using a Dirichelt process prior with concetration parameter
+fisher:1936:iris} using a Dirichlet process prior with concentration parameter
 $\alpha$.  One might imagine the biologist asking: ``Suppose I went out and
 gathered a new dataset the same size as the one I have.  How many distinct
 species of iris would I expect to find?''  This posterior predictive expectation
 of the number of distinct species may depend strongly on the choice of the
-concetration parameter $\alpha$ as $\alpha$ varies over some reasonable range,
+concentration parameter $\alpha$ as $\alpha$ varies over some reasonable range,
 and, if it does, the biologist would presumably like to be warned that her
 posterior quantity of interest is {\em non-robust} to the choice of $\alpha$.
 
-The posterior in a BNP model cannot be calcluated analytically, and thus
+The posterior in a BNP model cannot be calculated analytically, and thus
 approximate methods are required in practice. In the present work, we consider
 inference using variational Bayes (VB), which posits a constrained family of
 distributions, and uses optimization to find the member of the family that is
@@ -34,15 +34,15 @@ faster than running Markov chain Monte Carlo (MCMC). VB is particularly apt for
 data analysis problems that are exploratory in nature, and where quick,
 approximate solutions suffice.
 
-Concretely, the output of a VB approximation is a vector of optimal
-approximating parameters, which we can denote as $\etaopt$.  For instance,
+Concretely, the VB approximation is defined by a vector of optimal
+VB parameters, which we can denote as $\etaopt$.  For instance,
 $\etaopt$ might be a vector of approximating exponential family natural
 parameters for all the quantities in the posterior.  In our example, evaluating
 $\etaopt$ for a particular prior parameter $\alpha$ means solving an
 optimization problem whose objective function depends on $\alpha$, and we notate
 the resulting dependence of $\etaopt$ on $\alpha$ as $\etaopt(\alpha)$.
 %
-Posterior quantites of interest, such as posterior expectations, can be
+Posterior quantities of interest, such as posterior expectations, can be
 approximated using expectations of the variational distributions, which in turn
 are functions of the VB parameters $\etaopt(\alpha)$. For example, in our
 motivating example, can write $\alpha \mapsto \g(\etaopt(\alpha))$ as the map
@@ -52,12 +52,12 @@ quantity of interest.
 A conceptually straightforward way to assess the robustness of
 $\g(\etaopt(\alpha))$ to $\alpha$ would be to refit the VB posterior for several
 different plausible prior choices.  For example, one might find
-$\etaopt(\alpha_g)$ for each $\alpha_g \in \{\alpha_1, \ldots, \alpha_G \}$ in a
-grid of $G$ plausible values.  If $\g(\etaopt(\alpha_g))$ varies meaningfully,
+$\etaopt(\alpha_i)$ for each $\alpha_i \in \{\alpha_1, \ldots, \alpha_m \}$ in a
+grid of $m$ plausible values.  If $\g(\etaopt(\alpha_i))$ varies meaningfully,
 we would say that the quantity $\g(\cdot)$ is non-robust to the choice of
 $\alpha$.  However, repeatedly finding variational optima for each prior choice
-may be unnecessarily expensive, particularly for the settings we consider where
-approximate optima might suffice.
+may be unnecessarily expensive, particularly for the exploratory settings we
+consider where approximate optima might suffice.
 
 In this work, we circumvent the need for repeated optimization by approximating
 the nonlinear dependence of the VB optimum on prior parameters using a
@@ -84,9 +84,9 @@ we expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when $\abs{\alpha -
 \alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) / d\alpha$ can be
 computed much more efficiently than the cost of optimizing directly,
 $\etalin(\alpha)$ can be much faster to compute than $\etaopt(\alpha)$.  Even
-when the approximation $\etalin(\alpha)$ is not a completely adequate substitue
+when the approximation $\etalin(\alpha)$ is not a completely adequate substitute
 for exact re-optimization, the derivative can be a useful guide for what sorts
-of prior perturbations might be problematic, informing futher exploration based
+of prior perturbations might be problematic, informing further exploration based
 on re-optimizing.
 
 The approximation thus motivates three key questions:

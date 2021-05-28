@@ -47,7 +47,8 @@ number of distinct clusters in a dataset of size $N$ is given by
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
 %
-(See \citep{jordan:2015:gentleintrodp}.) We take $\alpha\in[0.1, 4.0]$, which
+(See \citep[Equation 75]{jordan:2015:gentleintrodp}.)
+We take $\alpha\in[0.1, 4.0]$, which
 according to \eqref{prior_num_clusters}, corresponds to an an {\em a priori}
 range of approximately $1.5$ to $15$ clusters.  Over this range, the shape of
 the stick-breaking density varies considerably, as shown in
@@ -108,9 +109,9 @@ recovers the known ground truth that there are in truth three distinct species.
 number of distinct clusters as $\alpha$ varies. Over this range of $\alpha$,
 the in-sample number of clusters is quite robust, remaining nearly constant at three, but the posterior predictive
 number of clusters is non-robust, ranging roughly from 3.0 to 5.6 expected
-species.  Our approximation captures this qualititative behavior. As expected,
+species.  Our approximation captures this qualitative behavior. As expected,
 the approximation is least accurate furthest from the $\alpha_0$ at which it is
-evalutated.
+evaluated.
 
 \subsubsection*{Functional perturbations and the influence function}
 
@@ -165,7 +166,7 @@ the refits and linear approximation.
         (Left) The multiplicative perturbation $\phi$ in grey.
         The influence function $\Psi$ in purple,
         scaled to also have $\norminf{\Psi}=1$.
-        (Middle) The base and alternative priors $\pbase(\nuk)$
+        (Middle) The initial and alternative priors $\pbase(\nuk)$
         and $\palt(\nuk)$.
         (Right) The effect of the perturbation
         on the change in expected number of in-sample clusters

@@ -12,25 +12,48 @@ The data sets we considered in our experiments had varying degrees
 of complexity,
 and the computational of cost of fitting the variational approximation
 thus also varies accordingly.
-Consistent across each experiment, the cost of forming the linear approximation
-is roughly an order of magnitude faster than refitting (\tabref{timing_table})
+Consistent across each experiment, the cost of forming the linear approximation---the step that requires computing and inverting the Hessian matrix---is roughly an order of magnitude faster than refitting (\tabref{timing_table}). 
+
+Importantly, the Hessian inversion only needs to be done once for a given perturbation.
+In all the examples, after the linear approximation is formed, 
+extrapolating to {\em any} new prior parameter 
+$\alpha\not=\alpha_0$ or $\t\not=0$ takes $\approx\sfrac{1}{1000}$th of a 
+second. 
 
 For example, in the thrush data and fastSTRUCTURE model,
 the initial fit took seven seconds, with subsequent refits
 (which recall were warm-started with the initial fit) taking
 between five and ten seconds.
 Inverting the Hessian to form the linear approximation takes less than a second.
-In all the examples, after forming the linear approximation, 
-extrapolating to a new $\alpha$ or a 
-perturbation $\phi$ takes \sfrac{1}{1000}th of a second. 
 
+In our experiments, we used conjugate gradient to solve the linear system, 
+and thus had to re-solve for each proposed perturbation $\phi$. 
+There are two ways to avoid re-solving the linear system for each $\phi$.
+First, we could have computed the Hessian directly and factorized it, 
+with a Cholesky decomposition, for example. 
+After this one-time cost of factorizing the Hessian, 
+the saved Cholesky decomposition could 
+be re-used to cheaply solve the requisite linear system for any $\phi$. 
+This is only possible if the size of the Hessian matrix is not too large, 
+otherwise saving the Hessian (or its factorization) in memory 
+may be impossible. 
+Secondly, we could have used the influence function in conjunction with 
+\corref{etafun_deriv_form} to form the fully linearized approximation $\glin$.
+This requires pre-specifying a posterior quantity of interest $\g$. 
+However, once $\g$ is defined, we can compute its influence function, which involves solving the linear system; then, given any perturbation $\phi$, 
+we can approximate the integral in \corref{etafun_deriv_form} numerically, 
+by evaluating the influence function and $\phi$ at a finite number of grid points, for example. The Hessian inversion is done only once in the
+computation of the influence function, 
+and the influence function can be applied
+to any $\phi$. 
 
 In each data set and model we consider, the the speed of the linear
-approximation allows us to quickly explore a wide range of possible prior perturbations. 
-However, even with the speed of our approximation, refitting for all possible perturbations is impossible.
-The influence function, which is also cheap to compute, 
+approximation allows us to quickly explore a wide range of possible prior perturbations.
+While refitting for all possible prior perturbations is impossible,
+the influence function, which is cheap to compute relative to refitting, 
 is able to provide a guide to uncover influential perturbations, 
 at which we can then refit the model. 
+
 
 
 % For example, in the mice data and regression model,
@@ -89,10 +112,11 @@ evaluate the influence function on a grid of 1000 points. }
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % influence function
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    The influence function &
+    \shortstack{ \\ The influence function \\ (at 1000 grid points)}  &
     0.09 &
     3 &
     0.6 \\
+    \hline
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % hessian solve for functional perturbation
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
