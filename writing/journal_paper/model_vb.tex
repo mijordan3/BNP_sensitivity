@@ -21,7 +21,7 @@ divergence:
 %
 \KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}
 ={}&    \expect{\q(\zeta \vert \eta)}{
-        \log \q(\zeta \vert \eta) - \logp(\x, \zeta)} + \logp(\x).
+        \log \q(\zeta \vert \eta) - \log\p(\x, \zeta)} + \log\p(\x).
 %
 \end{align}
 %
@@ -43,7 +43,7 @@ satisfy
 %
 \end{align}
 %
-Notice that the intractable $\logp(\x)$ term does not depend on $\eta$, and so
+Notice that the intractable $\log\p(\x)$ term does not depend on $\eta$, and so
 can be neglected in the objective function $\KL{\eta}$.  In general, when
 writing $\KL{\eta}$, we will neglect terms that do not depend on $\eta$.
 
@@ -167,7 +167,7 @@ we could write
 %
 \expect{\p(\z\vert\x)}{\nclusters(\z)} \approx
 \expect{\q(\z\vert\etaopt)}{\nclusters(\z)} =
-\sumk \left(1 -  \prod_{\n=1}^\N
+\sumkm \left(1 -  \prod_{\n=1}^\N
     (1 - \expect{\q(\z \vert \etaoptz)}{\z_{\n\k}})\right).
 %
 \end{align*}

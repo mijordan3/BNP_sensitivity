@@ -1,6 +1,7 @@
 ## LaTeX conventions
 
-- We keep text out of `main.tex`.
+- Please make changes through pull requests, and merge with master
+only when there are no undefined or duplicated labels.
 
 - Please use `refstyle` and `varioref` references.  The reference types
 are all specified in `_reference_defs.tex`.

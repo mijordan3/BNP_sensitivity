@@ -537,15 +537,15 @@ function theorem, but this time for general Banach spaces.  We will
 us \citet[Theorem 4.B]{zeidler:2013:functional}.
 
 First, \citet[Chapter 4 Condition 21b]{zeidler:2013:functional} holds since
-$\KLhess{\etaopt(\phiz), \phiz}$ is invertible by
-\assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy conditions (i), (ii), and
-(iii) of \citet[Theorem 4.B(c)]{zeidler:2013:functional}, giving that the
-function $\etaopt(\phi)$ exists.
+$\hessopt$ is invertible by \assuitemref{kl_opt_ok}{kl_hess}.   So we satisfy
+conditions (i), (ii), and (iii) of \citet[Theorem
+4.B(c)]{zeidler:2013:functional}, giving that the function $\etaopt(\phi)$
+exists.
 
 Moreover, by \assuitemref{kl_opt_ok}{kl_diffable} and
 \lemref{objective_is_frechet}, the estimating equation
 \eqref{vb_first_order_condition_phi} is continuously Fre{\'e}chet differentiable
-($C^1$ in the notation of Zeidler) in a neighborhood of $\etaopt(\phiz), \phiz$.
+($C^1$ in the notation of Zeidler) in a neighborhood of $\etaopt, 0$.
 It follows from \citet[Theorem 4.B(d)]{zeidler:2013:functional}, $\etaopt(\phi)$
 is also continuously Fr{\'e}chet differentiable.
 
@@ -627,11 +627,21 @@ the normal distribution. By properties of the exponential family,
 %
 \begin{align*}
 %
-\lqgrad{\theta \vert \eta} ={} (\theta, \theta^2)^T \mathand&
-\lqhess{\theta \vert \eta} ={} 0_{2\times2} \Rightarrow\\
+\fracat{\partial \log \qtil(\theta \vert \eta)}
+       {\partial \eta}{\eta}
+      ={} (\theta, \theta^2)^T \mathand&
+\fracat{\partial^2 \log \qtil(\theta \vert \eta)}
+      {\partial \eta \partial \eta^T}{\eta}
+      ={} 0_{2\times2} \Rightarrow\\
 %
-\norm{\lqgrad{\theta \vert \eta}}_2^2 ={} \theta^2 + \theta^4 \mathand&
-\norm{\lqhess{\theta \vert \eta}}_2 ={} 0.
+\norm{
+    \fracat{\partial \log \qtil(\theta \vert \eta)}
+           {\partial \eta}{\eta}
+}_2^2 ={} \theta^2 + \theta^4 \mathand&
+\norm{
+    \fracat{\partial^2 \log \qtil(\theta \vert \eta)}
+          {\partial \eta \partial \eta^T}{\eta}
+}_2 ={} 0.
 %
 \end{align*}
 %
