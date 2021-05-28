@@ -118,7 +118,7 @@ out$p
 The posterior quantities of interest in this application are the admixtures
 $\pi_\n$. \figref{stru_init_fit} plots the inferred admixtures
 $\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.  Our
-initial prior was a $\gem$ with parameter $\alpha_0 = 3$. The choice of
+initial prior was a $\textrm{GEM}$ with parameter $\alpha_0 = 3$. The choice of
 $\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}
 (\eqref{prior_num_clusters}), motivated by the fact that the individuals come
 from four geographic regions. Below, we will evaluate sensitivity to this prior
@@ -142,7 +142,7 @@ proportions of population 1. This suggests that some migration has occurred
 between the Mbololo and Ngangao regions.
 
 We evaluate the sensitivity of this conclusion to possible prior perturbations.
-Define the posterior quantity of interest
+Define the posterior quantity 
 %
 \begin{align*}
 \gadmix(\eta; \mathcal{N}, k) =
@@ -172,8 +172,8 @@ population present, a population which primarily appears in Chawia individuals.
 
 \subsubsection*{Functional sensitivity}
 
-We construct the worst-case negative perturbation
-for decreasing each of our three variants of $\gadmix$, in order to see
+We construct worst-case negative perturbations
+for each of the three variants of $\gadmix$, in order to see
 whether the biologically interesting patterns can be made to disappear
 with different prior choices.
 \figref{stru_func_sens} shows the result of the worst-case perturbations
@@ -213,10 +213,11 @@ source("R_scripts/structure/structure_fsens.R", echo=knitr_debug, print.eval=TRU
 
 
 
-The conclusions from the linear approximation did not
+
+In this data set and model,
+the conclusions from the linear approximation did not
 always agree with the conclusions from refitting the
-variational approximation
-in this data set and model.
+variational approximation.
 For example, the admixture proportion of population 3 in individuals C were predicted to more sensitive by our linear approximation than
 were actually observed after refitting (bottom row \figref{stru_func_sens}).
 
@@ -227,8 +228,7 @@ overall admixture proportion
 the approximation does does not perform uniformly well over all individuals.
 \figref{stru_func_sens_admix} plots the inferred admixtures
 computed using the linearized variational parameters
-and the refitted variational parameters
-after the worst-case prior perturbation.
+and the refitted variational parameters.
 The admixture proportion of population 2 in individual $n = 25$
 dramatically increased after refitting with the perturbed prior;
 the linearized parameters failed to reproduce this change.
@@ -244,7 +244,7 @@ with a similar effect as the worst-case,
 as we did in \secref{results_mice}.
 Importantly, as we will note in the next subsection,
 the influence function is cheap to compute relative to refitting.
-For a more further discussion of the limitations of the linear approximation,
+For a further discussion of the limitations of the linear approximation,
 see \appref{app_structure_results}.
 
 

@@ -63,7 +63,8 @@ number of distinct clusters in a dataset of size $N$ is given by
 \sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
 \end{align}
 %
-(See \citep{jordan:2015:gentleintrodp}.) We take $\alpha\in[0.1, 4.0]$, which
+(See \citep[Equation 75]{jordan:2015:gentleintrodp}.)
+We take $\alpha\in[0.1, 4.0]$, which
 according to \eqref{prior_num_clusters}, corresponds to an an {\em a priori}
 range of approximately $1.5$ to $15$ clusters.  Over this range, the shape of
 the stick-breaking density varies considerably, as shown in
