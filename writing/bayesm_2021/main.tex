@@ -1,35 +1,10 @@
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 
-% Any additional packages needed should be included after jmlr2e.
-% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
-% and defines many common macros, such as 'proof' and 'example'.
-%
-% It also sets the bibliographystyle to plainnat; for more information on
-% natbib citation styles, see the natbib documentation, a copy of which
-% is archived at http://www.jmlr.org/format/natbib.pdf
+% bibliography
+\usepackage[square,numbers]{natbib}
 
-%\usepackage{jmlr2e}
-
-% my added packages: copied from the swiss IJ paper
-\usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{subfigure}
-\usepackage{booktabs} % for professional tables
-\usepackage{siunitx}
-\usepackage{hyperref}
-\usepackage{xargs}[2008/03/08]
-\usepackage{xfrac}
-
-
-
-% Documentation
-% http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
 \usepackage{refstyle}
 \usepackage{varioref} % Use refstyle instead of varioref directly.
-\usepackage[authoryear]{natbib}
-
-% \usepackage{prettyref}
-% \usepackage{refstyle}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -42,20 +17,6 @@
 
 % Math scripts
 \usepackage{mathrsfs}  % For script fonts
-%\usepackage{dutchcal} % Lower-case mathcal
-%\usepackage{mathbbol}  % For lower-case bold fonts
-
-% \DeclareFontFamily{OT1}{pzc}{}
-% \DeclareFontShape{OT1}{pzc}{m}{it}{<-> s * [1.10] pzcmi7t}{}
-% \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
-
-\usepackage{listings}
-\usepackage{pdfpages}
-
-% added packages for todo notes
-% pass in option ``disable" to remove notes
-\usepackage[textsize=tiny]{todonotes}
-
 
 % This defines math macros.
 \input{_math_defs.tex}
@@ -63,38 +24,74 @@
 % This specifies the formatting for references (sections, theorems, etc.)
 \input{_reference_defs.tex}
 
+% mathematics
+\usepackage{amssymb}
+\usepackage{amsmath}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
 
-% Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
+% geometry
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage[top=1.2in,bottom=1.2in,left=1.2in,right=1.2in]{geometry}
+\onehalfspacing
+\hypersetup{
+	colorlinks=true,
+	urlcolor=blue,
+	citecolor=blue,
+	linktoc=all,
+	linkcolor=red}
 
-%\jmlrheading{1}{2000}{1-48}{4/00}{10/00}{giordano21}{Ryan Giordano and Runjing Liu and Michael I. Jordan and Tamara Broderick}
-
-% Short headings should be running head and authors last names
-
-%\ShortHeadings{BNP sensitivity}{Giordano et al.}
-%\firstpageno{1}
+% add your packages if you need
 
 \begin{document}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}
+\title{\textsc{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}} % Title: Limited to 180 characters in length. Use title capitalization.
 
-\author{Ryan Giordano \texttt{rgiordan@mit.edu} \\
-        \and
-        Runjing Liu \texttt{runjing\_liu@berkeley.edu} \\
-        \and
-        Michael I.\ Jordan \texttt{jordan@cs.berkeley.edu} \\
-        \and
-        Tamara Broderick \texttt{tbroderick@csail.mit.edu}
-        }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% AUTHORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\author{
+Ryan Giordano \footnote{Equal contribution first author.  CSAIL, MIT. email: rgiordan@mit.edu}
+Runjing Liu \footnote{Equal contribution first author.  Statistics, UC Berkeley. email: runjing\_liu@berkeley.edu},
+Micheal I.~Jordan\footnote{Computer Science, UC Berkeley. email: jordan@cs.berkeley.edu},
+and Tamara Broderick\footnote{CSAIL, MIT. email: tbroderick@csail.mit.edu}\\
+}
+
+\date{\empty}
 \maketitle
 
 
-\section{Introduction}\seclabel{introduction}
-\input{introduction.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ABSTRACT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+    \input{abstract}
+\end{abstract}
+
+\noindent\textbf{Keywords}:
+{Local Bayesian robustness;
+ Variational Bayes;
+ Bayesian nonparametrics;
+ Stick-breaking processes;
+ Functional analysis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BODY OF THE PAPER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REFERENCES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliography{references}
 \bibliographystyle{plainnat}
 
+% \begin{thebibliography}{99}
+% \bibitem{reference1} Author 1, Author 2  and Author 3 (Year). Title. \textit{Journal}, \textbf{volume}, pp--pp.
+% \bibitem{reference2} Author 1, Author 2  and Author 3 (Year). \textit{Book title}. Publisher.
+% \end{thebibliography}
 
 \end{document}
