@@ -1,13 +1,14 @@
-In \secref{diffable_nonparametric} we considered multiplicative perturbations to
-the prior density.  One might ask whether one could consider other paths through
-the space of priors, such as additive perturbations.  In this section, we
-briefly consider a broader class of nonlinear perturbations investigated by
-\citet{gustafson:1996:local}, of which additive and multiplicative perturbations
-are special cases, and show that, within this class, only multiplicative
-perturbations lead to Fr{\'e}chet differentiable VB optima.
+In \secref{diffable_nonparametric, diffable_worst_case} we considered
+multiplicative perturbations to the prior density.  One might ask whether one
+could consider other paths through the space of priors, such as additive
+perturbations.  In this section, we briefly consider a broader class of
+nonlinear perturbations investigated by \citet{gustafson:1996:local}, of which
+additive and multiplicative perturbations are special cases, and show that,
+within this class, only multiplicative perturbations lead to Fr{\'e}chet
+differentiable VB optima.
 
-As in \secref{diffable_nonparametric}, suppose we have a base prior $\pbase$ and
-an alternative $\palt$, and that we wish to parameterize a continuous path
+As in \secref{diffable_nonparametric}, suppose we have an initial prior $\pbase$
+and an alternative $\palt$, and that we wish to parameterize a continuous path
 between them.  Deviating from multiplicative perturbations, for some $p \in [1,
 \infty)$, let
 %
@@ -25,7 +26,7 @@ continously between the two in $\tp \in (0, 1)$.  When $p = 1$,
 $\ptil(\theta \vert \tp)$ defines an ``additive perturbation,'' and
 the limit as $p \rightarrow \infty$ gives the multiplicative perturbation
 of \eqref{mult_pert_simple}.
-%
+
 \citet[Result 2]{gustafson:1996:local} states
 a result analogous to \lemref{pert_invariance} for \eqref{p_pert_simple}, where
 the $\norminf{\cdot}$ norm is repalaced by
@@ -49,18 +50,21 @@ pointwise negative ``priors.''
 %
 We allow for negative $\phi(\theta \vert \palt, p)$ because otherwise
 $\norm{\cdot}_p$ leads to counterintuitive notions of the ``size'' of prior
-perturbations, as we dicuss in \appref{positive_pert}.
+perturbations, as we dicuss in \appref{positive_pert}, and because standard
+results in functional analysis used in the proof of \thmref{eta_phi_deriv}
+require open neighborhoods.
 
-However, we must acknolwedge that our \thmref{kl_discontinuous} below relies on
-the possibility that $\phi(\theta \vert \palt, p)$ can be negative.   In light
-of this, one might reasonably wonder whether we should in fact restrict to
-positive perturbations to avoid the negative consequences of
-\thmref{kl_discontinuous}. In the view of the authors, restricting to pointwise
-positive perturbations is a somewhat artificial solution to a fundamental
-disconnect between the $\norm{\cdot}_p$ and KL divergence which we dicuss at the
-end of the present section, a disconnect which we believe is resolved more
-transparently and naturally through the use of the $\norminf{\cdot}$ norm and
-multiplicative perturbations. }
+However, we must acknolwedge that the main result of this section,
+\thmref{kl_discontinuous} below, relies on the possibility that $\phi(\theta
+\vert \palt, p)$ can be negative.   In light of this, one might reasonably
+wonder whether we should in fact restrict to positive perturbations in an
+attempt to avoid the consequences of \thmref{kl_discontinuous}. In the view of
+the authors, restricting to pointwise positive perturbations is a somewhat
+artificial solution to a fundamental disconnect between the $\norm{\cdot}_p$
+norm and KL divergence which we dicuss at the end of the present section. We
+believe that the disconnect is resolved more transparently and naturally through
+the use of the $\norminf{\cdot}$ norm and multiplicative perturbations which are
+allowed to be negative.}
 %
 .  For our present discussion, what matters is that the use of the perturbation
 in \eqref{p_pert_simple} strongly motivates the use of the norm
@@ -68,13 +72,17 @@ $\norm{\phi(\theta \vert \palt, p)}_p$ when forming, for example, worst-case
 perturbations as in \corref{etafun_worst_case}.
 
 Though the $\norm{\phi(\theta \vert \palt, p)}_p$ norm does not appear to cause
-major difficulties for the full Bayesian posterior, this norm is not compatible
-with KL divergence, in the sense that KL divergence is {\em discontinuous} in
-this norm.  Prior changes that are arbitrarily small according to
-$\norm{\phi(\theta \vert \palt, p)}_p$ can induce arbitrarily large changes in
-the KL divergence \eqref{kl_def}, and so (in genreal) arbitrarily large
-changes in its optimum.  The problem is best illustrated with an
-example.
+major difficulties for the full Bayesian posterior,
+%
+\footnote{Other than the fact that there exist pointwise negative priors
+induced by $\phi(\theta \vert \palt, p)$ in every neighborhood of the
+zero function.}
+%
+the $\norm{\phi(\theta \vert \palt, p)}_p$ norm is not compatible with KL
+divergence, in the sense that KL divergence is {\em discontinuous} in this norm.
+Prior changes that are arbitrarily small according to $\norm{\phi(\theta \vert
+\palt, p)}_p$ can induce arbitrarily large changes in the KL divergence, and so
+(in general) arbitrarily large changes in its optimum.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,11 +100,15 @@ $\abs{\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}} > M$.
 
 \begin{proof}
 %
-The proof will follow by perturbing $\pbase(\theta)$ to zero in a small
-interval.  By making the interval narrow, we can make $\norm{\phi(\theta \vert
-\palt, p)}_p$ small, but by making the $\palt(\theta)$ sufficiently close to
-zero, we can make the KL divergence difference large irresective of how narrow
-the interval is.
+For the duration of the proof, we will use the shorthand that a density
+applied to a set represents the integral of the density over the set.
+For example, for a set $S$, $\p(S) = \int_S \p(\theta)\mu(d\theta)$.
+
+The proof will be constructive, based on an alternative $\palt(\theta)$ formed
+by driving $\pbase(\theta)$ to zero in a small interval.  By making the interval
+narrow, we can make $\norm{\phi(\theta \vert \palt, p)}_p$ small, but by making
+the $\palt(\theta)$ sufficiently close to zero, we can make the KL divergence
+difference large irresective of how narrow the interval is.
 
 First, observe that
 %
@@ -144,10 +156,6 @@ By \eqref{phi_lp_norm},
 %
 \end{align*}
 
-For the duration of the proof, we will use the shorthand that a density
-applied to a set represents the integral of the density over the set.
-For example, for a set $S$, $\p(S) = \int_S \p(\theta)\mu(d\theta)$.
-
 Since $\mu$ is absolutely continuous with respect to the Lebesgue measure, there
 exists a sequence $\epsilon_n \rightarrow 0$ with $\epsilon_n > 0$ and a
 sequence of corresponding sets $S_n$ such that $\pbase(S_n) = \epsilon_n$. (See
@@ -190,13 +198,13 @@ expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
 % prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
 % considers such densities to be ``distant'' from $\pbase$, whereas the
 % more permissive $\norm{\cdot}_p$ norms do not.
-Consider \figref{func_dist}, which succinctly summarizes the tradeoffs.  The two
-shown densities are far from one another according to KL divergence (from blue
-to red) since the red density takes values that are nearly zero where the blue
-density has nonzero mass. They are also distant from one another in
-$\norminf{\cdot}$, since it takes a large multiplicative change to turn the
-nonzero blue density into the nearly zero red density. However, the two
-densities are close in $\norm{\cdot}_{p}$, since the region where the red
+Consider \figref{func_dist}, which succinctly summarizes the tradeoffs between
+the various norms.  The two shown densities are far from one another according
+to KL divergence (from blue to red) since the red density takes values that are
+nearly zero where the blue density has nonzero mass. They are also distant from
+one another in $\norminf{\cdot}$, since it takes a large multiplicative change
+to turn the nonzero blue density into the nearly zero red density. However, the
+two densities are close in $\norm{\cdot}_{p}$, since the region where the red
 density is nearly zero has a small measure. In order for VB approximations to be
 continuous (a necessary condition for Fr{\'e}chet differentiability), one must
 consider a topology on priors that is no coarser than the topology induced by KL

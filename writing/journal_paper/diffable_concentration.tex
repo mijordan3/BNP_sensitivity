@@ -102,7 +102,7 @@ unconstrained parameterization} for $\q(\zeta \vert \eta)$.   Unconstrained
 parameterizations of variational distributions allow the use of unconstrained
 optimization for variational inference and are a good practice when available
 \citep{kucukelbir:2016:advi}.  For details on our parameterizations, see
-\appref{app_vb_details}.
+the corresponding appendices.
 
 Verifying \assuref{exchange_order} is the principal technical challenge of
 satisfying the conditions of \thmref{etat_deriv}. Recall from
@@ -121,72 +121,19 @@ so we need to establish \assuref{exchange_order} for
 %
 Since the preceding equality holds for all $\t$ and $\etanuk$, it suffices to
 establish that we can exchange the order of integration and differentiation for
-the right hand side.  Note that derivatives with respect to any components of
-$\eta$ other than $\etanuk$ are zero and so \assuref{exchange_order} is
-trivially satisfied.
+the right hand side.  Since the normal density has a term of the form
+$\exp(-\const \lnuk^2)$, and since $\log (1 + \exp(\lnuk)) \exp(-\abs{\lnuk})  <
+\infty$ for all $\lnuk \in \mathbb{R}$ as long as the variational variance is
+finite, one can show that the conditions of \assuref{exchange_order_dom} are
+satisfied within $\ball_\eta \times \ball_\t$.  (See
+\lemref{normal_q_is_regular} in \appref{proofs} for a proof.)
+Note that
+derivatives with respect to any components of $\eta$ other than $\etanuk$ are
+zero and so \assuref{exchange_order} is trivially satisfied.
 
-The following lemma establishes a general condition for the ability
-to exchange normal expectations and the needed derivatives.
-
-% \begin{align}\eqlabel{lnuk_derivatives}
-% %
-% \fracat{d \lnu_\k}{ d\nuk}{\nuk} ={}
-% %     \frac{1-\nuk}{\nuk}
-% %     \left(\frac{1}{1 - \nuk} + \frac{\nuk}{(1 - \nuk)^2} \right)
-% % \\={}& \frac{1}{\nuk} + \frac{1}{1 - \nuk}
-% % \\={}&
-%     \frac{1}{\nuk (1 - \nuk)} \mathand
-% %
-% \fracat{d \nuk}{ d\lnuk}{\lnuk} ={}
-%     \frac{\exp(\lnuk)}{(1 + \exp(\lnuk))^2}.
-% %
-% \end{align}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{lem}\lemlabel{normal_q_is_regular}
-%
-Let $\mu$ denote the Lebesgue measure on $\mathbb{R}$. Let $\eta = (\mu,
-\sigma)$, let $\normdist{\theta \vert \eta}$ denote the corresponding normal
-density with respect to $\mu$, and and let $\ball_\eta$ denote an open ball in
-$\mathbb{R}^2$ such that $0 < \sigma < \infty$ for all $\eta \in \ball_\eta$.
-%
-Let $\ball_\t$ denote an open ball in $\mathbb{R}$, and let $\psi(\theta, \t)$
-be a function such that $\theta \mapsto \psi(\theta, \t)$ is $\mu$-measurable
-for all $\t \in \ball_\t$.
-
-If there exists a constant $C > 0$ such that
-%
-\begin{align*}
-%
-\sup_{\t \in \ball_\t} \abs{\psi(\theta, \t)}
-    \le C \exp(\abs{\theta})
-\mathand
-\sup_{\t \in \ball_\t}
-    \abs{\frac{\partial \psi(\theta, \t)}{\partial \t}}
-    \le C \exp(\abs{\theta}),
-%
-\end{align*}
-%
-then one can exchange the order of expectation and differentation in the
-expression $\expect{\normdist{\theta \vert \eta}}{\psi(\theta, \t)}$ for the
-derivatives $\partial / \partial \eta$, $\partial^2 / \partial \eta \partial
-\eta$, and $\partial^2 / \partial \eta  \partial \t$, eavluated at any $\t \in
-\ball_\t$ and $\eta \in \ball_\eta$.
-
-\seeproof{normal_q_is_regular}
-\end{lem}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Since $\log (1 + \exp(\lnuk)) \exp(-\abs{\lnuk})  < \infty$ for all $\lnuk \in
-\mathbb{R}$, the conditions of \lemref{normal_q_is_regular} are satisfied for
-any ball $\ball_\eta$ such that the variational variances are all finite, and
-\assuref{exchange_order_dom} is satsified.
-
-Since both \assuref{kl_opt_ok} and \assuref{exchange_order_dom} are satisfied,
-it follows that \thmref{etat_deriv} applies to the map $\alpha \mapsto
-\etaopt(\alpha)$.
+\Assuref{exchange_order_dom} implies \assuref{exchange_order}.  Since both
+\assuref{kl_opt_ok, exchange_order} are satisfied, \thmref{etat_deriv} applies,
+and the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable.
 
 We end this section by observing that the only real technical challenge was
 showing that the assumptions were satisfied for the logit-normal densitys

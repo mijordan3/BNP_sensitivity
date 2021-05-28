@@ -1,0 +1,19 @@
+We evaluate the prior sensitivity in BNP models applied to three distinct data
+analysis examples. We first fit a Gaussian mixture model
+(\exref{iris_bnp_process}) to the canonical iris data set. Secondly, we cluster
+time-course gene expression data using a regression model and study the
+resulting co-clustering matrix. Finally, we fit a topic model on a data set of
+sampled genotypes in an endangered bird species, inferring  ancestral migration
+patterns from the posterior population structure.
+
+In each data example, we first specify our quantities of interest and fit the
+variational approximation to a model with a $\gem$ prior at some chosen
+parameter $\alpha = \alpha_0$. We then evaluate sensitivity to the chosen
+$\alpha$ parameter by refitting the variational approximation for each $\alpha$
+in a set $\{\alpha_1, ..., \alpha_m\}$ of plausible values. Next, we examine the
+effects of changing the functional form the stick-breaking prior, using the
+influence function to guide our choice of prior perturbation, either
+heuristically or using \corref{etafun_worst_case}.  For each prior perturbation,
+we validate the performance of the linear approximation against re-fitting the
+model and comare the relative compuatational cost of the linear approximation
+and re-fitting.

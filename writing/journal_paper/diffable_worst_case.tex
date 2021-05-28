@@ -37,26 +37,26 @@ to \eqref{vb_eta_infl_sens}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Even if one is not interested formally in the worst-case, one can still use the
-influence function as a low-dimensaional summary of the infinite dimensional
-space of prior densities, as illustrated by \exref{infl_univariate}.  This
-low-dimensional summary can be used to informally choose influential
-prior perturbations.
+influence function to informally choose influential prior perturbations, perhaps
+after dimension reduction, as in \exref{infl_univariate}.  Again, see
+\secref{results} below for motivating examples.
 
 However, \corref{etafun_deriv_form} does not precisely justify using the
 influence function for exploration in this way.  \Corref{etafun_deriv_form}
 states only that, for a {\em particular} direction $\phi$, $\t \mapsto
-\etaopt(\t \phi)$ is continuously differentiable.  This guarantees only that,
-for a fixed $\phi$, one can make $\delta$ sufficiently small so that the error
-$\abs{\etaopt(\phi) - \etalin(\phi)}$ goes to zero faster than $\delta$.
-However, this is not to say that, for a fixed $\delta$ (no matter how small),
-the worst-case error $\sup_{\phi \in \ball_\phi(\delta)} \abs{\etaopt(\phi) -
-\etalin(\phi)}$ is bounded, much less that it goes to zero faster than $\delta$.
+\etaopt(\t \phi)$ is continuously differentiable.  Observing that $\t \phi \in
+\ball_\phi(\t \norminf{\phi})$, this guarantees only that, for a fixed $\phi$,
+one can make $\t$ sufficiently small so that the error $\abs{\etaopt(\t \phi) -
+\etalin(\t \phi)}$ goes to zero faster than $\t$. However, this is not to say
+that, for a fixed $\delta$ (no matter how small), the worst-case error
+$\sup_{\phi \in \ball_\phi(\delta)} \abs{\etaopt(\phi) - \etalin(\phi)}$ is
+bounded, much less that it goes to zero faster than $\delta$.
 
 To justify using linear approximations to exploring the unit ball
 $\ball_\phi(\delta)$, we thus require a stronger result than
-\corref{etafun_deriv_form}.  In particular, we observe that $\phi$ is a member
-of the the Banach space $L_\infty$ \citep[Theorem 5.2.1]{dudley:2018:real}. We
-require that the map $\phi \mapsto \etaopt(\phi)$, which maps $\L_\infty$ to
+\corref{etafun_deriv_form}.  Observe that $\phi$ is a member of the the Banach
+space $L_\infty$ \citep[Theorem 5.2.1]{dudley:2018:real}.  We require that the
+map $\phi \mapsto \etaopt(\phi)$, which maps $\L_\infty$ to
 $\mathbb{R}^\etadim$, admits a {\em uniformly good linear approximation}, i.e.,
 to be Fr{\'e}chet differentiable, as described in \defref{diffable_classes}.
 
@@ -70,7 +70,8 @@ Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
 an open neighborhood of $\phi_0 \in B_1$.
 %
 A function $f: \ball_1 \mapsto B_2$ is {\em Fr{\'echet} differentiable} (also
-known as boundedly differentiable) at $\phi_0$ if
+known as boundedly differentiable) at $\phi_0$ if there exists a  bounded linear
+operator, $f^{\mathrm{lin}}: B_1 \mapsto B_2$, such that
 %
 \begin{align*}
 %
@@ -86,9 +87,12 @@ known as boundedly differentiable) at $\phi_0$ if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 By \citep[Proposition 4.8]{zeidler:2013:functional}, if a function is
-Fr{\'e}chet differentiable, then the linear approximation $f^{\mathrm{lin}}$ is
-given precisely by the directional derivative $d f^{\mathrm{lin}}(t (\phi -
-\phi_0)) / d t$.
+Fr{\'e}chet differentiable, then the linear operator $f^{\mathrm{lin}}$ is given
+precisely by the directional derivative $d f(t (\phi - \phi_0)) / d t$. Thus, if
+$\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable, its derivative is
+given by \corref{etafun_deriv_form}.  Fr{\'e}chet differentiability guarantees
+that the error of the linear approximation given by \corref{etafun_deriv_form}
+does not blow up in the ball $\ball_\phi(\delta)$.
 
 We emphasize that Fr{\'e}chet differentiability is neither sufficient nor
 necessary for a derivative to be useful.  For example, it is possible in
@@ -98,7 +102,7 @@ alternatives one cares about.  Conversely, if a function fails to be Fr{\'e}chet
 differentiable, the derivative may still perform well in particular directions,
 including that chosen by \corref{etafun_worst_case}.  Nevertheless, Fr{\'e}chet
 differentiability is a strong local result, and provides some assurance that one
-can use results such as \corref{etafun_worst_case} without producing
+can use results such as \corref{etafun_worst_case} without uncovering
 pathological behavior.
 
 As we now state in \thmref{eta_phi_deriv}, the perturbation given in
