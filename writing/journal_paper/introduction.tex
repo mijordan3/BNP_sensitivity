@@ -34,8 +34,8 @@ faster than running Markov chain Monte Carlo (MCMC). VB is particularly apt for
 data analysis problems that are exploratory in nature, and where quick,
 approximate solutions suffice.
 
-Concretely, the output of a VB approximation is a vector of optimal
-approximating parameters, which we can denote as $\etaopt$.  For instance,
+Concretely, the VB approximation defined by a vector of optimal
+VB parameters, which we can denote as $\etaopt$.  For instance,
 $\etaopt$ might be a vector of approximating exponential family natural
 parameters for all the quantities in the posterior.  In our example, evaluating
 $\etaopt$ for a particular prior parameter $\alpha$ means solving an
@@ -52,12 +52,12 @@ quantity of interest.
 A conceptually straightforward way to assess the robustness of
 $\g(\etaopt(\alpha))$ to $\alpha$ would be to refit the VB posterior for several
 different plausible prior choices.  For example, one might find
-$\etaopt(\alpha_g)$ for each $\alpha_g \in \{\alpha_1, \ldots, \alpha_G \}$ in a
-grid of $G$ plausible values.  If $\g(\etaopt(\alpha_g))$ varies meaningfully,
+$\etaopt(\alpha_i)$ for each $\alpha_i \in \{\alpha_1, \ldots, \alpha_m \}$ in a
+grid of $m$ plausible values.  If $\g(\etaopt(\alpha_i))$ varies meaningfully,
 we would say that the quantity $\g(\cdot)$ is non-robust to the choice of
 $\alpha$.  However, repeatedly finding variational optima for each prior choice
-may be unnecessarily expensive, particularly for the settings we consider where
-approximate optima might suffice.
+may be unnecessarily expensive, particularly for the exploratory settings we
+consider where approximate optima might suffice.
 
 In this work, we circumvent the need for repeated optimization by approximating
 the nonlinear dependence of the VB optimum on prior parameters using a

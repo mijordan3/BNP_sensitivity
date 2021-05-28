@@ -165,19 +165,22 @@ we could write
 %
 \begin{align*}
 %
-\expect{\p(\z\vert\x)}{\nclusters_0(\z)} \approx
-\expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)} =
+\expect{\p(\z\vert\x)}{\nclusters(\z)} \approx
+\expect{\q(\z\vert\etaopt)}{\nclusters(\z)} =
 \sumk \left(1 -  \prod_{\n=1}^\N
     (1 - \expect{\q(\z \vert \etaoptz)}{\z_{\n\k}})\right).
 %
 \end{align*}
 %
+Each term in the summation is the probability under $\q$ that at least
+one observation belongs to cluster $\k$.
+
 Using the preceding expression, one can express our function of interest as a
 function only of $\eta_\z$, the variational parameters for the $\z$ indicators,
-writing $\g(\eta) := \expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)}$.
+writing $\g(\eta) := \expect{\q(\z\vert\etaopt)}{\nclusters(\z)}$.
 
 In practice, we in fact take a more effective (but slightly more complicated)
-approach to approximating $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$, which
+approach to approximating $\expect{\p(\z\vert\x)}{\nclusters(\z)}$, which
 takes advantage of the closed form for the conditional posterior $\p(\z_\n \vert
 \beta, \nu, \x)$.  See \exref{vb_insample_nclusters_globallocal} of
 \secref{computing_sensitivity} for the details.

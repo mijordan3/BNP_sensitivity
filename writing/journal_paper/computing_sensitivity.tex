@@ -290,20 +290,20 @@ global parameters at prior parameter $\t$ using the mapping \eqref{g_as_global}.
 In this example, we produce a version of \exref{vb_insample_nclusters_simple}
 that takes advantage of the global / local structure of the BNP problem. Let
 $\gclustersabbr(\eta)$ denote our variational approximation to
-$\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$.   Using the fact that $\p(\z_\n
+$\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that $\p(\z_\n
 \vert \beta, \nu, \x)$ is available in closed form, we can then take
 %
 \begin{align*}
 %
 \gclustersabbr(\etaopt) :={}&
     \expect{\q(\beta, \nu \vert\etaopt)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
     }
 \\\approx{}&
     \expect{\p(\beta, \nu \vert \x)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters_0(\z)}
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
     }
-    = \expect{\p(\z\vert\x)}{\nclusters_0(\z)} \Rightarrow \\
+    = \expect{\p(\z\vert\x)}{\nclusters(\z)} \Rightarrow \\
 %
 \gclustersabbr(\eta) ={}&
     \sumk \left(1 -  \prod_{\n=1}^\N

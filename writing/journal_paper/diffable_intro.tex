@@ -130,7 +130,7 @@ $\p(\nuk \vert \t)  = \palt(\nuk)$.  For $\t \in (0,1)$
 $\p(\nuk \vert \t)$ varies smoothly between $\pbase$ and $\palt$.
 
 As in \exref{alpha_perturbation}, up to constants not depending on
-$\lnuk$ we can write
+$\nuk$ we can write
 %
 \begin{align*}
 %
@@ -138,7 +138,7 @@ $\lnuk$ we can write
     -\t \log \pbase(\nuk) + \t \log \palt(\nuk) + \const
 \\={}& -\t \nuk + \const \Rightarrow
 \\
-\KL{\eta, \t} ={}& \KL{\eta} -\t \nuk + \const.
+\KL{\eta, \t} ={}& \KL{\eta} -\t \expect{\q(\nuk\vert\eta)}{\nuk} + \const.
 %
 \end{align*}
 %
