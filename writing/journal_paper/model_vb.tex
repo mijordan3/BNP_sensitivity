@@ -1,6 +1,6 @@
 The posterior of a BNP model is difficult to compute for two reasons: because
 the number of components is (countably) infinite, and because the posterior
-normalizating constant is intractible.  To address these problems, we follow
+normalization constant is intractable.  To address these problems, we follow
 \citet{blei:2006:vi_for_dp} and form a mean field truncated variational
 approximation to the posterior. Variational Bayes (VB) is an approach that seeks
 an approximate posterior through solving a numerical optimization problem
@@ -8,7 +8,7 @@ an approximate posterior through solving a numerical optimization problem
 minimizing a divergence from a simple, tractable class of candidate posteriors
 to the true posterior.
 
-Formally, let $\zeta$ denote the full vector of unkown posterior variables. In
+Formally, let $\zeta$ denote the full vector of unknown posterior variables. In
 the GMM model of \exref{iris_bnp_process}, $\zeta := (\beta, \z, \nu)$.  The
 exact posterior distribution $\p(\zeta \vert \x)$ is intractable. A common
 version of VB specifies a family of approximating distributions $\q(\zeta \vert
@@ -131,7 +131,7 @@ to the variational Beta parameters.
 However, we will be considering stick-breaking densities $\p(\nuk)$
 that are outside the family of Beta densities. To approximate expectations,
 we will use numerical integration.  Define the logit-transformed stick-breaking
-proprtions $\lnuk$ as follows:
+proportions $\lnuk$ as follows:
 %
 \begin{align*}
   \lnu_\k := \log(\nu_\k) - \log(1 - \nu_\k)
@@ -165,19 +165,22 @@ we could write
 %
 \begin{align*}
 %
-\expect{\p(\z\vert\x)}{\nclusters_0(\z)} \approx
-\expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)} =
+\expect{\p(\z\vert\x)}{\nclusters(\z)} \approx
+\expect{\q(\z\vert\etaopt)}{\nclusters(\z)} =
 \sumk \left(1 -  \prod_{\n=1}^\N
     (1 - \expect{\q(\z \vert \etaoptz)}{\z_{\n\k}})\right).
 %
 \end{align*}
 %
+Each term in the summation is the probability under $\q$ that at least
+one observation belongs to cluster $\k$.
+
 Using the preceding expression, one can express our function of interest as a
 function only of $\eta_\z$, the variational parameters for the $\z$ indicators,
-writing $\g(\eta) := \expect{\q(\z\vert\etaopt)}{\nclusters_0(\z)}$.
+writing $\g(\eta) := \expect{\q(\z\vert\etaopt)}{\nclusters(\z)}$.
 
 In practice, we in fact take a more effective (but slightly more complicated)
-approach to approximating $\expect{\p(\z\vert\x)}{\nclusters_0(\z)}$, which
+approach to approximating $\expect{\p(\z\vert\x)}{\nclusters(\z)}$, which
 takes advantage of the closed form for the conditional posterior $\p(\z_\n \vert
 \beta, \nu, \x)$.  See \exref{vb_insample_nclusters_globallocal} of
 \secref{computing_sensitivity} for the details.

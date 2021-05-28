@@ -22,7 +22,7 @@ By the formula for transformation of probability densities,
 %
 where we have used the fact that $\fracat{d \lnu_\k}{ d\nuk}{\nuk} =
 \frac{1}{\nuk (1 - \nuk)}$.  Similarly, for any function $f(\nuk)$ of the stick
-lengths, we can transform the expecations as $\expect{\q(\nuk \vert
+lengths, we can transform the expectations as $\expect{\q(\nuk \vert
 \etanuk)}{f(\nuk)} = \expect{\q(\lnuk \vert \etanuk)}{f\left(
 \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}  \right))}$, using the fact that
 $\nuk = \frac{\exp(\lnuk)}{1 + \exp(\lnuk)}$.
@@ -41,7 +41,7 @@ term $\log (\nuk(1 - \nuk))$ now appearing in the entropy would have instead
 appeared in the $\log \ptil(\lnuk \vert \alpha)$ term, and so been part of
 \assuref{exchange_order} rather than \assuitemref{kl_opt_ok}{kl_diffable}.
 Nevertheless, the needed assumptions would be substantively the same. For
-essentially this reason, the choice of dominainting measure in \defref{prior_t}
+essentially this reason, the choice of dominating measure in \defref{prior_t}
 does not matter.}
 %
 , so we must show that the entropy $\expect{\q(\nuk \vert \etanuk)}{\log \q(\nuk
@@ -94,7 +94,7 @@ parameterization that would violate \assuitemref{kl_opt_ok}{kl_opt_interior},
 consider parametrizing $\q(\z_{\n} \vert \eta)$ by the $\kmax$ expectations
 $m_\k := \expect{\q(\z_{\n} \vert \eta)}{\z_{\n\k}}$.  The set $(m_1, \ldots,
 m_\kmax)$ completely specify $\q(\z_{\n} \vert \eta)$, but violate
-\assuitemref{kl_opt_ok}{kl_opt_interior}, since any valid parametization
+\assuitemref{kl_opt_ok}{kl_opt_interior}, since any valid parameterization
 satisfies $\sum_{\k=1}^\kmax m_\k = 1$, and so no open ball in
 $\mathbb{R}^\etadim$ can be contained in $\etadom$.  However,
 \assuitemref{kl_opt_ok}{kl_opt_interior} is satisfied we use an {\em
@@ -136,7 +136,7 @@ zero and so \assuref{exchange_order} is trivially satisfied.
 and the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable.
 
 We end this section by observing that the only real technical challenge was
-showing that the assumptions were satisfied for the logit-normal densitys
+showing that the assumptions were satisfied for the logit-normal densities
 $\q(\nuk \vert \etanuk)$.  Had we instead used the conjugate beta density
 parameterized by its natural parameters, then both \assuref{kl_opt_ok} and
 \assuref{exchange_order} would follow immediately by standard properties of the
