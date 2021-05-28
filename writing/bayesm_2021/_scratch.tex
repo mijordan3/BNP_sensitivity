@@ -1,0 +1,100 @@
+
+For the remainder of the paper, we address these three questions, after
+introducing our BNP model and VB approximation in \secref{model}.
+
+In \secref{local_sensitivity}, we state sufficient conditions for
+differentiability of VB approximations in general, both for parametric
+perturbations such as the concentration parameter $\alpha$, as well as for
+nonparametric perturbations to the prior density.  The differentiability of our
+motivating BNP problems follow as a special case.  Amongst a class of
+nonparametric perturbations considered by \citet{gustafson:1996:local}, we prove
+that VB optima are Fr{\'e}chet differentiable only for multiplicative
+perturbations to the prior density.  Furthermore, we show that the sensitivity
+of the VB approximation to nonparametric prior perturbations takes the form of
+an integral against a computationally tractable \textit{influence function},
+which can provide an interpretable summary of the effect of arbitrary changes to
+the prior density.
+
+In \secref{computing_sensitivity}, we address practical computability of the
+derivative, and show that the approximation can be easily and efficiently
+computed even in high-dimensional problems like BNP models, using modern
+automatic differentiation tools \citep{baydin:2018:automatic, jax2018github} and
+iterative linear algebra techniques such as the conjugate gradient algorithm
+\citep{nocedal:2006:numerical}.  In our experiments, we find that the  needed
+derivatives can be computed roughly an order of magnitude faster than
+re-optimizing.
+
+Finally, in \secref{results}, we demonstrate the usefulness of the approximation
+in practice on a series of increasingly complex real-world datasets.  We
+investigate the accuracy of our local approximation both for parametric and
+nonparametric perturbations by comparing against the much more expensive process
+of refitting the variational posterior.  We demonstrate how different posterior
+quantities can be sensitive or non-sensitive, depending on both the application
+and the quantity of interest.  In most cases, the local approximation provides
+qualitatively accurate results many times faster re-optimizing.  We also discuss
+some limitations of local sensitivity and present scenarios where it fails to be
+a good approximation to refitting.
+
+We close the introduction by observing that  the present work is essentially a
+VB extension of the local Bayesian robustness literature, which was
+traditionally based on Markov Chain Monte Carlo (MCMC)
+\citet{gustafson:1996:local, basu:1996:local}.  In a sense, VB is more naturally
+amenable to sensitivity analysis than MCMC, since the derivative of VB
+approximations is typically available in closed form, whereas the derivative of
+Bayesian posteriors must be approximated using potentially noisy posterior
+covariances and/ or posterior conditional densities that are not readily
+available from MCMC draws (e.g., \citet{gustafson:1996:marginal}).  In addition
+to providing rigorous theory and computational tools for the VB context, we pay
+special attention to our ability to accurately and usefully \textit{extrapolate}
+VB posterior inferences to different priors, rather than simply considering
+large derivatives to be indicative of non-robustness \textit{per se}.
+
+
+The approximation thus motivates three key questions:
+%
+\begin{enumerate}
+%
+\item \itemlabel{intro_diff}
+    When are the optimal VB parameters a continuously differentiable
+    function of the prior?
+%
+\item \itemlabel{intro_comp}
+    How can we easily and efficiently compute the derivative?
+%
+\item \itemlabel{intro_extrap}
+    How well does the linear approximation extrapolate to reasonable
+    alternative priors in real-world problems?
+%
+\end{enumerate}
+
+Our work address these three questions.  We state sufficient conditions for
+differentiability of VB approximations in general, both for parametric
+perturbations such as the concentration parameter $\alpha$, as well as for
+nonparametric perturbations to the prior density.  Amongst a class of
+nonparametric perturbations considered by \citet{gustafson:1996:local}, we prove
+that VB optima are Fr{\'e}chet differentiable only for multiplicative
+perturbations to the prior density.  We then apply these general results to the
+stick-breaking representation of a DP prior to study the robustness of
+BNP problems.
+
+We show that the approximation can be easily and efficiently
+computed even in high-dimensional problems like BNP models, using modern
+automatic differentiation tools \citep{baydin:2018:automatic, jax2018github} and
+iterative linear algebra techniques such as the conjugate gradient algorithm
+\citep{nocedal:2006:numerical}.  In our experiments, we find that the  needed
+derivatives can be computed roughly an order of magnitude faster than
+re-optimizing.
+
+We demonstrate the usefulness of the approximation in practice on a series of
+increasingly complex real-world datasets, validating our approximation against
+the much more expensive process of refitting the variational posterior.   In
+most cases, the local approximation provides qualitatively accurate results many
+times faster re-optimizing.
+
+
+
+Even
+when the approximation $\etalin(\alpha)$ is not a completely adequate substitue
+for exact re-optimization, the derivative can be a useful guide for what sorts
+of prior perturbations might be problematic, informing futher exploration based
+on re-optimizing.
