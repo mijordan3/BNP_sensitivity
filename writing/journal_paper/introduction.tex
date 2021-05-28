@@ -14,16 +14,16 @@ rather than because of a considered subjective belief.
 
 Consider, as a simple motivating example, a field biologist fitting a Gaussian
 mixture model (GMM) fit to the Fisher iris dataset \citep{anderson:1936:iris,
-fisher:1936:iris} using a Dirichelt process prior with concetration parameter
+fisher:1936:iris} using a Dirichlet process prior with concentration parameter
 $\alpha$.  One might imagine the biologist asking: ``Suppose I went out and
 gathered a new dataset the same size as the one I have.  How many distinct
 species of iris would I expect to find?''  This posterior predictive expectation
 of the number of distinct species may depend strongly on the choice of the
-concetration parameter $\alpha$ as $\alpha$ varies over some reasonable range,
+concentration parameter $\alpha$ as $\alpha$ varies over some reasonable range,
 and, if it does, the biologist would presumably like to be warned that her
 posterior quantity of interest is {\em non-robust} to the choice of $\alpha$.
 
-The posterior in a BNP model cannot be calcluated analytically, and thus
+The posterior in a BNP model cannot be calculated analytically, and thus
 approximate methods are required in practice. In the present work, we consider
 inference using variational Bayes (VB), which posits a constrained family of
 distributions, and uses optimization to find the member of the family that is
@@ -42,7 +42,7 @@ $\etaopt$ for a particular prior parameter $\alpha$ means solving an
 optimization problem whose objective function depends on $\alpha$, and we notate
 the resulting dependence of $\etaopt$ on $\alpha$ as $\etaopt(\alpha)$.
 %
-Posterior quantites of interest, such as posterior expectations, can be
+Posterior quantities of interest, such as posterior expectations, can be
 approximated using expectations of the variational distributions, which in turn
 are functions of the VB parameters $\etaopt(\alpha)$. For example, in our
 motivating example, can write $\alpha \mapsto \g(\etaopt(\alpha))$ as the map
@@ -84,9 +84,9 @@ we expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when $\abs{\alpha -
 \alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) / d\alpha$ can be
 computed much more efficiently than the cost of optimizing directly,
 $\etalin(\alpha)$ can be much faster to compute than $\etaopt(\alpha)$.  Even
-when the approximation $\etalin(\alpha)$ is not a completely adequate substitue
+when the approximation $\etalin(\alpha)$ is not a completely adequate substitute
 for exact re-optimization, the derivative can be a useful guide for what sorts
-of prior perturbations might be problematic, informing futher exploration based
+of prior perturbations might be problematic, informing further exploration based
 on re-optimizing.
 
 The approximation thus motivates three key questions:

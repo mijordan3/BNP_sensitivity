@@ -109,7 +109,7 @@ same cluster as gene $j$, given by
 Below, we will use the influence function (\corref{etafun_worst_case}) to try
 and find a perturbation that produces large changes in the co-clustering matrix.
 To compute the worst-case perturbation, we must choose a univariate summary of
-the $\ngenes^2$-dimensional co-clustering matrix whose deriviative we wish to
+the $\ngenes^2$-dimensional co-clustering matrix whose derivative we wish to
 extremize. We use the sum of the eigenvalues of the symmetrically normalized
 graph Laplacian, as given by
 %
