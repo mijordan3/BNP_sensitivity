@@ -1,0 +1,66 @@
+Two central goals of many clustering problems are inferring how many distinct
+clusters are present in a particular dataset and which observations cluster
+together. A Bayesian nonparametric (BNP) approach to clustering assumes an
+infinite number of \textit{components}, of which a finite number are present in
+the data as \textit{clusters}. Like all Bayesian approaches, BNP requires the
+specification of a prior, and this prior may favor a greater or fewer number of
+distinct clusters. In practice, it is important to establish that the prior is
+not too informative, particularly when---as is often the case in BNP---the
+particular form of the prior is chosen for mathematical convenience rather than
+because of a considered subjective belief.
+
+The posterior in a BNP model cannot be calculated analytically, and thus
+approximate methods are required in practice. In the present work, we employ a
+truncated variational Bayes (VB) approximation, which posits a constrained
+family of distributions, and uses optimization to find the member of the family
+that is closest to the true posterior in Kullback-Leibler ($\mathrm{KL}$)
+divergence \citep{blei:2017:vi_review, blei:2006:vi_for_dp}. Concretely, the
+output of a VB approximation is a vector of optimal approximating parameters,
+$\etaopt$ which, n general, depend on the prior.  For example, when using the
+Dirichlet process (DP) prior with concentration parameter $\alpha$, we can
+denote this dependence by $\etaopt(\alpha)$.
+
+In principle, one can always assess the robustness of of a VB approximation by
+refitting the VB posterior for several different plausible prior choices, though
+this can be computationally prohibitive. We circumvent this computational
+difficulty using a first-order Taylor series approximation to the optimum, as
+given by the implicit function theorem applied to the first-order condition of
+the optimization problem. For example, for the DP prior, we choose some
+``initial value'' $\alpha_0$ of the concentration parameter, solve the
+optimization problem to compute $\etaopt(\alpha_0)$, and use $\etaopt(\alpha_0)$
+to approximate
+%
+\begin{align}\eqlabel{taylor}
+%
+\etalin(\alpha) :=
+    \etaopt(\alpha_0) +
+    \fracat{d\etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0).
+%
+\end{align}
+%
+If the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable, then
+we expect $\etaopt(\alpha) \approx \etalin(\alpha)$ when $\abs{\alpha -
+\alpha_0}$ is small.  And if the derivative $d\etaopt(\alpha) / d\alpha$ can be
+computed much more efficiently than the cost of optimizing directly,
+$\etalin(\alpha)$ can be much faster to compute than $\etaopt(\alpha)$.
+
+We study Taylor series approximations like \eqref{taylor}, both theoretically
+and practically, for both parametric perturbations (such as the $\alpha$
+parameter of a DP prior) and nonparametric perturbations (such as changing
+the density of a stick-breaking representation of a random measure).
+We state sufficient conditions for differentiability of VB approximations
+in general, from which our BNP applications follow as a special case.
+Among a class of nonparametric perturbations considered by
+\citet{gustafson:1996:local}, we prove that VB optima are Fr{\'e}chet
+differentiable only for multiplicative perturbations to the prior density.
+
+We validate our theoretical results on a series of BNP models applied to real
+datasets, both for parametric and nonparametric perturbations to the BNP prior.
+We show that the approximation can be easily and efficiently computed even in
+high-dimensional problems like BNP models, using modern automatic
+differentiation tools \citep{baydin:2018:automatic, jax2018github}. We
+demonstrate the usefulness of the approximation in practice on a series of
+increasingly complex real-world datasets, validating our approximation against
+the much more expensive process of refitting the variational posterior.   In
+most cases, the local approximation provides qualitatively accurate results many
+times faster re-optimizing.

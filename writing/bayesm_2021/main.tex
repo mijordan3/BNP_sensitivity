@@ -1,0 +1,96 @@
+\documentclass[12pt]{article}
+
+% bibliography
+\usepackage[square,numbers]{natbib}
+
+\usepackage{refstyle}
+\usepackage{varioref} % Use refstyle instead of varioref directly.
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{colonequals}
+\usepackage{algpseudocode, algorithm} %typical alg typesetting packages
+\usepackage{xargs} % For def with default arguments
+
+% Math scripts
+\usepackage{mathrsfs}  % For script fonts
+
+% This defines math macros.
+\input{_math_defs.tex}
+
+% This specifies the formatting for references (sections, theorems, etc.)
+\input{_reference_defs.tex}
+
+% mathematics
+\usepackage{amssymb}
+\usepackage{amsmath}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+% geometry
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage[top=1.2in,bottom=1.2in,left=1.2in,right=1.2in]{geometry}
+\onehalfspacing
+\hypersetup{
+	colorlinks=true,
+	urlcolor=blue,
+	citecolor=blue,
+	linktoc=all,
+	linkcolor=red}
+
+% add your packages if you need
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\textsc{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}} % Title: Limited to 180 characters in length. Use title capitalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% AUTHORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\author{
+Ryan Giordano \footnote{Equal contribution first author.  CSAIL, MIT. email: \texttt{rgiordan@mit.edu}}
+Runjing Liu \footnote{Equal contribution first author.  Statistics, UC Berkeley. email: \texttt{runjing\_liu@berkeley.edu}},
+Micheal I.~Jordan\footnote{Computer Science, UC Berkeley. email: \texttt{jordan@cs.berkeley.edu}},
+and Tamara Broderick\footnote{CSAIL, MIT. email: \texttt{tbroderick@csail.mit.edu}}\\
+}
+
+\date{\empty}
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ABSTRACT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+    \input{abstract}
+\end{abstract}
+
+\noindent\textbf{Keywords}:
+{Local Bayesian robustness;
+ Variational Bayes;
+ Bayesian nonparametrics;
+ Stick-breaking processes;
+ Functional analysis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BODY OF THE PAPER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REFERENCES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+% \begin{thebibliography}{99}
+% \bibitem{reference1} Author 1, Author 2  and Author 3 (Year). Title. \textit{Journal}, \textbf{volume}, pp--pp.
+% \bibitem{reference2} Author 1, Author 2  and Author 3 (Year). \textit{Book title}. Publisher.
+% \end{thebibliography}
+
+\end{document}

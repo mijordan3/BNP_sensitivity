@@ -42,7 +42,7 @@ other than those that parameterize the stick distributions.
 To compute the local sensitivity in practice, we make use of a factorization
 common to all the models we will consider: the latent variables can be
 partitioned into a set of \textit{global} variables and a set of \textit{local}
-latent variables. The global variables are common to all data points, while the
+variables. The global variables are common to all data points, while the
 local variables are unique to each data point. In the GMM example
 (\exref{iris_bnp_process}), the global variables are $(\beta, \nu)$, while $\z$
 are local variables.
@@ -278,9 +278,11 @@ of $\etaoptlocal(\etaglob)$, by redefining our quantity of interest as
 %
 By using \eqref{g_as_global} for our approximation, we both render the
 derivative computation easier, and retain nonlinearities in the map $\etaglob
-\mapsto \etaoptlocal(\etaglob; \t)$.  As a shorthand, we will use
-$\g(\etalin_\gamma(t))$ to denote the posterior computed under our linearized
-global parameters at prior parameter $\t$ using the mapping \eqref{g_as_global}.
+\mapsto \etaoptlocal(\etaglob; \t)$.  Finally, we note that the the left-hand
+side of \eqref{g_as_global} it, itself, a function of $\eta$, so discussion of
+general functions of interest (as in \secref{diffable_nonparametric,
+diffable_worst_case}, for example) apply equally well to $\g(\etaglob(\t))$
+as given by \eqref{g_as_global}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -327,16 +329,69 @@ the map
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Finally, we will briefly discuss how to numerically solve the linear system
-$\hessopt_\gamma^{-1}\crosshessian_\gamma$ of \eqref{global_sens}.  We used the
-conjugate gradient (CG) algorithm, which requires only Hessian-vector products
-which are readily available through automatic differentiation. Iterative methods
-such as CG avoid instantiating the Hessian matrix in memory. We could have also
-computed the Hessian and either factorized it (e.g. with a Cholesky
-decomposition). Then, the Hessian inverse (or its Cholesky decomposition) can be
-re-used for different perturbations. In our approach, we need to re-solve the
-linear system \eqref{global_sens} with CG for each choice of prior perturbation
-(since different choices of prior perturbation require solving different
-$\crosshessian$). On our applications in \secref{results}, the conjugate
-gradient algorithm was at least an order of magnitude faster than refitting, and
-did not pose a meaningful bottleneck to exploring different perturbations.
+\subsection{Amortization and solutions to linear systems}
+\seclabel{comp_amortization}
+
+When $\g(\eta)$ is scalar-valued and continuously differentiable, we can use
+\thmref{etat_deriv} (or, equivalently, \corref{etafun_deriv_form}) to write
+%
+\begin{align}\eqlabel{dg_hess_product}
+%
+\nabla_\eta \g :={} \fracat{d g(\eta)}{ d \eta^T}{\etaopt}
+\mathand
+\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}
+- \nabla_\eta \g^T \hessopt^{-1} \crosshessian.
+%
+\end{align}
+%
+As we discuss above, $\nabla_\eta \g$ and $\crosshessian$ are typically easy to
+compute, and most of the computational cost of computing the derivative
+is the solution of a linear system involving $\hessopt^{-1}$.  The
+prior perturbation $\ptil(\theta \vert \t)$ determines $\crosshessian$,
+and the quantity of interest determines $\nabla_\eta \g$.  Consequently,
+for a fixed prior perturbation, one can compute $\hessopt^{-1} \crosshessian$
+{\em only once}, and re-use this computation to quickly evaluate
+\eqref{dg_hess_product} for a large number of different quantities of interest.
+Conversely, for a fixed quantity of interest, one can compute
+$\hessopt^{-T} \nabla_\eta \g$ {\em only once}, and use the result
+in \eqref{dg_hess_product} to investigate a large number of different prior
+perturbations.
+%
+Indeed, the influence function result of \corref{etafun_deriv_form}
+corroborates this observation, since the computation of $\infl(\theta)$ in
+\eqref{infl_defn} requires only $\hessopt^{-T} \nabla_\eta \g$, and summarizes
+the effect of all prior perturbations.
+%
+Further, in instances when $\hessopt$ can be formed and factorized in memory
+(e.g., using a Cholesky decomposition or QR factorization), then derivatives for
+any prior perturbation or functions of interest can be computed at little
+computational additional cost.
+
+In this sense, solving solutions to parts of \eqref{dg_hess_product}, either
+$\hessopt^{-1} \crosshessian$, $\hessopt^{-T} \nabla_\eta \g$, or a proxy for
+$\hessopt^{-1}$ itself, represents a high initial cost, which can be amortized
+over a large number of related quantities of interest.  Indeed, essentially the
+same computations can be re-used for related sensitivity measures, such as
+approximate cross-validation or the linear bootstrap \citep{giordano:2019:swiss,
+giordano:2017:linearboot}.  In contrast, repeated re-optimization incurs
+essentially the same cost for the evaluation of each new prior.
+
+In our BNP applications, it is not cost-effective to form and factorize
+$\hessopt$ in memory.  Instead, we numerically solve linear systems of the form
+$\hessopt^{-1} v$ using the conjugate gradient (CG) algorithm \citep[Chapter
+5]{nocedal:2006:numerical}, which requires only Hessian-vector products which
+are readily available through automatic differentiation.  However, we do take
+advantage of \eqref{dg_hess_product} when possible. In our applications in
+\secref{results}, the CG algorithm was at least an order of magnitude faster
+than refitting, and did not pose a meaningful bottleneck to exploring different
+perturbations.
+
+\Eqref{dg_hess_product} is used to construct the fully linear approximation
+$\glin(\t)$. It is not possible to amortize using $\hessopt^{-T} \nabla_\eta \g$
+when we use the approximation $\g(\etalin(\t))$, retaining nonlinearitites in
+the map $\eta \mapsto \g(\eta)$.  If we expect $\g(\etalin(\t))$ to be more
+accurate than $\glin(\t)$ (which make intuitive sense but is certainly not
+guaranteed), then the choice between using $\glin(\t)$ and $\g(\etalin(\t))$
+represents a choice between accuracy and computational efficiency.  In our
+experiments, it was always feasible to compute $\g(\etalin(\t))$ when evaluating
+particular prior perturbations, and so we report results for $\g(\etalin(\t))$.
