@@ -1,15 +1,13 @@
 A Bayesian nonparametric (BNP) approach to clustering allows for posterior
-inference without specifying the number of components {\em a priori}.  In practice,
-the particular form of the BNP prior is often chosen for mathematical
+inference without specifying the number of components {\em a priori}.  In
+practice, the particular form of the BNP prior is often chosen for mathematical
 convenience, and it is important to detect when conclusions are sensitive to
-possibly arbitrary prior choices.  Estimating the posterior for many
-different prior choices can be computationally prohibitive.
+arbitrary prior choices.
 
 We approximate the dependence of a variational Bayes approximation to a BNP
 model with a first-order Taylor series, both for parametric perturbations (e.g.,
 to the concentration parameter of a GEM prior) and for nonparametric
-perturbations to a stick-breaking density. We state general conditions under
-which a VB approximation is continuously differentiable as a function of
-parametric perturbations and Fr{\'e}chet differentiable as a function of
-nonparametric perturbations.  We validate the accuracy and utility of our
-approximation on several real-world datasets.
+perturbations to a stick-breaking density.  We state general conditions under
+which a VB approximation is continuously Fr{\'e}chet differentiable and
+validate the accuracy and utility of our approximation on several real-world
+datasets.
