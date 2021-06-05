@@ -8,6 +8,8 @@ image_path <- file.path(paper_directory, "static_images")
 data_path <- file.path(paper_directory, "R_scripts/data_simulated")
 
 
+save_files <- TRUE
+
 ##########################################################
 # R2 non-differentiable function
 
@@ -78,7 +80,7 @@ df_line <- do.call(
 ggplot(df_line %>% mutate(f=TruncateForPlot(f, quant=0.7))) +
     geom_line(aes(x=r, y=f, group=theta, color=log(theta)))
 
-if (FALSE) {
+if (save_files) {
     save(df_line, df, file=file.path(data_path, "nondifferentiable_r2.Rdata"))
 }
 
@@ -135,7 +137,7 @@ df <- data.frame(
 
 phi_range <- max(c(df$phim, df$phip))
 
-if (FALSE) {
+if (save_files) {
     save(df, file=file.path(data_path, "positive_pert.Rdata"))
 }
 
@@ -219,9 +221,9 @@ BasePlot <- function() {
 grid.arrange(
     BasePlot() + geom_line(aes(y=exp(logp))) + ggtitle("Multiplicative perturbation") + ylab("Densities"),
     BasePlot() + geom_line(aes(y=logp)) + ggtitle("Multiplicative perturbation") + ylab("Log densities"),
-    BasePlot() + geom_line(aes(y=p)) + ggtitle("Linear perturbation") + ylab("Densities"),  
+    BasePlot() + geom_line(aes(y=p)) + ggtitle("Linear perturbation") + ylab("Densities"),
     BasePlot() + geom_line(aes(y=log(p))) + ggtitle("Linear perturbation") + ylab("Log densities"),
-    ncol=2 
+    ncol=2
 )
 
 
@@ -281,11 +283,9 @@ if (FALSE) {
 
 
 
-if (FALSE) {
+if (save_files) {
     save(dens_min, theta_max, df,
          ball_width, df_ball,
          df_distant,
          file=file.path(data_path, "function_paths.Rdata"))
 }
-
-
