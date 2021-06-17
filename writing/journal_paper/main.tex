@@ -37,6 +37,13 @@
 \usepackage{refstyle}
 \usepackage{varioref} % Use refstyle instead of varioref directly.
 
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{colonequals}
+\usepackage{algpseudocode, algorithm} %typical alg typesetting packages
+\usepackage{xargs} % For def with default arguments
+
 % Math scripts
 \usepackage{mathrsfs}  % For script fonts
 %\usepackage{dutchcal} % Lower-case mathcal
@@ -114,6 +121,75 @@ Berkeley, CA 94720}
 \end{frontmatter}
 
 %% ** Mainmatter **
+
+\section{Introduction}\seclabel{introduction}
+\input{introduction.tex}
+
+\section{The model and variational approximation}
+\seclabel{model}
+    \subsection{Discrete Bayesian Nonparametric Model}
+    \seclabel{model_bnp}
+    \input{model_bnp.tex}
+
+    \subsection{Variational Approximation}
+    \seclabel{model_vb}
+    \input{model_vb.tex}
+
+    % \subsection{Robustness and the Taylor series approximation}
+    % \seclabel{model_taylor}
+    % \input{model_space_of_priors.tex}
+
+
+\section{Differentiability of the VB optimum}
+\seclabel{local_sensitivity}
+\input{diffable_intro}
+
+    \subsection{Parametric prior perturbations}
+    \seclabel{diffable_parametric}
+    \input{diffable_parametric}
+
+    \subsection{Differentiability of BNP models with respect to $\alpha$}
+    \seclabel{diffable_concentration}
+    \input{diffable_concentration}
+
+    \subsection{Nonparametric prior perturbations}
+    \seclabel{diffable_nonparametric}
+    \input{diffable_nonparametric}
+
+    \subsection{Worst-case prior perturbations and Fr{\'e}chet differentiability}
+    \seclabel{diffable_worst_case}
+    \input{diffable_worst_case}
+
+    \subsection{Other nonparametric prior perturbations}
+    \seclabel{diffable_lp}
+    \input{diffable_lp}
+
+\section{Computing the sensitivity}\seclabel{computing_sensitivity}
+\input{computing_sensitivity.tex}
+
+\section{Experimental Results}\seclabel{results}
+\input{experiments_intro.tex}
+
+    \subsection{Gaussian mixture modeling on iris data}
+    \seclabel{results_iris}
+    \input{experiments_iris.tex}
+
+    \subsection{Regression mixture modeling}
+    \seclabel{results_mice}
+    \input{experiments_mice.tex}
+
+    \subsection{Genetic admixture modeling with fastSTRUCTURE}
+    \seclabel{results_structure}
+    \input{experiments_structure.tex}
+
+    \subsection{Computation time}
+    \seclabel{compute_time}
+    \input{timing_table.tex}
+
+\section{Conclusion}
+\seclabel{conclusion}
+TODO: write this when the rest of the paper is done.
+
 
 %\section{}\label{}
 
