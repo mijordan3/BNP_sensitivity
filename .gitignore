@@ -18,6 +18,7 @@
 *~
 *.html
 *.json
+*.brf
 
 *cache*
 *.nav

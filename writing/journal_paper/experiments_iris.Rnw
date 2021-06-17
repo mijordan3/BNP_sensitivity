@@ -139,7 +139,7 @@ perturbation for $\gclustersabbr$.
 As in the previous subsection, we take $\pbase(\nuk) = \betadist{\nuk \vert 1,
 \alpha_0}$ for each $\k$.  The leftmost column of \figref{iris_fsens} shows in
 purple the influence function, $\infl(\nu)$, as given by
-\corref{etafun_deriv_form}.  For ease of visualization, we show the influence
+\coryref{etafun_deriv_form}.  For ease of visualization, we show the influence
 function in logit stick space, taking $\mu$ to be the Lebesgue measure on
 $\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots, \lnu_{\kmax - 1})$,
 suitably transforming the prior density.  We additionally perturb all the sticks
@@ -155,14 +155,14 @@ by the corresponding $\phi$, and the rightmost column of \figref{iris_fsens}
 shows the changes produced by the corresponding perturbation, as measured by
 re-fitting and as predicted by our approximation.
 
-According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
+According to \coryref{etafun_deriv_form}, the sign and magnitude of the effect of
 a perturbation should be determined by its integral against the influence
 function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
 first row, we expect the change to be negative.  Similarly, we expect the
 perturbation of the bottom row to produce a positive change, and the middle row,
 in which $\phi$ overlaps with both negative and positive parts of the influence
 function, to produce a relatively small change.  The third column of
-\corref{etafun_deriv_form} confirms that this intuition holds, both for
+\coryref{etafun_deriv_form} confirms that this intuition holds, both for
 the refits and linear approximation.
 
 <<iris_fsens_cap>>=
@@ -199,7 +199,7 @@ SetImageSize(aspect_ratio = 0.525 * base_aspect_ratio)
 source("R_scripts/iris/iris_worst_case.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case},
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \coryref{etafun_worst_case},
 along with its effect on the prior and $\gclustersabbr$.
 As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$

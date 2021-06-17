@@ -1,14 +1,20 @@
-\documentclass[11pt]{article}
-
-% Any additional packages needed should be included after jmlr2e.
-% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
-% and defines many common macros, such as 'proof' and 'example'.
+% \documentclass[ba,preprint]{imsart}% use this for supplement article
+\documentclass[ba]{imsart}
 %
-% It also sets the bibliographystyle to plainnat; for more information on
-% natbib citation styles, see the natbib documentation, a copy of which
-% is archived at http://www.jmlr.org/format/natbib.pdf
+\pubyear{2021}
+\volume{TBA}
+\issue{TBA}
+% \doi{0000}
+%\arxiv{}
+\firstpage{1}
+\lastpage{1}
 
-%\usepackage{jmlr2e}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue,filecolor=blue,backref=page]{hyperref}
+\usepackage{graphicx}
+
 
 % my added packages: copied from the swiss IJ paper
 \usepackage{microtype}
@@ -30,15 +36,9 @@
 % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
 \usepackage{refstyle}
 \usepackage{varioref} % Use refstyle instead of varioref directly.
-\usepackage[authoryear]{natbib}
 
-% \usepackage{prettyref}
-% \usepackage{refstyle}
-
-\usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
-\usepackage{amsthm}
 \usepackage{mathtools}
 \usepackage{colonequals}
 \usepackage{algpseudocode, algorithm} %typical alg typesetting packages
@@ -60,50 +60,67 @@
 % pass in option ``disable" to remove notes
 \usepackage[textsize=tiny]{todonotes}
 
-
 % This picks up the knitr boilerplate, allowing us to \input partial knitr
 % documents.
 \input{_knitr_header.tex}
 
+\startlocaldefs
 % This defines math macros.
 \input{_math_defs.tex}
 
 % This specifies the formatting for references (sections, theorems, etc.)
 \input{_reference_defs.tex}
-
-
-% Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
-
-%\jmlrheading{1}{2000}{1-48}{4/00}{10/00}{giordano21}{Ryan Giordano and Runjing Liu and Michael I. Jordan and Tamara Broderick}
-
-% Short headings should be running head and authors last names
-
-%\ShortHeadings{BNP sensitivity}{Giordano et al.}
-%\firstpageno{1}
+\endlocaldefs
 
 \begin{document}
 
 % Output of the knitr file defining certain simulated figures.
 \input{simulation_examples.tex}
 
+%% *** Frontmatter ***
 
+\begin{frontmatter}
 \title{Evaluating Sensitivity to the Stick Breaking Prior in Bayesian Nonparametrics}
+%\title{\support{}}
+\runtitle{BNP sensitivity}
 
-\author{Ryan Giordano \texttt{rgiordan@mit.edu} \\
-        \and
-        Runjing Liu \texttt{runjing\_liu@berkeley.edu} \\
-        \and
-        Michael I.\ Jordan \texttt{jordan@cs.berkeley.edu} \\
-        \and
-        Tamara Broderick \texttt{tbroderick@csail.mit.edu }
-        }
+\begin{aug}
+\author{\fnms{Ryan} \snm{Giordano}\thanksref{addr1,t1}},
+\author{\fnms{Runjing} \snm{Liu}\thanksref{addr2,t1}},
+\author{\fnms{Michael I.} \snm{Jordan}\thanksref{addr2}},
+\and
+\author{\fnms{Tamara} \snm{Broderick}\thanksref{addr1}}
+%\author{\fnms{<firstname>} \snm{<surname>}\thanksref{}\ead[label=e1]{}}
+%\and
+%\author{\fnms{} \snm{}}
 
-\maketitle
+\runauthor{}
 
-\begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
-\input{abstract.tex}
+\address[addr1]{Department of EECS, MIT
+77 Massachusetts Ave., 38-401
+Cambridge, MA 02139}
+
+\address[addr2]{Department of Statistics, UC Berkeley
+367 Evans Hall, UC Berkeley
+Berkeley, CA 94720}
+
+\thankstext{t1}{Equal contribution. }
+
+\end{aug}
+
+\begin{abstract}
+\input{abstract}
 \end{abstract}
 
+%% ** Keywords **
+\begin{keyword}%[class=MSC]
+%\kwd{}
+%\kwd[]{}
+\end{keyword}
+
+\end{frontmatter}
+
+%% ** Mainmatter **
 
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
@@ -175,18 +192,32 @@
 TODO: write this when the rest of the paper is done.
 
 
-\section{Acknowledgements}
-TODO: write this when the rest of the paper is done.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Supplementary Material, if any, should   %%
+%% be provided in {supplement} environment  %%
+%% with title and short description.        %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{supplement}
+%\stitle{???}
+%\sdescription{???.}
+%\end{supplement}
 
-% Manual newpage inserted to improve layout of sample file - not
-% needed in general before appendices/bibliography.
+% ** The bibliograhy **
+\bibliographystyle{ba}
+\bibliography{references}% place <bib-data-file> in ./bib folder
 
-\bibliography{references}
-\bibliographystyle{plainnat}
+% ** Acknowledgements **
+\begin{acks}[Acknowledgments]
+  TODO
+\end{acks}
 
 
-\clearpage
-\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% from my understanding,
+%% BA requests that supplementary material should be in a new file.
+%% For now, I left it here so all our text is in one place,
+%% and will move it later
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
 
@@ -211,6 +242,7 @@ TODO: write this when the rest of the paper is done.
 \section{Unconstrained variational parameterizations}
 \applabel{app_vb_details}
 \input{app_vb_details}
+
 
 
 
