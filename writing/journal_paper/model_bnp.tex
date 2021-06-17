@@ -98,10 +98,10 @@ is given by
 %
 \begin{align}\eqlabel{bnp_model}
 %
-\logp(\x, \beta, \z, \nu) =&
+\log\p(\x, \beta, \z, \nu) =&
 \sum_{n=1}^N \sum_{k=1}^{\infty}
     \z_{\n\k} \left(
-        \logp(\x_n \vert \beta_\k) + \log \pi_\k
+        \log\p(\x_n \vert \beta_\k) + \log \pi_\k
     \right)
 \nonumber\\
    & +
@@ -131,7 +131,7 @@ positive definite information matrix, and
 \begin{align*}
 %
 \p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}} \\
-\logp(\x_\n \vert \beta_\k) ={}&
+\log\p(\x_\n \vert \beta_\k) ={}&
     -\frac{1}{2}(\x_n - \mu_k)^T \Lambda_\k (\x_n - \mu_k)
     + \frac{1}{2} \log |\Lambda_\k| + \const.\\
     & \constdesc{\beta_\k}
@@ -182,7 +182,7 @@ following ``quantity of interest'':
 \end{align*}
 %
 where $\ind{\cdot}$ is the indicator function taking value $1$ when the argument
-is true and $0$ otherwise. 
+is true and $0$ otherwise.
 
 $\nclusters(\z)$ counts the number of clusters with at least one observations
 in a set of assignments $\z$.  Under the $\gem$ prior, the posterior expected

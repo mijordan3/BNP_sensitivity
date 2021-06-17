@@ -13,20 +13,20 @@ The posterior in a BNP model cannot be calculated analytically, and thus
 approximate methods are required in practice. In the present work, we employ a
 truncated variational Bayes (VB) approximation, which posits a constrained
 family of distributions, and uses optimization to find the member of the family
-that is closest to the true posterior in Kullback-Leibler ($\mathrm{KL}$)
-divergence \citep{blei:2017:vi_review, blei:2006:vi_for_dp}. Concretely, the
-output of a VB approximation is a vector of optimal approximating parameters,
-$\etaopt$ which, n general, depend on the prior.  For example, when using the
-Dirichlet process (DP) prior with concentration parameter $\alpha$, we can
-denote this dependence by $\etaopt(\alpha)$.
+that is closest to the true posterior in (a proxy for) Kullback-Leibler
+($\mathrm{KL}$) divergence \citep{blei:2017:vi_review, blei:2006:vi_for_dp}.
+Concretely, the output of a VB approximation is a vector of optimal
+approximating parameters, $\etaopt$ which, in general, depend on the prior.  For
+example, when using the Dirichlet process (DP) prior with concentration
+parameter $\alpha$, we can denote this dependence by $\etaopt(\alpha)$.
 
-In principle, one can always assess the robustness of of a VB approximation by
+In principle, one can always assess the robustness of a VB approximation by
 refitting the VB posterior for several different plausible prior choices, though
 this can be computationally prohibitive. We circumvent this computational
-difficulty using a first-order Taylor series approximation to the optimum, as
-given by the implicit function theorem applied to the first-order condition of
-the optimization problem. For example, for the DP prior, we choose some
-``initial value'' $\alpha_0$ of the concentration parameter, solve the
+difficulty using a first-order Taylor series approximation to the optimal VB
+parameters, as given by the implicit function theorem applied to the first-order
+condition of the optimization problem. For example, for the DP prior, we choose
+some ``initial value'' $\alpha_0$ of the concentration parameter, solve the
 optimization problem to compute $\etaopt(\alpha_0)$, and use $\etaopt(\alpha_0)$
 to approximate
 %
@@ -57,8 +57,8 @@ differentiable only for multiplicative perturbations to the prior density.
 We validate our theoretical results on a series of BNP models applied to real
 datasets, both for parametric and nonparametric perturbations to the BNP prior.
 We show that the approximation can be easily and efficiently computed even in
-high-dimensional problems like BNP models, using modern automatic
-differentiation tools \citep{baydin:2018:automatic, jax2018github}. We
+high-dimensional problems like BNP models using modern automatic
+differentiation \citep{baydin:2018:automatic, jax2018github}. We
 demonstrate the usefulness of the approximation in practice on a series of
 increasingly complex real-world datasets, validating our approximation against
 the much more expensive process of refitting the variational posterior.   In

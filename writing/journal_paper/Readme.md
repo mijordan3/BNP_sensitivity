@@ -1,6 +1,11 @@
+## Outline
+
+The outline is in [this Google doc](https://docs.google.com/document/d/1st4Tr1yTPvFtEvoc906oLrBah_MQ30Ro7D3I1M1DMbI/edit).
+
 ## LaTeX conventions
 
-- We keep text out of `main.tex`.
+- Please make changes on a separate branch through pull requests, and merge with master
+only when there are no undefined or duplicated labels.
 
 - Please use `refstyle` and `varioref` references.  The reference types
 are all specified in `_reference_defs.tex`.
