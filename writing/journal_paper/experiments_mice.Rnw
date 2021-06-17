@@ -106,7 +106,7 @@ same cluster as gene $j$, given by
 %
 \end{align*}
 
-Below, we will use the influence function (\corref{etafun_worst_case}) to try
+Below, we will use the influence function (\\coryref{{etafun_worst_case}) to try
 and find a perturbation that produces large changes in the co-clustering matrix.
 To compute the worst-case perturbation, we must choose a univariate summary of
 the $\ngenes^2$-dimensional co-clustering matrix whose derivative we wish to

@@ -1,4 +1,4 @@
-As we saw in \corref{etafun_deriv_form}, the derivative of perturbations given
+As we saw in \\coryref{{etafun_deriv_form}, the derivative of perturbations given
 by \defref{prior_nl_pert} takes the form of an integral of the influence
 function against the perturbation.  It is natural to use the influence function
 to {\em explore} the space of priors, e.g., to find alternative priors with
@@ -41,8 +41,8 @@ influence function to informally choose influential prior perturbations, perhaps
 after dimension reduction, as in \exref{infl_univariate}.  Again, see
 \secref{results} below for motivating examples.
 
-However, \corref{etafun_deriv_form} does not precisely justify using the
-influence function for exploration in this way.  \Corref{etafun_deriv_form}
+However, \\coryref{{etafun_deriv_form} does not precisely justify using the
+influence function for exploration in this way.  \\coryref{{etafun_deriv_form}
 states only that, for a {\em particular} direction $\phi$, $\t \mapsto
 \etaopt(\t \phi)$ is continuously differentiable.  Observing that $\t \phi \in
 \ball_\phi(\t \norminf{\phi})$, this guarantees only that, for a fixed $\phi$,
@@ -54,7 +54,7 @@ bounded, much less that it goes to zero faster than $\delta$.
 
 To justify using linear approximations to exploring the unit ball
 $\ball_\phi(\delta)$, we thus require a stronger result than
-\corref{etafun_deriv_form}.  Observe that $\phi$ is a member of the the Banach
+\\coryref{{etafun_deriv_form}.  Observe that $\phi$ is a member of the the Banach
 space $L_\infty$ \citep[Theorem 5.2.1]{dudley:2018:real}.  We require that the
 map $\phi \mapsto \etaopt(\phi)$, which maps $L_\infty$ to
 $\mathbb{R}^\etadim$, admits a {\em uniformly good linear approximation}, i.e.,
@@ -90,8 +90,8 @@ By \citep[Proposition 4.8]{zeidler:2013:functional}, if a function is
 Fr{\'e}chet differentiable, then the linear operator $f^{\mathrm{lin}}$ is given
 precisely by the directional derivative $d f(t (\phi - \phi_0)) / d t$. Thus, if
 $\phi \mapsto \etaopt(\phi)$ is Fr{\'e}chet differentiable, its derivative is
-given by \corref{etafun_deriv_form}.  Fr{\'e}chet differentiability guarantees
-that the error of the linear approximation given by \corref{etafun_deriv_form}
+given by \\coryref{{etafun_deriv_form}.  Fr{\'e}chet differentiability guarantees
+that the error of the linear approximation given by \\coryref{{etafun_deriv_form}
 does not blow up in the ball $\ball_\phi(\delta)$.
 
 We emphasize that Fr{\'e}chet differentiability is neither sufficient nor
@@ -100,9 +100,9 @@ principle for a function to be Fr{\'e}chet differentiable but still have a very
 large finite second derivative, and so fail to extrapolate meaningfully to any
 alternatives one cares about.  Conversely, if a function fails to be Fr{\'e}chet
 differentiable, the derivative may still perform well in particular directions,
-including that chosen by \corref{etafun_worst_case}.  Nevertheless, Fr{\'e}chet
+including that chosen by \\coryref{{etafun_worst_case}.  Nevertheless, Fr{\'e}chet
 differentiability is a strong local result, and provides some assurance that one
-can use results such as \corref{etafun_worst_case} without uncovering
+can use results such as \\coryref{{etafun_worst_case} without uncovering
 pathological behavior.
 
 As we now state in \thmref{eta_phi_deriv}, the perturbation given in
@@ -115,7 +115,7 @@ As we now state in \thmref{eta_phi_deriv}, the perturbation given in
 Let \assuref{kl_opt_ok, exchange_order_q} hold. Then the map $\phi \mapsto
 \etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
 neighborhood of $\phiz$ as a map from $\lp{\mu,\infty}$ to $\mathbb{R}^\etadim$,
-with the derivative given in \corref{etafun_deriv_form}.
+with the derivative given in \\coryref{{etafun_deriv_form}.
 
 (For a proof, see \appref{proofs} \proofref{eta_phi_deriv}.)
 
