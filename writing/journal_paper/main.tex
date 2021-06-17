@@ -125,6 +125,7 @@ Berkeley, CA 94720}
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
 
+
 \section{The model and variational approximation}
 \seclabel{model}
     \subsection{Discrete Bayesian Nonparametric Model}
@@ -191,24 +192,6 @@ Berkeley, CA 94720}
 TODO: write this when the rest of the paper is done.
 
 
-%\section{}\label{}
-
-% \begin{figure}
-% \includegraphics{<eps-file>}% place <eps-file> in ./img  subfolder
-% \caption{}
-% \label{}
-% \end{figure}
-
-
-% \begin{table}
-% *****************
-% \begin{tabular}{lll}
-% \end{tabular}
-% *****************
-% \caption{}
-% \label{}
-% \end{figure}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Supplementary Material, if any, should   %%
 %% be provided in {supplement} environment  %%
@@ -219,13 +202,48 @@ TODO: write this when the rest of the paper is done.
 %\sdescription{???.}
 %\end{supplement}
 
-%% ** The bibliograhy **
-%\bibliographystyle{ba}
-%\bibliography{<bib-data-file>}% place <bib-data-file> in ./bib folder
+% ** The bibliograhy **
+\bibliographystyle{ba}
+\bibliography{references}% place <bib-data-file> in ./bib folder
 
 % ** Acknowledgements **
-%\begin{acks}[Acknowledgments]
-%\end{acks}
+\begin{acks}[Acknowledgments]
+  TODO
+\end{acks}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% from my understanding,
+%% BA requests that supplementary material should be in a new file.
+%% For now, I left it here so all our text is in one place,
+%% and will move it later
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\section{Proofs}\applabel{proofs}
+\input{app_proofs.tex}
+
+\section{Positive Perturbations Are Counterintuitive}\applabel{positive_pert}
+\input{app_positive_perturbations.tex}
+
+\section{Evaluating stick expectations}\applabel{gh_quadrature}
+\input{app_gh}
+
+\section{Regression mixture model details}\applabel{app_mice}
+\input{app_mice_vb}
+
+\section{fastSTRUCTURE model details}\applabel{app_structure}
+\input{app_structure}
+
+\section{fastSTRUCTURE supplemental results}\applabel{app_structure_results}
+\input{app_structure_results}
+
+\section{Unconstrained variational parameterizations}
+\applabel{app_vb_details}
+\input{app_vb_details}
+
+
 
 
 \end{document}
