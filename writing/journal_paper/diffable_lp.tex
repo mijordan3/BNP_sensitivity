@@ -1,4 +1,4 @@
-In \secref{diffable_nonparametric, diffable_worst_case} we considered
+In \secref{local_sensitivity, influence_function} we considered
 multiplicative perturbations to the prior density.  One might ask whether one
 could consider other paths through the space of priors, such as additive
 perturbations.  In this section, we briefly consider a broader class of
@@ -7,7 +7,7 @@ additive and multiplicative perturbations are special cases, and show that,
 within this class, only multiplicative perturbations lead to Fr{\'e}chet
 differentiable VB optima.
 
-As in \secref{diffable_nonparametric}, suppose we have an initial prior $\pbase$
+As in \secref{local_sensitivity}, suppose we have an initial prior $\pbase$
 and an alternative $\palt$, and that we wish to parameterize a continuous path
 between them.  Deviating from multiplicative perturbations, for some $p \in [1,
 \infty)$, let
@@ -186,38 +186,38 @@ Thus, for sufficiently large $n$, the conclusion follows.
 \end{thm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Since Fr{\'e}chet differentiability implies continuity \citep[Proposition 4.8
-(d)]{zeidler:2013:functional}, \thmref{kl_discontinuous} shows that it is
-impossible to derive an analogue of \thmref{eta_phi_deriv} for perturbations of
-the form \eqref{p_pert_simple} with the norms \eqref{phi_lp_norm}.
-
-Viewed in light of the proof of \thmref{kl_discontinuous}, the limited
-expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
-\exref{beta_inf_norm}, looks like a feature, rather than a bug.
-% The KL divergence that defines a variational objective cannot handle
-% prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
-% considers such densities to be ``distant'' from $\pbase$, whereas the
-% more permissive $\norm{\cdot}_p$ norms do not.
-Consider \figref{func_dist}, which succinctly summarizes the tradeoffs between
-the various norms.  The two shown densities are far from one another according
-to KL divergence (from blue to red) since the red density takes values that are
-nearly zero where the blue density has nonzero mass. They are also distant from
-one another in $\norminf{\cdot}$, since it takes a large multiplicative change
-to turn the nonzero blue density into the nearly zero red density. However, the
-two densities are close in $\norm{\cdot}_{p}$, since the region where the red
-density is nearly zero has a small measure. In order for VB approximations to be
-continuous (a necessary condition for Fr{\'e}chet differentiability), one must
-consider a topology on priors that is no coarser than the topology induced by KL
-divergence.  But since valid priors can take values close to zero, a sacrifice
-in expressiveness of the neighborhood of zero must be made in order to induce a
-topology that works with KL divergence. Multiplicative changes and the
-$\norminf{\cdot}$ norm make such a tradeoff in a natural, easy-to-understand
-way.
-
-In this sense, VB approximations based on KL divergence are inherently
-non-robust to priors that ablate mass nearly to zero.  No parameterization of
-the space of priors will relieve this non-robustness.  Only by basing
-variational approximations on divergences other than KL will this non-robustness
-be alleviated.
-
-\FunctionDistFig{}
+% Since Fr{\'e}chet differentiability implies continuity \citep[Proposition 4.8
+% (d)]{zeidler:2013:functional}, \thmref{kl_discontinuous} shows that it is
+% impossible to derive an analogue of \thmref{eta_phi_deriv} for perturbations of
+% the form \eqref{p_pert_simple} with the norms \eqref{phi_lp_norm}.
+%
+% Viewed in light of the proof of \thmref{kl_discontinuous}, the limited
+% expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
+% \exref{beta_inf_norm}, looks like a feature, rather than a bug.
+% % The KL divergence that defines a variational objective cannot handle
+% % prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
+% % considers such densities to be ``distant'' from $\pbase$, whereas the
+% % more permissive $\norm{\cdot}_p$ norms do not.
+% Consider \figref{func_dist}, which succinctly summarizes the tradeoffs between
+% the various norms.  The two shown densities are far from one another according
+% to KL divergence (from blue to red) since the red density takes values that are
+% nearly zero where the blue density has nonzero mass. They are also distant from
+% one another in $\norminf{\cdot}$, since it takes a large multiplicative change
+% to turn the nonzero blue density into the nearly zero red density. However, the
+% two densities are close in $\norm{\cdot}_{p}$, since the region where the red
+% density is nearly zero has a small measure. In order for VB approximations to be
+% continuous (a necessary condition for Fr{\'e}chet differentiability), one must
+% consider a topology on priors that is no coarser than the topology induced by KL
+% divergence.  But since valid priors can take values close to zero, a sacrifice
+% in expressiveness of the neighborhood of zero must be made in order to induce a
+% topology that works with KL divergence. Multiplicative changes and the
+% $\norminf{\cdot}$ norm make such a tradeoff in a natural, easy-to-understand
+% way.
+%
+% In this sense, VB approximations based on KL divergence are inherently
+% non-robust to priors that ablate mass nearly to zero.  No parameterization of
+% the space of priors will relieve this non-robustness.  Only by basing
+% variational approximations on divergences other than KL will this non-robustness
+% be alleviated.
+%
+% \FunctionDistFig{}
