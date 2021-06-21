@@ -19,13 +19,13 @@ roughly an order of magnitude faster than refitting.
 Recall from \secref{computing_sensitivity} that the solution of a linear system
 involving $\hessopt^{-1}$ is the computationally intensive part of the linear
 approximation, and that the linear system needs to be solved only once for a
-given perturbation, as described in \secref{comp_amortization}.  Consistent with
+given perturbation, as described in \secref{computing_sensitivity}.  Consistent with
 this obervation, in all the examples, after the linear approximation is formed,
 extrapolating to {\em any} new prior parameter $\alpha \ne \alpha_0$ or $\t \ne
 0$ takes only fractions of a second.
 %
 For example, in the thrush data and fastSTRUCTURE model, the initial fit took
-seven seconds, with subsequent refits (which recall were warm-started with the
+seven seconds, with subsequent refits (which we warm-started with the
 initial fit) taking between five and ten seconds.  Solving a linear system to
 form the linear approximation for a particular perturbation $\phi$ took less
 than a second, and evaluating $\etaopt(\phi)$ was essentially free.

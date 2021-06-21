@@ -1,0 +1,51 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do not edit the TeX file your work
+% will be overwritten.  Edit the RnW
+% file instead.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<setup, include=FALSE, cache=FALSE>>=
+knitr_debug <- FALSE # Set to true to see error output
+simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
+source("R_scripts/initialize.R", echo=FALSE)
+source("R_scripts/plotting_utils.R")
+source("R_scripts/structure/structure_plotting_utils.R")
+
+# load data
+load('./R_scripts/data_processed/structure.RData')
+
+# we use Set2  for population colors
+pop1_color <- '#66c2a5'
+pop2_color <- '#fc8d62'
+pop3_color <- '#8da0cb'
+@
+
+The posterior quantities of interest in this application are the admixtures
+$\pi_\n$. \figref{stru_init_fit} plots the inferred admixtures
+$\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.
+
+In the approximate posterior with $\alpha_0$, there appear to be three dominant
+latent populations, which we arbitrarily label as populations 1, 2, and 3
+(\figref{stru_init_fit}). The inferred admixture proportions generally
+correspond with geographic regions: Mbololo individuals are primarily population
+1; Ngangao individuals are primarily population 2; and Chawia individuals are a
+mixture of populations 1, 2, and 3.
+
+<<stru_init_fit_cap>>=
+stru_init_fit_cap <- paste(
+    "The inferred individual admixtures at $\\alpha_0 = 3$.
+    Each vertical strip is an individual and each color
+    a latent population.
+    Lengths of colored segments represent the inferred admixture proportions.
+    Individuals are ordered by the geographic region from which they were sampled
+    (Mbololo, Ngangao, Yale, and Chawia).
+    In the text, we refer to the green, orange, and purple latent populations
+    as population 1, 2, and 3, respectively. ")
+SetImageSize(aspect_ratio = 0.6 * base_aspect_ratio)
+@
+<<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
+out <- plot_initial_fit()
+out$p
+@

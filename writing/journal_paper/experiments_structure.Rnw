@@ -6,6 +6,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Our final analysis illustrates the use of our approximation for stick-breaking priors
+beyond clustering: namely, in topic modeling.
+
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
 simple_cache <- TRUE # Set to true to cache knitr output for this analysis.
@@ -22,12 +25,13 @@ pop2_color <- '#fc8d62'
 pop3_color <- '#8da0cb'
 @
 
-Our final data analysis example is an application of a Bayesian topic model to
-population genetics. We consider a publicly available dataset from
-\citet{galbusera:2000:thrush} that contains genotypes from 155 individuals of an
-endangered bird species, the Taita thrush. Individuals were collected from four
+%%
+\noindent \textbf{Data and model.}
+We use a publicly available dataset that contains genotypes from $\nindiv=155$ individuals of an
+endangered bird species, the Taita thrush
+\citet{galbusera:2000:thrush}. Individuals were collected from four
 regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual
-was genotyped at seven micro-satellite loci. The four regions were once part of
+was genotyped at $\nloci=7$ micro-satellite loci. The four regions were once part of
 a cohesive cloud forest that has since been fragmented by human development. For
 this endangered bird species, understanding the degree to which populations have
 grown genetically distinct is important for conservation efforts: well-separated
@@ -35,11 +39,7 @@ populations with little genetic diversity are particularly at risk of
 extinction.  The goal of the analysis is to infer the population of origin for specific loci and estimate the degree to which populations are admixed in each
 individual.
 
-
-\subsubsection*{The model}
-
-The data consists of consists of $\nindiv$ individuals genotyped at $\nloci$
-loci. Let $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ be the observed genotype for
+Let $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ be the observed genotype for
 individual $\n$ at locus $\l$ and chromosome $\i$. $J_\l$ is the number of
 possible genotypes at locus $\l$. For example, if the measurements are all
 single nucleotides (A, T, C or G) then $J_\l = 4$ for all $\l$.
@@ -49,7 +49,7 @@ A latent population is characterized by the collection $\beta_k =
 $\latentpop_{\k\l}\in\Delta^{J_\l - 1}$ are the latent frequencies for the $J_l$
 possible genotypes at locus $\l$. Let $\z_{\n\l\i}$ be the assignment of
 observation $\x_{\n\l\i}$ to a latent population. Notice that for a given
-individual $\n$, different loci, or even different chromosomes at a given locus,
+individual $\n$, different loci (or even different chromosomes at a given locus)
 may have different population assignments. The distribution of
 $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ arising from population $\k$ is
 %
@@ -62,7 +62,7 @@ Unlike the previous models, we now have a stick-breaking process for each
 individual. Draw sticks
 %
 \begin{align*}
-\nu_{\n\k} \iid \pstick(\nu_{\n\k}) \quad \forall \n = 1, \ldots, \nindiv; \k = 1, 2, \ldots \infty.
+\nu_{\n\k} \indep \pstick(\nu_{\n\k}), \quad \n = 1, \ldots, \nindiv; \k = 1, 2, \ldots.
 \end{align*}
 %
 The prior assignment probability vector $\latentadmix_{\n} =
@@ -83,6 +83,12 @@ p(\z_{\n\l\i} | \latentadmix_\n) = \prod_{k=1}^{\infty} \latentadmix_{\n\k}^{\z_
 In this genetics application, we call $\latentadmix_{\n}$ the \textit{admixture}
 of individual $\n$.
 
+Initially we take $\pstick$ to be $\betadist{1,\alpha}$ with parameter $\alpha = \alpha_0 = 3$.
+The choice of
+$\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}, in agreement with the observation that the individuals come
+from four geographic regions. Below, we will evaluate sensitivity to this prior
+choice.
+
 This model is identical to fastSTRUCTURE, a model proposed in
 \citet{pritchard:2000:structure, raj:2014:faststructure}, except that we replace
 the Dirichlet prior in fastSTRUCTURE with an infinite stick-breaking process.
@@ -91,45 +97,22 @@ modeling \citep{teh:2006:hdp}, but without the top-level Dirichlet process. In
 addition, genotypes at genetic markers take the place of words in a document; in
 lieu of inferring ``topics," we infer latent populations.
 
-The variational approximation is mean-field as before, and all distributions are
+We use a mean-field variational approximation, and all distributions are
 conditionally conjugate except for the stick-breaking proportions, which remain
 logit-normal. See \appref{app_structure} for further details.
 
-
-<<stru_init_fit_cap>>=
-stru_init_fit_cap <- paste(
-    "The inferred individual admixtures at $\\alpha_0 = 3$.
-    Each vertical strip is an individual and each color
-    a latent population.
-    Lengths of colored segments represent the inferred admixture proportions.
-    Individuals are ordered by the geographic region from which they were sampled
-    (Mbololo, Ngangao, Yale, and Chawia).
-    In the text, we refer to the green, orange, and purple latent populations
-    as population 1, 2, and 3, respectively. ")
-SetImageSize(aspect_ratio = 0.6 * base_aspect_ratio)
-@
-<<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
-out <- plot_initial_fit()
-out$p
-@
-
-\subsubsection*{Quantity of interest}
-
+%%
+\noindent \textbf{Quantity of interest.}
 The posterior quantities of interest in this application are the admixtures
 $\pi_\n$. \figref{stru_init_fit} plots the inferred admixtures
-$\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.  Our
-initial prior was a $\textrm{GEM}$ with parameter $\alpha_0 = 3$. The choice of
-$\alpha_0 = 3$ corresponds to roughly four distinct populations {\em a priori}
-(\eqref{prior_num_clusters}), motivated by the fact that the individuals come
-from four geographic regions. Below, we will evaluate sensitivity to this prior
-choice.
+$\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.
 
-In the approximate posterior at $\alpha_0$, there appear to be three dominant
+In the approximate posterior with $\alpha_0$, there appear to be three dominant
 latent populations, which we arbitrarily label as populations 1, 2, and 3
-(\figref{stru_init_fit}). The inferred admixture proportions generally
+(top panel of \figref{stru_func_sens}). The inferred admixture proportions generally
 correspond with geographic regions: Mbololo individuals are primarily population
 1; Ngangao individuals are primarily population 2; and Chawia individuals are a
-mixture of populations 1, 2, and 3.
+mixture of populations 1, 2, and 3 (\figref{stru_init_fit} in \appref{app_results_structure}).
 
 Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species.
 For example,
@@ -138,7 +121,7 @@ several Mbololo individuals have abnormally
 large admixture proportions of population 2.
 Conversely, while most Ngangao individuals are dominantly population 2,
 several Ngangao individuals have abnormally large admixture
-proportions of population 1. This suggests that some migration has occurred
+proportions of population 1. These patterns suggest that some migration has occurred
 between the Mbololo and Ngangao regions.
 
 We evaluate the sensitivity of this conclusion to possible prior perturbations.
@@ -168,10 +151,10 @@ and for individuals C, we use $\k = 3$.
 The first two posterior quantities relate to the inferred migration between
 the Mbololo and Ngangao regions.
 In the last example, we study the robustness of having a third latent
-population present, a population which primarily appears in Chawia individuals.
+population present, a population that primarily appears in Chawia individuals.
 
-\subsubsection*{Functional sensitivity}
-
+%%
+\noindent \textbf{Functional sensitivity.}
 We construct worst-case negative perturbations
 for each of the three variants of $\gadmix$, in order to see
 whether the biologically interesting patterns can be made to disappear
@@ -225,7 +208,7 @@ Moreover, even though the linear approximation
 agreed with the refits for individuals A in
 overall admixture proportion
 (\figref{stru_func_sens} second row),
-the approximation does does not perform uniformly well over all individuals.
+the approximation does not perform uniformly well over all individuals.
 \figref{stru_func_sens_admix} plots the inferred admixtures
 computed using the linearized variational parameters
 and the refitted variational parameters.

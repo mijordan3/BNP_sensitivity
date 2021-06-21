@@ -1,0 +1,232 @@
+We here provide a number of illustrative examples, and review concepts from the literature, to supplement our main text.
+
+%%
+\subsection{A Gaussian mixture model with conjugate component distributions}
+\applabel{gmm_example}
+
+In this example, we provide the details for a Gaussian mixture model (GMM)
+with conjugate component distributions. 
+
+\begin{ex}[Gaussian mixture model]\exlabel{iris_bnp_process}
+%
+The observations are vectors $\x_\n \in \mathbb{R}^\d$, and we model each
+component with a multivariate Gaussian. In this model, $\beta_\k = (\mu_k,
+\Lambda_\k)$, where $\mu_\k \in \mathbb{R}^\d$, $\Lambda_\k$ is a $\d\times\d$
+positive definite information matrix, and
+%
+\begin{align*}
+%
+\p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}} \\
+\log\p(\x_\n \vert \beta_\k) ={}&
+    -\frac{1}{2}(\x_n - \mu_k)^T \Lambda_\k (\x_n - \mu_k)
+    + \frac{1}{2} \log |\Lambda_\k| + \const.\\
+    & \constdesc{\beta_\k}
+%
+\end{align*}
+We let $\pbetaprior(\beta_\k)$ be the conjugate prior, which in this case is normal-Wishart:
+\begin{align*}
+  \pbetaprior(\beta_\k) &= \normalwishart{\beta_\k \vert \tau_0, n_0, p_0, V_0}\\
+  \log\pbetaprior(\beta_\k) &=
+      -\frac{\tau_0}{2}(\mu_\k - \mu_0)^T \Lambda_\k (\mu_\k - \mu_0)\\
+      &{} + \frac{n_0 - p_0 - 1}{2} \log |\Lambda_\k| -
+      \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
+\end{align*}
+where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
+%
+For a choice of $\pstick$, and for $\pbetaprior(\beta_\k)$ and $\p(\x_\n \vert
+\beta_\k)$ as given above, the posterior $\p(\beta, \z, \nu \vert \x)$ can in
+principle be computed by applying Bayes' rule.
+
+In \secref{results}, we fit a GMM to Fisher's iris data set and cluster irises
+into latent species based on morphological measurements.  In that case, $\k$
+indexes distinct species, $\beta_{\k}$ characterizes the distribution of
+morphological measurements for species $\k$, and $\z_{\n\k} = 1$ when
+observation $\n$ is a member of species $\k$.
+%
+\end{ex}
+
+%%
+\subsection{A closed form for local variational parameters as a function of global variational parameters}
+\applabel{gmm_global_local_vb}
+
+We next illustrate for a Gaussian mixture model (GMM) how we 
+can express the local variational parameters as a closed-form function
+of the global variational parameters.
+
+\begin{ex}[Optimality of $\etalocal$ in a GMM]\exlabel{qz_optimality}
+Recall that under our truncated variational approximation,
+the cluster assignment $\z_\n$ is a discrete random variable
+over $\kmax$ categories.
+
+Let $\eta_{\z_\n}$ be the categorical parameters in its exponential family
+natural parameterization. That is, we let $\eta_{\z_\n} = (\rho_{\n1},
+\rho_{\n2}, ..., \rho_{\n(\kmax-1)})$ be an unconstrained vector in
+$\mathbb{R}^{\kmax-1}$; in this parameterization, the assignment probabilities
+are
+%
+\begin{align*}
+  p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
+  \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax-1}\exp(\rho_{\n\k})}
+\end{align*}
+%
+We use the exponential family parameterization because we require the optimal
+variational parameters $\etaopt$ to be interior to $\etadom$ in
+\assuitemref{kl_opt_ok}{kl_opt_interior}.
+
+Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
+the optimal $\etaopt_{\z_\n}$ must satisfy
+%
+\begin{align*}
+& \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
+& \mathwhere \tilde \rho_{\n\k} := \expect{\q(\beta, \nu \vert \eta)}
+       {\log\p(\x_n \vert \beta_\k) + \log \pi_\k}.
+\end{align*}
+%
+See \citet{bishop:2006:PRML} and \citet{blei:2017:vi_review} for details.
+To satisfy this optimality condition,
+we set the optimal $\etaopt_{\z_\n}$ to be
+%
+\begin{align*}
+%
+\etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
+\log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
+\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
+%
+\end{align*}
+%
+Thus, as long as the expectations $\tilde\rho_{\n\k}$ can be provided
+as a closed-form function of
+$(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
+a function of $(\etabeta, \etanu)$.
+%
+\end{ex}
+
+%%
+\subsection{More details on computing and inverting the Hessian}
+\applabel{more_hessian}
+
+We fill in more details for the efficient computation of the Hessian outlined in
+\secref{computing_sensitivity}.
+
+We start from our formula in \eqref{global_local_derivative_breakdown}.
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
+-\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\ell} \\
+   \hess{\ell\gamma}     & \hess{\ell\ell} \\
+\end{array}
+\right)^{-1}
+\left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right),
+%
+\end{align*}
+%
+and an application of the Schur complement gives
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
+-\left(\begin{array}{c}
+I_{\gamma\gamma} \\
+\hess{\ell\ell}^{-1} \hess{\ell\gamma}
+\end{array}\right)
+\left(\hess{\gamma\gamma} -
+      \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right)^{-1} \crosshessian_\gamma,
+%
+\end{align*}
+%
+where $I_{\gamma\gamma}$ is the identity matrix with
+the same dimension as $\eta_\gamma$.
+%
+Specifically, observe that the sensitivity of the global parameters
+is given by
+%
+\begin{align}\eqlabel{global_sens}
+  \fracat{d \etaopt_\gamma(\t)}{d \t}{t = 0} &=
+  - \hessopt_\gamma^{-1}\crosshessian_\gamma
+  \mathwhere
+  \hessopt_\gamma := \left(\hess{\gamma\gamma} -
+        \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right),
+\end{align}
+%
+In our model, $\hess{\ell\ell}$ is sparse, and the size of $\hess{\gamma\gamma}$
+does not grow with $\N$. Thus, each term of $\hessopt_\gamma$ can be tractably
+computed, stored in  memory, and inverted, even on very large datasets.
+
+One can derive the exact same identity using the optimality of
+$\etaoptlocal(\eta_\gamma)$.  By applying the chain rule, one can
+verify that
+%
+\begin{align}\eqlabel{global_kl}
+\hessopt_{\gamma} &=
+    \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
+    \KLglobal(\etaopt_\gamma, 0).
+\end{align}
+%
+In practice, we evaluate $\hessopt_\gamma$ using automatic differentiation and
+\eqref{global_kl} rather than the Schur complement.
+
+%%
+\subsection{An example using the global/local decomposition}
+\applabel{vb_insample_nclusters_example}
+
+In this example, we take advantage of the global/local structure of the BNP problem
+when our quantity of interest is the in-sample expected posterior number of clusters. 
+
+\begin{ex}\exlabel{vb_insample_nclusters_globallocal}
+%
+Let
+$\gclustersabbr(\eta)$ denote our variational approximation to
+$\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that $\p(\z_\n
+\vert \beta, \nu, \x)$ is available in closed form, we can then take
+%
+\begin{align*}
+%
+\gclustersabbr(\etaopt) :={}&
+    \expect{\q(\beta, \nu \vert\etaopt)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
+    }
+\\\approx{}&
+    \expect{\p(\beta, \nu \vert \x)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
+    }
+    = \expect{\p(\z\vert\x)}{\nclusters(\z)} \Rightarrow \\
+%
+\gclustersabbr(\eta) ={}&
+    \sumkm \left(1 -  \prod_{\n=1}^\N
+        \left(1 - \expect{\q(\beta, \nu \vert \eta_\beta, \eta_\nu)}
+                    {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}
+                    \right)\right).
+%
+\end{align*}
+%
+In this way, $\gclustersabbr(\eta)$ depends only on $\eta_\beta$ and $\eta_\nu$,
+which are much lower-dimensional than $\eta_\z$, and retains nonlinearities in
+the map
+%
+\begin{align*}
+%
+\eta_\beta, \eta_\nu \mapsto \expect{\q(\beta, \nu \vert \eta_\beta,
+\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}.
+%
+\end{align*}
+%
+\end{ex}
+
+%%
+\subsection{An example using the global/local decomposition}
+\applabel{dp_cluster_growth}
+
+To help us understand the effect of the concentration parameter
+$\alpha$ we often use the following fact. Under the $\gem$ prior, the {\em a priori} expected
+number of distinct clusters in a dataset of size $N$ is given by
+%
+\begin{align}\eqlabel{prior_num_clusters}
+\expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
+\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
+\end{align}
+%
+See \citep[Equation 75]{jordan:2015:gentleintrodp}. \textcolor{red}{There's a much, much earlier citation for this. E.g.\ the original Blackwell MacQueen paper?}
+

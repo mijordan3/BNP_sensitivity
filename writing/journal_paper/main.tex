@@ -128,47 +128,32 @@ Berkeley, CA 94720}
 
 \section{The model and variational approximation}
 \seclabel{model}
-    \subsection{Discrete Bayesian Nonparametric Model}
+    \subsection{A stick-breaking model for clustering}
     \seclabel{model_bnp}
     \input{model_bnp.tex}
 
-    \subsection{Variational Approximation}
+    \subsection{Variational approximation}
     \seclabel{model_vb}
     \input{model_vb.tex}
 
     % \subsection{Robustness and the Taylor series approximation}
     % \seclabel{model_taylor}
     % \input{model_space_of_priors.tex}
-
-
-\section{Differentiability of the VB optimum}
+    
+\section{A local approximation for sensitivity}
 \seclabel{local_sensitivity}
-\input{diffable_intro}
+\input{local_sensitivity}
 
-    \subsection{Parametric prior perturbations}
-    \seclabel{diffable_parametric}
-    \input{diffable_parametric}
+\section{The influence function and worst-case functional perturbations}
+\seclabel{influence_function}
+\input{influence_function}
 
-    \subsection{Differentiability of BNP models with respect to $\alpha$}
-    \seclabel{diffable_concentration}
-    \input{diffable_concentration}
-
-    \subsection{Nonparametric prior perturbations}
-    \seclabel{diffable_nonparametric}
-    \input{diffable_nonparametric}
-
-    \subsection{Worst-case prior perturbations and Fr{\'e}chet differentiability}
-    \seclabel{diffable_worst_case}
-    \input{diffable_worst_case}
-
-    \subsection{Other nonparametric prior perturbations}
-    \seclabel{diffable_lp}
-    \input{diffable_lp}
-
-\section{Computing the sensitivity}\seclabel{computing_sensitivity}
+\section{Fast computation of the sensitivity}
+\seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
 
-\section{Experimental Results}\seclabel{results}
+\section{Experimental Results}
+\seclabel{results}
 \input{experiments_intro.tex}
 
     \subsection{Gaussian mixture modeling on iris data}
@@ -221,6 +206,34 @@ TODO: write this when the rest of the paper is done.
 
 \appendix
 
+\section{Illustrative examples and review}
+\seclabel{examples}
+\input{examples}
+
+\section{General differentiability results}
+\applabel{diffable_intro}
+\input{diffable_intro}
+
+    \subsection{Parametric prior perturbations}
+    \applabel{diffable_parametric}
+    \input{diffable_parametric}
+
+    \subsection{Differentiability of BNP models with respect to $\alpha$}
+    \applabel{diffable_concentration}
+    \input{diffable_concentration}
+
+    \subsection{Nonparametric prior perturbations}
+    \applabel{diffable_nonparametric}
+    \input{diffable_nonparametric}
+
+    \subsection{Worst-case prior perturbations and Fr{\'e}chet differentiability}
+    \applabel{diffable_worst_case}
+    \input{diffable_worst_case}
+
+    \subsection{Other nonparametric prior perturbations}
+    \applabel{diffable_lp}
+    \input{diffable_lp}
+
 \section{Proofs}\applabel{proofs}
 \input{app_proofs.tex}
 
@@ -229,6 +242,22 @@ TODO: write this when the rest of the paper is done.
 
 \section{Evaluating stick expectations}\applabel{gh_quadrature}
 \input{app_gh}
+
+\section{Additional experiment illustrations}
+\applabel{app_results}
+We give some additional illustrations for each experiment.
+
+    \subsection{Gaussian mixture modeling on iris data}
+    \applabel{app_results_iris}
+    \input{app_results_iris.tex}
+
+    \subsection{Regression mixture modeling}
+    \applabel{app_results_mice}
+    \input{app_results_mice.tex}
+
+    \subsection{Genetic admixture modeling with fastSTRUCTURE}
+    \applabel{app_results_structure}
+    \input{app_results_structure.tex}
 
 \section{Regression mixture model details}\applabel{app_mice}
 \input{app_mice_vb}

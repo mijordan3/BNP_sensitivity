@@ -4,6 +4,7 @@
 \def\evalat#1#2{\left.#1\right|_{#2}}
 \def\fracat#1#2#3{\left.\frac{#1}{#2}\right\vert_{#3}}
 \def\iid{\overset{iid}{\sim}}
+\def\indep{\overset{indep}{\sim}}
 \def\expect#1#2{\underset{#1}{\mathbb{E}}\left[#2\right]}
 \def\expecthat#1#2{\underset{#1}{\widehat{\mathbb{E}}}\left[#2\right]}
 \def\abs#1{\left|#1\right|}
@@ -65,12 +66,15 @@
 % Distributions central to the story
 \def\p{\mathcal{P}}   % Other distributions
 \def\q{\mathcal{Q}}   % VB dist
+\def\qk{\q_k}   % VB dist, just the kth stick-breaking component
 \def\ptil{\tilde{\p}}   % Other distributions
 \def\qtil{\tilde{\q}}   % Unnormalized VB dist
 \def\pstick{\p_{\mathrm{stick}}} % Stick breaking dens, use only for BNP section
 \def\pbetaprior{\p_{\mathrm{base}}}   % distribution on cluster centroids
 \def\lqgrad#1{{\nabla_\eta \log \qtil}\left(#1\right)}   % Log VB distribution gradient
-\def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
+\def\lqgradbar#1{\mathcal{L}({#1})}  
+%\def\lqgradbar#1{\overline{\lqgrad{#1}}\,\,}   % Log VB distribution gradient centered
+\def\lqgradbark#1{\mathcal{L}_k({#1})}  
 \def\pbase{\p_{0}}   % Initial (base) prior (different from the base prior of the DP)
 \def\palt{\p_{1}}   % Alternative prior
 \def\pbasetil{\ptil_{0}}   % Base prior
@@ -82,7 +86,8 @@
 \def\KL#1{\mathrm{KL}\left(#1\right)}   % KL divergence
 \def\normalwishart#1{\mathcal{N}\mathcal{W}\left(#1\right)}   % Wishart distribution
 \def\gammadist#1{\mathrm{Gamma}\left(#1\right)}   % Gamma distribution
-\def\betadist#1{\mathrm{Beta}\left(#1\right)}   % Gamma distribution
+\def\betadist#1{\mathrm{Beta}\left(#1\right)}   % beta distribution
+\def\unifdist#1{\mathrm{Unif}\left[#1\right]}   % uniform distribution
 \def\KLglobal{\mathrm{KL}_{\mathrm{glob}}}   % KL divergence as function of global parameters only
 
 % Taylor series
@@ -104,6 +109,7 @@
 % Domains
 \def\etadom{\Omega_{\eta}}
 \def\thetadom{\Omega_{\theta}}
+\def\nudom{\Omega_{\nu}}
 \def\betadom{\Omega_{\beta}}
 \def\tdom{\Omega_{\t}}
 \def\linf{{L_{\infty}}}
