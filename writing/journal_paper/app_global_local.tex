@@ -1,0 +1,63 @@
+In all models we consider,
+the optimal local variational parameters $\etaoptlocal$ can be written
+as a closed-form function of the global variational parameters $\etaglob$.
+Let $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping; that is,
+\begin{align*}
+  \etaoptlocal(\etaglob; \t) := \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
+\end{align*}
+
+The next example details this mapping for the Gaussian mixture model.
+
+\begin{ex}[Optimalility of $\etalocal$ in a GMM]\exlabel{qz_optimality}
+Recall that under our truncated variational approximation,
+the cluster assignment $\z_\n$ is a discrete random variable
+over $\kmax$ categories.
+
+Let $\eta_{\z_\n}$ be the categorical parameters in its
+exponential family natural parameterization.
+That is, we let $\eta_{\z_\n} = (\rho_{\n1}, \rho_{\n2}, ..., \rho_{\n(\kmax-1)})$
+be an unconstrained vector in $\mathbb{R}^{\kmax-1}$;
+in this parameterization, the assignment probabilities are
+%
+\begin{align*}
+  p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
+  \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax-1}\exp(\rho_{\n\k})}
+\end{align*}
+%
+We use the exponential family parameterization because
+we require the optimal variational parameters $\etaopt$
+to be interior to $\etadom$ in \thmref{etat_deriv}.
+In the mean parameterization,
+$\sum_{\k=1}^\kmax p_{\n\k} = 1$, so the
+optimal mean parameters $\hat p_{\n}$ cannot be
+interior to $\Delta^{\kmax - 1}$.
+On the other hand, $\eta_{\z_\n}$ as defined
+is unconstrained in $\mathbb{R}^{\kmax - 1}$.
+
+Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
+the optimal $\etaopt_{\z_\n}$ must satisfy
+%
+\begin{align*}
+& \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
+& \mathwhere \tilde \rho_{\n\k} := \expect{\q(\beta, \nu \vert \eta)}
+       {\log\p(\x_n \vert \beta_\k) + \log \pi_\k}.
+\end{align*}
+%
+See \citet{bishop:2006:PRML} and \citet{blei:2017:vi_review} for details.
+To satisfy this optimality condition,
+we set the optimal $\etaopt_{\z_\n}$ to be
+%
+\begin{align*}
+%
+\etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
+\log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
+\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
+%
+\end{align*}
+%
+Thus, as long as the expectations $\tilde\rho_{\n\k}$ can be provided
+as a closed-form function of
+$(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
+a function of $(\etabeta, \etanu)$.
+%
+\end{ex}

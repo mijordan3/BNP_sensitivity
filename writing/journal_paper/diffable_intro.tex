@@ -39,7 +39,7 @@ of $\KL{\eta}$.
 \end{defn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The decomposition \eqref{perturbed_objective} is always possible, in the sense
+The decomposition in \eqref{perturbed_objective} is always possible, in the sense
 that one could always take $\theta = \zeta$ and $\KL{\eta} = 0$.  We decompose
 the objective in this way in order to state strict regularity assumptions only
 on the part of the KL divergence that is being perturbed.  Indeed, we will
@@ -51,15 +51,15 @@ as in \exref{alpha_perturbation} below), we can use \defref{prior_t} to study
 parametric perturbations.  Furthermore, by parameterizing a path through the
 space of general densities, \defref{prior_t} will allow us to study
 nonparametric perturbations (e.g. \exref{gem_mult_perturbation} below and the
-detailed analysis of \secrangeref{diffable_nonparametric}{diffable_lp}).  We
+detailed analysis of \apprangeref{diffable_nonparametric}{diffable_lp}).  We
 can thus study VB prior robustness in general by studying problems of the
-form \defref{prior_t}.
+form in \defref{prior_t}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{ex}\exlabel{alpha_perturbation}
 %
-For the BNP model with the $\gem$ prior, take $\theta = (\nu_1, \ldots,
+For the BNP model with the $\pstick$ prior on the stick breaks, take $\theta = (\nu_1, \ldots,
 \nu_{\kmax-1})$, and take $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$.
 Let $\alpha_0$ be some initial value of the concentration parameter, and
 let $\t$ be $\alpha - \alpha_0$, so that deviations of $\t$ away from
@@ -106,7 +106,7 @@ optimization, letting $\KL{\eta} := \KL{\eta, \alpha_0}$, and substituting $\t =
 As in \exref{alpha_perturbation}, take $\theta = (\nu_1, \ldots, \nu_{\kmax-1})$
 and $\mu$ to be the Lebesgue measure on $[0,1]^{\kmax-1}$. Let $\pbase(\nuk) :=
 \betadist{\nuk \vert 1, \alpha_0}$, and let $\palt(\nuk)$ be a density, not
-in the Beta family, that shifts mass towards zero:
+in the beta family, that shifts mass towards zero:
 %
 \begin{align*}
 %

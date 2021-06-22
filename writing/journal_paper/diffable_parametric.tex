@@ -46,7 +46,7 @@ Let the following conditions on the variational approximation hold.
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-As we discuss in \secref{diffable_concentration}, \assuref{kl_opt_ok} states
+As we discuss in \appref{diffable_concentration}, \assuref{kl_opt_ok} states
 conditions that are typically satisfied when $\KL{\eta}$ can be optimized
 numerically using unconstrained optimization.
 
@@ -120,11 +120,11 @@ proof). The advantage of \assuref{exchange_order_dom} over
 \assuref{exchange_order} is that the conditions of \assuref{exchange_order_dom}
 can typically be verified even when the expectation $\expect{\q(\theta \vert
 \eta)}{\log \ptil(\theta \vert \t)}$ does not have a closed form.  In
-\secref{diffable_concentration}, we will discuss how different choices of
+\appref{diffable_concentration}, we will discuss how different choices of
 variational approximations for the stick lengths lend themselves to either
 \assuref{exchange_order} of \assuref{exchange_order_dom}.  Furthermore,
 \assuref{exchange_order_f} will be essential to analyzing nonparametric
-perturbations in \secref{diffable_nonparametric}.
+perturbations in \appref{diffable_nonparametric}.
 
 We are now in a position to define the quantities that occur in the derivative
 and state our main result.
@@ -142,9 +142,9 @@ exchange_order} hold, define
                       {\partial \eta \partial \eta^T}
                       {\etaopt} \mathand \\
 %
-\lqgradbar{\theta \vert \etaopt} :={}&
-    \lqgrad{\theta \vert \etaopt} -
-    \expect{\q(\theta \vert \etaopt)}{\lqgrad{\theta \vert \etaopt}}.
+\lqgradbar{\theta \vert \eta} :={}&
+    \lqgrad{\theta \vert \eta} -
+    \expect{\q(\theta \vert \eta)}{\lqgrad{\theta \vert \eta}}.
 %
 \end{align*}
 
@@ -158,11 +158,11 @@ Further, define
 %
 \crosshessian :={}&
     \fracat{\partial
-            \expect{\q(\theta \vert \etaopt)}
+            \expect{\q(\theta \vert \textcolor{red}{\eta})}
                    {\fracat{\partial \log \ptil(\theta \vert \t)}
                            {\partial \t}{\t=0} }
             }
-        {\partial \eta}{\etaopt}
+        {\partial \eta}{\textcolor{red}{\eta = }\etaopt}
 ={}
     \expect{\q(\theta \vert \etaopt)}{
           \lqgradbar{\theta \vert \etaopt}

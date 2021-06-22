@@ -24,91 +24,38 @@ max_enum_clust_pred <- max(alpha_sens_df_pred$n_clusters_refit)
 
 @
 
-In this section, we apply our methods to Fisher's iris data set, using the
-Gaussian mixture model (GMM) model from \exref{iris_bnp_process} and VB
-approximation given in \eqref{vb_mf} and \exref{iris_var_distr}.  Here, the data
-dimension $d = 4$, we set the truncation parameter $\kmax = 15$.  For our
-quantities of interest, we investigate both the estimated number of in-sample
-clusters as described in \exref{vb_insample_nclusters_simple} and the
-\textit{posterior predictive} number of clusters. Let $\nclusters(\z)$ be the
-number of clusters as defined as in \exref{insample_nclusters_simple}.  The
-posterior predictive number of clusters, $\expect{\p(\pi \vert
-\x)}{\expect{\p(\z \vert \pi)}{\nclusters(\z)}}$, is the posterior expectation
-of the number of distinct clusters that we would expect to see in a new dataset
-the same size as our original dataset.  Analogously to
-\exref{insample_nclusters_simple}, we define a variational approximation to
-posterior predictive number of clusters as
-%
-\begin{align*}
-\gclusterspredabbr(\eta) :=
-    \expect{\q(\nu\vert\eta)}{\expect{\p(\z\vert\nu)}{\nclusters(\z)}}
-  = \sum_{k=1}^\kmax\left(1 -
-  \expect{\q(\nu \vert \eta)}{(1 - \pi_\k)^\N} \right).
-\end{align*}
-%
-In the iris example, the predictive quantity can interpreted as the expected
-number of species one might see if a fresh sample of iris flowers were
-collected.
+We perform a clustering analysis of Fisher's iris data set \textcolor{red}{TODO: cite}. Here each 
+data point (with $N=50$ total points)
+represents $d=4$ measurements of a particular flower, from one of three
+iris species.
+We use a standard Gaussian mixture model with conjugate
+Gaussian-Wishart prior for the component parameters (detailed in \appref{app_iris})
+and a mean-field VB approximation
+ with truncation parameter $\kmax = 15$.
+We consider two quantities of interest: (1) $\gclustersabbr$, the posterior expected
+number of clusters among the $N$ observed
+data points, and (2) $\gclusterspred$, the posterior predictive expected number of clusters in $N$ new (i.e.\ as-yet-unseen) data points.
+We set the base stick-breaking prior $\pbase(\nuk)$ to be the standard $\betadist{\nuk \vert 1,\alpha}$
+distribution with $\alpha = \alpha_0 = 2$.
+Under the base stick-breaking prior with $\alpha_0$, the posterior expected number of clusters
+matches the three iris species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
 
-\subsubsection*{Parametric sensitivity}
-
-We first explore sensitivity of the in-sample and posterior predictive number of
-clusters to the concentration parameter, $\alpha$, using the results in
-\secref{diffable_concentration}.  To choose a plausible range of $\alpha$,
-note that, under the $\gem$ prior, the {\em a priori} expected
-number of distinct clusters in a dataset of size $N$ is given by
-%
-\begin{align}\eqlabel{prior_num_clusters}
-\expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
-\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
-\end{align}
-%
-(See \citep[Equation 75]{jordan:2015:gentleintrodp}.)
-We take $\alpha\in[0.1, 4.0]$, which
-according to \eqref{prior_num_clusters}, corresponds to an an {\em a priori}
-range of approximately $1.5$ to $15$ clusters.  Over this range, the shape of
-the stick-breaking density varies considerably, as shown in
-\figref{beta_priors}.  We take $\alpha_0 = 2$, near the middle of the range, and
-use the prior $\p(\nuk \vert \alpha_0)$ as the initial prior at which we form the
-linear approximation for all the results below. \Figref{iris_fit} shows the
-posterior clustering for $\alpha_0$.  Using our initial prior, the posterior
-recovers the known ground truth that there are in truth three distinct species.
-
-<<beta_priors_cap>>=
-beta_priors_cap <-
-  paste0("Probability density functions of $\\text{Beta}(1, \\alpha)$ ",
-         "distributions, under various $\\alpha$ considered for the ",
-         "iris data set.")
-SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
-@
-<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
-source('./R_scripts/iris/plot_beta_priors.R',
-       echo=knitr_debug, print.eval=TRUE)
-@
-
-
-<<iris_fit_cap>>=
-iris_fit_cap <- paste0("The iris data in principal component space and
-                      GMM fit at $\\alpha = ",
-                      alpha0,
-                      "$. Colors denote inferred memberships and
-                      ellipses represent estimated covariances. ")
-SetImageSize(aspect_ratio = base_aspect_ratio,
-             image_width = 0.6)
-@
-<<iris_fit, cache=simple_cache, fig.show='hold', fig.cap=iris_fit_cap>>=
-source('./R_scripts/iris/iris_init_fit.R',
-       echo=knitr_debug, print.eval=TRUE)
-@
-
+%%
+\noindent \textbf{Sensitivity to the concentration parameter}
+We approximate the changes in the quantities of interest as $\alpha$ varies
+over $\alpha\in[0.1, 4.0]$, which corresponds to an a priori expected number of clusters
+among $N$ data points in $[1.5,15]$ (\appref{app_beta_prior}). 
+Over this range, the shape of a $\betadist{1,\alpha}$
+density varies considerably, as shown in
+\figref{beta_priors} in \appref{app_beta_prior}. 
 
 <<iris_alpha_sens_cap>>=
 iris_alpha_sens_cap <- paste0(
-    "The expected number of clusters as $\\alpha$ varies in the",
-    "the GMM fit of the iris data. ",
-    "On the left is in-sample quantity $\\gclustersabbr$. ",
-    "On the right is the the predictive quantity $\\gclusterspredabbr$. ",
-    "We formed the linear approximation at $\\alpha=",
+    "The expected number of clusters in the original data set ($\\gclustersabbr$, left) ",
+    "and in a new data set of size $N$ ($\\gclusterspredabbr$, right) ",
+    "as $\\alpha$ varies in the ",
+    "GMM fit of the iris data. ",
+    "We formed the linear approximation at $\\alpha_0=",
     alpha0, '$.')
 
 SetImageSize(aspect_ratio = 0.7 * base_aspect_ratio,
@@ -118,52 +65,28 @@ SetImageSize(aspect_ratio = 0.7 * base_aspect_ratio,
 source("R_scripts/iris/iris_alpha_sens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-\Figref{iris_alpha_sens} shows both the posterior in-sample and predictive
-number of distinct clusters as $\alpha$ varies. Over this range of $\alpha$,
-the in-sample number of clusters is quite robust, remaining nearly constant at three, but the posterior predictive
-number of clusters is non-robust, ranging roughly from \Sexpr{sprintf("%2.1f",
+\Figref{iris_alpha_sens} compares our linear approximation to ground truth
+on the two quantities of interest as $\alpha$ varies.
+ Over this range of $\alpha$, the posterior expected number of clusters in the observed data 
+ is quite robust; it remains nearly constant at three.
+ The posterior predictive expected
+number of clusters in $N$ new data points is less robust; it ranges roughly from \Sexpr{sprintf("%2.1f",
 min_enum_clust_pred)} to \Sexpr{sprintf("%2.1f", max_enum_clust_pred)} expected
 species.  Our approximation captures this qualitative behavior. As expected,
-the approximation is least accurate furthest from the $\alpha_0$ at which it is
-evaluated.
+the approximation is least accurate furthest from the $\alpha_0$, where the Taylor series
+is centered.
 
-\subsubsection*{Functional perturbations and the influence function}
-
-While the number of in-sample clusters $\gclustersabbr$ was insensitive over our
-range of $\alpha$, insensitivity to $\alpha$ does not rule out sensitivity to
-other prior perturbations. In this subsection, we first demonstrate the ability
-of the influence function to predict the effect of nonparametric changes to the
-prior. Then, we use the influence function to construct a worst-case
-perturbation for $\gclustersabbr$.
-
-As in the previous subsection, we take $\pbase(\nuk) = \betadist{\nuk \vert 1,
-\alpha_0}$ for each $\k$.  The leftmost column of \figref{iris_fsens} shows in
-purple the influence function, $\infl(\nu)$, as given by
-\coryref{etafun_deriv_form}.  For ease of visualization, we show the influence
-function in logit stick space, taking $\mu$ to be the Lebesgue measure on
-$\mathbb{R}^{\kmax - 1}$, and $\theta = (\lnu_1, \ldots, \lnu_{\kmax - 1})$,
-suitably transforming the prior density.  We additionally perturb all the sticks
-in the same way, reducing the domain of the influence function to $\mathbb{R}$
-as in \exref{infl_univariate}.
-
-We consider perturbations $\phi$ which are Gaussian bumps, with each
+%%
+\noindent \textbf{Sensitivity to functional perturbations.}
+Insensitivity of the expected number of clusters $\gclustersabbr$ to $\alpha$ does
+not rule out sensitivity to other prior perturbations. 
+We now check how our approximation fares for the multiplicative perturbations in \eqref{mult_perturbation}.
+We consider perturbations $\phi$ that are Gaussian bumps in logit stick space, with each
 perturbation centered at a different location on the real line.  Each row of
-\figref{iris_fsens} corresponds to a different $\phi$, which are shown in gray
-in the left-hand column of \figref{iris_fsens}. The middle column of
+\figref{iris_fsens} corresponds to a different $\phi$. Each $\phi$ is shown in gray
+in the leftmost plot of its row. The middle column of
 \figref{iris_fsens} shows the stick-breaking prior $\p(\nuk \vert \phi)$ induced
-by the corresponding $\phi$, and the rightmost column of \figref{iris_fsens}
-shows the changes produced by the corresponding perturbation, as measured by
-re-fitting and as predicted by our approximation.
-
-According to \coryref{etafun_deriv_form}, the sign and magnitude of the effect of
-a perturbation should be determined by its integral against the influence
-function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
-first row, we expect the change to be negative.  Similarly, we expect the
-perturbation of the bottom row to produce a positive change, and the middle row,
-in which $\phi$ overlaps with both negative and positive parts of the influence
-function, to produce a relatively small change.  The third column of
-\coryref{etafun_deriv_form} confirms that this intuition holds, both for
-the refits and linear approximation.
+by the corresponding $\phi$.
 
 <<iris_fsens_cap>>=
 iris_fsens_cap <- paste(
@@ -171,11 +94,10 @@ iris_fsens_cap <- paste(
         the expected number of in-sample clusters
         in the iris data set
         to three multiplicative perturbations each with $\\norminf{\\phi} = 1$.
-        (Left) The multiplicative perturbation $\\phi$ in grey.
-        The influence function $\\Psi$ in purple,
-        scaled to also have $\\norminf{\\Psi}=1$.
-        (Middle) The initial and alternative priors $\\pbase(\\nuk)$
-        and $\\palt(\\nuk)$.
+        (Left) The multiplicative perturbation $\\phi$ is in grey.
+        The influence function $\\Psi$, scaled so $\\norminf{\\Psi}=1$, is in purple.
+        (Middle) The initial $\\pbase(\\nuk)$ (light blue)
+        and alternative $\\palt(\\nuk)$ (dark blue) priors. 
         (Right) The effect of the perturbation
         on the change in expected number of in-sample clusters
         for $t \\in[0, 1]$.")
@@ -185,6 +107,23 @@ SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio)
 <<iris_fsens, cache=simple_cache, fig.show='hold', fig.cap=iris_fsens_cap>>=
 source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
 @
+
+The rightmost column of \figref{iris_fsens}
+shows the changes produced by the $\phi$ perturbation for that row.
+We see that our approximation captures the qualitative behavior of the exact
+changes.
+
+We also see in this example that we can use the influence function to 
+predict the effect of functional changes to the stick-breaking prior.
+In the leftmost column, we plot the influence function in the logit space in purple.
+According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
+a perturbation should be determined by its integral against the influence
+function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
+first row, we expect the change to be negative.  Similarly, we expect the
+perturbation of the bottom row to produce a positive change, and the middle row,
+in which $\phi$ overlaps with both negative and positive parts of the influence
+function, to produce a relatively small change. We see this intuition borne out in the
+rightmost column.
 
 <<iris_worstcase_cap>>=
 iris_worstcase_cap <- paste(
@@ -199,11 +138,47 @@ SetImageSize(aspect_ratio = 0.525 * base_aspect_ratio)
 source("R_scripts/iris/iris_worst_case.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \coryref{etafun_worst_case},
+%%
+\noindent \textbf{Worst-case functional perturbation.}
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case},
 along with its effect on the prior and $\gclustersabbr$.
 As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$
 compared to the other unit-norm perturbations in \figref{iris_fsens}.
-However, even with the worst-case perturbation---which results in a rather unreasonably shaped prior density---the change in $\gclustersabbr$
-is still small. We conclude that on the iris data set, $\gclustersabbr$ appears
+However, even with the worst-case perturbation---which results in an unreasonably shaped prior density---the change in $\gclustersabbr$
+is still small. We conclude that $\gclustersabbr$ appears
 to be a robust quantity for this model and dataset.
+
+
+%%%%%%%%%%
+% these figures are moved to the appendix 
+%%%%%%%%%%
+\newcommand{\BetaPriorsEx}{
+<<beta_priors_cap>>=
+beta_priors_cap <-
+  paste0("Probability density functions of $\\text{Beta}(1, \\alpha)$ ",
+         "distributions, under various $\\alpha$ considered for the ",
+         "iris data set.")
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
+@
+<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
+source('./R_scripts/iris/plot_beta_priors.R',
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+\newcommand{\IrisInitFit}{
+<<iris_fit_cap>>=
+iris_fit_cap <- paste0("The iris data in principal component space and
+                      GMM fit at $\\alpha = ",
+                      alpha0,
+                      "$. Colors denote inferred memberships and
+                      ellipses represent estimated covariances. ")
+SetImageSize(aspect_ratio = base_aspect_ratio,
+             image_width = 0.6)
+@
+<<iris_fit, cache=simple_cache, fig.show='hold', fig.cap=iris_fit_cap>>=
+source('./R_scripts/iris/iris_init_fit.R',
+       echo=knitr_debug, print.eval=TRUE)
+@
+}

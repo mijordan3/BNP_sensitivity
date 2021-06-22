@@ -1,0 +1,36 @@
+The observations are vectors $\x_\n \in \mathbb{R}^\d$, and we model each
+component with a multivariate Gaussian. In this model, $\beta_\k = (\mu_k,
+\Lambda_\k)$, where $\mu_\k \in \mathbb{R}^\d$, $\Lambda_\k$ is a $\d\times\d$
+positive definite information matrix, and
+%
+\begin{align*}
+%
+\p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}} \\
+\log\p(\x_\n \vert \beta_\k) ={}&
+    -\frac{1}{2}(\x_n - \mu_k)^T \Lambda_\k (\x_n - \mu_k)
+    + \frac{1}{2} \log |\Lambda_\k| + \const.\\
+    & \constdesc{\beta_\k}
+%
+\end{align*}
+We let $\pbetaprior(\beta_\k)$ be the conjugate prior, which in this case is normal-Wishart:
+\begin{align*}
+  \pbetaprior(\beta_\k) &= \normalwishart{\beta_\k \vert \tau_0, n_0, p_0, V_0}\\
+  \log\pbetaprior(\beta_\k) &=
+      -\frac{\tau_0}{2}(\mu_\k - \mu_0)^T \Lambda_\k (\mu_\k - \mu_0)\\
+      &{} + \frac{n_0 - p_0 - 1}{2} \log |\Lambda_\k| -
+      \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
+\end{align*}
+where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
+%
+
+In this model, the conditionally conjugate variational distribution on $\beta_\k$ is
+normal-Wishart, which we denote as
+$\q(\beta_\k \vert \eta) = \normalwishart{\beta_k \vert \eta_{\beta_\k}}$,
+with $\eta_{\beta_\k}$ the normal-Wishart parameters.
+The conditionally conjugate variational distribution on $\z$ are multinomial.
+
+\Figref{iris_fit} shows the
+inferred clustering for $\alpha_0 = 2$,
+which recovers that there are three iris species.
+
+\IrisInitFit

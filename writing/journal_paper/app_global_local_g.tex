@@ -1,0 +1,61 @@
+
+Given a posterior quantity $\g$,
+we again take advantage of the fact that the optimal
+local parameters can be found in closed form given global parameters.
+In general, $\g$ will be a function of the entire vector of variational parameters.
+However, in the same way that $\KLglobal$ implicitly sets the local parameters at their optimum
+and is a function of only global parameters and the prior parameter $\t$,
+we can construct an analogous mapping for $\g$,
+\begin{align}\eqlabel{g_as_global}
+(\t, \etaglob) \mapsto g\Big(\big(\etaglob, \etaoptz(\etaglob, \t))\Big).
+\end{align}
+
+We illustrate this mapping
+when our quantity of interest is the in-sample expected posterior number of clusters.
+
+\begin{ex}\exlabel{vb_insample_nclusters_globallocal}
+%
+Let
+$\gclustersabbr(\eta)$ denote our variational approximation to
+$\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that
+$\p(\z_\n\vert \beta, \nu, \x) = \q(\z_\n \vert \etaopt_{\z_\n})$
+is available in closed form, we can then take
+%
+\begin{align*}
+%
+\gclustersabbr(\etaopt) :={}&
+    \expect{\q(\beta, \nu \vert\etaopt)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
+    }
+\\\approx{}&
+    \expect{\p(\beta, \nu \vert \x)}{
+        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
+    }
+    = \expect{\p(\z\vert\x)}{\nclusters(\z)} \Rightarrow \\
+%
+\gclustersabbr(\eta) ={}&
+    \sumkm \left(1 -  \prod_{\n=1}^\N
+        \left(1 - \expect{\q(\beta, \nu \vert \eta_\beta, \eta_\nu)}
+                    {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}
+                    \right)\right).
+%
+\end{align*}
+%
+In this way, $\gclustersabbr(\eta)$ depends only on $\eta_\beta$ and $\eta_\nu$,
+which are much lower-dimensional than $\eta_\z$, and retains nonlinearities in
+the map
+%
+\begin{align*}
+%
+\eta_\beta, \eta_\nu \mapsto \expect{\q(\beta, \nu \vert \eta_\beta,
+\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}.
+%
+\end{align*}
+%
+\end{ex}
+
+
+The mapping \eqref{g_as_global} can be constructed for any posterior quantity $\g$.
+Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient:
+we do not need to invert the full Hessian
+and linearize the entire set of variational parameters, global and local.

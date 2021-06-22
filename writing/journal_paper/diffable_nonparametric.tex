@@ -107,7 +107,7 @@ perturbations.
 %
 Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
 measure $\palt \ll \mu$, let $\phi(\theta \vert \palt) := \log \palt(\theta) /
-\pbase(\theta)$.  Then $\palt \mapsto \norminf{\phi(\cdot \vert \palt)}$ is a
+\pbase(\theta)$. \textcolor{red}{I think you need $\ll \pbase$ here, not $\mu$, or equivalently restrict to $\nudom$. This seems related to my comment about $\mu$ and support in the main text}  Then $\palt \mapsto \norminf{\phi(\cdot \vert \palt)}$ is a
 norm, does not depend on $\mu$, and is invariant to invertible transformations
 of $\theta$.
 
@@ -127,8 +127,6 @@ prior, $\pbase$, as shown in \figref{func_ball}. Although
 \lemref{pert_invariance} proves that every $\phi$ with $\norminf{\phi}$ is a
 valid prior, the converse is not true, and the Beta prior perturbation of
 \exref{alpha_perturbation} is a counterexample.
-
-\FunctionBallFig{}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

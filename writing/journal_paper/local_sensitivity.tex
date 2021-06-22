@@ -1,0 +1,126 @@
+We would like to understand how our quantity of interest $g(\etaopt)$
+changes when the concentration parameter or, more generally, the stick-breaking
+density $\pstick$ changes. To efficiently compute these changes, we use
+a first-order Taylor series approximation in the optimal VB parameters. In this section, we first give the Taylor series and then show how to compute its terms.
+
+%%
+\noindent \textbf{Sensitivity to the concentration parameter.}
+First, we show how to approximate the sensitivity of $g(\etaopt)$ to the choice of concentration
+parameter $\alpha$. Let $\etaopt(\alpha)$ represent the value of $\etaopt$ for a particular choice of $\alpha$. For our approximation, we choose some initial value
+$\alpha_0$ of the concentration parameter and solve the optimization problem to
+compute $\etaopt(\alpha_0)$. We then approximate $\etaopt(\alpha)$ with the linear approximation $\etalin(\alpha)$, and in turn approximate $g(\etaopt(\alpha))$ with $g(\etalin(\alpha))$:
+%
+\begin{align*}
+%
+% \etaopt(\alpha) \approx
+\etalin(\alpha) :=
+    \etaopt(\alpha_0) +
+    \fracat{d\etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0)
+\mathand
+g(\etaopt(\alpha)) \approx g(\etalin(\alpha)).
+%
+\end{align*}
+%
+We show (\thmref{etat_deriv} with \appref{diffable_concentration}) that the map $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable. If $g$ is also sufficiently smooth, then
+we expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when $\abs{\alpha -
+\alpha_0}$ is small.
+
+%%
+\noindent \textbf{Sensitivity to the stick-breaking density.}
+Next, we show how to approximate the sensitivity of $g(\etaopt)$ to the choice of concentration
+stick distribution $\pstick$. Technically, perturbations of $\alpha$ are perturbations of $\pstick$. But here we consider more general perturbations of the form of $\pstick$, potentially outside the beta class. To define our perturbations, let $\ptil$ represent a potentially unnormalized (but normalizable) density with respect to Lebesgue measure; the same notation without the tilde will give the normalized density.
+Now start from an initial setting of $\pstick$ at $\pbase$; we will typically start from Dirichlet-process stick-breaking, i.e.\ $\pbase = \betadist{1,\alpha}$. Then take any Lebesgue-measurable function $\phi(\cdot)$ on $[0,1]$. We consider a range of alternative (potentially unnormalized) stick-breaking forms $\ptil(\cdot \vert \t)$ defined by
+%
+\begin{equation} \eqlabel{mult_perturbation}
+	\log \ptil(\cdot \vert \t) = \log \pbase(\cdot) + \t \phi(\cdot)
+\end{equation}
+%
+on $[0,1]$. Note that the perturbation applies equally to every stick break $\nuk$. This style of multiplicative functional perturbation was proposed by \citet{gustafson:1996:local}; we deviate from \citet{gustafson:1996:local} by allowing $\phi$ to take on negative values and by considering VB (rather than MCMC) approximations.
+
+If we now let $\etaopt(t)$ represent the value of $\etaopt$ for a particular choice of $\ptil(\cdot \vert \t)$, we can form an analogous approximation to the $\alpha$ case above:
+%
+\begin{align} \eqlabel{taylor_series_t}
+%
+% \etaopt(\alpha) \approx
+\etalin(\t) :=
+    \etaopt(0) +
+    \fracat{d\etaopt(t)}{dt}{\t=0} (1 - 0)
+\mathand
+g(\etaopt(\t)) \approx g(\etalin(\t)).
+%
+\end{align}
+%
+As in the $\alpha$ case, we will show that the map $t \mapsto \etaopt(t)$ is continuously differentiable (\textcolor{red}{TODO: back this up, possibly with concise additional assumptions}). So, for sufficiently smooth $g$, we expect this approximation to be good for small $t$.
+
+We next provide some additional justification for why this particular functional perturbation is useful. Note first that if we consider any other distribution $\palt$ for $\pstick$, we can continuously warp $\pbase$ to $\palt$ by setting $\phi(\cdot) = \log \left( \palt(\cdot) / \pbase(\cdot) \right)$ so long as $\palt \ll \pbase$, i.e.\ $\palt$ is absolutely continuous with respect to $\pbase$. Moreover, we will see in \secref{influence_function} that we can compute an \emph{influence function} to provide an interpretable summary of the effect of arbitrary changes $\phi$ and also find a worst-case $\phi$ in some appropriate ball. Second, while the perturbations above are essentially multiplicative relative to $\pbase$, one might wonder whether additive perturbations (subject to renormalization) or other perturbations would work instead; indeed \citet{gustafson:1996:local} proposes a number of alternative perturbations. We show in \secref{influence_function} that, among a class of potential functional perturbations, the one we consider here is the only one that admits a uniformly good approximation over an appropriate ball of $\phi$ choices -- and thus can be used to reason about worst-case $\phi$.
+
+%%
+\noindent \textbf{Computing the terms in the Taylor series.}
+First observe that we can write the $\alpha$ perturbation using the same notation as the stick-form perturbation by setting $t = \alpha - \alpha_0$. Then, as before, let $\ptil(\cdot \vert \t)$ be the corresponding (potentially unnormalized) distribution on a stick-breaking parameter, and let $\etaopt(t)$ be the value of $\etaopt$ for $\ptil(\cdot \vert \t)$. It follows that the concentration parameter perturbation is also given by \eqref{taylor_series_t}. Whether we perturb the concentration parameter or stick-breaking form, $\etaopt(0)$ is the VB optimum for the original, unperturbed problem, and $1-0$ is trivial to compute. It remains to provide a formula for the derivative $\fracat{d\etaopt(t)}{dt}{\t=0}$.
+
+Our next result gives a computable formula for the derivative. In what follows, we write $\qtil$ for a potentially unnormalized (but normalizable) approximation distribution; as with $\ptil$ and $\p$, we again assume $\q$ is the normalized form of $\qtil$.
+%
+\begin{thm}\thmlabel{bnp_deriv}
+%
+\textcolor{red}{I think this should all work given the proofs in the appendix for $\alpha$. Can we get away with adding some very minimal assumptions here to make sure it applies for the functional perturbation?}
+The map $\t \mapsto
+\etaopt(\t)$ is continuously differentiable at $\t=0$ with derivative
+%
+\begin{align}
+%
+\eqlabel{bnp_vb_eta_sens}
+\fracat{d \etaopt(\t)}{d \t}{\t=0} ={}&
+    - \hessopt^{-1} \crosshessian, \mathwhere \\
+%
+\hessopt :={}& \fracat{\partial^2 \KL{\eta}}
+                      {\partial \eta \partial \eta^T}
+                      {\eta = \etaopt}, 
+\quad \lqgradbar{\zeta \vert \eta} :={}
+    \lqgrad{\zeta \vert \eta} -
+    \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}}, \\
+%
+\eqlabel{bnp_vb_crosshessian}
+\crosshessian :={}&
+%    \fracat{\partial
+%            \expect{\q(\zeta \vert \eta)}
+%                   {\fracat{\partial \log \prod_{k=1}^{\kmax -1}\ptil(\nu_k \vert \t)}
+%                           {\partial \t}{\t=0} }
+%            }
+%        {\partial \eta}{\eta = \etaopt} \\
+%={}&
+    \expect{\q(\zeta \vert \etaopt)}{
+          \lqgradbar{\zeta \vert \etaopt}
+          \sum_{k=1}^{\kmax-1}
+          \fracat{\partial \log \ptil(\nu_k \vert \t)}
+                 {\partial \t}{\t=0}}.
+%
+\end{align}
+%
+\end{thm}
+%
+\begin{proof}
+Under differentiability and regularity conditions on a (generic, not just BNP) model and VB approximation, we show in \thmref{etat_deriv} that the maps $t \mapsto \etaopt(t)$ are differentiable and the formula for their computation holds. \appref{diffable_concentration} shows that the differentiability and regularity conditions hold when we vary the concentration parameter $\alpha$ in our stick-breaking model. \textcolor{red}{Can we say something similarly concise in main text for the functional perturbation?}
+\end{proof}
+%
+
+\eqref{vb_eta_sens} requires computation of two terms: $\hessopt^{-1}$
+and  $\crosshessian$.  Typically, $\crosshessian$, which is a derivative of a
+variational expectation, is straightforward to evaluate \textcolor{red}{$< 1$ sentence more info here}.  Forming and inverting or
+factorizing $\hessopt$ can present a challenge due to its high dimensionality. $\hessopt$ has dimensions
+$\etadim \times \etadim$, where $\etadim$ is the dimension of $\eta$. There are variational parameters in $\eta$ corresponding to each parameter $\z_\n$. Also, the truncation level $\kmax$ typically needs to grow with $N$ to keep pace with the growing number of clusters -- though this growth is sublinear. It follows from these observations that $\etadim$ can grow linearly with $N$ and thus become very large.  However, in many
+cases -- including our BNP problem here -- we can take advantage of model sparsity to
+efficiently compute \eqref{vb_eta_sens}. We show how to do so in \secref{computing_sensitivity}. And our experiments confirm that we can compute $\fracat{d \etaopt(\t)}{d \t}{\t=0}$ much more efficiently than re-optimizing the VB objective directly (\secref{compute_time}). Moreover, we will see that most of the cost of using the Taylor series approximation can be shared across multiple values of $t$, so the savings increases dramatically when
+we are interested in a range of $t$ values (\secref{compute_time}).
+
+%%
+\noindent \textbf{More on accuracy and speed trade-offs in the Taylor series.}
+One might save even more compute time, though likely at the cost of some accuracy, by extending the approximation to $g$ as well.
+If the cost of computing $g(\etalin(t))$ is prohibitive and if $g(\eta)$ is itself continuously differentiable, we may employ an additional
+first-order expansion of $g$ to further approximate $g(\etalin(t))$. In all of our experiments, 
+computing $g(\etalin(t))$ is not prohibitive, so we do not employ this additional approximation.
+
+Finally, we note that even
+when the approximation $\etalin(t)$ is an imperfect substitute
+for exact re-optimization, the derivative can be a useful guide for what sorts
+of prior perturbations might be problematic and thereby inform further exploration based
+on re-optimizing; see \secref{results_structure} for an example and discussion.

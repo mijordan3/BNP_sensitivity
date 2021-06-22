@@ -1,30 +1,11 @@
-A Bayesian nonparametric (BNP) approach to clustering treats the number of
-distinct clusters in a data set as a random quantity by modeling an infinite
-number of components, allowing for posterior inference without specifying the
-number of components {\em a priori}.  A BNP model requires the specification of
-a prior distribution on an infinite number of component probabilities, and some
-posterior quantities may be sensitive to the prior specification. Since a range
-of BNP priors are typically plausible in a given modeling context, it is
-important in practice to establish the the sensitivity of conclusions to
-possibly arbitrary prior choices.  In principle, one could re-estimate the
-posterior for a range of prior choices, but in practice this is computationally
-prohibitive, due to the high cost of even a single posterior approximation and
-the large number of potential choices for the prior.
 
-We circumvent this difficulty by deriving local sensitivity measures based on
-Taylor series approximations for a truncated variational Bayes (VB)
-approximation based on the Kullback-Leibler divergence, both for parametric
-perturbations (e.g., to the concetration parameter of a $\gem$ prior) and for
-nonparametric perturbations to a stick-breaking density.  In constrast to
-previous work on Bayesian local sensitivity based on Markov chain Monte Carlo,
-VB sensitivity measures can be computed automatically and efficiently.  We state
-general conditions under which a VB approximation is continuously
-differentiable, and show that nonparametric perturbations can be expressed as an
-integral against an \textit{influence function} which summarizes the first-order
-effect of changes to the prior density.   Amongst a general class of
-nonparmetric prior perturbations corresponding to the $L_p$ spaces, we show that
-the VB optimum is Fr{\'e}chet differentiable with respect to the prior density
-only for $p=\infty$.  We validate the ability of our local approximation to
-usefully extrapolate to alternative priors on several real-world datasets and
-show that it can be an accurate way to quickly assess robustness to both
-parametric and non-parametric prior perturbations.
+The Dirichlet process has become a mainstay in unsupervised learning tasks
+like clustering and topic modeling. Its stick-breaking representation in particular lends itself
+to fast approximate posterior inference with variational Bayes. However, choices for the
+stick-breaking representation are often made from convenience. For instance, particular
+values of the concentration parameter are favored by different applications, and the beta
+distribution of the sticks lends itself to conditional conjugacy and closed-form inferential updates.
+In many cases, though, different values of the concentration parameter and the underlying stick-breaking
+distribution could equally align with prior beliefs. If the major conclusions of our analysis changed under these different reasonable choices, we might worry that our conclusions were driven by arbitrary implementation choices rather than meaningful data trends.
+In the present work we demonstrate how to assess the sensitivity of conclusions
+to the choice of concentration parameter and stick-breaking distribution. While we focus on perturbations to stick-breaking priors in Bayesian nonparametrics, along the way we develop new theory to support sensitivity analysis more generally for variational Bayes.

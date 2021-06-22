@@ -22,3 +22,16 @@ like $\z$ does. Thus, we call $\z$ the local latent variables.
 The local variational parameters $\eta_\z$ can be set optimally in
 an analagous way as \exref{qz_optimality}, except with the
 indices $\n\k$ replaced with $\n\l\i\k$.
+
+The posterior quantities of interest in this application are the admixtures
+$\pi_\n$. \figref{stru_init_fit} plots the inferred admixtures
+$\expect{\q(\pi_\n \vert \etaopt)}{\pi_\n}$ for all individuals $\n$.
+
+In the approximate posterior with $\alpha_0 = 3$, there appear to be three dominant
+latent populations, which we arbitrarily label as populations 1, 2, and 3
+(\figref{stru_init_fit}). The inferred admixture proportions generally
+correspond with geographic regions: Mbololo individuals are primarily population
+1; Ngangao individuals are primarily population 2; and Chawia individuals are a
+mixture of populations 1, 2, and 3.
+
+\StructureInitialFit

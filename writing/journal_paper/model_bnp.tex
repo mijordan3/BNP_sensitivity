@@ -1,200 +1,40 @@
-A discrete Bayesian nonparametric (BNP) generative model draws data points
-$\x_n$ from one of an infinite number of components indexed by $\k = 1, 2,
-\ldots \infty$. Each component is characterized by a vector $\beta_\k \in
-\betadom \subseteq \mathbb{R}^{\betadim}$, with $\p(\x_n \vert \beta_\k)$
-denoting the distribution of data arising from  component $\k$. We model the
-$\beta_\k$ as arising IID from a known prior, or \textit{initial density},
-denoted $\pbetaprior(\beta_\k)$, and write $\beta = (\beta_1, \beta_2, \ldots)$.
-
-Assignment of data point $\n$ to a mixture component is represented by an
-(infinite dimensional) vector $\z_\n = (\z_{\n1}, \z_{\n2}, \ldots)$ whose
-elements $\z_{\n\k} = 1$ for exactly one $\k$ and $0$ otherwise. With $\z_\n$
-defined in this way, we can write
+Consider a standard Bayesian nonparametric generative model for clustering, with observed data $(x_n)_{n=1}^{N}$.
+We assume a countable infinity of latent components, with frequencies $\pi = (\pi_1, \pi_2, \ldots)$ such that $\forall \k, \pi_\k \in [0,1]$ and $\sum_{\k} \pi_\k = 1$. For the $n$th data point, let the vector $\z_\n = (\z_{\n1}, \z_{\n2}, \ldots)$ represent the assignment of the $\n$th data point to the $\k$th component when $\z_{\n\k} = 1$ and all other vector elements equal 0. We generate $\z_{\n\k} = 1$ with probability $\pi_\k$, i.i.d.\ across $\n$. To generate the $x_n$, we assume the $\k$th component is characterized by a component-specific parameter,
+$\beta_\k \in
+\betadom \subseteq \mathbb{R}^{\betadim}$, and that a data point arising from component $k$ is generated as $\p(\x_n \vert \beta_\k)$. Then
 %
-\begin{align*}
+$
 %
 \p(\x_n \vert \z_\n, \beta) =
     \prod_{k=1}^\infty \p(\x_n \vert \beta_\k)^{\z_{\n\k}}.
 %
-\end{align*}
+$
+The $\beta_\k$ in turn are generated i.i.d.\ from a prior $\pbetaprior(\beta_\k)$. For instance, in a Gaussian mixture model, $\beta_\k$ could be a vector describing the mean and covariance of a Gaussian distribution.
 
-The prior probabilities of assignments $\z_{\n}$ can be generated according to
-the following ``stick-breaking'' process. Fix a density $\pstick(\cdot)$, with
-respect to the Lebesgue measure on $[0,1]$, over stick-breaking proportions
-$\nuk \in [0, 1]$ and draw $\nuk\iid\pstick(\nuk)$ for $\k=1,2,\ldots\infty$.
-Given these stick lengths, we can construct probabilities using the following
-formula:
-%
+It remains to place a prior on the component frequencies $\pi$. We will focus on stick-breaking priors for $\pi$, so we first replace $\pi$ with a stick-breaking representation. Let $\nu = (\nu_1, \nu_2, \ldots)$ represent proportions: $\nuk \in [0, 1]$. Take
 \begin{align}\eqlabel{stick_breaking}
 %
-\pi_\k := \nuk \prod_{\k' < \k} (1 - \nu_{\k'}),
+\pi_\k := \nuk \prod_{\k' < \k} (1 - \nu_{\k'}).
 %
 \end{align}
-%
-where the empty product is taken to be equal to $1$. By construction,
-$\sum_{\k=1}^{\infty} \pi_\k = 1$. Given the probability vector $\pi := (\pi_1,
-\pi_2, \ldots)$, the $\z_\n$ are drawn according to
-%
+We then define a stick-breaking prior by placing a prior on the $\nuk$.
+Fix a density $\pstick(\cdot)$, with
+respect to the Lebesgue measure on $[0,1]$. We take $\nuk\iid\pstick(\nuk)$ across $\k$.
+An especially common choice of $\pstick$ is $\mathrm{Beta}(1, \alpha)$, with \emph{concentration parameter}
+$\alpha > 0$. With this choice, the
+$\pi$ are distributed according to the size-biased atom weights of a Dirichlet process.
+This particular beta stick-breaking prior is often favored due to its convenient mathematical properties and ease of use in inference.
+
+\noindent \textbf{Posterior quantities of interest.}
+In theory, with our generative model and observed data in hand, we can find the Bayesian posterior
+$\p(\beta, \z, \nu | \x)$ and report any posterior summaries of interest. For instance, the posterior $\p(\beta, \z, \nu | \x)$
+induces a posterior distribution on the number of clusters $\nclusters(\z)$, where \emph{clusters} are components to which at least one
+data point has been assigned:
 \begin{align*}
-%
-\p(\z_\n \vert \pi) ={}&
-   \prod_{k=1}^{\infty} \pi_\k^{\z_{\n\k}}.
-%
+  \nclusters(\z) := \sum_{k=1}^{\infty} \ind{ \left(\sum_{n=1}^{N}
+  \z_{\n\k}\right) > 0},
 \end{align*}
-%
-Since $\pi$ is a deterministic function of the stick-breaking proportions $\nu :=
-(\nu_1, \nu_2, \ldots)$, we can also write $\p(\z_\n \vert \nu)$ with no
-ambiguity.
-
-The stick-breaking density $\pstick$ can thus be thought of as inducing a
-distribution on the vector of probabilities $\pi$.  Different choices of
-$\pstick$ will favor different assignment probabilities, each with different
-implied prior degrees of concentration.
-%
-Typically, many different choices for $\pstick$ may be {\em a priori}
-reasonable.  A particularly common set of candidates for $\pstick$ is the class
-of densities given by $\mathrm{Beta}(\nuk \vert 1, \alpha)$ density, which we
-write as
-%
-\begin{align}\eqlabel{beta_density}
-%
-\pstick(\nuk \vert \alpha) :=
-\mathrm{Beta}(\nuk \vert 1, \alpha) =
-    \frac{\Gamma(1 + \alpha) (1 - \nuk)^{\alpha - 1}}
-         {\Gamma(\alpha)},
-%
-\end{align}
-%
-When $\pstick$ is $\mathrm{Beta}(\nuk \vert 1, \alpha)$, the resulting
-distribution on $\pi$ is known as the $\textit{GEM distribution}$, and we write
-$\pi \sim \gem$.
-%
-The $\gem$ distribution is closely related to the Dirichlet process (DP).
-Define a measure on $\betadom$ as
-%
-\begin{align*}
-  \mathcal{M} = \sum_{\k = 1}^\infty \pi_\k\delta_{\beta_\k},
-\end{align*}
-%
-which places atoms at points $\beta_k$ with weight $\pi_\k$. When $\pi \sim
-\gem$ and $\beta_\k \iid \pbetaprior(\beta_\k)$, $\mathcal{M}$
-is a random measure is distributed according to Dirichlet process with
-concentration parameter $\alpha$ and initial measure $\pbetaprior$
-\citep{ferguson:1973:bayesian, sethuraman:1994:constructivedp}. Below, we will
-give special attention to stick-breaking densities in the Beta family, though we
-will also consider deviations from the Beta family to generic densities.
-
-In the generative process we have just outlined, the joint distribution of the
-observed data and latent variables in a basic BNP mixture model
-%
-\footnote{ Our other experiments on real data sets in \secref{results_mice,
-results_structure} require slightly different modeling considerations, and we
-adjust the factorization in \eqref{bnp_model} to suit the model needs of the
-particular problem.  However, the basic case of \eqref{bnp_model} will suffice
-to motivate our approach, and we defer discussions of the variants until they
-are needed.}
-%
-is given by
-%
-\begin{align}\eqlabel{bnp_model}
-%
-\log\p(\x, \beta, \z, \nu) =&
-\sum_{n=1}^N \sum_{k=1}^{\infty}
-    \z_{\n\k} \left(
-        \log\p(\x_n \vert \beta_\k) + \log \pi_\k
-    \right)
-\nonumber\\
-   & +
-    \sum_{k=1}^{\infty} \left(
-        \log \pstick(\nuk) + \log \pbetaprior(\beta_\k)
-    \right).
-%
-\end{align}
-%
-Different choices of $\pstick$ will thus, in general, lead to different
-posterior distributions via the application of Bayes' rule to \eqref{bnp_model},
-and so lead to different values for posterior expectations of quantities of
-interest.
-
-For concreteness, let us consider the following motivational example
-based on the Fisher iris dataset \citep{anderson:1936:iris, fisher:1936:iris}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}[Gaussian mixture model and iris data]\exlabel{iris_bnp_process}
-%
-The observations are vectors $\x_\n \in \mathbb{R}^\d$, and we model each
-component with a multivariate Gaussian. In this model, $\beta_\k = (\mu_k,
-\Lambda_\k)$, where $\mu_\k \in \mathbb{R}^\d$, $\Lambda_\k$ is a $\d\times\d$
-positive definite information matrix, and
-%
-\begin{align*}
-%
-\p(\x_\n \vert \beta_\k) ={}& \normdist{\x_n \vert \mu_\k, \Lambda_\k^{-1}} \\
-\log\p(\x_\n \vert \beta_\k) ={}&
-    -\frac{1}{2}(\x_n - \mu_k)^T \Lambda_\k (\x_n - \mu_k)
-    + \frac{1}{2} \log |\Lambda_\k| + \const.\\
-    & \constdesc{\beta_\k}
-%
-\end{align*}
-We let $\pbetaprior(\beta_\k)$ be the conjugate prior, which in this case is normal-Wishart:
-\begin{align*}
-  \pbetaprior(\beta_\k) &= \normalwishart{\beta_\k \vert \tau_0, n_0, p_0, V_0}\\
-  \log\pbetaprior(\beta_\k) &=
-      -\frac{\tau_0}{2}(\mu_\k - \mu_0)^T \Lambda_\k (\mu_\k - \mu_0)\\
-      &{} + \frac{n_0 - p_0 - 1}{2} \log |\Lambda_\k| -
-      \frac{1}{2} \textrm{Tr}(V_0 \Lambda_\k) + \const,
-\end{align*}
-where $(\tau_0, n_0, p_0, V_0)$ are fixed prior parameters.
-%
-For a choice of $\pstick$, and for $\pbetaprior(\beta_\k)$ and $\p(\x_\n \vert
-\beta_\k)$ as given above, the posterior $\p(\beta, \z, \nu \vert \x)$ can in
-principle be computed by applying Bayes' rule to \eqref{bnp_model}.
-
-In \secref{results}, we fit a GMM to Fisher's iris data set and cluster irises
-into latent species based on morphological measurements.  In that case, $\k$
-indexes distinct species, $\beta_{\k}$ characterizes the distribution of
-morphological measurements for species $\k$, and $\z_{\n\k} = 1$ when
-observation $\n$ is a member of species $\k$.
-%
-\end{ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In practice, we are not interested in the whole posterior, but rather some
-aspect of the posterior, such as the expected number of clusters present in the
-observed data, or the pattern of co-clustering between observations. In the
-present work, we focus on quantities that can be expressed as posterior
-expectations.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{ex}[A posterior quantity of interest]\exlabel{insample_nclusters_simple}
-
-One might ask, \textit{how many clusters are present in the data set}? To answer
-this question in the context of a BNP model, define the
-following ``quantity of interest'':
-%
-\begin{align*}
-  \nclusters(\z) := \sum_{k=1}^\kmax \ind{ \left(\sum_{n=1}^{N}
-  \z_{\n\k}\right) > 0}
-\end{align*}
-%
 where $\ind{\cdot}$ is the indicator function taking value $1$ when the argument
 is true and $0$ otherwise.
 
-$\nclusters(\z)$ counts the number of clusters with at least one observations
-in a set of assignments $\z$.  Under the $\gem$ prior, the posterior expected
-number of clusters is thus given by
-$\expect{\p(\z\vert\x,\alpha)}{\nclusters(\z)}$. For example, in the iris data
-set of \exref{iris_bnp_process},
-$\expect{\p(\z\vert\x,\alpha)}{\nclusters(\z)}$ is the posterior expectation
-of the number of distinct iris species present in the observed data.  Here, we
-have conditioned the posterior explicitly on $\alpha$ to emphasize that our
-posterior expected quantity of interest depends on the prior chosen.
-%
-\end{ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In practice, though, neither the posterior nor the posterior summary is readily accessed. An approximation must be used instead.

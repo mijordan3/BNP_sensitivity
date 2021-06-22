@@ -1,64 +1,35 @@
+A principal challenge of computing the sensitivity efficiently is
+the high-dimensionality of the parameter $\zeta$ and hence variational
+parameters $\eta$. In particular, we have seen that, in our BNP stick-breaking model,
+$\zeta$ and $\eta$ both
+grow linearly with the number of data points $N$.
+This growth leads to two potential major computational challenges: (1) a high-dimensional optimization
+problem to extremize the VB objective and (2) computing and inverting the Hessian $\hessopt$.
+Here we show how we can use special structure in the model to reduce to low-dimensional problems
+and thereby enjoy efficient computation.
 
-This section outlines practical considerations for computing the local
-sensitivity in \thmref{etat_deriv}. The mixed, second-order partial term
-$\crosshessian$ is inexpensive to compute using automatic differentiation.
-Typically, it is the computation and inversion of the Hessian matrix that is the
-most expensive step in computing local sensitivity, especially when the
-dimension of $\eta$ is large. To invert the Hessian, we will take advantage of
-the fact that all the models we consider in \secref{results} can be decomposed
-into a relatively small dimensional set of ``global'' variables (e.g., $\beta$
-and $\nu$), and a relatively lare set of local variables ($\z$). This
-factorization will be useful for optimizing the $\mathrm{KL}$ objective as well.
+%%
+\noindent \textbf{Global and local parameters.}
+In both cases, the key to reducing to a lower-dimensional problem is separating
+\emph{global} and \emph{local} parameters. Global variables are common to all data points.
+Local variables are unique to each data point. For instance, in a Gaussian (or other typical) mixture model,
+the stick-breaking proportions $\nu$ and component parameters $\beta$ are global. But the
+cluster assignment parameters $z$ are local.
 
-\subsection{The cross-hessian}
+Let $\gamma$ denote the collection of global parameters. Since we use mean-field VB,
+these parameters have their own variational parameters, which we denote $\etaglob$.
+Similarly, let $\ell$ denote the local parameters and let $\etalocal$ be the corresponding local variational parameters.
 
-We are interested in sensitivity to the stick-breaking density, so in our
-experiments (\secref{results}), only the prior on stick-breaking proportions
-$\nu = (\nu_1, ..., \nu_{\kmax - 1})$ will depend on $\t$. Because the elements
-of $\nu$ fully factorize under both the prior and the variational density,
-$\crosshessian$ decomposes as
-%
-\begin{align}
-  \crosshessian
-  &= \sum_{\k=1}^{\kmax - 1}
-         \evalat{\frac{\partial}{\partial \etanuk} \expect{\q(\nuk \vert \eta)}
-                {
-                \fracat{\partial \log \ptil(\nuk \vert \t)}{\partial \t}{\t = 0}
-                }}{\etaopt}.
-\eqlabel{sens_mixed_partial}
-\end{align}
-
-We approximate the expectation using GH quadrature (\appref{gh_quadrature}). In
-all the functional forms for $\t \mapsto \ptil(\nuk \vert \t)$ considered below,
-the derivative can be provided either analytically or computed with automatic
-differentiation.  The resulting GH approximation is a deterministic function of
-$\eta$, and thus the derivative in \eqref{sens_mixed_partial} can be computed
-with another application of automatic differentiation. Note that $\crosshessian$
-is sparse in \eqref{sens_mixed_partial}: it is zero for all entries of $\eta$
-other than those that parameterize the stick distributions.
-
-\subsection{A global and local factorization}
-
-To compute the local sensitivity in practice, we make use of a factorization
-common to all the models we will consider: the latent variables can be
-partitioned into a set of \textit{global} variables and a set of \textit{local}
-variables. The global variables are common to all data points, while the
-local variables are unique to each data point. In the GMM example
-(\exref{iris_bnp_process}), the global variables are $(\beta, \nu)$, while $\z$
-are local variables.
-
-Let $\gamma$ denote the collection of global latent variables and let $\etaglob$
-be their variational parameters. Similarly, let $\ell$ denote the local latent
-variables and let $\etalocal$ be the local variational parameters. Notice that
-because the local latent variables are unique to each data point, the dimension
-of $\etalocal$ scales with $\N$. The global parameter $\etaglob$ does not scale
-directly with $\N$---in the GMM example, $\etaglob$ scales only with $\kmax$.
+%%
+\noindent \textbf{Reducing to optimization over the global variational parameters.}
+We next show how to reduce the potentially high-dimensional optimization problem over all of
+$\eta$ to optimizing over just the global variational parameters $\etaglob$.
 
 In all models we will consider, the conditional posterior $\p(\z \vert
 \gamma,\x)$ has a tractable closed form.  Since we choose a conjugate mean field
-approximating family for $\q(\z \vert \eta)$, this implies that the optimal
+approximating family for $\q(\z \vert \eta)$, the optimal
 local variational parameters $\etaoptlocal$ can be written as a closed-form
-function of the global variational parameters $\etaglob$.  Let
+function of the global variational parameters $\etaglob$. Let
 $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping, so that
 %
 \begin{align}\eqlabel{local_eta_optim}
@@ -66,81 +37,26 @@ $\etaoptlocal(\eta_\gamma; \t)$ denote this mapping, so that
     \argmin_{\etalocal} \KL{(\eta_\gamma, \etalocal), \t}.
 \end{align}
 %
-When $\t=0$, we will simply write $\etaoptlocal(\etaglob; \t=0) =
-\etaoptlocal(\etaglob)$. The next example details this mapping for the Gaussian
-mixture model.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}[Optimality of $\etalocal$ in a GMM]\exlabel{qz_optimality}
-Recall that under our truncated variational approximation,
-the cluster assignment $\z_\n$ is a discrete random variable
-over $\kmax$ categories.
-
-Let $\eta_{\z_\n}$ be the categorical parameters in its exponential family
-natural parameterization. That is, we let $\eta_{\z_\n} = (\rho_{\n1},
-\rho_{\n2}, ..., \rho_{\n(\kmax-1)})$ be an unconstrained vector in
-$\mathbb{R}^{\kmax-1}$; in this parameterization, the assignment probabilities
-are
+%When $\t=0$, we will write $\etaoptlocal(\etaglob; \t=0) =
+%\etaoptlocal(\etaglob)$.
+In \exref{qz_optimality} (\appref{gmm_global_local_vb}), we illustrate with a Gaussian mixture model example.
 %
-\begin{align*}
-  p_{\n\k} := \expect{\q(\z_\n \vert \etaz)}{\z_{\n\k}} =
-  \frac{\exp(\rho_{\n\k})}{1 + \sum_{\k'=1}^{\kmax-1}\exp(\rho_{\n\k})}
-\end{align*}
-%
-We use the exponential family parameterization because we require the optimal
-variational parameters $\etaopt$ to be interior to $\etadom$ in
-\assuitemref{kl_opt_ok}{kl_opt_interior}.
-
-Fixing $\q(\beta\vert\etabeta)$ and $\q(\nu\vert\etanu)$,
-the optimal $\etaopt_{\z_\n}$ must satisfy
-%
-\begin{align*}
-& \q(\z_\n | \etaopt_{\z_\n}) \propto \exp\left(\tilde \rho_{\n\k}\right)\\
-& \mathwhere \tilde \rho_{\n\k} := \expect{\q(\beta, \nu \vert \eta)}
-       {\log\p(\x_n \vert \beta_\k) + \log \pi_\k}.
-\end{align*}
-%
-See \citet{bishop:2006:PRML} and \citet{blei:2017:vi_review} for details.
-To satisfy this optimality condition,
-we set the optimal $\etaopt_{\z_\n}$ to be
-%
-\begin{align*}
-%
-\etaopt_{\z_\n} = \left(\log\frac{\tilde\rho_{\n1}}{\tilde\rho_{\n\kmax}},
-\log\frac{\tilde\rho_{\n2}}{\tilde\rho_{\n\kmax}}, \ldots,
-\log\frac{\tilde\rho_{\n(\kmax-1)}}{\tilde\rho_{\n\kmax}}\right).
-%
-\end{align*}
-%
-Thus, as long as the expectations $\tilde\rho_{\n\k}$ can be provided
-as a closed-form function of
-$(\etabeta, \etanu)$, the optimal $\etaopt_{\z_\n}$ can be also be set in closed-form as
-a function of $(\etabeta, \etanu)$.
-%
-\end{ex}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The availability of the minimizer \eqref{local_eta_optim} in closed-form will be
-useful for both optimizing the variational parameters and for computing local
-sensitivity.  Using \eqref{local_eta_optim}, we can rewrite our objective as a
-function of the global parameters, which will aid in both optimization and
-derivative computations.  Define
+Using \eqref{local_eta_optim}, we can rewrite our objective as a
+function of the global parameters.  Define
 %
 \begin{align*}
 \KLglobal(\etaglob, \t) :=
     \mathrm{KL}\Big((\etaglob, \etaoptlocal(\etaglob; \t)), \t\Big).
 \end{align*}
 %
-The $\etaoptglob(\t)$ which minimizes $\KLglobal(\etaglob, \t)$ is the same as
+The $\etaoptglob(\t)$ that minimizes $\KLglobal(\etaglob, \t)$ is the same as
 the corresponding sub-vector of the $\etaopt(\t)$ that minimizes $\KL{\eta,
-\t}$.  Therefore we can use the objective function $\KLglobal(\etaglob, \t)$ as
-a numerical surrogate for $\KL{\eta, \t}$ when optimizing or computing
-derivatives.
+\t}$.  %Therefore we can use the objective function $\KLglobal(\etaglob, \t)$ as
+%a numerical surrogate for $\KL{\eta, \t}$ when optimizing or computing
+%derivatives.
 
-For example rather than optimizing the $\KL{\eta}$ over all variational
-parameters, we numerically optimize $\KLglobal$, which is a function only of the
+Rather than optimizing the $\KL{\eta}$ over all variational
+parameters then, we numerically optimize $\KLglobal$, which is a function only of the
 relatively low-dimensional global parameters.  To minimize $\KLglobal(\etaglob)$
 in practice, we run the BFGS algorithm with a loose convergence tolerance
 followed by trust-region Newton conjugate gradient
@@ -148,26 +64,18 @@ followed by trust-region Newton conjugate gradient
 the optimization terminates at an optimal $\etaoptglob$, the optimal local
 parameters $\etaoptlocal$ can be set in closed form to produce the entire vector
 of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
-%
-The construction of $\KLglobal$ will also play an important role in inverting
-the Hessian matrix for local sensitivity, which we now detail.
 
+\subsection{Computing and inverting the Hessian}
+Since the dimension $\etadim$ of $\eta$ scales with $N$, we can quickly reach cases where
+inverting or even instantiating a dense matrix of size $\etadim \times \etadim$ in memory
+would be prohibitive. The key to efficient computation is that $\hessopt$ is not dense; we will again exploit
+structure inherent in the global/local decomposition.
 
-\subsection{The Hessian inversion}
-
-Typically, it is the computation and inversion of the $\etadim \times
-\etadim$-dimensional Hessian matrix $\hessopt$ that is the most computationally
-intensive part of \eqref{vb_eta_sens}, especially when the dimension of $\eta$
-is large.  Recalling that the dimension of $\eta$ scales with $N$, it is easy to
-imagine how it may even be impossible to instantiate a dense representation of
-$\hessopt$ in memory.
-
-To efficiently invert $\hessopt$, we again take advantage the factorization into
-global and local variables. For generic variables $a$ and $b$, let
+For generic variables $a$ and $b$, let
 $\hess{ab}$ denote the sub-matrix $\evalat{\partial^2 \KL{\eta} / \partial
 \eta_a \eta_b^T}{\etaopt}$, the Hessian with respect to the variational
 parameters governing $a$ and $b$. We decompose the Hessian matrix $\hessopt$
-into four blocks according to the global / local decomposition:
+into four blocks according to the global/local decomposition:
 %
 \begin{align*}
 %
@@ -185,22 +93,19 @@ into four blocks according to the global / local decomposition:
 \end{align*}
 %
 Similarly, let $\crosshessian_\gamma$ be the components of $\crosshessian$
-corresponding to the variational parameters $\etaglob$.  For example,
-$\crosshessian_\gamma$ is given by replacing the operator $\partial / \partial
-\eta$ with $\partial / \partial \etaglob$ in \eqref{sens_mixed_partial}. The
-analogous quantity for the local parameters, $\crosshessian_\ell$, is zero,
-since no local variables enter the expectation in \eqref{sens_mixed_partial}
+corresponding to the variational parameters $\etaglob$.  The local components, $\crosshessian_\ell$, are zero
+since no local variables enter the expectation in \eqref{bnp_vb_crosshessian}
 when we are perturbing the stick-breaking distribution.
 %
-We can thus write
-\begin{align*}
-  \crosshessian = \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right).
+%We can thus write
+%\begin{align*}
+%  \crosshessian = \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right).
   %
-\end{align*}
+%\end{align*}
 
 In this notation,
 %
-\begin{align*}
+\begin{align} \eqlabel{global_local_derivative_breakdown}
 %
 \fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
 -\left(
@@ -211,27 +116,9 @@ In this notation,
 \right)^{-1}
 \left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right),
 %
-\end{align*}
+\end{align}
 %
-and an application of the Schur complement gives
-%
-\begin{align*}
-%
-\fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
--\left(\begin{array}{c}
-I_{\gamma\gamma} \\
-\hess{\ell\ell}^{-1} \hess{\ell\gamma}
-\end{array}\right)
-\left(\hess{\gamma\gamma} -
-      \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right)^{-1} \crosshessian_\gamma,
-%
-\end{align*}
-%
-where $I_{\gamma\gamma}$ is the identity matrix with
-the same dimension as $\eta_\gamma$.
-%
-Specifically, observe that the sensitivity of the global parameters
-is given by
+Applying the Schur complement and focusing on the global parameters (see \appref{more_hessian} for more details), we find
 %
 \begin{align}\eqlabel{global_sens}
   \fracat{d \etaopt_\gamma(\t)}{d \t}{t = 0} &=
@@ -241,157 +128,29 @@ is given by
         \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right),
 \end{align}
 %
-In our model, $\hess{\ell\ell}$ is sparse, and the size of $\hess{\gamma\gamma}$
-does not grow with $\N$. Thus, each term of $\hessopt_\gamma$ can be tractably
-computed, stored in  memory, and inverted, even on very large datasets.
+In our model, $\hess{\ell\ell}$ is \textcolor{red}{block diagonal}, and the size of $\hess{\gamma\gamma}$
+is relatively small. Thus, each term of $\hessopt_\gamma$ can be tractably
+computed, stored in memory, and inverted, even on very large datasets.
+While the Schur complement calculation is illustrative, we can get the same benefits directly from automatic differentiation; see \appref{more_hessian} for details.
 
-One can derive the exact same identity using the optimality of
-$\etaoptlocal(\eta_\gamma)$.  By applying the chain rule, one can
-verify that
-%
-\begin{align}\eqlabel{global_kl}
-\hessopt_{\gamma} &=
-    \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
-    \KLglobal(\etaopt_\gamma, 0).
-\end{align}
-%
-In practice, we evaluate $\hessopt_\gamma$ using automatic differentiation and
-\eqref{global_kl} rather than the Schur complement.
+In our BNP applications, it is not cost-effective to form and factorize
+$\hessopt$ in memory.  Instead, we numerically solve linear systems of the form
+$\hessopt^{-1} v$ using the conjugate gradient (CG) algorithm \citep[Chapter
+5]{nocedal:2006:numerical}, which requires only Hessian-vector products that
+are readily available through automatic differentiation.
 
-Using \eqref{global_sens}, we can compute a Taylor series for the
-global parameters only:
+%%
+\noindent \textbf{A linear approximation only in the global variational parameters}
+%
+With the tools above, we can separate out the linear approximation in the global parameters
+and then directly compute the local parameters. In particular,
+we compute
 %
 \begin{align}\eqlabel{global_lin_approx}
   \etalin_\gamma(\t) := \etaopt_\gamma +
   \fracat{d \etaopt_\gamma(\t)}{d \t}{\t=0} \t .
 \end{align}
 %
-When our function of interest $\g_{loc}$ depends on the full vector $\eta$,
-including the local parameters, we can again take advantage of the closed form
-of $\etaoptlocal(\etaglob)$, by redefining our quantity of interest as
-%
-\begin{align}\eqlabel{g_as_global}
-\g(\etaglob(\t)) :=
-    \g_{loc}\left(
-        \left(\etaglob(\t), \etaoptlocal(\etaglob; \t) \right) \right)
-\end{align}
-%
-By using \eqref{g_as_global} for our approximation, we both render the
-derivative computation easier, and retain nonlinearities in the map $\etaglob
-\mapsto \etaoptlocal(\etaglob; \t)$.  Finally, we note that the the left-hand
-side of \eqref{g_as_global} it, itself, a function of $\eta$, so discussion of
-general functions of interest (as in \secref{diffable_nonparametric,
-diffable_worst_case}, for example) apply equally well to $\g(\etaglob(\t))$
-as given by \eqref{g_as_global}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{ex}\exlabel{vb_insample_nclusters_globallocal}
-%
-In this example, we produce a version of \exref{vb_insample_nclusters_simple}
-that takes advantage of the global / local structure of the BNP problem. Let
-$\gclustersabbr(\eta)$ denote our variational approximation to
-$\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that $\p(\z_\n
-\vert \beta, \nu, \x)$ is available in closed form, we can then take
-%
-\begin{align*}
-%
-\gclustersabbr(\etaopt) :={}&
-    \expect{\q(\beta, \nu \vert\etaopt)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
-    }
-\\\approx{}&
-    \expect{\p(\beta, \nu \vert \x)}{
-        \expect{\p(\z \vert \beta, \nu, \x)}{\nclusters(\z)}
-    }
-    = \expect{\p(\z\vert\x)}{\nclusters(\z)} \Rightarrow \\
-%
-\gclustersabbr(\eta) ={}&
-    \sumkm \left(1 -  \prod_{\n=1}^\N
-        \left(1 - \expect{\q(\beta, \nu \vert \eta_\beta, \eta_\nu)}
-                    {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}
-                    \right)\right).
-%
-\end{align*}
-%
-In this way, $\gclustersabbr(\eta)$ depends only on $\eta_\beta$ and $\eta_\nu$,
-which are much lower-dimensional than $\eta_\z$, and retains nonlinearities in
-the map
-%
-\begin{align*}
-%
-\eta_\beta, \eta_\nu \mapsto \expect{\q(\beta, \nu \vert \eta_\beta,
-\eta_\nu)} {\expect{\p(\z_{\n} \vert \beta, \nu, \x)}{\z_{\n\k}}}.
-%
-\end{align*}
-%
-\end{ex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Amortization and solutions to linear systems}
-\seclabel{comp_amortization}
-
-When $\g(\eta)$ is scalar-valued and continuously differentiable, we can use
-\thmref{etat_deriv} (or, equivalently, \coryref{etafun_deriv_form}) to write
-%
-\begin{align}\eqlabel{dg_hess_product}
-%
-\nabla_\eta \g :={} \fracat{d g(\eta)}{ d \eta^T}{\etaopt}
-\mathand
-\fracat{d g(\etaopt(\t \phi))}{d \t}{0} ={}
-- \nabla_\eta \g^T \hessopt^{-1} \crosshessian.
-%
-\end{align}
-%
-As we discuss above, $\nabla_\eta \g$ and $\crosshessian$ are typically easy to
-compute, and most of the computational cost of computing the derivative
-is the solution of a linear system involving $\hessopt^{-1}$.  The
-prior perturbation $\ptil(\theta \vert \t)$ determines $\crosshessian$,
-and the quantity of interest determines $\nabla_\eta \g$.  Consequently,
-for a fixed prior perturbation, one can compute $\hessopt^{-1} \crosshessian$
-{\em only once}, and re-use this computation to quickly evaluate
-\eqref{dg_hess_product} for a large number of different quantities of interest.
-Conversely, for a fixed quantity of interest, one can compute
-$\hessopt^{-T} \nabla_\eta \g$ {\em only once}, and use the result
-in \eqref{dg_hess_product} to investigate a large number of different prior
-perturbations.
-%
-Indeed, the influence function result of \coryref{etafun_deriv_form}
-corroborates this observation, since the computation of $\infl(\theta)$ in
-\eqref{infl_defn} requires only $\hessopt^{-T} \nabla_\eta \g$, and summarizes
-the effect of all prior perturbations.
-%
-Further, in instances when $\hessopt$ can be formed and factorized in memory
-(e.g., using a Cholesky decomposition or QR factorization), then derivatives for
-any prior perturbation or functions of interest can be computed at little
-computational additional cost.
-
-In this sense, solving solutions to parts of \eqref{dg_hess_product}, either
-$\hessopt^{-1} \crosshessian$, $\hessopt^{-T} \nabla_\eta \g$, or a proxy for
-$\hessopt^{-1}$ itself, represents a high initial cost, which can be amortized
-over a large number of related quantities of interest.  Indeed, essentially the
-same computations can be re-used for related sensitivity measures, such as
-approximate cross-validation or the linear bootstrap \citep{giordano:2019:swiss,
-giordano:2017:linearboot}.  In contrast, repeated re-optimization incurs
-essentially the same cost for the evaluation of each new prior.
-
-In our BNP applications, it is not cost-effective to form and factorize
-$\hessopt$ in memory.  Instead, we numerically solve linear systems of the form
-$\hessopt^{-1} v$ using the conjugate gradient (CG) algorithm \citep[Chapter
-5]{nocedal:2006:numerical}, which requires only Hessian-vector products which
-are readily available through automatic differentiation.  However, we do take
-advantage of \eqref{dg_hess_product} when possible. In our applications in
-\secref{results}, the CG algorithm was at least an order of magnitude faster
-than refitting, and did not pose a meaningful bottleneck to exploring different
-perturbations.
-
-\Eqref{dg_hess_product} is used to construct the fully linear approximation
-$\glin(\t)$. It is not possible to amortize using $\hessopt^{-T} \nabla_\eta \g$
-when we use the approximation $\g(\etalin(\t))$, retaining nonlinearitites in
-the map $\eta \mapsto \g(\eta)$.  If we expect $\g(\etalin(\t))$ to be more
-accurate than $\glin(\t)$ (which make intuitive sense but is certainly not
-guaranteed), then the choice between using $\glin(\t)$ and $\g(\etalin(\t))$
-represents a choice between accuracy and computational efficiency.  In our
-experiments, it was always feasible to compute $\g(\etalin(\t))$ when evaluating
-particular prior perturbations, and so we report results for $\g(\etalin(\t))$.
+and then use $\etaoptlocal(\etaglob)$ e.g.\ in computing our quantity of interest.
+We give an example for the expected number of clusters in
+\appref{vb_insample_nclusters_example}.

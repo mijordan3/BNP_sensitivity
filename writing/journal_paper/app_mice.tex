@@ -1,4 +1,4 @@
-\subsection{The data}
+\subsubsection{The data}
 The data come from a publicly available data set of mice gene expression
 \citep{shoemaker:2015:ultrasensitive}.
 Our analysis focuses on mice treated with the ``A/California/04/2009'' strain.
@@ -7,7 +7,16 @@ We normalize the data as described in
 analysis tool EDGE \citep{Storey:2005:significance} to rank the genes from most to least significantly differentially expressed.
 We run our analysis on the top $\ngenes = 1000$ genes.
 
-\subsection{The B-spline basis}
+The left plot of \figref{example_genes}
+shows the measurements of a single gene over time.
+We model each gene as belonging to a latent component,
+where each component defines a smooth expression curve over time.
+Then, observations are drawn by adding i.i.d.\ noise to the smoothed
+curve along with a gene-specific offset.
+
+\MiceExampleGenes
+
+\subsubsection{The B-spline basis}
 Notice from \figref{example_genes}, which shows an example time-course for a single gene,
 that the time points are unevenly spaced, with more frequent observations at the beginning.
 Following \citet{Luan:2003:clustering} we use cubic B-splines to smooth the time course expression data.
@@ -28,7 +37,7 @@ the matrix $\tilde \regmatrix^T \tilde \regmatrix$ is nearly singular
 because the later time points are more spread out.
 The left column of \figref{example_genes} shows our basis functions.
 
-\subsection{The generative model}
+\subsubsection{The generative model}
 \eqref{mice_model} gives the per-component conditional likelihood.
 We use a normal prior for the shifts $\b_\n$,
 a multivariate normal prior for the coefficients $\mu_\k$,
@@ -39,7 +48,7 @@ are drawn from a multinomial with wieghts $\pi$, as usual.
 
 
 
-\subsection{The variational approximation}
+\subsubsection{The variational approximation}
 The variational approximation, factorizes as
 \begin{align*}
 \q(\zeta \vert \eta) =

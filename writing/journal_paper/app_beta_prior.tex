@@ -1,0 +1,17 @@
+In the iris experiment, we considered $\alpha\in[0.1, 4.0]$.
+Over this range, the shape of
+the $\betadist{1, \alpha}$ stick-breaking density varies considerably, as shown in
+\figref{beta_priors}.
+
+\BetaPriorsEx
+
+To help us understand the effect of the concentration parameter
+$\alpha$ we often use the following fact. Under the $\gem$ prior, the {\em a priori} expected
+number of distinct clusters in a dataset of size $N$ is given by
+%
+\begin{align}\eqlabel{prior_num_clusters}
+\expect{\p(\z \vert \pi)\p(\pi \vert \alpha)}{\nclusters(\z)} =
+\sum_{\n = 1}^\N \frac{\alpha}{\alpha + \n - 1}.
+\end{align}
+%
+See \citep[Equation 75]{jordan:2015:gentleintrodp}. \textcolor{red}{There's a much, much earlier citation for this. E.g.\ the original Blackwell MacQueen paper?}

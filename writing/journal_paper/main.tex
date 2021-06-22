@@ -128,11 +128,11 @@ Berkeley, CA 94720}
 
 \section{The model and variational approximation}
 \seclabel{model}
-    \subsection{Discrete Bayesian Nonparametric Model}
+    \subsection{A stick-breaking model for clustering}
     \seclabel{model_bnp}
     \input{model_bnp.tex}
 
-    \subsection{Variational Approximation}
+    \subsection{Variational approximation}
     \seclabel{model_vb}
     \input{model_vb.tex}
 
@@ -140,35 +140,20 @@ Berkeley, CA 94720}
     % \seclabel{model_taylor}
     % \input{model_space_of_priors.tex}
 
-
-\section{Differentiability of the VB optimum}
+\section{A local approximation for sensitivity}
 \seclabel{local_sensitivity}
-\input{diffable_intro}
+\input{local_sensitivity}
 
-    \subsection{Parametric prior perturbations}
-    \seclabel{diffable_parametric}
-    \input{diffable_parametric}
+\section{The influence function and worst-case functional perturbations}
+\seclabel{influence_function}
+\input{influence_function}
 
-    \subsection{Differentiability of BNP models with respect to $\alpha$}
-    \seclabel{diffable_concentration}
-    \input{diffable_concentration}
-
-    \subsection{Nonparametric prior perturbations}
-    \seclabel{diffable_nonparametric}
-    \input{diffable_nonparametric}
-
-    \subsection{Worst-case prior perturbations and Fr{\'e}chet differentiability}
-    \seclabel{diffable_worst_case}
-    \input{diffable_worst_case}
-
-    \subsection{Other nonparametric prior perturbations}
-    \seclabel{diffable_lp}
-    \input{diffable_lp}
-
-\section{Computing the sensitivity}\seclabel{computing_sensitivity}
+\section{Fast computation of the sensitivity}
+\seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
 
-\section{Experimental Results}\seclabel{results}
+\section{Experimental Results}
+\seclabel{results}
 \input{experiments_intro.tex}
 
     \subsection{Gaussian mixture modeling on iris data}
@@ -221,27 +206,87 @@ TODO: write this when the rest of the paper is done.
 
 \appendix
 
+% \section{Illustrative examples and review}
+% \seclabel{examples}
+% \input{examples}
+
+\section{General differentiability results}
+\applabel{diffable_intro}
+\input{diffable_intro}
+
+    \subsection{Parametric prior perturbations}
+    \applabel{diffable_parametric}
+    \input{diffable_parametric}
+
+    \subsection{Differentiability of BNP models with respect to $\alpha$}
+    \applabel{diffable_concentration}
+    \input{diffable_concentration}
+
+    \subsection{Nonparametric prior perturbations}
+    \applabel{diffable_nonparametric}
+    \input{diffable_nonparametric}
+
+    \subsection{Worst-case prior perturbations and Fr{\'e}chet differentiability}
+    \applabel{diffable_worst_case}
+    \input{diffable_worst_case}
+
+    \subsection{Other nonparametric prior perturbations}
+    \applabel{diffable_lp}
+    \input{diffable_lp}
+
 \section{Proofs}\applabel{proofs}
 \input{app_proofs.tex}
 
 \section{Positive Perturbations Are Counterintuitive}\applabel{positive_pert}
 \input{app_positive_perturbations.tex}
 
-\section{Evaluating stick expectations}\applabel{gh_quadrature}
+\section{Computational details}
+
+\subsection{The optimal local parameters}
+\applabel{gmm_global_local_vb}
+\input{app_global_local}
+
+\subsection{More details on computing and inverting the Hessian}
+\applabel{more_hessian}
+\input{app_hess_inversion}
+
+\subsection{Expressing $\g$ using global parameters only}
+\applabel{vb_insample_nclusters_example}
+\input{app_global_local_g}
+
+\subsection{Evaluating stick expectations}\applabel{gh_quadrature}
 \input{app_gh}
 
-\section{Regression mixture model details}\applabel{app_mice}
-\input{app_mice_vb}
+\subsection{Unconstrained variational parameterizations}
+\applabel{app_vb_unconstrained}
+\input{app_vb_unconstrained.tex}
 
-\section{fastSTRUCTURE model details}\applabel{app_structure}
-\input{app_structure}
+\section{Additional experiment details}
+\applabel{app_results}
+
+First, we review the Beta prior on the stick-breaking proportions,
+which are common to each model we considered.
+Then, we give some additional modeling details for each experiment.
+
+    \subsection{The Beta prior}
+    \applabel{app_beta_prior}
+    \input{app_beta_prior}
+
+    \subsection{Gaussian mixture modeling on iris data}
+    \applabel{app_iris}
+    \input{app_iris.tex}
+
+    \subsection{Regression mixture modeling}
+    \applabel{app_mice}
+    \input{app_mice.tex}
+
+    \subsection{fastSTRUCTURE}
+    \applabel{app_structure}
+    \input{app_structure}
+
 
 \section{fastSTRUCTURE supplemental results}\applabel{app_structure_results}
 \input{app_structure_results}
-
-\section{Unconstrained variational parameterizations}
-\applabel{app_vb_details}
-\input{app_vb_details}
 
 
 
