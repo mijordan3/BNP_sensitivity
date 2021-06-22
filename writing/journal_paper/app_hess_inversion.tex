@@ -1,0 +1,62 @@
+We fill in more details for the efficient computation of the Hessian outlined in
+\secref{computing_sensitivity}.
+
+We start from our formula in \eqref{global_local_derivative_breakdown}.
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
+-\left(
+\begin{array}{cc}
+   \hess{\gamma\gamma} & \hess{\gamma\ell} \\
+   \hess{\ell\gamma}     & \hess{\ell\ell} \\
+\end{array}
+\right)^{-1}
+\left( \begin{array}{c} \crosshessian_\gamma \\ 0 \end{array}\right),
+%
+\end{align*}
+%
+and an application of the Schur complement gives
+%
+\begin{align*}
+%
+\fracat{d \etaopt(\t)}{d \t}{t = 0} ={}&
+-\left(\begin{array}{c}
+I_{\gamma\gamma} \\
+\hess{\ell\ell}^{-1} \hess{\ell\gamma}
+\end{array}\right)
+\left(\hess{\gamma\gamma} -
+      \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right)^{-1} \crosshessian_\gamma,
+%
+\end{align*}
+%
+where $I_{\gamma\gamma}$ is the identity matrix with
+the same dimension as $\eta_\gamma$.
+%
+Specifically, observe that the sensitivity of the global parameters
+is given by
+%
+\begin{align*}
+  \fracat{d \etaopt_\gamma(\t)}{d \t}{t = 0} &=
+  - \hessopt_\gamma^{-1}\crosshessian_\gamma
+  \mathwhere
+  \hessopt_\gamma := \left(\hess{\gamma\gamma} -
+        \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right),
+\end{align*}
+%
+In our model, $\hess{\ell\ell}$ is sparse, and the size of $\hess{\gamma\gamma}$
+does not grow with $\N$. Thus, each term of $\hessopt_\gamma$ can be tractably
+computed, stored in  memory, and inverted, even on very large datasets.
+
+One can derive the exact same identity using the optimality of
+$\etaoptlocal(\eta_\gamma)$.  By applying the chain rule, one can
+verify that
+%
+\begin{align}\eqlabel{global_kl_hess}
+\hessopt_{\gamma} &=
+    \frac{\partial^2}{\partial\eta_\gamma\partial\eta_\gamma^T}
+    \KLglobal(\etaopt_\gamma, 0).
+\end{align}
+%
+In practice, we evaluate $\hessopt_\gamma$ using automatic differentiation and
+\eqref{global_kl_hess} rather than the Schur complement.

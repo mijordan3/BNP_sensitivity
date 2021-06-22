@@ -67,7 +67,7 @@ of optimal variational parameters $\etaopt = (\etaoptglob, \etaoptlocal)$.
 
 \subsection{Computing and inverting the Hessian}
 Since the dimension $\etadim$ of $\eta$ scales with $N$, we can quickly reach cases where
-inverting or even instantiating a dense matrix of size $\etadim \times \etadim$ in memory 
+inverting or even instantiating a dense matrix of size $\etadim \times \etadim$ in memory
 would be prohibitive. The key to efficient computation is that $\hessopt$ is not dense; we will again exploit
 structure inherent in the global/local decomposition.
 
@@ -137,7 +137,7 @@ In our BNP applications, it is not cost-effective to form and factorize
 $\hessopt$ in memory.  Instead, we numerically solve linear systems of the form
 $\hessopt^{-1} v$ using the conjugate gradient (CG) algorithm \citep[Chapter
 5]{nocedal:2006:numerical}, which requires only Hessian-vector products that
-are readily available through automatic differentiation. 
+are readily available through automatic differentiation.
 
 %%
 \noindent \textbf{A linear approximation only in the global variational parameters}
@@ -152,4 +152,5 @@ we compute
 \end{align}
 %
 and then use $\etaoptlocal(\etaglob)$ e.g.\ in computing our quantity of interest.
-We give an example for the expected number of clusters in \appref{vb_insample_nclusters_example}.
+We give an example for the expected number of clusters in
+\appref{vb_insample_nclusters_example}.

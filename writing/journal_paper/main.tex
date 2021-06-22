@@ -139,7 +139,7 @@ Berkeley, CA 94720}
     % \subsection{Robustness and the Taylor series approximation}
     % \seclabel{model_taylor}
     % \input{model_space_of_priors.tex}
-    
+
 \section{A local approximation for sensitivity}
 \seclabel{local_sensitivity}
 \input{local_sensitivity}
@@ -206,9 +206,9 @@ TODO: write this when the rest of the paper is done.
 
 \appendix
 
-\section{Illustrative examples and review}
-\seclabel{examples}
-\input{examples}
+% \section{Illustrative examples and review}
+% \seclabel{examples}
+% \input{examples}
 
 \section{General differentiability results}
 \applabel{diffable_intro}
@@ -240,8 +240,26 @@ TODO: write this when the rest of the paper is done.
 \section{Positive Perturbations Are Counterintuitive}\applabel{positive_pert}
 \input{app_positive_perturbations.tex}
 
-\section{Evaluating stick expectations}\applabel{gh_quadrature}
+\section{Computational details}
+
+\subsection{A global/local factorization}
+\applabel{gmm_global_local_vb}
+\input{app_global_local}
+
+\subsection{More details on computing and inverting the Hessian}
+\applabel{more_hessian}
+\input{app_hess_inversion}
+
+\subsection{Expressing $\g$ using global parameters only}
+\applabel{vb_insample_nclusters_example}
+\input{app_global_local_g}
+
+\subsection{Evaluating stick expectations}\applabel{gh_quadrature}
 \input{app_gh}
+
+\subsection{Unconstrained variational parameterizations}
+\applabel{app_vb_unconstrained}
+\input{app_vb_unconstrained.tex}
 
 \section{Additional experiment illustrations}
 \applabel{app_results}
@@ -267,10 +285,6 @@ We give some additional illustrations for each experiment.
 
 \section{fastSTRUCTURE supplemental results}\applabel{app_structure_results}
 \input{app_structure_results}
-
-\section{Unconstrained variational parameterizations}
-\applabel{app_vb_details}
-\input{app_vb_details}
 
 
 
