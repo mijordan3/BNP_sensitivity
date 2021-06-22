@@ -58,8 +58,7 @@ In this model, the component-specific parameters are $\beta_\k = (\mu_\k, \tau_\
 the regression coefficients and the inverse noise variance.
 The component frequencies are determined by stick-breaking according to $\nu$, and 
 cluster assignments $z$ are drawn as in \secref{model_bnp}.
-We use $\p(\nu_\k\vert\alpha_0) = \betadist{\nu_\k \vert 1, \alpha_0}$
-with $\alpha_0 = 6$ as the initial stick-breaking prior.
+
 %
 %The mixture weights $\pi$ and cluster assignments $\z$ are drawn from the
 %stick-breaking process described in \secref{model_bnp}.
@@ -182,11 +181,12 @@ perturbations that produce large changes in $\laplacianevsum$ will also produce 
 We first evaluate the sensitivity of the co-clustering matrix $\gcoclustering$
 to the choice of $\alpha$ in the stick-breaking prior.
 
+We start at $\alpha = \alpha_0 = 6$. 
 We use the linear approximation to extrapolate the co-clustering matrix
 under prior parameters
 $\alpha = 0.1$ and $\alpha = 12$.
 The a priori expected number of clusters in the original data at these values 
-is 2 and 50, respectively. \textcolor{red}{what is it at $\alpha_0$?}
+is 2 and 50, respectively. 
 %At $\alpha = alpha_pert1$, only two clusters are expected
 %{\em a priori} under the GEM prior;
 %at $\alpha = alpha_pert2$, more than fifty are expected.

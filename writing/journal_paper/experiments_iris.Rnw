@@ -24,8 +24,8 @@ max_enum_clust_pred <- max(alpha_sens_df_pred$n_clusters_refit)
 
 @
 
-We perform a clustering analysis of Fisher's iris data set \textcolor{red}{TODO: cite}. Here each 
-data point (with $N=50$ total points)
+We perform a clustering analysis of Fisher's iris data set \cite{anderson:1936:iris}. Here each 
+data point (with $N=150$ total points)
 represents $d=4$ measurements of a particular flower, from one of three
 iris species.
 We use a standard Gaussian mixture model with conjugate
