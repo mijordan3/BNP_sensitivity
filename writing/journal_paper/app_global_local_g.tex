@@ -18,7 +18,8 @@ when our quantity of interest is the in-sample expected posterior number of clus
 Let
 $\gclustersabbr(\eta)$ denote our variational approximation to
 $\expect{\p(\z\vert\x)}{\nclusters(\z)}$.   Using the fact that
-$\q(\z_\n \vert \etaopt_{\z_\n}) = \p(\z_\n\vert \beta, \nu, \x)$ is available in closed form, we can then take
+$\p(\z_\n\vert \beta, \nu, \x) = \q(\z_\n \vert \etaopt_{\z_\n})$
+is available in closed form, we can then take
 %
 \begin{align*}
 %
@@ -54,7 +55,7 @@ the map
 \end{ex}
 
 
-The mapping (\eqref{g_as_global}) can be constructed for any posterior quantity $\g$.
+The mapping \eqref{g_as_global} can be constructed for any posterior quantity $\g$.
 Therefore, linearizing the global parameters using \eqref{global_sens, global_lin_approx} is sufficient:
 we do not need to invert the full Hessian
 and linearize the entire set of variational parameters, global and local.

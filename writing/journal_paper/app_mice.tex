@@ -1,4 +1,4 @@
-\subsection{The data}
+\subsubsection{The data}
 The data come from a publicly available data set of mice gene expression
 \citep{shoemaker:2015:ultrasensitive}.
 Our analysis focuses on mice treated with the ``A/California/04/2009'' strain.
@@ -16,7 +16,7 @@ curve along with a gene-specific offset.
 
 \MiceExampleGenes
 
-\subsection{The B-spline basis}
+\subsubsection{The B-spline basis}
 Notice from \figref{example_genes}, which shows an example time-course for a single gene,
 that the time points are unevenly spaced, with more frequent observations at the beginning.
 Following \citet{Luan:2003:clustering} we use cubic B-splines to smooth the time course expression data.
@@ -37,7 +37,7 @@ the matrix $\tilde \regmatrix^T \tilde \regmatrix$ is nearly singular
 because the later time points are more spread out.
 The left column of \figref{example_genes} shows our basis functions.
 
-\subsection{The generative model}
+\subsubsection{The generative model}
 \eqref{mice_model} gives the per-component conditional likelihood.
 We use a normal prior for the shifts $\b_\n$,
 a multivariate normal prior for the coefficients $\mu_\k$,
@@ -48,7 +48,7 @@ are drawn from a multinomial with wieghts $\pi$, as usual.
 
 
 
-\subsection{The variational approximation}
+\subsubsection{The variational approximation}
 The variational approximation, factorizes as
 \begin{align*}
 \q(\zeta \vert \eta) =
