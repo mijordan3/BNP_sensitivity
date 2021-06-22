@@ -1,5 +1,6 @@
 Consider a standard Bayesian nonparametric generative model for clustering, with observed data $(x_n)_{n=1}^{N}$.
-We assume a countable infinity of latent components, with frequencies $\pi = (\pi_1, \pi_2, \ldots)$ such that $\forall \k, \pi_\k \in [0,1]$ and $\sum_{\k} \pi_\k = 1$. For the $n$th data point, let the vector $\z_\n = (\z_{\n1}, \z_{\n2}, \ldots)$ represent the assignment of the $\n$th data point to the $\k$th component when $\z_{\n\k} = 1$ and all other vector elements equal 0. We generate $\z_{\n\k} = 1$ with probability $\pi_\k$, i.i.d.\ across $\n$. To generate the $x_n$, we assume the $\k$th component is characterized by a component-specific parameter, $\beta_\k \in
+We assume a countable infinity of latent components, with frequencies $\pi = (\pi_1, \pi_2, \ldots)$ such that $\forall \k, \pi_\k \in [0,1]$ and $\sum_{\k} \pi_\k = 1$. For the $n$th data point, let the vector $\z_\n = (\z_{\n1}, \z_{\n2}, \ldots)$ represent the assignment of the $\n$th data point to the $\k$th component when $\z_{\n\k} = 1$ and all other vector elements equal 0. We generate $\z_{\n\k} = 1$ with probability $\pi_\k$, i.i.d.\ across $\n$. To generate the $x_n$, we assume the $\k$th component is characterized by a component-specific parameter,
+$\beta_\k \in
 \betadom \subseteq \mathbb{R}^{\betadim}$, and that a data point arising from component $k$ is generated as $\p(\x_n \vert \beta_\k)$. Then
 %
 $
@@ -8,7 +9,7 @@ $
     \prod_{k=1}^\infty \p(\x_n \vert \beta_\k)^{\z_{\n\k}}.
 %
 $
-The $\beta_\k$ in turn are generated i.i.d.\ from a prior $\pbetaprior(\beta_\k)$. For instance, in a Gaussian mixture model, $\beta_\k$ could be a vector describing the mean and covariance of a Gaussian distribution (e.g.\ as in \exref{iris_bnp_process} in \appref{gmm_example}).
+The $\beta_\k$ in turn are generated i.i.d.\ from a prior $\pbetaprior(\beta_\k)$. For instance, in a Gaussian mixture model, $\beta_\k$ could be a vector describing the mean and covariance of a Gaussian distribution.
 
 It remains to place a prior on the component frequencies $\pi$. We will focus on stick-breaking priors for $\pi$, so we first replace $\pi$ with a stick-breaking representation. Let $\nu = (\nu_1, \nu_2, \ldots)$ represent proportions: $\nuk \in [0, 1]$. Take
 \begin{align}\eqlabel{stick_breaking}
@@ -20,9 +21,9 @@ We then define a stick-breaking prior by placing a prior on the $\nuk$.
 Fix a density $\pstick(\cdot)$, with
 respect to the Lebesgue measure on $[0,1]$. We take $\nuk\iid\pstick(\nuk)$ across $\k$.
 An especially common choice of $\pstick$ is $\mathrm{Beta}(1, \alpha)$, with \emph{concentration parameter}
-$\alpha > 0$. With this choice, the 
+$\alpha > 0$. With this choice, the
 $\pi$ are distributed according to the size-biased atom weights of a Dirichlet process.
-This particular beta stick-breaking prior is often favored due to its convenient mathematical properties and ease of use in inference. 
+This particular beta stick-breaking prior is often favored due to its convenient mathematical properties and ease of use in inference.
 
 \noindent \textbf{Posterior quantities of interest.}
 In theory, with our generative model and observed data in hand, we can find the Bayesian posterior

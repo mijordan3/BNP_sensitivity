@@ -37,7 +37,7 @@ and is a first step before further downstream investigation.
 It is important, therefore, to ascertain the
 stability of the discovered clusters.
 
-The left plot of \figref{example_genes} in \appref{app_results_mice}
+The left plot of \figref{example_genes} in \appref{app_mice}
 shows the measurements of a single gene over time.
 We model each gene as belonging to a latent component,
 where each component defines a smooth expression curve over time.
@@ -50,7 +50,7 @@ Let $\x_\n\in\mathbb{R}^\ntimepoints$ be measurements of gene $\n$ at
 $\ntimepoints$ time points. Let $\regmatrix$ be the $\ntimepoints \times \d$
 B-spline regressor matrix, so that the $ij$-th entry of $\regmatrix$ is the
 $j$-th B-spline basis vector evaluated at the $i$-th time point. The right plot
-of \figref{example_genes} in \appref{app_results_mice} shows the B-spline basis.
+of \figref{example_genes} in \appref{app_mice} shows the B-spline basis.
 The distribution of the data
 arising from component $k$ is
 %
@@ -105,6 +105,22 @@ same cluster as gene $j$, given by
 \end{align*}
 \figref{gene_initial_coclustering} shows the inferred
 co-clustering matrix at $\alpha_0$.
+
+\newcommand{\MiceExampleGenes}{
+<<example_genes_cap>>=
+example_genes_cap <- paste(
+    "(Left) An example gene and its expression measured at 14 unique time points
+    with three biological replicates at each time point.
+     (Right) The cubic B-spline basis with 7 degrees of freedom,
+    along with three indicator functions for the last three time points,
+    $\\timeindx = 72, 120, 168$.")
+SetImageSize(aspect_ratio = 0.5 * base_aspect_ratio)
+@
+<<example_genes, cache=simple_cache, fig.show='hold', fig.cap=example_genes_cap>>=
+source("R_scripts/mice/example_gene.R", echo=knitr_debug, print.eval=TRUE)
+@
+}
+%
 
 \newcommand{\MiceSmoothers}{
 % moving this to appendix

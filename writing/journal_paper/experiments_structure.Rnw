@@ -112,7 +112,7 @@ latent populations, which we arbitrarily label as populations 1, 2, and 3
 (top panel of \figref{stru_func_sens}). The inferred admixture proportions generally
 correspond with geographic regions: Mbololo individuals are primarily population
 1; Ngangao individuals are primarily population 2; and Chawia individuals are a
-mixture of populations 1, 2, and 3 (\figref{stru_init_fit} in \appref{app_results_structure}).
+mixture of populations 1, 2, and 3 (\figref{stru_init_fit} in \appref{app_structure}).
 
 Notably, outlying admixtures among individuals from the same geographic region provide clues into the historical migration patterns of this species.
 For example,
@@ -242,6 +242,27 @@ SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
 source("R_scripts/structure/structure_fsens_admixture.R", echo=knitr_debug, print.eval=TRUE)
 @
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% figures going into the appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\StructureInitialFit}{
+<<stru_init_fit_cap>>=
+stru_init_fit_cap <- paste(
+    "The inferred individual admixtures at $\\alpha_0 = 3$.
+    Each vertical strip is an individual and each color
+    a latent population.
+    Lengths of colored segments represent the inferred admixture proportions.
+    Individuals are ordered by the geographic region from which they were sampled
+    (Mbololo, Ngangao, Yale, and Chawia).
+    In the text, we refer to the green, orange, and purple latent populations
+    as population 1, 2, and 3, respectively. ")
+SetImageSize(aspect_ratio = 0.6 * base_aspect_ratio)
+@
+<<stru_init_fit, cache=simple_cache, fig.show='hold', fig.cap=stru_init_fit_cap>>=
+out <- plot_initial_fit()
+out$p
+@
+}
 
 \newcommand{\StructureLimitationsA}{
 <<stru_lin_bad_example_cap>>=

@@ -29,7 +29,7 @@ data point (with $N=50$ total points)
 represents $d=4$ measurements of a particular flower, from one of three
 iris species.
 We use a standard Gaussian mixture model with conjugate
-Gaussian-Wishart prior for the component parameters (detailed in \appref{gmm_example})
+Gaussian-Wishart prior for the component parameters (detailed in \appref{app_iris})
 and a mean-field VB approximation
  with truncation parameter $\kmax = 15$.
 We consider two quantities of interest: (1) $\gclustersabbr$, the posterior expected
@@ -38,16 +38,16 @@ data points, and (2) $\gclusterspred$, the posterior predictive expected number 
 We set the base stick-breaking prior $\pbase(\nuk)$ to be the standard $\betadist{\nuk \vert 1,\alpha}$
 distribution with $\alpha = \alpha_0 = 2$.
 Under the base stick-breaking prior with $\alpha_0$, the posterior expected number of clusters
-matches the three iris species; see also \figref{iris_fit} in \appref{app_results_iris} for an illustration.
+matches the three iris species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
 
 %%
 \noindent \textbf{Sensitivity to the concentration parameter}
 We approximate the changes in the quantities of interest as $\alpha$ varies
 over $\alpha\in[0.1, 4.0]$, which corresponds to an a priori expected number of clusters
-among $N$ data points in $[1.5,15]$ (\appref{dp_cluster_growth}). 
+among $N$ data points in $[1.5,15]$ (\appref{app_beta_prior}). 
 Over this range, the shape of a $\betadist{1,\alpha}$
 density varies considerably, as shown in
-\figref{beta_priors} in \appref{app_results_iris}. 
+\figref{beta_priors} in \appref{app_beta_prior}. 
 
 <<iris_alpha_sens_cap>>=
 iris_alpha_sens_cap <- paste0(
@@ -148,3 +148,37 @@ compared to the other unit-norm perturbations in \figref{iris_fsens}.
 However, even with the worst-case perturbation---which results in an unreasonably shaped prior density---the change in $\gclustersabbr$
 is still small. We conclude that $\gclustersabbr$ appears
 to be a robust quantity for this model and dataset.
+
+
+%%%%%%%%%%
+% these figures are moved to the appendix 
+%%%%%%%%%%
+\newcommand{\BetaPriorsEx}{
+<<beta_priors_cap>>=
+beta_priors_cap <-
+  paste0("Probability density functions of $\\text{Beta}(1, \\alpha)$ ",
+         "distributions, under various $\\alpha$ considered for the ",
+         "iris data set.")
+SetImageSize(aspect_ratio = base_aspect_ratio * 0.5)
+@
+<<beta_priors, cache=simple_cache, fig.show='hold', fig.cap=beta_priors_cap>>=
+source('./R_scripts/iris/plot_beta_priors.R',
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+\newcommand{\IrisInitFit}{
+<<iris_fit_cap>>=
+iris_fit_cap <- paste0("The iris data in principal component space and
+                      GMM fit at $\\alpha = ",
+                      alpha0,
+                      "$. Colors denote inferred memberships and
+                      ellipses represent estimated covariances. ")
+SetImageSize(aspect_ratio = base_aspect_ratio,
+             image_width = 0.6)
+@
+<<iris_fit, cache=simple_cache, fig.show='hold', fig.cap=iris_fit_cap>>=
+source('./R_scripts/iris/iris_init_fit.R',
+       echo=knitr_debug, print.eval=TRUE)
+@
+}

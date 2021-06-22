@@ -7,6 +7,15 @@ We normalize the data as described in
 analysis tool EDGE \citep{Storey:2005:significance} to rank the genes from most to least significantly differentially expressed.
 We run our analysis on the top $\ngenes = 1000$ genes.
 
+The left plot of \figref{example_genes}
+shows the measurements of a single gene over time.
+We model each gene as belonging to a latent component,
+where each component defines a smooth expression curve over time.
+Then, observations are drawn by adding i.i.d.\ noise to the smoothed
+curve along with a gene-specific offset.
+
+\MiceExampleGenes
+
 \subsection{The B-spline basis}
 Notice from \figref{example_genes}, which shows an example time-course for a single gene,
 that the time points are unevenly spaced, with more frequent observations at the beginning.
