@@ -74,7 +74,7 @@ The map $\t \mapsto
 %
 \hessopt :={}& \fracat{\partial^2 \KL{\eta}}
                       {\partial \eta \partial \eta^T}
-                      {\eta = \etaopt}, 
+                      {\eta = \etaopt},
 \quad \lqgradbar{\zeta \vert \eta} :={}
     \lqgrad{\zeta \vert \eta} -
     \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}}, \\
@@ -105,7 +105,9 @@ Under differentiability and regularity conditions on a (generic, not just BNP) m
 
 \eqref{vb_eta_sens} requires computation of two terms: $\hessopt^{-1}$
 and  $\crosshessian$.  Typically, $\crosshessian$, which is a derivative of a
-variational expectation, is straightforward to evaluate \textcolor{red}{$< 1$ sentence more info here}.  Forming and inverting or
+variational expectation, is straightforward to evaluate: the requisite expectation is evaluated either
+in closed form or approximated numerically; then, in either case, an application of automatic
+differentiation provides the gradient. Forming and inverting or
 factorizing $\hessopt$ can present a challenge due to its high dimensionality. $\hessopt$ has dimensions
 $\etadim \times \etadim$, where $\etadim$ is the dimension of $\eta$. There are variational parameters in $\eta$ corresponding to each parameter $\z_\n$. Also, the truncation level $\kmax$ typically needs to grow with $N$ to keep pace with the growing number of clusters -- though this growth is sublinear. It follows from these observations that $\etadim$ can grow linearly with $N$ and thus become very large.  However, in many
 cases -- including our BNP problem here -- we can take advantage of model sparsity to
@@ -116,7 +118,7 @@ we are interested in a range of $t$ values (\secref{compute_time}).
 \noindent \textbf{More on accuracy and speed trade-offs in the Taylor series.}
 One might save even more compute time, though likely at the cost of some accuracy, by extending the approximation to $g$ as well.
 If the cost of computing $g(\etalin(t))$ is prohibitive and if $g(\eta)$ is itself continuously differentiable, we may employ an additional
-first-order expansion of $g$ to further approximate $g(\etalin(t))$. In all of our experiments, 
+first-order expansion of $g$ to further approximate $g(\etalin(t))$. In all of our experiments,
 computing $g(\etalin(t))$ is not prohibitive, so we do not employ this additional approximation.
 
 Finally, we note that even
