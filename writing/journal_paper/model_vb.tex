@@ -1,19 +1,23 @@
-To assess the sensitivity of a procedure in practice, we need to consider the approximate
-Bayesian inference algorithm used as well. Here we focus on a variational Bayes approximation
-due to \citet{blei:2006:vi_for_dp}.
+To assess the sensitivity of a procedure in practice, we need to consider the
+approximate Bayesian inference algorithm used as well. Here we focus on a
+variational Bayes approximation due to \citet{blei:2006:vi_for_dp}.
 
-Variational Bayes (VB) posits a class of tractable distributions over the model parameters and chooses the 
-element of this class that minimizes the reverse Kullback-Leibler (KL) divergence to the exact posterior. The KL divergence
-for a full Bayesian nonparametric posterior is not well-defined due the infinitude of parameters. One approach
-to extend VB to Dirichlet process stick-breaking models 
-assumes $\nu_\kmax = 1$ for all distributions in the variational class and some truncation level $\kmax$.
-Let $\zeta$ collect the first $\kmax - 1$ elements of $\nu$, the first $\kmax$ elements of $\beta$,
-and the first $\kmax$ elements of $\z_\n$ across $n$.
-In what follows, then, we effectively consider approximations to the posterior marginal $\p(\zeta \vert \x)$.
-By setting $\kmax$ sufficiently large, one can make this truncation as expressive as desired.
+Variational Bayes (VB) posits a class of tractable distributions over the model
+parameters and chooses the  element of this class that minimizes the reverse
+Kullback-Leibler (KL) divergence to the exact posterior. \todo{I think the KL
+divergence isn't well defined between the truncation and the truth, but I don't
+think that KL divergences are inherently ill-defined for infinite dimensional
+spaces.} One approach to apply VB to Dirichlet process stick-breaking models
+assumes $\nu_\kmax = 1$ for all distributions in the variational class and some
+truncation level $\kmax$. Let $\zeta$ collect the first $\kmax - 1$ elements of
+$\nu$, the first $\kmax$ elements of $\beta$, and the first $\kmax$ elements of
+$\z_\n$ across $n$. In what follows, then, we effectively consider the reverse
+KL divergence to the posterior marginal $\p(\zeta \vert \x)$. By setting $\kmax$
+sufficiently large, one can make this truncation as expressive as desired.
 
-Mean-field VB is a particularly popular VB variant where the tractable approximating distributions $\q$ factorize
-over the parameters. In our case, then, we allow approximations of the form
+Mean-field VB is a particularly popular VB variant where the tractable
+approximating distributions $\q$ factorize over the parameters. In our case,
+then, we allow approximations of the form
 %
 \begin{align}\eqlabel{vb_mf}
 %
@@ -24,19 +28,21 @@ over the parameters. In our case, then, we allow approximations of the form
 %
 \end{align}
 %
-where $\eta \in \etadom \subseteq
-\mathbb{R}^{\etadim}$ represents \emph{variational parameters} that determine the factors of
-the $\q$ distribution. When the observation likelihood $\p(\x_n \vert \beta_\k)$ is conditionally
-conjugate with the component-parameter prior $\pbetaprior(\beta_\k)$, no further assumptions
-are needed on the form of $\q(\beta_\k \vert \eta)$; one can show that it will
-take the form of the conjugate exponential family after the KL optimization ***cite.
-Similarly, when $\pstick$ is a beta distribution,
-no further assumptions are needed on $\q(\nuk \vert \eta)$; it will take a beta form ***cite.
-However, since we will consider non-beta forms of $\pstick$, we must specify a more generic
-approximation -- one that will work even when conditional conjugacy does not hold. To that end, we
-follow ***cite to first transform the $\nuk$ to a form that takes any real values and then use a Gaussian approximation.
-Define the logit-transformed stick-breaking
-proportions $\lnuk$:
+where $\eta \in \etadom \subseteq \mathbb{R}^{\etadim}$ represents
+\emph{variational parameters} that determine the factors of the $\q$
+distribution. When the observation likelihood $\p(\x_n \vert \beta_\k)$ is
+conditionally conjugate with the component-parameter prior
+$\pbetaprior(\beta_\k)$, no further assumptions are needed on the form of
+$\q(\beta_\k \vert \eta)$; one can show that it will take the form of the
+conjugate exponential family after the KL optimization
+\citep{blei:2017:vi_review}. Similarly, when $\pstick$ is a beta distribution,
+no further assumptions are needed on $\q(\nuk \vert \eta)$; it will take a beta
+form. However, since we will consider non-beta forms of $\pstick$, we must
+specify a more generic approximation -- one that will work even when conditional
+conjugacy does not hold. \todo{We are not following anyone here, the logit stick
+transform is our idea AFAIK.} To that end, we propose to first transform the
+$\nuk$ to a form that takes any real values and then use a Gaussian
+approximation. Define the logit-transformed stick-breaking proportions $\lnuk$:
 %
 \begin{align*}
   \lnu_\k := \log(\nu_\k) - \log(1 - \nu_\k)
@@ -45,13 +51,14 @@ proportions $\lnuk$:
 \end{align*}
 %
 We take $\q(\lnuk \vert \eta)$ to be a normal distribution, which induces a
-logit-normal distribution on $\nuk$. We approximate all resulting integrals
-over $\q(\lnuk \vert \eta)$, as in the KL objective for VB or in our later sensitivity calculations, with GH quadrature;
-see \appref{gh_quadrature} for details.
+logit-normal distribution on $\nuk$. We approximate all resulting integrals over
+$\q(\lnuk \vert \eta)$, as in the KL objective for VB or in our later
+sensitivity calculations, with GH quadrature; see \appref{gh_quadrature} for
+details.
 
-GH quadrature gives us an approximation, which we will call $\KL{\eta}$, to the full KL, $\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}$.
-We minimize that approximation
-to perform approximate posterior inference:
+GH quadrature gives us an approximation, which we will call $\KL{\eta}$, to the
+full KL, $\KL{\q(\zeta \vert \eta) || \p(\zeta \vert \x)}$. We minimize that
+approximation to perform approximate posterior inference:
 %
 \begin{align}
 %
@@ -66,15 +73,14 @@ to perform approximate posterior inference:
 %
 \end{align}
 %
-Our final approximation to the marginal posterior $\p(\zeta \vert \x)$
-is $\q(\zeta \vert \etaopt)$.
+Our final approximation to the marginal posterior $\p(\zeta \vert \x)$ is
+$\q(\zeta \vert \etaopt)$.
 
 %%
-\noindent \textbf{Posterior quantities of interest.}
-To approximate any functional of the exact posterior, we apply the equivalent functional to
-$\q(\zeta \vert \etaopt)$. For instance, the approximation to the posterior expected number of clusters
-among the
-$N$ observed data points is
+\noindent \textbf{Posterior quantities of interest.} To approximate any
+functional of the exact posterior, we apply the equivalent functional to
+$\q(\zeta \vert \etaopt)$. For instance, the approximation to the posterior
+expected number of clusters among the $N$ observed data points is
 %
 \begin{align} \eqlabel{num_clust_vb}
 %
@@ -86,11 +92,14 @@ $N$ observed data points is
 \end{align}
 %
 
-We will see examples in \secref{results} where our quantity of interest is
-(a) the expected posterior number of clusters in the observed data, (b) the expected posterior
-number of clusters in a new set of (as yet unobserved) data, (c) some
-aspect of a co-clustering matrix, or (d) the topic assignments of certain data points.
-In all of these cases, as in \eqref{num_clust_vb}, we can express our (approximate) posterior quantity of interest as some function $g$ of the optimized variational parameters $\etaopt$: $g(\etaopt)$.
+We will see examples in \secref{results} where our quantity of interest is (a)
+the expected posterior number of clusters in the observed data, (b) the expected
+posterior number of clusters in a new set of (as yet unobserved) data, (c) some
+aspect of a co-clustering matrix, or (d) the topic assignments of certain data
+points. In all of these cases, as in \eqref{num_clust_vb}, we can express our
+(approximate) posterior quantity of interest as some function $g$ of the
+optimized variational parameters $\etaopt$: $g(\etaopt)$.
 
-Once we have an (approximate) posterior quantity of interest, we can ask how this quantity would change -- and
-whether our substantive scientific conclusions would change -- if we had made reasonably different prior choices.
+Once we have an (approximate) posterior quantity of interest, we can ask how
+this quantity would change -- and whether our substantive scientific conclusions
+would change -- if we had made reasonably different prior choices.
