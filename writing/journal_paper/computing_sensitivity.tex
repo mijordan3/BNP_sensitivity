@@ -128,10 +128,12 @@ Applying the Schur complement and focusing on the global parameters (see \appref
         \hess{\gamma\ell} \hess{\ell\ell}^{-1} \hess{\ell\gamma}\right),
 \end{align}
 %
-In our model, $\hess{\ell\ell}$ is \textcolor{red}{block diagonal}, and the size of $\hess{\gamma\gamma}$
-is relatively small. Thus, each term of $\hessopt_\gamma$ can be tractably
-computed, stored in memory, and inverted, even on very large datasets.
-While the Schur complement calculation is illustrative, we can get the same benefits directly from automatic differentiation; see \appref{more_hessian} for details.
+In our model, $\hess{\ell\ell}$ is block diagonal, and the size of
+$\hess{\gamma\gamma}$ is relatively small. Thus, each term of $\hessopt_\gamma$
+can be tractably computed, stored in memory, and inverted, even on very large
+datasets. While the Schur complement calculation is illustrative, we can get the
+same benefits directly from automatic differentiation; see \appref{more_hessian}
+for details.
 
 In our BNP applications, it is not cost-effective to form and factorize
 $\hessopt$ in memory.  Instead, we numerically solve linear systems of the form
