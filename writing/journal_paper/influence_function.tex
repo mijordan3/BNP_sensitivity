@@ -58,7 +58,7 @@ continuously differentiable real-valued function of interest.  Define the
 \emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$:
 \todo{Check this!}
 %
-\begin{align} \eqlabel{infl_defn}
+\begin{align} \eqlabel{infl_defn_bnp}
 %
 \infl(\cdot) :={}&
     - \sum_{k=1}^{\kmax-1} \fracat{d g(\eta)}{ d \eta^T}{\etaopt} \hessopt^{-1}
@@ -72,7 +72,7 @@ replace $\qtil(\zeta \vert \eta)$ with just the factor of $\qtil$ for $\nu_k$.
 Then, if $\norminf{\phi} < \infty$, the map $\t \mapsto g(\etaopt(\t \phi))$ is
 continuously differentiable at $\t=0$ with derivative
 %
-\begin{align} \eqlabel{vb_eta_infl_sens}
+\begin{align} \eqlabel{vb_eta_infl_sens_bnp}
 %
 \fracat{d g(\etaopt(\t))}{d \t}{0} ={}&
     \int \infl(\nu_0) \phi(\nu_0) \mu(d\nu_0).
@@ -243,7 +243,7 @@ initial prior $\pbase$ to alternative $\palt$, that take the following form --
 with $\theta$ a parameter $\theta \in \thetadom \subseteq
 \mathbb{R}^{\thetadim}$ and $p \in [1, \infty)$:
 %
-\begin{align}\eqlabel{p_pert_simple}
+\begin{align}\eqlabel{p_pert_simple_bnp}
 %
 \ptil(\theta \vert \tp) :=
     \left((1 - \tp)\pbase(\theta)^{1/p} +
@@ -253,7 +253,7 @@ with $\theta$ a parameter $\theta \in \thetadom \subseteq
 %
 Again, let $\phi$ represent the perturbation size, now with:
 %
-\begin{align}\eqlabel{phi_lp_norm}
+\begin{align}\eqlabel{phi_lp_norm_bnp}
 %
 \phi(\theta \vert \palt, p) :={}
     \palt(\theta)^{1/p} - \pbase(\theta)^{1/p} \mathand
@@ -269,7 +269,7 @@ Our next theorem shows that the KL is discontinuous for $p < \infty$.
 Since Fr{\'e}chet differentiability implies continuity \citep[Proposition 4.8
 (d)]{zeidler:2013:functional}, \thmref{kl_discontinuous} implies that it is
 impossible to derive an analogue of \thmref{eta_phi_deriv} for perturbations of
-the form \eqref{p_pert_simple} with the norms \eqref{phi_lp_norm}.
+the form \eqref{p_pert_simple_bnp} with the norms \eqref{phi_lp_norm_bnp}.
 %
 \begin{thm}\thmlabel{kl_discontinuous_main}
 %

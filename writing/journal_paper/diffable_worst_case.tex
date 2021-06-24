@@ -60,32 +60,6 @@ map $\phi \mapsto \etaopt(\phi)$, which maps $L_\infty$ to
 $\mathbb{R}^\etadim$, admits a {\em uniformly good linear approximation}, i.e.,
 to be Fr{\'e}chet differentiable, as described in \defref{diffable_classes}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{defn}\deflabel{diffable_classes}
-    (Fr{\'e}chet differentiability,
-    \citep[Definition 4.5]{zeidler:2013:functional})
-%
-Let $B_1$ and $B_2$ denote Banach spaces, and let $\ball_1 \subseteq B_1$ define
-an open neighborhood of $\phi_0 \in B_1$.
-%
-A function $f: \ball_1 \mapsto B_2$ is {\em Fr{\'echet} differentiable} (also
-known as boundedly differentiable) at $\phi_0$ if there exists a  bounded linear
-operator, $f^{\mathrm{lin}}: B_1 \mapsto B_2$, such that
-%
-\begin{align*}
-%
-\lim_{t \rightarrow 0}
-    \sup_{\phi: \norm{\phi - \phi_0} = 1}
-    \frac{f(\phi) - f(\phi_0) -
-          f^{\mathrm{lin}}(t (\phi - \phi_0))
-         }{t} \rightarrow 0.
-%
-\end{align*}
-%
-\end{defn}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 By \citep[Proposition 4.8]{zeidler:2013:functional}, if a function is
 Fr{\'e}chet differentiable, then the linear operator $f^{\mathrm{lin}}$ is given
 precisely by the directional derivative $d f(t (\phi - \phi_0)) / d t$. Thus, if
