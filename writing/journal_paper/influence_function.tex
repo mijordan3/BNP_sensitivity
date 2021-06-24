@@ -231,13 +231,17 @@ and parameters with a VB posterior approximation, in \thmref{eta_phi_deriv}.
 %%
 \noindent \textbf{Many other functional perturbations and norms are not Fr{\'e}chet differentiable.}
 %
-So far we have focused on the multiplicative functional perturbations in \eqref{mult_perturbation} combined with the infinity
-norm in \eqref{infty_norm}. We now ask whether we could perform a similar analysis for other functional perturbations. We show that, of the perturbations proposed by \citet{gustafson:1996:local}, only
-multiplicative perturbations yield Fr{\'e}chet
-differentiable VB optima.
+So far we have focused on the multiplicative functional perturbations in
+\eqref{mult_perturbation} combined with the infinity norm in \eqref{infty_norm}.
+We now ask whether we could perform a similar analysis for other functional
+perturbations. We show that, of the perturbations proposed by
+\citet{gustafson:1996:local}, only multiplicative perturbations yield
+Fr{\'e}chet differentiable VB optima.
 
-Specifically, \citet{gustafson:1996:local} examines general perturbations, from initial prior
-$\pbase$ to alternative $\palt$, that take the following form -- with $\theta$ a parameter $\theta \in \thetadom \subseteq \mathbb{R}^{\thetadim}$ and $p \in [1, \infty)$:
+Specifically, \citet{gustafson:1996:local} examines general perturbations, from
+initial prior $\pbase$ to alternative $\palt$, that take the following form --
+with $\theta$ a parameter $\theta \in \thetadom \subseteq
+\mathbb{R}^{\thetadim}$ and $p \in [1, \infty)$:
 %
 \begin{align}\eqlabel{p_pert_simple}
 %
@@ -257,8 +261,9 @@ Again, let $\phi$ represent the perturbation size, now with:
 %
 \end{align}
 %
-The limit $p \rightarrow \infty$ recovers our multiplicative perturbation in \eqref{mult_perturbation}
-with infinity norm in \eqref{infty_norm}. The choice $p=0$ recovers a purely additive perturbation.
+The limit $p \rightarrow \infty$ recovers our multiplicative perturbation in
+\eqref{mult_perturbation} with infinity norm in \eqref{infty_norm}. The choice
+$p=0$ recovers a purely additive perturbation.
 
 Our next theorem shows that the KL is discontinuous for $p < \infty$.
 Since Fr{\'e}chet differentiability implies continuity \citep[Proposition 4.8
@@ -268,9 +273,10 @@ the form \eqref{p_pert_simple} with the norms \eqref{phi_lp_norm}.
 %
 \begin{thm}\thmlabel{kl_discontinuous_main}
 %
-Let $\mu$ denote a measure on $\thetadom$ that is absolutely continuous
-with respect to the Lebesgue measure, and let $\q(\theta)$ and
-$\pbase(\theta)$ denote densities with respect to $\mu$.  Without loss of
+\todo{Here and elsewhere, we must assert that $\mu$ satisfies
+\defref{prior_nl_pert}}. Let $\mu$ denote a measure on $\thetadom$ that is
+absolutely continuous with respect to the Lebesgue measure, and let $\q(\theta)$
+and $\pbase(\theta)$ denote densities with respect to $\mu$.  Without loss of
 generality, assume that $\q(\theta) > 0$ on $\thetadom$.  Assume that
 $\KL{\q(\theta) || \pbase(\theta)}$ is well-defined and finite.
 
@@ -284,7 +290,10 @@ See \appref{diffable_lp} for a proof.
 
 In light of the proof of \thmref{kl_discontinuous_main}, the limited
 expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
-\exref{beta_inf_norm}, looks like a feature rather than a bug.
+\exref{beta_inf_norm}, \todo{If we leave this in, \exref{beta_inf_norm}
+needs to be in the main text.  Right now the main text does not discuss
+the limited expressiveness of $\linf$ perturbations.}
+looks like a feature rather than a bug.
 % The KL divergence that defines a variational objective cannot handle
 % prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
 % considers such densities to be ``distant'' from $\pbase$, whereas the

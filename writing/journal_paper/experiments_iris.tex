@@ -8,30 +8,32 @@
 
 
 
-We perform a clustering analysis of Fisher's iris data set \cite{anderson:1936:iris}. Here each 
-data point (with $N=150$ total points)
-represents $d=4$ measurements of a particular flower, from one of three
-iris species.
-We use a standard Gaussian mixture model with conjugate
-Gaussian-Wishart prior for the component parameters (detailed in \appref{app_iris})
-and a mean-field VB approximation
- with truncation parameter $\kmax = 15$.
-We consider two quantities of interest: (1) $\gclustersabbr$, the posterior expected
-number of clusters among the $N$ observed
-data points, and (2) $\gclusterspred$, the posterior predictive expected number of clusters in $N$ new (i.e.\ as-yet-unseen) data points.
-We set the base stick-breaking prior $\pbase(\nuk)$ to be the standard $\betadist{\nuk \vert 1,\alpha}$
-distribution with $\alpha = \alpha_0 = 2$.
-Under the base stick-breaking prior with $\alpha_0$, the posterior expected number of clusters
-matches the three iris species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
+We perform a clustering analysis of Fisher's iris data set
+\cite{anderson:1936:iris}. Here each  data point (with $N=150$ total points)
+represents $d=4$ measurements of a particular flower, from one of three iris
+species. We use a standard Gaussian mixture model with conjugate
+Gaussian-Wishart prior for the component parameters (detailed in
+\appref{app_iris}) and a mean-field VB approximation with truncation parameter
+\todo{Do we want to make it clear that $\gclustersabbr$ is not the same as
+the example given in \secref{model_vb}, but rather the version that linearizes
+only the global parameters?}
+$\kmax = 15$. We consider two quantities of interest: (1) $\gclustersabbr$, the
+posterior expected number of clusters among the $N$ observed data points, and
+(2) $\gclusterspred$, the posterior predictive expected number of clusters in
+$N$ new (i.e.\ as-yet-unseen) data points. We set the base stick-breaking prior
+$\pbase(\nuk)$ to be the standard $\betadist{\nuk \vert 1,\alpha}$ distribution
+with $\alpha = \alpha_0 = 2$. Under the base stick-breaking prior with
+$\alpha_0$, the posterior expected number of clusters matches the three iris
+species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
 
 %%
 \noindent \textbf{Sensitivity to the concentration parameter}
 We approximate the changes in the quantities of interest as $\alpha$ varies
 over $\alpha\in[0.1, 4.0]$, which corresponds to an a priori expected number of clusters
-among $N$ data points in $[1.5,15]$ (\appref{app_beta_prior}). 
+among $N$ data points in $[1.5,15]$ (\appref{app_beta_prior}).
 Over this range, the shape of a $\betadist{1,\alpha}$
 density varies considerably, as shown in
-\figref{beta_priors} in \appref{app_beta_prior}. 
+\figref{beta_priors} in \appref{app_beta_prior}.
 
 
 \begin{knitrout}
@@ -49,7 +51,7 @@ density varies considerably, as shown in
 
 \Figref{iris_alpha_sens} compares our linear approximation to ground truth
 on the two quantities of interest as $\alpha$ varies.
- Over this range of $\alpha$, the posterior expected number of clusters in the observed data 
+ Over this range of $\alpha$, the posterior expected number of clusters in the observed data
  is quite robust; it remains nearly constant at three.
  The posterior predictive expected
 number of clusters in $N$ new data points is less robust; it ranges roughly from 3.0 to 5.6 expected
@@ -60,7 +62,7 @@ is centered.
 %%
 \noindent \textbf{Sensitivity to functional perturbations.}
 Insensitivity of the expected number of clusters $\gclustersabbr$ to $\alpha$ does
-not rule out sensitivity to other prior perturbations. 
+not rule out sensitivity to other prior perturbations.
 We now check how our approximation fares for the multiplicative perturbations in \eqref{mult_perturbation}.
 We consider perturbations $\phi$ that are Gaussian bumps in logit stick space, with each
 perturbation centered at a different location on the real line.  Each row of
@@ -98,7 +100,7 @@ shows the changes produced by the $\phi$ perturbation for that row.
 We see that our approximation captures the qualitative behavior of the exact
 changes.
 
-We also see in this example that we can use the influence function to 
+We also see in this example that we can use the influence function to
 predict the effect of functional changes to the stick-breaking prior.
 In the leftmost column, we plot the influence function in the logit space in purple.
 According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
@@ -143,7 +145,7 @@ to be a robust quantity for this model and dataset.
 
 
 %%%%%%%%%%
-% these figures are moved to the appendix 
+% these figures are moved to the appendix
 %%%%%%%%%%
 \newcommand{\BetaPriorsEx}{
 
