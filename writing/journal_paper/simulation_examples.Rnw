@@ -8,7 +8,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 knitr_debug <- FALSE # Set to true to see error output
-cache <- TRUE # Set to true to cache knitr output for this analysis.
+cache <- FALSE # Set to true to cache knitr output for this analysis.
 r_script_dir <- "./R_scripts/"
 source("R_scripts/initialize.R", echo=FALSE)
 source("R_scripts/plotting_utils.R")
@@ -101,10 +101,29 @@ fig_cap <- paste("Two densities which are distant according to KL divergence and
                  "$\\norminf{\\cdot}$ but close according to $\\norm{\\cdot}_p$ ",
                  "for $p \\in [1, \\infty)$.",
                  sep="")
-SetImageSize(aspect_ratio=0.6 * base_aspect_ratio, image_width=1.0)
+#SetImageSize(aspect_ratio=0.6 * base_aspect_ratio, image_width=1.0)
+SetImageSize(aspect_ratio=base_aspect_ratio, image_width=1.0)
 @
 <<func_dist, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
 source(file.path(r_script_dir, 'simple_examples/distant_distributions.R'),
+       echo=knitr_debug, print.eval=TRUE)
+@
+}
+
+
+
+\newcommand{\LinfExamplesFig}{
+<<linf_examples_cap>>=
+fig_cap1 <- paste0("An multiplicative ball $\\ball_\\phi(\\delta)$.")
+fig_cap2 <- paste0("Two densities which are distant according to KL divergence and ",
+                   "$\\norminf{\\cdot}$ but close according to $\\norm{\\cdot}_p$ ",
+                   "for $p \\in [1, \\infty)$.")
+fig_cap <- paste0("Left two figures: ", fig_cap1,  "  Right figure: ", fig_cap2)
+#SetImageSize(aspect_ratio=0.6 * base_aspect_ratio, image_width=1.0)
+SetImageSize(aspect_ratio=0.4 * base_aspect_ratio, image_width=1.0)
+@
+<<linf_examples, cache=cache, fig.show='hold', fig.cap=fig_cap>>=
+source(file.path(r_script_dir, 'simple_examples/linf_examples.R'),
        echo=knitr_debug, print.eval=TRUE)
 @
 }
