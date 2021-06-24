@@ -1,5 +1,15 @@
-In this section, we show how to find worst-case functional perturbations to the stick form. In particular, we start by motivating an $\infty$-norm to measure the size of a functional perturbation $\phi$. We then show how to compute an influence function to summarize the effect of different choices of $\phi$. We prove that, for multiplicative perturbations and the $\infty$-norm, the linear approximation is uniformly good. Finally, we show that this uniformly good approximation is unique among many alternative choices of functional perturbation.
+In this section, we show how to find worst-case functional perturbations to the
+stick form. In particular, we start by  to motivating an norm measuring the size
+of a functional perturbation $\phi$. We then show how to compute an influence
+function to summarize the effect of different choices of $\phi$. We prove that,
+for multiplicative perturbations and the $\infty$-norm, the linear approximation
+is uniformly good. Finally, we show that this uniformly good approximation is
+unique among many alternative choices of functional perturbation.
 
+\todo{Given our sufficient condition for differentiability requires
+$\norminf{\phi} < \infty$, and that you might reasonably ask after
+\eqref{mult_perturbation} whether you always get valid priors, should this not
+be moved earlier?}
 %%
 \noindent \textbf{An infinity norm.}
 First, we define $\norminf{\cdot}$ and a corresponding ball.
@@ -9,29 +19,44 @@ Let $\mu$ be a probability measure on $[0,1]$. Then
 	\quad \ball_\phi(\delta) := \left\{ \phi: \norminf{\phi} <
 \delta \right\}.
 \end{equation}
-We check in \lemref{pert_invariance} in \appref{diffable_nonparametric} that $\norminf{\cdot}$ is, in fact, a norm, that it does not depend on the choice of $\mu$, and that functional perturbations with $\norminf{\phi} < \infty$ yield valid priors.  \textcolor{red}{if $\mu$ represents a distribution with the same support as Lebesgue, this not-depending on $\mu$ part could be true. or more generally, if you make sure all the $\mu$ choices have the same support. but i don't think it's true as stated. you could have $\mu_1$ uniform on [0,0.5] and $\mu_2$ uniform on [0.5,1] and that clearly depends on $\mu$}
+%
+As in \citep{gustafson:1996:marginal}, we check in \lemref{pert_invariance} in
+\appref{diffable_nonparametric} that $\norminf{\cdot}$ is, in fact, a norm, that
+it does not depend on the choice of $\mu$, and that functional perturbations
+with $\norminf{\phi} < \infty$ yield valid priors. \todo{Make sure this works
+with the corrected \defref{prior_nl_pert} }
 
 The set of priors that arise by considering functional perturbations $\phi \in
-\ball_\phi(\delta)$ live in a multiplicative band around the original
-prior, $\pbase$, as shown in \figref{func_ball}. Although
-\lemref{pert_invariance} proves that every $\phi$ with $\norminf{\phi}$ is a
-valid prior, the converse is not true. For instance, perturbing the beta stick-breaking form
-by changing $\alpha$ provides a counterexample; see \exref{beta_inf_norm} for more details.
+\ball_\phi(\delta)$ live in a multiplicative band around the original prior,
+$\pbase$, as shown in \figref{func_ball}. Although \lemref{pert_invariance}
+proves that every $\phi$ with $\norminf{\phi}$ is a valid prior, the converse is
+not true. For instance, perturbing the beta stick-breaking form by changing
+$\alpha$ provides a counterexample; see \exref{beta_inf_norm} for more details.
 
 \FunctionBallFig{}
 
 %%
 \noindent \textbf{The influence function.}
-Next we define the influence function $\infl$ and discuss its usefulness for understanding the effect of functional perturbations $\phi$.
+%
+Next we define the influence function $\infl$ and discuss its usefulness for
+understanding the effect of functional perturbations $\phi$.
 
-\textcolor{red}{TODO: similar to discussion above: in next result, since we're restricting the BNP model here, can we reduce the assumption load?}
-\textcolor{red}{TODO: original text says we don't need to use linear approx in g, but current form of result below and in appendix uses that approx. we'll want to square this.}
+\todo{TODO: similar to discussion above: in next result, since we're restricting
+the BNP model here, can we reduce the assumption load?
+\par\vspace{1em}
+The concerns are identical to that of \thmref{bnp_deriv}, I think, so we
+can just refer back.
+}
+%
 \begin{cor}\corylabel{etafun_deriv_form_stick}
 %
-Let \assuref{kl_opt_ok,
-exchange_order_q} in \appref{diffable_nonparametric} hold. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
+Under the conditions of \thmref{bnp_deriv},
+% Let \assuref{kl_opt_ok,
+% exchange_order_q} in \appref{diffable_nonparametric} hold.
+let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
-\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$: \textcolor{red}{Check this!}
+\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$:
+\todo{Check this!}
 %
 \begin{align} \eqlabel{infl_defn}
 %
@@ -56,20 +81,38 @@ continuously differentiable at $\t=0$ with derivative
 \end{cor}
 %
 \begin{proof}
-We establish and prove a similar but much more general form of the influence function for mean-field VB approximations with general choices of model and parameters in \coryref{etafun_deriv_form} in \appref{diffable_nonparametric}. We derive the special case here from that general form in \exref{infl_univariate}.
+%
+\todo{I think this just follows by re-writing \thmref{bnp_deriv}, both
+in the specific and general case.  We can just say that.}
+%
+We establish and prove a similar but much more general form of the influence
+function for mean-field VB approximations with general choices of model and
+parameters in \coryref{etafun_deriv_form} in \appref{diffable_nonparametric}. We
+derive the special case here from that general form in \exref{infl_univariate}.
+%
 \end{proof}
 
-Although we will shortly use the influence function to find the formal worst-case choice of $\phi$, we
-can also use the influence function to informally choose influential prior perturbations. In our experiments
-in \secref{results}, we show how to do this by choosing $\phi$ that align with particularly high-magnitude positive or negative values of the influence function; this alignment will ensure a large positive or negative gradient and hence a large change.
+Although we will shortly use the influence function to find the formal
+worst-case choice of $\phi$, we can also use the influence function to
+informally choose influential prior perturbations. In our experiments in
+\secref{results}, we show how to do this by choosing $\phi$ that align with
+particularly high-magnitude positive or negative values of the influence
+function; this alignment will ensure a large positive or negative gradient and
+hence a large change.
+
+\todo{TODO: original text says we don't need to use linear approx in g, but
+current form of result below and in appendix uses that approx. we'll want to
+square this.}
 
 %%
 \noindent \textbf{Worst-case functional perturbations.}
 %
-With \coryref{etafun_deriv_form_stick} in hand, we can find the worst-case choice of $\phi \in \ball_\phi(\delta)$.
-First, our next result shows how to find the VB analogue of \citet[Result
-11]{gustafson:1996:local}. Second, we justify using the influence function for finding the worst case
-by establishing uniform quality of the linear approximation.
+With \coryref{etafun_deriv_form_stick} in hand, we can find the worst-case
+choice of $\phi \in \ball_\phi(\delta)$. First, our next result shows how to
+find the VB analogue of \citet[Result 11]{gustafson:1996:local}. Second, we
+justify using the influence function for finding the worst case by establishing
+uniform quality of the linear approximation for sufficiently small
+$\ball_\phi(\delta)$.
 
 \begin{cor}\corylabel{etafun_worst_case_stick}
 \begin{align*}
@@ -87,30 +130,36 @@ $\phi^*(\cdot) = \delta \, \mathrm{sign}\left(\infl(\cdot)\right)$.
 %
 \begin{proof}
 %
-We establish a similar but much more general result for mean-field VB approximations with general choices of model and parameters in \coryref{etafun_worst_case}. The present result is a special case using \exref{infl_univariate}.
+\todo{As with the influence funciton, this specific result follows directly
+from Holder, and I think we can just say that.}
+%
+We establish a similar but much more general result for mean-field VB
+approximations with general choices of model and parameters in
+\coryref{etafun_worst_case}. The present result is a special case using
+\exref{infl_univariate}.
 %
 \end{proof}
 
 To justify using linear approximations to explore the unit ball
 $\ball_\phi(\delta)$ and find the worst case, we require a stronger result than
-\coryref{etafun_deriv_form}. In particular, \coryref{etafun_deriv_form}
-states only that, for a {\em particular} direction $\phi$, $\t \mapsto
-\etaopt(\t)$ is continuously differentiable.  Since $\t \phi \in
-\ball_\phi(\t \norminf{\phi})$, we have only that, for a fixed $\phi$,
-one can make $\t$ sufficiently small so that the error $\abs{\etaopt(\t) -
-\etalin(\t)}$ goes to zero faster than $\t$. But we can write $\etaopt(\t\phi)$ and $\etalin(\t \phi)$ 
-to make the dependence on $\phi$ explicit. Then \coryref{etafun_deriv_form} does not imply
-that, for a fixed $\delta$ (no matter how small), the worst-case error
-$\sup_{\phi \in \ball_\phi(\delta)} \abs{\etaopt(\phi) - \etalin(\phi)}$ is
-bounded, much less that it goes to zero faster than $\delta$.
+\coryref{etafun_deriv_form}. In particular, \coryref{etafun_deriv_form} states
+only that, for a {\em particular} direction $\phi$, $\t \mapsto \etaopt(\t)$ is
+continuously differentiable.  Since $\t \phi \in \ball_\phi(\t \norminf{\phi})$,
+we have only that, for a fixed $\phi$, one can make $\t$ sufficiently small so
+that the error $\abs{\etaopt(\t) - \etalin(\t)}$ goes to zero faster than $\t$.
+But we can write $\etaopt(\t\phi)$ and $\etalin(\t \phi)$ to make the dependence
+on $\phi$ explicit. Then \coryref{etafun_deriv_form} does not imply that, for a
+fixed $\delta$ (no matter how small), the worst-case error $\sup_{\phi \in
+\ball_\phi(\delta)} \abs{\etaopt(\phi) - \etalin(\phi)}$ is bounded, much less
+that it goes to zero faster than $\delta$.
 
-To be able to apply \coryref{etafun_worst_case} to find the worst-case perturbation $\phi$, 
-we need to establish that the approximation is sufficiently good over all $\phi$ of interest.
-Observe that $\phi$ is a member of the Banach
+To be able to apply \coryref{etafun_worst_case} to find the worst-case
+perturbation $\phi$, we need to establish that the approximation is sufficiently
+good over all $\phi$ of interest. Observe that $\phi$ is a member of the Banach
 space $L_\infty$ \citep[Theorem 5.2.1]{dudley:2018:real}.  We require that the
-map $\phi \mapsto \etaopt(\phi)$, which maps $L_\infty$ to
-$\mathbb{R}^\etadim$, admits a uniformly good linear approximation.
-Fr{\'e}chet differentiability, defined next, will allow us to accomplish this goal.
+map $\phi \mapsto \etaopt(\phi)$, which maps $L_\infty$ to $\mathbb{R}^\etadim$,
+admits a uniformly good linear approximation. Fr{\'e}chet differentiability,
+defined next, will allow us to accomplish this goal.
 
 \begin{defn}\deflabel{diffable_classes}
     (Fr{\'e}chet differentiability,
@@ -157,22 +206,33 @@ pathological behavior.
 Finally, then, we prove that our perturbation here is Fr{\'e}chet differentiable.
 \begin{thm}\thmlabel{eta_phi_deriv_stick}
 %
-Let \assuref{kl_opt_ok, exchange_order_q} hold. \textcolor{red}{Same question as above: can we get rid of appendix assumptions or have a fast summary in main text?} Then the map $\phi \mapsto
-\etaopt(\phi)$ is well-defined and continuously Fr{\'e}chet differentiable in a
-neighborhood of $0$ as a map from $\linf$ to $\mathbb{R}^\etadim$, with the
-derivative given in \coryref{etafun_deriv_form}.
+Let \assuref{kl_opt_ok, exchange_order_q} hold.
+%
+\todo{Same question as above: can we get rid of appendix assumptions or have a
+fast summary in main text?
+\par\vspace{1em}
+Now that I see how things are being used, I think it suffices to assume that we
+use the VB approximation of \secref{model_vb} and that $\norminf{\phi} <
+\infty$.  I don't see a way around stating \assuref{kl_opt_ok} though.
+}
+%
+Then the map $\phi \mapsto \etaopt(\phi)$ is well-defined and continuously
+Fr{\'e}chet differentiable in a neighborhood of $0$ as a map from $\linf$ to
+$\mathbb{R}^\etadim$, with the derivative given in \coryref{etafun_deriv_form}.
 \end{thm}
 %
 \begin{proof}
-Again, our result here is a special case of the general result, across models and parameters with a VB posterior approximation, in 
-\thmref{eta_phi_deriv}.
+%
+Again, our result here is a special case of the general result, across models
+and parameters with a VB posterior approximation, in \thmref{eta_phi_deriv}.
+%
 \end{proof}
 
 %%
 \noindent \textbf{Many other functional perturbations and norms are not Fr{\'e}chet differentiable.}
 %
 So far we have focused on the multiplicative functional perturbations in \eqref{mult_perturbation} combined with the infinity
-norm in \eqref{infty_norm}. We now ask whether we could perform a similar analysis for other functional perturbations. We show that, of the perturbations proposed by \citet{gustafson:1996:local}, only 
+norm in \eqref{infty_norm}. We now ask whether we could perform a similar analysis for other functional perturbations. We show that, of the perturbations proposed by \citet{gustafson:1996:local}, only
 multiplicative perturbations yield Fr{\'e}chet
 differentiable VB optima.
 
@@ -197,7 +257,7 @@ Again, let $\phi$ represent the perturbation size, now with:
 %
 \end{align}
 %
-The limit $p \rightarrow \infty$ recovers our multiplicative perturbation in \eqref{mult_perturbation} 
+The limit $p \rightarrow \infty$ recovers our multiplicative perturbation in \eqref{mult_perturbation}
 with infinity norm in \eqref{infty_norm}. The choice $p=0$ recovers a purely additive perturbation.
 
 Our next theorem shows that the KL is discontinuous for $p < \infty$.
@@ -252,7 +312,3 @@ non-robust to priors that ablate mass nearly to zero.  No parameterization of
 the space of priors will relieve this non-robustness.  Only by basing
 variational approximations on divergences other than KL will this non-robustness
 be alleviated.
-
-
-
-
