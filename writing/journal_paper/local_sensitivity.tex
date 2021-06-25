@@ -79,38 +79,45 @@ will show in \thmref{bnp_deriv} below, a simple sufficient condition for
 differentiability is given in terms of the following norm on the perturbation
 $\phi$.
 
-\noindent \textbf{An infinity norm.}
+%\noindent \textbf{An infinity norm.}
 %First, we define $\norminf{\cdot}$ and a corresponding ball.
-Let $\mu$ be a probability measure on $[0,1]$. Then
+%Let $\mu$ be a probability measure on $[0,1]$. Then
 \begin{equation} \eqlabel{infty_norm}
-	\norminf{\phi} := \esssup_{\nu_0 \sim \mu} \abs{\phi(\nu_0)},
+    \textrm{Define }
+	\norminf{\phi} := \esssup_{\nu_0 \sim \pbase} \abs{\phi(\nu_0)}
+    \textrm{ and }
 	\quad \ball_\phi(\delta) := \left\{ \phi: \norminf{\phi} <
 \delta \right\}.
 \end{equation}
 %
-In \thmref{bnp_deriv}, we show that $\t \mapsto \etaopt(\t)$ is continuously
+\Thmref{bnp_deriv} below states that $\t \mapsto \etaopt(\t)$ is continuously
 differentiable whenever $\norminf{\phi} < \infty$.  So, for sufficiently smooth
-$g$, we expect the approximation \eqref{taylor_series_t} to be good for small
-$t$ when $\norminf{\phi} < \infty$. The $\norminf{\cdot}$ norm has further
-connections to multiplicative perturbations, as discussed in
-\citep{gustafson:1996:marginal} and later in \secref{influence_function}.
+$\g$, we expect the approximation \eqref{taylor_series_t} to be good for small
+$\t$, given a particular choice of $\phi$ with $\norminf{\phi} < \infty$.
+%
+Futhermore, we show in \lemref{pert_invariance} of
+\appref{diffable_nonparametric} that functional perturbations with
+$\norminf{\phi} < \infty$ yield valid priors.   \Secref{influence_function}
+below contains a more detailed investigation of the consequences of  using the
+norm $\norminf{\cdot}$ to measure the size of a perturbation $\phi$.
 
-We next provide some additional justification for why this particular functional
-perturbation is useful. Note first that if we consider any other distribution
-$\palt$ for $\pstick$, we can continuously warp $\pbase$ to $\palt$ by setting
-$\phi(\cdot) = \log \left( \palt(\cdot) / \pbase(\cdot) \right)$ so long as
-$\palt \ll \pbase$, i.e.\ $\palt$ is absolutely continuous with respect to
-$\pbase$. Moreover, we will see in \secref{influence_function} that we can
-compute an \emph{influence function} to provide an interpretable summary of the
-effect of arbitrary changes $\phi$ and also find a worst-case $\phi$ in
-$\ball_\phi(\delta)$. Second, while the perturbations above are essentially
-multiplicative relative to $\pbase$, one might wonder whether additive
-perturbations (subject to renormalization) or other perturbations would work
-instead; indeed \citet{gustafson:1996:local} proposes a number of alternative
-perturbations. We show in \secref{influence_function} that, among a class of
-potential functional perturbations, the one we consider here is the only one
-that is {\em Fr{\'e}chet differentiable} -- and thus can be used to safely
-reason about worst-case $\phi$.
+We next provide some additional justification for why the functional
+perturbation given in \eqref{mult_perturbation} is useful. Note first that if we
+consider any other distribution $\palt$ for $\pstick$, we can continuously warp
+$\pbase$ to $\palt$ by setting $\phi(\cdot) = \log \left( \palt(\cdot) /
+\pbase(\cdot) \right)$ so long as $\palt \ll \pbase$, i.e.\ $\palt$ is
+absolutely continuous with respect to $\pbase$. Moreover, we will see in
+\secref{influence_function} that we can compute an \emph{influence function} to
+provide an interpretable summary of the effect of arbitrary changes $\phi$ and
+also find a worst-case $\phi$ in $\ball_\phi(\delta)$. Second, while the
+perturbations above are essentially multiplicative relative to $\pbase$, one
+might wonder whether additive perturbations (subject to renormalization) or
+other perturbations would work instead; indeed \citet{gustafson:1996:local}
+proposes a number of alternative perturbations. We show in
+\secref{influence_function} that, among a class of potential functional
+perturbations, the one we consider here is the only one that is {\em Fr{\'e}chet
+differentiable} -- and thus can be used to safely reason about worst-case
+$\phi$.
 
 %%
 \noindent \textbf{Computing the terms in the Taylor series.}  It remains to show
@@ -146,34 +153,9 @@ Assume that:
 %
 \end{assu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% First observe that
-% we can write the $\alpha$ perturbation using the same notation as the stick-form
-% perturbation by setting $t = \alpha - \alpha_0$. Then, as before, let
-% $\ptil(\cdot \vert \t)$ be the corresponding (potentially unnormalized)
-% distribution on a stick-breaking parameter, and let $\etaopt(t)$ be the value of
-% $\etaopt$ for $\ptil(\cdot \vert \t)$. It follows that the concentration
-% parameter perturbation is also given by \eqref{taylor_series_t}. Whether we
-% perturb the concentration parameter or stick-breaking form, $\etaopt(0)$ is the
-% VB optimum for the original, unperturbed problem, and $1-0$ is trivial to
-% compute. It remains to provide a formula for the derivative
-% $\fracat{d\etaopt(t)}{dt}{\t=0}$.
 %
-% \todo{Something may be confusing to the reader here.  We have observed that the
-% $\alpha$ perturbation could have been represented with a particular choice of
-% $\phi$.  Now we are suggesting replacing $\alpha$ with $\t$. We should be clear
-% that we are not suggesting using the functional parameterization for all
-% hyperparameter perturbations.  The two happen to be equivalent in this case
-% because the beta prior is log-linear in $\alpha$, but in general, the two
-% parameterizations are not equivalent.}
-
 Our next result gives differentiability as well as a computable formula for the
 derivative.
-% In what follows,
-% we write $\qtil$ for a potentially unnormalized (but normalizable) approximation
-% distribution; as with $\ptil$ and $\p$, we again assume $\q$ is the normalized
-% form of $\qtil$.
 %
 \begin{thm}\thmlabel{bnp_deriv}
 %

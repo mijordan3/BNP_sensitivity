@@ -6,10 +6,6 @@ for multiplicative perturbations and the $\infty$-norm, the linear approximation
 is uniformly good. Finally, we show that this uniformly good approximation is
 unique among many alternative choices of functional perturbation.
 
-\todo{Given our sufficient condition for differentiability requires
-$\norminf{\phi} < \infty$, and that you might reasonably ask after
-\eqref{mult_perturbation} whether you always get valid priors, should this not
-be moved earlier?}
 % %
 % \noindent \textbf{An infinity norm.}
 % First, we define $\norminf{\cdot}$ and a corresponding ball.
@@ -20,18 +16,9 @@ be moved earlier?}
 % \delta \right\}.
 % \end{equation}
 % %
-As in \citep{gustafson:1996:marginal}, we check in \lemref{pert_invariance} in
-\appref{diffable_nonparametric} that $\norminf{\cdot}$ is, in fact, a norm, that
-it does not depend on the choice of $\mu$, and that functional perturbations
-with $\norminf{\phi} < \infty$ yield valid priors. \todo{Make sure this works
-with the corrected \defref{prior_nl_pert} }
-
 The set of priors that arise by considering functional perturbations $\phi \in
 \ball_\phi(\delta)$ live in a multiplicative band around the original prior,
-$\pbase$, as shown in \figref{linf_examples}. Although \lemref{pert_invariance}
-proves that every $\phi$ with $\norminf{\phi}$ is a valid prior, the converse is
-not true. For instance, perturbing the beta stick-breaking form by changing
-$\alpha$ provides a counterexample; see \exref{beta_inf_norm} for more details.
+$\pbase$, as shown in \figref{linf_examples}.
 
 \LinfExamplesFig{}
 
@@ -65,9 +52,9 @@ continuously differentiable real-valued function of interest.  Define the
         \lqgradbark{\cdot \vert \etaopt}
         \qk(\cdot \vert \etaopt),
 %
-\end{align}
-where $\lqgradbark{\cdot \vert \etaopt}$ and $\qk(\cdot \vert \etaopt)$
-replace $\qtil(\zeta \vert \eta)$ with just the factor of $\qtil$ for $\nu_k$.
+\end{align} where $\lqgradbark{\cdot \vert \etaopt}$ and $\qk(\cdot \vert
+\etaopt)$ replace $\q(\zeta \vert \eta)$ with just the factor of $\q$ for
+$\nu_k$.
 %
 Then, if $\norminf{\phi} < \infty$, the map $\t \mapsto g(\etaopt(\t \phi))$ is
 continuously differentiable at $\t=0$ with derivative
@@ -287,6 +274,13 @@ $\abs{\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}} > M$.
 \end{thm}
 %
 See \appref{diffable_lp} for a proof.
+
+Although
+\lemref{pert_invariance} of \appref{diffable_nonparametric} proves that every
+$\phi$ with $\norminf{\phi}$ is a valid prior, the converse is not true. For
+instance, perturbing the beta stick-breaking form by changing $\alpha$ provides
+a counterexample; see \exref{beta_inf_norm} for more details. \todo{Make sure
+this works with the corrected \defref{prior_nl_pert} }
 
 In light of the proof of \thmref{kl_discontinuous_main}, the limited
 expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
