@@ -72,7 +72,7 @@ $\alpha$ case above:
 g(\etaopt(\t)) \approx g(\etalin(\t)).
 %
 \end{align}
-
+%
 As in the $\alpha$ case, \eqref{taylor_series_t} is useful only if the map $t
 \mapsto \etaopt(t)$ is continuously differentiable for the chosen $\phi$.  As we
 will show in \thmref{bnp_deriv} below, a simple sufficient condition for
@@ -90,31 +90,41 @@ $\phi$.
 \delta \right\}.
 \end{equation}
 %
-\Thmref{bnp_deriv} below states that $\t \mapsto \etaopt(\t)$ is continuously
-differentiable whenever $\norminf{\phi} < \infty$.  So, for sufficiently smooth
-$\g$, we expect the approximation \eqref{taylor_series_t} to be good for small
-$\t$, given a particular choice of $\phi$ with $\norminf{\phi} < \infty$.
-%
-Futhermore, we show in \lemref{pert_invariance} of
-\appref{diffable_nonparametric} that functional perturbations with
-$\norminf{\phi} < \infty$ yield valid priors.   \Secref{influence_function}
-below contains a more detailed investigation of the consequences of  using the
-norm $\norminf{\cdot}$ to measure the size of a perturbation $\phi$.
+The set of priors that arise by considering functional perturbations $\phi \in
+\ball_\phi(\delta)$ live in a multiplicative band around the original prior,
+$\pbase$, as shown in \figref{linf_examples}.  \Thmref{bnp_deriv} below states
+that $\t \mapsto \etaopt(\t)$ is continuously differentiable whenever
+$\norminf{\phi} < \infty$.  So, for sufficiently smooth $\g$, we expect the
+approximation \eqref{taylor_series_t} to be good for small $\t$, given a
+particular choice of $\phi$ with $\norminf{\phi} < \infty$.
 
 We next provide some additional justification for why the functional
 perturbation given in \eqref{mult_perturbation} is useful. Note first that if we
 consider any other distribution $\palt$ for $\pstick$, we can continuously warp
 $\pbase$ to $\palt$ by setting $\phi(\cdot) = \log \left( \palt(\cdot) /
 \pbase(\cdot) \right)$ so long as $\palt \ll \pbase$, i.e.\ $\palt$ is
-absolutely continuous with respect to $\pbase$. Moreover, we will see in
-\secref{influence_function} that we can compute an \emph{influence function} to
-provide an interpretable summary of the effect of arbitrary changes $\phi$ and
-also find a worst-case $\phi$ in $\ball_\phi(\delta)$. Second, while the
-perturbations above are essentially multiplicative relative to $\pbase$, one
-might wonder whether additive perturbations (subject to renormalization) or
-other perturbations would work instead; indeed \citet{gustafson:1996:local}
-proposes a number of alternative perturbations. We show in
-\secref{influence_function} that, among a class of potential functional
+absolutely continuous with respect to $\pbase$.
+%
+However, restricting to $\norminf{\phi} < \infty$ limits the kinds of
+alternative priors $\palt$ that can be formed using \eqref{mult_perturbation}.
+We show in \lemref{pert_invariance} of \appref{diffable_nonparametric} that
+functional perturbations with $\norminf{\phi} < \infty$ yield valid priors.
+However, the converse is not true. For instance, perturbing the beta
+stick-breaking form by changing $\alpha$ provides a counterexample; see
+\exref{beta_inf_norm} of \appref{diffable_nonparametric} for more details.
+\todo{Make sure this works with the corrected \defref{prior_nl_pert} }
+
+Next, we will see in \secref{influence_function} that we can compute an
+\emph{influence function} to provide an interpretable summary of the effect of
+arbitrary changes $\phi$.  Using the influence function and the
+$\norminf{\cdot}$ norm, we are able to find a worst-case $\phi$ in
+$\ball_\phi(\delta)$.
+
+Finally, while the perturbations above are essentially multiplicative relative
+to $\pbase$, one might wonder whether additive perturbations (subject to
+renormalization) or other perturbations would work instead; indeed
+\citet{gustafson:1996:local} proposes a number of alternative perturbations. We
+show in \secref{influence_function} that, among a class of potential functional
 perturbations, the one we consider here is the only one that is {\em Fr{\'e}chet
 differentiable} -- and thus can be used to safely reason about worst-case
 $\phi$.

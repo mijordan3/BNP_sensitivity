@@ -16,34 +16,20 @@ unique among many alternative choices of functional perturbation.
 % \delta \right\}.
 % \end{equation}
 % %
-The set of priors that arise by considering functional perturbations $\phi \in
-\ball_\phi(\delta)$ live in a multiplicative band around the original prior,
-$\pbase$, as shown in \figref{linf_examples}.
-
-\LinfExamplesFig{}
-
 %%
 \noindent \textbf{The influence function.}
 %
 Next we define the influence function $\infl$ and discuss its usefulness for
 understanding the effect of functional perturbations $\phi$.
-
-\todo{TODO: similar to discussion above: in next result, since we're restricting
-the BNP model here, can we reduce the assumption load?
-\par\vspace{1em}
-The concerns are identical to that of \thmref{bnp_deriv}, I think, so we
-can just refer back.
-}
+\todo{The experiments use $\mathbb{R}$ as the space, not $[0,1]$.  So it
+would be good to be explicit about the densitites.}
 %
 \begin{cor}\corylabel{etafun_deriv_form_stick}
 %
-Under the conditions of \thmref{bnp_deriv},
-% Let \assuref{kl_opt_ok,
-% exchange_order_q} in \appref{diffable_nonparametric} hold.
-let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
+Under the conditions of \thmref{bnp_deriv}, with $\norminf{\phi} < \infty$ and
+$\varepsilon = \t$, let $\g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
-\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$:
-\todo{Check this!}
+\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$: \todo{Check this!}
 %
 \begin{align} \eqlabel{infl_defn_bnp}
 %
@@ -56,26 +42,24 @@ continuously differentiable real-valued function of interest.  Define the
 \etaopt)$ replace $\q(\zeta \vert \eta)$ with just the factor of $\q$ for
 $\nu_k$.
 %
-Then, if $\norminf{\phi} < \infty$, the map $\t \mapsto g(\etaopt(\t \phi))$ is
-continuously differentiable at $\t=0$ with derivative
+Then the derivative \eqref{bnp_vb_eta_sens} can be written as
 %
 \begin{align} \eqlabel{vb_eta_infl_sens_bnp}
 %
-\fracat{d g(\etaopt(\t))}{d \t}{0} ={}&
-    \int \infl(\nu_0) \phi(\nu_0) \mu(d\nu_0).
+\fracat{d \g(\etaopt(\t))}{d \t}{0} ={}&
+    \int_0^1 \infl(\nu_0) \phi(\nu_0) d\nu_0.
 %
 \end{align}
 \end{cor}
 %
 \begin{proof}
 %
-\todo{I think this just follows by re-writing \thmref{bnp_deriv}, both
-in the specific and general case.  We can just say that.}
-%
-We establish and prove a similar but much more general form of the influence
-function for mean-field VB approximations with general choices of model and
-parameters in \coryref{etafun_deriv_form} in \appref{diffable_nonparametric}. We
-derive the special case here from that general form in \exref{infl_univariate}.
+The form of the influence function is given by gathering terms in
+\eqref{bnp_vb_eta_sens} and re-writing the variational expectation as an
+integral over $[0,1]$. We establish an analogous general result for mean-field
+VB approximations in \coryref{etafun_deriv_form} of
+\appref{diffable_nonparametric}, specializing to the BNP case in
+\exref{infl_univariate} of \appref{diffable_nonparametric}.
 %
 \end{proof}
 
@@ -87,15 +71,16 @@ particularly high-magnitude positive or negative values of the influence
 function; this alignment will ensure a large positive or negative gradient and
 hence a large change.
 
-\todo{TODO: original text says we don't need to use linear approx in g, but
-current form of result below and in appendix uses that approx. we'll want to
-square this.}
-
 %%
 \noindent \textbf{Worst-case functional perturbations.}
 %
 With \coryref{etafun_deriv_form_stick} in hand, we can find the worst-case
-choice of $\phi \in \ball_\phi(\delta)$. First, our next result shows how to
+choice of $\phi \in \ball_\phi(\delta)$.
+
+\LinfExamplesFig{}
+
+
+First, our next result shows how to
 find the VB analogue of \citet[Result 11]{gustafson:1996:local}. Second, we
 justify using the influence function for finding the worst case by establishing
 uniform quality of the linear approximation for sufficiently small
@@ -274,13 +259,6 @@ $\abs{\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}} > M$.
 \end{thm}
 %
 See \appref{diffable_lp} for a proof.
-
-Although
-\lemref{pert_invariance} of \appref{diffable_nonparametric} proves that every
-$\phi$ with $\norminf{\phi}$ is a valid prior, the converse is not true. For
-instance, perturbing the beta stick-breaking form by changing $\alpha$ provides
-a counterexample; see \exref{beta_inf_norm} for more details. \todo{Make sure
-this works with the corrected \defref{prior_nl_pert} }
 
 In light of the proof of \thmref{kl_discontinuous_main}, the limited
 expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
