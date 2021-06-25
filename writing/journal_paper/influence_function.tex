@@ -85,6 +85,9 @@ establishing uniform quality of the linear approximation for sufficiently small
 $\ball_\phi(\delta)$.
 
 \begin{cor}\corylabel{etafun_worst_case_stick}
+%
+Under the conditions of \coryref{etafun_deriv_form_stick},
+%
 \begin{align*}
 %
 \sup_{\phi \in \ball_\phi(\delta)}
@@ -186,9 +189,9 @@ with the derivative given in \coryref{etafun_deriv_form}. \end{thm}
 %
 \begin{proof}
 %
-Our result here is a special case of the general result, across models and
-parameters with a VB posterior approximation, in \thmref{eta_phi_deriv}
-of \appref{diffable_worst_case}.
+Our result here is a special case of a general result for VB approximations
+based on KL divergence given in \thmref{eta_phi_deriv} of
+\appref{diffable_worst_case}.
 %
 \end{proof}
 
@@ -237,12 +240,11 @@ the form \eqref{p_pert_simple_bnp} with the norms \eqref{phi_lp_norm_bnp}.
 %
 \begin{thm}\thmlabel{kl_discontinuous_main}
 %
-\todo{Here and elsewhere, we must assert that $\mu$ satisfies
-\defref{prior_nl_pert}}. Let $\mu$ denote a measure on $\thetadom$ that is
-absolutely continuous with respect to the Lebesgue measure, and let $\q(\theta)$
-and $\pbase(\theta)$ denote densities with respect to $\mu$.  Without loss of
-generality, assume that $\q(\theta) > 0$ on $\thetadom$.  Assume that
-$\KL{\q(\theta) || \pbase(\theta)}$ is well-defined and finite.
+Let $\mu$ denote a measure on $\thetadom$ that is absolutely continuous with
+respect to the Lebesgue measure, and let $\q(\theta)$ and $\pbase(\theta)$
+denote densities with respect to $\mu$.  Without loss of generality, assume that
+$\q(\theta) > 0$ on $\thetadom$.  Assume that $\KL{\q(\theta) ||
+\pbase(\theta)}$ is well-defined and finite.
 
 Then, for any $\epsilon > 0$ and any $M > 0$, we can find a density
 $\palt(\theta)$ such that $\norm{\phi(\theta \vert \palt, p)}_p < \epsilon$ but
@@ -251,13 +253,14 @@ $\abs{\KL{q(\theta) || \palt(\theta)} - \KL{q(\theta) || \pbase(\theta)}} > M$.
 \end{thm}
 %
 See \appref{diffable_lp} for a proof.
+% \thmref{kl_discontinuous}
 
-In light of the proof of \thmref{kl_discontinuous_main}, the limited
-expressiveness of the $\norminf{\cdot}$ norm, as demonstrated in
-\exref{beta_inf_norm}, \todo{If we leave this in, \exref{beta_inf_norm}
-needs to be in the main text.  Right now the main text does not discuss
-the limited expressiveness of $\linf$ perturbations.}
-looks like a feature rather than a bug.
+Recall from \secref{local_sensitivity} (and \exref{beta_inf_norm} of
+\appref{diffable_nonparametric}) that there exist priors that cannot be formed
+from \eqref{mult_perturbation} using $\phi$ with $\norminf{\phi} < \infty$. In
+light of the proof of \thmref{kl_discontinuous_main}, the limited expressiveness
+of multiplicative perturbations with the $\norminf{\cdot}$ norm looks like a
+feature rather than a bug.
 % The KL divergence that defines a variational objective cannot handle
 % prior densities that are too close to zero.  The $\norminf{\cdot}$ norm
 % considers such densities to be ``distant'' from $\pbase$, whereas the
