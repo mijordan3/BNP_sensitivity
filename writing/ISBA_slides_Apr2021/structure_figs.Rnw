@@ -38,16 +38,37 @@ initial_fit$p +
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % alpha sensitivity for structure
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\StructureAlphaTreshZero}{
+\newcommand{\StructureAlphaTreshZeroRefit}{
 <<structure_alphasens_size>>=
 SetImageSize(aspect_ratio=0.5 * base_aspect_ratio)
 @
-<<structure_alphasens0, cache=cache, fig.show='hold'>>=
+<<structure_alphasens00, cache=cache, fig.show='hold'>>=
 set_to_na <- function(x, bool_vec){
   x[bool_vec] <- NA
   return(x)
 }
 
+# the initial figure with threshold = 0 and refit ONLY
+alpha_sens_df %>% 
+  rename(t = alpha) %>% 
+  mutate(refit = set_to_na(refit, bool_vec = (threshold != 0))) %>% 
+  mutate(lin = NA) %>% 
+  mutate(threshold = paste0('Threshold = ', threshold)) %>%
+  plot_post_stat_trace_plot() + 
+  facet_wrap(~threshold, nrow = 1, scales = 'free_y') + 
+  # add a dummy point so that scales align
+  geom_point(aes(x = 1, 4.5), alpha = 0.) + 
+  ylab('E[# pop.]') + 
+  xlab(TeX('DP parameter $\\alpha$')) + 
+  geom_vline(xintercept = 3, 
+             color = 'red', 
+             linetype = 'dashed')
+
+@
+}
+
+\newcommand{\StructureAlphaTreshZero}{
+<<structure_alphasens0, cache=cache, fig.show='hold'>>=
 # the initial figure with threshold = 0 ONLY
 alpha_sens_df %>% 
   rename(t = alpha) %>% 
