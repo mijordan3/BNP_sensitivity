@@ -114,21 +114,23 @@ $\ball_\phi(\delta)$ and find the worst case, we require a stronger result than
 \coryref{etafun_deriv_form}. In particular, \coryref{etafun_deriv_form} states
 only that, for a {\em particular} direction $\phi$, $\t \mapsto \etaopt(\t)$ is
 continuously differentiable.  Since $\t \phi \in \ball_\phi(\t \norminf{\phi})$,
-we have only that, for a fixed $\phi$, one can make $\t$ sufficiently small so
-that the error $\abs{\etaopt(\t) - \etalin(\t)}$ goes to zero faster than $\t$.
-But we can write $\etaopt(\t\phi)$ and $\etalin(\t \phi)$ to make the dependence
-on $\phi$ explicit. Then \coryref{etafun_deriv_form} does not imply that, for a
-fixed $\delta$ (no matter how small), the worst-case error $\sup_{\phi \in
-\ball_\phi(\delta)} \abs{\etaopt(\phi) - \etalin(\phi)}$ is bounded, much less
-that it goes to zero faster than $\delta$.
+\coryref{etafun_deriv_form} implies only that, for a fixed $\phi$, one can make
+$\t$ sufficiently small so that the error $\abs{\etaopt(\t) - \etalin(\t)}$ goes
+to zero faster than $\t$. But, if we write $\etaopt(\t\phi)$ and $\etalin(\t
+\phi)$ to make the dependence on $\phi$ explicit, then
+\coryref{etafun_deriv_form} does not imply that, for a fixed $\delta$ (no matter
+how small), the worst-case error $\sup_{\phi \in \ball_\phi(\delta)}
+\abs{\etaopt(\phi) - \etalin(\phi)}$ is bounded, much less that it goes to zero
+faster than $\delta$.
 
 To be able to apply \coryref{etafun_worst_case} to find the worst-case
 perturbation $\phi$, we need to establish that the approximation is sufficiently
 good over all $\phi$ of interest. Observe that $\phi$ is a member of the Banach
 space $L_\infty$ \citep[Theorem 5.2.1]{dudley:2018:real}.  We require that the
 map $\phi \mapsto \etaopt(\phi)$, which maps $L_\infty$ to $\mathbb{R}^\etadim$,
-admits a uniformly good linear approximation. Fr{\'e}chet differentiability,
-defined next, will allow us to accomplish this goal.
+admits a uniformly good linear approximation amongst $\phi \in
+\ball_\phi(\delta)$. In other words, we require $\phi \mapsto \etaopt(\phi)$ to
+be Fr{\'e}chet differentiable, as we now formally define.
 
 \begin{defn}\deflabel{diffable_classes}
     (Fr{\'e}chet differentiability,
@@ -173,27 +175,20 @@ can use results such as \coryref{etafun_worst_case} without uncovering
 pathological behavior.
 
 Finally, then, we prove that our perturbation here is Fr{\'e}chet differentiable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thm}\thmlabel{eta_phi_deriv_stick}
 %
-Let \assuref{kl_opt_ok, exchange_order_q} hold.
-%
-\todo{Same question as above: can we get rid of appendix assumptions or have a
-fast summary in main text?
-\par\vspace{1em}
-Now that I see how things are being used, I think it suffices to assume that we
-use the VB approximation of \secref{model_vb} and that $\norminf{\phi} <
-\infty$.  I don't see a way around stating \assuref{kl_opt_ok} though.
-}
-%
-Then the map $\phi \mapsto \etaopt(\phi)$ is well-defined and continuously
-Fr{\'e}chet differentiable in a neighborhood of $0$ as a map from $\linf$ to
-$\mathbb{R}^\etadim$, with the derivative given in \coryref{etafun_deriv_form}.
-\end{thm}
+Under the conditions of \thmref{bnp_deriv}, the map $\phi \mapsto \etaopt(\phi)$
+is well-defined and continuously Fr{\'e}chet differentiable in a neighborhood of
+the zero function as a map from $\linf$ to $\mathbb{R}^\etadim$,
+with the derivative given in \coryref{etafun_deriv_form}. \end{thm}
 %
 \begin{proof}
 %
-Again, our result here is a special case of the general result, across models
-and parameters with a VB posterior approximation, in \thmref{eta_phi_deriv}.
+Our result here is a special case of the general result, across models and
+parameters with a VB posterior approximation, in \thmref{eta_phi_deriv}
+of \appref{diffable_worst_case}.
 %
 \end{proof}
 

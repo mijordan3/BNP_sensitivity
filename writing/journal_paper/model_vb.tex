@@ -4,16 +4,14 @@ variational Bayes approximation due to \citet{blei:2006:vi_for_dp}.
 
 Variational Bayes (VB) posits a class of tractable distributions over the model
 parameters and chooses the  element of this class that minimizes the reverse
-Kullback-Leibler (KL) divergence to the exact posterior. \todo{I think the KL
-divergence isn't well defined between the truncation and the truth, but I don't
-think that KL divergences are inherently ill-defined for infinite dimensional
-spaces.} One approach to apply VB to Dirichlet process stick-breaking models
-assumes $\nu_\kmax = 1$ for all distributions in the variational class and some
-truncation level $\kmax$. Let $\zeta$ collect the first $\kmax - 1$ elements of
-$\nu$, the first $\kmax$ elements of $\beta$, and the first $\kmax$ elements of
-$\z_\n$ across $n$. In what follows, then, we effectively consider the reverse
-KL divergence to the posterior marginal $\p(\zeta \vert \x)$. By setting $\kmax$
-sufficiently large, one can make this truncation as expressive as desired.
+Kullback-Leibler (KL) divergence to the exact posterior.  One approach to apply
+VB to Dirichlet process stick-breaking models assumes $\nu_\kmax = 1$ for all
+distributions in the variational class and some truncation level $\kmax$. Let
+$\zeta$ collect the first $\kmax - 1$ elements of $\nu$, the first $\kmax$
+elements of $\beta$, and the first $\kmax$ elements of $\z_\n$ across $n$. In
+what follows, then, we effectively consider the reverse KL divergence to the
+posterior marginal $\p(\zeta \vert \x)$. By setting $\kmax$ sufficiently large,
+one can make this truncation as expressive as desired.
 
 Mean-field VB is a particularly popular VB variant where the tractable
 approximating distributions $\q$ factorize over the parameters. In our case,
