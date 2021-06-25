@@ -30,9 +30,9 @@ g(\etalin(\alpha))$ when $\abs{\alpha - \alpha_0}$ is small.
 
 We show (\thmref{etat_deriv} in \appref{diffable_concentration}) that the map
 $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable for the VB
-approximation given in \secref{model_vb} under the following set of mild
-conditions on the VB objective and optimum.
-
+approximation given in \secref{model_vb} under the following
+\assuref{kl_opt_ok}, which is satisfied for any local optimum of a smooth,
+unconstrained parameterization of the variational approximation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,7 +50,7 @@ Assume that:
     {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular; and
 
     \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
-    \subset \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subset
+    \subseteq \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subseteq
     \etadom$.
 %
 \end{enumerate*}
@@ -98,12 +98,28 @@ $\alpha$ case above:
 g(\etaopt(\t)) \approx g(\etalin(\t)).
 %
 \end{align}
+
+As in the $\alpha$ case, \eqref{taylor_series_t} is useful only if the map $t
+\mapsto \etaopt(t)$ is continuously differentiable for the chosen $\phi$. A
+simple sufficient condition for differentiability is given in terms of the
+following norm on the perturbation $\phi$.
+
+\noindent \textbf{An infinity norm.}
+%First, we define $\norminf{\cdot}$ and a corresponding ball.
+Let $\mu$ be a probability measure on $[0,1]$. Then
+\begin{equation} \eqlabel{infty_norm}
+	\norminf{\phi} := \esssup_{\nu_0 \sim \mu} \abs{\phi(\nu_0)},
+	\quad \ball_\phi(\delta) := \left\{ \phi: \norminf{\phi} <
+\delta \right\}.
+\end{equation}
 %
-As in the $\alpha$ case, we will show that the map $t \mapsto \etaopt(t)$ is
-continuously differentiable \todo{TODO: back this up, possibly with concise
-additional assumptions.  \par Boundedness of $\phi$ is what you need.
-Should that go here, or later?}. So, for sufficiently smooth $g$, we expect this
-approximation to be good for small $t$.
+In \coryref{etafun_deriv_form} of \appref{diffable_nonparametric}, we show that
+$\t \mapsto \etaopt(\t)$ is continuously differentiable whenever $\norminf{\phi} <
+\infty$.  So, for sufficiently smooth $g$, we expect the approximation
+\eqref{taylor_series_t} to be good for small $t$ when $\norminf{\phi} < \infty$.
+The $\norminf{\cdot}$ norm has further connections to multiplicative
+perturbations, as discussed in \citep{gustafson:1996:marginal} and later in
+\secref{influence_function}.
 
 We next provide some additional justification for why this particular functional
 perturbation is useful. Note first that if we consider any other distribution
@@ -112,16 +128,15 @@ $\phi(\cdot) = \log \left( \palt(\cdot) / \pbase(\cdot) \right)$ so long as
 $\palt \ll \pbase$, i.e.\ $\palt$ is absolutely continuous with respect to
 $\pbase$. Moreover, we will see in \secref{influence_function} that we can
 compute an \emph{influence function} to provide an interpretable summary of the
-effect of arbitrary changes $\phi$ and also find a worst-case $\phi$ in some
-appropriate ball. Second, while the perturbations above are essentially
+effect of arbitrary changes $\phi$ and also find a worst-case $\phi$ in
+$\ball_\phi(\delta)$. Second, while the perturbations above are essentially
 multiplicative relative to $\pbase$, one might wonder whether additive
 perturbations (subject to renormalization) or other perturbations would work
 instead; indeed \citet{gustafson:1996:local} proposes a number of alternative
 perturbations. We show in \secref{influence_function} that, among a class of
 potential functional perturbations, the one we consider here is the only one
-that admits a uniformly good approximation over an appropriate ball of $\phi$
-choices -- and thus can be used to reason about worst-case $\phi$.
-\todo{I'd like to tighten up the language about ``uniformly good approximation''}
+that is {\em Fr{\'e}chet differentiable} -- and thus can be used to safely
+reason about worst-case $\phi$.
 
 %%
 \noindent \textbf{Computing the terms in the Taylor series.} First observe that
@@ -151,30 +166,32 @@ form of $\qtil$.
 %
 \begin{thm}\thmlabel{bnp_deriv}
 %
-\todo{I think this should all work given the proofs in the appendix for
-$\alpha$. Can we get away with adding some very minimal assumptions here to make
-sure it applies for the functional perturbation?
-\par\vspace{1em}
-Ryan: I see a few options.
-\par\vspace{1em}
-1) Say that this only applies to the $\phi$ and $\alpha$ peturbations.
-That seems unnecessarily limiting, because it's actually quite general.
-\par\vspace{1em}
-2) Say that it applies whenever you can apply the implicit function theorem.
-That's basically what the original assumptions provide.  That puts us in the
-spot of either saying them here or referring to things in the appendix.
-\par\vspace{1em}
-3) It would be great if we could say something like {\em when}
-$\t \mapsto \etaopt(\t)$ is continuously differentiable, its derivative has
-this form.  I doubt that's true, but I could be wrong.  AFAIK the implication
-of the implicit function theorem only goes one way.
-\par\vspace{1em}
-4) Take option (1), but say in the text that it applies generally, and refer
-to a proof in the appendix.
-}
+% \todo{I think this should all work given the proofs in the appendix for
+% $\alpha$. Can we get away with adding some very minimal assumptions here to make
+% sure it applies for the functional perturbation?
+% \par\vspace{1em}
+% Ryan: I see a few options.
+% \par\vspace{1em}
+% 1) Say that this only applies to the $\phi$ and $\alpha$ peturbations.
+% That seems unnecessarily limiting, because it's actually quite general.
+% \par\vspace{1em}
+% 2) Say that it applies whenever you can apply the implicit function theorem.
+% That's basically what the original assumptions provide.  That puts us in the
+% spot of either saying them here or referring to things in the appendix.
+% \par\vspace{1em}
+% 3) It would be great if we could say something like {\em when}
+% $\t \mapsto \etaopt(\t)$ is continuously differentiable, its derivative has
+% this form.  I doubt that's true, but I could be wrong.  AFAIK the implication
+% of the implicit function theorem only goes one way.
+% \par\vspace{1em}
+% 4) Take option (1), but say in the text that it applies generally, and refer
+% to a proof in the appendix.
+% }
 %
-The map $\t \mapsto
-\etaopt(\t)$ is continuously differentiable at $\t=0$ with derivative
+Under the VB approximation of \secref{model_vb}, \assuref{kl_opt_ok}, and with
+$\t = \alpha - \alpha_0$ or the perturbation given by \eqref{mult_perturbation}
+with $\norminf{\phi} < \infty$, the map $\t \mapsto \etaopt(\t)$ is continuously
+differentiable at $\t=0$ with derivative
 %
 \begin{align}
 %
@@ -191,13 +208,13 @@ The map $\t \mapsto
 %
 \eqlabel{bnp_vb_crosshessian}
 \crosshessian :={}&
-%    \fracat{\partial
-%            \expect{\q(\zeta \vert \eta)}
-%                   {\fracat{\partial \log \prod_{k=1}^{\kmax -1}\ptil(\nu_k \vert \t)}
-%                           {\partial \t}{\t=0} }
-%            }
-%        {\partial \eta}{\eta = \etaopt} \\
-%={}&
+   \fracat{\partial
+           \expect{\q(\zeta \vert \eta)}
+                  {\fracat{\partial \log \prod_{k=1}^{\kmax -1}\ptil(\nu_k \vert \t)}
+                          {\partial \t}{\t=0} }
+           }
+       {\partial \eta}{\eta = \etaopt} %\\
+={}
     \expect{\q(\zeta \vert \etaopt)}{
           \lqgradbar{\zeta \vert \etaopt}
           \sum_{k=1}^{\kmax-1}
