@@ -27,12 +27,11 @@ $\alpha_0$, the posterior expected number of clusters matches the three iris
 species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
 
 %%
-\noindent \textbf{Sensitivity to the concentration parameter}
-We approximate the changes in the quantities of interest as $\alpha$ varies
-over $\alpha\in[0.1, 4.0]$, which corresponds to an a priori expected number of clusters
-among $N$ data points in $[1.5,15]$ (\appref{app_beta_prior}).
-Over this range, the shape of a $\betadist{1,\alpha}$
-density varies considerably, as shown in
+\noindent \textbf{Sensitivity to the concentration parameter} We approximate the
+changes in the quantities of interest as $\alpha$ varies over $\alpha\in[0.1,
+4.0]$, which corresponds to an a priori expected number of clusters among $N$
+data points in $[1.5,15]$ (\appref{app_beta_prior}). Over this range, the shape
+of a $\betadist{1,\alpha}$ density varies considerably, as shown in
 \figref{beta_priors} in \appref{app_beta_prior}.
 
 
@@ -49,25 +48,24 @@ density varies considerably, as shown in
 
 \end{knitrout}
 
-\Figref{iris_alpha_sens} compares our linear approximation to ground truth
-on the two quantities of interest as $\alpha$ varies.
- Over this range of $\alpha$, the posterior expected number of clusters in the observed data
- is quite robust; it remains nearly constant at three.
- The posterior predictive expected
-number of clusters in $N$ new data points is less robust; it ranges roughly from 3.0 to 5.6 expected
-species.  Our approximation captures this qualitative behavior. As expected,
-the approximation is least accurate furthest from the $\alpha_0$, where the Taylor series
-is centered.
+\Figref{iris_alpha_sens} compares our linear approximation to ground truth on
+the two quantities of interest as $\alpha$ varies. Over this range of $\alpha$,
+the posterior expected number of clusters in the observed data is quite robust;
+it remains nearly constant at three. The posterior predictive expected number of
+clusters in $N$ new data points is less robust; it ranges roughly from
+3.0 to 5.6 expected species.  Our approximation captures this
+qualitative behavior. As expected, the approximation is least accurate furthest
+from the $\alpha_0$, where the Taylor series is centered.
 
 %%
-\noindent \textbf{Sensitivity to functional perturbations.}
-Insensitivity of the expected number of clusters $\gclustersabbr$ to $\alpha$ does
-not rule out sensitivity to other prior perturbations.
-We now check how our approximation fares for the multiplicative perturbations in \eqref{mult_perturbation}.
-We consider perturbations $\phi$ that are Gaussian bumps in logit stick space, with each
-perturbation centered at a different location on the real line.  Each row of
-\figref{iris_fsens} corresponds to a different $\phi$. Each $\phi$ is shown in gray
-in the leftmost plot of its row. The middle column of
+\noindent \textbf{Sensitivity to functional perturbations.} Insensitivity of the
+expected number of clusters $\gclustersabbr$ to $\alpha$ does not rule out
+sensitivity to other prior perturbations. We now check how our approximation
+fares for the multiplicative perturbations in \eqref{mult_perturbation}. We
+consider perturbations $\phi$ that are Gaussian bumps in logit stick space, with
+each perturbation centered at a different location on the real line.  Each row
+of \figref{iris_fsens} corresponds to a different $\phi$. Each $\phi$ is shown
+in gray in the leftmost plot of its row. The middle column of
 \figref{iris_fsens} shows the stick-breaking prior $\p(\nuk \vert \phi)$ induced
 by the corresponding $\phi$.
 
@@ -100,17 +98,23 @@ shows the changes produced by the $\phi$ perturbation for that row.
 We see that our approximation captures the qualitative behavior of the exact
 changes.
 
-We also see in this example that we can use the influence function to
-predict the effect of functional changes to the stick-breaking prior.
-In the leftmost column, we plot the influence function in the logit space in purple.
-According to \corref{etafun_deriv_form}, the sign and magnitude of the effect of
-a perturbation should be determined by its integral against the influence
+We also see in this example that we can use the influence function to predict
+the effect of functional changes to the stick-breaking prior. In the leftmost
+column, we plot  in purple the influence function in the logit space.
+\footnote{\coryref{etafun_deriv_form_stick} expresses the influence function in
+the stick domain $[0,1]$, but, for visualization, it is easier to express the
+influence function in the logit stick domain $\mathbb{R}$.  The general result
+\coryref{etafun_deriv_form} in \appref{diffable_nonparametric} accomodates such
+transformations.}
+%
+According to \coryref{etafun_deriv_form}, the sign and magnitude of the effect
+of a perturbation should be determined by its integral against the influence
 function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
 first row, we expect the change to be negative.  Similarly, we expect the
 perturbation of the bottom row to produce a positive change, and the middle row,
 in which $\phi$ overlaps with both negative and positive parts of the influence
-function, to produce a relatively small change. We see this intuition borne out in the
-rightmost column.
+function, to produce a relatively small change. We see this intuition borne out
+in the rightmost column.
 
 
 \begin{knitrout}
@@ -134,7 +138,7 @@ rightmost column.
 
 %%
 \noindent \textbf{Worst-case functional perturbation.}
-Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case},
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \coryref{etafun_worst_case},
 along with its effect on the prior and $\gclustersabbr$.
 As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$

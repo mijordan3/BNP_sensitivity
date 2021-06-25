@@ -115,9 +115,15 @@ changes.
 
 We also see in this example that we can use the influence function to predict
 the effect of functional changes to the stick-breaking prior. In the leftmost
-column, we plot the influence function in the logit space in purple. According
-to \corref{etafun_deriv_form}, the sign and magnitude of the effect of a
-perturbation should be determined by its integral against the influence
+column, we plot  in purple the influence function in the logit space.
+\footnote{\coryref{etafun_deriv_form_stick} expresses the influence function in
+the stick domain $[0,1]$, but, for visualization, it is easier to express the
+influence function in the logit stick domain $\mathbb{R}$.  The general result
+\coryref{etafun_deriv_form} in \appref{diffable_nonparametric} accomodates such
+transformations.}
+%
+According to \coryref{etafun_deriv_form}, the sign and magnitude of the effect
+of a perturbation should be determined by its integral against the influence
 function.  Thus, when $\phi$ lines up with a negative part of $\infl$, as in the
 first row, we expect the change to be negative.  Similarly, we expect the
 perturbation of the bottom row to produce a positive change, and the middle row,
@@ -140,7 +146,7 @@ source("R_scripts/iris/iris_worst_case.R", echo=knitr_debug, print.eval=TRUE)
 
 %%
 \noindent \textbf{Worst-case functional perturbation.}
-Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \corref{etafun_worst_case},
+Finally, \figref{iris_worstcase} shows the worst-case multiplicative perturbation with $\norminf{\phi} = 1$, as given by \coryref{etafun_worst_case},
 along with its effect on the prior and $\gclustersabbr$.
 As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$
