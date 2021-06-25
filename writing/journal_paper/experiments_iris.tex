@@ -14,9 +14,6 @@ represents $d=4$ measurements of a particular flower, from one of three iris
 species. We use a standard Gaussian mixture model with conjugate
 Gaussian-Wishart prior for the component parameters (detailed in
 \appref{app_iris}) and a mean-field VB approximation with truncation parameter
-\todo{Do we want to make it clear that $\gclustersabbr$ is not the same as
-the example given in \secref{model_vb}, but rather the version that linearizes
-only the global parameters?}
 $\kmax = 15$. We consider two quantities of interest: (1) $\gclustersabbr$, the
 posterior expected number of clusters among the $N$ observed data points, and
 (2) $\gclusterspred$, the posterior predictive expected number of clusters in
