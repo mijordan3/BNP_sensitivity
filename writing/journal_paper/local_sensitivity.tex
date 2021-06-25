@@ -208,12 +208,13 @@ differentiable at $\t=0$ with derivative
 %
 \eqlabel{bnp_vb_crosshessian}
 \crosshessian :={}&
-   \fracat{\partial
-           \expect{\q(\zeta \vert \eta)}
-                  {\fracat{\partial \log \prod_{k=1}^{\kmax -1}\ptil(\nu_k \vert \t)}
-                          {\partial \t}{\t=0} }
-           }
-       {\partial \eta}{\eta = \etaopt} %\\
+    \frac{\partial}{\partial\eta}
+    \expect{\q(\zeta \vert \eta)}{
+        \sum_{k=1}^{\kmax-1}
+        \fracat{\partial \log \ptil(\nu_k \vert \t)}
+                {\partial \t}{\t=0}
+    }
+    \Bigg|_{\eta = \etaopt}
 ={}
     \expect{\q(\zeta \vert \etaopt)}{
           \lqgradbar{\zeta \vert \etaopt}
