@@ -85,6 +85,10 @@ $\p(\theta \vert \phi)$ be the normalized version of $\ptil(\theta \vert \phi)$.
 Further, define the norm $\norminf{\phi} := \esssup_{\theta \sim \mu}
 \abs{\phi(\theta)}$, and let $\ball_\phi(\delta) := \left\{ \phi: \norminf{\phi} <
 \delta \right\}$.
+\todo{Tamara rightly points out that there is a need for $\mu$ and
+$\pbase$ to be mutually absolutely continuous, where $\pbase$ is fixed.
+This is awkward as $\pbase$ is now defined as a density, but it is actually
+the distribution induced by $\pbase$ that is the fundamental object.}
 %
 \end{defn}
 %
@@ -107,9 +111,10 @@ perturbations.
 %
 Fix the quantities given in \defref{prior_nl_pert}.  For a fixed probability
 measure $\palt \ll \mu$, let $\phi(\theta \vert \palt) := \log \palt(\theta) /
-\pbase(\theta)$. \textcolor{red}{I think you need $\ll \pbase$ here, not $\mu$, or equivalently restrict to $\nudom$. This seems related to my comment about $\mu$ and support in the main text}  Then $\palt \mapsto \norminf{\phi(\cdot \vert \palt)}$ is a
+\pbase(\theta)$.  Then $\palt \mapsto \norminf{\phi(\cdot \vert \palt)}$ is a
 norm, does not depend on $\mu$, and is invariant to invertible transformations
 of $\theta$.
+\todo{Make sure this works with the corrected \defref{prior_nl_pert} }
 
 Furthermore, for any $\phi$ with $\norminf{\phi} < \infty$, the quantity
 $\ptil(\theta \vert \phi)$ gives rise to a valid prior, in the sense that
@@ -123,7 +128,7 @@ $0 < \int \ptil(\theta \vert \phi) \mu(d\theta) < \infty$.
 
 The set of priors $\left\{\p(\theta \vert \phi) : \phi \in
 \ball_\phi(\delta)\right\}$ live in a multiplicative band around the original
-prior, $\pbase$, as shown in \figref{func_ball}. Although
+prior, $\pbase$, as shown in \figref{linf_examples}. Although
 \lemref{pert_invariance} proves that every $\phi$ with $\norminf{\phi}$ is a
 valid prior, the converse is not true, and the Beta prior perturbation of
 \exref{alpha_perturbation} is a counterexample.
@@ -172,7 +177,7 @@ Assume that \assuref{exchange_order_f} applies with the function $f(\theta,
 
 \begin{cor}\corylabel{etafun_deriv_form}
 %
-Fix the quantities given in \defref{prior_nl_pert}, and  et \assuref{kl_opt_ok,
+Fix the quantities given in \defref{prior_nl_pert}, and let \assuref{kl_opt_ok,
 exchange_order_q} hold. Let $g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
 ``influence function'' $\infl: \thetadom \mapsto \mathbb{R}$:

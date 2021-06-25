@@ -31,6 +31,10 @@
 \usepackage{lineno}
 \linenumbers
 
+% For inline enumerate:
+% https://en.wikibooks.org/wiki/LaTeX/List_Structures
+\usepackage{blindtext}
+\usepackage[inline]{enumitem}
 
 % Documentation
 % http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/refstyle/refstyle.pdf
@@ -114,7 +118,12 @@ Berkeley, CA 94720}
 
 %% ** Keywords **
 \begin{keyword}%[class=MSC]
-%\kwd{}
+\kwd{Dirichlet Process}
+\kwd{Stick breaking}
+\kwd{Local robustness}
+\kwd{Variational Bayes}
+\kwd{Fr{\'e}chet differentiability}
+\kwd{fastSTRUCTURE}
 %\kwd[]{}
 \end{keyword}
 
@@ -122,6 +131,9 @@ Berkeley, CA 94720}
 
 %% ** Mainmatter **
 
+\todo{Fix the footer on the first page.  (Weirdly the presence of this TODO
+actually fixes it.)}
+%\vspace{0.1em}
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
 
@@ -172,9 +184,11 @@ Berkeley, CA 94720}
     \seclabel{compute_time}
     \input{timing_table.tex}
 
-\section{Conclusion}
-\seclabel{conclusion}
-TODO: write this when the rest of the paper is done.
+% BA does not require a conclusion.
+% https://projecteuclid.org/journals/bayesian-analysis/author-guidelines
+% \section{Conclusion}
+% \seclabel{conclusion}
+% TODO: write this when the rest of the paper is done.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
