@@ -30,34 +30,7 @@ g(\etalin(\alpha))$ when $\abs{\alpha - \alpha_0}$ is small.
 
 We show (\thmref{etat_deriv} in \appref{diffable_concentration}) that the map
 $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable for the VB
-approximation given in \secref{model_vb} under the following
-\assuref{kl_opt_ok}, which is satisfied for any local optimum of a smooth,
-unconstrained parameterization of the variational approximation.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_opt_ok}
-%
-Assume that:
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate*}[label=(\arabic*)]
-%
-    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
-    continuously differentiable at $\etaopt$;
-
-    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
-    {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular; and
-
-    \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
-    \subseteq \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subseteq
-    \etadom$.
-%
-\end{enumerate*}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+approximation given in \secref{model_vb}.
 
 %%
 \noindent \textbf{Sensitivity to the stick-breaking density.} Next, we show how
@@ -139,105 +112,127 @@ that is {\em Fr{\'e}chet differentiable} -- and thus can be used to safely
 reason about worst-case $\phi$.
 
 %%
-\noindent \textbf{Computing the terms in the Taylor series.} First observe that
-we can write the $\alpha$ perturbation using the same notation as the stick-form
-perturbation by setting $t = \alpha - \alpha_0$. Then, as before, let
-$\ptil(\cdot \vert \t)$ be the corresponding (potentially unnormalized)
-distribution on a stick-breaking parameter, and let $\etaopt(t)$ be the value of
-$\etaopt$ for $\ptil(\cdot \vert \t)$. It follows that the concentration
-parameter perturbation is also given by \eqref{taylor_series_t}. Whether we
-perturb the concentration parameter or stick-breaking form, $\etaopt(0)$ is the
-VB optimum for the original, unperturbed problem, and $1-0$ is trivial to
-compute. It remains to provide a formula for the derivative
-$\fracat{d\etaopt(t)}{dt}{\t=0}$.
+\noindent \textbf{Computing the terms in the Taylor series.}  It remains to show
+that $\alpha \mapsto \etaopt(\alpha)$ and $\t \mapsto \etaopt(\t)$ are
+continuously differentiable, and to provide a computable formula for the
+derivative.
 %
-\todo{Something may be confusing to the reader here.  We have observed that the
-$\alpha$ perturbation could have been represented with a particular choice of
-$\phi$.  Now we are suggesting replacing $\alpha$ with $\t$. We should be clear
-that we are not suggesting using the functional parameterization for all
-hyperparameter perturbations.  The two happen to be equivalent in this case
-because the beta prior is log-linear in $\alpha$, but in general, the two
-parameterizations are not equivalent.}
+Differentiability naturally requires some regularity conditions on the VB
+parameterization and on the optimum.  We state sufficient conditions in the
+following \assuref{kl_opt_ok}, which is satisfied for any local optimum of a
+smooth, unconstrained parameterization of the variational approximation.
 
-Our next result gives a computable formula for the derivative. In what follows,
-we write $\qtil$ for a potentially unnormalized (but normalizable) approximation
-distribution; as with $\ptil$ and $\p$, we again assume $\q$ is the normalized
-form of $\qtil$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Assume that:
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate*}[label=(\arabic*)]
+%
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
+    continuously differentiable at $\etaopt$;
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
+    {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular; and
+
+    \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
+    \subseteq \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subseteq
+    \etadom$.
+%
+\end{enumerate*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% First observe that
+% we can write the $\alpha$ perturbation using the same notation as the stick-form
+% perturbation by setting $t = \alpha - \alpha_0$. Then, as before, let
+% $\ptil(\cdot \vert \t)$ be the corresponding (potentially unnormalized)
+% distribution on a stick-breaking parameter, and let $\etaopt(t)$ be the value of
+% $\etaopt$ for $\ptil(\cdot \vert \t)$. It follows that the concentration
+% parameter perturbation is also given by \eqref{taylor_series_t}. Whether we
+% perturb the concentration parameter or stick-breaking form, $\etaopt(0)$ is the
+% VB optimum for the original, unperturbed problem, and $1-0$ is trivial to
+% compute. It remains to provide a formula for the derivative
+% $\fracat{d\etaopt(t)}{dt}{\t=0}$.
+%
+% \todo{Something may be confusing to the reader here.  We have observed that the
+% $\alpha$ perturbation could have been represented with a particular choice of
+% $\phi$.  Now we are suggesting replacing $\alpha$ with $\t$. We should be clear
+% that we are not suggesting using the functional parameterization for all
+% hyperparameter perturbations.  The two happen to be equivalent in this case
+% because the beta prior is log-linear in $\alpha$, but in general, the two
+% parameterizations are not equivalent.}
+
+Our next result gives differentiability as well as a computable formula for the
+derivative.
+% In what follows,
+% we write $\qtil$ for a potentially unnormalized (but normalizable) approximation
+% distribution; as with $\ptil$ and $\p$, we again assume $\q$ is the normalized
+% form of $\qtil$.
 %
 \begin{thm}\thmlabel{bnp_deriv}
 %
-% \todo{I think this should all work given the proofs in the appendix for
-% $\alpha$. Can we get away with adding some very minimal assumptions here to make
-% sure it applies for the functional perturbation?
-% \par\vspace{1em}
-% Ryan: I see a few options.
-% \par\vspace{1em}
-% 1) Say that this only applies to the $\phi$ and $\alpha$ peturbations.
-% That seems unnecessarily limiting, because it's actually quite general.
-% \par\vspace{1em}
-% 2) Say that it applies whenever you can apply the implicit function theorem.
-% That's basically what the original assumptions provide.  That puts us in the
-% spot of either saying them here or referring to things in the appendix.
-% \par\vspace{1em}
-% 3) It would be great if we could say something like {\em when}
-% $\t \mapsto \etaopt(\t)$ is continuously differentiable, its derivative has
-% this form.  I doubt that's true, but I could be wrong.  AFAIK the implication
-% of the implicit function theorem only goes one way.
-% \par\vspace{1em}
-% 4) Take option (1), but say in the text that it applies generally, and refer
-% to a proof in the appendix.
-% }
-%
-Under the VB approximation of \secref{model_vb}, \assuref{kl_opt_ok}, and with
-$\t = \alpha - \alpha_0$ or the perturbation given by \eqref{mult_perturbation}
-with $\norminf{\phi} < \infty$, the map $\t \mapsto \etaopt(\t)$ is continuously
-differentiable at $\t=0$ with derivative
+Assume that we are using the VB approximation given in \secref{model_vb} and
+that \assuref{kl_opt_ok} holds.  Take the perturbation given by
+\eqref{mult_perturbation} with $\norminf{\phi} < \infty$, or the concentration
+parameter with $\varepsilon = \alpha$, identifying $\varepsilon$ with $\t$ or
+$\alpha - \alpha_0$, respectively.  Then the map $\varepsilon \mapsto
+\etaopt(\varepsilon)$ is continuously differentiable at $\varepsilon = 0$ with
+derivative
 %
 \begin{align}
 %
 \eqlabel{bnp_vb_eta_sens}
-\fracat{d \etaopt(\t)}{d \t}{\t=0} ={}&
-    - \hessopt^{-1} \crosshessian, \mathwhere \\
+\fracat{d \etaopt(\varepsilon)}{d \varepsilon}{\varepsilon=0} ={}&
+    - \hessopt^{-1} \crosshessian, \mathwhere
+    \rho_\k(\nuk) := \fracat{\partial \log \ptil(\nu_k \vert \varepsilon)}
+            {\partial \varepsilon}{\varepsilon=0}
+            ,
+\\
 %
 \hessopt :={}& \fracat{\partial^2 \KL{\eta}}
                       {\partial \eta \partial \eta^T}
                       {\eta = \etaopt},
 \quad \lqgradbar{\zeta \vert \eta} :={}
-    \lqgrad{\zeta \vert \eta} -
-    \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}}, \\
+\fracat{\partial \log \q(\zeta \vert \eta)}{\partial \eta}{\eta}, \textrm{ and}\\
+    % \lqgrad{\zeta \vert \eta} -
+    % \expect{\q(\zeta \vert \eta)}{\lqgrad{\zeta \vert \eta}}, \\
 %
 \eqlabel{bnp_vb_crosshessian}
 \crosshessian :={}&
     \frac{\partial}{\partial\eta}
     \expect{\q(\zeta \vert \eta)}{
         \sum_{k=1}^{\kmax-1}
-        \fracat{\partial \log \ptil(\nu_k \vert \t)}
-                {\partial \t}{\t=0}
+        \rho_\k(\nuk)
     }
     \Bigg|_{\eta = \etaopt}
 ={}
     \expect{\q(\zeta \vert \etaopt)}{
           \lqgradbar{\zeta \vert \etaopt}
           \sum_{k=1}^{\kmax-1}
-          \fracat{\partial \log \ptil(\nu_k \vert \t)}
-                 {\partial \t}{\t=0}}.
+          \rho_\k(\nuk)}.
 %
 \end{align}
-%
-\todo{We had the other form of the cross Hessian for a reason, make sure
-it's still covered later.}
 %
 \end{thm}
 %
 \begin{proof}
 %
-Under differentiability and regularity conditions on a (generic, not just BNP)
-model and VB approximation, we show in \thmref{etat_deriv} that the maps $t
-\mapsto \etaopt(t)$ are differentiable and the formula for their computation
-holds. \appref{diffable_concentration} shows that the differentiability and
-regularity conditions hold when we vary the concentration parameter $\alpha$ in
-our stick-breaking model.
-\todo{Fix this proof once we decide about the assumptions.}
+The result follows from \thmref{etat_deriv} of \appref{diffable_parametric},
+which states general conditions for the differentiability of VB optima.  We show
+in \appref{diffable_concentration, diffable_nonparametric} that the conditions
+of \thmref{etat_deriv} are satisfied in the case of our present BNP problem. The
+equivalence of the expressions for $\crosshessian$ follow by differentiating
+through the expectation; see \appref{proofs} for more details.
+% The proof of \thmref{etat_deriv} relies on the differentiability of the
+% log densities, the ability to exchange the order of integration and
+% differentiation using the dominated convergence theorem, and the implicit
+% function theorem applied to the the first order condition of the VB
+% objective function.
 %
 \end{proof}
 %
