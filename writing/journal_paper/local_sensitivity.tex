@@ -26,11 +26,12 @@ g(\etaopt(\alpha)) \approx g(\etalin(\alpha)).
 %
 If $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable, and $g$ is
 sufficiently smooth, then we expect $g(\etaopt(\alpha)) \approx
-g(\etalin(\alpha))$ when $\abs{\alpha - \alpha_0}$ is small.
-
-We show (\thmref{etat_deriv} in \appref{diffable_concentration}) that the map
-$\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable for the VB
-approximation given in \secref{model_vb}.
+g(\etalin(\alpha))$ when $\abs{\alpha - \alpha_0}$ is small. We will show in
+\thmref{bnp_deriv} below that the map $\alpha \mapsto \etaopt(\alpha)$ is
+continuously differentiable.
+% We show (\thmref{etat_deriv} in \appref{diffable_concentration}) that the map
+% $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable for the VB
+% approximation given in \secref{model_vb}.
 
 %%
 \noindent \textbf{Sensitivity to the stick-breaking density.} Next, we show how
@@ -73,9 +74,10 @@ g(\etaopt(\t)) \approx g(\etalin(\t)).
 \end{align}
 
 As in the $\alpha$ case, \eqref{taylor_series_t} is useful only if the map $t
-\mapsto \etaopt(t)$ is continuously differentiable for the chosen $\phi$. A
-simple sufficient condition for differentiability is given in terms of the
-following norm on the perturbation $\phi$.
+\mapsto \etaopt(t)$ is continuously differentiable for the chosen $\phi$.  As we
+will show in \thmref{bnp_deriv} below, a simple sufficient condition for
+differentiability is given in terms of the following norm on the perturbation
+$\phi$.
 
 \noindent \textbf{An infinity norm.}
 %First, we define $\norminf{\cdot}$ and a corresponding ball.
@@ -86,13 +88,12 @@ Let $\mu$ be a probability measure on $[0,1]$. Then
 \delta \right\}.
 \end{equation}
 %
-In \coryref{etafun_deriv_form} of \appref{diffable_nonparametric}, we show that
-$\t \mapsto \etaopt(\t)$ is continuously differentiable whenever $\norminf{\phi} <
-\infty$.  So, for sufficiently smooth $g$, we expect the approximation
-\eqref{taylor_series_t} to be good for small $t$ when $\norminf{\phi} < \infty$.
-The $\norminf{\cdot}$ norm has further connections to multiplicative
-perturbations, as discussed in \citep{gustafson:1996:marginal} and later in
-\secref{influence_function}.
+In \thmref{bnp_deriv}, we show that $\t \mapsto \etaopt(\t)$ is continuously
+differentiable whenever $\norminf{\phi} < \infty$.  So, for sufficiently smooth
+$g$, we expect the approximation \eqref{taylor_series_t} to be good for small
+$t$ when $\norminf{\phi} < \infty$. The $\norminf{\cdot}$ norm has further
+connections to multiplicative perturbations, as discussed in
+\citep{gustafson:1996:marginal} and later in \secref{influence_function}.
 
 We next provide some additional justification for why this particular functional
 perturbation is useful. Note first that if we consider any other distribution
@@ -176,13 +177,12 @@ derivative.
 %
 \begin{thm}\thmlabel{bnp_deriv}
 %
-Assume that we are using the VB approximation given in \secref{model_vb} and
-that \assuref{kl_opt_ok} holds.  Take the perturbation given by
-\eqref{mult_perturbation} with $\norminf{\phi} < \infty$, or the concentration
-parameter with $\varepsilon = \alpha$, identifying $\varepsilon$ with $\t$ or
-$\alpha - \alpha_0$, respectively.  Then the map $\varepsilon \mapsto
-\etaopt(\varepsilon)$ is continuously differentiable at $\varepsilon = 0$ with
-derivative
+Under the VB approximation given in \secref{model_vb}, let \assuref{kl_opt_ok}
+hold.  Take the perturbation given by \eqref{mult_perturbation} with
+$\norminf{\phi} < \infty$, or the concentration parameter $\alpha$, identifying
+$\varepsilon$ with $\t$ or $\alpha - \alpha_0$, respectively.  Then the map
+$\varepsilon \mapsto \etaopt(\varepsilon)$ is continuously differentiable at
+$\varepsilon = 0$ with derivative
 %
 \begin{align}
 %
