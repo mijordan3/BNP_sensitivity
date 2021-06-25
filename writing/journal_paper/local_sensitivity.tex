@@ -244,13 +244,17 @@ values (\secref{compute_time}).
 %%
 \noindent \textbf{More on accuracy and speed trade-offs in the Taylor series.}
 One might save even more compute time, though likely at the cost of some
-accuracy, by extending the approximation to $g$ as well. If the cost of
-computing $g(\etalin(t))$ is prohibitive and if $g(\eta)$ is itself continuously
-differentiable, we may employ an additional first-order expansion of $g$ to
-further approximate $g(\etalin(t))$. In all of our experiments, computing
-$g(\etalin(t))$ is not prohibitive, so we do not employ this additional
-approximation.
-\todo{The other big reason to linearize $g$ is for the influence function.}
+accuracy, by extending the approximation to $\g$ as well. If the cost of
+computing $\g(\etalin(t))$ is prohibitive and if $\g(\eta)$ is itself
+continuously differentiable, we may employ an additional first-order expansion
+of $\g$ to further approximate $\g(\etalin(t))$. In all of our experiments,
+computing $\g(\etalin(t))$ is not prohibitive, so we do not employ this
+additional approximation when evaluating the accuracy of our results. However,
+as we discuss in \secref{influence_function} below, by linearizing $\g$, we can
+construct {\em influence functions} which succinctly summarize the effect of
+different choices of $\phi$.  In our experiments, we use the influence function
+based on a linearization of $\g$ to choose prior perturbations, whose accuracy
+we evaluate with the non-linearized $\g(\etalin(t))$.
 
 Finally, we note that even when the approximation $\etalin(t)$ is an imperfect
 substitute for exact re-optimization, the derivative can be a useful guide for
