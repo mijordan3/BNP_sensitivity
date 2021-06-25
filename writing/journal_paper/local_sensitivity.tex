@@ -16,7 +16,6 @@ approximate $g(\etaopt(\alpha))$ with $g(\etalin(\alpha))$:
 %
 \begin{align*}
 %
-% \etaopt(\alpha) \approx
 \etalin(\alpha) :=
     \etaopt(\alpha_0) +
     \fracat{d\etaopt(\alpha)}{d\alpha}{\alpha_0} (\alpha - \alpha_0)
@@ -25,11 +24,40 @@ g(\etaopt(\alpha)) \approx g(\etalin(\alpha)).
 %
 \end{align*}
 %
-We show (\thmref{etat_deriv} with \appref{diffable_concentration}) that the map
+If $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable, and $g$ is
+sufficiently smooth, then we expect $g(\etaopt(\alpha)) \approx
+g(\etalin(\alpha))$ when $\abs{\alpha - \alpha_0}$ is small.
+
+We show (\thmref{etat_deriv} in \appref{diffable_concentration}) that the map
 $\alpha \mapsto \etaopt(\alpha)$ is continuously differentiable for the VB
-approximation given in \secref{model_vb}. If $g$ is also sufficiently smooth,
-then we expect $g(\etaopt(\alpha)) \approx g(\etalin(\alpha))$ when $\abs{\alpha -
-\alpha_0}$ is small.
+approximation given in \secref{model_vb} under the following set of mild
+conditions on the VB objective and optimum.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{assu}\assulabel{kl_opt_ok}
+%
+Assume that:
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate*}[label=(\arabic*)]
+%
+    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
+    continuously differentiable at $\etaopt$;
+
+    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
+    {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular; and
+
+    \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
+    \subset \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subset
+    \etadom$.
+%
+\end{enumerate*}
+%
+\end{assu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%
 \noindent \textbf{Sensitivity to the stick-breaking density.} Next, we show how

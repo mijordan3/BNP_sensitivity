@@ -21,30 +21,30 @@ corresponding $\q$ and $\p$ given in \defref{prior_t}, so that
 
 First, in \assuref{kl_opt_ok}, we will require some mild regularity conditions
 for the ``initial problem,'' $\KL{\eta}$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{assu}\assulabel{kl_opt_ok}
 %
-Let the following conditions on the variational approximation hold.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{assu}\assulabel{kl_opt_ok}
+% %
+% Let the following conditions on the variational approximation hold.
+% %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{enumerate}
+% %
+%     \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
+%     continuously differentiable at $\etaopt$.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
+%     \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
+%     {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular.
 %
-    \item \itemlabel{kl_diffable} The map $\eta \mapsto \KL{\eta}$ is twice
-    continuously differentiable at $\etaopt$.
-
-    \item\itemlabel{kl_hess} The Hessian matrix $\fracat{\partial^2 \KL{\eta}}
-    {\partial \eta \partial \eta^T} {\etaopt}$ is non-singular.
-
-    \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
-    \subset \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subset
-    \etadom$.
-%
-\end{enumerate}
-%
-\end{assu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     \item \itemlabel{kl_opt_interior} There exists an open ball $\ball_\eta
+%     \subset \mathbb{R}^\etadim$ such that $\etaopt \in \ball_\eta \subset
+%     \etadom$.
+% %
+% \end{enumerate}
+% %
+% \end{assu}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 As we discuss in \appref{diffable_concentration}, \assuref{kl_opt_ok} states
 conditions that are typically satisfied when $\KL{\eta}$ can be optimized
