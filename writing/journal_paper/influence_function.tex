@@ -29,7 +29,7 @@ would be good to be explicit about the densitites.}
 Under the conditions of \thmref{bnp_deriv}, with $\norminf{\phi} < \infty$ and
 $\varepsilon = \t$, let $\g(\eta): \etadom \mapsto \mathbb{R}$ denote a
 continuously differentiable real-valued function of interest.  Define the
-\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$: \todo{Check this!}
+\emph{influence function} $\infl: [0,1] \mapsto \mathbb{R}$:
 %
 \begin{align} \eqlabel{infl_defn_bnp}
 %
@@ -79,11 +79,9 @@ choice of $\phi \in \ball_\phi(\delta)$.
 
 \LinfExamplesFig{}
 
-
-First, our next result shows how to
-find the VB analogue of \citet[Result 11]{gustafson:1996:local}. Second, we
-justify using the influence function for finding the worst case by establishing
-uniform quality of the linear approximation for sufficiently small
+First, we find the VB analogue of \citet[Result 11]{gustafson:1996:local}.
+Second, we justify using the influence function for finding the worst case by
+establishing uniform quality of the linear approximation for sufficiently small
 $\ball_\phi(\delta)$.
 
 \begin{cor}\corylabel{etafun_worst_case_stick}
@@ -102,13 +100,12 @@ $\phi^*(\cdot) = \delta \, \mathrm{sign}\left(\infl(\cdot)\right)$.
 %
 \begin{proof}
 %
-\todo{As with the influence funciton, this specific result follows directly
-from Holder, and I think we can just say that.}
-%
-We establish a similar but much more general result for mean-field VB
-approximations with general choices of model and parameters in
-\coryref{etafun_worst_case}. The present result is a special case using
-\exref{infl_univariate}.
+The result follows immediately from applying H{\"o}lder's inequality to
+\eqref{vb_eta_infl_sens_bnp}. We establish a similar but much more general
+result for mean-field VB approximations with general choices of model and
+parameters in \coryref{etafun_worst_case} of \appref{diffable_worst_case}. The
+present result is a special case using \exref{infl_univariate} of
+\appref{diffable_worst_case}.
 %
 \end{proof}
 
