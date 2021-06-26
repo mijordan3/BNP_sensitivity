@@ -27,9 +27,13 @@
 \usepackage{xfrac}
 
 % adding line numbers.
-% delete this when done
-\usepackage{lineno}
-\linenumbers
+% comment this out when done
+% adding line numbers also somewhat messes up the
+% formatting on the first page; it looks fine
+% without line numbers, curiously.
+
+% \usepackage{lineno}
+% \linenumbers
 
 % For inline enumerate:
 % https://en.wikibooks.org/wiki/LaTeX/List_Structures
@@ -131,9 +135,6 @@ Berkeley, CA 94720}
 
 %% ** Mainmatter **
 
-\todo{Fix the footer on the first page.  (Weirdly the presence of this TODO
-actually fixes it.)}
-%\vspace{0.1em}
 \section{Introduction}\seclabel{introduction}
 \input{introduction.tex}
 
@@ -163,6 +164,10 @@ actually fixes it.)}
 \section{Fast computation of the sensitivity}
 \seclabel{computing_sensitivity}
 \input{computing_sensitivity.tex}
+
+\section{Related work}
+\seclabel{related_work}
+\input{related_work.tex}
 
 \section{Experimental Results}
 \seclabel{results}
