@@ -7,7 +7,7 @@ Work specific to robustness in Dirichlet process mixture models can be found in
 with the latter two focusing on density estimation problems.
 
 To the best of our knowledge, the present work is the first to apply the
-correspondance of MCMC covariances and VB sensitivity derived in
+correspondence of MCMC covariances and VB sensitivity derived in
 \citep{giordano:2018:covariances} to study the sensitivity of VB approximations to BNP.
 In a sense, VB is more naturally
 amenable to sensitivity analysis than MCMC, since the derivative of VB
@@ -16,7 +16,7 @@ Bayesian posteriors must be approximated using potentially noisy posterior
 covariances and/ or posterior conditional densities that are not readily
 available from MCMC draws (e.g., \citet{gustafson:1996:marginal}).
 
-Unlike prevous work on robustness, we pay
+Unlike previous work on robustness, we pay
 special attention to the ability of using local sensitivity measures
 to accurately and usefully \textit{extrapolate}
 VB posterior inferences to different priors, rather than simply considering
@@ -32,10 +32,10 @@ require an \textit{a priori} specification of the number of clusters.
 However, as \citet{miller:2013:neurips, miller:14:inconsistency} prove,
 the posterior number of clusters in a BNP model is,
 in general, an inconsistent estimate for the true number of clusters if the
-data come from a finite mixture model.
+true data generating process is a finite mixture model.
 This inconsistency is not unique to a BNP approach either, as
 \citet{cai:2020:finite, cai:2020:power} show
-the same inconsistency for a finite mixture model with a prior on the number
+a similar inconsistency for a finite mixture model with a prior on the number
 of clusters.
 
 As \citet{miller:14:inconsistency} observes empirically,
@@ -52,14 +52,14 @@ the change.
 \todo{I removed the figure that shows this. Need to add it back in the appendix. }
 
 In a way, our sensitivity analysis on the expected number of clusters can be viewed as
-orthogonal to the proven inconsistency results: inconsistency says that the
+orthogonal to the proven inconsistency results for BNP models: inconsistency says that the
 posterior number of clusters may be unreliable even as the number of data points
 tend towards infinity; we show here that with a fixed data set, the number of clusters
-may be unreliable due to the subjective nature of the prior specificiation.
+may be unreliable due to the subjective nature of the prior specification.
 
 In our experiments below, we are able to construct robust posterior quantities
 by counting only the clusters with significant probability mass,
 an approach used in practice in other data applications such as \citet{fox:2007:dptracking}.
-We take care to construct posterior quantities that are of actual interest to
-a scientific application, and in many cases, such quantities involve only the
-largest clusters, and can be shown to be robust.
+We take care to construct posterior quantities that are of scientific interest,
+and in many cases, such quantities involve only the
+largest clusters and can be shown to be robust.
