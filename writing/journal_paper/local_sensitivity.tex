@@ -75,7 +75,7 @@ g(\etaopt(\t)) \approx g(\etalin(\t)).
 %
 As in the $\alpha$ case, \eqref{taylor_series_t} is useful only if the map $t
 \mapsto \etaopt(t)$ is continuously differentiable for the chosen $\phi$.  As we
-will show in \thmref{bnp_deriv} below, a simple sufficient condition for
+will show in \thmref{bnp_deriv} below, a sufficient condition for
 differentiability is given in terms of the following norm on the perturbation
 $\phi$.
 
@@ -119,12 +119,10 @@ arbitrary changes $\phi$.  Using the influence function and the
 $\norminf{\cdot}$ norm, we are able to find a worst-case $\phi$ in
 $\ball_\phi(\delta)$.
 
-Finally, while the perturbations above are essentially multiplicative relative
-to $\pbase$, one might wonder whether additive perturbations (subject to
-renormalization) or other perturbations would work instead; indeed
-\citet{gustafson:1996:local} proposes a number of alternative perturbations. We
-show in \secref{influence_function} that, among a class of potential functional
-perturbations, the one we consider here is the only one that is {\em Fr{\'e}chet
+Moreover, we will show in \secref{influence_function} that
+among a class of potential functional perturbations, such as those
+proposed by \citet{gustafson:1996:local},
+only the one we defined in \eqref{mult_perturbation} is {\em Fr{\'e}chet
 differentiable} -- and thus can be used to safely reason about worst-case
 $\phi$.
 
@@ -234,39 +232,35 @@ variational expectation, is straightforward to evaluate: the requisite
 expectation is evaluated either in closed form or approximated numerically;
 then, in either case, an application of automatic differentiation provides the
 gradient. Forming and inverting or factorizing $\hessopt$ can present a
-challenge due to its high dimensionality. $\hessopt$ has dimensions $\etadim
-\times \etadim$, where $\etadim$ is the dimension of $\eta$. There are
-variational parameters in $\eta$ corresponding to each parameter $\z_\n$. Also,
-the truncation level $\kmax$ typically needs to grow with $N$ to keep pace with
-the growing number of clusters -- though this growth is sublinear. It follows
-from these observations that $\etadim$ can grow linearly with $N$ and thus
-become very large.  However, in many cases -- including our BNP problem here --
+challenge due to its high dimensionality -- it has dimensions $\etadim
+\times \etadim$, where $\etadim$ is the dimension of $\eta$.
+However, in many cases -- including our BNP problem here --
 we can take advantage of model sparsity to efficiently compute
-\eqref{vb_eta_sens}. We show how to do so in \secref{computing_sensitivity}. And
+\eqref{vb_eta_sens} (see \secref{computing_sensitivity}), and
 our experiments confirm that we can compute $\fracat{d \etaopt(\t)}{d \t}{\t=0}$
 much more efficiently than re-optimizing the VB objective directly
-(\secref{compute_time}). Moreover, we will see that most of the cost of using
-the Taylor series approximation can be shared across multiple values of $t$, so
+(\secref{compute_time}). Moreover,
 the savings increases dramatically when we are interested in a range of $t$
-values (\secref{compute_time}).
+values because $\fracat{d \etaopt(\t)}{d \t}{\t=0}$ can be re-used to
+for any chosen value of $\t$.
 
 %%
-\noindent \textbf{More on accuracy and speed trade-offs in the Taylor series.}
-One might save even more compute time, though likely at the cost of some
-accuracy, by extending the approximation to $\g$ as well. If the cost of
-computing $\g(\etalin(t))$ is prohibitive and if $\g(\eta)$ is itself
-continuously differentiable, we may employ an additional first-order expansion
-of $\g$ to further approximate $\g(\etalin(t))$. In all of our experiments,
-computing $\g(\etalin(t))$ is not prohibitive, so we do not employ this
-additional approximation when evaluating the accuracy of our results. However,
-as we discuss in \secref{influence_function} below, by linearizing $\g$, we can
-construct {\em influence functions} which succinctly summarize the effect of
-different choices of $\phi$.  In our experiments, we use the influence function
-based on a linearization of $\g$ to choose prior perturbations, whose accuracy
-we evaluate with the non-linearized $\g(\etalin(t))$.
-
-Finally, we note that even when the approximation $\etalin(t)$ is an imperfect
-substitute for exact re-optimization, the derivative can be a useful guide for
-what sorts of prior perturbations might be problematic and thereby inform
-further exploration based on re-optimizing; see \secref{results_structure} for
-an example and discussion.
+% \noindent \textbf{More on accuracy and speed trade-offs in the Taylor series.}
+% One might save even more compute time, though likely at the cost of some
+% accuracy, by extending the approximation to $\g$ as well. If the cost of
+% computing $\g(\etalin(t))$ is prohibitive and if $\g(\eta)$ is itself
+% continuously differentiable, we may employ an additional first-order expansion
+% of $\g$ to further approximate $\g(\etalin(t))$. In all of our experiments,
+% computing $\g(\etalin(t))$ is not prohibitive, so we do not employ this
+% additional approximation when evaluating the accuracy of our results. However,
+% as we discuss in \secref{influence_function} below, by linearizing $\g$, we can
+% construct {\em influence functions} which succinctly summarize the effect of
+% different choices of $\phi$.  In our experiments, we use the influence function
+% based on a linearization of $\g$ to choose prior perturbations, whose accuracy
+% we evaluate with the non-linearized $\g(\etalin(t))$.
+%
+% Finally, we note that even when the approximation $\etalin(t)$ is an imperfect
+% substitute for exact re-optimization, the derivative can be a useful guide for
+% what sorts of prior perturbations might be problematic and thereby inform
+% further exploration based on re-optimizing; see \secref{results_structure} for
+% an example and discussion.
