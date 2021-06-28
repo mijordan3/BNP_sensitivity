@@ -29,7 +29,7 @@ pop3_color <- '#8da0cb'
 \noindent \textbf{Data and model.}
 We use a publicly available dataset that contains genotypes from $\nindiv=155$ individuals of an
 endangered bird species, the Taita thrush
-\citet{galbusera:2000:thrush}. Individuals were collected from four
+\citep{galbusera:2000:thrush}. Individuals were collected from four
 regions in southeast Kenya (Chawia, Mbololo, Ngangao, Yale), and each individual
 was genotyped at $\nloci=7$ micro-satellite loci. The four regions were once part of
 a cohesive cloud forest that has since been fragmented by human development. For
@@ -52,11 +52,9 @@ observation $\x_{\n\l\i}$ to a latent population. Notice that for a given
 individual $\n$, different loci (or even different chromosomes at a given locus)
 may have different population assignments. The distribution of
 $\x_{\n\l\i}\in\{1, \ldots, J_\l\}$ arising from population $\k$ is
-%
-\begin{align*}
+$
 \p(\x_{\n\l\i} \vert \latentpop_{\k}) =
-\categoricaldist{\x_{\n\l\i}\vert \latentpop_{\k\l}}.
-\end{align*}
+\categoricaldist{\x_{\n\l\i}\vert \latentpop_{\k\l}}$.
 
 Unlike the previous models, we now have a stick-breaking process for each
 individual. Draw sticks

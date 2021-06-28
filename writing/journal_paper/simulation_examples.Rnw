@@ -97,7 +97,7 @@ source('./R_scripts/simple_examples/function_ball.R',
 
 \newcommand{\FunctionDistFig}{
 <<func_dist_cap>>=
-fig_cap <- paste("Two densities which are distant according to KL divergence and ",
+fig_cap <- paste("Two densities that are distant according to KL divergence and ",
                  "$\\norminf{\\cdot}$ but close according to $\\norm{\\cdot}_p$ ",
                  "for $p \\in [1, \\infty)$.",
                  sep="")
@@ -114,11 +114,11 @@ source(file.path(r_script_dir, 'simple_examples/distant_distributions.R'),
 
 \newcommand{\LinfExamplesFig}{
 <<linf_examples_cap>>=
-fig_cap1 <- paste0("An multiplicative ball $\\ball_\\phi(\\delta)$.")
-fig_cap2 <- paste0("Two densities which are distant according to KL divergence and ",
+fig_cap1 <- paste0("A multiplicative ball $\\ball_\\phi(\\delta)$.")
+fig_cap2 <- paste0("Two densities that are distant according to KL divergence and ",
                    "$\\norminf{\\cdot}$ but close according to $\\norm{\\cdot}_p$ ",
                    "for $p \\in [1, \\infty)$.")
-fig_cap <- paste0("Left two figures: ", fig_cap1,  "  Right figure: ", fig_cap2)
+fig_cap <- paste0("Left two: ", fig_cap1,  "  Right: ", fig_cap2)
 #SetImageSize(aspect_ratio=0.6 * base_aspect_ratio, image_width=1.0)
 SetImageSize(aspect_ratio=0.4 * base_aspect_ratio, image_width=1.0)
 @

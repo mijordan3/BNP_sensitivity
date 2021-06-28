@@ -84,6 +84,10 @@ of \figref{iris_fsens} corresponds to a different $\phi$. Each $\phi$ is shown
 in gray in the leftmost plot of its row. The middle column of
 \figref{iris_fsens} shows the stick-breaking prior $\p(\nuk \vert \phi)$ induced
 by the corresponding $\phi$.
+The rightmost column of \figref{iris_fsens}
+shows the changes produced by the $\phi$ perturbation for that row.
+We see that our approximation captures the qualitative behavior of the exact
+changes.
 
 <<iris_fsens_cap>>=
 iris_fsens_cap <- paste(
@@ -105,19 +109,14 @@ SetImageSize(aspect_ratio = 1.1 * base_aspect_ratio)
 source("R_scripts/iris/iris_func_sens.R", echo=knitr_debug, print.eval=TRUE)
 @
 
-The rightmost column of \figref{iris_fsens}
-shows the changes produced by the $\phi$ perturbation for that row.
-We see that our approximation captures the qualitative behavior of the exact
-changes.
-
 We also see in this example that we can use the influence function to predict
 the effect of functional changes to the stick-breaking prior. In the leftmost
-column, we plot  in purple the influence function in the logit space.
+column, we plot  in purple the influence function in the logit space
 \footnote{\coryref{etafun_deriv_form_stick} expresses the influence function in
 the stick domain $[0,1]$, but, for visualization, it is easier to express the
 influence function in the logit stick domain $\mathbb{R}$.  The general result
 \coryref{etafun_deriv_form} in \appref{diffable_nonparametric} accomodates such
-transformations.}
+transformations.}.
 %
 According to \coryref{etafun_deriv_form}, the sign and magnitude of the effect
 of a perturbation should be determined by its integral against the influence
@@ -148,7 +147,7 @@ along with its effect on the prior and $\gclustersabbr$.
 As expected, this worst-case perturbation
 has a much larger effect on $\gclustersabbr$
 compared to the other unit-norm perturbations in \figref{iris_fsens}.
-However, even with the worst-case perturbation---which results in an unreasonably shaped prior density---the change in $\gclustersabbr$
+However, even with the worst-case perturbation -- which results in an unreasonably shaped prior density -- the change in $\gclustersabbr$
 is still small. We conclude that $\gclustersabbr$ appears
 to be a robust quantity for this model and dataset.
 

@@ -12,15 +12,15 @@ The relative computational costs of the approximation and re-fitting for our
 three experiments are shown in \tabref{timing_table}. The data sets we
 considered in our experiments had varying degrees of complexity, and the
 computational of cost of fitting the variational approximation thus also varies
-accordingly. However, the cost of forming the linear approximation---the step
-that requires computing and inverting the Hessian matrix--- was consistently
+accordingly. However, the cost of forming the linear approximation -- the step
+that requires computing and inverting the Hessian matrix -- was consistently
 roughly an order of magnitude faster than refitting.
 
 Recall from \secref{computing_sensitivity} that the solution of a linear system
 involving $\hessopt^{-1}$ is the computationally intensive part of the linear
 approximation, and that the linear system needs to be solved only once for a
 given perturbation, as described in \secref{computing_sensitivity}.  Consistent with
-this obervation, in all the examples, after the linear approximation is formed,
+this observation, in all the examples, after the linear approximation is formed,
 extrapolating to {\em any} new prior parameter $\alpha \ne \alpha_0$ or $\t \ne
 0$ takes only fractions of a second.
 %
