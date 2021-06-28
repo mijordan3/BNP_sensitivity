@@ -1,0 +1,33 @@
+The concept of local sensitivity in Bayesian nonparametric models is not novel
+(see, for example, \cite{basu:1996:local}).
+Historically however, the derivatives required for local sensitivity
+required analytic derivations, which are tedious to produce
+or perhaps unavailable altogether.
+With the availability of modern automatic differentiation tools in combination
+with a variational approach to inference,
+such difficulties are rendered obsolete.
+All that is necessary for computing derivatives
+is the implementation in computer code the
+$\mathrm{KL}$ objective as a function of variational parameters
+and the hyperparameter. Tools such as \texttt{JAX}~\citep{jax2018github}
+handle the derivative evaluations with either a backward or forward pass
+through the computation graph.
+We showed that computing these derivatives and linearizing the variational parameters
+can be an order of magnitude faster than refitting the $\mathrm{KL}$ objective at
+a perturbed prior.
+
+Computing the influence function is equally as fast as forming
+the linear approximation.
+Evaluating sensitivity to all possible perturbations is impossible, but
+we demonstrated how the influence function can guide our search for
+functional perturbations that result in high sensitivity.
+The high-influence perturbations can then be explored more closely either by our linear approximation
+or by refitting.
+
+Finally, we emphasize that concern about prior sensitivity is not
+unique to Bayesian nonparametric models, and our local sensitivity framework
+also extends to VI applications for general Bayesian models.
+As our examples show, nonrobustness in posterior inferences
+may result in changes in scientific conclusions,
+and our method provides a fast, efficient way to detect nonrobustness in
+real applications.

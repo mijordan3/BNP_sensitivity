@@ -40,7 +40,7 @@ $\alpha_0$, the posterior expected number of clusters matches the three iris
 species; see also \figref{iris_fit} in \appref{app_iris} for an illustration.
 
 %%
-\noindent \textbf{Sensitivity to the concentration parameter} We approximate the
+\noindent \textbf{Sensitivity to the concentration parameter.} We approximate the
 changes in the quantities of interest as $\alpha$ varies over $\alpha\in[0.1,
 4.0]$, which corresponds to an a priori expected number of clusters among $N$
 data points in $[1.5,15]$ (\appref{app_beta_prior}). Over this range, the shape
